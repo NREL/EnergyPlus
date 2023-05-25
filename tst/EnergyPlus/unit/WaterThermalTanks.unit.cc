@@ -794,9 +794,9 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     // ValidateFuelType tests for WaterHeater:Stratified
     WaterThermalTanks::getWaterHeaterStratifiedInput(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eResource::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -1524,9 +1524,9 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 
     // ValidateFuelType tests for WaterHeater:Mixed
     WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-    EXPECT_TRUE(compare_enums(Tank.FuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
-    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, WaterThermalTanks::Fuel::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.FuelType, Constant::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OffCycParaFuelType, Constant::eResource::Electricity));
+    EXPECT_TRUE(compare_enums(Tank.OnCycParaFuelType, Constant::eResource::Electricity));
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -2551,6 +2551,8 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    res gshp clg unitary system Fan - Cooling Coil Node,  !- Air Inlet Node Name",
         "    Node 45,                 !- Air Outlet Node Name",
         "    0.951796450842996,       !- Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000567811767595478,    !- Rated Water Flow Rate {m3/s}",
         "    14067.4113682534,        !- Gross Rated Total Cooling Capacity {W}",
         "    10297.3451215615,        !- Gross Rated Sensible Cooling Capacity {W}",
@@ -4208,9 +4210,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, WaterThermalTanks::Fuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, WaterThermalTanks::Fuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, WaterThermalTanks::Fuel::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, Constant::eResource::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, Constant::eResource::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, Constant::eResource::Steam));
     }
 
     ++HPWaterHeaterNum;

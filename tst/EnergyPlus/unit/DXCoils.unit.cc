@@ -451,8 +451,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = Constant::ResourceType::Electricity;
+    Coil.FuelType = Constant::eResource::Electricity;
     Coil.RegionNum = 4;
     Coil.MSRatedTotCap(1) = 2202.5268975202675;
     Coil.MSRatedCOP(1) = 4.200635910578916;
@@ -806,8 +805,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = "Electricity";
-    Coil.FuelTypeNum = Constant::ResourceType::Electricity;
+    Coil.FuelType = Constant::eResource::Electricity;
     Coil.RegionNum = 4;
 
     state->dataCurveManager->allocateCurveVector(5);
@@ -2275,15 +2273,13 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 1 test
     GetDXCoils(*state);
 
-    EXPECT_EQ("Electricity", state->dataDXCoils->DXCoil(1).FuelType); // it also covers a test for fuel type input
-    EXPECT_TRUE(compare_enums(Constant::ResourceType::Electricity, state->dataDXCoils->DXCoil(1).FuelTypeNum));
+    EXPECT_TRUE(compare_enums(Constant::eResource::Electricity, state->dataDXCoils->DXCoil(1).FuelType));
     EXPECT_EQ(0, state->dataDXCoils->DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
-    state->dataDXCoils->DXCoil(1).FuelType = "NaturalGas";
-    state->dataDXCoils->DXCoil(1).FuelTypeNum = Constant::ResourceType::Natural_Gas;
+    state->dataDXCoils->DXCoil(1).FuelType = Constant::eResource::NaturalGas;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35;
@@ -3021,6 +3017,8 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
         "    0.8,                     !- High Speed Rated Sensible Heat Ratio",
         "    3.0,                     !- High Speed Gross Rated Cooling COP{ W / W }",
         "    autosize,                !- High Speed Rated Air Flow Rate{ m3 / s }",
+        "    773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    ,                        !- Unit Internal Static Air Pressure{ Pa }",
         "    Mixed Air Node 1,        !- Air Inlet Node Name",
         "    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
@@ -3033,6 +3031,8 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
         "    0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio",
         "    4.2,                     !- Low Speed Gross Rated Cooling COP{ W / W }",
         "    autosize,                !- Low Speed Rated Air Flow Rate{ m3 / s }",
+        "    773.3,                   !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    WindACCoolCapFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "    WindACEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "    ;  !- Condenser Air Inlet Node Name",
@@ -3130,6 +3130,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
         "  0.8,                     !- High Speed Rated Sensible Heat Ratio",
         "  3.0,                     !- High Speed Gross Rated Cooling COP{ W / W }",
         "  autosize,                !- High Speed Rated Air Flow Rate{ m3 / s }",
+        "  773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "  934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "  ,                        !- Unit Internal Static Air Pressure{ Pa }",
         "  Mixed Air Node 1,        !- Air Inlet Node Name",
         "  Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name",
@@ -3142,6 +3144,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
         "  0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio",
         "  4.2,                     !- Low Speed Gross Rated Cooling COP{ W / W }",
         "  autosize,                !- Low Speed Rated Air Flow Rate{ m3 / s }",
+        "  773.3,                   !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "  934.4,                   !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "  WindACCoolCapFT,         !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "  WindACEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "  Main Cooling Coil 1 Condenser Node,  !- Condenser Air Inlet Node Name",
@@ -5381,6 +5385,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
         "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
         "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
         "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    ,",
+        "    ,",
         "    400,                     !- Unit Internal Static Air Pressure {Pa}",
         "    Node 9,                  !- Air Inlet Node Name",
         "    Node 10,                 !- Air Outlet Node Name",
@@ -5393,6 +5399,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
         "    0.70,                    !- Low Speed Gross Rated Sensible Heat Ratio",
         "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
         "    0.30,                    !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    ,",
+        "    ,",
         "    LSCoolCAPFT,             !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "    LSCoolEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
@@ -5511,6 +5519,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
         "    0.75,                    !- High Speed Rated Sensible Heat Ratio",
         "    3,                       !- High Speed Gross Rated Cooling COP {W/W}",
         "    1.0,                     !- High Speed Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    400,                     !- Unit Internal Static Air Pressure {Pa}",
         "    Node 9,                  !- Air Inlet Node Name",
         "    Node 10,                 !- Air Outlet Node Name",
@@ -5523,6 +5533,8 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
         "    0.70,                    !- Low Speed Gross Rated Sensible Heat Ratio",
         "    3,                       !- Low Speed Gross Rated Cooling COP {W/W}",
         "    0.30,                    !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
+        "    934.4,                   !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    CapFT2_Lookup_Table,             !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "    LSCoolEIRFT,             !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
