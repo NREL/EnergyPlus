@@ -462,12 +462,14 @@ namespace VariableSpeedCoils {
             }
 
             for (I = 1; I <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(12 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(13 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(14 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(15 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) = NumArray(16 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeatFrac(I) = NumArray(17 + (I - 1) * 6);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(12 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(13 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(14 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(15 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(I) = NumArray(16 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(I) = NumArray(17 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) = NumArray(18 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSWasteHeatFrac(I) = NumArray(19 + (I - 1) * 8);
 
                 AlfaFieldIncre = 7 + (I - 1) * 7;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) =
@@ -1137,20 +1139,21 @@ namespace VariableSpeedCoils {
             }
 
             for (I = 1; I <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(13 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(14 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(15 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(16 + (I - 1) * 6);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondAirFlow(I) = NumArray(17 + (I - 1) * 6);
-
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) = NumArray(18 + (I - 1) * 6);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(13 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(14 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(15 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(16 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(I) = NumArray(17 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(I) = NumArray(18 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondAirFlow(I) = NumArray(19 + (I - 1) * 8);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) = NumArray(20 + (I - 1) * 8);
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) < 0.0 ||
                     state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondEffect(I) > 1.0) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...{} cannot be < 0.0 or > 1.0.", cNumericFields(18 + (I - 1) * 6)));
-                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(18 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...{} cannot be < 0.0 or > 1.0.", cNumericFields(20 + (I - 1) * 8)));
+                    ShowContinueError(state, format("...entered value=[{:.2T}].", NumArray(20 + (I - 1) * 8)));
                     ErrorsFound = true;
                 }
 
@@ -1984,7 +1987,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapHeat = NumArray(3);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
-            
+
             // Previously set by parent objects, but not user-definable
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = 0.;
@@ -2165,9 +2168,11 @@ namespace VariableSpeedCoils {
             }
 
             for (I = 1; I <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(12 + (I - 1) * 3);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(13 + (I - 1) * 3);
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(14 + (I - 1) * 3);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(12 + (I - 1) * 5);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(13 + (I - 1) * 5);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(14 + (I - 1) * 5);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(I) = NumArray(15 + (I - 1) * 5);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedEvaporatorFanPowerPerVolumeFlowRate2023(I) = NumArray(16 + (I - 1) * 5);
 
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) < 1.e-10) {
                     ShowSevereError(state,
@@ -5789,6 +5794,48 @@ namespace VariableSpeedCoils {
                 ShowContinueError(state, "Carefully review the Load Side Total, Sensible, and Latent heat transfer rates");
                 ShowContinueError(state, "... to ensure they meet the expected manufacturers performance specifications.");
             }
+        }
+
+        Array1D<DataHeatBalance::RefrigCondenserType> CondenserType;
+        StandardRatings::HPdefrostControl DefrostControl;
+        switch (varSpeedCoil.VSCoilType) {
+        case DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed:
+            CondenserType.push_back(varSpeedCoil.CondenserType);
+            switch (varSpeedCoil.DefrostControl) // defrost control; 1=timed, 2=on-demand
+            {
+            case 2:
+                DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+                break;
+            case 1:
+            default:
+                DefrostControl = StandardRatings::HPdefrostControl::Timed;
+                break;
+            }
+            StandardRatings::CalcDXCoilStandardRating(state,
+                                                      varSpeedCoil.Name,
+                                                      varSpeedCoil.VarSpeedCoilType,
+                                                      varSpeedCoil.VSCoilType,
+                                                      varSpeedCoil.NumOfSpeeds,
+                                                      varSpeedCoil.MSRatedTotCap,
+                                                      varSpeedCoil.MSRatedCOP,
+                                                      varSpeedCoil.MSCCapAirFFlow,
+                                                      varSpeedCoil.MSCCapFTemp,
+                                                      varSpeedCoil.MSEIRAirFFlow,
+                                                      varSpeedCoil.MSEIRFTemp,
+                                                      varSpeedCoil.PLFFPLR,
+                                                      varSpeedCoil.MSRatedAirVolFlowRate,
+                                                      varSpeedCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2017,
+                                                      varSpeedCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                      CondenserType,
+                                                      0, // varSpeedCoil.RegionNum, // ??
+                                                      varSpeedCoil.MinOATCompressor,
+                                                      varSpeedCoil.OATempCompressorOn,
+                                                      false, // varSpeedCoil.OATempCompressorOnOffBlank, // ??
+                                                      DefrostControl,
+                                                      ObjexxFCL::Optional_bool_const());
+            break;
+        default:
+            break;
         }
     }
 

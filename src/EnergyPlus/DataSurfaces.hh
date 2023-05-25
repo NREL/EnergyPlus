@@ -1267,7 +1267,7 @@ struct SurfacesData : BaseGlobalStruct
     int BuildingShadingCount = 0;    // Total number of Building External Shades
     int FixedShadingCount = 0;       // Total number of Fixed External Shades
     int AttachedShadingCount = 0;    // Total number of Shades attached to Zones
-    int ShadingSurfaceFirst = -1;    // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
+    int ShadingSurfaceFirst = 0;     // Start index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
     int ShadingSurfaceLast = -1;     // End index of shading surfaces (Building External Shades, Fixed External Shades and Shades attached to Zone)
     bool AspectTransform = false;    // Set to true when GeometryTransform object is used
     bool CalcSolRefl = false;        // Set to true when Solar Reflection Calculations object is used
@@ -1673,7 +1673,7 @@ struct SurfacesData : BaseGlobalStruct
         this->BuildingShadingCount = 0;
         this->FixedShadingCount = 0;
         this->AttachedShadingCount = 0;
-        this->ShadingSurfaceFirst = -1;
+        this->ShadingSurfaceFirst = 0;
         this->ShadingSurfaceLast = -1;
         this->AspectTransform = false;
         this->CalcSolRefl = false;

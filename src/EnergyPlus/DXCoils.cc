@@ -2415,8 +2415,12 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.RatedSHR(1) = Numbers(2);
         thisDXCoil.RatedCOP(1) = Numbers(3);
         thisDXCoil.RatedAirVolFlowRate(1) = Numbers(4);
-        if (!lNumericBlanks(5)) {
-            thisDXCoil.InternalStaticPressureDrop = Numbers(5);
+
+        thisDXCoil.FanPowerPerEvapAirFlowRate(1) = Numbers(5);
+        thisDXCoil.FanPowerPerEvapAirFlowRate_2023(1) = Numbers(6);
+
+        if (!lNumericBlanks(7)) {
+            thisDXCoil.InternalStaticPressureDrop = Numbers(7);
             thisDXCoil.RateWithInternalStaticAndFanObject = true;
         } else {
             thisDXCoil.InternalStaticPressureDrop = -999.0;
@@ -2620,14 +2624,18 @@ void GetDXCoils(EnergyPlusData &state)
 
         thisDXCoil.RatedEIR(1) = 1.0 / thisDXCoil.RatedCOP(1);
 
-        thisDXCoil.RatedTotCap2 = Numbers(6);
-        thisDXCoil.RatedSHR2 = Numbers(7);
-        thisDXCoil.RatedCOP2 = Numbers(8);
-        thisDXCoil.RatedAirVolFlowRate2 = Numbers(9);
-        if (lNumericBlanks(10)) {
+        thisDXCoil.RatedTotCap2 = Numbers(8);
+        thisDXCoil.RatedSHR2 = Numbers(9);
+        thisDXCoil.RatedCOP2 = Numbers(10);
+        thisDXCoil.RatedAirVolFlowRate2 = Numbers(11);
+
+        thisDXCoil.FanPowerPerEvapAirFlowRate_LowSpeed(1) = Numbers(12);
+        thisDXCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed(1) = Numbers(13);
+
+        if (lNumericBlanks(14)) {
             thisDXCoil.MinOATCompressor = -25.0;
         } else {
-            thisDXCoil.MinOATCompressor = Numbers(10);
+            thisDXCoil.MinOATCompressor = Numbers(14);
         }
 
         thisDXCoil.CCapFTemp2 = GetCurveIndex(state, Alphas(10)); // convert curve name to number
@@ -2729,51 +2737,51 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        thisDXCoil.EvapCondEffect(1) = Numbers(11);
+        thisDXCoil.EvapCondEffect(1) = Numbers(15);
         if (thisDXCoil.EvapCondEffect(1) < 0.0 || thisDXCoil.EvapCondEffect(1) > 1.0) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...{} cannot be < 0.0 or > 1.0.", cNumericFields(11)));
-            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(11)));
-            ErrorsFound = true;
-        }
-
-        thisDXCoil.EvapCondAirFlow(1) = Numbers(12);
-        if (thisDXCoil.EvapCondAirFlow(1) < 0.0 && thisDXCoil.EvapCondAirFlow(1) != AutoSize) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(12)));
-            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(12)));
-            ErrorsFound = true;
-        }
-
-        thisDXCoil.EvapCondPumpElecNomPower(1) = Numbers(13);
-        if (thisDXCoil.EvapCondPumpElecNomPower(1) < 0.0 && thisDXCoil.EvapCondPumpElecNomPower(1) != AutoSize) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(13)));
-            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(13)));
-            ErrorsFound = true;
-        }
-
-        thisDXCoil.EvapCondEffect2 = Numbers(14);
-        if (thisDXCoil.EvapCondEffect2 < 0.0 || thisDXCoil.EvapCondEffect2 > 1.0) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...{} cannot be cannot be < 0.0 or > 1.0.", cNumericFields(14)));
-            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(14)));
-            ErrorsFound = true;
-        }
-
-        thisDXCoil.EvapCondAirFlow2 = Numbers(15);
-        if (thisDXCoil.EvapCondAirFlow2 < 0.0 && thisDXCoil.EvapCondAirFlow2 != AutoSize) {
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(15)));
+            ShowContinueError(state, format("...{} cannot be < 0.0 or > 1.0.", cNumericFields(15)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(15)));
             ErrorsFound = true;
         }
 
-        thisDXCoil.EvapCondPumpElecNomPower2 = Numbers(16);
-        if (thisDXCoil.EvapCondPumpElecNomPower2 < 0.0 && thisDXCoil.EvapCondPumpElecNomPower2 != AutoSize) {
+        thisDXCoil.EvapCondAirFlow(1) = Numbers(16);
+        if (thisDXCoil.EvapCondAirFlow(1) < 0.0 && thisDXCoil.EvapCondAirFlow(1) != AutoSize) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(16)));
             ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(16)));
+            ErrorsFound = true;
+        }
+
+        thisDXCoil.EvapCondPumpElecNomPower(1) = Numbers(17);
+        if (thisDXCoil.EvapCondPumpElecNomPower(1) < 0.0 && thisDXCoil.EvapCondPumpElecNomPower(1) != AutoSize) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
+            ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(17)));
+            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(17)));
+            ErrorsFound = true;
+        }
+
+        thisDXCoil.EvapCondEffect2 = Numbers(18);
+        if (thisDXCoil.EvapCondEffect2 < 0.0 || thisDXCoil.EvapCondEffect2 > 1.0) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
+            ShowContinueError(state, format("...{} cannot be cannot be < 0.0 or > 1.0.", cNumericFields(18)));
+            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(18)));
+            ErrorsFound = true;
+        }
+
+        thisDXCoil.EvapCondAirFlow2 = Numbers(19);
+        if (thisDXCoil.EvapCondAirFlow2 < 0.0 && thisDXCoil.EvapCondAirFlow2 != AutoSize) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
+            ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(19)));
+            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(19)));
+            ErrorsFound = true;
+        }
+
+        thisDXCoil.EvapCondPumpElecNomPower2 = Numbers(20);
+        if (thisDXCoil.EvapCondPumpElecNomPower2 < 0.0 && thisDXCoil.EvapCondPumpElecNomPower2 != AutoSize) {
+            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
+            ShowContinueError(state, format("...{} cannot be < 0.0.", cNumericFields(20)));
+            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(20)));
             ErrorsFound = true;
         }
 
@@ -2811,23 +2819,23 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // Basin heater power as a function of temperature must be greater than or equal to 0
-        thisDXCoil.BasinHeaterPowerFTempDiff = Numbers(17);
-        if (Numbers(17) < 0.0) {
+        thisDXCoil.BasinHeaterPowerFTempDiff = Numbers(21);
+        if (Numbers(21) < 0.0) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...{} must be >= 0.0.", cNumericFields(17)));
-            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(17)));
+            ShowContinueError(state, format("...{} must be >= 0.0.", cNumericFields(21)));
+            ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(21)));
             ErrorsFound = true;
         }
 
-        thisDXCoil.BasinHeaterSetPointTemp = Numbers(18);
+        thisDXCoil.BasinHeaterSetPointTemp = Numbers(22);
         if (thisDXCoil.BasinHeaterPowerFTempDiff > 0.0) {
-            if (NumNumbers < 18) {
+            if (NumNumbers < 22) {
                 thisDXCoil.BasinHeaterSetPointTemp = 2.0;
             }
             if (thisDXCoil.BasinHeaterSetPointTemp < 2.0) {
                 ShowWarningError(state, format("{}{}=\"{}\", freeze possible", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(18)));
-                ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(18)));
+                ShowContinueError(state, format("...{} is < 2 {{C}}. Freezing could occur.", cNumericFields(22)));
+                ShowContinueError(state, format("...entered value=[{:.2T}].", Numbers(22)));
             }
         }
 
@@ -8554,7 +8562,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
     }
 
     // Call routine that computes AHRI certified rating for single-speed DX Coils
-    if ((thisDXCoil.DXCoilType_Num == CoilDX_CoolingSingleSpeed && thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) ||
+    if ((thisDXCoil.DXCoilType_Num == CoilDX_CoolingSingleSpeed && (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
+                                                                    thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) ||
         thisDXCoil.DXCoilType_Num == CoilDX_HeatingEmpirical) {
         CalcDXCoilStandardRating(state,
                                  thisDXCoil.Name,
@@ -8571,6 +8580,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                  thisDXCoil.RatedAirVolFlowRate(1),
                                  thisDXCoil.FanPowerPerEvapAirFlowRate(1),
                                  thisDXCoil.FanPowerPerEvapAirFlowRate_2023(1),
+                                 thisDXCoil.CondenserType,
                                  thisDXCoil.RegionNum,
                                  thisDXCoil.MinOATCompressor,
                                  thisDXCoil.OATempCompressorOn,
@@ -8595,12 +8605,37 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                                  thisDXCoil.MSRatedAirVolFlowRate,
                                  thisDXCoil.MSFanPowerPerEvapAirFlowRate,
                                  thisDXCoil.MSFanPowerPerEvapAirFlowRate_2023,
+                                 thisDXCoil.CondenserType,
                                  thisDXCoil.RegionNum,
                                  thisDXCoil.MinOATCompressor,
                                  thisDXCoil.OATempCompressorOn,
                                  thisDXCoil.OATempCompressorOnOffBlank,
                                  thisDXCoil.DefrostControl,
                                  ObjexxFCL::Optional_bool_const());
+    }
+
+    if (thisDXCoil.DXCoilType_Num == CoilDX_CoolingTwoSpeed && (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air ||
+                                                                thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Evap)) {
+        StandardRatings::CalcTwoSpeedDXCoilRating(state,
+                                                  thisDXCoil.Name,
+                                                  thisDXCoil.DXCoilType,
+                                                  thisDXCoil.DXCoilType_Num,
+                                                  thisDXCoil.RatedTotCap,
+                                                  thisDXCoil.RatedTotCap2,
+                                                  thisDXCoil.RatedCOP,
+                                                  thisDXCoil.RatedCOP2,
+                                                  thisDXCoil.CCapFFlow, // High Speed
+                                                  thisDXCoil.CCapFTemp,
+                                                  thisDXCoil.CCapFTemp2,
+                                                  thisDXCoil.EIRFFlow, // High Speed
+                                                  thisDXCoil.EIRFTemp,
+                                                  thisDXCoil.EIRFTemp2,
+                                                  thisDXCoil.RatedAirVolFlowRate,
+                                                  thisDXCoil.RatedAirVolFlowRate2,
+                                                  thisDXCoil.FanPowerPerEvapAirFlowRate_2023,
+                                                  thisDXCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed,
+                                                  thisDXCoil.CondenserType,
+                                                  thisDXCoil.PLFFPLR(1));
     }
 
     // create predefined report entries
@@ -14757,7 +14792,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     state.dataHVACGlobal->TurnFansOff = saveTurnFansOff;
 
     IEER = (0.02 * EER_TestPoint_IP(1)) + (0.617 * EER_TestPoint_IP(2)) + (0.238 * EER_TestPoint_IP(3)) + (0.125 * EER_TestPoint_IP(4));
-
+    // CalcMultiSpeedDXCoilCooling() //??
     // begin output
     if (state.dataDXCoils->CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite) {
         print(state.files.eio, Header);
@@ -14859,7 +14894,16 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, thisDXCoil.Name, IEER, 2);
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, thisDXCoil.Name, "N/A");
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, thisDXCoil.Name, "N/A");
-    addFootNoteSubTable(state, state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
+    addFootNoteSubTable(state,
+                        state.dataOutRptPredefined->pdstDXCoolCoil,
+                        "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                        "1 - EnergyPlus object type. <br/>"
+                        "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2017. <br/>"
+                        "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2007. <br/>"
+                        "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                        "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                        "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                        "from the appropriate AHRI standard.");
 
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchVAVDXCoolCoilType, thisDXCoil.Name, "Coil:Cooling:DX:TwoSpeed");
     if (thisDXCoil.RateWithInternalStaticAndFanObject) {

@@ -36347,6 +36347,8 @@
     AirLoop G SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop G SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36371,6 +36373,8 @@
     AirLoop G NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop G NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36395,6 +36399,8 @@
     AirLoop Office Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop Office,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36419,6 +36425,8 @@
     AirLoop G NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop G NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36443,6 +36451,8 @@
     AirLoop G N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop G N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36467,6 +36477,8 @@
     AirLoop G N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop G N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36491,6 +36503,8 @@
     AirLoop G S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop G S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36515,6 +36529,8 @@
     AirLoop G S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop G S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36539,6 +36555,8 @@
     AirLoop F2 SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36563,6 +36581,8 @@
     AirLoop F2 NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36587,6 +36607,8 @@
     AirLoop F2 SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36611,6 +36633,8 @@
     AirLoop F2 NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36635,6 +36659,8 @@
     AirLoop F2 N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36659,6 +36685,8 @@
     AirLoop F2 N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36683,6 +36711,8 @@
     AirLoop F2 S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36707,6 +36737,8 @@
     AirLoop F2 S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F2 S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36731,6 +36763,8 @@
     AirLoop F3 SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36755,6 +36789,8 @@
     AirLoop F3 NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36779,6 +36815,8 @@
     AirLoop F3 SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36803,6 +36841,8 @@
     AirLoop F3 NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36827,6 +36867,8 @@
     AirLoop F3 N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36851,6 +36893,8 @@
     AirLoop F3 N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36875,6 +36919,8 @@
     AirLoop F3 S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36899,6 +36945,8 @@
     AirLoop F3 S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F3 S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36923,6 +36971,8 @@
     AirLoop F4 SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36947,6 +36997,8 @@
     AirLoop F4 NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36971,6 +37023,8 @@
     AirLoop F4 SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -36995,6 +37049,8 @@
     AirLoop F4 NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37019,6 +37075,8 @@
     AirLoop F4 N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37043,6 +37101,8 @@
     AirLoop F4 N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37067,6 +37127,8 @@
     AirLoop F4 S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37091,6 +37153,8 @@
     AirLoop F4 S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F4 S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37115,6 +37179,8 @@
     AirLoop M SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37139,6 +37205,8 @@
     AirLoop M NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37163,6 +37231,8 @@
     AirLoop M SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37187,6 +37257,8 @@
     AirLoop M NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37211,6 +37283,8 @@
     AirLoop M N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37235,6 +37309,8 @@
     AirLoop M N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37259,6 +37335,8 @@
     AirLoop M S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37283,6 +37361,8 @@
     AirLoop M S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop M S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37307,6 +37387,8 @@
     AirLoop F6 SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37331,6 +37413,8 @@
     AirLoop F6 NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37355,6 +37439,8 @@
     AirLoop F6 SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37379,6 +37465,8 @@
     AirLoop F6 NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37403,6 +37491,8 @@
     AirLoop F6 N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37427,6 +37517,8 @@
     AirLoop F6 N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37451,6 +37543,8 @@
     AirLoop F6 S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37475,6 +37569,8 @@
     AirLoop F6 S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F6 S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37499,6 +37595,8 @@
     AirLoop F7 SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37523,6 +37621,8 @@
     AirLoop F7 NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37547,6 +37647,8 @@
     AirLoop F7 SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37571,6 +37673,8 @@
     AirLoop F7 NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37595,6 +37699,8 @@
     AirLoop F7 N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37619,6 +37725,8 @@
     AirLoop F7 N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37643,6 +37751,8 @@
     AirLoop F7 S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37667,6 +37777,8 @@
     AirLoop F7 S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F7 S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37691,6 +37803,8 @@
     AirLoop F8 SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37715,6 +37829,8 @@
     AirLoop F8 NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37739,6 +37855,8 @@
     AirLoop F8 SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37763,6 +37881,8 @@
     AirLoop F8 NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37787,6 +37907,8 @@
     AirLoop F8 N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37811,6 +37933,8 @@
     AirLoop F8 N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37835,6 +37959,8 @@
     AirLoop F8 S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37859,6 +37985,8 @@
     AirLoop F8 S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F8 S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37883,6 +38011,8 @@
     AirLoop F9 SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37907,6 +38037,8 @@
     AirLoop F9 NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37931,6 +38063,8 @@
     AirLoop F9 SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37955,6 +38089,8 @@
     AirLoop F9 NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -37979,6 +38115,8 @@
     AirLoop F9 N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38003,6 +38141,8 @@
     AirLoop F9 N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38027,6 +38167,8 @@
     AirLoop F9 S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38051,6 +38193,8 @@
     AirLoop F9 S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop F9 S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38075,6 +38219,8 @@
     AirLoop T SW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T SW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38099,6 +38245,8 @@
     AirLoop T NW Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T NW,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38123,6 +38271,8 @@
     AirLoop T SE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T SE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38147,6 +38297,8 @@
     AirLoop T NE Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T NE,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38171,6 +38323,8 @@
     AirLoop T N1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T N1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38195,6 +38349,8 @@
     AirLoop T N2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T N2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38219,6 +38375,8 @@
     AirLoop T S1 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T S1,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -38243,6 +38401,8 @@
     AirLoop T S2 Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop T S2,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}

@@ -213,7 +213,6 @@ namespace HVACDuct {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataHVACDuct->Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataHVACDuct->Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
