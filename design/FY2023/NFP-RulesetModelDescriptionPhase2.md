@@ -3,12 +3,13 @@ Ruleset Model Description Phase 2 JSON Output
 
 **Jason Glazer, GARD Analytics**
 
- - May 18, 2023
+ - May 25, 2023
 
 ## Justification for New Feature ##
 
 This continues the work from 2022 to develop a script that creates a JSON file consistent with the ASHRAE Standard 229
-Ruleset Model Description schema  to show the feasibilty of the schema and uncover problems with implementation. 
+Ruleset Model Description schema to show the feasibilty of the schema, uncover problems with implementation, and provide
+an implementation for early adopters. 
 
 The title, purpose, and scope of ASHRAE Standard 229 are:
 
@@ -28,9 +29,9 @@ systems, controls, sites, and other aspects described by the ruleset. It establi
 - 2.1 building performance modeling software    
 - 2.2 software that evaluates building performance models and associated information to check the application of a ruleset
 
-ASHRAE Standard 229 has not been published or gone through public review yet and is being developed
+ASHRAE Standard 229 has not been published or even gone through public review and is under development
 by the ASHRAE SPC 229P committee. The intention of the standard is to provide code officials and rating
-authorities with files that they can use with a Ruleset Checking Tool (currently under development at 
+authorities with files that they can use with a Ruleset Checking Tool (currently an example is under development at 
 PNNL) to automatically check if a ruleset (such as 90.1 Appendix G, RESNET, California Title 24 performance 
 paths, or Canada National Energy Code for Buildings performance path) has been implemented correctly. 
 Since each EnergyPlus IDF file could generate a RMD file, the Ruleset Checking Tool will be able to see if the 
@@ -55,45 +56,47 @@ https://github.com/open229/ruleset-model-description-schema/blob/main/schema-sou
 
 ## E-mail and  Conference Call Conclusions ##
 
+None so far.
 
 ## Overview ##
 
-The initial version does not support the full schema and needs polishing up before being used in widespread workflows.  
+The initial version did not support the full schema and needs polishing up before being used in widespread workflows.  
 For this phase, the focus is on methods to merge compliance parameters, implementing additional output reports in EnergyPlus, 
 filling in gaps in existing data groups, and supporting more data groups.
 
 Targeted data groups from the 229 RMD Schema for this effort include the HVAC portion of the schema:
 
-- HeatingVentilatingAirConditioningSystem*
-- HeatingSystem*
-- CoolingSystem*
-- FanSystem*
+- HeatingVentilatingAirConditioningSystem
+- HeatingSystem
+- CoolingSystem
+- FanSystem
 - AirEconomizer
 - AirEnergyRecovery
-- Fan*
+- Fan
+- Terminal
+- FluidLoop
+- FluidLoopDesignAndControl
+- Pump
+- Boiler
+- Chiller
+- HeatRejection
+
+This effort will focus on trying to implement as many data groups as possible. It is unlikely that full support 
+for all data groups and data elements for these will be achieved in this phase so the focus will again be on 
+implementing the more direct data elements within each data group so that as many data elements can be implemented 
+as possible.
+
+In future efforts, related data groups will be supported:
 - FanOutputValidationPoint
-- Terminal*
-- FluidLoop*
-- FluidLoopDesignAndControl*
-- Pump*
-- Boiler*
-- BoilerOutputValidationPoint
-- Chiller*
+- BoilerOutputValidationPoint 
 - ChillerCapacityValidationPoint
 - ChillerPowerValidationPoint
-- HeatRejection*
-
-This effort will focus on trying to implement as many data groups as possible. It data groups with asterisks
-have the highest priority. It is unlikely that full support for all data groups and data elements for these 
-will be achieved in this phase so the focus will again be on implementing the more direct data elements within 
-each data group so that as many data elements can be implemented as possible.
-
 
 ## Approach ##
 
 The effort will continue the approach used in 2022 during the initial development of the createRMD but 
 will add more reporting to EnergyPlus to be consistent with the goal of being driven by EnergyPlus 
-outputs. The approach has two focuses:
+outputs and not needing to read the IDF or epJSON files. The approach has two focuses:
 
 - Enhance EnergyPlus Tabular Output Reports
 - Support New Data Groups in createRMD Python script
@@ -106,8 +109,9 @@ In addition some fixes of the createRMD Python script will be incorporated from 
 - Add docstrings (issue #7)
 - Fix grouping of HVAC related datagroups and use Construction:FfactorGroundFloor (issue #8)
 - Ground Surfaces cannot be identified (issue #12)
+- Add method to merge compliance parameters (issue #14)
 
-To understand how often data elements would be populated by either EnergyPlus input or 
+To understand how when data elements can be populated by either EnergyPlus input or 
 EnergyPlus output as the source of the RMD data elements, a special tagged version of the 
 schema file was created here:
 
@@ -126,15 +130,6 @@ Tags added are:
 - EP Notes
 
 Most of these were used previously during the 2022 effort.
-
-In the future, to support the data groups:
-- FanOutputValidationPoint
-- BoilerOutputValidationPoint 
-- ChillerCapacityValidationPoint
-- ChillerPowerValidationPoint
-
-Additional input objects may be required so that the values are consistent with what is requested by 
-the code official/rating authority.
 
 ### Enhance Existing EnergyPlus Tabular Output Reports ###
 
@@ -234,7 +229,7 @@ The new columns would be:
 #### Equipment Summary - Pumps ####
 
 The current colums are:
-Type
+- Type
 - Control
 - Head [pa]
 - Water Flow [m3/s]
@@ -256,7 +251,6 @@ The new columns would be:
 Consists of tables for air and plant loops
 
 For each Plant loop and AirLoopHVAC a table is created that has:
-
 - Component Type (normal components including Connector:Splitter and Connector:Mixer)
 - Component Name
 - Loop Name
@@ -267,12 +261,11 @@ For each Plant loop and AirLoopHVAC a table is created that has:
 - node name in
 - node name out
 
-Probably also need table to outdoor air.
+Probably also need table to describe the components on an outdoor air branch.
 
-Maybe include where controllers, setpoint managers, and other items that reference nodes.
+The table would also need to include where controllers, setpoint managers, and other items that reference nodes.
 
-REVIEW BND FILE FOR WHAT ELSE IS REPORTED.
-
+The BND file will also be reviewd for what can easily be added to the topology report with minimal effort.
 
 #### Coil Sizing Details - Coil Connections ####
 
@@ -311,13 +304,13 @@ the type, where they apply and sense and control parameters from input. Need:
 - Setpoint at Outdoor High Temperature
 - Outdoor High Temperature
    
-
-This is probably a series of tables, one for each type, the report the pertinant information including what they apply to.
+This is probably a series of tables, one for each input object, the report would include the pertinant information
+including the controls, related temperatures, and what they apply to but would generally be limited to what is already
+available within the data structure that would be useful to report.
 
 #### Equipment Summary - PlantLoop or CondenserLoop ####
 
 New report for PlantLoop objects. One row for each Plant or CondenserLoop
-
 - name
 - type (PlantLoop or CondenserLoop)
 - provides heating
@@ -345,6 +338,8 @@ New report for AirTerminals.
 - Minimum Flow
 - Minimum Flow Schedule Name
 - Maximum Flow During Reheat
+- Minimum Outdoor Flow
+- Minimum Outdoor Flow Schedule Name
 - Supply cooling setpoint
 - Supply heating setpoint
 - Temperature control
@@ -364,16 +359,19 @@ New report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:A
 - Exhaust airflow
 - Outdoor airflow
 
+We might want to add the other effectivenesses at different air flow rates to make report more comprehensive.
+
 ## Testing/Validation/Data Sources ##
 
 Since the output JSON file needs to comply with a JSON schema, it should be easy to confirm that it is valid. 
-The Python jsonschema library can be used to confirm that the RMD file is consistent with the schema.
+The Python jsonschema library can be used to confirm that the RMD file is consistent with the schema. Comparison
+of input and related outputs should provide the final check if the reporting is being done correctly.
 
 ## Input Output Reference Documentation ##
 
 No specific changes for input are expected.
 
-Additional tabular outputs will be considered on a case-by-case basis as described above.
+Additional tabular outputs will be described in the IOref.
 
 ## Outputs Description ##
 
@@ -391,43 +389,24 @@ None required.
 
 ## Design Document ##
 
-The following describes the design:
-
- - A new Python utility will be created separate from EnergyPlus that can
- eventually be packaged with the EnergyPlus installer. It will be developed in
- its own repository but eventually this may be merged or linked from the
- EnergyPlus repository.
-
- - The new Python utility will read the JSON files that EnergyPlus produces when
- the output:JSON input object is used as the primary source of information. As a
- secondary source of information, the epJSON input file will be read. It is
- possible that the EIO file will be read as part of this effort. 
-
- - The Ruleset Model Description (RMD) format will be produced by the utility and
- is also a JSON format.
-
- - Verification that the RMD output produced by the new utility is consistent
- with the RMD schema will be performed by using the jsonschema Python library
- "validate" method.
-
- - The PathLib library is expected to be used for accessing files.
-
- - The unittest library is expected to be used for providing unit testing. The
- goal is to have tests for almost all of the methods.
-
- - At this point no changes to EnergyPlus are expected as part of this but
- issues may be added for features that are not working or are needed. For
- example, #9419 was added due to the initialization summary not being produced
- in the output:JSON file. 
-
- - Only a subset of data groups from the RMD schema will be generated and only
- data elements that are most direct will be implemented. This is expected to be
- the first step in an ongoing effort to fully implement the RMD schema as an
- output format.
+Not yet developed
 
 ## References ##
 
-https://github.com/open229/ruleset-model-description-schema
+The original NFP is here:
 
+https://github.com/NREL/EnergyPlus/blob/develop/design/FY2022/NFP-InitialRulesetModelDescription.md
+
+The repo for the script development is here:
+
+https://github.com/JasonGlazer/createRulesetModelDescription
+
+Some lessons learned from the initial effort in 2022 is described here:
+
+https://github.com/JasonGlazer/createRulesetModelDescription/blob/main/docs/lessons_learned.rst
+
+The schema is described here:
+
+https://github.com/open229/ruleset-model-description-schema/blob/main/schema-source/ASHRAE229_extra.schema.yaml
 
 
