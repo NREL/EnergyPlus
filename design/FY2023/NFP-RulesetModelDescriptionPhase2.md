@@ -351,7 +351,18 @@ New report for AirTerminals.
 - Heating capacity
 - Cooling capacity
 
+#### Equipment Summary - Air Heat Recovery ####
 
+New report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:AirToAir:FlatPlate:
+- name
+- input object type
+- plate/rotary
+- Sensible Effectiveness at 100% Heating Air Flow
+- Sensible Effectiveness at 100% Cooling Air Flow
+- Latent Effectiveness at 100% Heating Air Flow
+- Latent Effectiveness at 100% Cooling Air Flow
+- Exhaust airflow
+- Outdoor airflow
 
 ## Testing/Validation/Data Sources ##
 
