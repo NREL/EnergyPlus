@@ -1803,71 +1803,71 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "Curve:Linear,",
         "heaterCapCurve,          !- Name",
         "10.0,                    !- Coefficient1 Constant",
-        "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-2.0,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve2,          !- Name",
         "15.0,                    !- Coefficient1 Constant",
-        "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-2.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve3,          !- Name",
         "22.0,                    !- Coefficient1 Constant",
-        "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-3.,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve4,          !- Name",
         "25.0,                    !- Coefficient1 Constant",
         "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve5,          !- Name",
         "26.0,                    !- Coefficient1 Constant",
         "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve6,          !- Name",
         "28.0,                    !- Coefficient1 Constant",
         "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve7,          !- Name",
         "29.0,                    !- Coefficient1 Constant",
         "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve8,          !- Name",
         "30.0,                    !- Coefficient1 Constant",
         "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve9,          !- Name",
         "31.0,                    !- Coefficient1 Constant",
         "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Linear,",
         "heaterCapCurve10,          !- Name",
         "32.0,                    !- Coefficient1 Constant",
         "2.,                      !- Coefficient2 x",
-        "10.0,                    !- Minimum Value of x",
+        "-10.0,                    !- Minimum Value of x",
         "70;                      !- Maximum Value of x",
 
         "Curve:Biquadratic,",
@@ -1928,6 +1928,124 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     EXPECT_EQ("HEATERCAPCURVE6", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(2).CrankcaseHeaterCapacityCurveIndex));
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(3).VSCoilType, CoilDX_HeatPumpWaterHeaterVariableSpeed);
     EXPECT_EQ("HEATERCAPCURVE10", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(3).CrankcaseHeaterCapacityCurveIndex));
+
+    state->dataEnvrn->OutDryBulbTemp = -5.0;
+    int const FanOpMode = ContFanCycCoil;
+    Real64 PLR = 0.0;
+    int DXCoilNum = 1;
+    CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
+    //    power = 10 - 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 20.0);
+    DXCoilNum = 3;
+    CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
+    //    power = 15 - 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 25.0);
+
+    Real64 SpeedRatio = 0.0;
+    Real64 CycRatio = 1.0;
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    int SingleMode = 0;
+    // Coil:Cooling:DX:MultiSpeed
+
+    int VarSpeedCoilNum = 1;
+    int CyclingScheme = 1;
+    Real64 RuntimeFrac = 0.0;
+    Real64 SensLoad = 100.0;
+    Real64 LatentLoad = 100.0;
+    Real64 OnOffAirFlowRatio = 0.5;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 1.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    // power = 26 + 2x
+    VariableSpeedCoils::CalcVarSpeedCoilCooling(*state,
+                                                VarSpeedCoilNum,
+                                                CyclingScheme,
+                                                RuntimeFrac,
+                                                SensLoad,
+                                                LatentLoad,
+                                                CompressorOp,
+                                                PLR,
+                                                OnOffAirFlowRatio,
+                                                SpeedRatio,
+                                                state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 16.0);
+
+    VarSpeedCoilNum = 2;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    // power = 28 + 2x
+    state->dataEnvrn->OutHumRat = 0.0114507065;
+    state->dataEnvrn->OutBaroPress = 98200.0;
+    VariableSpeedCoils::CalcVarSpeedCoilHeating(*state,
+                                                VarSpeedCoilNum,
+                                                CyclingScheme,
+                                                RuntimeFrac,
+                                                SensLoad,
+                                                CompressorOp,
+                                                PLR,
+                                                OnOffAirFlowRatio,
+                                                SpeedRatio,
+                                                state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds);
+    // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as a
+    // result
+    EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 18.0);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
+
+    VarSpeedCoilNum = 3;
+    // power = 32 + 2x
+    /*
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirInletNodeNum = 0;
+    PLR = 0.5;
+    // fixme: sort out the logic first, might be a bug? crankcase heater might always be off?
+    VariableSpeedCoils::CalcVarSpeedHPWH(
+        *state, DXCoilNum, RuntimeFrac, PLR, SpeedRatio, state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds,
+        CyclingScheme);
+    // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as a
+    // result
+    EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 22.0);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
+    */
+
+    DXCoilNum = 6;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap = 4000.0;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate = 2.0;
+    CalcMultiSpeedDXCoilCooling(
+        *state, DXCoilNum, SpeedRatio, CycRatio, state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds, FanOpMode, CompressorOp, SingleMode);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 37.0);
+
+    DXCoilNum = 7;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap = 4000.0;
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
+    state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate = 2.0;
+    CalcMultiSpeedDXCoilCooling(
+        *state, DXCoilNum, SpeedRatio, CycRatio, state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds, FanOpMode, CompressorOp, SingleMode);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 15.0);
+
+    // Coil:Cooling:DX:TwoStageWithHumidityControlMode
+    DXCoilNum = 2;
+    bool FirstHVACIteration = true;
+    Real64 AirFlowRatio = 1.0;
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 19.0);
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Pumped,
+    // for water heaters, the following temperature is used in heater capacity curve calculation
+    state->dataHVACGlobal->HPWHCrankcaseDBTemp = -6.0;
+    DXCoilNum = 4;
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    // heaterCapCurve9, power = 31 + 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 19.0);
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+    DXCoilNum = 5;
+    state->dataHVACGlobal->HPWHCrankcaseDBTemp = -7.0;
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    // heaterCapCurve8, power = 30 + 2x
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 16.0);
 }
 
 TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)
