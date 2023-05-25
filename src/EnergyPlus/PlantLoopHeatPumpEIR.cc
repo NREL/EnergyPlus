@@ -594,15 +594,16 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
     this->oneTimeInit(state);          // plant setup
     this->isPlantInletOrOutlet(state); // check location
 
-    if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-        if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
-            this->sizeLoadSide(state);
-            if (this->waterSource) {
-                this->sizeSrcSideWSHP(state);
-            } else if (this->airSource) {
-                this->sizeSrcSideASHP(state);
-            }
+    if (calledFromLocation.loopNum == this->loadSidePlantLoc.loopNum) {
+        this->sizeLoadSide(state);
+        if (this->waterSource) {
+            this->sizeSrcSideWSHP(state);
+        } else if (this->airSource) {
+            this->sizeSrcSideASHP(state);
         }
+    }
+
+    if (state.dataGlobal->BeginEnvrnFlag && this->envrnInit && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
 
         Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,

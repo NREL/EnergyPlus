@@ -648,6 +648,37 @@ namespace DataPlant {
             }
         }
 
+        // process primary loops for supply inlet node numbers
+
+        // examine supply inlet branch on primary chilled water loop to see if there is a tank, use outlet of tank if so
+
+        if (this->PlantOps.PrimaryChWLoopIndex > 0) {
+
+            this->PlantOps.PrimaryChWLoopSupInletNode =
+                state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
+            for (int numComps = 1; numComps <= state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex)
+                                                   .LoopSide(DataPlant::LoopSideLocation::Supply)
+                                                   .Branch(1)
+                                                   .TotalComponents;
+                 ++numComps) {
+                auto &this_Comp(state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex)
+                                    .LoopSide(DataPlant::LoopSideLocation::Supply)
+                                    .Branch(1)
+                                    .Comp(numComps));
+                if (this_Comp.Type == DataPlant::PlantEquipmentType::ChilledWaterTankMixed ||
+                    this_Comp.Type == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
+                    // assume tank is on chilled water return for use as a buffer tank, use the outlet of the tank instead of the inlet when
+                    // calculating the current load on the primary chilled water plant
+                    this->PlantOps.PrimaryChWLoopSupInletNode = this_Comp.NodeNumOut;
+                }
+            }
+        }
+
+        if (this->PlantOps.PrimaryHWLoopIndex > 0) {
+            this->PlantOps.PrimaryHWLoopSupInletNode =
+                state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
+        }
+
         // process dedicated heat recovery water to water heatpumps to control
         if (this->PlantOps.DedicatedHR_ChWRetControl_Input) {
             PlantLocation compLoc;
@@ -926,34 +957,36 @@ namespace DataPlant {
     {
 
         // Calculate load on primary chilled water loop and store in AirSourcePlantCoolingLoad
-        int ChWSupInletNode =
-            state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
-        Real64 CW_RetMdot = state.dataLoopNodes->Node(ChWSupInletNode).MassFlowRate;
+        //     int ChWSupInletNode = this->PlantOps.PrimaryChWLoopSupInletNode;
+
+        Real64 CW_RetMdot = state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).MassFlowRate;
         Real64 const CpCW = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidName,
-                                                                   state.dataLoopNodes->Node(ChWSupInletNode).Temp,
+                                                                   state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).Temp,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidIndex,
                                                                    "DetermineCurrentPlantLoads");
         Real64 CW_Qdot =
             min(0.0,
                 CW_RetMdot * CpCW *
-                    (this->Setpoint.PrimCW - state.dataLoopNodes->Node(ChWSupInletNode).Temp)); // power = Mdot Cp Delta T, cooling load is negative
+                    (this->Setpoint.PrimCW -
+                     state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).Temp)); // power = Mdot Cp Delta T, cooling load is negative
         this->Report.AirSourcePlantCoolingLoad = CW_Qdot;
 
         // Calculate load on primary hot water loop and store in AirSourcePlantHeatingLoad
-        int HWSupInletNode =
-            state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
-        Real64 HW_RetMdot = state.dataLoopNodes->Node(HWSupInletNode).MassFlowRate;
+        // int HWSupInletNode = this->PlantOps.PrimaryHWLoopSupInletNode;
+        //      state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
+        Real64 HW_RetMdot = state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).MassFlowRate;
         Real64 const CpHW = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidName,
-                                                                   state.dataLoopNodes->Node(HWSupInletNode).Temp,
+                                                                   state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).Temp,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidIndex,
                                                                    "DetermineCurrentPlantLoads");
 
-        Real64 HW_Qdot = max(0.0,
-                             HW_RetMdot * CpHW *
-                                 (this->DetermineHWSetpointOARest(state) -
-                                  state.dataLoopNodes->Node(HWSupInletNode).Temp)); // power = Mdot Cp Delta T, heating load is positive
+        Real64 HW_Qdot =
+            max(0.0,
+                HW_RetMdot * CpHW *
+                    (this->DetermineHWSetpointOARest(state) -
+                     state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).Temp)); // power = Mdot Cp Delta T, heating load is positive
         this->Report.AirSourcePlantHeatingLoad = HW_Qdot;
     }
 
@@ -1539,6 +1572,7 @@ namespace DataPlant {
         this->Report.BoilerAux_OpMode = 0;
         if (this->PlantOps.numBoilers <= 0) return;
 
+        // first intialize them to be off
         if (this->PlantOps.numBoilers > 0) {
             for (int BoilerNum = 1; BoilerNum <= this->PlantOps.numBoilers; ++BoilerNum) {
                 state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)

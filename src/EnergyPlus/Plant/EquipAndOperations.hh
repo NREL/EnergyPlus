@@ -163,7 +163,9 @@ struct PlantOpsData
     bool AirSourcePlantCoolingOnly = false;                   // operation mode, if true primary plant appears to only need cooling
     bool AirSourcePlantSimultaneousHeatingAndCooling = false; // operation mode, if true primary plant appears to need both heating and cooling
     int PrimaryHWLoopIndex = 0;
+    int PrimaryHWLoopSupInletNode = 0;  
     int PrimaryChWLoopIndex = 0;
+    int PrimaryChWLoopSupInletNode = 0; 
     int SecondaryHWLoopIndex = 0;
     int SecondaryChWLoopIndex = 0;
 };
