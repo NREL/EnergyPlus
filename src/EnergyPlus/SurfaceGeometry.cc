@@ -341,7 +341,7 @@ namespace SurfaceGeometry {
         state.dataSurface->BuildingShadingCount = 0;
         state.dataSurface->FixedShadingCount = 0;
         state.dataSurface->AttachedShadingCount = 0;
-        state.dataSurface->ShadingSurfaceFirst = -1;
+        state.dataSurface->ShadingSurfaceFirst = 0;
         state.dataSurface->ShadingSurfaceLast = -1;
 
         // Reserve space to avoid excess allocations
@@ -357,7 +357,7 @@ namespace SurfaceGeometry {
             if (thisSurface.Class == SurfaceClass::Shading || thisSurface.Class == SurfaceClass::Detached_F ||
                 thisSurface.Class == SurfaceClass::Detached_B) {
                 thisSurface.IsShadowing = true;
-                if (state.dataSurface->ShadingSurfaceFirst == -1) state.dataSurface->ShadingSurfaceFirst = SurfNum;
+                if (state.dataSurface->ShadingSurfaceFirst == 0) state.dataSurface->ShadingSurfaceFirst = SurfNum;
                 state.dataSurface->ShadingSurfaceLast = SurfNum;
             }
             if ((thisSurface.HeatTransSurf && thisSurface.ExtSolar) || thisSurface.IsShadowing) {
@@ -3466,12 +3466,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMinValue = SchedMinValue;
                     SchedMaxValue = GetScheduleMaxValue(state, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex);
                     if (SchedMinValue == 1.0) {
-                        ShowWarningError(state,
-                                         format("{}=\"{}\", {}=\"{}\", is always transparent.",
-                                                cCurrentModuleObject,
-                                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                                state.dataIPShortCut->cAlphaFieldNames(2),
-                                                state.dataIPShortCut->cAlphaArgs(2)));
+                        // Set transparent for now, check for EMS actuators later in SolarShading::resetShadingSurfaceTransparency
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).IsTransparent = true;
                     }
                     if (SchedMinValue < 0.0) {
@@ -6635,12 +6630,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMinValue = SchedMinValue;
                 SchedMaxValue = GetScheduleMaxValue(state, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex);
                 if (SchedMinValue == 1.0) {
-                    ShowWarningError(state,
-                                     format("{}=\"{}\", {}=\"{}\", is always transparent.",
-                                            cCurrentModuleObject,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                            state.dataIPShortCut->cAlphaFieldNames(2),
-                                            state.dataIPShortCut->cAlphaArgs(2)));
+                    // Set transparent for now, check for EMS actuators later in SolarShading::resetShadingSurfaceTransparency
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).IsTransparent = true;
                 }
                 if (SchedMinValue < 0.0) {
