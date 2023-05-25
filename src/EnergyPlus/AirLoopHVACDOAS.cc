@@ -823,7 +823,8 @@ namespace AirLoopHVACDOAS {
                 }
                 if (!OutletnodeFound) {
                     ShowSevereError(
-                        state, format("The outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
+                        state,
+                        format("The outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
                     ShowContinueError(state,
                                       format("The outlet node name is {}, and the inlet node name of AirLoopHVAC:Splitter is {}",
                                              state.dataLoopNodes->NodeID(thisDOAS.m_OutletNodeNum),
