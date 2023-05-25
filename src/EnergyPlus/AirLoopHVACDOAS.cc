@@ -697,6 +697,21 @@ namespace AirLoopHVACDOAS {
                         ShowSevereError(state, format("Outlet node number is not found in {} = {}", CurrentModuleObject, CompName));
                         errorsFound = true;
                     }
+                    // Check node connection to ensure that the outlet node of the previous component is the inlet node of the current component
+                    if (CompNum > 1) {
+                        if (thisOutsideAirSys.InletNodeNum(CompNum) != thisOutsideAirSys.OutletNodeNum(CompNum - 1)) {
+                            ShowSevereError(state,
+                                            format("Node Connection Error, Inlet node of {} as current component is not same as the outlet node of "
+                                                   "{} as previous component",
+                                                   thisOutsideAirSys.ComponentName(CompNum),
+                                                   thisOutsideAirSys.ComponentName(CompNum - 1)));
+                            ShowContinueError(state,
+                                              format("The inlet node name = {}, and the outlet node name = {}.",
+                                                     state.dataLoopNodes->NodeID(thisOutsideAirSys.InletNodeNum(CompNum)),
+                                                     state.dataLoopNodes->NodeID(thisOutsideAirSys.OutletNodeNum(CompNum - 1))));
+                            errorsFound = true;
+                        }
+                    }
                 }
 
                 thisDOAS.m_InletNodeNum = thisOutsideAirSys.InletNodeNum(1);
@@ -808,7 +823,7 @@ namespace AirLoopHVACDOAS {
                 }
                 if (!OutletnodeFound) {
                     ShowSevereError(
-                        state, format("Outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
+                        state, format("The outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
                     ShowContinueError(state,
                                       format("The outlet node name is {}, and the inlet node name of AirLoopHVAC:Splitter is {}",
                                              state.dataLoopNodes->NodeID(thisDOAS.m_OutletNodeNum),

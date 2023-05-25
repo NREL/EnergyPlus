@@ -10320,15 +10320,19 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompConnectionError)
     ASSERT_THROW(AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
+        "   ** Severe  ** Node Connection Error, Inlet node of DOAS_COOLC as current component is not same as the outlet node of DOAS OA HUMIDIFIER "
+        "as previous component",
+        "   **   ~~~   ** The inlet node name = OUTSIDE AIR INLET NODE 1, and the outlet node name = AIRLOOPDOASSPLITTERINLET.",
         "   ** Severe  ** Inlet node (OA SUPPLY FAN OUTLET NODE) is not one of OutdoorAir:Node in AirLoopHVAC:OutdoorAirSystem:EquipmentList = "
         "AIRLOOPHVAC DOAS",
-        "   ** Severe  ** Outlet node is not the inlet node of AirLoopHVAC:Splitter in AirLoopHVAC:OutdoorAirSystem:EquipmentList = AIRLOOPHVAC DOAS",
+        "   ** Severe  ** The outlet node is not the inlet node of AirLoopHVAC:Splitter in AirLoopHVAC:OutdoorAirSystem:EquipmentList = AIRLOOPHVAC "
+        "DOAS",
         "   **   ~~~   ** The outlet node name is OA SUPPLY FAN OUTLET NODE, and the inlet node name of AirLoopHVAC:Splitter is "
         "AIRLOOPDOASSPLITTERINLET",
         "   **  Fatal  ** getAirLoopHVACDOAS: Previous errors cause termination.",
         "   ...Summary of Errors that led to program termination:",
-        "   ..... Reference severe error count=2",
-        "   ..... Last severe error=Outlet node is not the inlet node of AirLoopHVAC:Splitter in AirLoopHVAC:OutdoorAirSystem:EquipmentList = "
+        "   ..... Reference severe error count=3",
+        "   ..... Last severe error=The outlet node is not the inlet node of AirLoopHVAC:Splitter in AirLoopHVAC:OutdoorAirSystem:EquipmentList = "
         "AIRLOOPHVAC DOAS",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
