@@ -220,8 +220,8 @@ class Runtime:
         cli_args = cli_arg_type(*args_with_program_name)
         return self.api.energyplus(state, len(args_with_program_name), cli_args)
 
-    # def stop_simulation(self, state: c_void_p) -> None:
-    #     pass
+    def stop_simulation(self, state: c_void_p) -> None:
+        self.api.stopSimulation(state)
 
     def set_console_output_status(self, state, print_output: bool) -> None:
         """
