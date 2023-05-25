@@ -4467,10 +4467,10 @@ void CLIPPOLY(EnergyPlusData &state,
 }
 
 void MULTOL(EnergyPlusData &state,
-            int const NNN,    // argument
-            int const LOC0,   // Location in the homogeneous coordinate array
-            int const NRFIGS, // Number of figures overlapped
-            bool const calledFromSHDGSS)
+            int const NNN,   // argument
+            int const LOC0,  // Location in the homogeneous coordinate array
+            int const NRFIGS // Number of figures overlapped
+)
 {
 
     // SUBROUTINE INFORMATION:
@@ -4499,7 +4499,7 @@ void MULTOL(EnergyPlusData &state,
         NS1 = LOC0 + I;
         NS3 = state.dataSolarShading->LOCHCA + 1;
 
-        DeterminePolygonOverlap(state, NS1, NS2, NS3, calledFromSHDGSS); // Find overlap of figure NS2 on figure NS1.
+        DeterminePolygonOverlap(state, NS1, NS2, NS3); // Find overlap of figure NS2 on figure NS1.
 
         // Process overlap cases:
 
@@ -4631,8 +4631,8 @@ void ORDER(EnergyPlusData &state,
 void DeterminePolygonOverlap(EnergyPlusData &state,
                              int const NS1, // Number of the figure being overlapped
                              int const NS2, // Number of the figure doing overlapping
-                             int const NS3, // Location to place results of overlap
-                             bool const calledFromMULTOLfromSHDGSS)
+                             int const NS3  // Location to place results of overlap
+)
 {
 
     // SUBROUTINE INFORMATION:
@@ -4759,20 +4759,18 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
         if (std::abs(state.dataSolarShading->HCAREA(NS3)) * HCMULT < std::abs(state.dataSolarShading->HCAREA(NS1))) {
             state.dataSolarShading->OverlapStatus = NoOverlap;
         } else {
-            if (state.dataSolarShading->HCAREA(NS1) * state.dataSolarShading->HCAREA(NS2) > 0.0)
+            if (state.dataSolarShading->HCAREA(NS1) * state.dataSolarShading->HCAREA(NS2) > 0.0) {
                 state.dataSolarShading->HCAREA(NS3) = -state.dataSolarShading->HCAREA(NS3); // Determine sign of area of overlap
+            }
             Real64 const HCT_1 = state.dataSolarShading->HCT(NS1);
             Real64 const HCT_2 = state.dataSolarShading->HCT(NS2);
-            Real64 HCT_3 = 1.0;
-            if (calledFromMULTOLfromSHDGSS) {
-                HCT_3 = HCT_1 + HCT_2 - (HCT_1 * HCT_2); // Determine transmission of overlap
-            } else {
-                HCT_3 = HCT_2 * HCT_1; // Determine transmission of overlap
-                if (HCT_2 >= 0.5 && HCT_1 >= 0.5) {
-                    if (HCT_2 != 1.0 && HCT_1 != 1.0) {
-                        HCT_3 = 1.0 - HCT_3;
-                    }
-                }
+            Real64 HCT_3 = HCT_1 * HCT_2;
+            if (HCT_2 != 1.0 && HCT_1 != 1.0) {
+                // Determine transmission of overlap which corrects for prior shadows
+                // The resulting transmission of overlapping shadows is HCT_1 * HCT_2
+                // Shadows with HCT_1 and HCT_2 have already been applied in the overlapping area
+                // so the correction is the difference between (HCT_1+HCT_2) and (HCT_1*HCT_2)
+                HCT_3 = (HCT_1 + HCT_2) - HCT_3;
             }
             state.dataSolarShading->HCT(NS3) = HCT_3;
         }
@@ -6129,8 +6127,7 @@ void SHDGSS(EnergyPlusData &state,
                     MULTOL(state,
                            state.dataSolarShading->LOCHCA,
                            state.dataSolarShading->FGSSHC - 1,
-                           state.dataSolarShading->NGSSHC - 1,
-                           true); // HOYT - Remove this call
+                           state.dataSolarShading->NGSSHC - 1); // HOYT - Remove this call
             } else {
                 goto ShadowingSurfaces_exit;
             }
