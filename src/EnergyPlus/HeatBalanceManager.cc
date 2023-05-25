@@ -868,7 +868,7 @@ namespace HeatBalanceManager {
 
         constexpr const char *Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
                                          "AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{}\n");
-        print(state.files.eio, Format_723, Convect::HcExtNamesUC[static_cast<int>(state.dataHeatBal->DefaultExtConvAlgo)]);
+        print(state.files.eio, Format_723, Convect::HcExtNames[static_cast<int>(state.dataHeatBal->DefaultExtConvAlgo)]);
 
         state.dataHeatBalMgr->CurrentModuleObject = "HeatBalanceAlgorithm";
         NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);

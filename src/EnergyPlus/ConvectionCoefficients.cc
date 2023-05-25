@@ -301,7 +301,8 @@ void InitIntConvCoeff(EnergyPlusData &state,
 
                 switch (intConvAlgo) {
                 case HcInt::Value:
-                case HcInt::Schedule: { 
+                case HcInt::Schedule:
+		case HcInt::UserCurve: { 
 		    state.dataHeatBalSurf->SurfHConvInt(SurfNum) = SetIntConvCoeff(state, SurfNum);
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
@@ -3322,14 +3323,23 @@ void SetupAdaptiveConvStaticMetaData(EnergyPlusData &state)
 
             static constexpr std::string_view Format_901(
                 "Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
+
+	    // This reporting rubric (using numbers instead of strings, using negative numbers for "built-in" coefficients) is stupid,
+	    // but we are maintaining compatiblity here
+	    int hcExtRptNum = state.dataSurface->SurfExtConvUserCoeffNum(SurfLoop);
+	    if (hcExtRptNum == 0) hcExtRptNum = -Convect::HcExtReportVals[static_cast<int>(state.dataSurface->SurfExtConvCoeff(SurfLoop))];
+
+	    int hcIntRptNum = state.dataSurface->SurfIntConvUserCoeffNum(SurfLoop);
+	    if (hcIntRptNum == 0) hcIntRptNum = -Convect::HcIntReportVals[static_cast<int>(state.dataSurface->SurfIntConvCoeff(SurfLoop))];
+
             print(state.files.eio,
                   Format_901,
                   Surface(SurfLoop).Name,
-                  state.dataSurface->SurfExtConvUserCoeffNum(SurfLoop),
+                  hcExtRptNum,
                   state.dataSurface->SurfExtConvFaceArea(SurfLoop),
                   state.dataSurface->SurfExtConvFacePerimeter(SurfLoop),
                   state.dataSurface->SurfExtConvFaceHeight(SurfLoop),
-                  state.dataSurface->SurfIntConvUserCoeffNum(SurfLoop),
+                  hcIntRptNum,
                   state.dataSurface->SurfIntConvZoneWallHeight(SurfLoop),
                   state.dataSurface->SurfIntConvZonePerimLength(SurfLoop),
                   state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfLoop),

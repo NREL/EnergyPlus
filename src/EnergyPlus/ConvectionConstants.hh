@@ -231,6 +231,45 @@ enum class HcExt {
     Num
 };
 	
+constexpr std::array<std::string_view, static_cast<int>(HcExt::Num)> HcExtNames = {
+    "Value",
+    "Schedule",
+    "SetByZone", 
+    "SimpleCombined",
+    "TARP",
+    "TARPOoutside",
+    "MoWiTT",
+    "DOE-2",
+    "BLAST",
+    "AdaptiveConvectionAlgorithm",
+    "None",
+    "UserValue",
+    "UserSchedule",
+    "UserCurve",
+    "SimpleCombined",
+    "ASHRAEVerticalWall",
+    "WaltonUnstableHorizontalOrTilt",
+    "WaltonStableHorizontalOrTilt",
+    "TARPWindward",
+    "TARPLeeward",
+    "MoWiTTWindward",
+    "MoWiTTLeeward",
+    "DOE2Windward",
+    "DOE2Leeward",
+    "NussletJurges",
+    "McAdams",
+    "Mitchell",
+    "ClearRoof",
+    "BlockenWindward",
+    "EmmelVertical",
+    "EmmelRoof",
+    "AlamdariHammondVerticalWall",
+    "FohannoPolidoriVerticalWall",
+    "ISO15099Windows",
+    "AlamdariHammondStableHorizontal",
+    "AlamdariHammondUnstableHorizontal"
+};
+
 constexpr std::array<std::string_view, static_cast<int>(HcExt::Num)> HcExtNamesUC = {
     "VALUE",
     "SCHEDULE",
