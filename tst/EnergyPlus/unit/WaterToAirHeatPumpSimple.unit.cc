@@ -1539,6 +1539,7 @@ TEST_F(EnergyPlusFixture, EquationFit_Initialization)
         "   TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
         "   SensCoolCapCurve,        !- Sensible Cooling Capacity Curve Name",
         "   CoolPowCurve,            !- Cooling Power Consumption Curve Name",
+        "   PLFFPLR,                 !- Part Load Fraction Correlation Curve Name",
         "   0,                       !- Nominal Time for Condensate Removal to Begin {s}",
         "   0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
 
@@ -1598,6 +1599,9 @@ TEST_F(EnergyPlusFixture, EquationFit_Initialization)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
+
+        "Curve:Quadratic, PLFFPLR, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
+
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1611,9 +1615,9 @@ TEST_F(EnergyPlusFixture, EquationFit_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 20);
-    EXPECT_EQ(NumAlphas, 8);
-    EXPECT_EQ(NumNumbers, 12);
+    EXPECT_EQ(TotalArgs, 24);
+    EXPECT_EQ(NumAlphas, 9);
+    EXPECT_EQ(NumNumbers, 15);
 
     GetCurveInput(*state);
     WaterToAirHeatPumpSimple::GetSimpleWatertoAirHPInput(*state);

@@ -3571,6 +3571,9 @@ Coil:Cooling:DX:VariableSpeed,
   autosize,                       !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }
   0.0,                            !- Nominal Time for Condensate to Begin Leaving the Coil{ s }
   0.0,                            !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }
+  ,                               !- Maximum Cycling Rate
+  ,                               !- Latent Capacity Time Constant
+  ,                               !- Fan Delay Time
   Quadratic,                      !- Energy Part Load Fraction Curve Name
   ,                               !- Condenser Air Inlet Node Name
   AirCooled,                      !- Condenser Type
@@ -6657,6 +6660,9 @@ Coil:Cooling:DX:VariableSpeed,
   1.6, !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }
   0.0, !- Nominal Time for Condensate to Begin Leaving the Coil{ s }
   0.0, !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }
+  , !- Maximum Cycling Rate
+  , !- Latent Capacity Time Constant
+  , !- Fan Delay Time
   PLFFPLR, !- Energy Part Load Fraction Curve Name
   , !- Condenser Air Inlet Node Name
   AirCooled, !- Condenser Type
@@ -7148,6 +7154,9 @@ Coil:Cooling:DX:VariableSpeed,
   1.6, !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }
   0.0, !- Nominal Time for Condensate to Begin Leaving the Coil{ s }
   0.0, !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }
+  , !- Maximum Cycling Rate
+  , !- Latent Capacity Time Constant
+  , !- Fan Delay Time
   PLFFPLR, !- Energy Part Load Fraction Curve Name
   , !- Condenser Air Inlet Node Name
   AirCooled, !- Condenser Type
@@ -11126,10 +11135,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         "  50, !- Maximum Supply Air Temperature{ C }",
         "  		21, !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }",
         "  		, !- Outdoor Dry - Bulb Temperature Sensor Node Name",
-        "  		, !- Maximum Cycling Rate",
-        "  		, !- Heat Pump Time Constant",
-        "  		, !- Fraction of On - Cycle Power Use",
-        "  		, !- Heat Pump Fan Delay Time",
         "  		, !- Ancillary On - Cycle Electric Power",
         "  		, !- Ancillary Off - Cycle Electric Power",
         "  		, !- Design Heat Recovery Water Flow Rate",
@@ -16665,6 +16670,9 @@ Coil:Cooling:DX:VariableSpeed,
   autosize,                       !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }
   0.0,                            !- Nominal Time for Condensate to Begin Leaving the Coil{ s }
   0.0,                            !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }
+  ,                               !- Maximum Cycling Rate
+  ,                               !- Latent Capacity Time Constant
+  ,                               !- Fan Delay Time
   Quadratic,                      !- Energy Part Load Fraction Curve Name
   ,                               !- Condenser Air Inlet Node Name
   AirCooled,                      !- Condenser Type

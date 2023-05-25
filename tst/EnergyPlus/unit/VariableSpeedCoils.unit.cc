@@ -75,6 +75,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    autosize,                !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
          "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
          "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+         "    ,                        !- Maximum Cycling Rate",
+         "    ,                        !- Latent Capacity Time Constant",
+         "    ,                        !- Fan Delay Time",
          "    PLF Curve Multi Compressor 30prcnt unloading,               !- Energy Part Load Fraction Curve Name",
          "    PSZ-AC_1:5 OA Node,           !- Condenser Air Inlet Node Name",
          "    AirCooled,               !- Condenser Type",
@@ -2727,6 +2730,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
         "    autosize,                !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    PSZ-AC_1:5 OA Node,      !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
@@ -2904,6 +2910,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         "    5.00,                    !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
@@ -3076,6 +3085,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Cooling)
         "    5.00,                    !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
@@ -3971,6 +3983,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_Initialization)
         "    0.4,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
@@ -4172,9 +4187,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 141);
+    EXPECT_EQ(TotalArgs, 144);
     EXPECT_EQ(NumAlphas, 49);
-    EXPECT_EQ(NumNumbers, 92);
+    EXPECT_EQ(NumNumbers, 95);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     auto _name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
@@ -4393,6 +4408,9 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    Autosize,                !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    4682.3964854,            !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
@@ -6723,9 +6741,9 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 164);
+    EXPECT_EQ(TotalArgs, 167);
     EXPECT_EQ(NumAlphas, 76);
-    EXPECT_EQ(NumNumbers, 88);
+    EXPECT_EQ(NumNumbers, 91);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     auto _name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
