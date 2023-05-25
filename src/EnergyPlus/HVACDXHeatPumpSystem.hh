@@ -180,22 +180,22 @@ struct HVACDXHeatPumpSystemData : BaseGlobalStruct
     Array1D_bool CheckEquipName;
     Array1D<HVACDXHeatPumpSystem::DXHeatPumpSystemStruct> DXHeatPumpSystem;
 
-    Real64 QZnReq = 0.001;              // Zone load (W), input to variable-speed DX coil
-    Real64 QLatReq = 0.0;               // Zone latent load, input to variable-speed DX coil
-    Real64 OnOffAirFlowRatio = 1.0;     // ratio of compressor on flow to average flow over time step
-    bool ErrorsFound = false;           // If errors detected in input
-    int TotalArgs = 0;                  // Total number of alpha and numeric arguments (max) for a certain object in the input file
+    Real64 QZnReq = 0.001;          // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReq = 0.0;           // Zone latent load, input to variable-speed DX coil
+    Real64 OnOffAirFlowRatio = 1.0; // ratio of compressor on flow to average flow over time step
+    bool ErrorsFound = false;       // If errors detected in input
+    int TotalArgs = 0;              // Total number of alpha and numeric arguments (max) for a certain object in the input file
     bool MySetPointCheckFlag = true;
-    int SpeedNum = 1;                       // speed number of variable speed DX cooling coil
-    Real64 QZnReqr = 0.001;                 // Zone load (W), input to variable-speed DX coil
-    Real64 QLatReqr = 0.0;                  // Zone latent load, input to variable-speed DX coil
-    Real64 OnandOffAirFlowRatio = 1.0;      // ratio of compressor on flow to average flow over time step
-    Real64 SpeedRatio = 0.0;                // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-    int SpeedNumber = 1;                    // speed number of variable speed DX cooling coil
-    Real64 QZoneReq = 0.001;                // Zone load (W), input to variable-speed DX coil
-    Real64 QLatentReq = 0.0;                // Zone latent load, input to variable-speed DX coil
-    Real64 AirFlowOnOffRatio = 1.0;         // ratio of compressor on flow to average flow over time step
-    Real64 SpeedPartLoadRatio = 1.0;        // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+    int SpeedNum = 1;                  // speed number of variable speed DX cooling coil
+    Real64 QZnReqr = 0.001;            // Zone load (W), input to variable-speed DX coil
+    Real64 QLatReqr = 0.0;             // Zone latent load, input to variable-speed DX coil
+    Real64 OnandOffAirFlowRatio = 1.0; // ratio of compressor on flow to average flow over time step
+    Real64 SpeedRatio = 0.0;           // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+    int SpeedNumber = 1;               // speed number of variable speed DX cooling coil
+    Real64 QZoneReq = 0.001;           // Zone load (W), input to variable-speed DX coil
+    Real64 QLatentReq = 0.0;           // Zone latent load, input to variable-speed DX coil
+    Real64 AirFlowOnOffRatio = 1.0;    // ratio of compressor on flow to average flow over time step
+    Real64 SpeedPartLoadRatio = 1.0;   // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
     void clear_state() override
     {

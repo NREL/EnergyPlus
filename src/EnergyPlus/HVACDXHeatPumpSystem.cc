@@ -580,16 +580,16 @@ namespace HVACDXHeatPumpSystem {
         bool SensibleLoad; // True if there is a sensible cooling load on this system
         int FanOpMode;     // Supply air fan operating mode
         // added variables to call variable speed DX coils
-        int SpeedNum;                 // speed number of variable speed DX cooling coil
-        Real64 QZnReq;                // Zone load (W), input to variable-speed DX coil
-        Real64 QLatReq;               // Zone latent load, input to variable-speed DX coil
-        Real64 OnOffAirFlowRatio;     // ratio of compressor on flow to average flow over time step
-        Real64 TempSpeedOut;          // output at one speed level
-        Real64 TempSpeedReqst;        // request capacity at one speed level
-        int NumOfSpeeds;              // maximum number of speed
-        int VSCoilIndex;              // variable-speed coil index
-        int I;                        // interation increment
-        Real64 SpeedRatio;            // speed ratio between two neighboring speeds
+        int SpeedNum;             // speed number of variable speed DX cooling coil
+        Real64 QZnReq;            // Zone load (W), input to variable-speed DX coil
+        Real64 QLatReq;           // Zone latent load, input to variable-speed DX coil
+        Real64 OnOffAirFlowRatio; // ratio of compressor on flow to average flow over time step
+        Real64 TempSpeedOut;      // output at one speed level
+        Real64 TempSpeedReqst;    // request capacity at one speed level
+        int NumOfSpeeds;          // maximum number of speed
+        int VSCoilIndex;          // variable-speed coil index
+        int I;                    // interation increment
+        Real64 SpeedRatio;        // speed ratio between two neighboring speeds
 
         auto &DXHeatPumpSystem = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXSystemNum);
 
