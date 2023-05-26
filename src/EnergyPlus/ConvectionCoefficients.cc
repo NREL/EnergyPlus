@@ -1121,7 +1121,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
 		case HcExt::MoWiTTHcOutside:
 		case HcExt::DOE2HcOutside:
 		case HcExt::AdaptiveConvectionAlgorithm: {
-                        // PotentialAssignedValue = -ExtValue;
+                    ApplyExtConvValue(state, surfNum, hcExt, 0);
 		} break;
 
 		case HcExt::Value: {
@@ -1145,7 +1145,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                         ShowContinueError(state, format("Since VALUE is used for \"{}\", {}={} is ignored.",
 							ipsc->cAlphaFieldNames(FieldNo + 2), ipsc->cAlphaFieldNames(Ptr + 2), Alphas(Ptr + 2)));
 		    }
-                    state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = state.dataSurface->TotExtConvCoeffUser;
+                    ApplyExtConvValue(state, surfNum, hcExt, state.dataSurface->TotExtConvCoeffUser);
 		} break;
 
                 case HcExt::Schedule: { // Schedule
@@ -1162,7 +1162,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     } else {
                         state.dataSurface->UserExtConvCoeffs(state.dataSurface->TotExtConvCoeffUser).ScheduleName = Alphas(Ptr + 2);
                     }
-                    state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = state.dataSurface->TotExtConvCoeffUser;
+                    ApplyExtConvValue(state, surfNum, hcExt, state.dataSurface->TotExtConvCoeffUser);
                 } break;
 			  
                 case HcExt::UserCurve: { // User curve
@@ -1178,7 +1178,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                                           format(" Invalid {} entered={}", ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3)));
                         ErrorsFound = true;
                     }
-                    state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = state.dataSurface->TotExtConvCoeffUser;
+                    ApplyExtConvValue(state, surfNum, hcExt, state.dataSurface->TotExtConvCoeffUser);
                 } break;
 
                 case HcExt::UserValue: // Unhandled cases < HcExt::UserCurve
@@ -1200,7 +1200,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
 		    userOutConvCoef.WhichSurface = surfNum;
 		    userOutConvCoef.overrideType = OverrideType::SpecifiedModel;
 		    userOutConvCoef.HcExtModelEq = hcExt;
-                    state.dataSurface->SurfExtConvUserCoeffNum(surfNum) = state.dataSurface->TotExtConvCoeffUser;
+                    ApplyExtConvValue(state, surfNum, hcExt, state.dataSurface->TotExtConvCoeffUser);
                 } break;
 		} // switch (ExtValue)			    
 

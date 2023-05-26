@@ -833,7 +833,7 @@ namespace HeatBalanceManager {
         }
         constexpr const char *Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
                                          "AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{}\n");
-        print(state.files.eio, Format_722, Convect::HcIntNamesUC[static_cast<int>(state.dataHeatBal->DefaultIntConvAlgo)]);
+        print(state.files.eio, Format_722, Convect::HcIntNames[static_cast<int>(state.dataHeatBal->DefaultIntConvAlgo)]);
 
         // Get only the first (if more were input)
         state.dataHeatBalMgr->CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";

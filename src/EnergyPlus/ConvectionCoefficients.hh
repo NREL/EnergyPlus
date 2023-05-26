@@ -312,7 +312,7 @@ namespace Convect {
     void GetUserConvCoeffs(EnergyPlusData &state);
 
     void ApplyIntConvValue(EnergyPlusData &state, int surfNum, HcInt model, int userNum);
-    void ApplyExtConvValue(EnergyPlusData &state, int surfNum, HcInt model, int userNum);
+    void ApplyExtConvValue(EnergyPlusData &state, int surfNum, HcExt model, int userNum);
     void ApplyIntConvValueMulti(EnergyPlusData &state, DataSurfaces::SurfaceFilter surfaceFilter, HcInt model, int userNum);
     void ApplyExtConvValueMulti(EnergyPlusData &state, DataSurfaces::SurfaceFilter surfaceFilter, HcExt model, int userNum);
 
