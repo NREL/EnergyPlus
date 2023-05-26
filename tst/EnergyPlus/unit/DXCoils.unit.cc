@@ -2021,7 +2021,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     // VariableSpeedCoils::CalcVarSpeedHPWH(
     //     *state, DXCoilNum, RuntimeFrac, PLR, SpeedRatio, state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds,
     //     CyclingScheme);
-    // // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as a
+    // // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as
+    // a
     // // result
     // EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 22.0);
     // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
