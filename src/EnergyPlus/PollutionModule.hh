@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -343,7 +344,7 @@ namespace PollutionModule {
     {
         // Members
         // FuelType Names
-        Array1D_string FuelTypeNames;
+        Array1D<Constant::eFuel> FuelTypeNames;
         // Fuel Types used with the Pollution Factors
         Real64 Elec;
         Real64 NatGas;
