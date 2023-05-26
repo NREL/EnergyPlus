@@ -287,6 +287,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     // evaluate the actual current operating load side heat transfer rate
     auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
+    auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
     Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
                                                            thisLoadPlantLoop.FluidName,
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
@@ -352,9 +353,9 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 CpSrc = 0.0;
     if (this->waterSource) {
         CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
-                                                       thisLoadPlantLoop.FluidName,
+                                                       thisSourcePlantLoop.FluidName,
                                                        state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                       thisLoadPlantLoop.FluidIndex,
+                                                       thisSourcePlantLoop.FluidIndex,
                                                        "PLHPEIR::simulate()");
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);

@@ -959,7 +959,7 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
 void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
                                          int const LoopNum,                                   // component's loop index
                                          const DataPlant::LoopSideLocation LoopSide,          // component's loop side number
-                                         [[maybe_unused]] DataPlant::PlantEquipmentType Type, // Component's type index
+                                         DataPlant::PlantEquipmentType Type, // Component's type index
                                          int const InletNodeNum,                              // Component's inlet node pointer
                                          int const OutletNodeNum,                             // Component's outlet node pointer
                                          Real64 const ModelCondenserHeatRate,                 // model's heat rejection rate at condenser (W)
@@ -996,18 +996,21 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
     int ConnectLoopNum;                        // local do loop counter
     Real64 Cp;
 
+    auto & inletNode = state.dataLoopNodes->Node(InletNodeNum);
+    auto & outletNode = state.dataLoopNodes->Node(OutletNodeNum);
+
     // check if any conditions have changed
-    if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
+    if (inletNode.MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
-    if (state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
+    if (outletNode.MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
 
-    if (state.dataLoopNodes->Node(InletNodeNum).Temp != ModelInletTemp) DidAnythingChange = true;
+    if (inletNode.Temp != ModelInletTemp) DidAnythingChange = true;
 
-    if (state.dataLoopNodes->Node(OutletNodeNum).Temp != ModelOutletTemp) DidAnythingChange = true;
+    if (outletNode.Temp != ModelOutletTemp) DidAnythingChange = true;
 
     // could also check heat rate against McDeltaT from node data
 
-    if ((state.dataLoopNodes->Node(InletNodeNum).MassFlowRate == 0.0) && (ModelCondenserHeatRate > 0.0)) {
+    if ((inletNode.MassFlowRate == 0.0) && (ModelCondenserHeatRate > 0.0)) {
 
         // TODO also send a request that condenser loop be made available, interlock message infrastructure??
 
@@ -1015,13 +1018,19 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
     }
 
     if (DidAnythingChange || FirstHVACIteration) {
+
         // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-        if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+        if (inletNode.MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
             // update node outlet conditions
             Cp = GetSpecificHeatGlycol(
                 state, state.dataPlnt->PlantLoop(LoopNum).FluidName, ModelInletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-            state.dataLoopNodes->Node(OutletNodeNum).Temp =
-                state.dataLoopNodes->Node(InletNodeNum).Temp + ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
+            // so this routine is being used for the plant loop heat pump object, which has a heating coil that should extract heat from the loop
+            // for now I think that's the only component type doing this, but we should verify
+            if (Type == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+                outletNode.Temp = inletNode.Temp - ModelCondenserHeatRate / (inletNode.MassFlowRate * Cp);
+            } else {
+                outletNode.Temp = inletNode.Temp + ModelCondenserHeatRate / (inletNode.MassFlowRate * Cp);
+            }
         }
 
         // set sim flag for this loop
