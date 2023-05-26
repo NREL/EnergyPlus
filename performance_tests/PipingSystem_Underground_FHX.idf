@@ -960,6 +960,7 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -977,7 +978,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Zone 2 Fan,              !- Name
@@ -1086,6 +1088,7 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
     0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
 
@@ -1103,7 +1106,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Zone 1 Fan,              !- Name
