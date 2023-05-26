@@ -4184,8 +4184,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 141);
-    EXPECT_EQ(NumAlphas, 49);
+    EXPECT_EQ(TotalArgs, 142);
+    EXPECT_EQ(NumAlphas, 50);
     EXPECT_EQ(NumNumbers, 92);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);

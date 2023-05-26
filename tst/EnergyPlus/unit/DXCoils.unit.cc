@@ -1371,6 +1371,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
         "    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}",
         "    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}",
         "    Biquadratic,             !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
@@ -1467,6 +1469,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",",
         ",",
         ",",
+        ",,,,,,,,,,,,,,,,,,"
         "heaterCapCurve5;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
 
         "  Coil:Heating:DX:VariableSpeed,",
@@ -1491,6 +1494,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 1 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
@@ -1498,6 +1503,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 2 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
@@ -1505,6 +1512,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 3 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
@@ -1512,6 +1521,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 4 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
@@ -1519,6 +1530,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 5 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 5 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 5 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
@@ -1526,6 +1539,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 6 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 6 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 6 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
@@ -1533,6 +1548,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 7 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 7 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 7 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
@@ -1540,6 +1557,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 8 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 8 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 8 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
@@ -1547,6 +1566,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 9 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 9 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 9 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
@@ -1554,6 +1575,8 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    ,                        !- 2017 Speed 10 Rated Supply Air Fan Power Per Volume Flow Rate",
+        "    ,                        !- 2023 Speed 10 Rated Supply Air Fan Power Per Volume Flow Rate",
         "    Biquadratic,             !- Speed 10 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
@@ -1988,22 +2011,20 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 18.0);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
 
-    VarSpeedCoilNum = 3;
-    // power = 32 + 2x
-    /*
-    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
-    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
-    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirInletNodeNum = 0;
-    PLR = 0.5;
-    // fixme: sort out the logic first, might be a bug? crankcase heater might always be off?
-    VariableSpeedCoils::CalcVarSpeedHPWH(
-        *state, DXCoilNum, RuntimeFrac, PLR, SpeedRatio, state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds,
-        CyclingScheme);
-    // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as a
-    // result
-    EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 22.0);
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
-    */
+    // VarSpeedCoilNum = 3;
+    // // power = 32 + 2x
+    // state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
+    // state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    // state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirInletNodeNum = 0;
+    // PLR = 0.5;
+    // // fixme: sort out the logic first, might be a bug? crankcase heater might always be off?
+    // VariableSpeedCoils::CalcVarSpeedHPWH(
+    //     *state, DXCoilNum, RuntimeFrac, PLR, SpeedRatio, state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds,
+    //     CyclingScheme);
+    // // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as a
+    // // result
+    // EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 22.0);
+    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
 
     DXCoilNum = 6;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
