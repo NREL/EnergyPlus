@@ -359,7 +359,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(6);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated = NumArray(7);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = NumArray(8);
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = NumArray(9);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = NumArray(9);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = NumArray(10);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HOTGASREHEATFLG = int(NumArray(11));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CondenserType = DataHeatBalance::RefrigCondenserType::Water;
@@ -920,7 +920,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated = NumArray(6);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = NumArray(7);
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = NumArray(8);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = NumArray(8);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = NumArray(9);
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum =
@@ -1454,7 +1454,7 @@ namespace VariableSpeedCoils {
 
             // Previously set by parent objects, but not user-definable
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = 0.;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = 0.;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = 0.;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum =
@@ -1988,7 +1988,7 @@ namespace VariableSpeedCoils {
 
             // Previously set by parent objects, but not user-definable
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour = 4;
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant = 0.;
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant = 0.;
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime = 0.;
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum =
@@ -8406,12 +8406,12 @@ namespace VariableSpeedCoils {
         // at the current operating conditions (sec)
         Real64 Gamma; // Initial moisture evaporation rate divided by steady-state AC latent capacity
         // at the current operating conditions
-        Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
-        Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
-        Real64 Twet_max;              // Maximum allowed value for Twet
-        Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant;        // Heat pump time constant [s]
-        Real64 FanDelayTime;          // Fan delay time, time delay for the HP's fan to
+        Real64 Twet_Rated;                 // Twet at rated conditions (coil air flow rate and air temperatures), sec
+        Real64 Gamma_Rated;                // Gamma at rated conditions (coil air flow rate and air temperatures)
+        Real64 Twet_max;                   // Maximum allowed value for Twet
+        Real64 MaxONOFFCyclesperHour;      // Maximum cycling rate of heat pump [cycles/hr]
+        Real64 LatentCapacityTimeConstant; // Latent capacity time constant [s]
+        Real64 FanDelayTime;               // Fan delay time, time delay for the HP's fan to
         // shut off after compressor cycle off  [s]
         Real64 Ton;     // Coil on time (sec)
         Real64 Toff;    // Coil off time (sec)
@@ -8425,14 +8425,14 @@ namespace VariableSpeedCoils {
         Twet_Rated = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated;
         Gamma_Rated = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated;
         MaxONOFFCyclesperHour = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxONOFFCyclesperHour;
-        HPTimeConstant = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).HPTimeConstant;
+        LatentCapacityTimeConstant = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).LatentCapacityTimeConstant;
         FanDelayTime = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).FanDelayTime;
 
         //  No moisture evaporation (latent degradation) occurs for runtime fraction of 1.0
         //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
         //  Latent degradation model parameters initialize to 0.0 meaning no evaporation model used.
         if ((RTF >= 1.0) || (QLatRated == 0.0) || (QLatActual == 0.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0) ||
-            (MaxONOFFCyclesperHour <= 0.0) || (HPTimeConstant <= 0.0) || (RTF <= 0.0)) {
+            (MaxONOFFCyclesperHour <= 0.0) || (LatentCapacityTimeConstant <= 0.0) || (RTF <= 0.0)) {
             SHReff = SHRss;
             return SHReff;
         }
@@ -8466,20 +8466,20 @@ namespace VariableSpeedCoils {
         //  Use sucessive substitution to solve for To
         aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
 
-        To1 = aa + HPTimeConstant;
+        To1 = aa + LatentCapacityTimeConstant;
         Error = 1.0;
         while (Error > 0.001) {
-            To2 = aa - HPTimeConstant * (std::exp(-To1 / HPTimeConstant) - 1.0);
+            To2 = aa - LatentCapacityTimeConstant * (std::exp(-To1 / LatentCapacityTimeConstant) - 1.0);
             Error = std::abs((To2 - To1) / To1);
             To1 = To2;
         }
 
         //  Adjust Sensible Heat Ratio (SHR) using Latent Heat Ratio (LHR) multiplier
-        //  Floating underflow errors occur when -Ton/HPTimeConstant is a large negative number.
+        //  Floating underflow errors occur when -Ton/LatentCapacityTimeConstant is a large negative number.
         //  Cap lower limit at -700 to avoid the underflow errors.
-        aa = std::exp(max(-700.0, -Ton / HPTimeConstant));
+        aa = std::exp(max(-700.0, -Ton / LatentCapacityTimeConstant));
         //  Calculate latent heat ratio multiplier
-        LHRmult = max(((Ton - To2) / (Ton + HPTimeConstant * (aa - 1.0))), 0.0);
+        LHRmult = max(((Ton - To2) / (Ton + LatentCapacityTimeConstant * (aa - 1.0))), 0.0);
 
         //  Calculate part-load or "effective" sensible heat ratio
         SHReff = 1.0 - (1.0 - SHRss) * LHRmult;

@@ -80,41 +80,41 @@ namespace WaterToAirHeatPump {
         DataPlant::PlantEquipmentType WAHPType; // type of component in plant
         std::string Refrigerant;                // Refrigerant name
         bool SimFlag;
-        Real64 InletAirMassFlowRate;    // Inlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
-        Real64 OutletAirMassFlowRate;   // Outlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
-        Real64 InletAirDBTemp;          // Inlet Air Dry Bulb Temperature [C]
-        Real64 InletAirHumRat;          // Inlet Air Humidity Ratio [kg/kg]
-        Real64 OutletAirDBTemp;         // Outlet Air Dry Bulb Temperature [C]
-        Real64 OutletAirHumRat;         // Outlet Air Humidity Ratio [kg/kg]
-        Real64 InletAirEnthalpy;        // Inlet Air Enthalpy [J/kg]
-        Real64 OutletAirEnthalpy;       // Outlet Air Enthalpy [J/kg]
-        Real64 InletWaterTemp;          // Inlet Water Temperature [C]
-        Real64 OutletWaterTemp;         // Outlet Water Temperature [C]
-        Real64 InletWaterMassFlowRate;  // Inlet Water Mass Flow Rate [kg/s]
-        Real64 OutletWaterMassFlowRate; // Outlet Water Mass Flow Rate [kg/s]
-        Real64 DesignWaterMassFlowRate; // Design Water Mass Flow Rate [kg/s]
-        Real64 DesignWaterVolFlowRate;  // Design Water Volumetric Flow Rate [m3/s]
-        Real64 InletWaterEnthalpy;      // Inlet Water Enthalpy [J/kg]
-        Real64 OutletWaterEnthalpy;     // Outlet Water Enthalpy [J/kg]
-        Real64 Power;                   // Power Consumption [W]
-        Real64 Energy;                  // Energy Consumption [J]
-        Real64 QSensible;               // Sensible Load Side Heat Transfer Rate [W]
-        Real64 QLatent;                 // Latent Load Side Heat Transfer Rate [W]
-        Real64 QSource;                 // Source Side Heat Transfer Rate [W]
-        Real64 EnergySensible;          // Sensible Load Side Heat Transferred [J]
-        Real64 EnergyLatent;            // Latent Load Side Heat Transferred [J]
-        Real64 EnergySource;            // Source Side Heat Transferred [J]
-        Real64 RunFrac;                 // Duty Factor
-        Real64 PartLoadRatio;           // Part Load Ratio
-        Real64 HeatingCapacity;         // Nominal Heating Capacity
-        Real64 CoolingCapacity;         // Nominal Cooling Capacity
-        Real64 QLoadTotal;              // Load Side Total Heat Transfer Rate [W]
-        Real64 EnergyLoadTotal;         // Load Side Total Heat Transferred [J]
-        Real64 Twet_Rated;              // Nominal Time for Condensate Removal to Begin [s]
-        Real64 Gamma_Rated;             // Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
-        Real64 MaxONOFFCyclesperHour;   // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant;          // Heat pump time constant [s]
-        Real64 FanDelayTime;            // Fan delay time, time delay for the HP's fan to
+        Real64 InletAirMassFlowRate;       // Inlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
+        Real64 OutletAirMassFlowRate;      // Outlet Air Mass Flow through the Water to Air Heat Pump being Simulated [kg/s]
+        Real64 InletAirDBTemp;             // Inlet Air Dry Bulb Temperature [C]
+        Real64 InletAirHumRat;             // Inlet Air Humidity Ratio [kg/kg]
+        Real64 OutletAirDBTemp;            // Outlet Air Dry Bulb Temperature [C]
+        Real64 OutletAirHumRat;            // Outlet Air Humidity Ratio [kg/kg]
+        Real64 InletAirEnthalpy;           // Inlet Air Enthalpy [J/kg]
+        Real64 OutletAirEnthalpy;          // Outlet Air Enthalpy [J/kg]
+        Real64 InletWaterTemp;             // Inlet Water Temperature [C]
+        Real64 OutletWaterTemp;            // Outlet Water Temperature [C]
+        Real64 InletWaterMassFlowRate;     // Inlet Water Mass Flow Rate [kg/s]
+        Real64 OutletWaterMassFlowRate;    // Outlet Water Mass Flow Rate [kg/s]
+        Real64 DesignWaterMassFlowRate;    // Design Water Mass Flow Rate [kg/s]
+        Real64 DesignWaterVolFlowRate;     // Design Water Volumetric Flow Rate [m3/s]
+        Real64 InletWaterEnthalpy;         // Inlet Water Enthalpy [J/kg]
+        Real64 OutletWaterEnthalpy;        // Outlet Water Enthalpy [J/kg]
+        Real64 Power;                      // Power Consumption [W]
+        Real64 Energy;                     // Energy Consumption [J]
+        Real64 QSensible;                  // Sensible Load Side Heat Transfer Rate [W]
+        Real64 QLatent;                    // Latent Load Side Heat Transfer Rate [W]
+        Real64 QSource;                    // Source Side Heat Transfer Rate [W]
+        Real64 EnergySensible;             // Sensible Load Side Heat Transferred [J]
+        Real64 EnergyLatent;               // Latent Load Side Heat Transferred [J]
+        Real64 EnergySource;               // Source Side Heat Transferred [J]
+        Real64 RunFrac;                    // Duty Factor
+        Real64 PartLoadRatio;              // Part Load Ratio
+        Real64 HeatingCapacity;            // Nominal Heating Capacity
+        Real64 CoolingCapacity;            // Nominal Cooling Capacity
+        Real64 QLoadTotal;                 // Load Side Total Heat Transfer Rate [W]
+        Real64 EnergyLoadTotal;            // Load Side Total Heat Transferred [J]
+        Real64 Twet_Rated;                 // Nominal Time for Condensate Removal to Begin [s]
+        Real64 Gamma_Rated;                // Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+        Real64 MaxONOFFCyclesperHour;      // Maximum cycling rate of heat pump [cycles/hr]
+        Real64 LatentCapacityTimeConstant; // Latent capacity time constant [s]
+        Real64 FanDelayTime;               // Fan delay time, time delay for the HP's fan to
         // shut off after compressor cycle off [s]
         Real64 SourceSideUACoeff;      // Source Side Heat Transfer coefficient [W/C]
         Real64 LoadSideTotalUACoeff;   // Load Side Total Heat Transfer coefficient [W/C]
@@ -154,7 +154,7 @@ namespace WaterToAirHeatPump {
               DesignWaterVolFlowRate(0.0), InletWaterEnthalpy(0.0), OutletWaterEnthalpy(0.0), Power(0.0), Energy(0.0), QSensible(0.0), QLatent(0.0),
               QSource(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), RunFrac(0.0), PartLoadRatio(0.0), HeatingCapacity(0.0),
               CoolingCapacity(0.0), QLoadTotal(0.0), EnergyLoadTotal(0.0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0),
-              HPTimeConstant(0.0), FanDelayTime(0.0), SourceSideUACoeff(0.0), LoadSideTotalUACoeff(0.0), LoadSideOutsideUACoeff(0.0),
+              LatentCapacityTimeConstant(0.0), FanDelayTime(0.0), SourceSideUACoeff(0.0), LoadSideTotalUACoeff(0.0), LoadSideOutsideUACoeff(0.0),
               CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0), PowerLosses(0.0), LossFactor(0.0),
               RefVolFlowRate(0.0), VolumeRatio(0.0), LeakRateCoeff(0.0), SourceSideHTR1(0.0), SourceSideHTR2(0.0), HighPressCutoff(0.0),
               LowPressCutoff(0.0), compressorType(CompressorType::Invalid), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0),

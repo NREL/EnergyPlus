@@ -13764,7 +13764,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
     21,                                     !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                                       !- Outdoor Dry-Bulb Temperature Sensor Node Name
     2.5,                                    !- Maximum Cycling Rate {cycles/hr}
-    60,                                     !- Heat Pump Time Constant {s}
+    60,                                     !- Latent Capacity Time Constant {s}
     0.01,                                   !- Fraction of On-Cycle Power Use
     60,                                     !- Heat Pump Fan Delay Time {s}
     0,                                      !- Ancillary On-Cycle Electric Power {W}
@@ -13912,7 +13912,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
     21,                                     !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                                       !- Outdoor Dry-Bulb Temperature Sensor Node Name
     2.5,                                    !- Maximum Cycling Rate {cycles/hr}
-    60,                                     !- Heat Pump Time Constant {s}
+    60,                                     !- Latent Capacity Time Constant {s}
     0.01,                                   !- Fraction of On-Cycle Power Use
     60,                                     !- Heat Pump Fan Delay Time {s}
     0,                                      !- Ancillary On-Cycle Electric Power {W}
@@ -15304,7 +15304,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
     ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
+    ,                        !- Latent Capacity Time Constant {s}
     ,                        !- Fraction of On-Cycle Power Use
     ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
@@ -18075,7 +18075,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
     ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
+    ,                        !- Latent Capacity Time Constant {s}
     ,                        !- Fraction of On-Cycle Power Use
     ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
@@ -20243,7 +20243,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_LowerSpeedFlowSizingTest)
     ,                                !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                                !- Outdoor Dry-Bulb Temperature Sensor Node Name
     ,                                !- Maximum Cycling Rate
-    ,                                !- Heat Pump Time Constant
+    ,                                !- Latent Capacity Time Constant
     ,                                !- Fraction of On-Cycle Power Use
     ,                                !- Heat Pump Fan Delay Time
     ,                                !- Ancilliary On-Cycle Electric Power

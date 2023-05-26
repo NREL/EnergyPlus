@@ -155,10 +155,10 @@ namespace WaterToAirHeatPumpSimple {
         Real64 Twet_Rated = 0.0;         // Nominal Time for Condensate Removal to Begin [s]
         Real64 Gamma_Rated = 0.0;        // Ratio of Initial Moisture Evaporation Rate
         // and Steady-state Latent Capacity
-        Real64 MaxONOFFCyclesperHour = 0.0; // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
-        Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
-        bool reportCoilFinalSizes = true;   // one time report of sizes to coil report
+        Real64 MaxONOFFCyclesperHour = 0.0;      // Maximum cycling rate of heat pump [cycles/hr]
+        Real64 LatentCapacityTimeConstant = 0.0; // Latent capcacity time constant [s]
+        Real64 FanDelayTime = 0.0;               // Fan delay time, time delay for the HP's fan to
+        bool reportCoilFinalSizes = true;        // one time report of sizes to coil report
     };
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,

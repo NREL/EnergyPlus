@@ -429,7 +429,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWAHP.Twet_Rated = NumArray(11);
             simpleWAHP.Gamma_Rated = NumArray(12);
             simpleWAHP.MaxONOFFCyclesperHour = NumArray(13);
-            simpleWAHP.HPTimeConstant = NumArray(14);
+            simpleWAHP.LatentCapacityTimeConstant = NumArray(14);
             simpleWAHP.FanDelayTime = NumArray(15);
 
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = simpleWAHP.Name;
@@ -3787,12 +3787,12 @@ namespace WaterToAirHeatPumpSimple {
         // at the current operating conditions (sec)
         Real64 Gamma; // Initial moisture evaporation rate divided by steady-state AC latent capacity
         // at the current operating conditions
-        Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
-        Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
-        Real64 Twet_max;              // Maximum allowed value for Twet
-        Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant;        // Heat pump time constant [s]
-        Real64 FanDelayTime;          // Fan delay time, time delay for the HP's fan to
+        Real64 Twet_Rated;                 // Twet at rated conditions (coil air flow rate and air temperatures), sec
+        Real64 Gamma_Rated;                // Gamma at rated conditions (coil air flow rate and air temperatures)
+        Real64 Twet_max;                   // Maximum allowed value for Twet
+        Real64 MaxONOFFCyclesperHour;      // Maximum cycling rate of heat pump [cycles/hr]
+        Real64 LatentCapacityTimeConstant; // Latent capacity time constant [s]
+        Real64 FanDelayTime;               // Fan delay time, time delay for the HP's fan to
         // shut off after compressor cycle off  [s]
         Real64 Ton;     // Coil on time (sec)
         Real64 Toff;    // Coil off time (sec)
@@ -3808,14 +3808,14 @@ namespace WaterToAirHeatPumpSimple {
         Twet_Rated = simpleWatertoAirHP.Twet_Rated;
         Gamma_Rated = simpleWatertoAirHP.Gamma_Rated;
         MaxONOFFCyclesperHour = simpleWatertoAirHP.MaxONOFFCyclesperHour;
-        HPTimeConstant = simpleWatertoAirHP.HPTimeConstant;
+        LatentCapacityTimeConstant = simpleWatertoAirHP.LatentCapacityTimeConstant;
         FanDelayTime = simpleWatertoAirHP.FanDelayTime;
 
         //  No moisture evaporation (latent degradation) occurs for runtime fraction of 1.0
         //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
         //  Latent degradation model parameters initialize to 0.0 meaning no evaporation model used.
         if ((RTF >= 1.0) || (QLatRated == 0.0) || (QLatActual == 0.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0) ||
-            (MaxONOFFCyclesperHour <= 0.0) || (HPTimeConstant <= 0.0) || (RTF <= 0.0)) {
+            (MaxONOFFCyclesperHour <= 0.0) || (LatentCapacityTimeConstant <= 0.0) || (RTF <= 0.0)) {
             SHReff = SHRss;
             return SHReff;
         }
@@ -3849,20 +3849,20 @@ namespace WaterToAirHeatPumpSimple {
         //  Use sucessive substitution to solve for To
         aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
 
-        To1 = aa + HPTimeConstant;
+        To1 = aa + LatentCapacityTimeConstant;
         Error = 1.0;
         while (Error > 0.001) {
-            To2 = aa - HPTimeConstant * (std::exp(-To1 / HPTimeConstant) - 1.0);
+            To2 = aa - LatentCapacityTimeConstant * (std::exp(-To1 / LatentCapacityTimeConstant) - 1.0);
             Error = std::abs((To2 - To1) / To1);
             To1 = To2;
         }
 
         //  Adjust Sensible Heat Ratio (SHR) using Latent Heat Ratio (LHR) multiplier
-        //  Floating underflow errors occur when -Ton/HPTimeConstant is a large negative number.
+        //  Floating underflow errors occur when -Ton/LatentCapacityTimeConstant is a large negative number.
         //  Cap lower limit at -700 to avoid the underflow errors.
-        aa = std::exp(max(-700.0, -Ton / HPTimeConstant));
+        aa = std::exp(max(-700.0, -Ton / LatentCapacityTimeConstant));
         //  Calculate latent heat ratio multiplier
-        LHRmult = max(((Ton - To2) / (Ton + HPTimeConstant * (aa - 1.0))), 0.0);
+        LHRmult = max(((Ton - To2) / (Ton + LatentCapacityTimeConstant * (aa - 1.0))), 0.0);
 
         //  Calculate part-load or "effective" sensible heat ratio
         SHReff = 1.0 - (1.0 - SHRss) * LHRmult;

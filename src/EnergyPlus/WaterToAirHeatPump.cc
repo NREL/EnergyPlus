@@ -450,7 +450,7 @@ namespace WaterToAirHeatPump {
             }
 
             heatPump.MaxONOFFCyclesperHour = NumArray(21);
-            heatPump.HPTimeConstant = NumArray(22);
+            heatPump.LatentCapacityTimeConstant = NumArray(22);
             heatPump.FanDelayTime = NumArray(23);
 
             TestCompSet(state, CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Water Nodes");
@@ -2361,7 +2361,7 @@ namespace WaterToAirHeatPump {
         //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
         //  Latent degradation model parameters initialize to 0.0 meaning no evaporation model used.
         if ((RTF >= 1.0) || (QLatRated == 0.0) || (QLatActual == 0.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) ||
-            (heatPump.MaxONOFFCyclesperHour <= 0.0) || (heatPump.HPTimeConstant <= 0.0) || (RTF <= 0.0)) {
+            (heatPump.MaxONOFFCyclesperHour <= 0.0) || (heatPump.LatentCapacityTimeConstant <= 0.0) || (RTF <= 0.0)) {
             SHReff = SHRss;
             return SHReff;
         }
@@ -2395,20 +2395,20 @@ namespace WaterToAirHeatPump {
         //  Use sucessive substitution to solve for To
         aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
 
-        To1 = aa + heatPump.HPTimeConstant;
+        To1 = aa + heatPump.LatentCapacityTimeConstant;
         Error = 1.0;
         while (Error > 0.001) {
-            To2 = aa - heatPump.HPTimeConstant * (std::exp(-To1 / heatPump.HPTimeConstant) - 1.0);
+            To2 = aa - heatPump.LatentCapacityTimeConstant * (std::exp(-To1 / heatPump.LatentCapacityTimeConstant) - 1.0);
             Error = std::abs((To2 - To1) / To1);
             To1 = To2;
         }
 
         //  Adjust Sensible Heat Ratio (SHR) using Latent Heat Ratio (LHR) multiplier
-        //  Floating underflow errors occur when -Ton/HPTimeConstant is a large negative number.
+        //  Floating underflow errors occur when -Ton/LatentCapacityTimeConstant is a large negative number.
         //  Cap lower limit at -700 to avoid the underflow errors.
-        aa = std::exp(max(-700.0, -Ton / heatPump.HPTimeConstant));
+        aa = std::exp(max(-700.0, -Ton / heatPump.LatentCapacityTimeConstant));
         //  Calculate latent heat ratio multiplier
-        LHRmult = max(((Ton - To2) / (Ton + heatPump.HPTimeConstant * (aa - 1.0))), 0.0);
+        LHRmult = max(((Ton - To2) / (Ton + heatPump.LatentCapacityTimeConstant * (aa - 1.0))), 0.0);
 
         //  Calculate part-load or "effective" sensible heat ratio
         SHReff = 1.0 - (1.0 - SHRss) * LHRmult;
