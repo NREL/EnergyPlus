@@ -16093,6 +16093,117 @@ namespace SurfaceGeometry {
         }
     }
 
+void GetGeoSummaryRoof(EnergyPlusData &state, GeoSummary &geoSummaryRoof)
+{
+    std::vector<Vector> uniqueRoofVertices;
+    std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
+    for (const auto &surface : state.dataSurface->Surface) {
+
+        if (surface.ExtBoundCond != ExternalEnvironment) {
+            continue;
+        }
+        if (!surface.HeatTransSurf) {
+            continue;
+        }
+
+        if (surface.Tilt > 45.0) { // TODO Double check tilt wrt outside vs inside?
+            continue;
+        }
+
+        Real64 const z_min(minval(surface.Vertex, &Vector::z));
+        Real64 const z_max(maxval(surface.Vertex, &Vector::z));
+        Real64 const verticalHeight = z_max - z_min;
+        geoSummaryRoof.Height += verticalHeight * surface.Area;
+	geoSummaryRoof.Tilt += surface.Tilt * surface.Area;
+        geoSummaryRoof.Azimuth += surface.Azimuth * surface.Area;
+        geoSummaryRoof.Area += surface.Area;
+
+        for (auto it = surface.Vertex.begin(); it != surface.Vertex.end(); ++it) {
+
+            auto itnext = std::next(it);
+            if (itnext == std::end(surface.Vertex)) {
+                itnext = std::begin(surface.Vertex);
+            }
+
+            auto &curVertex = *it;
+            auto &nextVertex = *itnext;
+            auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
+                return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
+            });
+            if (it2 == std::end(uniqueRoofVertices)) {
+                uniqueRoofVertices.emplace_back(curVertex);
+            }
+
+            SurfaceGeometry::EdgeOfSurf thisEdge;
+            thisEdge.start = std::move(curVertex);
+            thisEdge.end = std::move(nextVertex);
+            thisEdge.count = 1;
+
+            // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
+            auto itEdge = std::find(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), thisEdge);
+            if (itEdge == uniqEdgeOfSurfs.end()) {
+                uniqEdgeOfSurfs.emplace_back(std::move(thisEdge));
+            } else {
+                ++(itEdge->count);
+            }
+        }
+    }
+
+    if (geoSummaryRoof.Area > 0) {
+        geoSummaryRoof.Height /= geoSummaryRoof.Area;
+        geoSummaryRoof.Tilt /= geoSummaryRoof.Area;
+        geoSummaryRoof.Azimuth /= geoSummaryRoof.Area;
+    } else {
+        geoSummaryRoof.Height = 0.0;
+        geoSummaryRoof.Tilt = 0.0;
+        geoSummaryRoof.Azimuth = 0.0;
+    }
+
+    // Remove the ones that are already used twice
+    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+                          uniqEdgeOfSurfs.end());
+
+    // Intersect with unique vertices as much as needed
+    bool insertedVertext = true;
+    while (insertedVertext) {
+        insertedVertext = false;
+
+        for (auto &edge : uniqEdgeOfSurfs) {
+
+            // now go through all the vertices and see if they are colinear with start and end vertices
+            for (const auto &testVertex : uniqueRoofVertices) {
+                if (edge.containsPoints(testVertex)) {
+                    SurfaceGeometry::EdgeOfSurf newEdgeOfSurface;
+                    newEdgeOfSurface.start = testVertex;
+                    newEdgeOfSurface.end = edge.end;
+                    edge.end = testVertex;
+                    uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
+                    insertedVertext = true;
+                    break;
+                }
+            }
+            // Break out of the loop on edges, and start again at the while
+            if (insertedVertext) {
+                break;
+            }
+        }
+    }
+
+    // recount
+    for (auto &edge : uniqEdgeOfSurfs) {
+        edge.count = std::count(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), edge);
+    }
+
+    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+                          uniqEdgeOfSurfs.end());
+
+    geoSummaryRoof.Perimeter =
+        std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
+            return sum + edge.length();
+        });
+
+}
+	
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

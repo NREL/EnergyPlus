@@ -777,4 +777,34 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
     }
 }
 
+Compass4 AzimuthToCompass4(Real64 azimuth)
+{
+    assert(azimuth >= 0.0 && azimuth < 360.0);
+    for (int c4 = 0; c4 < static_cast<int>(Compass4::Num); ++c4) {
+        Real64 lo = Compass4AzimuthLo[c4];
+        Real64 hi = Compass4AzimuthHi[c4];
+        if (lo > hi) {
+            if (azimuth >= lo || azimuth < hi) return static_cast<Compass4>(c4);
+        } else {
+            if (azimuth >= lo && azimuth < hi) return static_cast<Compass4>(c4);
+	}
+    }
+    assert(false);
+}
+
+Compass8 AzimuthToCompass8(Real64 azimuth)
+{
+    assert(azimuth >= 0.0 && azimuth < 360.0);
+    for (int c8 = 0; c8 < static_cast<int>(Compass8::Num); ++c8) {
+        Real64 lo = Compass4AzimuthLo[c8];
+        Real64 hi = Compass4AzimuthHi[c8];
+        if (lo > hi) {
+            if (azimuth >= lo || azimuth < hi) return static_cast<Compass8>(c8);
+        } else {
+            if (azimuth >= lo && azimuth < hi) return static_cast<Compass8>(c8);
+        }
+    }
+    assert(false);
+}
+
 } // namespace EnergyPlus::DataSurfaces

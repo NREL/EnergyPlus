@@ -83,9 +83,54 @@ namespace DataSurfaces {
     // MODULE PARAMETER DEFINITIONS:
     constexpr int MaxPolyCoeff(6);
 
+    // Not sure this is the right module for this stuff, may move it later	
+    enum class Compass4 {
+        Invalid = -1,
+        North,
+        East,
+        South,
+        West,
+        Num
+    };
+
+    constexpr std::array<std::string_view, static_cast<int>(Compass4::Num)> compass4Names =
+        { "North", "East", "South", "West" };
+	
+    constexpr std::array<Real64, static_cast<int>(Compass4::Num)> Compass4AzimuthLo =
+        { 315.0, 45.0, 135.0, 225.0 };
+    constexpr std::array<Real64, static_cast<int>(Compass4::Num)> Compass4AzimuthHi =
+        { 45.0, 135.0, 225.0, 315.0 };
+
+    Compass4 AzimuthToCompass4(Real64 azimuth);
+
+    enum class Compass8 {
+        Invalid = -1,
+        North,
+        NorthEast,
+        East,
+	SouthEast,
+	South,
+	SouthWest,
+        West,
+	NorthWest,
+        Num
+    };
+	
+    constexpr std::array<std::string_view, static_cast<int>(Compass8::Num)> compass8Names =
+        { "North", "NorthEast", "East", "SouthEast", "South", "SouthWest", "West", "NorthWest" };
+	
+    // There is a bug here, the azimuth that divides West from
+    // NorthWest is 292.5 not 287.5.  Keeping it like this temporarily
+    // to minimize diffs.
+    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthLo = 
+        { 337.5, 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5 };
+    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthHi = 
+        { 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5, 337.5 };
+
+    Compass8 AzimuthToCompass8(Real64 azimuth);
+		
     // Parameters to indicate surface shape for use with the Surface
     // derived type (see below):
-
     enum class SurfaceShape : int
     {
         // TODO: enum check

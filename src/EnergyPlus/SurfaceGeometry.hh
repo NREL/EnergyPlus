@@ -238,6 +238,28 @@ namespace SurfaceGeometry {
 
     void GetSurfaceGroundSurfsData(EnergyPlusData &state, bool &ErrorsFound); // Error flag indicator (true if errors found)
 
+    // Roof perimeter, Area, weighted-by-area average height azimuth
+    struct GeoSummary
+    {
+        // Members
+        Real64 Area = 0.0;      // Sum of all roof surface areas
+        Real64 Perimeter = 0.0; // Actual perimeter of all roof surfaces, after removing all edges that are used twice (and inserting vertices
+                                // to split surfaces as needed)
+        Real64 Height = 0.0;    // Weighted average mean vertical height: for each surface, take max - Zmin value,
+                                // then do a weighted average by surface area
+        Real64 Azimuth = 0.0;   // Weighted average azimuth
+        Real64 Tilt = 0.0;      // Weighted average tilt
+
+        Real64 Zmax = 0;
+        Real64 Zmin = 0;
+        Real64 Ymax = 0;
+        Real64 Ymin = 0;
+        Real64 Xmax = 0;
+        Real64 Xmin = 0;
+    };
+
+    void GetGeoSummaryRoof(EnergyPlusData &state, GeoSummary &geoSumRoof);
+	
     class ExposedFoundationPerimeter
     {
     public:

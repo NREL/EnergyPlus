@@ -110,7 +110,7 @@ constexpr std::array<std::string_view, static_cast<int>(HcInt::Num)> HcIntNames 
     "SetByZone", 
     "Simple", 
     "TARP",
-    "CeilingDiffuer",
+    "CeilingDiffuser",
     "TrombeWall",
     "AdaptiveConvectionAlgorithm", 
     "ASTMC1340",

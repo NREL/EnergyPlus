@@ -466,7 +466,8 @@ void InitExtConvCoeff(EnergyPlusData &state,
     
     switch (extConvAlgo) {
     case HcExt::Value:
-    case HcExt::Schedule: {
+    case HcExt::Schedule:
+    case HcExt::UserCurve: {
         HExt = SetExtConvCoeff(state, SurfNum);
     } break;
 
@@ -2884,120 +2885,6 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
 }
 
-RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state)
-{
-    RoofGeoCharacteristicsStruct RoofGeo;
-
-    std::vector<Vector> uniqueRoofVertices;
-    std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
-    for (const auto &surface : state.dataSurface->Surface) {
-
-        if (surface.ExtBoundCond != ExternalEnvironment) {
-            continue;
-        }
-        if (!surface.HeatTransSurf) {
-            continue;
-        }
-
-        if (surface.Tilt > 45.0) { // TODO Double check tilt wrt outside vs inside?
-            continue;
-        }
-
-        Real64 const z_min(minval(surface.Vertex, &Vector::z));
-        Real64 const z_max(maxval(surface.Vertex, &Vector::z));
-        Real64 const verticalHeight = z_max - z_min;
-        RoofGeo.Height += verticalHeight * surface.Area;
-        RoofGeo.Tilt += surface.Tilt * surface.Area;
-        RoofGeo.Azimuth += surface.Azimuth * surface.Area;
-        RoofGeo.Area += surface.Area;
-
-        for (auto it = surface.Vertex.begin(); it != surface.Vertex.end(); ++it) {
-
-            auto itnext = std::next(it);
-            if (itnext == std::end(surface.Vertex)) {
-                itnext = std::begin(surface.Vertex);
-            }
-
-            auto &curVertex = *it;
-            auto &nextVertex = *itnext;
-            auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
-                return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
-            });
-            if (it2 == std::end(uniqueRoofVertices)) {
-                uniqueRoofVertices.emplace_back(curVertex);
-            }
-
-            SurfaceGeometry::EdgeOfSurf thisEdge;
-            thisEdge.start = std::move(curVertex);
-            thisEdge.end = std::move(nextVertex);
-            thisEdge.count = 1;
-
-            // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
-            auto itEdge = std::find(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), thisEdge);
-            if (itEdge == uniqEdgeOfSurfs.end()) {
-                uniqEdgeOfSurfs.emplace_back(std::move(thisEdge));
-            } else {
-                ++(itEdge->count);
-            }
-        }
-    }
-
-    if (RoofGeo.Area > 0) {
-        RoofGeo.Height /= RoofGeo.Area;
-        RoofGeo.Tilt /= RoofGeo.Area;
-        RoofGeo.Azimuth /= RoofGeo.Area;
-    } else {
-        RoofGeo.Height = 0.0;
-        RoofGeo.Tilt = 0.0;
-        RoofGeo.Azimuth = 0.0;
-    }
-
-    // Remove the ones that are already used twice
-    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
-                          uniqEdgeOfSurfs.end());
-
-    // Intersect with unique vertices as much as needed
-    bool insertedVertext = true;
-    while (insertedVertext) {
-        insertedVertext = false;
-
-        for (auto &edge : uniqEdgeOfSurfs) {
-
-            // now go through all the vertices and see if they are colinear with start and end vertices
-            for (const auto &testVertex : uniqueRoofVertices) {
-                if (edge.containsPoints(testVertex)) {
-                    SurfaceGeometry::EdgeOfSurf newEdgeOfSurface;
-                    newEdgeOfSurface.start = testVertex;
-                    newEdgeOfSurface.end = edge.end;
-                    edge.end = testVertex;
-                    uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
-                    insertedVertext = true;
-                    break;
-                }
-            }
-            // Break out of the loop on edges, and start again at the while
-            if (insertedVertext) {
-                break;
-            }
-        }
-    }
-
-    // recount
-    for (auto &edge : uniqEdgeOfSurfs) {
-        edge.count = std::count(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), edge);
-    }
-
-    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
-                          uniqEdgeOfSurfs.end());
-
-    RoofGeo.Perimeter =
-        std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
-            return sum + edge.length();
-        });
-
-    return RoofGeo;
-}
-
 void SetupAdaptiveConvStaticMetaData(EnergyPlusData &state)
 {
 
@@ -3108,202 +2995,80 @@ void SetupAdaptiveConvStaticMetaData(EnergyPlusData &state)
 
     state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume = std::pow(BldgVolumeSum, 1.0/3.0);
 
-    auto &NorthFacade = state.dataConvectionCoefficient->NorthFacade;
-    auto &NorthEastFacade = state.dataConvectionCoefficient->NorthEastFacade;
-    auto &EastFacade = state.dataConvectionCoefficient->EastFacade;
-    auto &SouthEastFacade = state.dataConvectionCoefficient->SouthEastFacade;
-    auto &SouthFacade = state.dataConvectionCoefficient->SouthFacade;
-    auto &SouthWestFacade = state.dataConvectionCoefficient->SouthWestFacade;
-    auto &WestFacade = state.dataConvectionCoefficient->WestFacade;
-    auto &NorthWestFacade = state.dataConvectionCoefficient->NorthWestFacade;
-
-    // Calculate roof perimeter, Area, weighted-by-area average height azimuth
-    auto &RoofGeo = state.dataConvectionCoefficient->RoofGeo;
-    RoofGeo = getRoofGeometryInformation(state);
-    state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = RoofGeo.Azimuth;
+    SurfaceGeometry::GeoSummary geoSummaryRoof;
+    SurfaceGeometry::GetGeoSummaryRoof(state, geoSummaryRoof);
+    
+    state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = geoSummaryRoof.Azimuth;
+    
+    // Calculate facade areas, perimeters, and heights.
+    // Why are these calculations so quick and dirty while the roof calcluation is much more detailed?
+    std::array<SurfaceGeometry::GeoSummary, static_cast<int>(DataSurfaces::Compass8::Num)> geoSummaryFacades;
 
     // first pass over surfaces for outside face params
-    for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) {
+    for (auto const &surf : state.dataSurface->Surface) {
+        if (surf.ExtBoundCond != ExternalEnvironment) {
             continue;
         }
-        if (!Surface(SurfLoop).HeatTransSurf) {
+        if (!surf.HeatTransSurf) {
             continue;
         }
-        Real64 thisAzimuth = Surface(SurfLoop).Azimuth;
-        Real64 thisArea = Surface(SurfLoop).Area;
-        if ((Surface(SurfLoop).Tilt >= 45.0) && (Surface(SurfLoop).Tilt < 135.0)) { // treat as vertical wall
+        if ((surf.Tilt < 45.0) || (surf.Tilt >= 135.0)) continue; // not a vertical wall
 
-            auto const &vertices(Surface(SurfLoop).Vertex);
-            Real64 const x_min(minval(vertices, &Vector::x));
-            Real64 const y_min(minval(vertices, &Vector::y));
-            Real64 const z_min(minval(vertices, &Vector::z));
-            Real64 const x_max(maxval(vertices, &Vector::x));
-            Real64 const y_max(maxval(vertices, &Vector::y));
-            Real64 const z_max(maxval(vertices, &Vector::z));
+	DataSurfaces::Compass8 compass8 = AzimuthToCompass8(surf.Azimuth);
 
-            if ((thisAzimuth >= NorthFacade.AzimuthRangeLow) || (thisAzimuth < NorthFacade.AzimuthRangeHi)) {
-                NorthFacade.Area += thisArea;
-                NorthFacade.Zmax = max(z_max, NorthFacade.Zmax);
-                NorthFacade.Zmin = min(z_min, NorthFacade.Zmin);
-                NorthFacade.Ymax = max(y_max, NorthFacade.Ymax);
-                NorthFacade.Ymin = min(y_min, NorthFacade.Ymin);
-                NorthFacade.Xmax = max(x_max, NorthFacade.Xmax);
-                NorthFacade.Xmin = min(x_min, NorthFacade.Xmin);
-
-            } else if ((thisAzimuth >= NorthEastFacade.AzimuthRangeLow) && (thisAzimuth < NorthEastFacade.AzimuthRangeHi)) {
-                NorthEastFacade.Area += thisArea;
-                NorthEastFacade.Zmax = max(z_max, NorthEastFacade.Zmax);
-                NorthEastFacade.Zmin = min(z_min, NorthEastFacade.Zmin);
-                NorthEastFacade.Ymax = max(y_max, NorthEastFacade.Ymax);
-                NorthEastFacade.Ymin = min(y_min, NorthEastFacade.Ymin);
-                NorthEastFacade.Xmax = max(x_max, NorthEastFacade.Xmax);
-                NorthEastFacade.Xmin = min(x_min, NorthEastFacade.Xmin);
-
-            } else if ((thisAzimuth >= EastFacade.AzimuthRangeLow) && (thisAzimuth < EastFacade.AzimuthRangeHi)) {
-                EastFacade.Area += thisArea;
-                EastFacade.Zmax = max(z_max, EastFacade.Zmax);
-                EastFacade.Zmin = min(z_min, EastFacade.Zmin);
-                EastFacade.Ymax = max(y_max, EastFacade.Ymax);
-                EastFacade.Ymin = min(y_min, EastFacade.Ymin);
-                EastFacade.Xmax = max(x_max, EastFacade.Xmax);
-                EastFacade.Xmin = min(x_min, EastFacade.Xmin);
-            } else if ((thisAzimuth >= SouthEastFacade.AzimuthRangeLow) && (thisAzimuth < SouthEastFacade.AzimuthRangeHi)) {
-                SouthEastFacade.Area += thisArea;
-                SouthEastFacade.Zmax = max(z_max, SouthEastFacade.Zmax);
-                SouthEastFacade.Zmin = min(z_min, SouthEastFacade.Zmin);
-                SouthEastFacade.Ymax = max(y_max, SouthEastFacade.Ymax);
-                SouthEastFacade.Ymin = min(y_min, SouthEastFacade.Ymin);
-                SouthEastFacade.Xmax = max(x_max, SouthEastFacade.Xmax);
-                SouthEastFacade.Xmin = min(x_min, SouthEastFacade.Xmin);
-
-            } else if ((thisAzimuth >= SouthFacade.AzimuthRangeLow) && (thisAzimuth < SouthFacade.AzimuthRangeHi)) {
-                SouthFacade.Area += thisArea;
-                SouthFacade.Zmax = max(z_max, SouthFacade.Zmax);
-                SouthFacade.Zmin = min(z_min, SouthFacade.Zmin);
-                SouthFacade.Ymax = max(y_max, SouthFacade.Ymax);
-                SouthFacade.Ymin = min(y_min, SouthFacade.Ymin);
-                SouthFacade.Xmax = max(x_max, SouthFacade.Xmax);
-                SouthFacade.Xmin = min(x_min, SouthFacade.Xmin);
-
-            } else if ((thisAzimuth >= SouthWestFacade.AzimuthRangeLow) && (thisAzimuth < SouthWestFacade.AzimuthRangeHi)) {
-                SouthWestFacade.Area += thisArea;
-                SouthWestFacade.Zmax = max(z_max, SouthWestFacade.Zmax);
-                SouthWestFacade.Zmin = min(z_min, SouthWestFacade.Zmin);
-                SouthWestFacade.Ymax = max(y_max, SouthWestFacade.Ymax);
-                SouthWestFacade.Ymin = min(y_min, SouthWestFacade.Ymin);
-                SouthWestFacade.Xmax = max(x_max, SouthWestFacade.Xmax);
-                SouthWestFacade.Xmin = min(x_min, SouthWestFacade.Xmin);
-
-            } else if ((thisAzimuth >= WestFacade.AzimuthRangeLow) && (thisAzimuth < WestFacade.AzimuthRangeHi)) {
-                WestFacade.Area += thisArea;
-                WestFacade.Zmax = max(z_max, WestFacade.Zmax);
-                WestFacade.Zmin = min(z_min, WestFacade.Zmin);
-                WestFacade.Ymax = max(y_max, WestFacade.Ymax);
-                WestFacade.Ymin = min(y_min, WestFacade.Ymin);
-                WestFacade.Xmax = max(x_max, WestFacade.Xmax);
-                WestFacade.Xmin = min(x_min, WestFacade.Xmin);
-
-            } else if ((thisAzimuth >= NorthWestFacade.AzimuthRangeLow) && (thisAzimuth < NorthWestFacade.AzimuthRangeHi)) {
-                NorthWestFacade.Area += thisArea;
-                NorthWestFacade.Zmax = max(z_max, NorthWestFacade.Zmax);
-                NorthWestFacade.Zmin = min(z_min, NorthWestFacade.Zmin);
-                NorthWestFacade.Ymax = max(y_max, NorthWestFacade.Ymax);
-                NorthWestFacade.Ymin = min(y_min, NorthWestFacade.Ymin);
-                NorthWestFacade.Xmax = max(x_max, NorthWestFacade.Xmax);
-                NorthWestFacade.Xmin = min(x_min, NorthWestFacade.Xmin);
-            }
-        }
+	Real64 x_min = Constant::BigNumber;
+	Real64 x_max = -Constant::BigNumber;
+	Real64 y_min = Constant::BigNumber;
+	Real64 y_max = -Constant::BigNumber;
+	Real64 z_min = Constant::BigNumber;
+	Real64 z_max = -Constant::BigNumber;
+		
+	for (auto const &v : surf.Vertex) {
+            if (v.x < x_min) { x_min = v.x; } else if (v.x > x_max) { x_max = v.x; }
+            if (v.y < y_min) { y_min = v.y; } else if (v.y > y_max) { y_max = v.y; }
+            if (v.z < z_min) { z_min = v.z; } else if (v.z > z_max) { z_max = v.z; }
+	}
+	
+	auto &facade = geoSummaryFacades[static_cast<int>(compass8)];
+	facade.Area += surf.Area;
+	facade.Zmax = max(z_max, facade.Zmax);
+	facade.Zmin = min(z_min, facade.Zmin);
+	facade.Ymax = max(y_max, facade.Ymax);
+	facade.Ymin = min(y_min, facade.Ymin);
+	facade.Xmax = max(x_max, facade.Xmax);
+	facade.Xmin = min(x_min, facade.Xmin);
     } // fist loop over surfaces for outside face params
 
-    NorthFacade.Perimeter = 2.0 * std::sqrt(pow_2(NorthFacade.Xmax - NorthFacade.Xmin) + pow_2(NorthFacade.Ymax - NorthFacade.Ymin)) +
-                            2.0 * (NorthFacade.Zmax - NorthFacade.Zmin);
-    NorthFacade.Height = NorthFacade.Zmax - NorthFacade.Zmin;
+    for (auto &facade : geoSummaryFacades) {
+        facade.Perimeter = 2.0 * std::sqrt(pow_2(facade.Xmax - facade.Xmin) + pow_2(facade.Ymax - facade.Ymin)) + 2.0 * (facade.Zmax - facade.Zmin);
+	facade.Height = facade.Zmax - facade.Zmin;
+    }
+    for (int surfNum = 1; surfNum <= state.dataSurface->TotSurfaces; ++surfNum) {
+        auto const &surf = state.dataSurface->Surface(surfNum);		
+        if (surf.ExtBoundCond != ExternalEnvironment) continue;
+        if (!surf.HeatTransSurf) continue;
 
-    NorthEastFacade.Perimeter =
-        2.0 * std::sqrt(pow_2(NorthEastFacade.Xmax - NorthEastFacade.Xmin) + pow_2(NorthEastFacade.Ymax - NorthEastFacade.Ymin)) +
-        2.0 * (NorthEastFacade.Zmax - NorthEastFacade.Zmin);
-    NorthEastFacade.Height = NorthEastFacade.Zmax - NorthEastFacade.Zmin;
+	Real64 z_min = Constant::BigNumber;
+	Real64 z_max = -Constant::BigNumber;
+	for (auto const &v : surf.Vertex) {
+            if (v.z < z_min) { z_min = v.z; } else if (v.z > z_max) { z_max = v.z; }
+	}
+        Real64 z_del = z_max - z_min;
 
-    EastFacade.Perimeter = 2.0 * std::sqrt(pow_2(EastFacade.Xmax - EastFacade.Xmin) + pow_2(EastFacade.Ymax - EastFacade.Ymin)) +
-                           2.0 * (EastFacade.Zmax - EastFacade.Zmin);
-    EastFacade.Height = EastFacade.Zmax - EastFacade.Zmin;
-
-    SouthEastFacade.Perimeter =
-        2.0 * std::sqrt(pow_2(SouthEastFacade.Xmax - SouthEastFacade.Xmin) + pow_2(SouthEastFacade.Ymax - SouthEastFacade.Ymin)) +
-        2.0 * (SouthEastFacade.Zmax - SouthEastFacade.Zmin);
-    SouthEastFacade.Height = SouthEastFacade.Zmax - SouthEastFacade.Zmin;
-
-    SouthFacade.Perimeter = 2.0 * std::sqrt(pow_2(SouthFacade.Xmax - SouthFacade.Xmin) + pow_2(SouthFacade.Ymax - SouthFacade.Ymin)) +
-                            2.0 * (SouthFacade.Zmax - SouthFacade.Zmin);
-    SouthFacade.Height = SouthFacade.Zmax - SouthFacade.Zmin;
-
-    SouthWestFacade.Perimeter =
-        2.0 * std::sqrt(pow_2(SouthWestFacade.Xmax - SouthWestFacade.Xmin) + pow_2(SouthWestFacade.Ymax - SouthWestFacade.Ymin)) +
-        2.0 * (SouthWestFacade.Zmax - SouthWestFacade.Zmin);
-    SouthWestFacade.Height = SouthWestFacade.Zmax - SouthWestFacade.Zmin;
-
-    WestFacade.Perimeter = 2.0 * std::sqrt(pow_2(WestFacade.Xmax - WestFacade.Xmin) + pow_2(WestFacade.Ymax - WestFacade.Ymin)) +
-                           2.0 * (WestFacade.Zmax - WestFacade.Zmin);
-    WestFacade.Height = WestFacade.Zmax - WestFacade.Zmin;
-
-    NorthWestFacade.Perimeter =
-        2.0 * std::sqrt(pow_2(NorthWestFacade.Xmax - NorthWestFacade.Xmin) + pow_2(NorthWestFacade.Ymax - NorthWestFacade.Ymin)) +
-        2.0 * (NorthWestFacade.Zmax - NorthWestFacade.Zmin);
-    NorthWestFacade.Height = NorthWestFacade.Zmax - NorthWestFacade.Zmin;
-
-    for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-        if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
-        if (!Surface(SurfLoop).HeatTransSurf) continue;
-        Real64 thisAzimuth = Surface(SurfLoop).Azimuth;
-
-        auto const &vertices(Surface(SurfLoop).Vertex);
-        Real64 const z_min(minval(vertices, &Vector::z));
-        Real64 const z_max(maxval(vertices, &Vector::z));
-        Real64 const z_del(z_max - z_min);
-
-        if ((Surface(SurfLoop).Tilt >= 45.0) && (Surface(SurfLoop).Tilt < 135.0)) { // treat as vertical wall
-            if ((thisAzimuth >= NorthFacade.AzimuthRangeLow) || (thisAzimuth < NorthFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(NorthFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(NorthFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(NorthFacade.Height, z_del);
-            } else if ((thisAzimuth >= NorthEastFacade.AzimuthRangeLow) && (thisAzimuth < NorthEastFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(NorthEastFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(NorthEastFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(NorthEastFacade.Height, z_del);
-            } else if ((thisAzimuth >= EastFacade.AzimuthRangeLow) && (thisAzimuth < EastFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(EastFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(EastFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(EastFacade.Height, z_del);
-            } else if ((thisAzimuth >= SouthEastFacade.AzimuthRangeLow) && (thisAzimuth < SouthEastFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(SouthEastFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(SouthEastFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(SouthEastFacade.Height, z_del);
-            } else if ((thisAzimuth >= SouthFacade.AzimuthRangeLow) && (thisAzimuth < SouthFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(SouthFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(SouthFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(SouthFacade.Height, z_del);
-            } else if ((thisAzimuth >= SouthWestFacade.AzimuthRangeLow) && (thisAzimuth < SouthWestFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(SouthWestFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(SouthWestFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(SouthWestFacade.Height, z_del);
-            } else if ((thisAzimuth >= WestFacade.AzimuthRangeLow) && (thisAzimuth < WestFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(WestFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(WestFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(WestFacade.Height, z_del);
-            } else if ((thisAzimuth >= NorthWestFacade.AzimuthRangeLow) && (thisAzimuth < NorthWestFacade.AzimuthRangeHi)) {
-                state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(NorthWestFacade.Area, Surface(SurfLoop).GrossArea);
-                state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(NorthWestFacade.Perimeter, Surface(SurfLoop).Perimeter);
-                state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(NorthWestFacade.Height, z_del);
-            }
-        } else if (Surface(SurfLoop).Tilt < 45.0) { // assume part of roof
-            state.dataSurface->SurfExtConvFaceArea(SurfLoop) = max(RoofGeo.Area, Surface(SurfLoop).GrossArea);
-            state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = max(RoofGeo.Perimeter, Surface(SurfLoop).Perimeter);
-            state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = max(RoofGeo.Height, z_del);
-        } else if (Surface(SurfLoop).Tilt >= 135.0) { // assume floor over exterior, just use surface's geometry
-            state.dataSurface->SurfExtConvFaceArea(SurfLoop) = Surface(SurfLoop).GrossArea;
-            state.dataSurface->SurfExtConvFacePerimeter(SurfLoop) = Surface(SurfLoop).Perimeter;
-            state.dataSurface->SurfExtConvFaceHeight(SurfLoop) = z_del;
+        if ((surf.Tilt >= 45.0) && (surf.Tilt < 135.0)) { // treat as vertical wall
+	    DataSurfaces::Compass8 compass8 = AzimuthToCompass8(surf.Azimuth);
+	    auto const &facade = geoSummaryFacades[static_cast<int>(compass8)];
+	    state.dataSurface->SurfExtConvFaceArea(surfNum) = max(facade.Area, surf.GrossArea);
+	    state.dataSurface->SurfExtConvFacePerimeter(surfNum) = max(facade.Perimeter, surf.Perimeter);
+	    state.dataSurface->SurfExtConvFaceHeight(surfNum) = max(facade.Height, z_del);
+        } else if (surf.Tilt < 45.0) { // assume part of roof
+            state.dataSurface->SurfExtConvFaceArea(surfNum) = max(geoSummaryRoof.Area, surf.GrossArea);
+            state.dataSurface->SurfExtConvFacePerimeter(surfNum) = max(geoSummaryRoof.Perimeter, surf.Perimeter);
+            state.dataSurface->SurfExtConvFaceHeight(surfNum) = max(geoSummaryRoof.Height, z_del);
+        } else if (surf.Tilt >= 135.0) { // assume floor over exterior, just use surface's geometry
+            state.dataSurface->SurfExtConvFaceArea(surfNum) = surf.GrossArea;
+            state.dataSurface->SurfExtConvFacePerimeter(surfNum) = surf.Perimeter;
+            state.dataSurface->SurfExtConvFaceHeight(surfNum) = z_del;
         }
     } // second pass thru surfs for outside face convection params.
 
@@ -3355,135 +3120,44 @@ void SetupAdaptiveConvStaticMetaData(EnergyPlusData &state)
 
         // if display advanced reports also dump meta group data used for convection geometry
         if (state.dataGlobal->DisplayAdvancedReportVariables) {
-            static constexpr std::string_view Format_8000(
-                "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8000); // header for north facade
-            static constexpr std::string_view Format_8001(
-                "Building Convection Parameters:North Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8001,
-                  NorthFacade.Perimeter,
-                  NorthFacade.Height,
-                  NorthFacade.Xmin,
-                  NorthFacade.Xmax,
-                  NorthFacade.Ymin,
-                  NorthFacade.Ymax,
-                  NorthFacade.Zmin,
-                  NorthFacade.Zmax);
-            static constexpr std::string_view Format_8100(
-                "! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8100); // header for northeast facade
-            static constexpr std::string_view Format_8101(
-                "Building Convection Parameters:Northeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8101,
-                  NorthEastFacade.Perimeter,
-                  NorthEastFacade.Height,
-                  NorthEastFacade.Xmin,
-                  NorthEastFacade.Xmax,
-                  NorthEastFacade.Ymin,
-                  NorthEastFacade.Ymax,
-                  NorthEastFacade.Zmin,
-                  NorthEastFacade.Zmax);
-            static constexpr std::string_view Format_8200(
-                "! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8200); // header for east facade
-            static constexpr std::string_view Format_8201(
-                "Building Convection Parameters:East Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8201,
-                  EastFacade.Perimeter,
-                  EastFacade.Height,
-                  EastFacade.Xmin,
-                  EastFacade.Xmax,
-                  EastFacade.Ymin,
-                  EastFacade.Ymax,
-                  EastFacade.Zmin,
-                  EastFacade.Zmax);
+    	    static constexpr std::string_view Format_8000 = 
+                "! <Building Convection Parameters:{} Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n";
+            static constexpr std::string_view Format_8001 = 
+                "Building Convection Parameters:{} Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n";
 
-            static constexpr std::string_view Format_8300(
-                "! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8300); // header for southeast facade
-            static constexpr std::string_view Format_8301(
-                "Building Convection Parameters:Southeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8301,
-                  SouthEastFacade.Perimeter,
-                  SouthEastFacade.Height,
-                  SouthEastFacade.Xmin,
-                  SouthEastFacade.Xmax,
-                  SouthEastFacade.Ymin,
-                  SouthEastFacade.Ymax,
-                  SouthEastFacade.Zmin,
-                  SouthEastFacade.Zmax);
+            for (int c8 = 0; c8 < static_cast<int>(DataSurfaces::Compass8::Num); ++c8) {
+			
+                // header for north facade
+                print(state.files.eio,
+		      Format_8000,
+		      DataSurfaces::compass8Names[c8]); 
 
-            static constexpr std::string_view Format_8400(
-                "! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8400); // header for south facade
-            static constexpr std::string_view Format_8401(
-                "Building Convection Parameters:South Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8401,
-                  SouthFacade.Perimeter,
-                  SouthFacade.Height,
-                  SouthFacade.Xmin,
-                  SouthFacade.Xmax,
-                  SouthFacade.Ymin,
-                  SouthFacade.Ymax,
-                  SouthFacade.Zmin,
-                  SouthFacade.Zmax);
-            static constexpr std::string_view Format_8500(
-                "! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8500); // header for southwest facade
-            static constexpr std::string_view Format_8501(
-                "Building Convection Parameters:Southwest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8501,
-                  SouthWestFacade.Perimeter,
-                  SouthWestFacade.Height,
-                  SouthWestFacade.Xmin,
-                  SouthWestFacade.Xmax,
-                  SouthWestFacade.Ymin,
-                  SouthWestFacade.Ymax,
-                  SouthWestFacade.Zmin,
-                  SouthWestFacade.Zmax);
-            static constexpr std::string_view Format_8600(
-                "! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8600); // header for west facade
-            static constexpr std::string_view Format_8601(
-                "Building Convection Parameters:West Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8601,
-                  WestFacade.Perimeter,
-                  WestFacade.Height,
-                  WestFacade.Xmin,
-                  WestFacade.Xmax,
-                  WestFacade.Ymin,
-                  WestFacade.Ymax,
-                  WestFacade.Zmin,
-                  WestFacade.Zmax);
-            static constexpr std::string_view Format_8700(
-                "! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
-            print(state.files.eio, Format_8700); // header for northwest facade
-            static constexpr std::string_view Format_8701(
-                "Building Convection Parameters:NorthwWest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
-            print(state.files.eio,
-                  Format_8701,
-                  NorthWestFacade.Perimeter,
-                  NorthWestFacade.Height,
-                  NorthWestFacade.Xmin,
-                  NorthWestFacade.Xmax,
-                  NorthWestFacade.Ymin,
-                  NorthWestFacade.Ymax,
-                  NorthWestFacade.Zmin,
-                  NorthWestFacade.Zmax);
+		auto const &facade = geoSummaryFacades[c8];
+		print(state.files.eio,
+                      Format_8001,
+		      DataSurfaces::compass8Names[c8],
+                      facade.Perimeter,
+                      facade.Height,
+                      facade.Xmin,
+                      facade.Xmax,
+                      facade.Ymin,
+                      facade.Ymax,
+                      facade.Zmin,
+                      facade.Zmax);
+	    }
+
             static constexpr std::string_view Format_8800(
                 "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], Tilt [deg], Azimuth [deg]\n");
             print(state.files.eio, Format_8800); // header for roof
             static constexpr std::string_view Format_8801("Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}");
-            print(state.files.eio, Format_8801, RoofGeo.Area, RoofGeo.Perimeter, RoofGeo.Height, RoofGeo.Tilt, RoofGeo.Azimuth);
-        }
-    }
+            print(state.files.eio, Format_8801,
+		  geoSummaryRoof.Area,
+		  geoSummaryRoof.Perimeter,
+		  geoSummaryRoof.Height,
+		  geoSummaryRoof.Tilt,
+		  geoSummaryRoof.Azimuth);
+        } // Display
+    } // Do Report
 }
 
 void SetupAdaptiveConvRadiantSurfaceData(EnergyPlusData &state)

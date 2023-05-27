@@ -219,62 +219,6 @@ namespace Convect {
         };
     };
 
-    struct BoundingBoxVertStruct
-    {
-        // Members
-        int SurfNum = 0;
-        int VertNum = 0;
-        Vector3<Real64> Vertex{0.0, 0.0, 0.0};
-    };
-
-    struct RoofGeoCharacteristicsStruct
-    {
-        // Members
-        Real64 Area = 0.0;      // Sum of all roof surface areas
-        Real64 Perimeter = 0.0; // Actual perimeter of all roof surfaces, after removing all edges that are used twice (and inserting vertices
-                                // to split surfaces as needed)
-        Real64 Height = 0.0;    // Weighted average mean vertical height: for each surface, take max - Zmin value,
-                                // then do a weighted average by surface area
-        Real64 Azimuth = 0.0;   // Weighted average azimuth
-        Real64 Tilt = 0.0;      // Weighted average tilt
-    };
-
-    struct FacadeGeoCharacteristicsStruct
-    {
-        // Members
-        Real64 AzimuthRangeLow;
-        Real64 AzimuthRangeHi;
-        Real64 Zmax;
-        Real64 Zmin;
-        Real64 Ymax;
-        Real64 Ymin;
-        Real64 Xmax;
-        Real64 Xmin;
-        Real64 Area;
-        Real64 Perimeter;
-        Real64 Height;
-
-        // Default Constructor
-        FacadeGeoCharacteristicsStruct() = default;
-
-        // Member Constructor
-        FacadeGeoCharacteristicsStruct(Real64 const AzimuthRangeLow,
-                                       Real64 const AzimuthRangeHi,
-                                       Real64 const Zmax,
-                                       Real64 const Zmin,
-                                       Real64 const Ymax,
-                                       Real64 const Ymin,
-                                       Real64 const Xmax,
-                                       Real64 const Xmin,
-                                       Real64 const Area,
-                                       Real64 const Perimeter,
-                                       Real64 const Height)
-            : AzimuthRangeLow(AzimuthRangeLow), AzimuthRangeHi(AzimuthRangeHi), Zmax(Zmax), Zmin(Zmin), Ymax(Ymax), Ymin(Ymin), Xmax(Xmax),
-              Xmin(Xmin), Area(Area), Perimeter(Perimeter), Height(Height)
-        {
-        }
-    };
-
     // Functions
 
     void
@@ -405,8 +349,6 @@ namespace Convect {
                                         Real64 SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
-
-    RoofGeoCharacteristicsStruct getRoofGeometryInformation(EnergyPlusData &state);
 
     void SetupAdaptiveConvStaticMetaData(EnergyPlusData &state);
 
@@ -839,16 +781,6 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
     Convect::ExtAdaptiveConvAlgo extAdaptiveConvAlgo;
     Array1D<Convect::HcIntUserCurve> hcIntUserCurve;
     Array1D<Convect::HcExtUserCurve> hcExtUserCurve;
-    Convect::RoofGeoCharacteristicsStruct RoofGeo;
-
-    Convect::FacadeGeoCharacteristicsStruct NorthFacade = {332.5, 22.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    Convect::FacadeGeoCharacteristicsStruct NorthEastFacade = {22.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    Convect::FacadeGeoCharacteristicsStruct EastFacade = {67.5, 112.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    Convect::FacadeGeoCharacteristicsStruct SouthEastFacade = {112.5, 157.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    Convect::FacadeGeoCharacteristicsStruct SouthFacade = {157.5, 202.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    Convect::FacadeGeoCharacteristicsStruct SouthWestFacade = {202.5, 247.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    Convect::FacadeGeoCharacteristicsStruct WestFacade = {247.5, 287.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    Convect::FacadeGeoCharacteristicsStruct NorthWestFacade = {287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
     void clear_state() override
     {
