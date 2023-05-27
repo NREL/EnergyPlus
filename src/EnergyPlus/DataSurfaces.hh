@@ -117,7 +117,7 @@ namespace DataSurfaces {
     };
 	
     constexpr std::array<std::string_view, static_cast<int>(Compass8::Num)> compass8Names =
-        { "North", "NorthEast", "East", "SouthEast", "South", "SouthWest", "West", "NorthWest" };
+        { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest" };
 	
     // There is a bug here, the azimuth that divides West from
     // NorthWest is 292.5 not 287.5.  Keeping it like this temporarily
