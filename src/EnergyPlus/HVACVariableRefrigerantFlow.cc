@@ -333,11 +333,7 @@ void VRFCondenserEquipment::simulate(EnergyPlusData &state,
                                                             PlantEquipmentType::HeatPumpVRF,
                                                             this->CondenserNodeNum,
                                                             this->CondenserOutletNodeNum,
-                                                            this->QCondenser,
-                                                            this->CondenserInletTemp,
-                                                            this->CondenserSideOutletTemp,
-                                                            this->WaterCondenserMassFlow,
-                                                            FirstHVACIteration);
+                                                            this->QCondenser);
     } else {
         ShowFatalError(state, format("SimVRFCondenserPlant:: Invalid loop connection {}", cVRFTypes(VRF_HeatPump)));
     }

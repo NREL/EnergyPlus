@@ -144,11 +144,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
                                                                 DataPlant::PlantEquipmentType::HPWaterEFCooling,
                                                                 this->SourceSideInletNodeNum,
                                                                 this->SourceSideOutletNodeNum,
-                                                                this->reportQSource,
-                                                                this->reportSourceSideInletTemp,
-                                                                this->reportSourceSideOutletTemp,
-                                                                this->reportSourceSideMassFlowRate,
-                                                                FirstHVACIteration);
+                                                                this->reportQSource);
         } else {
             ShowFatalError(state, format("SimHPWatertoWaterSimple:: Invalid loop connection {}, Requested Unit={}", HPEqFitCooling, this->Name));
         }
@@ -164,11 +160,7 @@ void GshpSpecs::simulate(EnergyPlusData &state,
                                                                 DataPlant::PlantEquipmentType::HPWaterEFHeating,
                                                                 this->SourceSideInletNodeNum,
                                                                 this->SourceSideOutletNodeNum,
-                                                                -this->reportQSource,
-                                                                this->reportSourceSideInletTemp,
-                                                                this->reportSourceSideOutletTemp,
-                                                                this->reportSourceSideMassFlowRate,
-                                                                FirstHVACIteration);
+                                                                -this->reportQSource);
         } else {
             ShowFatalError(state, format("SimHPWatertoWaterSimple:: Invalid loop connection {}, Requested Unit={}", HPEqFitCooling, this->Name));
         }

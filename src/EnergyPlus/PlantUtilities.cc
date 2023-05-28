@@ -957,89 +957,59 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
 }
 
 void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
-                                         int const LoopNum,                                   // component's loop index
-                                         const DataPlant::LoopSideLocation LoopSide,          // component's loop side number
-                                         [[maybe_unused]] DataPlant::PlantEquipmentType Type, // Component's type index
-                                         int const InletNodeNum,                              // Component's inlet node pointer
-                                         int const OutletNodeNum,                             // Component's outlet node pointer
-                                         Real64 const ModelCondenserHeatRate,                 // model's heat rejection rate at condenser (W)
-                                         Real64 const ModelInletTemp,                         // model's inlet temperature (C)
-                                         Real64 const ModelOutletTemp,                        // model's outlet temperature (C)
-                                         Real64 const ModelMassFlowRate,                      // model's condenser water mass flow rate (kg/s)
-                                         bool const FirstHVACIteration)
+                                         int const LoopNum,                          // component's loop index
+                                         const DataPlant::LoopSideLocation LoopSide, // component's loop side number
+                                         DataPlant::PlantEquipmentType Type,         // Component's type index
+                                         int const InletNodeNum,                     // Component's inlet node pointer
+                                         int const OutletNodeNum,                    // Component's outlet node pointer
+                                         Real64 const ModelCondenserHeatRate)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   February 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // provides reusable update routine for water cooled chiller's condenser water
-    // connection to plant loops
+    // provides reusable update routine for water cooled chiller's condenser water connection to plant loops
 
     // METHODOLOGY EMPLOYED:
     // check if anything changed or doesn't agree and set simulation flags.
     // update outlet conditions if needed or possible
 
-    // Using/Aliasing
-    using FluidProperties::GetSpecificHeatGlycol;
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Real64 outletTemp;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateChillerComponentCondenserSide");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool DidAnythingChange(false);             // set to true if conditions changed
-    int OtherLoopNum;                          // local loop pointer for remote connected loop
-    DataPlant::LoopSideLocation OtherLoopSide; // local loop side pointer for remote connected loop
-    int ConnectLoopNum;                        // local do loop counter
-    Real64 Cp;
-
-    // check if any conditions have changed
-    if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
-
-    if (state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
-
-    if (state.dataLoopNodes->Node(InletNodeNum).Temp != ModelInletTemp) DidAnythingChange = true;
-
-    if (state.dataLoopNodes->Node(OutletNodeNum).Temp != ModelOutletTemp) DidAnythingChange = true;
-
-    // could also check heat rate against McDeltaT from node data
-
-    if ((state.dataLoopNodes->Node(InletNodeNum).MassFlowRate == 0.0) && (ModelCondenserHeatRate > 0.0)) {
-
-        // TODO also send a request that condenser loop be made available, interlock message infrastructure??
-
-        DidAnythingChange = true;
-    }
-
-    if (DidAnythingChange || FirstHVACIteration) {
-        // use current mass flow rate and inlet temp from Node and recalculate outlet temp
-        if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-            // update node outlet conditions
-            Cp = GetSpecificHeatGlycol(
-                state, state.dataPlnt->PlantLoop(LoopNum).FluidName, ModelInletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-            state.dataLoopNodes->Node(OutletNodeNum).Temp =
+    if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+        // update node outlet conditions
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                                                           state.dataPlnt->PlantLoop(LoopNum).FluidName,
+                                                           state.dataLoopNodes->Node(InletNodeNum).Temp,
+                                                           state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
+                                                           RoutineName);
+        if (Type == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+            outletTemp =
+                state.dataLoopNodes->Node(InletNodeNum).Temp - ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
+        } else {
+            outletTemp =
                 state.dataLoopNodes->Node(InletNodeNum).Temp + ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
         }
+        if (outletTemp != state.dataLoopNodes->Node(OutletNodeNum).Temp) {
+            // didn't the component model already do this? set outlet temp/mass flow? No need to do this here?
+            // seems to me this function just sets a flag that the component model could have set
+            state.dataLoopNodes->Node(OutletNodeNum).Temp = outletTemp;
+            state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
+            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
 
-        // set sim flag for this loop
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
-
-        // set sim flag on connected loops to true because this side changed
-        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected > 0) {
-            for (ConnectLoopNum = 1; ConnectLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected; ++ConnectLoopNum) {
-                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopDemandsOnRemote) {
-                    OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopNum;
-                    OtherLoopSide = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopSideNum;
-                    state.dataPlnt->PlantLoop(OtherLoopNum).LoopSide(OtherLoopSide).SimLoopSideNeeded = true;
+            // set sim flag on connected loops to true because this side changed
+            for (auto connectedLoop : state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected) {
+                if (connectedLoop.LoopDemandsOnRemote) {
+                    state.dataPlnt->PlantLoop(connectedLoop.LoopNum).LoopSide(connectedLoop.LoopSideNum).SimLoopSideNeeded = true;
                 }
             }
         }
-
-    } else { // nothing changed so turn off sim flag
-        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = false;
     }
 }
 

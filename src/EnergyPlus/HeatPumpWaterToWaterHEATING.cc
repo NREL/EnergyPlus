@@ -129,11 +129,7 @@ void GshpPeHeatingSpecs::simulate(
                                                             DataPlant::PlantEquipmentType::HPWaterEFHeating,
                                                             this->SourceSideInletNodeNum,
                                                             this->SourceSideOutletNodeNum,
-                                                            -this->QSource,
-                                                            this->SourceSideWaterInletTemp,
-                                                            this->SourceSideWaterOutletTemp,
-                                                            this->SourceSideWaterMassFlowRate,
-                                                            FirstHVACIteration);
+                                                            -this->QSource);
     } else {
         ShowFatalError(state, format("SimHPWatertoWaterHEATING:: Invalid loop connection {}, Requested Unit={}", ModuleCompName, this->Name));
     }

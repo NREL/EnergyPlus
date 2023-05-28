@@ -1648,11 +1648,7 @@ void ASHRAE205ChillerSpecs::simulate(
                                                             DataPlant::PlantEquipmentType::Chiller_ElectricASHRAE205,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
-                                                            this->QCondenser,
-                                                            this->CondInletTemp,
-                                                            this->CondOutletTemp,
-                                                            this->CondMassFlowRate,
-                                                            FirstHVACIteration);
+                                                            this->QCondenser);
     }
 }
 
