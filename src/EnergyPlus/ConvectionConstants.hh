@@ -500,8 +500,53 @@ enum class IntConvClass
 // note that Invalid (-1) is also reported but not included here
 // where used, that should be handled with a static_cast<int>(InConvClass::Invalid)
 constexpr static std::array<int, static_cast<int>(IntConvClass::Num)> IntConvClassReportVals = {
-    1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45};
+    // SimpleBuoy goes first in the IDF objects, so has to go first here too, A3 or not.
+    16, // A3_SimpleBuoy_VertWalls
+    17, // A3_SimpleBuoy_StableHoriz
+    18, // A3_SimpleBuoy_UnstableHoriz
+    19, // A3_SimpleBuoy_StableTilted
+    20, // A3_SimpleBuoy_UnstableTilted
+    21, // A3_SimpleBuoy_Windows
+    1, // A1_FloorHeatCeilCool_VertWalls
+    2, // A1_FloorHeatCeilCool_StableHoriz
+    3, // A1_FloorHeatCeilCool_UnstableHoriz
+    4, // A1_FloorHeatCeilCool_HeatedFloor
+    5, // A1_FloorHeatCeilCool_ChilledCeil
+    6, // A1_FloorHeatCeilCool_StableTilted
+    7, // A1_FloorHeatCeilCool_UnstableTilted
+    8, // A1_FloorHeatCeilCool_Windows
+    9, // A2_WallPanelHeat_VertWallsNonHeated
+    10, // A2_WallPanelHeat_HeatedVerticalWall
+    11, // A2_WallPanelHeat_StableHoriz
+    12, // A2_WallPanelHeat_UnstableHoriz
+    13, // A2_WallPanelHeat_StableTilted
+    14, // A2_WallPanelHeat_UnstableTilted
+    15, // A2_WallPanelHeat_Windows
+    22, // B_ConvectiveHeat_VertWalls
+    23, // B_ConvectiveHeat_VertWallsNearHeat
+    24, // B_ConvectiveHeat_StableHoriz
+    25, // B_ConvectiveHeat_UnstableHoriz
+    26, // B_ConvectiveHeat_StableTilted
+    27, // B_ConvectiveHeat_UnstableTilted
+    28, // B_ConvectiveHeat_Windows
+    29, // C_CentralAirHeat_Walls
+    30, // C_CentralAirHeat_Ceiling
+    31, // C_CentralAirHeat_Floor
+    32, // C_CentralAirHeat_Windows
+    33, // D_ZoneFanCirc_Walls
+    34, // D_ZoneFanCirc_StableHoriz
+    35, // D_ZoneFanCirc_UnstableHoriz
+    36, // D_ZoneFanCirc_StableTilted
+    37, // D_ZoneFanCirc_UnstableTilted
+    38, // D_ZoneFanCirc_Windows
+    39, // E_MixedBuoy_AssistFlowWalls
+    40, // E_MixedBuoy_OpposFlowWalls
+    41, // E_MixedBuoy_StableFloor
+    42, // E_MixedBuoy_UnstableFloor
+    43, // E_MixedBuoy_StableCeiling
+    44, // E_MixedBuoy_UnstableCeiling
+    45 // E_MixedBuoy_Windows
+};
 
 // Parameters to indicate user specified convection coefficients (for surface)
 enum class OverrideType
