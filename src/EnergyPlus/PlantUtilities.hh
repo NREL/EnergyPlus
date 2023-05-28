@@ -110,7 +110,8 @@ namespace PlantUtilities {
                                              DataPlant::PlantEquipmentType Type,   // Component's type index
                                              int InletNodeNum,                     // Component's inlet node pointer
                                              int OutletNodeNum,                    // Component's outlet node pointer
-                                             Real64 ModelCondenserHeatRate);       // model's heat rejection rate at condenser (W)
+                                             Real64 ModelCondenserHeatRate,        // model's heat rejection rate at condenser (W)
+                                             bool const FirstHVACIteration);
 
     void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
                                          int LoopNum,                          // component's loop index

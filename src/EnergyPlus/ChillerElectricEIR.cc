@@ -153,7 +153,8 @@ void ElectricEIRChillerSpecs::simulate(
                                                             DataPlant::PlantEquipmentType::Chiller_ElectricEIR,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
-                                                            this->QCondenser);
+                                                            this->QCondenser,
+                                                            FirstHVACIteration);
 
     } else if (calledFromLocation.loopNum == this->HRPlantLoc.loopNum) {
         PlantUtilities::UpdateComponentHeatRecoverySide(state,

@@ -180,7 +180,8 @@ void GasAbsorberSpecs::simulate(
                                                                 DataPlant::PlantEquipmentType::Chiller_DFAbsorption,
                                                                 this->CondReturnNodeNum,
                                                                 this->CondSupplyNodeNum,
-                                                                this->TowerLoad);
+                                                                this->TowerLoad,
+                                                                FirstHVACIteration);
         }
     } else {
         // Error, nodes do not match

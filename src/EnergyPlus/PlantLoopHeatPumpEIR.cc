@@ -100,7 +100,8 @@ void EIRPlantLoopHeatPump::simulate(
                                                                 this->EIRHPType,
                                                                 this->sourceSideNodes.inlet,
                                                                 this->sourceSideNodes.outlet,
-                                                                this->sourceSideHeatTransfer);
+                                                                this->sourceSideHeatTransfer,
+                                                                FirstHVACIteration);
             return;
         }
     } else if (this->airSource) {

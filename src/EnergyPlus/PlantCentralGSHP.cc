@@ -167,7 +167,8 @@ void WrapperSpecs::simulate(
                                                             DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
                                                             this->GLHEInletNodeNum,
                                                             this->GLHEOutletNodeNum,
-                                                            this->Report.GLHERate);
+                                                            this->Report.GLHERate,
+                                                            FirstHVACIteration);
 
         // Use the first chiller heater's evaporator capacity ratio to determine dominant load
         this->SimulClgDominant = false;

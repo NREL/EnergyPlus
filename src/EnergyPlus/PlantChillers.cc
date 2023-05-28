@@ -823,7 +823,8 @@ namespace PlantChillers {
                                                                 this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
-                                                                this->QCondenser);
+                                                                this->QCondenser,
+                                                                FirstHVACIteration);
         } else if (calledFromLocation.loopNum == this->HRPlantLoc.loopNum) { // heat recovery loop
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->HRPlantLoc.loopNum,
@@ -2091,7 +2092,8 @@ namespace PlantChillers {
                                                                 this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
-                                                                this->QCondenser);
+                                                                this->QCondenser,
+                                                                FirstHVACIteration);
         } else if (calledFromLocation.loopNum == this->HRPlantLoc.loopNum) { // heat recovery loop
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->HRPlantLoc.loopNum,
@@ -4091,7 +4093,8 @@ namespace PlantChillers {
                                                                 this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
-                                                                this->QCondenser);
+                                                                this->QCondenser,
+                                                                FirstHVACIteration);
         } else if (calledFromLocation.loopNum == this->HRPlantLoc.loopNum) { // heat recovery loop
             PlantUtilities::UpdateComponentHeatRecoverySide(state,
                                                             this->HRPlantLoc.loopNum,
@@ -6015,7 +6018,8 @@ namespace PlantChillers {
                                                                 this->ChillerType,
                                                                 this->CondInletNodeNum,
                                                                 this->CondOutletNodeNum,
-                                                                this->QCondenser);
+                                                                this->QCondenser,
+                                                                FirstHVACIteration);
         }
     }
 

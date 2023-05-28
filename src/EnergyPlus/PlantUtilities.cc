@@ -962,7 +962,8 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
                                          DataPlant::PlantEquipmentType Type,         // Component's type index
                                          int const InletNodeNum,                     // Component's inlet node pointer
                                          int const OutletNodeNum,                    // Component's outlet node pointer
-                                         Real64 const ModelCondenserHeatRate)
+                                         Real64 const ModelCondenserHeatRate,
+                                         bool const FirstHVACIteration)
 {
 
     // SUBROUTINE INFORMATION:
@@ -981,20 +982,22 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateChillerComponentCondenserSide");
+    auto &inletNode = state.dataLoopNodes->Node(InletNodeNum);
 
-    if (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+    if (inletNode.MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance || FirstHVACIteration) {
         // update node outlet conditions
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                           state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                                           state.dataLoopNodes->Node(InletNodeNum).Temp,
+                                                           state.dataPlnt->PlantLoop(LoopNum).FluidName, inletNode.Temp,
                                                            state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                                            RoutineName);
-        if (Type == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
-            outletTemp =
-                state.dataLoopNodes->Node(InletNodeNum).Temp - ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
+        if (inletNode.MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            if (Type == DataPlant::PlantEquipmentType::HeatPumpEIRHeating || Type == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
+                outletTemp = inletNode.Temp - ModelCondenserHeatRate / (inletNode.MassFlowRate * Cp);
+            } else {
+                outletTemp = inletNode.Temp + ModelCondenserHeatRate / (inletNode.MassFlowRate * Cp);
+            }
         } else {
-            outletTemp =
-                state.dataLoopNodes->Node(InletNodeNum).Temp + ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
+            outletTemp = inletNode.Temp;
         }
         if (outletTemp != state.dataLoopNodes->Node(OutletNodeNum).Temp) {
             // didn't the component model already do this? set outlet temp/mass flow? No need to do this here?
@@ -1004,7 +1007,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
             state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
 
             // set sim flag on connected loops to true because this side changed
-            for (auto connectedLoop : state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected) {
+            for (auto &connectedLoop : state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected) {
                 if (connectedLoop.LoopDemandsOnRemote) {
                     state.dataPlnt->PlantLoop(connectedLoop.LoopNum).LoopSide(connectedLoop.LoopSideNum).SimLoopSideNeeded = true;
                 }

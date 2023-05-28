@@ -1626,6 +1626,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     // call from source side location, firsthvac, no load, not running, connected loop should be triggered to resimulate
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).SimLoopSideNeeded = false;
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).SimLoopSideNeeded = false;
+    state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.outlet).Temp = 83.0;
     thisCoolingPLHP->simulate(*state, mySourceLocation, firstHVAC, curLoad, runFlag);
     EXPECT_TRUE(state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).SimLoopSideNeeded);
 

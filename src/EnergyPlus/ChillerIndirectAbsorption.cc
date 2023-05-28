@@ -141,7 +141,8 @@ void IndirectAbsorberSpecs::simulate(
                                                             DataPlant::PlantEquipmentType::Chiller_Indirect_Absorption,
                                                             this->CondInletNodeNum,
                                                             this->CondOutletNodeNum,
-                                                            this->Report.QCond);
+                                                            this->Report.QCond,
+                                                            FirstHVACIteration);
 
     } else if (calledFromLocation.loopNum == this->GenPlantLoc.loopNum) {
         // Called from non-dominant generator hot water or steam connection loop side

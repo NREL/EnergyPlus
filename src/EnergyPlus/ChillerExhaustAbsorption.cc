@@ -179,7 +179,8 @@ void ExhaustAbsorberSpecs::simulate(
                                                                 DataPlant::PlantEquipmentType::Chiller_ExhFiredAbsorption,
                                                                 this->CondReturnNodeNum,
                                                                 this->CondSupplyNodeNum,
-                                                                this->TowerLoad);
+                                                                this->TowerLoad,
+                                                                FirstHVACIteration);
         }
     } else {
         // Error, nodes do not match
