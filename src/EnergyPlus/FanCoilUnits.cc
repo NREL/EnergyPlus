@@ -1160,8 +1160,8 @@ namespace FanCoilUnits {
         // Set the inlet node mass flow rate
         if (((ScheduleManager::GetCurrentScheduleValue(state, fanCoil.SchedPtr) > 0.0 &&
               ScheduleManager::GetCurrentScheduleValue(state, fanCoil.fanAvailSchIndex) > 0.0) ||
-             state.dataHVACGlobal->ZoneCompTurnFansOn) &&
-            !state.dataHVACGlobal->ZoneCompTurnFansOff) {
+             state.dataHVACGlobal->TurnFansOn) &&
+            !state.dataHVACGlobal->TurnFansOff) {
             state.dataLoopNodes->Node(fanCoil.AirInNode).MassFlowRate = fanCoil.MaxAirMassFlow;
             state.dataLoopNodes->Node(fanCoil.AirInNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(fanCoil.AirInNode).MassFlowRate;
             state.dataLoopNodes->Node(fanCoil.AirInNode).MassFlowRateMinAvail = 0.0;
@@ -1444,7 +1444,7 @@ namespace FanCoilUnits {
                         fanCoil.FanAirVolFlow =
                             Fans::GetFanDesignVolumeFlowRate(state, DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName, ErrorsFound);
                     } else {
-                        state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _, _, _);
+                        state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                         fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
                     }
                 }
@@ -1485,7 +1485,7 @@ namespace FanCoilUnits {
                 fanCoil.FanAirVolFlow =
                     Fans::GetFanDesignVolumeFlowRate(state, DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName, ErrorsFound);
             } else {
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
             }
             //   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
@@ -3253,10 +3253,6 @@ namespace FanCoilUnits {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        // Using/Aliasing
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;            // total mass flow through the unit
         Real64 PartLoad;               // if PLR present PartLoad = PLR
@@ -3281,8 +3277,8 @@ namespace FanCoilUnits {
         // if it were variable flow, with the flow being the averaqe flow over the time step
         if (((ScheduleManager::GetCurrentScheduleValue(state, fanCoil.SchedPtr) > 0.0 &&
               ScheduleManager::GetCurrentScheduleValue(state, fanCoil.fanAvailSchIndex) > 0.0) ||
-             state.dataHVACGlobal->ZoneCompTurnFansOn) &&
-            !state.dataHVACGlobal->ZoneCompTurnFansOff) {
+             state.dataHVACGlobal->TurnFansOn) &&
+            !state.dataHVACGlobal->TurnFansOff) {
             if (fanCoil.CapCtrlMeth_Num != CCM::ConsFanVarFlow) {
                 if (fanCoil.CapCtrlMeth_Num != CCM::ASHRAE)
                     state.dataLoopNodes->Node(InletNode).MassFlowRate = PartLoad * state.dataLoopNodes->Node(InletNode).MassFlowRateMax;
@@ -3340,33 +3336,29 @@ namespace FanCoilUnits {
             // cycling fan coil unit calculation
             if (fanCoil.SpeedFanSel == 1) {
                 if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.LowSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.LowSpeedRatio);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else if (fanCoil.SpeedFanSel == 2) {
 
                 if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.MedSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.MedSpeedRatio);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else if (fanCoil.SpeedFanSel == 3) {
 
                 if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 1.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 1.0);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
                 if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    Fans::SimulateFanComponents(
-                        state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                    Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 0.0);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, 0.0, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, 0.0, _);
                 }
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
@@ -3397,17 +3389,11 @@ namespace FanCoilUnits {
 
         } else if (fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
             if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(state,
-                                            fanCoil.FanName,
-                                            FirstHVACIteration,
-                                            fanCoil.FanIndex,
-                                            state.dataFanCoilUnits->FanFlowRatio,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, state.dataFanCoilUnits->FanFlowRatio);
             } else {
                 // FanFlowRatio needs to be accurate here for new fan model
                 Real64 ActFanFlowRatio = state.dataFanCoilUnits->FanFlowRatio * PartLoad;
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, ActFanFlowRatio, _);
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
@@ -3450,10 +3436,9 @@ namespace FanCoilUnits {
             // Constant fan and variable flow calculation AND variable fan
 
             if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, FanSpeedRatio);
             } else {
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, FanSpeedRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, FanSpeedRatio, _);
             }
 
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {

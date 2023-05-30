@@ -145,7 +145,7 @@ namespace HeatBalanceManager {
 
     void OpenShadingFile(EnergyPlusData &state);
 
-    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+    void GetFrameAndDividerData(EnergyPlusData &state); // set to true if errors found in input
 
     void SearchWindow5DataFile(EnergyPlusData &state,
                                fs::path const &DesiredFilePath,            // File path (or just name) that contains the Window5 constructions.

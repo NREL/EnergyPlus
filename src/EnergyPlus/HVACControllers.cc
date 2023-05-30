@@ -475,7 +475,6 @@ void GetControllerInput(EnergyPlusData &state)
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             controllerProps.ControllerName = AlphArray(1);
             controllerProps.ControllerType = CurrentModuleObject;
