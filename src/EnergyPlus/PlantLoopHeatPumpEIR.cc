@@ -551,20 +551,16 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->powerEnergy = this->powerUsage * reportingInterval;
 
     // energy balance on heat pump
-    // test this->sourceSideHeatTransfer = max(0.0, this->calcQsource(this->loadSideHeatTransfer, this->powerUsage)); // TODO don't let it go
-    // negative, or is it negative cooling and shouldn't get positive?
-    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage); // ?? sign convention??
+    this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions
     Real64 CpSrc = 0.0;
     if (this->waterSource) {
-        CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
-                                                       thisLoadPlantLoop.FluidName,
-                                                       state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
-                                                       thisLoadPlantLoop.FluidIndex,
-                                                       "PLHPEIR::simulate()");
-    } else if (this->airSource) {
+        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
+        CpSrc = FluidProperties::GetSpecificHeatGlycol(
+            state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
+    } else {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
@@ -576,7 +572,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         // lets do something different than fatal the simulation
         if ((this->sourceSideMassFlowRate / this->sourceSideDesignMassFlowRate) < 0.01) { // current source side flow is 1% of design max
             // just send it all to skin losses and leave the fluid temperature alone
-            this->sourceSideOutletTemp = this->sourceSideInletTemp; // TRANE
+            this->sourceSideOutletTemp = this->sourceSideInletTemp;
         } else if (this->sourceSideOutletTemp > this->sourceSideInletTemp) {
             this->sourceSideOutletTemp = this->sourceSideInletTemp + 100.0; // cap it at 100C delta
 
@@ -635,7 +631,9 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
             }
         }
 
-        this->envrnInit = false;
+        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+            this->envrnInit = false;
+        }
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
         this->envrnInit = true;
