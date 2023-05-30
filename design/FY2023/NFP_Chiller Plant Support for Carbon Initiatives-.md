@@ -6,7 +6,7 @@ Chiller Plant Support for Carbon Initiatives
 **University of Central Florida, Florida Solar Energy Center**
 
  - Original Date: Apr 24, 2023
- - Modified Date:
+ - Modified Date: May 5, 2023 (update changes to feature)
  
 *Preface:*
 
@@ -104,23 +104,23 @@ Updates to the HeatPump:PlantLoop:EIR:Cooling object are shown below. New fields
            \note Enter the maximum inlet outdoor air dry-bulb temperature
            \note for air-cooled units or maximum inlet water temperature for water-cooled units.
            \note The unit is disabled above this temperature.
-      N9,  \field Minimum Supply Water Temperature Curve Name<br>
-           \type object-list<br>
-           \object-list UniVariateFunctions<br>
-           \note quadratic curve = a + b*OAT is typical, other univariate curves may be used<br>
-           \note OAT = Outdoor Dry-Bulb Temperature<br>
-      N10; \field Maximum Supply Water Temperature Curve Name<br>
-           \type object-list<br>
-           \object-list UniVariateFunctions<br>
-           \note quadratic curve = a + b*OAT is typical, other univariate curves may be used<br>
-           \note OAT = Outdoor Dry-Bulb Temperature<br>
+      N9,  \field Minimum Supply Water Temperature Curve Name
+           \type object-list
+           \object-list UniVariateFunctions
+           \note quadratic curve = a + b*OAT is typical, other univariate curves may be used
+           \note OAT = Outdoor Dry-Bulb Temperature
+      N10; \field Maximum Supply Water Temperature Curve Name
+           \type object-list
+           \object-list UniVariateFunctions
+           \note quadratic curve = a + b*OAT is typical, other univariate curves may be used
+           \note OAT = Outdoor Dry-Bulb Temperature
 
 Updates to the HeatPump:PlantLoop:EIR:Heating object are shown below. New fields are added at the end of the object such that existing example files still execute. Min-fields has not changed.  Note that default values are used for each real type input field since these inputs are past min-fields. Existing fields in this object are not shown here:
 
     HeatPump:PlantLoop:EIR:Heating,
       // the following fields are past min-fields
       N6,  \field Heating To Cooling Capacity Sizing Ratio
-           \note Multiplies the autosized heating capacity
+           \note Maintains heating capacity to cooling capacity ratio
            \type real
            \minimum 0.0
            \default 1.0
@@ -331,9 +331,14 @@ HeatPump:PlantLoop:EIR:Heating
 
 PlantEquipmentOperation:ChillerHeaterChangeOver
 
-    Supervisory Plant Operation Mode
-    Supervisory Plant Operation Sensed Heating Load
-    Supervisory Plant Operation Sensed Cooling Load
+    Supervisory Plant Heat Pump Operation Mode
+    Supervisory Plant Heat Recovery Operation Mode
+    Supervisory Plant Operation Polled Building Heating Load
+    Supervisory Plant Operation Polled Building Cooling Load
+    Supervisory Plant Operation Primary Plant Heating Load
+    Supervisory Plant Operation Primary Plant Cooling Load
+    Supervisory Plant Auxiliary Boiler Mode
+    
 
 ## Engineering and Input Output Reference Documents
 
@@ -420,7 +425,7 @@ The controls model inlucdes inputs for primary and secondary plant set point tem
 A truncated list of zones attached to this plant configuration:
 
     ZoneList,
-      All Conditioned Zones served by Plant,
+      All Conditioned Zones,
       Zone_FC_07,
       Zone_FC_36,
       Zone_FC_10,
@@ -455,15 +460,19 @@ The supervisory class will reside in the unused source file EquipAndOperations.c
 
     struct TempSetpoint
     {
-        Real64 CW = 0.0;
-        Real64 HW = 0.0;
+        Real64 PrimCW = 0.0;      // Chilled water setpoint for primary plant loop
+        Real64 SecCW = 0.0;       // CW setpoint for secondary/distribution plant loop
+        Real64 PrimHW_High = 0.0; // HW primary plant setpoint at High Outdoor Air
+                                     Temperature, or higher, Deg. C
+        Real64 PrimHW_Low = 0.0;  // HW primary plant setpoint at Low Outdoor Air
+                                     Temperature, or Lower, Deg. C
+        Real64 SecHW = 0.0;       // HW setpoint for secondary/distribution plant loop
     };
 
     struct TempResetData
     {
-        Real64 HWStartTemp = 0.0;
-        Real64 HWMaxDeltaTemp = 0.0;
-        Real64 HWRatio = 0.0;
+        Real64 HighOutdoorTemp = 0.0;
+        Real64 LowOutdoorTemp = 0.0;
     };
 
     struct PlantOpsData
@@ -471,6 +480,8 @@ The supervisory class will reside in the unused source file EquipAndOperations.c
         int NumOfZones = 0;           // Number of zones in the list
         int NumOfAirLoops = 0;        // number of air loops
         int numPlantLoadProfiles = 0; // number of load profiles
+        int numBoilers = 0;           // number of boilers
+        int numPlantHXs = 0;          // number of fluid to fluid heat exchangers
         int NumHeatingOnlyEquipLists = 0;
         int NumCoolingOnlyEquipLists = 0;
         int NumSimultHeatCoolHeatingEquipLists = 0;
@@ -484,13 +495,39 @@ The supervisory class will reside in the unused source file EquipAndOperations.c
         bool SimulHeatCoolCoolingOpInput = false;
         bool DedicatedHR_ChWRetControl_Input = false;
         bool DedicatedHR_HWRetControl_Input = false;
+        Real64 DedicatedHR_SecChW_DesignCapacity = 0.0;
+        Real64 DedicatedHR_SecHW_DesignCapacity = 0.0;
+        Real64 DedicatedHR_CapacityControlFactor = 0.0;
+        bool AirSourcePlantHeatingOnly = false;           // operation mode, if true primary
+                                                          plant appears to only need heating
+        bool AirSourcePlantCoolingOnly = false;           // operation mode, if true primary
+                                                          plant appears to only need cooling
+        bool AirSourcePlantSimultaneousHeatingAndCooling = false; // operation mode, if true primary plant appears to need both heating and cooling
+        int PrimaryHWLoopIndex = 0;
+        int PrimaryChWLoopIndex = 0;
+        int SecondaryHWLoopIndex = 0;
+        int SecondaryChWLoopIndex = 0;
     };
 
     struct ReportData
     {
-        int OutputOpMode = 0;
-        Real64 SensedHeatingLoad = 0.0;
-        Real64 SensedCoolingLoad = 0.0;
+        int AirSourcePlant_OpMode = 0;    //  heat only = 1, cool only = 2,
+                                              simult heat cool = 3
+        Real64 BuildingPolledHeatingLoad = 0.0; // current  building heating loads from
+                                                   predicted sensible zone loads, air system
+                                                   ventilation loads, and
+                                                // any plant load profile process laods
+        Real64 BuildingPolledCoolingLoad = 0.0; //  current building Cooling loads from
+                                                    predicted sensible zone loads, air
+                                                    system ventilation loads, and
+                                                //  any plant load profile process laods
+        Real64 AirSourcePlantHeatingLoad = 0.0; // current apparant plant load on hot water
+                                                   plant served by air source heatpumps
+        Real64 AirSourcePlantCoolingLoad = 0.0; // current apparant plant load on chilled
+                                                  water plant served by air source heatpumps
+        int DedicHR_OpMode = 0;   //  heating led = 1, cooling led = 2, , not dispatched = 0
+        int BoilerAux_OpMode = 0; // Not Dispatched = 0, Secondary Boiler On = 1,
+                             Primary Boiler On = 3, Both Secondary and Primary Boiler On = 4
     };
 
     struct ChillerHeaterSupervisoryOperationData
@@ -523,12 +560,35 @@ The supervisory class will reside in the unused source file EquipAndOperations.c
         EquipListCompData DedicatedHR_HWRetControl_LoadSideComp;
         EquipListCompData DedicatedHR_HWRetControl_SourceSideComp;
         Array1D<int> PlantLoopIndicesBeingSupervised;
+        Array1D<int> SecondaryPlantLoopIndicesBeingSupervised;
         Array1D<PlantLocation> PlantLoadProfileComps;
+        Array1D<PlantLocation> PlantBoilerComps;   // Boilers that may need to be managed.
+        Array1D<PlantLocation> PlantHXComps; // fluid to fluid heat exchangers
         ReportData Report;
 
         void OneTimeInitChillerHeaterChangeoverOpScheme(EnergyPlusData &state);
 
         void EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration);
+
+        void OneTimeInitChillerHeaterChangeoverOpScheme(EnergyPlusData &state);
+
+        void EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration);
+
+        void DetermineCurrentBuildingLoads(EnergyPlusData &state);
+
+        void DetermineCurrentPlantLoads(EnergyPlusData &state);
+
+        void ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state);
+
+        void InitAirSourcePlantEquipmentOff(EnergyPlusData &state, bool const FirstHVACIteration);
+
+        void ProcessAndSetAirSourcePlantEquipLists(EnergyPlusData &state);
+
+        void ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state, bool const FirstHVACIteration);
+
+        void ProcessAndSetAuxilBoiler(EnergyPlusData &state, bool const FirstHVACIteration);
+
+        Real64 DetermineHWSetpointOARest(EnergyPlusData &state);
     };
 
     struct OperationData
@@ -547,4 +607,4 @@ A Trane systems development engineering document dated March 10, 2022 included s
  - A heating capacity adjustment model for latent loading on the condenser fins
  - Cooling and heating part-load ratio curves with associated IP performance curve coefficients
 
- This document was reviewed and enhancements/additions to the HeatPump:PlantLoop:EIR model were designed and implemented.
+ This document was reviewed and enhancements/additions to the HeatPump:PlantLoop:EIR model were designed and implemented. Control sequences formed the basis for the supervisory control implementation.
