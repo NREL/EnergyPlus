@@ -243,6 +243,22 @@ The new columns would be:
 - Plantloop name
 - Plantloop branch name
 
+#### System Summary - Demand Controlled Ventilation using Controller:MechanicalVentilation ####
+
+The current colums are:
+- Controller:MechanicalVentilation Name 
+- Outdoor Air Per Person [m3/s-person] 
+- Outdoor Air Per Area [m3/s-m2] 
+- Outdoor Air Per Zone [m3/s] 
+- Outdoor Air ACH [ach] 
+- Outdoor Air Method 
+- Outdoor Air Schedule Name 
+- Air Distribution Effectiveness in Cooling Mode 
+- Air Distribution Effectiveness in Heating Mode 
+- Air Distribution Effectiveness Schedule Name
+
+The new columns would be:
+- Type (CO2 Zone/Other)
 
 ### Add New EnergyPlus Tabular Reports and Tables ###
 
@@ -292,8 +308,8 @@ that table since it is very wide already or they could be kept for compatibility
 
 #### Controls ####
 
-New report that includes Setpoint Managers, Controllers, Availability Managers, PlantEquipmentOperation and identifies 
-the type, where they apply and sense and control parameters from input. Need: 
+New report that includes Setpoint Managers, Controllers, Availability Managers, PlantEquipmentOperation, and components
+with control options and identifies the type, where they apply and sense and control parameters from input. Need: 
 
 - minimum and maximum setpoint temperatures
 - minimum turndown ratio
@@ -306,7 +322,12 @@ the type, where they apply and sense and control parameters from input. Need:
    
 This is probably a series of tables, one for each input object, the report would include the pertinant information
 including the controls, related temperatures, and what they apply to but would generally be limited to what is already
-available within the data structure that would be useful to report.
+available within the data structure that would be useful to report. Include specifically:
+
+- Heat Recovery - Operation With Economizer
+- Heat Recovery - Supply Air Temperature Control
+
+
 
 #### Equipment Summary - PlantLoop or CondenserLoop ####
 
