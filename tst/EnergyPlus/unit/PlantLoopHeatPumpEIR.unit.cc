@@ -2855,6 +2855,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
     thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
+    thisCoolingPLHP->sourceSidePlantLoc.loopNum = 2;
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node
@@ -2887,7 +2888,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     thisCoolingPLHP->doPhysics(*state, curLoad);
 
     EXPECT_NEAR(thisCoolingPLHP->loadSideOutletTemp, 12.00, 0.1);
-    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.66, 0.1);
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.90, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, CoolingMetering)
@@ -3296,6 +3297,7 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
     thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
     thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
+    thisCoolingPLHP->sourceSidePlantLoc.loopNum = 2;
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node
@@ -3336,7 +3338,7 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
 
     EXPECT_NEAR(thisCoolingPLHP->loadSideOutletTemp, 12.095, 1e-3);
 
-    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 22.964, 1e-3);
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 22.989, 1e-3);
 
     EXPECT_EQ(thisCoolingPLHP->eirModFPLRErrorIndex, 1);
 
