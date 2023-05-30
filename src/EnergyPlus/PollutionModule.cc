@@ -6285,11 +6285,11 @@ void ReadEnergyMeters(EnergyPlusData &state)
 // *****************************************************************************
 
 void GetFuelFactorInfo(EnergyPlusData &state,
-                       std::string const &fuelName,  // input fuel name  (standard from Tabular reports)
-                       bool &fuelFactorUsed,         // return value true if user has entered this fuel
-                       Real64 &fuelSourceFactor,     // if used, the source factor
-                       bool &fuelFactorScheduleUsed, // if true, schedules for this fuel are used
-                       int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
+                       Constant::eFuel const &fuelName, // input fuel name  (standard from Tabular reports)
+                       bool &fuelFactorUsed,            // return value true if user has entered this fuel
+                       Real64 &fuelSourceFactor,        // if used, the source factor
+                       bool &fuelFactorScheduleUsed,    // if true, schedules for this fuel are used
+                       int &ffScheduleIndex             // if schedules for this fuel are used, return schedule index
 )
 {
 
@@ -6338,182 +6338,180 @@ void GetFuelFactorInfo(EnergyPlusData &state,
     fuelFactorScheduleUsed = false;
     ffScheduleIndex = 0;
 
-    {
-        auto const &SELECT_CASE_var(fuelName);
-
-        if ((SELECT_CASE_var == "NaturalGas") || (SELECT_CASE_var == "Gas")) {
-            if (Pollution.NatGasCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.NatGasCoef.Source;
-                if (Pollution.NatGasCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
-                }
+    switch (fuelName) {
+    case Constant::eFuel::NaturalGas: {
+        if (Pollution.NatGasCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.NatGasCoef.Source;
+            if (Pollution.NatGasCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
             } else {
-                fuelSourceFactor = 1.084;
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
             }
-
-        } else if (SELECT_CASE_var == "Electricity") {
-            if (Pollution.ElecCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.ElecCoef.Source;
-                if (Pollution.ElecCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.ElecCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 3.167;
-            }
-
-        } else if (SELECT_CASE_var == "FuelOilNo2") {
-            if (Pollution.FuelOil2Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.FuelOil2Coef.Source;
-                if (Pollution.FuelOil2Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.FuelOil2Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "FuelOilNo1") {
-            if (Pollution.FuelOil1Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.FuelOil1Coef.Source;
-                if (Pollution.FuelOil1Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.FuelOil1Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Coal") {
-            if (Pollution.CoalCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.CoalCoef.Source;
-                if (Pollution.CoalCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.CoalCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Gasoline") {
-            if (Pollution.GasolineCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.GasolineCoef.Source;
-                if (Pollution.GasolineCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.GasolineCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Propane") {
-            if (Pollution.PropaneCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.PropaneCoef.Source;
-                if (Pollution.PropaneCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.PropaneCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "Diesel") {
-            if (Pollution.DieselCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.DieselCoef.Source;
-                if (Pollution.DieselCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.DieselCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.05;
-            }
-
-        } else if (SELECT_CASE_var == "OtherFuel1") {
-            if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.OtherFuel1Coef.Source;
-                if (Pollution.OtherFuel1Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.OtherFuel1Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.0;
-            }
-
-        } else if (SELECT_CASE_var == "OtherFuel2") {
-            if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.OtherFuel2Coef.Source;
-                if (Pollution.OtherFuel2Coef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.OtherFuel2Coef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.0;
-            }
-
-        } else if (SELECT_CASE_var == "DistrictHeating") {
-            if (Pollution.NatGasCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.NatGasCoef.Source / Pollution.PurchHeatEffic;
-                if (Pollution.NatGasCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 1.084 / Pollution.PurchHeatEffic;
-            }
-
-        } else if (SELECT_CASE_var == "DistrictCooling") {
-            if (Pollution.ElecCoef.FuelFactorUsed) {
-                fuelFactorUsed = true;
-                fuelSourceFactor = Pollution.ElecCoef.Source / Pollution.PurchCoolCOP;
-                if (Pollution.ElecCoef.SourceSched == 0) {
-                    fuelFactorScheduleUsed = false;
-                } else {
-                    fuelFactorScheduleUsed = true;
-                    ffScheduleIndex = Pollution.ElecCoef.SourceSched;
-                }
-            } else {
-                fuelSourceFactor = 3.167 / Pollution.PurchCoolCOP;
-            }
-
-        } else if (SELECT_CASE_var == "Steam") {
-            fuelSourceFactor = 0.3 / Pollution.SteamConvEffic;
-
         } else {
+            fuelSourceFactor = 1.084;
         }
+    } break;
+    case Constant::eFuel::Electricity: {
+        if (Pollution.ElecCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.ElecCoef.Source;
+            if (Pollution.ElecCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.ElecCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 3.167;
+        }
+    } break;
+    case Constant::eFuel::FuelOilNo2: {
+        if (Pollution.FuelOil2Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.FuelOil2Coef.Source;
+            if (Pollution.FuelOil2Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.FuelOil2Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::FuelOilNo1: {
+        if (Pollution.FuelOil1Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.FuelOil1Coef.Source;
+            if (Pollution.FuelOil1Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.FuelOil1Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Coal: {
+        if (Pollution.CoalCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.CoalCoef.Source;
+            if (Pollution.CoalCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.CoalCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Gasoline: {
+        if (Pollution.GasolineCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.GasolineCoef.Source;
+            if (Pollution.GasolineCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.GasolineCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Propane: {
+        if (Pollution.PropaneCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.PropaneCoef.Source;
+            if (Pollution.PropaneCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.PropaneCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::Diesel: {
+        if (Pollution.DieselCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.DieselCoef.Source;
+            if (Pollution.DieselCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.DieselCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.05;
+        }
+    } break;
+    case Constant::eFuel::OtherFuel1: {
+        if (Pollution.OtherFuel1Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.OtherFuel1Coef.Source;
+            if (Pollution.OtherFuel1Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.OtherFuel1Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.0;
+        }
+    } break;
+    case Constant::eFuel::OtherFuel2: {
+        if (Pollution.OtherFuel2Coef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.OtherFuel2Coef.Source;
+            if (Pollution.OtherFuel2Coef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.OtherFuel2Coef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.0;
+        }
+    } break;
+    case Constant::eFuel::DistrictHeating: {
+        if (Pollution.NatGasCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.NatGasCoef.Source / Pollution.PurchHeatEffic;
+            if (Pollution.NatGasCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 1.084 / Pollution.PurchHeatEffic;
+        }
+    } break;
+    case Constant::eFuel::DistrictCooling: {
+        if (Pollution.ElecCoef.FuelFactorUsed) {
+            fuelFactorUsed = true;
+            fuelSourceFactor = Pollution.ElecCoef.Source / Pollution.PurchCoolCOP;
+            if (Pollution.ElecCoef.SourceSched == 0) {
+                fuelFactorScheduleUsed = false;
+            } else {
+                fuelFactorScheduleUsed = true;
+                ffScheduleIndex = Pollution.ElecCoef.SourceSched;
+            }
+        } else {
+            fuelSourceFactor = 3.167 / Pollution.PurchCoolCOP;
+        }
+    } break;
+    case Constant::eFuel::Steam: {
+        fuelSourceFactor = 0.3 / Pollution.SteamConvEffic;
+    } break;
+    default: {
+    } break;
     }
 }
 

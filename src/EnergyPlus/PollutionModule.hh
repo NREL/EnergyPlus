@@ -432,11 +432,11 @@ namespace PollutionModule {
     void ReadEnergyMeters(EnergyPlusData &state);
 
     void GetFuelFactorInfo(EnergyPlusData &state,
-                           std::string const &fuelName,  // input fuel name  (standard from Tabular reports)
-                           bool &fuelFactorUsed,         // return value true if user has entered this fuel
-                           Real64 &fuelSourceFactor,     // if used, the source factor
-                           bool &fuelFactorScheduleUsed, // if true, schedules for this fuel are used
-                           int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
+                           Constant::eFuel const &fuelName, // input fuel name  (standard from Tabular reports)
+                           bool &fuelFactorUsed,            // return value true if user has entered this fuel
+                           Real64 &fuelSourceFactor,        // if used, the source factor
+                           bool &fuelFactorScheduleUsed,    // if true, schedules for this fuel are used
+                           int &ffScheduleIndex             // if schedules for this fuel are used, return schedule index
     );
 
     void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,

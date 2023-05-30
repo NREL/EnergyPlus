@@ -8517,7 +8517,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
     bool fFScheduleUsed;
     int ffScheduleIndex;
 
-    PollutionModule::GetFuelFactorInfo(*state, "Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    PollutionModule::GetFuelFactorInfo(*state, Constant::eFuel::Steam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
 
     EXPECT_EQ(curSourceFactor, 1.2);
 }
