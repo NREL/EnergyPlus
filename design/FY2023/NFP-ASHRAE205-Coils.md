@@ -12,7 +12,7 @@ The initial edition of the standard was published near the beginning of 2023; an
 
 ## Implementation
 
-ASHRAE 205 coil pefromance will be indicated through a new object, `Coil:DX:ASHRAE205:Performance`, which will be referenceable from `Coil:Cooling:DX` object (and the future `Coil:Heating:DX` object). The current `Coil:[Cooling]:DX:CurveFit:Performance` object and the new performance object will both derive from a new base class that encapsulates common functionality and isolates the performance calculation. (Making this structural change will ease the transition to a future Coil:Heating:DX:Curvefit:Performance object, should a non-205 performance imlementation ever be desired.)
+ASHRAE 205 coil performance will be indicated through a new object, `Coil:DX:ASHRAE205:Performance`, which will be referenceable from `Coil:Cooling:DX` object (and the future `Coil:Heating:DX` object). The current `Coil:[Cooling]:DX:CurveFit:Performance` object and the new performance object will both derive from a new base class that encapsulates common functionality and isolates the performance calculation. (Making this structural change will ease the transition to a future Coil:Heating:DX:Curvefit:Performance object, should a non-205 performance imlementation ever be desired.)
 
 Standard 205 representations are stored in either human-readable JSON or serialized CBOR (Concise Binary Object Representation) format. libtk205 (Toolkit 205) library will populate the internal EnergyPlus class data.
 
