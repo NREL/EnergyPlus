@@ -335,6 +335,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 capacityModifierFuncTemp = 1.0;
     Real64 availableCapacity = this->referenceCapacity;
     Real64 partLoadRatio = 0.0;
+    bool minWaterTempExceeded = false;
 
     // evaluate capacity modifier curve and determine load side heat transfer
     // any adjustment to outlet water temp set point requires some form of iteration
@@ -364,14 +365,17 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
             Real64 minWaterTemp = Curve::CurveValue(state, this->minSupplyWaterTempCurveIndex, state.dataEnvrn->OutDryBulbTemp);
             if (loadSideOutletSetpointTemp < minWaterTemp) {
                 loadSideOutletSetpointTemp = originalLoadSideOutletSPTemp + (1.0 - partLoadRatio) * (minWaterTemp - originalLoadSideOutletSPTemp);
+                minWaterTempExceeded = true;
             }
         }
         if (this->maxSupplyWaterTempCurveIndex > 0) {
             Real64 maxWaterTemp = Curve::CurveValue(state, this->maxSupplyWaterTempCurveIndex, state.dataEnvrn->OutDryBulbTemp);
             if (loadSideOutletSetpointTemp > maxWaterTemp) {
                 loadSideOutletSetpointTemp = maxWaterTemp + (1.0 - partLoadRatio) * (originalLoadSideOutletSPTemp - maxWaterTemp);
+            } else if (!minWaterTempExceeded) {
+                break;
             }
-        } else {
+        } else if (!minWaterTempExceeded) {
             break;
         }
     }
@@ -555,7 +559,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions
-    Real64 CpSrc = 0.0;
+    Real64 CpSrc;
     if (this->waterSource) {
         auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
         CpSrc = FluidProperties::GetSpecificHeatGlycol(
