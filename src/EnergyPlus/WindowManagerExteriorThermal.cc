@@ -143,11 +143,11 @@ namespace WindowManager {
                 Real64 EffShBlEmiss;
                 Real64 EffGlEmiss;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    EffShBlEmiss = General::InterpGeneral(
+                    EffShBlEmiss = General::Interp(
                         window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
                         window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
-                    EffGlEmiss = General::InterpGeneral(
+                    EffGlEmiss = General::Interp(
                         window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
                         window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
