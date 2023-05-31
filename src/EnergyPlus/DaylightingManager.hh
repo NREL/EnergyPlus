@@ -500,10 +500,10 @@ struct DaylightingManagerData : BaseGlobalStruct
     Real64 SPHSUN = 0.0;                                 // Sine of solar altitude
     Real64 CPHSUN = 0.0;                                 // Cosine of solar altitude
     Real64 THSUN = 0.0;                                  // Solar azimuth (rad) in Absolute Coordinate System (azimuth=0 along east)
-    Array1D<Real64> PHSUNHR = Array1D<Real64>(24, 0.0);  // Hourly values of PHSUN
-    Array1D<Real64> SPHSUNHR = Array1D<Real64>(24, 0.0); // Hourly values of the sine of PHSUN
-    Array1D<Real64> CPHSUNHR = Array1D<Real64>(24, 0.0); // Hourly values of the cosine of PHSUN
-    Array1D<Real64> THSUNHR = Array1D<Real64>(24, 0.0);  // Hourly values of THSUN
+    Array1D<Real64> PHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);  // Hourly values of PHSUN
+    Array1D<Real64> SPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0); // Hourly values of the sine of PHSUN
+    Array1D<Real64> CPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0); // Hourly values of the cosine of PHSUN
+    Array1D<Real64> THSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);  // Hourly values of THSUN
 
     // In the following I,J,K arrays:
     // I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
@@ -518,8 +518,8 @@ struct DaylightingManagerData : BaseGlobalStruct
     Array2D<Real64> WLUMSU;     // Sun-related window luminance, excluding view of solar disk
     Array2D<Real64> WLUMSUdisk; // Sun-related window luminance, due to view of solar disk
 
-    Array2D<Real64> GILSK = Array2D<Real64>(24, 4, 0.0); // Horizontal illuminance from sky, by sky type, for each hour of the day
-    Array1D<Real64> GILSU = Array1D<Real64>(24, 0.0);    // Horizontal illuminance from sun for each hour of the day
+    Array2D<Real64> GILSK = Array2D<Real64>(Constant::HoursInDay, static_cast<int>(Dayltg::SkyType::Num), 0.0); // Horizontal illuminance from sky, by sky type, for each hour of the day
+    Array1D<Real64> GILSU = Array1D<Real64>(Constant::HoursInDay, 0.0);    // Horizontal illuminance from sun for each hour of the day
 
     Array3D<Real64> EDIRSK;     // Sky-related component of direct illuminance
     Array2D<Real64> EDIRSU;     // Sun-related component of direct illuminance (excluding beam solar at ref pt)
@@ -649,11 +649,11 @@ struct DaylightingManagerData : BaseGlobalStruct
     Vector3<Real64> CalcMinIntWinSolidAngsWNORM; // Unit vector normal to window (pointing away from room)
 
     Array2D<Real64> DayltgInteriorMapIllumDFSKHR =
-        Array2D<Real64>(2, 4); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
+        Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num)); // Sky daylight factor for sky type (first index), bare/shaded window (second index)
     Array2D<Real64> DayltgInteriorMapIllumBFSKHR =
-        Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
+        Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num)); // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
     Array2D<Real64> DayltgInteriorMapIllumSFSKHR =
-        Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
+        Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num)); // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
     Array1D<Real64> BACLUM;
     Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
     Array1D<Real64> daylight_illum;
@@ -676,9 +676,9 @@ struct DaylightingManagerData : BaseGlobalStruct
                         Dayltg::NTHMAX); // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
     Array2D<Real64> FLFWSK;                          // Sky-related downgoing luminous flux
     Array2D<Real64> ObTransM = Array2D<Real64>(Dayltg::NPHMAX, Dayltg::NTHMAX); // ObTrans value for each (TH,PH) direction
-    Array2D<Real64> SFSKHR = Array2D<Real64>(2, 4); // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
-    Array2D<Real64> DFSKHR = Array2D<Real64>(2, 4); // Sky daylight factor for sky type (second index), bare/shaded window (first index)
-    Array2D<Real64> BFSKHR = Array2D<Real64>(2, 4); // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
+    Array2D<Real64> SFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num)); // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
+    Array2D<Real64> DFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num)); // Sky daylight factor for sky type (second index), bare/shaded window (first index)
+    Array2D<Real64> BFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num)); // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
     Array3D<Real64> tmpIllumFromWinAtRefPt;
     Array3D<Real64> tmpBackLumFromWinAtRefPt;
     Array3D<Real64> tmpSourceLumFromWinAtRefPt;
@@ -742,18 +742,18 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->SPHSUN = 0.0;
         this->CPHSUN = 0.0;
         this->THSUN = 0.0;
-        this->PHSUNHR = Array1D<Real64>(24, 0.0);
-        this->SPHSUNHR = Array1D<Real64>(24, 0.0);
-        this->CPHSUNHR = Array1D<Real64>(24, 0.0);
-        this->THSUNHR = Array1D<Real64>(24, 0.0);
+        this->PHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
+        this->SPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
+        this->CPHSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
+        this->THSUNHR = Array1D<Real64>(Constant::HoursInDay, 0.0);
         this->EINTSK.deallocate();
         this->EINTSU.deallocate();
         this->EINTSUdisk.deallocate();
         this->WLUMSK.deallocate();
         this->WLUMSU.deallocate();
         this->WLUMSUdisk.deallocate();
-        this->GILSK = Array2D<Real64>(24, 4, 0.0);
-        this->GILSU = Array1D<Real64>(24, 0.0);
+        this->GILSK = Array2D<Real64>(Constant::HoursInDay, static_cast<int>(Dayltg::SkyType::Num), 0.0);
+        this->GILSU = Array1D<Real64>(Constant::HoursInDay, 0.0);
         this->EDIRSK.deallocate();
         this->EDIRSU.deallocate();
         this->EDIRSUdisk.deallocate();
@@ -824,9 +824,9 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->VTDark = 0.0;
         this->VTMULT = 1.0;
 
-        this->DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, 4);
-        this->DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, 4);
-        this->DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, 4);
+        this->DayltgInteriorMapIllumDFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num));
+        this->DayltgInteriorMapIllumBFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num));
+        this->DayltgInteriorMapIllumSFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num));
         this->BACLUM.clear();
         this->DayltgInteriorMapIllumGLRNDX.clear();
         this->daylight_illum.clear();
@@ -847,9 +847,9 @@ struct DaylightingManagerData : BaseGlobalStruct
         this->SkyObstructionMult = Array2D<Real64>(Dayltg::NPHMAX, Dayltg::NTHMAX);
         this->FLFWSK.clear();
         this->ObTransM = Array2D<Real64>(Dayltg::NPHMAX, Dayltg::NTHMAX);
-        this->SFSKHR = Array2D<Real64>(2, 4);
-        this->DFSKHR = Array2D<Real64>(2, 4);
-        this->BFSKHR = Array2D<Real64>(2, 4);
+        this->SFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num));
+        this->DFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num));
+        this->BFSKHR = Array2D<Real64>(2, static_cast<int>(Dayltg::SkyType::Num));
         this->tmpIllumFromWinAtRefPt.clear();
         this->tmpBackLumFromWinAtRefPt.clear();
         this->tmpSourceLumFromWinAtRefPt.clear();

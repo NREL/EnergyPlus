@@ -68,7 +68,7 @@ namespace Dayltg {
     // Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
     constexpr int MaxMapRefPoints(2500); // Maximum number of Illuminance Map Ref Points
 
-    enum class SkyType : int
+    enum class SkyType 
     {
         Invalid = -1,
         Clear = 1,
