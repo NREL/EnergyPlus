@@ -3,12 +3,12 @@ Ruleset Model Description Phase 2 JSON Output
 
 **Jason Glazer, GARD Analytics**
 
- - May 25, 2023
+ - May 31, 2023
 
 ## Justification for New Feature ##
 
 This continues the work from 2022 to develop a script that creates a JSON file consistent with the ASHRAE Standard 229
-Ruleset Model Description schema to show the feasibilty of the schema, uncover problems with implementation, and provide
+Ruleset Model Description schema to show the feasibility of the schema, uncover problems with implementation, and provide
 an implementation for early adopters. 
 
 The title, purpose, and scope of ASHRAE Standard 229 are:
@@ -31,10 +31,10 @@ systems, controls, sites, and other aspects described by the ruleset. It establi
 
 ASHRAE Standard 229 has not been published or even gone through public review and is under development
 by the ASHRAE SPC 229P committee. The intention of the standard is to provide code officials and rating
-authorities with files that they can use with a Ruleset Checking Tool (currently an example is under development at 
+authorities with files that they can use with a Ruleset Checking Tool (currently, an example is under development at 
 PNNL) to automatically check if a ruleset (such as 90.1 Appendix G, RESNET, California Title 24 performance 
 paths, or Canada National Energy Code for Buildings performance path) has been implemented correctly. 
-Since each EnergyPlus IDF file could generate a RMD file, the Ruleset Checking Tool will be able to see if the 
+Since each EnergyPlus IDF file could generate an RMD file, the Ruleset Checking Tool will be able to see if the 
 changes between the RMD files correspond to rules in the ruleset by looking at both the baseline
 and proposed RMD file. 
 
@@ -46,7 +46,7 @@ The repo for the script development is here:
 
 https://github.com/JasonGlazer/createRulesetModelDescription
 
-Some lessons learned from the initial effort in 2022 is described here:
+Some lessons learned from the initial effort in 2022 are described here:
 
 https://github.com/JasonGlazer/createRulesetModelDescription/blob/main/docs/lessons_learned.rst
 
@@ -60,7 +60,7 @@ None so far.
 
 ## Overview ##
 
-The initial version did not support the full schema and needs polishing up before being used in widespread workflows.  
+The initial version did not support the full schema and needed polishing up before being used in widespread workflows.  
 For this phase, the focus is on methods to merge compliance parameters, implementing additional output reports in EnergyPlus, 
 filling in gaps in existing data groups, and supporting more data groups.
 
@@ -82,7 +82,7 @@ Targeted data groups from the 229 RMD Schema for this effort include the HVAC po
 - HeatRejection
 
 This effort will focus on trying to implement as many data groups as possible. It is unlikely that full support 
-for all data groups and data elements for these will be achieved in this phase so the focus will again be on 
+for all data groups and data elements for these will be achieved in this phase, so the focus will again be on 
 implementing the more direct data elements within each data group so that as many data elements can be implemented 
 as possible.
 
@@ -101,7 +101,7 @@ outputs and not needing to read the IDF or epJSON files. The approach has two fo
 - Enhance EnergyPlus Tabular Output Reports
 - Support New Data Groups in createRMD Python script
 
-In addition some fixes of the createRMD Python script will be incorporated from the current list of issues:
+In addition, some fixes of the createRMD Python script will be incorporated from the current list of issues:
 
 - Ensure that all IDs are unique and consistent between instances (issue #4)
 - Add Infiltration for each Zone even if not present in EnergyPlus (issue #5)
@@ -112,7 +112,7 @@ In addition some fixes of the createRMD Python script will be incorporated from 
 - Add method to merge compliance parameters (issue #14)
 
 To understand how when data elements can be populated by either EnergyPlus input or 
-EnergyPlus output as the source of the RMD data elements, a special tagged version of the 
+EnergyPlus output as the source of the RMD data elements, a specially tagged version of the 
 schema file was created here:
 
 https://github.com/open229/ruleset-model-description-schema/blob/EPtags/schema-source/ASHRAE229_extra.schema.yaml
@@ -131,11 +131,19 @@ Tags added are:
 
 Most of these were used previously during the 2022 effort.
 
+## Prioritization ##
+
+It is unlikely that all table enhancements and RMD data groups described in this NFP will be able to be supported
+with the budget for this task, so some prioritization of what should be in this effort versus in following efforts
+will be needed. The prioritization will link the support of the enhanced tables to the support of data elements in 
+the RMD data elements. Feedback on the priorities is welcome, either overall (air side vs. water side) or detailed, 
+such as specific new columns and data elements that are most important.
+
 ### Enhance Existing EnergyPlus Tabular Output Reports ###
 
 #### Equipment Summary - Central Plant ####
 
-The current colums are:
+The current columns are:
 - Type
 - Reference Capacity [W]
 - Reference Efficiency [W/W]
@@ -163,16 +171,16 @@ The new columns would be:
 - Range
 - Approach
 - Design Fan Power
-- Desing inlet air wet-bulb temperature
+- Design inlet air wet-bulb temperature
 - Leaving water setpoint temperature
 - Chiller Condenser type
 
-We may also want to consider breaking up "Central Plant" table into separate tables for chillers, boilers, and heat 
+We may also want to consider breaking up the "Central Plant" table into separate tables for chillers, boilers, and heat 
 rejection since more columns are unique to just one of those.
 
 #### Equipment Summary - Heating Coils ####
 
-The current colums are:
+The current columns are:
 - Type
 - Design Coil Load [W]
 - Nominal Total Capacity [W]
@@ -184,11 +192,11 @@ The new columns would be:
 - Airloop branch name
 - Plantloop name
 - Plantloop branch name
-- Suppplemental heat high shutoff temperature [C]
+- Supplemental heat high shutoff temperature [C]
 
 #### Equipment Summary - DX Heating Coils ####
 
-The current colums are:
+The current columns are:
 - DX Heating Coil Type
 - High Temperature Heating (net) Rating Capacity [W]
 - Low Temperature Heating (net) Rating Capacity [W]
@@ -202,7 +210,7 @@ The new columns would be:
 
 #### Equipment Summary - Fans ####
 
-The current colums are:
+The current columns are:
 - Type
 - Total Efficiency [W/W]
 - Delta Pressure [pa]
@@ -229,7 +237,7 @@ The new columns would be:
 
 #### Equipment Summary - Pumps ####
 
-The current colums are:
+The current columns are:
 - Type
 - Control
 - Head [pa]
@@ -246,7 +254,7 @@ The new columns would be:
 
 #### System Summary - Demand Controlled Ventilation using Controller:MechanicalVentilation ####
 
-The current colums are:
+The current columns are:
 - Controller:MechanicalVentilation Name 
 - Outdoor Air Per Person [m3/s-person] 
 - Outdoor Air Per Area [m3/s-m2] 
@@ -263,7 +271,7 @@ The new columns would be:
 
 #### Component Sizing Summary - PlantLoop ####
 
-The current colums are:
+The current columns are:
 - Maximum Loop Flow Rate [m3/s]
 - Plant Loop Volume [m3]
 
@@ -281,23 +289,27 @@ Consists of tables for air and plant loops
 For each Plant loop and AirLoopHVAC a table is created that has:
 - Component Type (normal components including Connector:Splitter and Connector:Mixer)
 - Component Name
-- Loop Name
-- Plant side/Demand side
+- Zone Name (for demand side)
+- Loop side (supply side/demand side)
 - Order (2nd of 5 items on branch, items in parallel after split would have same number)
 - Branch Name
 - Split (either y/n or “split 3 of 5”)
-- node name in
-- node name out
+- node name in (multiple names for mixer)
+- node name out (multiple names for splitter)
+- other control objects that reference node in as sensor (or node out?)
+- other control objects that reference node in as actuator (or node out?)
 
-Probably also need table to describe the components on an outdoor air branch.
+Will this completely describe the zone equipment?
 
-The table would also need to include where controllers, setpoint managers, and other items that reference nodes.
+Probably also need a table to describe the components on an outdoor air branch.
 
-The BND file will also be reviewd for what can easily be added to the topology report with minimal effort.
+The table would list where controllers, setpoint managers, and other items that reference nodes.
+
+Additionally, the BND file may also be reviewed for what can easily be added to the topology report with minimal effort.
 
 #### Coil Sizing Details - Coil Connections ####
 
-New table under current Coil Sizing Details report called "Coil Connections". Each row would be a coil:
+A new table under the current Coil Sizing Details report called "Coil Connections". Each row would be a coil:
 
 - Coil Name
 - Coil Type*
@@ -316,12 +328,12 @@ New table under current Coil Sizing Details report called "Coil Connections". Ea
 - Location count on Plantloop Branch
 
 Some of these columns (shown with asterisks) are currently in the "Coils" table and could be removed from 
-that table since it is very wide already or they could be kept for compatibility.
+that table since it is very wide already, or they could be kept for compatibility.
 
 #### Controls ####
 
-New report that includes Setpoint Managers, Controllers, Availability Managers, PlantEquipmentOperation, and components
-with control options and identifies the type, where they apply and sense and control parameters from input. Need: 
+A new report that includes Setpoint Managers, Controllers, Availability Managers, PlantEquipmentOperation, and components
+with control options and identifies the type, where they apply, sense, and control parameters from the input. Need: 
 
 - minimum and maximum setpoint temperatures
 - minimum turndown ratio
@@ -332,7 +344,7 @@ with control options and identifies the type, where they apply and sense and con
 - Setpoint at Outdoor High Temperature
 - Outdoor High Temperature
    
-This is probably a series of tables, one for each input object, the report would include the pertinant information
+This is probably a series of tables, one for each input object. The report would include the pertinent information,
 including the controls, related temperatures, and what they apply to but would generally be limited to what is already
 available within the data structure that would be useful to report. Include specifically:
 
@@ -343,7 +355,7 @@ available within the data structure that would be useful to report. Include spec
 
 #### Equipment Summary - PlantLoop or CondenserLoop ####
 
-New report for PlantLoop objects. One row for each Plant or CondenserLoop
+A new report for PlantLoop objects. One row for each Plant or CondenserLoop
 - name
 - type (PlantLoop or CondenserLoop)
 - provides heating
@@ -355,7 +367,7 @@ New report for PlantLoop objects. One row for each Plant or CondenserLoop
 
 #### Equipment Summary - AirTerminals ####
 
-New report for AirTerminals.
+A new report for AirTerminals.
 - name
 - type of input object
 - Heat/Reheat Coil Object Type
@@ -382,7 +394,7 @@ New report for AirTerminals.
 
 #### Equipment Summary - Air Heat Recovery ####
 
-New report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:AirToAir:FlatPlate:
+A new report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:AirToAir:FlatPlate:
 - name
 - input object type
 - plate/rotary
@@ -393,7 +405,7 @@ New report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:A
 - Exhaust airflow
 - Outdoor airflow
 
-We might want to add the other effectivenesses at different air flow rates to make report more comprehensive.
+We might want to add the other effectivenesses at different air flow rates to make the report more comprehensive.
 
 ## Testing/Validation/Data Sources ##
 
@@ -435,7 +447,7 @@ The repo for the script development is here:
 
 https://github.com/JasonGlazer/createRulesetModelDescription
 
-Some lessons learned from the initial effort in 2022 is described here:
+Some lessons learned from the initial effort in 2022 are described here:
 
 https://github.com/JasonGlazer/createRulesetModelDescription/blob/main/docs/lessons_learned.rst
 
