@@ -263,18 +263,18 @@ namespace Dayltg {
         Array3D<Real64> IllumFromWinAtMapPt; // (Number of Zones, 2, Total Map Reference Points)
         // Arguments (dimensions) for Dayl---Sky are:
         //  1: Sun position index / HourOfDay (1 to 24)
-        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
-        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
+        //  2: Daylit window number (1 to NumOfDayltgExtWins)
         //  3: Reference point number (1 to Total Map Reference Points)
-        //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
-        //  5: Daylit window number (1 to NumOfDayltgExtWins)
+        //  4: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
+        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
+        //  5: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
         Array5D<Real64> DaylIllFacSky;
         // Arguments (dimensions) for Dayl---Sun are:
         //  1: Sun position index / HourOfDay (1 to 24)
-        //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
-        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
+        //  2: Daylit window number (1 to NumOfDayltgExtWins)
         //  3: Reference point number (1 to Total Map Reference Points)
-        //  4: Daylit window number (1 to NumOfDayltgExtWins)
+        //  4: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
+        //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
         Array4D<Real64> DaylIllFacSun;
         Array4D<Real64> DaylIllFacSunDisk;
     };

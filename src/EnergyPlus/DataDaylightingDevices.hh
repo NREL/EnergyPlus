@@ -138,7 +138,7 @@ struct DataDaylightingDevicesData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = DataDaylightingDevicesData();
+        new (this) DataDaylightingDevicesData();
     }
 };
 
