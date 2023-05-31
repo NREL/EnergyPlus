@@ -165,6 +165,7 @@ The new columns would be:
 - Design Fan Power
 - Desing inlet air wet-bulb temperature
 - Leaving water setpoint temperature
+- Chiller Condenser type
 
 We may also want to consider breaking up "Central Plant" table into separate tables for chillers, boilers, and heat 
 rejection since more columns are unique to just one of those.
@@ -260,6 +261,17 @@ The current colums are:
 The new columns would be:
 - Type (CO2 Zone/Other)
 
+#### Component Sizing Summary - PlantLoop ####
+
+The current colums are:
+- Maximum Loop Flow Rate [m3/s]
+- Plant Loop Volume [m3]
+
+The new columns would be:
+- Design supply temperature
+- Design return temperature
+- Sizing option (Coincident/NonCoincident)
+
 ### Add New EnergyPlus Tabular Reports and Tables ###
 
 #### HVAC Topology ####
@@ -339,6 +351,7 @@ New report for PlantLoop objects. One row for each Plant or CondenserLoop
 - Maximum Loop Flow Rate
 - Minimum Loop Flow Rate
 - Total pump power on loop
+- Branch name
 
 #### Equipment Summary - AirTerminals ####
 
