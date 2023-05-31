@@ -81,9 +81,9 @@ namespace Dayltg {
     enum class ExtWinType
     {
         Invalid = -1,
-        NotInOrAdjZoneExtWin, // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
-        InZoneExtWin,         // Exterior window is in a Daylighting:Detailed zone
-        AdjZoneExtWin,        // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
+        NotInOrAdjZone, // Exterior window is not in a Daylighting:Detailed zone or in an adjacent zone with a shared interior window
+        InZone,         // Exterior window is in a Daylighting:Detailed zone
+        AdjZone,        // Exterior window is in a zone adjacent to a Daylighting:Detailed zone with which it shares an interior window
         Num
     };
 
