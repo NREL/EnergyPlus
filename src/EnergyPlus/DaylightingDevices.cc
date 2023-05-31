@@ -74,7 +74,7 @@
 
 namespace EnergyPlus {
 
-namespace DaylightingDevices {
+namespace Dayltg {
 
     // MODULE INFORMATION:
     //       AUTHOR         Peter Graham Ellis
@@ -193,7 +193,7 @@ namespace DaylightingDevices {
             Array1D<Real64> TransBeam; // Table of beam transmittance vs. cosine angle
 
             // Default Constructor
-            TDDPipeStoredData() : AspectRatio(0.0), Reflectance(0.0), TransBeam(DataDaylightingDevices::NumOfAngles, 0.0)
+            TDDPipeStoredData() : AspectRatio(0.0), Reflectance(0.0), TransBeam(NumOfAngles, 0.0)
             {
             }
         };
@@ -208,11 +208,11 @@ namespace DaylightingDevices {
             DisplayString(state, "Initializing Tubular Daylighting Devices");
             // Setup COSAngle list for all TDDs
             state.dataDaylightingDevices->COSAngle(1) = 0.0;
-            state.dataDaylightingDevices->COSAngle(DataDaylightingDevices::NumOfAngles) = 1.0;
+            state.dataDaylightingDevices->COSAngle(NumOfAngles) = 1.0;
 
-            Real64 dTheta = 90.0 * Constant::DegToRadians / (DataDaylightingDevices::NumOfAngles - 1.0);
+            Real64 dTheta = 90.0 * Constant::DegToRadians / (NumOfAngles - 1.0);
             Real64 Theta = 90.0 * Constant::DegToRadians;
-            for (int AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
+            for (int AngleNum = 2; AngleNum <= NumOfAngles - 1; ++AngleNum) {
                 Theta -= dTheta;
                 state.dataDaylightingDevices->COSAngle(AngleNum) = std::cos(Theta);
             } // AngleNum
@@ -253,11 +253,11 @@ namespace DaylightingDevices {
 
                         // Set beam transmittances for 0 and 90 degrees
                         TDDPipeStored(NumStored).TransBeam(1) = 0.0;
-                        TDDPipeStored(NumStored).TransBeam(DataDaylightingDevices::NumOfAngles) = 1.0;
+                        TDDPipeStored(NumStored).TransBeam(NumOfAngles) = 1.0;
 
                         // Calculate intermediate beam transmittances between 0 and 90 degrees
                         Theta = 90.0 * Constant::DegToRadians;
-                        for (int AngleNum = 2; AngleNum <= DataDaylightingDevices::NumOfAngles - 1; ++AngleNum) {
+                        for (int AngleNum = 2; AngleNum <= NumOfAngles - 1; ++AngleNum) {
                             Theta -= dTheta;
                             TDDPipeStored(NumStored).TransBeam(AngleNum) =
                                 CalcPipeTransBeam(Reflectance, state.dataDaylightingDevicesData->TDDPipe(PipeNum).AspectRatio, Theta);
@@ -730,7 +730,7 @@ namespace DaylightingDevices {
                                      format("{} = {}:  No transition zones specified.  All pipe absorbed solar goes to exterior.",
                                             cCurrentModuleObject,
                                             state.dataIPShortCut->cAlphaArgs(1)));
-                } else if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones > DataDaylightingDevices::MaxTZones) {
+                } else if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones > MaxTZones) {
                     ShowSevereError(
                         state,
                         format("{} = {}:  Maximum number of transition zones exceeded.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1179,7 +1179,7 @@ namespace DaylightingDevices {
             Real64 P = COSI; // Angular distribution function: P = COS(Incident Angle) for diffuse isotropic
 
             // Calculate total TDD transmittance for given angle
-            trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam);
+            trans = TransTDD(state, PipeNum, COSI, RadType::SolarBeam);
 
             FluxInc += P * SINI * dPH;
             FluxTrans += trans * P * SINI * dPH;
@@ -1248,7 +1248,7 @@ namespace DaylightingDevices {
                 Real64 COSI = CosPhi * std::cos(TH - Theta); // Cosine of the incident angle
 
                 // Calculate total TDD transmittance for given angle
-                Real64 trans = TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam); // Total beam solar transmittance of TDD
+                Real64 trans = TransTDD(state, PipeNum, COSI, RadType::SolarBeam); // Total beam solar transmittance of TDD
 
                 FluxInc += COSI * dTH;
                 FluxTrans += trans * COSI * dTH;
@@ -1323,7 +1323,7 @@ namespace DaylightingDevices {
                          state.dataHeatBal->SurfSunlitFrac(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, DomeSurf);
 
         AnisoSkyTDDMult = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * IsoSkyRad +
-                          TransTDD(state, PipeNum, COSI, DataDaylightingDevices::RadType::SolarBeam) * CircumSolarRad +
+                          TransTDD(state, PipeNum, COSI, RadType::SolarBeam) * CircumSolarRad +
                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon * HorizonRad;
 
         if (state.dataSolarShading->SurfAnisoSkyMult(DomeSurf) > 0.0) {
@@ -1338,7 +1338,7 @@ namespace DaylightingDevices {
     Real64 TransTDD(EnergyPlusData &state,
                     int const PipeNum,                                  // TDD pipe object number
                     Real64 const COSI,                                  // Cosine of the incident angle
-                    DataDaylightingDevices::RadType const RadiationType // Radiation type flag
+                    RadType const RadiationType // Radiation type flag
     )
     {
 
@@ -1391,7 +1391,7 @@ namespace DaylightingDevices {
 
         // Get the transmittance of each component and of total TDD
         switch (RadiationType) {
-        case DataDaylightingDevices::RadType::VisibleBeam: {
+        case RadType::VisibleBeam: {
             transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransVisBeamCoef);
             transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransVisBeam);
             transDiff = state.dataConstruction->Construct(constDiff).TransDiffVis; // May want to change to POLYF also!
@@ -1399,7 +1399,7 @@ namespace DaylightingDevices {
             TransTDD = transDome * transPipe * transDiff;
 
         } break;
-        case DataDaylightingDevices::RadType::SolarBeam: {
+        case RadType::SolarBeam: {
             transDome = POLYF(COSI, state.dataConstruction->Construct(constDome).TransSolBeamCoef);
             transPipe = InterpolatePipeTransBeam(state, COSI, state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeTransSolBeam);
             transDiff = state.dataConstruction->Construct(constDiff).TransDiff; // May want to change to POLYF also!
@@ -1407,10 +1407,10 @@ namespace DaylightingDevices {
             TransTDD = transDome * transPipe * transDiff;
 
         } break;
-        case DataDaylightingDevices::RadType::SolarAniso: {
+        case RadType::SolarAniso: {
             TransTDD = CalcTDDTransSolAniso(state, PipeNum, COSI);
         } break;
-        case DataDaylightingDevices::RadType::SolarIso: {
+        case RadType::SolarIso: {
             TransTDD = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso;
         } break;
         default:
@@ -1445,7 +1445,7 @@ namespace DaylightingDevices {
         Real64 InterpolatePipeTransBeam;
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(transBeam, DataDaylightingDevices::NumOfAngles);
+        EP_SIZE_CHECK(transBeam, NumOfAngles);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1462,7 +1462,7 @@ namespace DaylightingDevices {
         Lo = FindArrayIndex(COSI, state.dataDaylightingDevices->COSAngle);
         Hi = Lo + 1;
 
-        if (Lo > 0 && Hi <= DataDaylightingDevices::NumOfAngles) {
+        if (Lo > 0 && Hi <= NumOfAngles) {
             m = (transBeam(Hi) - transBeam(Lo)) / (state.dataDaylightingDevices->COSAngle(Hi) - state.dataDaylightingDevices->COSAngle(Lo));
             b = transBeam(Lo) - m * state.dataDaylightingDevices->COSAngle(Lo);
 
@@ -1843,6 +1843,6 @@ namespace DaylightingDevices {
         if (!state.dataGlobal->BeginEnvrnFlag) state.dataDaylightingDevices->MyEnvrnFlag = true;
     }
 
-} // namespace DaylightingDevices
+} // namespace Dayltg
 
 } // namespace EnergyPlus

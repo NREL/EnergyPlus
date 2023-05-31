@@ -63,7 +63,7 @@
 
 namespace EnergyPlus {
 
-namespace DataDaylighting {
+namespace Dayltg {
 
     // Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
     constexpr int MaxMapRefPoints(2500); // Maximum number of Illuminance Map Ref Points
@@ -155,7 +155,7 @@ namespace DataDaylighting {
         int zoneIndex = 0;    // Index to zone where the daylighting:controls object is located
         int spaceIndex = 0;   // Index to space where the daylighting:controls object is located (0 if specified for a zone)
         int enclIndex = 0;    // Index to enclosure where the daylighting:controls object is located
-        DataDaylighting::DaylightingMethod DaylightMethod = DaylightingMethod::None; // Type of Daylighting (1=SplitFlux, 2=DElight)
+        Dayltg::DaylightingMethod DaylightMethod = DaylightingMethod::None; // Type of Daylighting (1=SplitFlux, 2=DElight)
         int AvailSchedNum = 0;                                                       // pointer to availability schedule if present
         int TotalDaylRefPoints = 0;                                                  // Number of daylighting reference points for this control
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
@@ -298,7 +298,7 @@ namespace DataDaylighting {
         Real64 feneRota;             // Fenestration Rotation
     };
 
-} // namespace DataDaylighting
+} // namespace Dayltg
 
 struct DaylightingData : BaseGlobalStruct
 {
@@ -309,13 +309,13 @@ struct DaylightingData : BaseGlobalStruct
     bool DFSReportSizingDays = false;
     bool DFSReportAllShadowCalculationDays = false;
 
-    Array1D<DataDaylighting::EnclDaylightCalc> enclDaylight;
-    Array1D<DataDaylighting::ZoneDaylightCalc> ZoneDaylight;
-    Array1D<DataDaylighting::DaylightingControl> daylightControl;
-    Array1D<DataDaylighting::IllumMapData> IllumMap;
-    Array1D<DataDaylighting::MapCalcData> IllumMapCalc;
-    Array1D<DataDaylighting::RefPointData> DaylRefPt;
-    Array1D<DataDaylighting::DElightComplexFeneData> DElightComplexFene;
+    Array1D<Dayltg::EnclDaylightCalc> enclDaylight;
+    Array1D<Dayltg::ZoneDaylightCalc> ZoneDaylight;
+    Array1D<Dayltg::DaylightingControl> daylightControl;
+    Array1D<Dayltg::IllumMapData> IllumMap;
+    Array1D<Dayltg::MapCalcData> IllumMapCalc;
+    Array1D<Dayltg::RefPointData> DaylRefPt;
+    Array1D<Dayltg::DElightComplexFeneData> DElightComplexFene;
     Array1D<Real64> spacePowerReductionFactor; // Average electric power reduction factor for space due to daylighting
 
     void clear_state() override

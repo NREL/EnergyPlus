@@ -454,7 +454,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         ComputeDifSolExcZonesWIZWindows(state, state.dataGlobal->NumOfZones);
     }
 
-    DaylightingManager::initDaylighting(state, state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime);
+    Dayltg::initDaylighting(state, state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime);
 
     CalcInteriorRadExchange(state, state.dataHeatBalSurf->SurfInsideTempHist(1), 0, state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea, _, "Main");
 
@@ -466,7 +466,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     InitSolarHeatGains(state);
 
-    DaylightingManager::manageDaylighting(state);
+    Dayltg::manageDaylighting(state);
 
     if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) DisplayString(state, "Initializing Internal Heat Gains");
     ManageInternalHeatGains(state, false);
@@ -2461,7 +2461,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
     auto &Surface = state.dataSurface->Surface;
 
     // Using/Aliasing
-    using DaylightingDevices::TransTDD;
+    using Dayltg::TransTDD;
     using General::POLYF;
     using SolarShading::CalcInteriorSolarDistribution;
     using namespace DataWindowEquivalentLayer;
@@ -2991,11 +2991,11 @@ void InitSolarHeatGains(EnergyPlusData &state)
             state.dataHeatBal->SurfCosIncidenceAngle(SurfNum) = ConInc;
             Real64 SurfIncSolarMultiplier = state.dataSurface->Surface(SurfNum).IncSolMultiplier;
             currBeamSolar(SurfNum) = state.dataEnvrn->BeamSolarRad * SurfIncSolarMultiplier *
-                                     TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarBeam) / thisConstruct.TransDiff;
+                                     TransTDD(state, PipeNum, ConInc, Dayltg::RadType::SolarBeam) / thisConstruct.TransDiff;
 
             state.dataSurface->SurfSkySolarInc(SurfNum) =
                 state.dataEnvrn->DifSolarRad * SurfIncSolarMultiplier * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) *
-                TransTDD(state, PipeNum, ConInc, DataDaylightingDevices::RadType::SolarAniso) / thisConstruct.TransDiff;
+                TransTDD(state, PipeNum, ConInc, Dayltg::RadType::SolarAniso) / thisConstruct.TransDiff;
 
             state.dataSurface->SurfGndSolarInc(SurfNum) = state.dataSurface->SurfGndSolarInc(SurfNum2) *
                                                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso / thisConstruct.TransDiff;
@@ -3729,7 +3729,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     // REFERENCES:
     // (I)BLAST legacy routine QSUN
 
-    using DaylightingDevices::DistributeTDDAbsorbedSolar;
+    using Dayltg::DistributeTDDAbsorbedSolar;
     using namespace DataWindowEquivalentLayer;
 
     auto &Surface = state.dataSurface->Surface;

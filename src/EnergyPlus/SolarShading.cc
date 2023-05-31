@@ -6377,7 +6377,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
     // For a time step, calculates solar radiation absorbed by exterior
     // surfaces and interior solar radiation distribution
 
-    using DaylightingDevices::TransTDD;
+    using Dayltg::TransTDD;
     using General::POLYF;
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataWindowEquivalentLayer;
@@ -6997,7 +6997,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     // Construct( Surface( SurfNum ).Construction ).TransDiff = NomDiffTrans;
                 }
             } else if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                DiffTrans = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso);
+                DiffTrans = TransTDD(state, PipeNum, CosInc, Dayltg::RadType::SolarAniso);
             } else {
                 DiffTrans = thisConstruct.TransDiff;
             }
@@ -7079,7 +7079,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             // Beam-beam transmittance for bare exterior window
             if (SunLitFract > 0.0) {
                 if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                    TBmDif = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarBeam);
+                    TBmDif = TransTDD(state, PipeNum, CosInc, Dayltg::RadType::SolarBeam);
                     state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolBeam = TBmDif;             // Report variable
                 } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::Detailed) { // Regular window
                     if (!state.dataSurface->SurfWinSolarDiffusing(SurfNum)) {                             // Clear glazing
@@ -7111,7 +7111,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
             }
             // Diffuse-diffuse transmittance for bare exterior window
             if (state.dataSurface->SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) {
-                TDifBare = TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso);
+                TDifBare = TransTDD(state, PipeNum, CosInc, Dayltg::RadType::SolarAniso);
             } else {
                 if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowModel::BSDF) {
                     // Complex Fenestration: use hemispherical ave of directional-hemispherical transmittance
@@ -8411,7 +8411,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         Real64 DifSolarInc = currDifSolarRad * state.dataSolarShading->SurfAnisoSkyMult(SurfNum2) +
                                              currGndSolarRad * state.dataSurface->Surface(SurfNum2).ViewFactorGround;
                         // Exterior diffuse sky solar transmitted by TDD (W/m2)
-                        Real64 SkySolarTrans = currDifSolarRad * TransTDD(state, PipeNum, CosInc, DataDaylightingDevices::RadType::SolarAniso) *
+                        Real64 SkySolarTrans = currDifSolarRad * TransTDD(state, PipeNum, CosInc, Dayltg::RadType::SolarAniso) *
                                                state.dataSolarShading->SurfAnisoSkyMult(SurfNum2);
                         // Exterior diffuse ground solar transmitted by TDD (W/m2)
                         Real64 GndSolarTrans = currGndSolarRad * state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso *
@@ -8884,7 +8884,7 @@ void PerformSolarCalculations(EnergyPlusData &state)
     // na
 
     // Using/Aliasing
-    using DaylightingManager::CalcDayltgCoefficients;
+    using Dayltg::CalcDayltgCoefficients;
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
     // na
@@ -9961,7 +9961,7 @@ void WindowShadingManager(EnergyPlusData &state)
                         Real64 ThetaBlock1; // Slat angles that just block beam solar (rad)
                         Real64 ThetaBlock2;
 
-                        DaylightingManager::ProfileAngle(state,
+                        Dayltg::ProfileAngle(state,
                                                          ISurf,
                                                          state.dataEnvrn->SOLCOS,
                                                          state.dataMaterial->Blind(BlNum).SlatOrientation,

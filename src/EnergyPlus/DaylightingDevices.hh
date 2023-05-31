@@ -57,7 +57,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace DaylightingDevices {
+namespace Dayltg {
 
     void InitDaylightingDevices(EnergyPlusData &state);
 
@@ -82,7 +82,7 @@ namespace DaylightingDevices {
     Real64 TransTDD(EnergyPlusData &state,
                     int const PipeNum,                                  // TDD pipe object number
                     Real64 const COSI,                                  // Cosine of the incident angle
-                    DataDaylightingDevices::RadType const RadiationType // Radiation type flag
+                    Dayltg::RadType const RadiationType // Radiation type flag
     );
 
     Real64 InterpolatePipeTransBeam(EnergyPlusData &state,
@@ -101,12 +101,12 @@ namespace DaylightingDevices {
 
     void FigureTDDZoneGains(EnergyPlusData &state);
 
-} // namespace DaylightingDevices
+} // namespace Dayltg
 
 struct DaylightingDevicesData : BaseGlobalStruct
 {
 
-    Array1D<Real64> COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles); // List of cosines of incident angle
+    Array1D<Real64> COSAngle = Array1D<Real64>(Dayltg::NumOfAngles); // List of cosines of incident angle
     bool ShelfReported = false;
     bool GetTDDInputErrorsFound = false;   // Set to true if errors in input, fatal at end of routine
     bool GetShelfInputErrorsFound = false; // Set to true if errors in input, fatal at end of routine
@@ -114,7 +114,7 @@ struct DaylightingDevicesData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->COSAngle = Array1D<Real64>(DataDaylightingDevices::NumOfAngles);
+        this->COSAngle = Array1D<Real64>(Dayltg::NumOfAngles);
         this->ShelfReported = false;
         this->GetTDDInputErrorsFound = false;
         this->GetShelfInputErrorsFound = false;
