@@ -1,4 +1,4 @@
-Ruleset Model Description Phase 2 JSON Output
+Ruleset Model Description Phase 2
 ================
 
 **Jason Glazer, GARD Analytics**
