@@ -3329,6 +3329,30 @@ This numeric field defines the nominal time (in seconds) after startup for conde
 
 This numeric field defines ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil's steady-state latent capacity (Watts) at rated airflow and temperature conditions. Suggested value is 1.5; zero value means the latent degradation model is disabled. The default value for this field is zero.
 
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-vs}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-vs}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-vs}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-vs}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-vs}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-vs}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-vs}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
+
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-4}
 
 This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR, sensible or latent load/steady-state sensible or latent cooling capacity for Speed 1), in the case that the unit operates under the lowest speed, i.e.~on/off. The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep for Speed 1. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
@@ -3453,6 +3477,9 @@ Coil:Cooling:DX:VariableSpeed,
   1.7,                                       !- Rated Air Flow Rate {m3/s}
   0.0,                                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}
   0.0,   !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+  ,                               !- Maximum Cycling Rate {cylcles/hr}
+  ,                               !- Latent Capacity Time Constant
+  ,                               !- Fan Delay Time
   HPACCOOLPLFFPLR,                     !- Part Load Fraction Correlation Curve Name
   ,                                      ! - Condenser Air Inlet Node Name
   AirCooled,                                ! - Condenser Type
@@ -7017,6 +7044,34 @@ This numeric field defines the estimated parameter \textbf{source side heat tran
 
 This numeric field defines the estimated parameter \textbf{source side heat transfer resistance} 2. Unit is W/K. This field was previously known as Parameter 10. It should only be used when the Source Side Fluid Name is an antifreeze.
 
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-pe}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
+
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-pe}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-pe}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-pe}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-pe}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-pe}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-pe}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-pe}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
+
 Following is an example for COIL:WaterToAirHP:ParameterEstimation:Cooling coil input
 
 \begin{lstlisting}
@@ -7048,7 +7103,9 @@ Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,
   2.06530E-02,                         !-Leak Rate Coefficient
   1.92757E+03,                         !- Source Side Heat Transfer Coefficient {W/K}
   ,                                               !- Source Side Heat Transfer Resistance1 {dimensionless}
-  ;                                               !- Source Side Heat Transfer Resistance2 {W/K}
+  ,                                               !- Source Side Heat Transfer Resistance2 {W/K}
+  HPACCOOLPLFFPLR;         !- Part Load Fraction Correlation Curve Name
+
 \end{lstlisting}
 
 \subsection{Coil:Cooling:WaterToAirHeatPump:EquationFit}\label{coilcoolingwatertoairheatpumpequationfit}
@@ -7139,6 +7196,10 @@ This alpha field specifies the name of a \textbf{quintlinear} performance curve 
 
 This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
 
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-efc}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
+
 \paragraph{Field: Nominal Time for Condensate Removal to Begin}\label{field-nominal-time-for-condensate-removal-to-begin-4}
 
 This numeric field defines the nominal time (in seconds) after startup for condensate to begin leaving the coil's condensate drain line at the coil's rated airflow and temperature conditions, starting with a dry coil. Nominal time is equal to the ratio of the energy of the coil's maximum condensate holding capacity (J) to the coil's steady-state latent capacity (W). Suggested value is 1000; zero value means the latent degradation model is disabled. The default value for this field is zero.
@@ -7146,6 +7207,30 @@ This numeric field defines the nominal time (in seconds) after startup for conde
 \paragraph{Field: Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity}\label{field-ratio-of-initial-moisture-evaporation-rate-and-steady-state-latent-capacity-4}
 
 This numeric field defines ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil's steady-state latent capacity (Watts) at rated airflow and temperature conditions. Suggested value is 1.5; zero value means the latent degradation model is disabled. The default value for this field is zero.
+
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-efc}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-efc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-efc}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-efc}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-efc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-efc}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-efc}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
 
 Following is an example of the input for Coil:WaterToAirHP:EquationFit:Cooling coil
 
@@ -7165,6 +7250,7 @@ Coil:Cooling:WaterToAirHeatPump:EquationFit,
   TotCoolCapCurve,                                !- Total Cooling Capacity Curve Name
   CoolSensCapCurve,                               !- Sensible Cooling Capacity Curve Name
   CoolPowCurve,                                   !- Cooling Power Consumption Curve Name
+  HPACCOOLPLFFPLR,                                !- Part Load Fraction Correlation Curve Name
   0,                                              !- Nominal Time for Condensate Removal to Begin
   0;                                              !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
   
@@ -7463,6 +7549,30 @@ This numeric field defines the nominal time (in seconds) after startup for conde
 
 This numeric field defines ratio of the initial moisture evaporation rate from the cooling coil (when the compressor first turns off, in Watts) and the coil's steady-state latent capacity (Watts) at rated airflow and temperature conditions. Suggested value is 1.5; zero value means the latent degradation model is disabled. The default value for this field is zero.
 
+\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-vsefc}
+
+This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate-vsefc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image295.png}
+\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate-vsefc}}
+\end{figure}
+
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant-vsefc}
+
+This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant-vsefc}. (Henderson et al. 1999):
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{media/image296.png}
+\caption{Suggested values for latent capacity time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant-vsefc}}
+\end{figure}
+
+\paragraph{Field: Fan Delay Time}\label{field-heat-pump-fan-delay-time-vsefc}
+
+This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
+
 \paragraph{Field: Flag for Using Hot Gas Reheat, 0 or 1}\label{field-flag-for-using-hot-gas-reheat-0-or-1}
 
 This numeric field dictates whether to use the recoverable waste heat for reheating the supply air, downstream of the coil. The value 1 means using the hot gas reheating, and 0 means not using. If the hot gas reheating is turned on, the recoverable waste heat is subtracted from both the total cooling capacity and the sensible cooling capacity. The default value for this field is zero.
@@ -7615,6 +7725,9 @@ Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,
   Autosize,                         !- Rated Water Flow Rate {m3/s}
   0.0,                              !- Nominal time for Condensate to Begin Leaving the Coil
   0.0,                              !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity
+  ,                                 !- Maximum Cycling Rate {cylcles/hr}
+  ,                                 !- Latent Capacity Time Constant
+  ,                                 !- Fan Delay Time
   1,                                !- Flag for Using Hot Gas Reheat or Not, 0 = false; 1 = true
   VS Energy Part Load Fraction 1,   !- Energy Part Load Fraction Curve
   1524.1,                           !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity
@@ -8002,6 +8115,10 @@ This numeric field defines the estimated parameter \textbf{source side heat tran
 
 This numeric field defines the estimated \textbf{parameter source side heat transfer resistance 2}. Unit is W/K. This field was previously known as Parameter 9. It should only be used when the Source Side Fluid Name is an antifreeze.
 
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-peh}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
+
 Following is an example input for Coil:WatertoAirHP:ParameterEstimation:Heating
 
 \begin{lstlisting}
@@ -8031,6 +8148,7 @@ Coil:Heating:WaterToAirHeatPump:ParameterEstimation,
   4.00322E+03,                         !- Source Side Heat Transfer Coefficient {W/K}
   ,                                               !- Source Side Heat Transfer Resistance1 {dimensionless}
   ;                                               !- Source Side Heat Transfer Resistance2 {W/K}
+  HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 \end{lstlisting}
 
 \subsection{Coil:Heating:WaterToAirHeatPump:EquationFit}\label{coilheatingwatertoairheatpumpequationfit}
@@ -8094,6 +8212,10 @@ This alpha field specifies the name of a \textbf{quadlinear} performance curve o
 \paragraph{Field: Heating Power Consumption Curve Name}\label{field-heating-power-consumption-curve-name}
 
 This alpha field specifies the name of a \textbf{quadlinear} performance curve object (ref: Performance Curves) for the heat pump power consumption. The Single Speed Equation-Fit Model for Unitary Water-To-Air Heat Pump under the Air System Compound Component Groups in the Engineering Reference document contains more explanation regarding this.
+
+\paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-efh}
+
+This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep).
 
 \subsubsection{Outputs}\label{outputs-27}
 

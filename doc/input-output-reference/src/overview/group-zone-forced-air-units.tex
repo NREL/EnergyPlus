@@ -3068,40 +3068,6 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 This alpha field contains the identifying name given to the WaterToAirHeatPump cooling coil, and should match the name specified in the corresponding WaterToAirHeatPump cooling coil object.
 
-\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-002}
-
-This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image289.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant-001}
-
-This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image290.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use-001}
-
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image291.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time-001}
-
-This numeric field contains the time delay in seconds for the heat pump supply air fan to shut off after compressor cycle off. This value can be obtained from the manufacturer or the heat pump catalog. Suggested value is 60 seconds. This value is disregared at times when the WaterToAirHeatPump's fan operating mode schedule value is greater than 0 (i.e., continuous fan mode).
-
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-1-000}
 
 This is the object type of the supplemental heating coil. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (Zone Water to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. The valid choices are:
@@ -3208,10 +3174,6 @@ ZoneHVAC:WaterToAirHeatPump,
   Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
   Coil:Cooling:WaterToAirHeatPump:EquationFit, !- Cooling Coil Object Type
   Sys 1 Heat Pump Cooling Mode, !- Cooling Coil Name
-  2.5,                      !- Maximum Cycling Rate
-  60.0,                     !- Heat Pump Time Constant
-  0.01,                     !- Fraction of On-Cycle Power Use
-  60,                       !- Heat Pump Fan Delay Time
   Coil:Heating:Fuel,         !- Supplemental Heating Coil Object Type
   Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name
   60.0,                  !- Maximum Supply Air Temperature from Supplemental Heater {C}
