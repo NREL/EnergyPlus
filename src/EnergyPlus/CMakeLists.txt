@@ -14,7 +14,6 @@ set(PYTHON_API_VERSION_MINOR 2)
 set(BUILD_PLATFORM_STRING "${SYSTEM_NICKNAME}_${TARGET_ARCH}")
 configure_file(DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc")
 configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema")
 
 if(LINK_WITH_PYTHON)
   add_compile_definitions(LINK_WITH_PYTHON)
@@ -700,8 +699,8 @@ set(INPUTPARSING_SRC
 
 create_src_groups("${INPUTPARSING_SRC}")
 
-add_custom_target(
-  GenerateEmbeddedEpJSONSchema
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
   COMMAND
     ${CMAKE_COMMAND}
         -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
@@ -747,7 +746,6 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
-add_dependencies(energyplusparser GenerateEmbeddedEpJSONSchema)
 target_link_libraries(energyplusparser PUBLIC ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
@@ -787,7 +785,6 @@ target_link_libraries(energypluslib PRIVATE project_options project_fp_options p
 if(OPENGL_FOUND)
   target_link_libraries(energypluslib PUBLIC penumbra)
 endif()
-add_dependencies(energypluslib GenerateEmbeddedEpJSONSchema)
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries(energypluslib PUBLIC groundplot)
