@@ -44,7 +44,7 @@
 ! Chillers:                       HeatPump:PlantLoop:EIR:Cooling, HeatPump:PlantLoop:EIR:Heating
 ! Number of Zones: 19
 
-  Version,23.1;
+  Version,23.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4786,7 +4786,7 @@ Fan:SystemModel,
     HVACOperationSchd,        !- Availability Schedule Name
     Core_bottom_ZoneOutlet Node, !- Air Inlet Node Name
     Core_bottom_FanOutlet Node,  !- Air Outlet Node Name
-    4.2,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                    !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -4929,7 +4929,7 @@ Fan:SystemModel,
     HVACOperationSchd,        !- Availability Schedule Name
     Core_mid_ZoneOutlet Node, !- Air Inlet Node Name
     Core_mid_FanOutlet Node,  !- Air Outlet Node Name
-    4.2,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                 !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5058,7 +5058,7 @@ Fan:SystemModel,
     HVACOperationSchd,        !- Availability Schedule Name
     Core_top_ZoneOutlet Node, !- Air Inlet Node Name
     Core_top_FanOutlet Node,  !- Air Outlet Node Name
-    4.2,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                 !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5178,7 +5178,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_bot_ZN_1_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_bot_ZN_1_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5307,7 +5307,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_bot_ZN_2_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_bot_ZN_2_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                     !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5436,7 +5436,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_bot_ZN_3_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_bot_ZN_3_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5565,7 +5565,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_bot_ZN_4_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_bot_ZN_4_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5694,7 +5694,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_mid_ZN_1_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_mid_ZN_1_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5823,7 +5823,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_mid_ZN_2_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_mid_ZN_2_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -5952,7 +5952,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_mid_ZN_3_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_mid_ZN_3_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -6081,7 +6081,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_mid_ZN_4_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_mid_ZN_4_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -6211,7 +6211,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_top_ZN_1_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_top_ZN_1_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -6341,7 +6341,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_top_ZN_2_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_top_ZN_2_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -6465,7 +6465,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_top_ZN_3_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_top_ZN_3_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -6594,7 +6594,7 @@ Fan:SystemModel,
     HVACOperationSchd,    !- Availability Schedule Name
     Perimeter_top_ZN_4_ZoneOutlet Node,          !- Air Inlet Node Name
     Perimeter_top_ZN_4_FanOutlet Node,  !- Air Outlet Node Name
-    1.6,                     !- Design Maximum Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     600.0,                   !- Design Pressure Rise {Pa}
@@ -10071,7 +10071,7 @@ Fan:SystemModel,
     1.0,                        !- Sizing Factor
     CoolCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     CoolEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                    !- Control Type
     VariableSpeedPumping,            !- Flow Mode
     0.2;                     !- Minimum Part Load Ratio
@@ -10095,7 +10095,7 @@ Fan:SystemModel,
     1.0,                        !- Sizing Factor
     CoolCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     CoolEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                    !- Control Type
     VariableSpeedPumping,            !- Flow Mode
     0.2;                     !- Minimum Part Load Ratio
@@ -10156,7 +10156,7 @@ Curve:Biquadratic,
     1.0,                        !- Sizing Factor
     HeatCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     HeatEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     1.1,                     !- Heating To Cooling Capacity Sizing Ratio
     GreaterOfHeatingOrCooling,  !- Heat Pump Sizing Method
     Setpoint,                    !- Control Type
@@ -10218,7 +10218,7 @@ Curve:Biquadratic,
     1.0,                        !- Sizing Factor
     HeatCapCurveFuncTemp,    !- Capacity Modifier Function of Temperature Curve Name
     HeatEIRCurveFuncTemp,    !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    FakeEIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     1.1,                     !- Heating To Cooling Capacity Sizing Ratio
     GreaterOfHeatingOrCooling,  !- Heat Pump Sizing Method
     Setpoint,                    !- Control Type
@@ -10298,28 +10298,10 @@ Curve:Biquadratic,
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Curve:Biquadratic,
-    FakeEIRCurveFuncTemp,        !- Name
+  Curve:Quadratic,
+    EIRCurveFuncPLR,         !- Name
     0.0,                     !- Coefficient1 Constant
     1.0,                     !- Coefficient2 x
-    0.0,                     !- Coefficient3 x**2
-    0.0,                     !- Coefficient4 y
-    0.0,                     !- Coefficient5 y**2
-    0.0,                     !- Coefficient6 x*y
-    5.0,                     !- Minimum Value of x
-    10.0,                    !- Maximum Value of x
-    24.0,                    !- Minimum Value of y
-    35.0,                    !- Maximum Value of y
-    ,                        !- Minimum Curve Output
-    ,                        !- Maximum Curve Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless;           !- Output Unit Type
-
-  Curve:Quadratic,
-    FakeEIRCurveFuncPLR,         !- Name
-    1.0,                     !- Coefficient1 Constant
-    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
@@ -10619,14 +10601,6 @@ Curve:Biquadratic,
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Curve:Quadratic,
-    EIRCurveFuncPLR,         !- Name
-    1.0,                     !- Coefficient1 Constant
-    0.0,                     !- Coefficient2 x
-    0.0,                     !- Coefficient3 x**2
-    0.0,                     !- Minimum Value of x
-    1.0;                     !- Maximum Value of x
-
 
   HeatPump:PlantLoop:EIR:Cooling,
     Dedicated HR Cooling Side WSHP,            !- Name
@@ -10643,7 +10617,10 @@ Curve:Biquadratic,
     0.2,                        !- Sizing Factor
     CapCurveFuncTemp2,       !- Capacity Modifier Function of Temperature Curve Name
     EIRCurveFuncTemp2,       !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    EIRCurveFuncPLR2;        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    EIRCurveFuncPLR2,        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    Setpoint,                !- Control Type
+    VariableSpeedPumping,    !- Flow Mode
+    0.2;                     !- Minimum Part Load Ratio
 
   Curve:Biquadratic,
     CapCurveFuncTemp2,       !- Name
@@ -11690,10 +11667,13 @@ Output:Variable,Cooling Side WSHP Load Side Outlet,System Node Mass Flow Rate,ti
     Output:Variable,*,Fluid Heat Exchanger Operation Status,timestep; !- HVAC Average []
     Output:Variable,*,Fluid Heat Exchanger Effectiveness,timestep; !- HVAC Average []
 
-Output:Variable,*,Supervisory Plant Operation Mode,timestep; !- HVAC Average [unknown]
-Output:Variable,*,Supervisory Plant Operation Sensed Heating Load,timestep; !- HVAC Average [unknown]
-Output:Variable,*,Supervisory Plant Operation Sensed Cooling Load,timestep; !- HVAC Average [unknown]
-Output:Variable,*,Supervisory Plant Dedicated Recovery Heat Pump Mode,timestep; !- HVAC Average [unknown]
+Output:Variable,*,Supervisory Plant Heat Pump Operation Mode,timestep; !- HVAC Average [unknown]
+Output:Variable,*,Supervisory Plant Operation Polled Building Heating Load,timestep; !- HVAC Average [W]
+Output:Variable,*,Supervisory Plant Operation Polled Building Cooling Load,timestep; !- HVAC Average [W]
+Output:Variable,*,Supervisory Plant Heat Recovery Operation Mode,timestep; !- HVAC Average [unknown]
+Output:Variable,*,Supervisory Plant Operation Primary Plant Heating Load,timestep; !- HVAC Average [W]
+Output:Variable,*,Supervisory Plant Operation Primary Plant Cooling Load,timestep; !- HVAC Average [W]
+Output:Variable,*,Supervisory Plant Auxiliary Boiler Mode,timestep; !- HVAC Average [unknown]
 
 Output:Variable,*,Chilled Water Thermal Storage Tank Temperature,timestep; !- HVAC Average [C]
 Output:Variable,*,Chilled Water Thermal Storage Tank Heat Gain Rate,timestep; !- HVAC Average [W]
