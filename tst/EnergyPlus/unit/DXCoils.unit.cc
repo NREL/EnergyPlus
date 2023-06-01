@@ -1929,24 +1929,43 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     GetCurveInput(*state);
     GetDXCoils(*state);
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+    // Coil:Cooling:DX:SingleSpeed
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).DXCoilType_Num, CoilDX_CoolingSingleSpeed);
     EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(1).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Cooling:DX:TwoStageWithHumidityControlMode
     EXPECT_EQ(state->dataDXCoils->DXCoil(2).DXCoilType_Num, CoilDX_CoolingTwoStageWHumControl);
     EXPECT_EQ("HEATERCAPCURVE7", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(2).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Heating:DX:SingleSpeed
     EXPECT_EQ(state->dataDXCoils->DXCoil(3).DXCoilType_Num, CoilDX_HeatingEmpirical);
     EXPECT_EQ("HEATERCAPCURVE2", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(3).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Pumped
     EXPECT_EQ(state->dataDXCoils->DXCoil(4).DXCoilType_Num, CoilDX_HeatPumpWaterHeaterPumped);
     EXPECT_EQ("HEATERCAPCURVE9", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(4).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:WaterHeating:AirToWaterHeatPump:Wrapped
     EXPECT_EQ(state->dataDXCoils->DXCoil(5).DXCoilType_Num, CoilDX_HeatPumpWaterHeaterWrapped);
     EXPECT_EQ("HEATERCAPCURVE8", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(5).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Cooling:DX:MultiSpeed
     EXPECT_EQ(state->dataDXCoils->DXCoil(6).DXCoilType_Num, CoilDX_MultiSpeedCooling);
     EXPECT_EQ("HEATERCAPCURVE3", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(6).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Heating:DX:MultiSpeed
     EXPECT_EQ(state->dataDXCoils->DXCoil(7).DXCoilType_Num, CoilDX_MultiSpeedHeating);
     EXPECT_EQ("HEATERCAPCURVE4", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(7).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Cooling:DX:VariableSpeed
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).VSCoilType, Coil_CoolingAirToAirVariableSpeed);
     EXPECT_EQ("HEATERCAPCURVE5", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(1).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:Heating:DX:VariableSpeed
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).VSCoilType, Coil_HeatingAirToAirVariableSpeed);
     EXPECT_EQ("HEATERCAPCURVE6", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(2).CrankcaseHeaterCapacityCurveIndex));
+
+    // Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(3).VSCoilType, CoilDX_HeatPumpWaterHeaterVariableSpeed);
     EXPECT_EQ("HEATERCAPCURVE10", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(3).CrankcaseHeaterCapacityCurveIndex));
 
@@ -1966,7 +1985,6 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     Real64 CycRatio = 1.0;
     DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     int SingleMode = 0;
-    // Coil:Cooling:DX:MultiSpeed
 
     int VarSpeedCoilNum = 1;
     int CyclingScheme = 1;
@@ -2027,6 +2045,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     // EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 22.0);
     // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
 
+    // Coil:Cooling:DX:MultiSpeed
     DXCoilNum = 6;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap = 4000.0;
@@ -2036,6 +2055,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         *state, DXCoilNum, SpeedRatio, CycRatio, state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds, FanOpMode, CompressorOp, SingleMode);
     EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 37.0);
 
+    // Coil:Heating:DX:MultiSpeed
     DXCoilNum = 7;
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap.allocate(state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds);
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedTotCap = 4000.0;
