@@ -81,7 +81,6 @@ namespace DataEnvironment {
 
 struct EnvironmentData : BaseGlobalStruct
 {
-
     Real64 BeamSolarRad = 0.0;                 // Current beam normal solar irradiance
     bool EMSBeamSolarRadOverrideOn = false;    // EMS flag for beam normal solar irradiance
     Real64 EMSBeamSolarRadOverrideValue = 0.0; // EMS override value for beam normal solar irradiance
@@ -144,7 +143,7 @@ struct EnvironmentData : BaseGlobalStruct
     Real64 WaterMainsTemp = 0.0;                                // Current water mains temperature
     int Year = 0;                                               // Current calendar year of the simulation from the weather file
     int YearTomorrow = 0;                                       // Tomorrow's calendar year of the simulation
-    Vector3<Real64> SOLCOS;                                     // Solar direction cosines at current time step
+    Vector3<Real64> SOLCOS = {0.0, 0.0, 0.0};                                     // Solar direction cosines at current time step
     Real64 CloudFraction = 0.0;                                 // Fraction of sky covered by clouds
     Real64 HISKF = 0.0;                                         // Exterior horizontal illuminance from sky (lux).
     Real64 HISUNF = 0.0;                                        // Exterior horizontal beam illuminance (lux)
@@ -207,7 +206,7 @@ struct EnvironmentData : BaseGlobalStruct
 
     void clear_state() override
     {
-        *this = EnvironmentData();
+        new (this) EnvironmentData();
     }
 };
 
