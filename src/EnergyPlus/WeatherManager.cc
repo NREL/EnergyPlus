@@ -4547,7 +4547,7 @@ namespace WeatherManager {
         }
     }
 
-    void DetermineSunUpDown(EnergyPlusData &state, Array1D<Real64> &SunDirectionCosines)
+    void DetermineSunUpDown(EnergyPlusData &state, Vector3<Real64> &SunDirectionCosines)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4562,8 +4562,6 @@ namespace WeatherManager {
 
         // REFERENCES:
         // Sun routines from IBLAST, authored by Walton.
-
-        EP_SIZE_CHECK(SunDirectionCosines, 3); // NOLINT(misc-static-assert)
 
         // COMPUTE THE HOUR ANGLE
         if (state.dataGlobal->NumOfTimeStepInHour != 1) {
@@ -4598,17 +4596,17 @@ namespace WeatherManager {
             state.dataWeatherManager->SolarAzimuthAngle = 360.0 - state.dataWeatherManager->SolarAzimuthAngle;
         }
 
-        SunDirectionCosines(3) = CosZenith;
+        SunDirectionCosines.z = CosZenith;
         state.dataEnvrn->SunIsUpPrevTS = state.dataEnvrn->SunIsUp;
         if (CosZenith < DataEnvironment::SunIsUpValue) {
             state.dataEnvrn->SunIsUp = false;
-            SunDirectionCosines(2) = 0.0;
-            SunDirectionCosines(1) = 0.0;
+            SunDirectionCosines.y = 0.0;
+            SunDirectionCosines.x = 0.0;
         } else {
             state.dataEnvrn->SunIsUp = true;
-            SunDirectionCosines(2) = state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle * state.dataEnvrn->CosLatitude -
+            SunDirectionCosines.y = state.dataWeatherManager->TodayVariables.SinSolarDeclinAngle * state.dataEnvrn->CosLatitude -
                                      state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * state.dataEnvrn->SinLatitude * std::cos(H);
-            SunDirectionCosines(1) = state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::sin(H);
+            SunDirectionCosines.x = state.dataWeatherManager->TodayVariables.CosSolarDeclinAngle * std::sin(H);
         }
     }
 
