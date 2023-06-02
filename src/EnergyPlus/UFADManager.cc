@@ -107,7 +107,7 @@ using namespace DataHeatBalance;
 using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
 using namespace DataRoomAirModel;
-using ConvectionCoefficients::CalcDetailedHcInForDVModel;
+using Convect::CalcDetailedHcInForDVModel;
 
 void ManageUCSDUFModels(EnergyPlusData &state,
                         int const ZoneNum,                                 // index number for the specified zone
@@ -136,7 +136,7 @@ void ManageUCSDUFModels(EnergyPlusData &state,
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
     using namespace DataRoomAirModel;
-    using ConvectionCoefficients::CalcDetailedHcInForDVModel;
+    using Convect::CalcDetailedHcInForDVModel;
 
     // input was obtained in RoomAirManager, GetUFADIntZoneData
 
