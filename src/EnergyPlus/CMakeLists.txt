@@ -699,6 +699,18 @@ set(INPUTPARSING_SRC
 
 create_src_groups("${INPUTPARSING_SRC}")
 
+configure_file("${PROJECT_SOURCE_DIR}/idd/Energy+.idd.in" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd")
+
+add_custom_command(
+        OUTPUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON"
+        COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        DEPENDS
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd"
+        "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py"
+        "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/idd_parser.py"
+        "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/modify_schema.py"
+)
+
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
   COMMAND
@@ -710,7 +722,7 @@ add_custom_command(
         -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddable_epJSON_schema>"
         -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS generate_embeddable_epJSON_schema)
+  DEPENDS generate_embeddable_epJSON_schema "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
 
 add_subdirectory(AirflowNetwork)
 

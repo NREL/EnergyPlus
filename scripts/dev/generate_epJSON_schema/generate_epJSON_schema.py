@@ -62,7 +62,7 @@ from os import path
 
 source_dir_path = sys.argv[1]
 data = idd_parser.Data()
-with open(path.join(source_dir_path, 'idd', 'Energy+.idd.in'), 'r') as f:
+with open(path.join(source_dir_path, 'Energy+.idd'), 'r') as f:
     data.file = f.read()
 
 idd_parser.parse_idd(data)
@@ -75,5 +75,5 @@ modify_schema.change_extensions_name(data.schema)
 modify_schema.change_89_release_issues(data.schema)
 modify_schema.add_explicit_extensible_bounds(data.schema)
 
-with open(path.join(source_dir_path, 'idd', 'Energy+.schema.epJSON.in'), 'w') as f2:
+with open(path.join(source_dir_path, 'Energy+.schema.epJSON'), 'w') as f2:
     f2.write(json.dumps(data.schema, indent=4))
