@@ -259,7 +259,7 @@ namespace SurfaceGeometry {
     };
 
     void GetGeoSummaryRoof(EnergyPlusData &state, GeoSummary &geoSumRoof);
-	
+
     class ExposedFoundationPerimeter
     {
     public:

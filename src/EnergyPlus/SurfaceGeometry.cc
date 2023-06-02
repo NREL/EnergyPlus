@@ -714,24 +714,50 @@ namespace SurfaceGeometry {
             std::string String2;
             std::string String3;
 
-	    switch (state.dataHeatBal->Zone(ZoneNum).IntConvAlgo) {
-	    case Convect::HcInt::ASHRAESimple: { String1 = "Simple"; } break;
-	    case Convect::HcInt::ASHRAETARP: { String1 = "TARP"; } break;
-	    case Convect::HcInt::CeilingDiffuser: { String1 = "CeilingDiffuser"; } break;
-	    case Convect::HcInt::TrombeWall: { String1 = "TrombeWall"; } break;
-	    case Convect::HcInt::AdaptiveConvectionAlgorithm: { String1 = "AdaptiveConvectionAlgorithm"; } break;
-	    case Convect::HcInt::ASTMC1340: { String1 = "ASTMC1340"; } break;
-	    default: break;
-	    }
+            switch (state.dataHeatBal->Zone(ZoneNum).IntConvAlgo) {
+            case Convect::HcInt::ASHRAESimple: {
+                String1 = "Simple";
+            } break;
+            case Convect::HcInt::ASHRAETARP: {
+                String1 = "TARP";
+            } break;
+            case Convect::HcInt::CeilingDiffuser: {
+                String1 = "CeilingDiffuser";
+            } break;
+            case Convect::HcInt::TrombeWall: {
+                String1 = "TrombeWall";
+            } break;
+            case Convect::HcInt::AdaptiveConvectionAlgorithm: {
+                String1 = "AdaptiveConvectionAlgorithm";
+            } break;
+            case Convect::HcInt::ASTMC1340: {
+                String1 = "ASTMC1340";
+            } break;
+            default:
+                break;
+            }
 
-            switch (state.dataHeatBal->Zone(ZoneNum).ExtConvAlgo) { 
-	    case Convect::HcExt::ASHRAESimple: { String2 = "Simple"; } break;
-	    case Convect::HcExt::ASHRAETARP: { String2 = "TARP"; } break;
-	    case Convect::HcExt::TarpHcOutside: { String2 = "TARP"; } break;
-	    case Convect::HcExt::MoWiTTHcOutside: { String2 = "MoWitt"; } break;
-	    case Convect::HcExt::DOE2HcOutside: { String2 = "DOE-2"; } break;
-	    case Convect::HcExt::AdaptiveConvectionAlgorithm: { String2 = "AdaptiveConvectionAlgorithm"; } break;
-	    default: break;
+            switch (state.dataHeatBal->Zone(ZoneNum).ExtConvAlgo) {
+            case Convect::HcExt::ASHRAESimple: {
+                String2 = "Simple";
+            } break;
+            case Convect::HcExt::ASHRAETARP: {
+                String2 = "TARP";
+            } break;
+            case Convect::HcExt::TarpHcOutside: {
+                String2 = "TARP";
+            } break;
+            case Convect::HcExt::MoWiTTHcOutside: {
+                String2 = "MoWitt";
+            } break;
+            case Convect::HcExt::DOE2HcOutside: {
+                String2 = "DOE-2";
+            } break;
+            case Convect::HcExt::AdaptiveConvectionAlgorithm: {
+                String2 = "AdaptiveConvectionAlgorithm";
+            } break;
+            default:
+                break;
             }
 
             String3 = (state.dataHeatBal->Zone(ZoneNum).isPartOfTotalArea) ? "Yes" : "No";
@@ -953,9 +979,9 @@ namespace SurfaceGeometry {
             state.dataSurface->SurfLowTempErrCount(SurfNum) = 0;
             state.dataSurface->SurfHighTempErrCount(SurfNum) = 0;
             state.dataSurface->SurfIntConvCoeff(SurfNum) = Convect::HcInt::SetByZone;
-	    state.dataSurface->SurfIntConvUserCoeffNum(SurfNum) = 0;
+            state.dataSurface->SurfIntConvUserCoeffNum(SurfNum) = 0;
             state.dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::SetByZone;
-	    state.dataSurface->SurfExtConvUserCoeffNum(SurfNum) = 0;
+            state.dataSurface->SurfExtConvUserCoeffNum(SurfNum) = 0;
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::Invalid;
             state.dataSurface->SurfTAirRefRpt(SurfNum) = static_cast<int>(DataSurfaces::RefAirTemp::Invalid);
             state.dataSurface->SurfIntConvClass(SurfNum) = Convect::IntConvClass::Invalid;
@@ -2752,7 +2778,7 @@ namespace SurfaceGeometry {
                     }
                 }
 
-		// Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
+                // Exclude non-exterior heat transfer surfaces (but not OtherSideCondModeledExt = -4 CR7640)
                 if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond > 0) continue;
                 if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == Ground) continue;
                 if (state.dataSurface->Surface(SurfNum).HeatTransSurf && state.dataSurface->Surface(SurfNum).ExtBoundCond == KivaFoundation) {
@@ -2808,40 +2834,39 @@ namespace SurfaceGeometry {
                 }
             }
 
-	    // Populate SurfaceFilter lists
-	    for (int iSurfaceFilter = 1; iSurfaceFilter < static_cast<int>(SurfaceFilter::Num); ++iSurfaceFilter)
-	        state.dataSurface->SurfaceFilterLists[iSurfaceFilter].reserve(state.dataSurface->TotSurfaces);
+            // Populate SurfaceFilter lists
+            for (int iSurfaceFilter = 1; iSurfaceFilter < static_cast<int>(SurfaceFilter::Num); ++iSurfaceFilter)
+                state.dataSurface->SurfaceFilterLists[iSurfaceFilter].reserve(state.dataSurface->TotSurfaces);
 
-	    for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 auto const &surf = state.dataSurface->Surface(SurfNum);
                 if (!surf.HeatTransSurf) continue;
-		if (surf.ExtBoundCond > 0) {
+                if (surf.ExtBoundCond > 0) {
                     state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorSurfaces)].push_back(SurfNum);
-		    if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWindows)].push_back(SurfNum);
-		    } else if (surf.Class == SurfaceClass::Wall) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWalls)].push_back(SurfNum);
-		    } else if (surf.Class == SurfaceClass::Floor) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorFloors)].push_back(SurfNum);
-		    } else if (surf.Class == SurfaceClass::Roof) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorRoofs)].push_back(SurfNum);
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
-		    }
-		} else {
+                    if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWindows)].push_back(SurfNum);
+                    } else if (surf.Class == SurfaceClass::Wall) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorWalls)].push_back(SurfNum);
+                    } else if (surf.Class == SurfaceClass::Floor) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorFloors)].push_back(SurfNum);
+                    } else if (surf.Class == SurfaceClass::Roof) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorRoofs)].push_back(SurfNum);
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+                    }
+                } else {
                     state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorSurfaces)].push_back(SurfNum);
-		    if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWindows)].push_back(SurfNum);
-		    } else if (surf.Class == SurfaceClass::Wall) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWalls)].push_back(SurfNum);
-		    } else if (surf.Class == SurfaceClass::Floor) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorFloors)].push_back(SurfNum);
-		    } else if (surf.Class == SurfaceClass::Roof) {
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorRoofs)].push_back(SurfNum);
-		        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
-		    }
-		}
-	    }
-	    
+                    if (state.dataConstruction->Construct(surf.Construction).TypeIsWindow) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWindows)].push_back(SurfNum);
+                    } else if (surf.Class == SurfaceClass::Wall) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorWalls)].push_back(SurfNum);
+                    } else if (surf.Class == SurfaceClass::Floor) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorFloors)].push_back(SurfNum);
+                    } else if (surf.Class == SurfaceClass::Roof) {
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllExteriorRoofs)].push_back(SurfNum);
+                        state.dataSurface->SurfaceFilterLists[static_cast<int>(SurfaceFilter::AllInteriorCeilings)].push_back(SurfNum);
+                    }
+                }
+            }
 
             // Note, could do same for Window Area and detecting if Interzone Surface in Zone
 
@@ -16093,117 +16118,118 @@ namespace SurfaceGeometry {
         }
     }
 
-void GetGeoSummaryRoof(EnergyPlusData &state, GeoSummary &geoSummaryRoof)
-{
-    std::vector<Vector> uniqueRoofVertices;
-    std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
-    for (const auto &surface : state.dataSurface->Surface) {
+    void GetGeoSummaryRoof(EnergyPlusData &state, GeoSummary &geoSummaryRoof)
+    {
+        std::vector<Vector> uniqueRoofVertices;
+        std::vector<SurfaceGeometry::EdgeOfSurf> uniqEdgeOfSurfs; // I'm only partially using this
+        for (const auto &surface : state.dataSurface->Surface) {
 
-        if (surface.ExtBoundCond != ExternalEnvironment) {
-            continue;
-        }
-        if (!surface.HeatTransSurf) {
-            continue;
-        }
-
-        if (surface.Tilt > 45.0) { // TODO Double check tilt wrt outside vs inside?
-            continue;
-        }
-
-        Real64 const z_min(minval(surface.Vertex, &Vector::z));
-        Real64 const z_max(maxval(surface.Vertex, &Vector::z));
-        Real64 const verticalHeight = z_max - z_min;
-        geoSummaryRoof.Height += verticalHeight * surface.Area;
-	geoSummaryRoof.Tilt += surface.Tilt * surface.Area;
-        geoSummaryRoof.Azimuth += surface.Azimuth * surface.Area;
-        geoSummaryRoof.Area += surface.Area;
-
-        for (auto it = surface.Vertex.begin(); it != surface.Vertex.end(); ++it) {
-
-            auto itnext = std::next(it);
-            if (itnext == std::end(surface.Vertex)) {
-                itnext = std::begin(surface.Vertex);
+            if (surface.ExtBoundCond != ExternalEnvironment) {
+                continue;
+            }
+            if (!surface.HeatTransSurf) {
+                continue;
             }
 
-            auto &curVertex = *it;
-            auto &nextVertex = *itnext;
-            auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
-                return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
-            });
-            if (it2 == std::end(uniqueRoofVertices)) {
-                uniqueRoofVertices.emplace_back(curVertex);
+            if (surface.Tilt > 45.0) { // TODO Double check tilt wrt outside vs inside?
+                continue;
             }
 
-            SurfaceGeometry::EdgeOfSurf thisEdge;
-            thisEdge.start = std::move(curVertex);
-            thisEdge.end = std::move(nextVertex);
-            thisEdge.count = 1;
+            Real64 const z_min(minval(surface.Vertex, &Vector::z));
+            Real64 const z_max(maxval(surface.Vertex, &Vector::z));
+            Real64 const verticalHeight = z_max - z_min;
+            geoSummaryRoof.Height += verticalHeight * surface.Area;
+            geoSummaryRoof.Tilt += surface.Tilt * surface.Area;
+            geoSummaryRoof.Azimuth += surface.Azimuth * surface.Area;
+            geoSummaryRoof.Area += surface.Area;
 
-            // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
-            auto itEdge = std::find(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), thisEdge);
-            if (itEdge == uniqEdgeOfSurfs.end()) {
-                uniqEdgeOfSurfs.emplace_back(std::move(thisEdge));
-            } else {
-                ++(itEdge->count);
+            for (auto it = surface.Vertex.begin(); it != surface.Vertex.end(); ++it) {
+
+                auto itnext = std::next(it);
+                if (itnext == std::end(surface.Vertex)) {
+                    itnext = std::begin(surface.Vertex);
+                }
+
+                auto &curVertex = *it;
+                auto &nextVertex = *itnext;
+                auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
+                    return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
+                });
+                if (it2 == std::end(uniqueRoofVertices)) {
+                    uniqueRoofVertices.emplace_back(curVertex);
+                }
+
+                SurfaceGeometry::EdgeOfSurf thisEdge;
+                thisEdge.start = std::move(curVertex);
+                thisEdge.end = std::move(nextVertex);
+                thisEdge.count = 1;
+
+                // Uses the custom operator== that uses isAlmostEqual3dPt internally and doesn't care about order of the start/end
+                auto itEdge = std::find(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), thisEdge);
+                if (itEdge == uniqEdgeOfSurfs.end()) {
+                    uniqEdgeOfSurfs.emplace_back(std::move(thisEdge));
+                } else {
+                    ++(itEdge->count);
+                }
             }
         }
-    }
 
-    if (geoSummaryRoof.Area > 0) {
-        geoSummaryRoof.Height /= geoSummaryRoof.Area;
-        geoSummaryRoof.Tilt /= geoSummaryRoof.Area;
-        geoSummaryRoof.Azimuth /= geoSummaryRoof.Area;
-    } else {
-        geoSummaryRoof.Height = 0.0;
-        geoSummaryRoof.Tilt = 0.0;
-        geoSummaryRoof.Azimuth = 0.0;
-    }
+        if (geoSummaryRoof.Area > 0) {
+            geoSummaryRoof.Height /= geoSummaryRoof.Area;
+            geoSummaryRoof.Tilt /= geoSummaryRoof.Area;
+            geoSummaryRoof.Azimuth /= geoSummaryRoof.Area;
+        } else {
+            geoSummaryRoof.Height = 0.0;
+            geoSummaryRoof.Tilt = 0.0;
+            geoSummaryRoof.Azimuth = 0.0;
+        }
 
-    // Remove the ones that are already used twice
-    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
-                          uniqEdgeOfSurfs.end());
+        // Remove the ones that are already used twice
+        uniqEdgeOfSurfs.erase(
+            std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+            uniqEdgeOfSurfs.end());
 
-    // Intersect with unique vertices as much as needed
-    bool insertedVertext = true;
-    while (insertedVertext) {
-        insertedVertext = false;
+        // Intersect with unique vertices as much as needed
+        bool insertedVertext = true;
+        while (insertedVertext) {
+            insertedVertext = false;
 
-        for (auto &edge : uniqEdgeOfSurfs) {
+            for (auto &edge : uniqEdgeOfSurfs) {
 
-            // now go through all the vertices and see if they are colinear with start and end vertices
-            for (const auto &testVertex : uniqueRoofVertices) {
-                if (edge.containsPoints(testVertex)) {
-                    SurfaceGeometry::EdgeOfSurf newEdgeOfSurface;
-                    newEdgeOfSurface.start = testVertex;
-                    newEdgeOfSurface.end = edge.end;
-                    edge.end = testVertex;
-                    uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
-                    insertedVertext = true;
+                // now go through all the vertices and see if they are colinear with start and end vertices
+                for (const auto &testVertex : uniqueRoofVertices) {
+                    if (edge.containsPoints(testVertex)) {
+                        SurfaceGeometry::EdgeOfSurf newEdgeOfSurface;
+                        newEdgeOfSurface.start = testVertex;
+                        newEdgeOfSurface.end = edge.end;
+                        edge.end = testVertex;
+                        uniqEdgeOfSurfs.emplace_back(std::move(newEdgeOfSurface));
+                        insertedVertext = true;
+                        break;
+                    }
+                }
+                // Break out of the loop on edges, and start again at the while
+                if (insertedVertext) {
                     break;
                 }
             }
-            // Break out of the loop on edges, and start again at the while
-            if (insertedVertext) {
-                break;
-            }
         }
+
+        // recount
+        for (auto &edge : uniqEdgeOfSurfs) {
+            edge.count = std::count(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), edge);
+        }
+
+        uniqEdgeOfSurfs.erase(
+            std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
+            uniqEdgeOfSurfs.end());
+
+        geoSummaryRoof.Perimeter =
+            std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
+                return sum + edge.length();
+            });
     }
 
-    // recount
-    for (auto &edge : uniqEdgeOfSurfs) {
-        edge.count = std::count(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), edge);
-    }
-
-    uniqEdgeOfSurfs.erase(std::remove_if(uniqEdgeOfSurfs.begin(), uniqEdgeOfSurfs.end(), [](const auto &edge) -> bool { return edge.count == 2; }),
-                          uniqEdgeOfSurfs.end());
-
-    geoSummaryRoof.Perimeter =
-        std::accumulate(uniqEdgeOfSurfs.cbegin(), uniqEdgeOfSurfs.cend(), 0.0, [](const double &sum, const SurfaceGeometry::EdgeOfSurf &edge) {
-            return sum + edge.length();
-        });
-
-}
-	
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

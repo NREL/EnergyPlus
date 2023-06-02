@@ -787,7 +787,7 @@ Compass4 AzimuthToCompass4(Real64 azimuth)
             if (azimuth >= lo || azimuth < hi) return static_cast<Compass4>(c4);
         } else {
             if (azimuth >= lo && azimuth < hi) return static_cast<Compass4>(c4);
-	}
+        }
     }
     assert(false);
     return Compass4::Invalid;

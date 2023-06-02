@@ -83,8 +83,9 @@ namespace DataSurfaces {
     // MODULE PARAMETER DEFINITIONS:
     constexpr int MaxPolyCoeff(6);
 
-    // Not sure this is the right module for this stuff, may move it later	
-    enum class Compass4 {
+    // Not sure this is the right module for this stuff, may move it later
+    enum class Compass4
+    {
         Invalid = -1,
         North,
         East,
@@ -93,42 +94,38 @@ namespace DataSurfaces {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(Compass4::Num)> compass4Names =
-        { "North", "East", "South", "West" };
-	
-    constexpr std::array<Real64, static_cast<int>(Compass4::Num)> Compass4AzimuthLo =
-        { 315.0, 45.0, 135.0, 225.0 };
-    constexpr std::array<Real64, static_cast<int>(Compass4::Num)> Compass4AzimuthHi =
-        { 45.0, 135.0, 225.0, 315.0 };
+    constexpr std::array<std::string_view, static_cast<int>(Compass4::Num)> compass4Names = {"North", "East", "South", "West"};
+
+    constexpr std::array<Real64, static_cast<int>(Compass4::Num)> Compass4AzimuthLo = {315.0, 45.0, 135.0, 225.0};
+    constexpr std::array<Real64, static_cast<int>(Compass4::Num)> Compass4AzimuthHi = {45.0, 135.0, 225.0, 315.0};
 
     Compass4 AzimuthToCompass4(Real64 azimuth);
 
-    enum class Compass8 {
+    enum class Compass8
+    {
         Invalid = -1,
         North,
         NorthEast,
         East,
-	SouthEast,
-	South,
-	SouthWest,
+        SouthEast,
+        South,
+        SouthWest,
         West,
-	NorthWest,
+        NorthWest,
         Num
     };
-	
-    constexpr std::array<std::string_view, static_cast<int>(Compass8::Num)> compass8Names =
-        { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest" };
-	
+
+    constexpr std::array<std::string_view, static_cast<int>(Compass8::Num)> compass8Names = {
+        "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest"};
+
     // There is a bug here, the azimuth that divides West from
     // NorthWest is 292.5 not 287.5.  Keeping it like this temporarily
     // to minimize diffs.
-    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthLo = 
-        { 337.5, 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5 };
-    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthHi = 
-        { 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5, 337.5 };
+    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthLo = {337.5, 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5};
+    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthHi = {22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5, 337.5};
 
     Compass8 AzimuthToCompass8(Real64 azimuth);
-		
+
     // Parameters to indicate surface shape for use with the Surface
     // derived type (see below):
     enum class SurfaceShape : int
@@ -187,20 +184,18 @@ namespace DataSurfaces {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SurfaceFilter::Num)> SurfaceFilterNamesUC = {
-        "ALLEXTERIORSURFACES",
-        "ALLEXTERIORWINDOWS",
-        "ALLEXTERIORWALLS",
-        "ALLEXTERIORROOFS",
-        "ALLEXTERIORFLOORS",
-        "ALLINTERIORSURFACES",
-        "ALLINTERIORWINDOWS",
-        "ALLINTERIORWALLS",
-        "ALLINTERIORROOFS",
-        "ALLINTERIORCEILINGS",
-        "ALLINTERIORFLOORS"
-    };
-	
+    constexpr std::array<std::string_view, static_cast<int>(SurfaceFilter::Num)> SurfaceFilterNamesUC = {"ALLEXTERIORSURFACES",
+                                                                                                         "ALLEXTERIORWINDOWS",
+                                                                                                         "ALLEXTERIORWALLS",
+                                                                                                         "ALLEXTERIORROOFS",
+                                                                                                         "ALLEXTERIORFLOORS",
+                                                                                                         "ALLINTERIORSURFACES",
+                                                                                                         "ALLINTERIORWINDOWS",
+                                                                                                         "ALLINTERIORWALLS",
+                                                                                                         "ALLINTERIORROOFS",
+                                                                                                         "ALLINTERIORCEILINGS",
+                                                                                                         "ALLINTERIORFLOORS"};
+
     enum class WinShadingType
     {
         Invalid = -1,
@@ -538,7 +533,7 @@ namespace DataSurfaces {
         HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
         Convect::HcInt intConvCoeff;             // Interior convection algorithm
         int intConvUserCoeffNum;                 // Interior convection user coefficient index
-	Convect::HcExt extConvCoeff;             // Exterior convection algorithm
+        Convect::HcExt extConvCoeff;             // Exterior convection algorithm
         int extConvUserCoeffNum;                 // Exterior convection user coefficient index
         int OSCPtr;                              // Pointer to OSC data structure
         int OSCMPtr;                             // "Pointer" to OSCM data structure (other side conditions from a model)
@@ -588,10 +583,10 @@ namespace DataSurfaces {
                     hash<Real64>()(ViewFactorSky),
 
                     hash<HeatTransferModel>()(HeatTransferAlgorithm),
-		    hash<Convect::HcInt>()(intConvCoeff),
-		    hash<Convect::HcExt>()(extConvCoeff),
-		    hash<int>()(intConvUserCoeffNum),
-		    hash<int>()(extConvUserCoeffNum),
+                    hash<Convect::HcInt>()(intConvCoeff),
+                    hash<Convect::HcExt>()(extConvCoeff),
+                    hash<int>()(intConvUserCoeffNum),
+                    hash<int>()(extConvUserCoeffNum),
                     hash<int>()(OSCPtr),
                     hash<int>()(OSCMPtr),
 
@@ -628,7 +623,7 @@ namespace DataSurfaces {
 
                     HeatTransferAlgorithm == other.HeatTransferAlgorithm && intConvCoeff == other.intConvCoeff &&
                     intConvUserCoeffNum == other.intConvUserCoeffNum && extConvUserCoeffNum == other.extConvUserCoeffNum &&
-		    extConvCoeff == other.extConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
+                    extConvCoeff == other.extConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
 
                     FrameDivider == other.FrameDivider && SurfWinStormWinConstr == other.SurfWinStormWinConstr &&
 
@@ -801,10 +796,10 @@ namespace DataSurfaces {
               ViewFactorGroundIR(0.0), ViewFactorSkyIR(0.0), OSCPtr(0), OSCMPtr(0), MirroredSurf(false), IsShadowing(false),
               IsShadowPossibleObstruction(false), SchedShadowSurfIndex(0), IsTransparent(false), SchedMinValue(0.0), activeWindowShadingControl(0),
               HasShadeControl(false), activeShadedConstruction(0), activeShadedConstructionPrev(0), FrameDivider(0), Multiplier(1.0),
-              SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), 
-              IsSurfPropertyGndSurfacesDefined(false), SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false),
-              UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0), SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false),
-              SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0), SurfLinkedOutAirNode(0)
+              SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), IsSurfPropertyGndSurfacesDefined(false),
+              SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
+              SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false), SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0),
+              SurfLinkedOutAirNode(0)
         {
         }
 
@@ -1159,16 +1154,16 @@ namespace DataSurfaces {
     struct ConvectionCoefficient
     {
         // Members
-        int WhichSurface = 0;                                   // Which surface number this is applied to
-        std::string SurfaceName = "";                           // Which surface (name)
-        Convect::OverrideType overrideType =                    // Override type, 1=value, 2=schedule, 3=model, 4=user curve
+        int WhichSurface = 0;                // Which surface number this is applied to
+        std::string SurfaceName = "";        // Which surface (name)
+        Convect::OverrideType overrideType = // Override type, 1=value, 2=schedule, 3=model, 4=user curve
             Convect::OverrideType::Invalid;
-	Real64 OverrideValue = 0.0;                             // User specified value
-        std::string ScheduleName = "";                          // Which surface (name)
-        int ScheduleIndex = 0;                                  // if type="schedule" is used
-        int UserCurveIndex = 0;                                 // if type=UserCurve is used
-	Convect::HcInt HcIntModelEq = Convect::HcInt::Invalid;  // if type is one of specific model equations
-	Convect::HcExt HcExtModelEq = Convect::HcExt::Invalid;
+        Real64 OverrideValue = 0.0;                            // User specified value
+        std::string ScheduleName = "";                         // Which surface (name)
+        int ScheduleIndex = 0;                                 // if type="schedule" is used
+        int UserCurveIndex = 0;                                // if type=UserCurve is used
+        Convect::HcInt HcIntModelEq = Convect::HcInt::Invalid; // if type is one of specific model equations
+        Convect::HcExt HcExtModelEq = Convect::HcExt::Invalid;
     };
 
     struct ShadingVertexData
@@ -1466,35 +1461,35 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfIsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
 
     // Surface ConvCoeff Properties
-    Array1D<int> SurfTAirRef;           // Flag for reference air temperature
-    Array1D<int> SurfTAirRefRpt;        // Flag for reference air temperature for reporting
+    Array1D<int> SurfTAirRef;    // Flag for reference air temperature
+    Array1D<int> SurfTAirRefRpt; // Flag for reference air temperature for reporting
 
     Array1D<Convect::IntConvClass> SurfIntConvClass; // current classification for inside face air flow regime and surface orientation
     Array1D<int> SurfIntConvClassRpt;                // current classification for inside face air flow regime and surface orientation for reporting
-    Array1D<Convect::HcInt> SurfIntConvCoeff;         // Interior Convection Coefficient 
+    Array1D<Convect::HcInt> SurfIntConvCoeff;        // Interior Convection Coefficient
     Array1D<int> SurfIntConvUserCoeffNum;            // Interior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<Convect::HcInt> SurfIntConvHcModelEq;    // current convection model for inside face
     Array1D<int> SurfIntConvHcModelEqRpt;            // current convection model for inside face
     Array1D<int> SurfIntConvHcUserCurveNum;          // current index to user convection model if used
 
-    Array1D<Convect::ExtConvClass> SurfExtConvClass;// current classification for outside face wind regime and convection orientation
-    Array1D<int> SurfExtConvClassRpt;               // current classification for outside face wind regime and convection orientation for reporting
+    Array1D<Convect::ExtConvClass> SurfExtConvClass; // current classification for outside face wind regime and convection orientation
+    Array1D<int> SurfExtConvClassRpt;                // current classification for outside face wind regime and convection orientation for reporting
     Array1D<Convect::HcExt> SurfExtConvCoeff;        // Exterior Convection Coefficient pointer (different data structure) when being overridden
     Array1D<int> SurfExtConvUserCoeffNum;            // Exterior Convection Coefficient pointer (different data structure) when being overridden
-    Array1D<Convect::HcExt> SurfExtConvHfModelEq;   // current convection model for forced convection at outside face
-    Array1D<int> SurfExtConvHfModelEqRpt;           // current convection model for forced convection at outside face
-    Array1D<int> SurfExtConvHfUserCurveNum;         // current index to user forced convection model if used
-    Array1D<Convect::HcExt> SurfExtConvHnModelEq;   // current Convection model for natural convection at outside face
-    Array1D<int> SurfExtConvHnModelEqRpt;           // current Convection model for natural convection at outside face
-    Array1D<int> SurfExtConvHnUserCurveNum;         // current index to user natural convection model if used
+    Array1D<Convect::HcExt> SurfExtConvHfModelEq;    // current convection model for forced convection at outside face
+    Array1D<int> SurfExtConvHfModelEqRpt;            // current convection model for forced convection at outside face
+    Array1D<int> SurfExtConvHfUserCurveNum;          // current index to user forced convection model if used
+    Array1D<Convect::HcExt> SurfExtConvHnModelEq;    // current Convection model for natural convection at outside face
+    Array1D<int> SurfExtConvHnModelEqRpt;            // current Convection model for natural convection at outside face
+    Array1D<int> SurfExtConvHnUserCurveNum;          // current index to user natural convection model if used
 
-    Array1D<Real64> SurfExtConvFaceArea;          // area of larger building envelope facade that surface is a part of
-    Array1D<Real64> SurfExtConvFacePerimeter;     // perimeter of larger building envelope facade that surface is a part of
-    Array1D<Real64> SurfExtConvFaceHeight;        // height of larger building envelope facade that surface is a part of
-    Array1D<Real64> SurfIntConvZoneWallHeight;    // [m] height of larger inside building wall element that surface is a part of
-    Array1D<Real64> SurfIntConvZonePerimLength;   // [m] length of perimeter zone's exterior wall
-    Array1D<Real64> SurfIntConvZoneHorizHydrDiam; // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
-    Array1D<Real64> SurfIntConvWindowWallRatio;   // [-] area of windows over area of exterior wall for zone
+    Array1D<Real64> SurfExtConvFaceArea;                       // area of larger building envelope facade that surface is a part of
+    Array1D<Real64> SurfExtConvFacePerimeter;                  // perimeter of larger building envelope facade that surface is a part of
+    Array1D<Real64> SurfExtConvFaceHeight;                     // height of larger building envelope facade that surface is a part of
+    Array1D<Real64> SurfIntConvZoneWallHeight;                 // [m] height of larger inside building wall element that surface is a part of
+    Array1D<Real64> SurfIntConvZonePerimLength;                // [m] length of perimeter zone's exterior wall
+    Array1D<Real64> SurfIntConvZoneHorizHydrDiam;              // [m] hydraulic diameter, usually 4 times the zone floor area div by perimeter
+    Array1D<Real64> SurfIntConvWindowWallRatio;                // [-] area of windows over area of exterior wall for zone
     Array1D<Convect::IntConvWinLoc> SurfIntConvWindowLocation; // relative location of window in zone for interior Hc models
     Array1D<bool> SurfIntConvSurfGetsRadiantHeat;
     Array1D<bool> SurfIntConvSurfHasActiveInIt;
@@ -1857,24 +1852,24 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfTAirRef.deallocate();
         this->SurfTAirRefRpt.deallocate();
 
-	this->SurfIntConvClass.deallocate();
-	this->SurfIntConvClassRpt.deallocate();
-	this->SurfIntConvCoeff.deallocate();        
-	this->SurfIntConvUserCoeffNum.deallocate(); 
-	this->SurfIntConvHcModelEq.deallocate();   
-	this->SurfIntConvHcModelEqRpt.deallocate();   
-	this->SurfIntConvHcUserCurveNum.deallocate();
+        this->SurfIntConvClass.deallocate();
+        this->SurfIntConvClassRpt.deallocate();
+        this->SurfIntConvCoeff.deallocate();
+        this->SurfIntConvUserCoeffNum.deallocate();
+        this->SurfIntConvHcModelEq.deallocate();
+        this->SurfIntConvHcModelEqRpt.deallocate();
+        this->SurfIntConvHcUserCurveNum.deallocate();
 
-	this->SurfExtConvClass.deallocate();
-	this->SurfExtConvClassRpt.deallocate();
-	this->SurfExtConvCoeff.deallocate();       
-	this->SurfExtConvUserCoeffNum.deallocate();
-	this->SurfExtConvHfModelEq.deallocate(); 
-	this->SurfExtConvHfModelEqRpt.deallocate(); 
-	this->SurfExtConvHfUserCurveNum.deallocate();
-	this->SurfExtConvHnModelEq.deallocate();
-	this->SurfExtConvHnModelEqRpt.deallocate();
-	this->SurfExtConvHnUserCurveNum.deallocate();         // current index to user natural convection model if used
+        this->SurfExtConvClass.deallocate();
+        this->SurfExtConvClassRpt.deallocate();
+        this->SurfExtConvCoeff.deallocate();
+        this->SurfExtConvUserCoeffNum.deallocate();
+        this->SurfExtConvHfModelEq.deallocate();
+        this->SurfExtConvHfModelEqRpt.deallocate();
+        this->SurfExtConvHfUserCurveNum.deallocate();
+        this->SurfExtConvHnModelEq.deallocate();
+        this->SurfExtConvHnModelEqRpt.deallocate();
+        this->SurfExtConvHnUserCurveNum.deallocate(); // current index to user natural convection model if used
 
         this->SurfExtConvFaceArea.deallocate();
         this->SurfExtConvFacePerimeter.deallocate();

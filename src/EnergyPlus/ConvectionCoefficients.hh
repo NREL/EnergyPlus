@@ -96,101 +96,100 @@ namespace Convect {
         std::string Name;
 
         std::array<HcInt, static_cast<int>(IntConvClass::Num)> intConvClassEqNums = {
-            HcInt::FohannoPolidoriVerticalWall, // A3_SimpleBuoy_VertWalls
-	    HcInt::AlamdariHammondStableHorizontal, // A3_SimpleBuoy_StableHoriz
-	    HcInt::AlamdariHammondUnstableHorizontal, // A3_SimpleBuoy_UnstableHoriz
-	    HcInt::WaltonStableHorizontalOrTilt, // A3_SimpleBuoy_StableTilted
-	    HcInt::WaltonUnstableHorizontalOrTilt, // A3_SimpleBuoy_UnstableTilted
-	    HcInt::ISO15099Windows, // A3_SimpleBuoy_Windows
-	    HcInt::KhalifaEq3WallAwayFromHeat, // A1_FloorHeatCeilingCool_VertWalls
-	    HcInt::AlamdariHammondStableHorizontal, // A1_FloorHeatCeilingCool_StableHoriz
-	    HcInt::KhalifaEq4CeilingAwayFromHeat, // A1_FloorHeatCeilingCool_UnstableHoriz
-	    HcInt::AwbiHattonHeatedFloor, // A1_FloorHeatCeilingCool_HeatedFloor
-	    HcInt::KaradagChilledCeiling, // A1_FloorHeatCeilingCool_ChilledCeil
-	    HcInt::WaltonStableHorizontalOrTilt, // A1_FloorHeatCeilingCool_StableTilted
-	    HcInt::WaltonUnstableHorizontalOrTilt, // A1_FloorHeatCeilingCool_UnstableTilted
-	    HcInt::ISO15099Windows, // A1_FloorHeatCeilingCool_Windows
-	    HcInt::KhalifaEq6NonHeatedWalls, // A2_WallPanelHeat_VertWallsNonHeated
-	    HcInt::AwbiHattonHeatedWall, // A2_WallPanelHeat_HeatedVerticalWall
-	    HcInt::AlamdariHammondStableHorizontal, // A2_WallPanelHeat_StableHoriz
-	    HcInt::KhalifaEq7Ceiling, // A2_WallPanelHeat_UnstableHoriz
-	    HcInt::WaltonStableHorizontalOrTilt, // A2_WallPanelHeat_StableTilted
-	    HcInt::WaltonUnstableHorizontalOrTilt, // A2_WallPanelHeat_UnstableTilted
-	    HcInt::ISO15099Windows, // A2_WallPanelHeat_Windows
-	    HcInt::FohannoPolidoriVerticalWall, // B_ConvectiveHeat_VertWall
-	    HcInt::KhalifaEq5WallNearHeat, // B_ConvectiveHeat_VertWallNearHeater
-	    HcInt::AlamdariHammondStableHorizontal, // B_ConvectiveHeat_StableHoriz
-	    HcInt::KhalifaEq7Ceiling, // B_ConvectiveHeat_UnstableHoriz
-	    HcInt::WaltonStableHorizontalOrTilt, // B_ConvectiveHeat_StableTilted
-	    HcInt::WaltonUnstableHorizontalOrTilt, // B_ConvectiveHeat_UnstableTilted
-	    HcInt::ISO15099Windows, // B_ConvectiveHeat_Windows
-	    HcInt::GoldsteinNovoselacCeilingDiffuserWalls, // C_CentralAir_Walls
-	    HcInt::FisherPedersenCeilDiffuserCeiling, // C_CentralAir_Ceiling
-	    HcInt::GoldsteinNovoselacCeilingDiffuserFloor, // C_CentralAir_Floor
-	    HcInt::GoldsteinNovoselacCeilingDiffuserWindow, // C_CentralAir_Windows
-	    HcInt::KhalifaEq3WallAwayFromHeat, // D_ZoneFanCirc_VertWall
-	    HcInt::AlamdariHammondStableHorizontal, // D_ZoneFanCirc_StableHoriz
-	    HcInt::KhalifaEq4CeilingAwayFromHeat, // D_ZoneFanCirc_UnstableHoriz
-	    HcInt::WaltonStableHorizontalOrTilt, // D_ZoneFanCirc_StableTilted
-	    HcInt::WaltonUnstableHorizontalOrTilt, // D_ZoneFanCirc_UnstableTilted
-	    HcInt::ISO15099Windows, // D_ZoneFanCirc_Windows
-            HcInt::BeausoleilMorrisonMixedAssistingWall, // E_MixedBuoy_AssistFlowWall
-	    HcInt::BeausoleilMorrisonMixedOppossingWall, // E_MixedBuoy_OppositeFlowWall
-	    HcInt::BeausoleilMorrisonMixedStableFloor, // E_MixedBuoy_StableFloor
-	    HcInt::BeausoleilMorrisonMixedUnstableFloor, // E_MixedBuoy_UnstableFloor
-	    HcInt::BeausoleilMorrisonMixedStableCeiling, // E_MixedBuoy_StableCeiling
-	    HcInt::BeausoleilMorrisonMixedUnstableCeiling, // E_MixedBuoy_UnstableCeiling
-	    HcInt::GoldsteinNovoselacCeilingDiffuserWindow // E_MixedBuoy_Windows
-	};
-	    
+            HcInt::FohannoPolidoriVerticalWall,             // A3_SimpleBuoy_VertWalls
+            HcInt::AlamdariHammondStableHorizontal,         // A3_SimpleBuoy_StableHoriz
+            HcInt::AlamdariHammondUnstableHorizontal,       // A3_SimpleBuoy_UnstableHoriz
+            HcInt::WaltonStableHorizontalOrTilt,            // A3_SimpleBuoy_StableTilted
+            HcInt::WaltonUnstableHorizontalOrTilt,          // A3_SimpleBuoy_UnstableTilted
+            HcInt::ISO15099Windows,                         // A3_SimpleBuoy_Windows
+            HcInt::KhalifaEq3WallAwayFromHeat,              // A1_FloorHeatCeilingCool_VertWalls
+            HcInt::AlamdariHammondStableHorizontal,         // A1_FloorHeatCeilingCool_StableHoriz
+            HcInt::KhalifaEq4CeilingAwayFromHeat,           // A1_FloorHeatCeilingCool_UnstableHoriz
+            HcInt::AwbiHattonHeatedFloor,                   // A1_FloorHeatCeilingCool_HeatedFloor
+            HcInt::KaradagChilledCeiling,                   // A1_FloorHeatCeilingCool_ChilledCeil
+            HcInt::WaltonStableHorizontalOrTilt,            // A1_FloorHeatCeilingCool_StableTilted
+            HcInt::WaltonUnstableHorizontalOrTilt,          // A1_FloorHeatCeilingCool_UnstableTilted
+            HcInt::ISO15099Windows,                         // A1_FloorHeatCeilingCool_Windows
+            HcInt::KhalifaEq6NonHeatedWalls,                // A2_WallPanelHeat_VertWallsNonHeated
+            HcInt::AwbiHattonHeatedWall,                    // A2_WallPanelHeat_HeatedVerticalWall
+            HcInt::AlamdariHammondStableHorizontal,         // A2_WallPanelHeat_StableHoriz
+            HcInt::KhalifaEq7Ceiling,                       // A2_WallPanelHeat_UnstableHoriz
+            HcInt::WaltonStableHorizontalOrTilt,            // A2_WallPanelHeat_StableTilted
+            HcInt::WaltonUnstableHorizontalOrTilt,          // A2_WallPanelHeat_UnstableTilted
+            HcInt::ISO15099Windows,                         // A2_WallPanelHeat_Windows
+            HcInt::FohannoPolidoriVerticalWall,             // B_ConvectiveHeat_VertWall
+            HcInt::KhalifaEq5WallNearHeat,                  // B_ConvectiveHeat_VertWallNearHeater
+            HcInt::AlamdariHammondStableHorizontal,         // B_ConvectiveHeat_StableHoriz
+            HcInt::KhalifaEq7Ceiling,                       // B_ConvectiveHeat_UnstableHoriz
+            HcInt::WaltonStableHorizontalOrTilt,            // B_ConvectiveHeat_StableTilted
+            HcInt::WaltonUnstableHorizontalOrTilt,          // B_ConvectiveHeat_UnstableTilted
+            HcInt::ISO15099Windows,                         // B_ConvectiveHeat_Windows
+            HcInt::GoldsteinNovoselacCeilingDiffuserWalls,  // C_CentralAir_Walls
+            HcInt::FisherPedersenCeilDiffuserCeiling,       // C_CentralAir_Ceiling
+            HcInt::GoldsteinNovoselacCeilingDiffuserFloor,  // C_CentralAir_Floor
+            HcInt::GoldsteinNovoselacCeilingDiffuserWindow, // C_CentralAir_Windows
+            HcInt::KhalifaEq3WallAwayFromHeat,              // D_ZoneFanCirc_VertWall
+            HcInt::AlamdariHammondStableHorizontal,         // D_ZoneFanCirc_StableHoriz
+            HcInt::KhalifaEq4CeilingAwayFromHeat,           // D_ZoneFanCirc_UnstableHoriz
+            HcInt::WaltonStableHorizontalOrTilt,            // D_ZoneFanCirc_StableTilted
+            HcInt::WaltonUnstableHorizontalOrTilt,          // D_ZoneFanCirc_UnstableTilted
+            HcInt::ISO15099Windows,                         // D_ZoneFanCirc_Windows
+            HcInt::BeausoleilMorrisonMixedAssistingWall,    // E_MixedBuoy_AssistFlowWall
+            HcInt::BeausoleilMorrisonMixedOppossingWall,    // E_MixedBuoy_OppositeFlowWall
+            HcInt::BeausoleilMorrisonMixedStableFloor,      // E_MixedBuoy_StableFloor
+            HcInt::BeausoleilMorrisonMixedUnstableFloor,    // E_MixedBuoy_UnstableFloor
+            HcInt::BeausoleilMorrisonMixedStableCeiling,    // E_MixedBuoy_StableCeiling
+            HcInt::BeausoleilMorrisonMixedUnstableCeiling,  // E_MixedBuoy_UnstableCeiling
+            HcInt::GoldsteinNovoselacCeilingDiffuserWindow  // E_MixedBuoy_Windows
+        };
+
         std::array<int, static_cast<int>(IntConvClass::Num)> intConvClassUserCurveNums = {
             0, // A3_SimpleBuoy_VertWalls
-	    0, // A3_SimpleBuoy_StableHoriz
-	    0, // A3_SimpleBuoy_UnstableHoriz
-	    0, // A3_SimpleBuoy_StableTilted
-	    0, // A3_SimpleBuoy_UnstableTilted
-	    0, // A3_SimpleBuoy_Windows
-	    0, // A1_FloorHeatCeilingCool_VertWalls
-	    0, // A1_FloorHeatCeilingCool_StableHoriz
-	    0, // A1_FloorHeatCeilingCool_UnstableHoriz
-	    0, // A1_FloorHeatCeilingCool_HeatedFloor
-	    0, // A1_FloorHeatCeilingCool_ChilledCeil
-	    0, // A1_FloorHeatCeilingCool_StableTilted
-	    0, // A1_FloorHeatCeilingCool_UnstableTilted
-	    0, // A1_FloorHeatCeilingCool_Windows
-	    0, // A2_WallPanelHeat_VertWallsNonHeated
-	    0, // A2_WallPanelHeat_HeatedVerticalWall
-	    0, // A2_WallPanelHeat_StableHoriz
-	    0, // A2_WallPanelHeat_UnstableHoriz
-	    0, // A2_WallPanelHeat_StableTilted
-	    0, // A2_WallPanelHeat_UnstableTilted
-	    0, // A2_WallPanelHeat_Windows
-	    0, // B_ConvectiveHeat_VertWall
-	    0, // B_ConvectiveHeat_VertWallNearHeater
-	    0, // B_ConvectiveHeat_StableHoriz
-	    0, // B_ConvectiveHeat_UnstableHoriz
-	    0, // B_ConvectiveHeat_StableTilted
-	    0, // B_ConvectiveHeat_UnstableTilted
-	    0, // B_ConvectiveHeat_Windows
-	    0, // C_CentralAir_Walls
-	    0, // C_CentralAir_Ceiling
-	    0, // C_CentralAir_Floor
-	    0, // C_CentralAir_Windows
-	    0, // D_ZoneFanCirc_VertWall
-	    0, // D_ZoneFanCirc_StableHoriz
-	    0, // D_ZoneFanCirc_UnstableHoriz
-	    0, // D_ZoneFanCirc_StableTilted
-	    0, // D_ZoneFanCirc_UnstableTilted
-	    0, // D_ZoneFanCirc_Windows
+            0, // A3_SimpleBuoy_StableHoriz
+            0, // A3_SimpleBuoy_UnstableHoriz
+            0, // A3_SimpleBuoy_StableTilted
+            0, // A3_SimpleBuoy_UnstableTilted
+            0, // A3_SimpleBuoy_Windows
+            0, // A1_FloorHeatCeilingCool_VertWalls
+            0, // A1_FloorHeatCeilingCool_StableHoriz
+            0, // A1_FloorHeatCeilingCool_UnstableHoriz
+            0, // A1_FloorHeatCeilingCool_HeatedFloor
+            0, // A1_FloorHeatCeilingCool_ChilledCeil
+            0, // A1_FloorHeatCeilingCool_StableTilted
+            0, // A1_FloorHeatCeilingCool_UnstableTilted
+            0, // A1_FloorHeatCeilingCool_Windows
+            0, // A2_WallPanelHeat_VertWallsNonHeated
+            0, // A2_WallPanelHeat_HeatedVerticalWall
+            0, // A2_WallPanelHeat_StableHoriz
+            0, // A2_WallPanelHeat_UnstableHoriz
+            0, // A2_WallPanelHeat_StableTilted
+            0, // A2_WallPanelHeat_UnstableTilted
+            0, // A2_WallPanelHeat_Windows
+            0, // B_ConvectiveHeat_VertWall
+            0, // B_ConvectiveHeat_VertWallNearHeater
+            0, // B_ConvectiveHeat_StableHoriz
+            0, // B_ConvectiveHeat_UnstableHoriz
+            0, // B_ConvectiveHeat_StableTilted
+            0, // B_ConvectiveHeat_UnstableTilted
+            0, // B_ConvectiveHeat_Windows
+            0, // C_CentralAir_Walls
+            0, // C_CentralAir_Ceiling
+            0, // C_CentralAir_Floor
+            0, // C_CentralAir_Windows
+            0, // D_ZoneFanCirc_VertWall
+            0, // D_ZoneFanCirc_StableHoriz
+            0, // D_ZoneFanCirc_UnstableHoriz
+            0, // D_ZoneFanCirc_StableTilted
+            0, // D_ZoneFanCirc_UnstableTilted
+            0, // D_ZoneFanCirc_Windows
             0, // E_MixedBuoy_AssistFlowWall
-	    0, // E_MixedBuoy_OppositeFlowWall
-	    0, // E_MixedBuoy_StableFloor
-	    0, // E_MixedBuoy_UnstableFloor
-	    0, // E_MixedBuoy_StableCeiling
-	    0, // E_MixedBuoy_UnstableCeiling
-	    0 // E_MixedBuoy_Windows
-	};
-
+            0, // E_MixedBuoy_OppositeFlowWall
+            0, // E_MixedBuoy_StableFloor
+            0, // E_MixedBuoy_UnstableFloor
+            0, // E_MixedBuoy_StableCeiling
+            0, // E_MixedBuoy_UnstableCeiling
+            0  // E_MixedBuoy_Windows
+        };
     };
 
     struct ExtAdaptiveConvAlgo
@@ -200,17 +199,16 @@ namespace Convect {
         bool suppressRainChange = false;
 
         std::array<HcExt, static_cast<int>(ExtConvClass2::Num)> extConvClass2EqNums = {
-            HcExt::SparrowWindward, // WindConvection_WindwardWall 
-            HcExt::SparrowLeeward, // WindConvection_LeewardWall
-            HcExt::ClearRoof, // WindConvection_HorizRoof
-            HcExt::NaturalASHRAEVerticalWall, // NaturalConvection_VertWall
-            HcExt::NaturalWaltonStableHorizontalOrTilt, // NaturalConvection_StableHorizOrTilt
+            HcExt::SparrowWindward,                      // WindConvection_WindwardWall
+            HcExt::SparrowLeeward,                       // WindConvection_LeewardWall
+            HcExt::ClearRoof,                            // WindConvection_HorizRoof
+            HcExt::NaturalASHRAEVerticalWall,            // NaturalConvection_VertWall
+            HcExt::NaturalWaltonStableHorizontalOrTilt,  // NaturalConvection_StableHorizOrTilt
             HcExt::NaturalWaltonUnstableHorizontalOrTilt // NaturalConvection_StableHorizOrTilt
         };
-		    
 
-	std::array<int, static_cast<int>(ExtConvClass2::Num)> extConvClass2UserCurveNums = {
-            0, // WindConvection_WindwardWall 
+        std::array<int, static_cast<int>(ExtConvClass2::Num)> extConvClass2UserCurveNums = {
+            0, // WindConvection_WindwardWall
             0, // WindConvection_LeewardWall
             0, // WindConvection_HorizRoof
             0, // NaturalConvection_VertWall
@@ -221,24 +219,23 @@ namespace Convect {
 
     // Functions
 
-    void
-    InitIntConvCoeff(EnergyPlusData &state,
-		     const Array1D<Real64> &SurfaceTemperatures,        // Temperature of surfaces for evaluation of HcIn
-		     ObjexxFCL::Optional_int_const ZoneToResimulate = _ // if passed in, then only calculate surfaces that have this zone
-		     );
+    void InitIntConvCoeff(EnergyPlusData &state,
+                          const Array1D<Real64> &SurfaceTemperatures,        // Temperature of surfaces for evaluation of HcIn
+                          ObjexxFCL::Optional_int_const ZoneToResimulate = _ // if passed in, then only calculate surfaces that have this zone
+    );
 
     void InitExtConvCoeff(EnergyPlusData &state,
-			  int SurfNum,                          // Surface number (in Surface derived type)
-			  Real64 HMovInsul,                     // Equivalent convection coefficient of movable insulation
-			  Material::SurfaceRoughness Roughness, // Roughness index (1-6), see DataHeatBalance parameters
-			  Real64 AbsExt,                        // Exterior thermal absorptance
-			  Real64 TempExt,                       // Exterior surface temperature (C)
-			  Real64 &HExt,                         // Convection coefficient to exterior air
-			  Real64 &HSky,                         // "Convection" coefficient to sky temperature
-			  Real64 &HGround,                      // "Convection" coefficient to ground temperature
-			  Real64 &HAir                          // Radiation to Air Component
-			  );
-	
+                          int SurfNum,                          // Surface number (in Surface derived type)
+                          Real64 HMovInsul,                     // Equivalent convection coefficient of movable insulation
+                          Material::SurfaceRoughness Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                          Real64 AbsExt,                        // Exterior thermal absorptance
+                          Real64 TempExt,                       // Exterior surface temperature (C)
+                          Real64 &HExt,                         // Convection coefficient to exterior air
+                          Real64 &HSky,                         // "Convection" coefficient to sky temperature
+                          Real64 &HGround,                      // "Convection" coefficient to ground temperature
+                          Real64 &HAir                          // Radiation to Air Component
+    );
+
     Real64 CalcHfExteriorSparrow(Real64 SurfWindSpeed,                 // Local wind speed at height of the heat transfer surface (m/s)
                                  Real64 GrossArea,                     // Gross surface area {m2}
                                  Real64 Perimeter,                     // Surface perimeter length {m}
@@ -261,7 +258,7 @@ namespace Convect {
     void ApplyExtConvValueMulti(EnergyPlusData &state, DataSurfaces::SurfaceFilter surfaceFilter, HcExt model, int userNum);
 
     Real64 CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness Roughness, // Integer index for roughness, relates to parameter array indices
-                                         Real64 SurfWindSpeed                  // Current wind speed, m/s
+                                      Real64 SurfWindSpeed                  // Current wind speed, m/s
     );
 
     Real64 CalcASHRAESimpleIntConvCoeff(Real64 Tsurf, Real64 Tamb, Real64 cosTilt);
@@ -357,7 +354,7 @@ namespace Convect {
     void ManageIntAdaptiveConvAlgo(EnergyPlusData &state, int SurfNum); // surface number for which coefficients are being calculated
 
     Real64 ManageExtAdaptiveConvAlgo(EnergyPlusData &state,
-				     int SurfNum); // surface number for which coefficients are being calculated
+                                     int SurfNum); // surface number for which coefficients are being calculated
 
     Real64 EvaluateIntHcModels(EnergyPlusData &state, int SurfNum, HcInt ConvModelEquationNum);
 
@@ -619,28 +616,28 @@ namespace Convect {
 
     Real64 CalcKaradagChilledCeiling(Real64 DeltaTemp); // [C] temperature difference between surface and air
 
-    Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 AirSystemFlowRate,  // [m3/s] air system flow rate
-                                                       Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                       Real64 WindWallRatio,      // [ ] fraction of window area to wall area for zone
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(Real64 AirSystemFlowRate,        // [m3/s] air system flow rate
+                                                       Real64 ZoneExtPerimLength,       // [m] length of zone perimeter with exterior walls
+                                                       Real64 WindWallRatio,            // [ ] fraction of window area to wall area for zone
                                                        IntConvWinLoc WindowLocationType // index for location types
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
-                                                       Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
-                                                       Real64 WindWallRatio,      // [ ] fraction of window area to wall area for zone
+                                                       Real64 ZoneExtPerimLength,        // [m] length of zone perimeter with exterior walls
+                                                       Real64 WindWallRatio,             // [ ] fraction of window area to wall area for zone
                                                        IntConvWinLoc WindowLocationType, // index for location types
-                                                       int ZoneNum                                           // for messages
+                                                       int ZoneNum                       // for messages
     );
 
-    Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 AirSystemFlowRate,  // [m3/s] air system flow rate
-                                                     Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(Real64 AirSystemFlowRate,        // [m3/s] air system flow rate
+                                                     Real64 ZoneExtPerimLength,       // [m] length of zone perimeter with exterior walls
                                                      IntConvWinLoc WindowLocationType // index for location types
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
-                                                     Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
+                                                     Real64 ZoneExtPerimLength,        // [m] length of zone perimeter with exterior walls
                                                      IntConvWinLoc WindowLocationType, // index for location types
-                                                     int ZoneNum                                           // for messages
+                                                     int ZoneNum                       // for messages
     );
 
     Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(Real64 AirSystemFlowRate, // [m3/s] air system flow rate
@@ -654,11 +651,13 @@ namespace Convect {
 
     Real64 CalcSparrowWindward(Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowWindward(EnergyPlusData &state, Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowWindward(
+        EnergyPlusData &state, Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
     Real64 CalcSparrowLeeward(Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowLeeward(EnergyPlusData &state, Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowLeeward(
+        EnergyPlusData &state, Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
     Real64 CalcMoWITTNatural(Real64 DeltaTemp);
 
@@ -784,7 +783,7 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
 
     void clear_state() override
     {
-       new (this) ConvectionCoefficientsData();
+        new (this) ConvectionCoefficientsData();
     }
 };
 

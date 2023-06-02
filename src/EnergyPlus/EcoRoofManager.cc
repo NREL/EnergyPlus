@@ -201,15 +201,15 @@ namespace EcoRoofManager {
 
         if (state.dataSurface->Surface(SurfNum).ExtWind) {
             Convect::InitExtConvCoeff(state,
-                                        SurfNum,
-                                        HMovInsul,
-                                        RoughSurf,
-                                        AbsThermSurf,
-                                        state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
-                                        state.dataHeatBalSurf->SurfHConvExt(SurfNum),
-                                        state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
-                                        state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                        state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+                                      SurfNum,
+                                      HMovInsul,
+                                      RoughSurf,
+                                      AbsThermSurf,
+                                      state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
+                                      state.dataHeatBalSurf->SurfHConvExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHAirExt(SurfNum));
         }
         // Long Wave Radiation (W/m^2) - original equation shown in comment
         // Real64 Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
