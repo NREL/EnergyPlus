@@ -159,11 +159,11 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataSurface->Surface(3).Vertex(4).y = -1.48693002;
     state->dataSurface->Surface(3).Vertex(4).z = 8.5343999852;
 
-    state->dataSurface->SurfIntConvCoeffIndex.allocate(TotSurfaces);
-    state->dataSurface->SurfTAirRef.allocate(TotSurfaces);
-    state->dataSurface->SurfTAirRefRpt.allocate(TotSurfaces);
-    state->dataSurface->SurfIntConvCoeffIndex = 0.0;
-    state->dataSurface->SurfTAirRef = 0;
+    state->dataSurface->SurfIntConvCoeff.allocate(TotSurfaces);
+    std::fill(state->dataSurface->SurfIntConvCoeff.begin(), state->dataSurface->SurfIntConvCoeff.end(), Convect::HcInt::SetByZone);
+    state->dataSurface->SurfIntConvUserCoeffNum.dimension(TotSurfaces, 0);
+    state->dataSurface->SurfTAirRef.dimension(TotSurfaces, 0);
+    state->dataSurface->SurfTAirRefRpt.dimension(TotSurfaces, 0);
 
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
