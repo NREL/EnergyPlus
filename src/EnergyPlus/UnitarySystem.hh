@@ -383,6 +383,7 @@ namespace UnitarySystems {
         Real64 m_CoolingSpeedRatio = 0.0;
         int m_CoolingSpeedNum = 0;
         int m_EconoSpeedNum = 0;
+        Real64 m_EconoPartLoadRatio = 0;
         Real64 m_HeatingCycRatio = 0.0;
         Real64 m_HeatingSpeedRatio = 0.0;
         int m_HeatingSpeedNum = 0;
@@ -868,6 +869,13 @@ namespace UnitarySystems {
                                bool const SensibleLoad,   // True when meeting a sensible load (not a moisture load)
                                Real64 const PartLoadRatio // operating PLR
         );
+
+        Real64 getFanHeat(EnergyPlusData &state,
+                          int const AirLoopNum,
+                          bool const FirstHVACIteration,
+                          UnitarySystems::UnitarySys &unitarySystem,
+                          Real64 const massFlowRate,
+                          Real64 const airFlowRatio);
 
     public:
         static void
