@@ -3987,178 +3987,181 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             max(state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyEncl);
     }
 
-    for (int SurfNum : state.dataSurface->AllHTWindowSurfaceList) {
-        int const surfEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
-        int const numEnclRefPoints = state.dataViewFactor->EnclSolInfo(surfEnclNum).TotalEnclosureDaylRefPoints;
-        if (numEnclRefPoints > 0) {
-            if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
-                state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numEnclRefPoints);
-                state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numEnclRefPoints);
-                state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numEnclRefPoints);
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numEnclRefPoints);
-                state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numEnclRefPoints);
-                state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numEnclRefPoints);
-                state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numEnclRefPoints);
-                state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-                state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
+ if (state.dataDaylightingManager->maxNumRefPtInAnyEncl > 0) {
+        for (int SurfNum : state.dataSurface->AllHTWindowSurfaceList) {
+            int const surfEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
+            int const numEnclRefPoints = state.dataViewFactor->EnclSolInfo(surfEnclNum).TotalEnclosureDaylRefPoints;
+            if (numEnclRefPoints > 0) {
+                if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
+                    state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numEnclRefPoints);
+                    state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numEnclRefPoints);
+                    state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numEnclRefPoints);
+                    state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numEnclRefPoints);
+                    state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numEnclRefPoints);
+                    state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numEnclRefPoints);
+                    state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numEnclRefPoints);
+                    state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
+                    state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
+                }
+            } else {
+                int SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
+                if (SurfNumAdj > 0) {
+                    int const adjSurfEnclNum = state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex;
+                    int const numAdjEnclRefPoints = state.dataViewFactor->EnclSolInfo(adjSurfEnclNum).TotalEnclosureDaylRefPoints;
+                    if (numAdjEnclRefPoints > 0) {
+                        if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
+                            state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numAdjEnclRefPoints);
+                            state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
+                            state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numAdjEnclRefPoints);
+                            state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
+                            state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numAdjEnclRefPoints);
+                            state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
+                            state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numAdjEnclRefPoints);
+                            state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
+                            state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numAdjEnclRefPoints);
+                            state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
+                            state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numAdjEnclRefPoints);
+                            state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
+                            state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numAdjEnclRefPoints);
+                            state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
+                            state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
+                        }
+                    }
+                }
+            }
+
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+
+                if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
+                    auto &thisSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex));
+                    if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl)
+                            .GlareControlIsActive) {
+                        // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
+                        if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
+                            ShowSevereError(state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
+                            ShowContinueError(state, "GlareControlIsActive = Yes but it is not in a Daylighting zone or enclosure.");
+                            ShowContinueError(state,
+                                              format("Zone or enclosure indicated={}",
+                                                     state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex).Name));
+                            ErrorsFound = true;
+                        }
+                        // Error if GlareControlIsActive and window is in a Daylighting:Detailed zone/enclosure with
+                        // an interior window adjacent to another Daylighting:Detailed zone/enclosure
+                        if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
+                            for (int const intWin : thisSurfEnclosure.SurfacePtr) {
+                                int const SurfNumAdj = state.dataSurface->Surface(intWin).ExtBoundCond;
+                                if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
+                                    auto &adjSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
+                                    if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
+                                        ShowSevereError(
+                                            state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
+                                        ShowContinueError(state, "GlareControlIsActive = Yes and is in a Daylighting zone or enclosure");
+                                        ShowContinueError(state, "that shares an interior window with another Daylighting zone or enclosure");
+                                        ShowContinueError(state, format("Adjacent Zone or Enclosure indicated={}", adjSurfEnclosure.Name));
+                                        ErrorsFound = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).shadingControlType ==
+                        WindowShadingControlType::MeetDaylIlumSetp) {
+                        // Error if window has shadingControlType = MeetDaylightingIlluminanceSetpoint &
+                        // but is not in a Daylighting:Detailed zone
+                        if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
+                            ShowSevereError(state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
+                            ShowContinueError(state, "MeetDaylightingIlluminanceSetpoint but it is not in a Daylighting zone or enclosure.");
+                            ShowContinueError(state, format("Zone or enclosure indicated={}", thisSurfEnclosure.Name));
+                            ErrorsFound = true;
+                        }
+                        // Error if window has shadingControlType = MeetDaylightIlluminanceSetpoint and is in a &
+                        // Daylighting:Detailed zone with an interior window adjacent to another Daylighting:Detailed zone
+                        if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
+                            for (int const intWin : thisSurfEnclosure.SurfacePtr) {
+                                int const SurfNumAdj = state.dataSurface->Surface(intWin).ExtBoundCond;
+                                if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
+                                    auto &adjSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
+                                    if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
+                                        ShowSevereError(
+                                            state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
+                                        ShowContinueError(state, "MeetDaylightIlluminanceSetpoint and is in a Daylighting zone or enclosure");
+                                        ShowContinueError(state, "that shares an interior window with another Daylighting zone or enclosure");
+                                        ShowContinueError(state, format("Adjacent Zone or enclosure indicated={}", adjSurfEnclosure.Name));
+                                        ErrorsFound = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!state.dataHeatBal->AnyAirBoundary) {
+            for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
+                if (state.dataSurface->Surface(SurfLoop).Class == SurfaceClass::Window && state.dataSurface->Surface(SurfLoop).ExtSolar) {
+                    int const enclOfSurf = state.dataSurface->Surface(SurfLoop).SolarEnclIndex;
+                    if (state.dataViewFactor->EnclSolInfo(enclOfSurf).TotalEnclosureDaylRefPoints > 0 &&
+                        !state.dataViewFactor->EnclSolInfo(enclOfSurf).HasInterZoneWindow &&
+                        state.dataDaylightingData->enclDaylight(enclOfSurf).hasSplitFluxDaylighting) {
+                        for (int refPtNum = 1; refPtNum <= state.dataViewFactor->EnclSolInfo(enclOfSurf).TotalEnclosureDaylRefPoints; ++refPtNum) {
+                            SetupOutputVariable(state,
+                                                format("Daylighting Window Reference Point {} Illuminance", refPtNum),
+                                                OutputProcessor::Unit::lux,
+                                                state.dataSurface->SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
+                                                OutputProcessor::SOVTimeStepType::Zone,
+                                                OutputProcessor::SOVStoreType::Average,
+                                                state.dataSurface->Surface(SurfLoop).Name);
+                            SetupOutputVariable(state,
+                                                format("Daylighting Window Reference Point {} View Luminance", refPtNum),
+                                                OutputProcessor::Unit::cd_m2,
+                                                state.dataSurface->SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
+                                                OutputProcessor::SOVTimeStepType::Zone,
+                                                OutputProcessor::SOVStoreType::Average,
+                                                state.dataSurface->Surface(SurfLoop).Name);
+                        }
+                    }
+                }
             }
         } else {
-            int SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
-            if (SurfNumAdj > 0) {
-                int const adjSurfEnclNum = state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex;
-                int const numAdjEnclRefPoints = state.dataViewFactor->EnclSolInfo(adjSurfEnclNum).TotalEnclosureDaylRefPoints;
-                if (numAdjEnclRefPoints > 0) {
-                    if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
-                        state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numAdjEnclRefPoints);
-                        state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
-                        state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numAdjEnclRefPoints);
-                        state.dataSurface->SurfaceWindow(SurfNum).SolidAngAtRefPtWtd = 0.0;
-                        state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt.allocate(2, numAdjEnclRefPoints);
-                        state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPt = 0.0;
-                        state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt.allocate(2, numAdjEnclRefPoints);
-                        state.dataSurface->SurfaceWindow(SurfNum).BackLumFromWinAtRefPt = 0.0;
-                        state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt.allocate(2, numAdjEnclRefPoints);
-                        state.dataSurface->SurfaceWindow(SurfNum).SourceLumFromWinAtRefPt = 0.0;
-                        state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep.allocate(numAdjEnclRefPoints);
-                        state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                        state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numAdjEnclRefPoints);
-                        state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-                        state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
-                    }
-                }
-            }
-        }
-
-        if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-
-            if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
-                auto &thisSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex));
-                if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).GlareControlIsActive) {
-                    // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
-                    if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
-                        ShowSevereError(state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
-                        ShowContinueError(state, "GlareControlIsActive = Yes but it is not in a Daylighting zone or enclosure.");
-                        ShowContinueError(state,
-                                          format("Zone or enclosure indicated={}",
-                                                 state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex).Name));
-                        ErrorsFound = true;
-                    }
-                    // Error if GlareControlIsActive and window is in a Daylighting:Detailed zone/enclosure with
-                    // an interior window adjacent to another Daylighting:Detailed zone/enclosure
-                    if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                        for (int const intWin : thisSurfEnclosure.SurfacePtr) {
-                            int const SurfNumAdj = state.dataSurface->Surface(intWin).ExtBoundCond;
-                            if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
-                                auto &adjSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
-                                if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                                    ShowSevereError(state,
-                                                    format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
-                                    ShowContinueError(state, "GlareControlIsActive = Yes and is in a Daylighting zone or enclosure");
-                                    ShowContinueError(state, "that shares an interior window with another Daylighting zone or enclosure");
-                                    ShowContinueError(state, format("Adjacent Zone or Enclosure indicated={}", adjSurfEnclosure.Name));
-                                    ErrorsFound = true;
+            for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
+                for (int const enclSurfNum : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {
+                    if (state.dataSurface->Surface(enclSurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(enclSurfNum).ExtSolar) {
+                        if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
+                            !state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow &&
+                            state.dataDaylightingData->enclDaylight(enclNum).hasSplitFluxDaylighting) {
+                            int refPtCount = 0;
+                            for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
+                                for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->daylightControl(controlNum).TotalDaylRefPoints;
+                                     ++refPtNum) {
+                                    ++refPtCount; // Count reference points across each daylighting control in the same enclosure
+                                    std::string const varKey =
+                                        state.dataSurface->Surface(enclSurfNum).Name + " to " +
+                                        state.dataDaylightingData
+                                            ->DaylRefPt(state.dataDaylightingData->daylightControl(controlNum).DaylRefPtNum(refPtNum))
+                                            .Name;
+                                    SetupOutputVariable(state,
+                                                        "Daylighting Window Reference Point Illuminance",
+                                                        OutputProcessor::Unit::lux,
+                                                        state.dataSurface->SurfaceWindow(enclSurfNum).IllumFromWinAtRefPtRep(refPtCount),
+                                                        OutputProcessor::SOVTimeStepType::Zone,
+                                                        OutputProcessor::SOVStoreType::Average,
+                                                        varKey);
+                                    SetupOutputVariable(state,
+                                                        "Daylighting Window Reference Point View Luminance",
+                                                        OutputProcessor::Unit::cd_m2,
+                                                        state.dataSurface->SurfaceWindow(enclSurfNum).LumWinFromRefPtRep(refPtCount),
+                                                        OutputProcessor::SOVTimeStepType::Zone,
+                                                        OutputProcessor::SOVStoreType::Average,
+                                                        varKey);
                                 }
-                            }
-                        }
-                    }
-                }
-
-                if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).shadingControlType ==
-                    WindowShadingControlType::MeetDaylIlumSetp) {
-                    // Error if window has shadingControlType = MeetDaylightingIlluminanceSetpoint &
-                    // but is not in a Daylighting:Detailed zone
-                    if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
-                        ShowSevereError(state, format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
-                        ShowContinueError(state, "MeetDaylightingIlluminanceSetpoint but it is not in a Daylighting zone or enclosure.");
-                        ShowContinueError(state, format("Zone or enclosure indicated={}", thisSurfEnclosure.Name));
-                        ErrorsFound = true;
-                    }
-                    // Error if window has shadingControlType = MeetDaylightIlluminanceSetpoint and is in a &
-                    // Daylighting:Detailed zone with an interior window adjacent to another Daylighting:Detailed zone
-                    if (thisSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                        for (int const intWin : thisSurfEnclosure.SurfacePtr) {
-                            int const SurfNumAdj = state.dataSurface->Surface(intWin).ExtBoundCond;
-                            if (state.dataSurface->Surface(intWin).Class == SurfaceClass::Window && SurfNumAdj > 0) {
-                                auto &adjSurfEnclosure(state.dataViewFactor->EnclSolInfo(state.dataSurface->Surface(SurfNumAdj).SolarEnclIndex));
-                                if (adjSurfEnclosure.TotalEnclosureDaylRefPoints > 0) {
-                                    ShowSevereError(state,
-                                                    format("Window={} has Window Shading Control with", state.dataSurface->Surface(SurfNum).Name));
-                                    ShowContinueError(state, "MeetDaylightIlluminanceSetpoint and is in a Daylighting zone or enclosure");
-                                    ShowContinueError(state, "that shares an interior window with another Daylighting zone or enclosure");
-                                    ShowContinueError(state, format("Adjacent Zone or enclosure indicated={}", adjSurfEnclosure.Name));
-                                    ErrorsFound = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (!state.dataHeatBal->AnyAirBoundary) {
-        for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
-            if (state.dataSurface->Surface(SurfLoop).Class == SurfaceClass::Window && state.dataSurface->Surface(SurfLoop).ExtSolar) {
-                int const enclOfSurf = state.dataSurface->Surface(SurfLoop).SolarEnclIndex;
-                if (state.dataViewFactor->EnclSolInfo(enclOfSurf).TotalEnclosureDaylRefPoints > 0 &&
-                    !state.dataViewFactor->EnclSolInfo(enclOfSurf).HasInterZoneWindow &&
-                    state.dataDaylightingData->enclDaylight(enclOfSurf).hasSplitFluxDaylighting) {
-                    for (int refPtNum = 1; refPtNum <= state.dataViewFactor->EnclSolInfo(enclOfSurf).TotalEnclosureDaylRefPoints; ++refPtNum) {
-                        SetupOutputVariable(state,
-                                            format("Daylighting Window Reference Point {} Illuminance", refPtNum),
-                                            OutputProcessor::Unit::lux,
-                                            state.dataSurface->SurfaceWindow(SurfLoop).IllumFromWinAtRefPtRep(refPtNum),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataSurface->Surface(SurfLoop).Name);
-                        SetupOutputVariable(state,
-                                            format("Daylighting Window Reference Point {} View Luminance", refPtNum),
-                                            OutputProcessor::Unit::cd_m2,
-                                            state.dataSurface->SurfaceWindow(SurfLoop).LumWinFromRefPtRep(refPtNum),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataSurface->Surface(SurfLoop).Name);
-                    }
-                }
-            }
-        }
-    } else {
-        for (int enclNum = 1; enclNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclNum) {
-            for (int const enclSurfNum : state.dataViewFactor->EnclSolInfo(enclNum).SurfacePtr) {
-                if (state.dataSurface->Surface(enclSurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(enclSurfNum).ExtSolar) {
-                    if (state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
-                        !state.dataViewFactor->EnclSolInfo(enclNum).HasInterZoneWindow &&
-                        state.dataDaylightingData->enclDaylight(enclNum).hasSplitFluxDaylighting) {
-                        int refPtCount = 0;
-                        for (int controlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
-                            for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->daylightControl(controlNum).TotalDaylRefPoints;
-                                 ++refPtNum) {
-                                ++refPtCount; // Count reference points across each daylighting control in the same enclosure
-                                std::string const varKey =
-                                    state.dataSurface->Surface(enclSurfNum).Name + " to " +
-                                    state.dataDaylightingData
-                                        ->DaylRefPt(state.dataDaylightingData->daylightControl(controlNum).DaylRefPtNum(refPtNum))
-                                        .Name;
-                                SetupOutputVariable(state,
-                                                    "Daylighting Window Reference Point Illuminance",
-                                                    OutputProcessor::Unit::lux,
-                                                    state.dataSurface->SurfaceWindow(enclSurfNum).IllumFromWinAtRefPtRep(refPtCount),
-                                                    OutputProcessor::SOVTimeStepType::Zone,
-                                                    OutputProcessor::SOVStoreType::Average,
-                                                    varKey);
-                                SetupOutputVariable(state,
-                                                    "Daylighting Window Reference Point View Luminance",
-                                                    OutputProcessor::Unit::cd_m2,
-                                                    state.dataSurface->SurfaceWindow(enclSurfNum).LumWinFromRefPtRep(refPtCount),
-                                                    OutputProcessor::SOVTimeStepType::Zone,
-                                                    OutputProcessor::SOVStoreType::Average,
-                                                    varKey);
                             }
                         }
                     }
