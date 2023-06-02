@@ -3987,7 +3987,7 @@ void GetDaylightingParametersInput(EnergyPlusData &state)
             max(state.dataViewFactor->EnclSolInfo(enclNum).TotalEnclosureDaylRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyEncl);
     }
 
- if (state.dataDaylightingManager->maxNumRefPtInAnyEncl > 0) {
+    if (state.dataDaylightingManager->maxNumRefPtInAnyEncl > 0) {
         for (int SurfNum : state.dataSurface->AllHTWindowSurfaceList) {
             int const surfEnclNum = state.dataSurface->Surface(SurfNum).SolarEnclIndex;
             int const numEnclRefPoints = state.dataViewFactor->EnclSolInfo(surfEnclNum).TotalEnclosureDaylRefPoints;
