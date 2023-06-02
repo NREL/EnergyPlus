@@ -4285,6 +4285,8 @@ void SetupPollutionMeterReporting(EnergyPlusData &state)
                                 {},
                                 "");
         } break;
+        default:
+            break;
         }
 
     } // End of the NumEnergyTypes Do Loop
