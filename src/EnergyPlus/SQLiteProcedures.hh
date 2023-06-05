@@ -477,9 +477,9 @@ private:
               centroidZ(zoneData.Centroid.z), ofType(zoneData.OfType), multiplier(zoneData.Multiplier), listMultiplier(zoneData.ListMultiplier),
               minimumX(zoneData.MinimumX), maximumX(zoneData.MaximumX), minimumY(zoneData.MinimumY), maximumY(zoneData.MaximumY),
               minimumZ(zoneData.MinimumZ), maximumZ(zoneData.MaximumZ), ceilingHeight(zoneData.CeilingHeight), volume(zoneData.Volume),
-              insideConvectionAlgo(zoneData.InsideConvectionAlgo), outsideConvectionAlgo(zoneData.OutsideConvectionAlgo),
-              floorArea(zoneData.FloorArea), extGrossWallArea(zoneData.ExtGrossWallArea), extNetWallArea(zoneData.ExtNetWallArea),
-              extWindowArea(zoneData.ExtWindowArea), isPartOfTotalArea(zoneData.isPartOfTotalArea)
+              insideConvectionAlgo(zoneData.IntConvAlgo), outsideConvectionAlgo(zoneData.ExtConvAlgo), floorArea(zoneData.FloorArea),
+              extGrossWallArea(zoneData.ExtGrossWallArea), extNetWallArea(zoneData.ExtNetWallArea), extWindowArea(zoneData.ExtWindowArea),
+              isPartOfTotalArea(zoneData.isPartOfTotalArea)
         {
         }
 
@@ -506,8 +506,8 @@ private:
         double const &maximumZ;
         double const &ceilingHeight;
         double const &volume;
-        int const &insideConvectionAlgo;
-        int const &outsideConvectionAlgo;
+        Convect::HcInt const &insideConvectionAlgo;
+        Convect::HcExt const &outsideConvectionAlgo;
         double const &floorArea;
         double const &extGrossWallArea;
         double const &extNetWallArea;
