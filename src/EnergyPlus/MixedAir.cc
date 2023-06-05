@@ -797,17 +797,22 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
         bool sensLoadCtrlUnitarySystemFound = false;
         if (primaryAirSystems.EconomizerStagingCheckFlag == false) {
             OAControllerNum = UtilityRoutines::FindItemInList(CtrlName, state.dataMixedAir->OAController);
-            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingOperation == EconomizerFirst) {
+            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingOperation == DataHVACGlobals::EconomizerStaging::EconomizerFirst) {
                 for (int BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
                     for (int CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
                         if (primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::CompType::UnitarySystemModel) {
-                            std::string unitarySystemName = primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name;
+                            std::string_view unitarySystemName = primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name;
                             int unitarySystemNum = UtilityRoutines::FindItemInList(
                                 unitarySystemName, state.dataUnitarySystems->unitarySys, state.dataUnitarySystems->numUnitarySystems);
                             if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_ControlType ==
                                 UnitarySystems::UnitarySys::UnitarySysCtrlType::Load) {
-                                sensLoadCtrlUnitarySystemFound = true;
-                                break;
+                                if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
+                                        DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                                    state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
+                                        Coil_CoolingAirToAirVariableSpeed) {
+                                    sensLoadCtrlUnitarySystemFound = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -817,7 +822,8 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
                         state,
                         format(
                             "SimOAController: EconomizerFirst was selected in the \"{}\" Controller:OutdoorAir object but the air loop it belongs to "
-                            "doesn't include a AirLoopHVAC:UnitarySystem with a Load Control Type input. EconomizerFirst will not be enforced.",
+                            "doesn't include a AirLoopHVAC:UnitarySystem with a Load Control Type input and a Coil:Cooling:DX:MultiSpeed or "
+                            "Coil:Cooling:DX:VariableSpeed cooling coil. EconomizerFirst will not be enforced.",
                             state.dataMixedAir->OAController(OAControllerNum).Name));
                 }
             }
@@ -2428,9 +2434,10 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     if (NumAlphas > 19) {
         if (!lAlphaBlanks(20)) {
             if (UtilityRoutines::SameString(AlphArray(20), "EconomizerFirst")) {
-                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation = EconomizerFirst;
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation = DataHVACGlobals::EconomizerStaging::EconomizerFirst;
             } else {
-                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation = InterlockedWithMechanicalCooling;
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation =
+                    DataHVACGlobals::EconomizerStaging::InterlockedWithMechanicalCooling;
             }
         }
     }

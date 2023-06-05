@@ -534,8 +534,9 @@ namespace UnitarySystems {
         int OAMixerIndex = -1;                  // index to zone equipment OA mixer
         int OASysIndex = -1;                    // index to OA system
         int OAControllerIndex = -1;             // index to OA controller
-        int OAControllerEconomizerStaging = DataHVACGlobals::InterlockedWithMechanicalCooling; // economizer staging operation type
-        bool OAMixerExists = false; // true if OA mixer is connected to inlet of UnitarySystem
+        DataHVACGlobals::EconomizerStaging OAControllerEconomizerStaging =
+            DataHVACGlobals::EconomizerStaging::InterlockedWithMechanicalCooling; // economizer staging operation type
+        bool OAMixerExists = false;                                               // true if OA mixer is connected to inlet of UnitarySystem
 
         //    private:
         // private members not initialized in constructor
@@ -870,13 +871,6 @@ namespace UnitarySystems {
                                Real64 const PartLoadRatio // operating PLR
         );
 
-        Real64 getFanHeat(EnergyPlusData &state,
-                          int const AirLoopNum,
-                          bool const FirstHVACIteration,
-                          UnitarySystems::UnitarySys &unitarySystem,
-                          Real64 const massFlowRate,
-                          Real64 const airFlowRatio);
-
     public:
         static void
         getUnitarySystemInputData(EnergyPlusData &state, std::string_view Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
@@ -949,6 +943,10 @@ namespace UnitarySystems {
                       Real64 &latOutputProvided    // latent output at supply air node
                       ) override;
 
+        Real64 getFanDeltaTemp(EnergyPlusData &state, bool const firstHVACIteration, Real64 const massFlowRate, Real64 const airFlowRatio);
+
+        void CoolingSpeedForEconomizerOperation(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration, Real64 const ZoneLoad);
+
         void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) override;
         int getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
         int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
@@ -977,11 +975,6 @@ namespace UnitarySystems {
                                int &airLoopIndex);
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes);
     void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound);
-    void CoolingSpeedForEconomizerOperation(EnergyPlusData &state,
-                                            int const AirLoopNum,
-                                            bool const FirstHVACIteration,
-                                            UnitarySystems::UnitarySys &UnitarySystemMSEconomizer,
-                                            Real64 const ZoneLoad);
 
 } // namespace UnitarySystems
 struct UnitarySystemsData : BaseGlobalStruct

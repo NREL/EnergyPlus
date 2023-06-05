@@ -150,9 +150,23 @@ namespace DataHVACGlobals {
     // OA Controller Heat Recovery Bypass Control Types
     int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
+
+    enum class EconomizerStaging
     // OA Controller Economizer Staging
-    int constexpr EconomizerFirst(0);                  // system air flow rate and economizer is ramped-up before using mechanical cooling
-    int constexpr InterlockedWithMechanicalCooling(1); // economizer operation (flow rate) depends on the cooling speed chosen by the system
+    {
+        Invalid = -1,
+        EconomizerFirst,                  // system air flow rate and economizer is ramped-up before using mechanical cooling
+        InterlockedWithMechanicalCooling, // economizer operation (flow rate) depends on the cooling speed chosen by the system
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStaging::Num)> EconomizerStagingUC = {
+        "ECONOMIZERFIRST",
+        "INTERLOCKEDWITHMECHANICALCOOLING",
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStaging::Num)> EconomizerStagingCC = {
+        "EconomizerFirst",
+        "InterlockedWithMechanicalCooling",
+    };
 
     // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);

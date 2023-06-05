@@ -843,6 +843,11 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_NEAR(totalAncillaryPower, thisSys->m_TotalAuxElecPower, 0.00000001);
     // at PLR very near 0.5, m_TotalAuxElecPower should be very near 75 W.
     EXPECT_NEAR(73.96002, thisSys->m_TotalAuxElecPower, 0.0001);
+    // delta temperature calculations
+    Real64 fanDT = thisSys->getFanDeltaTemp(*state, true, 1, 1.0);
+    EXPECT_NEAR(fanDT, 0.7070, 0.0001);
+    fanDT = thisSys->getFanDeltaTemp(*state, true, 0.5, 0.5);
+    EXPECT_NEAR(fanDT, 0.3068, 0.0001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
@@ -13434,7 +13439,21 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
     ,                            !- Electric Power Per Unit Flow Rate
     ,                            !- Electric Power Per Unit Flow Rate Per Unit Pressure
-    0.50;                        !- Fan Total Efficiency
+    0.50,                        !- Fan Total Efficiency
+    ,                        !- Electric Power Function of Flow Fraction Curve Name
+    ,                        !- Night Ventilation Mode Pressure Rise {Pa}
+    ,                        !- Night Ventilation Mode Flow Fraction
+    ,                        !- Motor Loss Zone Name
+    ,                        !- Motor Loss Radiative Fraction
+    General,                 !- End-Use Subcategory
+    3,                       !- Number of Speeds
+    0.33,                    !- Speed 1 Flow Fraction
+    0.2,                     !- Speed 1 Electric Power Fraction
+    0.66,                    !- Speed 2 Flow Fraction
+    0.4,                     !- Speed 2 Electric Power Fraction
+    1,                       !- Speed 3 Flow Fraction
+    1;                       !- Speed 3 Electric Power Fraction
+
   Fan:ConstantVolume,
     Test Fan 4,            !- Name
     ,    !- Availability Schedule Name
@@ -13545,6 +13564,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
+
+    // delta temperature calculations
+    Real64 fanDT = thisSys.getFanDeltaTemp(*state, true, 1, 1.0);
+    EXPECT_NEAR(fanDT, 0.3068, 0.0001);
+    fanDT = thisSys.getFanDeltaTemp(*state, true, 0.5, 0.5);
+    EXPECT_NEAR(fanDT, 0.17615, 0.0001);
 
     // With Test Fan 4 fan heat
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
