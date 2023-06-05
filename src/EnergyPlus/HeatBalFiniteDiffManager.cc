@@ -1322,7 +1322,6 @@ namespace HeatBalFiniteDiffManager {
             }
 
             for (int ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
-                auto &constructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD(ThisNum);
                 auto &construct = state.dataConstruction->Construct(ThisNum);
 
                 if (construct.TypeIsWindow) continue;
@@ -1331,6 +1330,7 @@ namespace HeatBalFiniteDiffManager {
                 if (!construct.IsUsed) continue;
                 if (!findAnySurfacesUsingConstructionAndCondFD(state, ThisNum)) continue;
 
+                auto &constructFD = state.dataHeatBalFiniteDiffMgr->ConstructFD(ThisNum);
                 static constexpr std::string_view Format_700(" Construction CondFD,{},{},{},{},{:.6R}\n");
                 print(state.files.eio,
                       Format_700,
