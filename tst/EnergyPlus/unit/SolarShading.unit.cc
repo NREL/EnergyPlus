@@ -4218,9 +4218,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
     int overhangSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE001", state->dataSurface->Surface);
-    int mirOverhangSurfNum = UtilityRoutines::FindItemInList("Mir-ZN001:WALL-SOUTH:SHADE001", state->dataSurface->Surface);
     int treeSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:TREE", state->dataSurface->Surface);
-    int mirTreeSurfNum = UtilityRoutines::FindItemInList("Mir-ZN001:WALL-SOUTH:TREE", state->dataSurface->Surface);
 
     // Get shading surface schedule indexes
     int overhangSchedNum = state->dataSurface->Surface(overhangSurfNum).SchedShadowSurfIndex;
