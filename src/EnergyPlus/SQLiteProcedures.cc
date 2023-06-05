@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -2547,8 +2548,8 @@ bool SQLite::Zone::insertIntoSQLite(sqlite3_stmt *insertStmt)
     sqliteBindDouble(insertStmt, 18, maximumZ);
     sqliteBindDouble(insertStmt, 19, ceilingHeight);
     sqliteBindDouble(insertStmt, 20, volume);
-    sqliteBindInteger(insertStmt, 21, insideConvectionAlgo);
-    sqliteBindInteger(insertStmt, 22, outsideConvectionAlgo);
+    sqliteBindInteger(insertStmt, 21, Convect::HcIntReportVals[static_cast<int>(insideConvectionAlgo)]);
+    sqliteBindInteger(insertStmt, 22, Convect::HcExtReportVals[static_cast<int>(outsideConvectionAlgo)]);
     sqliteBindDouble(insertStmt, 23, floorArea);
     sqliteBindDouble(insertStmt, 24, extGrossWallArea);
     sqliteBindDouble(insertStmt, 25, extNetWallArea);
