@@ -338,7 +338,6 @@ namespace HVACUnitaryBypassVAV {
         bool FanErrFlag(false);       // Error flag returned during CALL to GetFanType
         Array1D_int OANodeNums(4);    // Node numbers of OA mixer (OA, EA, RA, MA)
         std::string HXDXCoolCoilName; // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
-        bool OANodeErrFlag;           // TRUE if DX Coil condenser node is not found
         bool DXCoilErrFlag;           // used in warning messages
 
         Array1D_string Alphas(20, "");
