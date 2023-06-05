@@ -243,8 +243,8 @@ protected:
         state->dataHeatingCoils->GetCoilsInputFlag = false;
         state->dataSize->UnitarySysEqSizing.allocate(1);
         cbvav.HeatCoilName = "MyHeatingCoil";
-        cbvav.DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        cbvav.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+        cbvav.CoolCoilType = DataHVACGlobals::CoilType::DXCoolingSingleSpeed;
+        cbvav.HeatCoilType = DataHVACGlobals::CoilType::HeatingElectric;
         cbvav.minModeChangeTime = 0.0;
         cbvav.AirInNode = 1;
         cbvav.AirOutNode = 2;
