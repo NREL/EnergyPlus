@@ -4375,9 +4375,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Pointers (as pointers), pointers (as indices), and lots of other KEWL data stuff.
 
-    // Using/Aliasing
     using namespace OutputProcessor;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
