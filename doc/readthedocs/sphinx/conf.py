@@ -134,7 +134,7 @@ print("* Generating epJSON schema")
 # # OK, now we need to make sure the epJSON schema is generated so we can process it
 # Since this will primarily just be run by readthedocs, I'm just going to re-run the schema generator
 try:
-    check_call(['python3', 'scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py', '.'], cwd=repo_root)
+    check_call(['python3', 'scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py', 'idd'], cwd=repo_root)
 except CalledProcessError as e:
     raise Exception(f"Schema Generation failed! Exception string: {str(e)}") from None
 except FileNotFoundError as e:
@@ -142,7 +142,7 @@ except FileNotFoundError as e:
         f"python3 binary not found, what?  Looked for it at: `python3'; error = {str(e)}"
     ) from None
 
-generated_schema_file = repo_root / 'Energy+.schema.epJSON'  # I know this will have CMake placeholders
+generated_schema_file = repo_root / 'idd' / 'Energy+.schema.epJSON'  # I know this will have CMake placeholders
 if not generated_schema_file.exists():
     raise Exception("Generated schema file did not exist, aborting.")
 print("* Generated schema existence confirmed")

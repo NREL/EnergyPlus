@@ -85,3 +85,7 @@ CMakeSettings.json
 
 # py2app puts things inside dist/ and build/, build/ is already ignored, just add dist/
 dist
+
+# if you generate sphinx docs, it builds a dummy version of the schema in the idd folder, just ignore it
+/idd/Energy+.schema.epJSON
+/idd/Energy+.schema.epJSON.in
