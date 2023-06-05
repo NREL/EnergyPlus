@@ -15595,9 +15595,12 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = true;
 
         // DOAS
-        resultCells(LoadCompCol::SensInst, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
+        Real64 const mult = state.dataHeatBal->Zone(zoneIndex).Multiplier * state.dataHeatBal->Zone(zoneIndex).ListMultiplier;
+        resultCells(LoadCompCol::SensInst, LoadCompRow::DOAS) =
+            state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax) / mult;
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::DOAS) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
+        resultCells(LoadCompCol::Latent, LoadCompRow::DOAS) =
+            state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax) / mult;
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::DOAS) = true;
 
         // INFILTRATION

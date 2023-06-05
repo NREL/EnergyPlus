@@ -1223,9 +1223,6 @@ namespace SurfaceGroundHeatExchanger {
         // METHODOLOGY EMPLOYED:
         // calc surface heat balance
 
-        // Using/Aliasing
-        using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ConvCoef;     // convection coefficient
         Real64 RadCoef;      // radiation coefficient
@@ -1251,7 +1248,7 @@ namespace SurfaceGroundHeatExchanger {
         SkyTempAbs = ThisSkyTemp + Constant::KelvinConv;
 
         // ASHRAE simple convection coefficient model for external surfaces.
-        ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);
+        ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(this->TopRoughness, ThisWindSpeed);
         // radiation coefficient using surf temp from past time step
         if (std::abs(SurfTempAbs - SkyTempAbs) > SmallNum) {
             RadCoef = StefBoltzmann * this->TopThermAbs * (pow_4(SurfTempAbs) - pow_4(SkyTempAbs)) / (SurfTempAbs - SkyTempAbs);
@@ -1287,7 +1284,6 @@ namespace SurfaceGroundHeatExchanger {
         // calc surface heat balances
 
         // Using/Aliasing
-        using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
 
         Real64 ConvCoef;    // convection coefficient
         Real64 RadCoef;     // radiation coefficient
@@ -1304,7 +1300,7 @@ namespace SurfaceGroundHeatExchanger {
             ExtTempAbs = ThisDryBulb + Constant::KelvinConv;
 
             // ASHRAE simple convection coefficient model for external surfaces.
-            ConvCoef = CalcASHRAESimpExtConvectCoeff(this->TopRoughness, ThisWindSpeed);
+            ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(this->TopRoughness, ThisWindSpeed);
 
             // radiation coefficient using surf temp from past time step
             if (std::abs(SurfTempAbs - ExtTempAbs) > SmallNum) {
