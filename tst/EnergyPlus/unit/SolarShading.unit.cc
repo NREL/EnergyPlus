@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -4211,6 +4212,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     SolarShading::SkyDifSolarShading(*state);
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->BeginEnvrnFlag = false;
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state); // prevents crash in GetDaylightingParametersInput
     SolarShading::PerformSolarCalculations(*state);
     state->dataSolarShading->CalcSkyDifShading = false;
 
