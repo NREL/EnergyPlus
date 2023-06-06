@@ -17328,10 +17328,10 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
             s += "&gt;";
         } else if (c == char(176)) {
             s += "&deg;";
-        } else if (c == char(-30) && char(inString[index]) == char(-119) && char(inString[index + 1]) == char(-92)) { // ≤
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(164)) { // ≤
             s += "&le;";
             index += 2;
-        } else if (c == char(-30) && char(inString[index]) == char(-119) && char(inString[index + 1]) == char(-91)) { // ≥
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(165)) { // ≥
             s += "&ge;";
             index += 2;
         } else if (c == '\xC2') {
