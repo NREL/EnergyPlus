@@ -230,7 +230,7 @@ namespace HeatRecovery {
         int NumNumbers;                                                    // Number of Numbers for each GetObjectItem call
         int IOStatus;                                                      // Used in GetObjectItem
         bool ErrorsFound(false);                                           // Set to true if errors in input, fatal at end of routine
-        std::string_view constexpr RoutineName = "GetHeatRecoveryInput: "; // include trailing blank space
+        constexpr std::string_view RoutineName = "GetHeatRecoveryInput: "; // include trailing blank space
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         int NumAirToAirPlateExchs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
@@ -2486,9 +2486,9 @@ namespace HeatRecovery {
         if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut) UnitOn = false;
 
         if (UnitOn) {
-            std::string_view constexpr ThisSubTSat = "CalcDesiccantBalancedHeatExch:   TSat";
-            std::string_view constexpr ThisSubSecOutHumRat("CalcDesiccantBalancedHeatExch:   SecOutHumRat");
-            std::string_view constexpr ThisSubTestSatSec("CalcDesiccantBalancedHeatExch:   TestSatSec");
+            constexpr std::string_view ThisSubTSat = "CalcDesiccantBalancedHeatExch:   TSat";
+            constexpr std::string_view ThisSubSecOutHumRat = "CalcDesiccantBalancedHeatExch:   SecOutHumRat";
+            constexpr std::string_view ThisSubTestSatSec = "CalcDesiccantBalancedHeatExch:   TestSatSec";
             Real64 local_SupInMassFlow; // Supply side HX mass flow rate
             Real64 local_SecInMassFlow; // Secondary side HX mass flow rate
 
@@ -2573,8 +2573,8 @@ namespace HeatRecovery {
             //     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
             TestSaturationEnthalpy = Psychrometrics::PsyHFnTdbW(FullLoadSupOutTemp, FullLoadSupOutHumRat);
             if (Psychrometrics::PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSat) > FullLoadSupOutTemp) {
-                std::string_view constexpr ThisSubTSatFullLoadOutTemp = "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp";
-                std::string_view constexpr ThisSubTSatFullLoadOutHumRat = "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat";
+                constexpr std::string_view ThisSubTSatFullLoadOutTemp = "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp";
+                constexpr std::string_view ThisSubTSatFullLoadOutHumRat = "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat";
                 FullLoadSupOutTemp =
                     Psychrometrics::PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSatFullLoadOutTemp);
                 FullLoadSupOutHumRat = Psychrometrics::PsyWFnTdbH(state, FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat);
@@ -2656,7 +2656,7 @@ namespace HeatRecovery {
             // although this may occur during warmup. This check is included here for consistency.
             TempSecOutSat = Psychrometrics::PsyTsatFnHPb(state, this->SecOutEnth, state.dataEnvrn->OutBaroPress, ThisSubTestSatSec);
             if (TempSecOutSat > this->SecOutTemp) {
-                std::string_view constexpr ThisSubTSatSecOutHumRat = "CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat";
+                constexpr std::string_view ThisSubTSatSecOutHumRat = "CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat";
                 this->SecOutTemp = TempSecOutSat;
                 this->SecOutHumRat = Psychrometrics::PsyWFnTdbH(state, this->SecOutTemp, this->SecOutEnth, ThisSubTSatSecOutHumRat);
             }
