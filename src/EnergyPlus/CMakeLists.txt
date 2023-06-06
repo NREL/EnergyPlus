@@ -724,6 +724,13 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS generate_embeddable_epJSON_schema "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc")
 
+# Since multiple targets depend on EmbeddedEpJSONSchema.cc, we need to make a custom target for it so the dependent
+# targets don't try to run the custom command at the same time.
+# (see: https://cmake.org/cmake/help/latest/command/add_custom_command.html?highlight=add_custom_command#example-generating-files-for-multiple-targets)
+
+add_custom_target(embedded_epjson_source DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc")
+set_target_properties(embedded_epjson_source PROPERTIES FOLDER "Internal")
+
 add_subdirectory(AirflowNetwork)
 
 if(LINK_WITH_PYTHON)
@@ -758,6 +765,7 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
+add_dependencies(energyplusparser embedded_epjson_source)
 target_link_libraries(energyplusparser PUBLIC ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
@@ -772,6 +780,7 @@ endif()
 # first we will create a static library of EnergyPlus this will be linked
 # statically to create the DLL and also the unit tests
 add_library(energypluslib STATIC ${SRC})
+add_dependencies(energypluslib embedded_epjson_source)
 
 target_link_libraries(
   energypluslib

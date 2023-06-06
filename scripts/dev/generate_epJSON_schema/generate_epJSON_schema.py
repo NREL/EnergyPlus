@@ -80,7 +80,6 @@ else:
         sys.exit(1)
 
 idd_parser.parse_idd(data)
-modify_schema.change_version(data.schema)
 modify_schema.change_schedule_compact(data.schema)
 modify_schema.change_utility_cost(data.schema)
 modify_schema.change_special_cased_enums(data.schema)
