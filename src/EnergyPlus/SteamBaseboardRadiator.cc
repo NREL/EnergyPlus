@@ -1492,7 +1492,7 @@ namespace SteamBaseboardRadiator {
         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSource =
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSrcAvg;
 
-        DistributeBBSteamRadGains(state); // QBBRadSource has been modified so we need to redistribute gains
+        DistributeBBSteamRadGains(state); // QBBSteamRadSource has been modified so we need to redistribute gains
     }
 
     void DistributeBBSteamRadGains(EnergyPlusData &state)
