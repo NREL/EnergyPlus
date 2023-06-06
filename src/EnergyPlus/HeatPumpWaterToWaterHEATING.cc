@@ -721,7 +721,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
             CompSuctionEnth = FluidProperties::GetSupHeatEnthalpyRefrig(
                 state, GSHPRefrigerant, CompSuctionTemp, SuctionPr, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameCompSuctionTemp);
             if (std::abs(CompSuctionEnth - SuperHeatEnth) / SuperHeatEnth < 0.0001) {
-                goto LOOP_exit;
+                break;
             }
 
             if (CompSuctionEnth < SuperHeatEnth) {
@@ -730,7 +730,6 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
                 T111 = CompSuctionTemp;
             }
         }
-    LOOP_exit:;
 
         // Determine the Mass flow rate of refrigerant
         CompSuctionDensity = FluidProperties::GetSupHeatDensityRefrig(
