@@ -203,98 +203,99 @@ void GetGshpInput(EnergyPlusData &state)
     state.dataHPWaterToWaterClg->GSHP.allocate(state.dataHPWaterToWaterClg->NumGSHPs);
 
     for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterClg->NumGSHPs; ++GSHPNum) {
+        auto &thisGSHP = state.dataHPWaterToWaterClg->GSHP(GSHPNum);
         state.dataInputProcessing->inputProcessor->getObjectItem(state, ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name = AlphArray(1);
+        thisGSHP.Name = AlphArray(1);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterPECooling;
+        thisGSHP.WWHPPlantTypeOfNum = DataPlant::PlantEquipmentType::HPWaterPECooling;
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).COP = NumArray(1);
+        thisGSHP.COP = NumArray(1);
         if (NumArray(1) == 0.0) {
             ShowSevereError(state, format("{}:COP = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        // zero values for NumArray 3 - 6 checked in input - idd
+        // zero values for NumArray 0 - 6 checked in input - idd
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).NomCap = NumArray(2);
+        thisGSHP.NomCap = NumArray(2);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).MinPartLoadRat = NumArray(3);
+        thisGSHP.MinPartLoadRat = NumArray(3);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).MaxPartLoadRat = NumArray(4);
+        thisGSHP.MaxPartLoadRat = NumArray(4);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).OptPartLoadRat = NumArray(5);
+        thisGSHP.OptPartLoadRat = NumArray(5);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideVolFlowRate = NumArray(6);
+        thisGSHP.LoadSideVolFlowRate = NumArray(6);
         if (NumArray(6) == 0.0) {
             ShowSevereError(state, format("{}:Load Side Vol Flow Rate = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideVolFlowRate = NumArray(7);
+        thisGSHP.SourceSideVolFlowRate = NumArray(7);
         if (NumArray(7) == 0.0) {
             ShowSevereError(state, format("{}:Source Side Vol Flow Rate = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideUACoeff = NumArray(8);
+        thisGSHP.LoadSideUACoeff = NumArray(8);
         if (NumArray(9) == 0.0) {
             ShowSevereError(state, format("{}:Load Side Heat Transfer Coefficient = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideUACoeff = NumArray(9);
+        thisGSHP.SourceSideUACoeff = NumArray(9);
         if (NumArray(8) == 0.0) {
             ShowSevereError(state, format("{}:Source Side Heat Transfer Coefficient = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).CompPistonDisp = NumArray(10);
+        thisGSHP.CompPistonDisp = NumArray(10);
         if (NumArray(10) == 0.0) {
             ShowSevereError(state, format("{}:Compressor Piston displacement/Stroke = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).CompClearanceFactor = NumArray(11);
+        thisGSHP.CompClearanceFactor = NumArray(11);
         if (NumArray(11) == 0.0) {
             ShowSevereError(state, format("{}:Compressor Clearance Factor = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).CompSucPressDrop = NumArray(12);
+        thisGSHP.CompSucPressDrop = NumArray(12);
         if (NumArray(12) == 0.0) {
             ShowSevereError(state, format("{}: Pressure Drop = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SuperheatTemp = NumArray(13);
+        thisGSHP.SuperheatTemp = NumArray(13);
         if (NumArray(13) == 0.0) {
             ShowSevereError(state, format("{}:Source Side SuperHeat = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).PowerLosses = NumArray(14);
+        thisGSHP.PowerLosses = NumArray(14);
         if (NumArray(14) == 0.0) {
             ShowSevereError(state, format("{}:Compressor Power Loss = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LossFactor = NumArray(15);
+        thisGSHP.LossFactor = NumArray(15);
         if (NumArray(15) == 0.0) {
             ShowSevereError(state, format("{}:Efficiency = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
             ErrorsFound = true;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).HighPressCutoff = NumArray(16);
+        thisGSHP.HighPressCutoff = NumArray(16);
         if (NumArray(16) == 0.0) {
-            state.dataHPWaterToWaterClg->GSHP(GSHPNum).HighPressCutoff = 500000000.0;
+            thisGSHP.HighPressCutoff = 500000000.0;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LowPressCutoff = NumArray(17);
+        thisGSHP.LowPressCutoff = NumArray(17);
         if (NumArray(17) == 0.0) {
-            state.dataHPWaterToWaterClg->GSHP(GSHPNum).LowPressCutoff = 0.0;
+            thisGSHP.LowPressCutoff = 0.0;
         }
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum =
+        thisGSHP.SourceSideInletNodeNum =
             GetOnlySingleNode(state,
                               AlphArray(2),
                               ErrorsFound,
@@ -305,7 +306,7 @@ void GetGshpInput(EnergyPlusData &state)
                               NodeInputManager::CompFluidStream::Primary,
                               DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideOutletNodeNum =
+        thisGSHP.SourceSideOutletNodeNum =
             GetOnlySingleNode(state,
                               AlphArray(3),
                               ErrorsFound,
@@ -316,7 +317,7 @@ void GetGshpInput(EnergyPlusData &state)
                               NodeInputManager::CompFluidStream::Primary,
                               DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideInletNodeNum =
+        thisGSHP.LoadSideInletNodeNum =
             GetOnlySingleNode(state,
                               AlphArray(4),
                               ErrorsFound,
@@ -327,7 +328,7 @@ void GetGshpInput(EnergyPlusData &state)
                               NodeInputManager::CompFluidStream::Secondary,
                               DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideOutletNodeNum =
+        thisGSHP.LoadSideOutletNodeNum =
             GetOnlySingleNode(state,
                               AlphArray(5),
                               ErrorsFound,
@@ -344,20 +345,20 @@ void GetGshpInput(EnergyPlusData &state)
 
         // save the design source side flow rate for use by plant loop sizing algorithms
         PlantUtilities::RegisterPlantCompDesignFlow(state,
-                                                    state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum,
-                                                    0.5 * state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideVolFlowRate);
+                                                    thisGSHP.SourceSideInletNodeNum,
+                                                    0.5 * thisGSHP.SourceSideVolFlowRate);
 
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).QLoad = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).QSource = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).Power = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideWaterInletTemp = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideWaterInletTemp = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideWaterOutletTemp = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideWaterOutletTemp = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideWaterMassFlowRate = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideWaterMassFlowRate = 0.0;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).IsOn = false;
-        state.dataHPWaterToWaterClg->GSHP(GSHPNum).MustRun = true;
+        thisGSHP.QLoad = 0.0;
+        thisGSHP.QSource = 0.0;
+        thisGSHP.Power = 0.0;
+        thisGSHP.LoadSideWaterInletTemp = 0.0;
+        thisGSHP.SourceSideWaterInletTemp = 0.0;
+        thisGSHP.LoadSideWaterOutletTemp = 0.0;
+        thisGSHP.SourceSideWaterOutletTemp = 0.0;
+        thisGSHP.SourceSideWaterMassFlowRate = 0.0;
+        thisGSHP.LoadSideWaterMassFlowRate = 0.0;
+        thisGSHP.IsOn = false;
+        thisGSHP.MustRun = true;
     }
 
     if (ErrorsFound) {
@@ -372,20 +373,21 @@ void GetGshpInput(EnergyPlusData &state)
 
     // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Cooling'
     for (GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterClg->NumGSHPs; ++GSHPNum) {
+        auto &thisGSHP = state.dataHPWaterToWaterClg->GSHP(GSHPNum);
         SetupOutputVariable(state,
                             "Heat Pump Electricity Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Power,
+                            thisGSHP.Power,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Electricity Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Energy,
+                            thisGSHP.Energy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name,
+                            thisGSHP.Name,
                             {},
                             "Electricity",
                             "Cooling",
@@ -395,75 +397,75 @@ void GetGshpInput(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).QLoad,
+                            thisGSHP.QLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).QLoadEnergy,
+                            thisGSHP.QLoadEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
 
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).QSource,
+                            thisGSHP.QSource,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).QSourceEnergy,
+                            thisGSHP.QSourceEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
 
         SetupOutputVariable(state,
                             "Heat Pump Load Side Outlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideWaterOutletTemp,
+                            thisGSHP.LoadSideWaterOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Inlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideWaterInletTemp,
+                            thisGSHP.LoadSideWaterInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Outlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideWaterOutletTemp,
+                            thisGSHP.SourceSideWaterOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Inlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideWaterInletTemp,
+                            thisGSHP.SourceSideWaterInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).LoadSideWaterMassFlowRate,
+                            thisGSHP.LoadSideWaterMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideWaterMassFlowRate,
+                            thisGSHP.SourceSideWaterMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterClg->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
     }
 }
 
