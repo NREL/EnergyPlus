@@ -1539,7 +1539,6 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->MySizeFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             state.dataVentilatedSlab->MyPlantScanFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             state.dataVentilatedSlab->MyZoneEqFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataVentilatedSlab->QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
             state.dataVentilatedSlab->LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
             state.dataVentilatedSlab->LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1630,14 +1629,14 @@ namespace VentilatedSlab {
             OutsideAirNode = ventSlab.OutsideAirNode;
             RhoAir = state.dataEnvrn->StdRhoAir;
 
-            // Radiation Panel Part
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf = 0.0;
+            // "Radiant" Source Part
             state.dataVentilatedSlab->QRadSysSrcAvg = 0.0;
             state.dataVentilatedSlab->LastQRadSysSrc = 0.0;
             state.dataVentilatedSlab->LastSysTimeElapsed = 0.0;
             state.dataVentilatedSlab->LastTimeStepSys = 0.0;
             if (state.dataVentilatedSlab->NumOfVentSlabs > 0) {
                 for (auto &e : state.dataVentilatedSlab->VentSlab) {
+                    e.ZeroVentSlabSourceSumHATsurf = 0.0;
                     e.RadHeatingPower = 0.0;
                     e.RadHeatingEnergy = 0.0;
                     e.RadCoolingPower = 0.0;
@@ -1767,7 +1766,7 @@ namespace VentilatedSlab {
 
             // The first pass through in a particular time step
             ZoneNum = ventSlab.ZonePtr;
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf(ZoneNum) =
+            ventSlab.ZeroVentSlabSourceSumHATsurf =
                 state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
             for (RadSurfNum = 1; RadSurfNum <= ventSlab.NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = ventSlab.SurfacePtr(RadSurfNum);

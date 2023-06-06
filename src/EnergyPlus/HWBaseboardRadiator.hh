@@ -118,9 +118,16 @@ namespace HWBaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod;         // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        int HeatingCapMethod;          // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+                                       // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity;  // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 ZeroBBSourceSumHATsurf; // used in baseboard energy balance
+        // Record keeping variables used to calculate QBBRadSrcAvg locally
+        Real64 QBBRadSource;       // Need to keep the last value in case we are still iterating
+        Real64 QBBRadSrcAvg;       // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+        Real64 LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
 
         // Default Constructor
         HWBaseboardParams()
@@ -131,7 +138,8 @@ namespace HWBaseboardRadiator {
               WaterOutletEnthalpy(0.0), AirInletTempStd(0.0), AirInletTemp(0.0), AirOutletTemp(0.0), AirInletHumRat(0.0), AirOutletTempStd(0.0),
               FracConvect(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0),
               RadEnergy(0.0), plantLoc{}, BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0),
-              ScaledHeatingCapacity(0.0)
+              ScaledHeatingCapacity(0.0), ZeroBBSourceSumHATsurf(0.0), QBBRadSource(0.0), QBBRadSrcAvg(0.0), LastSysTimeElapsed(0.0),
+              LastTimeStepSys(0.0), LastQBBRadSrc(0.0)
         {
         }
     };
@@ -216,13 +224,6 @@ namespace HWBaseboardRadiator {
 struct HWBaseboardRadiatorData : BaseGlobalStruct
 {
 
-    Array1D<Real64> QBBRadSource;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> QBBRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QBBRadSrcAvg locally
-    Array1D<Real64> LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
@@ -242,12 +243,6 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->QBBRadSource.clear();
-        this->QBBRadSrcAvg.clear();
-        this->ZeroSourceSumHATsurf.clear();
-        this->LastQBBRadSrc.clear();
-        this->LastSysTimeElapsed.clear();
-        this->LastTimeStepSys.clear();
         this->MySizeFlag.clear();
         this->CheckEquipName.clear();
         this->SetLoopIndexFlag.clear();

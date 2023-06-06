@@ -692,9 +692,8 @@ namespace DataHeatBalance {
         Real64 delta_T = 0.0;                               // Indoor and outdoor temperature
         Real64 delta_HumRat = 0.0;                          // Indoor and outdoor humidity ratio delta
 
-        Real64 ZeroSourceSumHATsurf = 0.0; // From Chilled Ceiling Panel, equal to the SumHATsurf for all the walls in a zone with no source
-        bool zoneOAQuadratureSum = false;  // True when zone OA balance method is Quadrature
-        int zoneOABalanceIndex = 0;        // Index to ZoneAirBalance for this zone, if any
+        bool zoneOAQuadratureSum = false; // True when zone OA balance method is Quadrature
+        int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
 
         // Spaces
         bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input

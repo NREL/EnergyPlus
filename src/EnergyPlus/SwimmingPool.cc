@@ -478,27 +478,13 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
 
     if (this->MyOneTimeFlag) {
         this->setupOutputVars(state); // Set up the output variables once here
-        this->ZeroSourceSumHATsurf.allocate(state.dataGlobal->NumOfZones);
-        this->ZeroSourceSumHATsurf = 0.0;
-        this->QPoolSrcAvg.allocate(state.dataSurface->TotSurfaces);
-        this->QPoolSrcAvg = 0.0;
-        this->HeatTransCoefsAvg.allocate(state.dataSurface->TotSurfaces);
-        this->HeatTransCoefsAvg = 0.0;
-        this->LastQPoolSrc.allocate(state.dataSurface->TotSurfaces);
-        this->LastQPoolSrc = 0.0;
-        this->LastHeatTransCoefs.allocate(state.dataSurface->TotSurfaces);
-        this->LastHeatTransCoefs = 0.0;
-        this->LastSysTimeElapsed.allocate(state.dataSurface->TotSurfaces);
-        this->LastSysTimeElapsed = 0.0;
-        this->LastTimeStepSys.allocate(state.dataSurface->TotSurfaces);
-        this->LastTimeStepSys = 0.0;
         this->MyOneTimeFlag = false;
     }
 
     SwimmingPoolData::initSwimmingPoolPlantLoopIndex(state);
 
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
-        this->ZeroSourceSumHATsurf = 0.0;
+        this->ZeroPoolSourceSumHATsurf = 0.0;
         this->QPoolSrcAvg = 0.0;
         this->HeatTransCoefsAvg = 0.0;
         this->LastQPoolSrc = 0.0;
@@ -529,14 +515,14 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
         int ZoneNum = this->ZonePtr;
-        this->ZeroSourceSumHATsurf(ZoneNum) =
-            state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
+        this->ZeroPoolSourceSumHATsurf =
+            state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what the impact of the swimming pool on all zone surfaces
         int SurfNum = this->SurfacePtr;
-        this->QPoolSrcAvg(SurfNum) = 0.0;        // Initialize this variable to zero (pool parameters "off")
-        this->HeatTransCoefsAvg(SurfNum) = 0.0;  // Initialize this variable to zero (pool parameters "off")
-        this->LastQPoolSrc(SurfNum) = 0.0;       // At the start of a time step, reset to zero so average calculation can begin again
-        this->LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-        this->LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+        this->QPoolSrcAvg = 0.0;        // Initialize this variable to zero (pool parameters "off")
+        this->HeatTransCoefsAvg = 0.0;  // Initialize this variable to zero (pool parameters "off")
+        this->LastQPoolSrc = 0.0;       // At the start of a time step, reset to zero so average calculation can begin again
+        this->LastSysTimeElapsed = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+        this->LastTimeStepSys = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
     }
 
     // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature
@@ -1004,23 +990,22 @@ void SwimmingPoolData::update(EnergyPlusData &state)
 
     int SurfNum = this->SurfacePtr; // surface number/pointer
 
-    if (this->LastSysTimeElapsed(SurfNum) == state.dataHVACGlobal->SysTimeElapsed) {
+    if (this->LastSysTimeElapsed == state.dataHVACGlobal->SysTimeElapsed) {
         // Still iterating or reducing system time step, so subtract old values which were
         // not valid
-        this->QPoolSrcAvg(SurfNum) -= this->LastQPoolSrc(SurfNum) * this->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
-        this->HeatTransCoefsAvg(SurfNum) -= this->LastHeatTransCoefs(SurfNum) * this->LastTimeStepSys(SurfNum) / state.dataGlobal->TimeStepZone;
+        this->QPoolSrcAvg -= this->LastQPoolSrc * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
+        this->HeatTransCoefsAvg -= this->LastHeatTransCoefs * this->LastTimeStepSys / state.dataGlobal->TimeStepZone;
     }
 
     // Update the running average and the "last" values with the current values of the appropriate variables
-    this->QPoolSrcAvg(SurfNum) +=
-        state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
-    this->HeatTransCoefsAvg(SurfNum) +=
+    this->QPoolSrcAvg += state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
+    this->HeatTransCoefsAvg +=
         state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) * state.dataHVACGlobal->TimeStepSys / state.dataGlobal->TimeStepZone;
 
-    this->LastQPoolSrc(SurfNum) = state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum);
-    this->LastHeatTransCoefs(SurfNum) = state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum);
-    this->LastSysTimeElapsed(SurfNum) = state.dataHVACGlobal->SysTimeElapsed;
-    this->LastTimeStepSys(SurfNum) = state.dataHVACGlobal->TimeStepSys;
+    this->LastQPoolSrc = state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum);
+    this->LastHeatTransCoefs = state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum);
+    this->LastSysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
+    this->LastTimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
     PlantUtilities::SafeCopyPlantNode(state, this->WaterInletNode, this->WaterOutletNode);
 
@@ -1056,13 +1041,14 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     SwimmingPoolOn = false;
 
-    // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-    for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
-        if (!allocated(state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg)) return;
+    // If there are no pools, then just RETURN
 
-        // If it was allocated, then we have to check to see if this was running at all
+    if (state.dataSwimmingPools->NumSwimmingPools == 0) return;
+
+    for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
+        // Check to see if any of the pools were running at all
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg(SurfNum) != 0.0) {
+            if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg != 0.0) {
                 SwimmingPoolOn = true;
                 break; // DO loop
             }

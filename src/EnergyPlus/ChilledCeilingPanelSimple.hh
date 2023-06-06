@@ -144,7 +144,7 @@ namespace CoolingPanelSimple {
         int CoolingPanelMassFlowReSimIndex = 0;
         int CoolingPanelInletTempFlowReSimIndex = 0;
         bool MyEnvrnFlag = true;
-        Real64 ZeroSourceSumHATsurf = 0.0;
+        Real64 ZeroCPSourceSumHATsurf = 0.0;
         Real64 CoolingPanelSource = 0.0;
         Real64 CoolingPanelSrcAvg = 0.0;
         Real64 LastCoolingPanelSrc = 0.0;

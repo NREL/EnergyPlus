@@ -1972,7 +1972,6 @@ namespace LowTempRadiantSystem {
 
         if (state.dataLowTempRadSys->FirstTimeInit) {
 
-            state.dataLowTempRadSys->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataLowTempRadSys->QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
             state.dataLowTempRadSys->LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
             state.dataLowTempRadSys->LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1984,8 +1983,9 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->MySizeFlagCFlo = true;
             state.dataLowTempRadSys->MySizeFlagElec = true;
 
-            // Initialize total areas for all radiant systems
+            // Initialize total areas and ZeroLTRSource for all radiant systems
             for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++RadNum) {
+                state.dataLowTempRadSys->HydrRadSys(RadNum).ZeroLTRSourceSumHATsurf = 0.0;
                 state.dataLowTempRadSys->HydrRadSys(RadNum).TotalSurfaceArea = 0.0;
                 for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->HydrRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
                     state.dataLowTempRadSys->HydrRadSys(RadNum).TotalSurfaceArea +=
@@ -1993,6 +1993,7 @@ namespace LowTempRadiantSystem {
                 }
             }
             for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++RadNum) {
+                state.dataLowTempRadSys->CFloRadSys(RadNum).ZeroLTRSourceSumHATsurf = 0.0;
                 state.dataLowTempRadSys->CFloRadSys(RadNum).TotalSurfaceArea = 0.0;
                 for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->CFloRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
                     state.dataLowTempRadSys->CFloRadSys(RadNum).TotalSurfaceArea +=
@@ -2000,6 +2001,7 @@ namespace LowTempRadiantSystem {
                 }
             }
             for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++RadNum) {
+                state.dataLowTempRadSys->ElecRadSys(RadNum).ZeroLTRSourceSumHATsurf = 0.0;
                 state.dataLowTempRadSys->ElecRadSys(RadNum).TotalSurfaceArea = 0.0;
                 for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->ElecRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
                     state.dataLowTempRadSys->ElecRadSys(RadNum).TotalSurfaceArea +=
@@ -2273,7 +2275,13 @@ namespace LowTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataLowTempRadSys->MyEnvrnFlagGeneral) {
-            state.dataLowTempRadSys->ZeroSourceSumHATsurf = 0.0;
+            if (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
+                state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZeroLTRSourceSumHATsurf = 0.0;
+            } else if (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
+                state.dataLowTempRadSys->CFloRadSys(RadSysNum).ZeroLTRSourceSumHATsurf = 0.0;
+            } else if (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) {
+                state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZeroLTRSourceSumHATsurf = 0.0;
+            }
             state.dataLowTempRadSys->QRadSysSrcAvg = 0.0;
             state.dataLowTempRadSys->LastQRadSysSrc = 0.0;
             state.dataLowTempRadSys->LastSysTimeElapsed = 0.0;
@@ -2424,7 +2432,7 @@ namespace LowTempRadiantSystem {
             switch (SystemType) {
             case LowTempRadiantSystem::SystemType::HydronicSystem: {
                 ZoneNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr;
-                state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
+                state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZeroLTRSourceSumHATsurf =
                     state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
                 for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                     SurfNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
@@ -2439,7 +2447,7 @@ namespace LowTempRadiantSystem {
             } break;
             case LowTempRadiantSystem::SystemType::ConstantFlowSystem: {
                 ZoneNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).ZonePtr;
-                state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
+                state.dataLowTempRadSys->CFloRadSys(RadSysNum).ZeroLTRSourceSumHATsurf =
                     state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
                 for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                     SurfNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
@@ -2454,7 +2462,7 @@ namespace LowTempRadiantSystem {
             } break;
             case LowTempRadiantSystem::SystemType::ElectricSystem: {
                 ZoneNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZonePtr;
-                state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
+                state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZeroLTRSourceSumHATsurf =
                     state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
                 for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                     SurfNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
@@ -4171,7 +4179,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
+        LoadMet = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - this->ZeroLTRSourceSumHATsurf;
     }
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -5190,7 +5198,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = state.dataHeatBal->Zone(this->ZonePtr).sumHATsurf(state) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(this->ZonePtr);
+        LoadMet = state.dataHeatBal->Zone(this->ZonePtr).sumHATsurf(state) - this->ZeroLTRSourceSumHATsurf;
     }
     // TODO Write unit tests for baseboard
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData &state, int RadSysNum)
@@ -5322,7 +5330,7 @@ namespace LowTempRadiantSystem {
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-                LoadMet = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
+                LoadMet = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - this->ZeroLTRSourceSumHATsurf;
 
             } else { //  OFF or COOLING MODE (not allowed for an electric low temperature radiant system), turn it off
 

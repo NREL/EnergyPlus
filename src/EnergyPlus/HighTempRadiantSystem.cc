@@ -735,12 +735,6 @@ namespace HighTempRadiantSystem {
         int Loop;
 
         if (state.dataHighTempRadSys->firstTime) {
-            state.dataHighTempRadSys->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataHighTempRadSys->QHTRadSource.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
-            state.dataHighTempRadSys->QHTRadSrcAvg.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
-            state.dataHighTempRadSys->LastQHTRadSrc.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
-            state.dataHighTempRadSys->LastSysTimeElapsed.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
-            state.dataHighTempRadSys->LastTimeStepSys.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
             state.dataHighTempRadSys->MySizeFlag.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, true);
             state.dataHighTempRadSys->firstTime = false;
         }
@@ -764,29 +758,27 @@ namespace HighTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHighTempRadSys->MyEnvrnFlag) {
-            state.dataHighTempRadSys->ZeroSourceSumHATsurf = 0.0;
-            state.dataHighTempRadSys->QHTRadSource = 0.0;
-            state.dataHighTempRadSys->QHTRadSrcAvg = 0.0;
-            state.dataHighTempRadSys->LastQHTRadSrc = 0.0;
-            state.dataHighTempRadSys->LastSysTimeElapsed = 0.0;
-            state.dataHighTempRadSys->LastTimeStepSys = 0.0;
             state.dataHighTempRadSys->MyEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
+            for (int HTRnum = 1; state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
+                state.dataHighTempRadSys->HighTempRadSys(HTRnum).LastQHTRRadSrc = 0.0;
+            }
             state.dataHighTempRadSys->MyEnvrnFlag = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
-            ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
-            state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
-                state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);  // Set this to figure out what part of the load the radiant system meets
-            state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
-            state.dataHighTempRadSys->LastQHTRadSrc(RadSysNum) =
-                0.0; // At the beginning of a time step, reset to zero so average calculation can start again
-            state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) =
-                0.0; // At the beginning of a time step, reset to zero so average calculation can start again
-            state.dataHighTempRadSys->LastTimeStepSys(RadSysNum) =
-                0.0; // At the beginning of a time step, reset to zero so average calculation can start again
+            for (int HTRnum = 1; state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
+                auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(HTRnum);
+                ZoneNum = thisHTR.ZonePtr;
+                thisHTR.ZeroHTRSourceSumHATsurf =
+                    state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure out what part of the load the radiant system meets
+                thisHTR.QHTRRadSource = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+                thisHTR.QHTRRadSrcAvg = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+                thisHTR.LastQHTRRadSrc = 0.0;     // At the beginning of a time step, reset to zero so average calculation can start again
+                thisHTR.LastSysTimeElapsed = 0.0; // At the beginning of a time step, reset to zero so average calculation can start again
+                thisHTR.LastTimeStepSys = 0.0;    // At the beginning of a time step, reset to zero so average calculation can start again
+            }
         }
     }
 
@@ -958,7 +950,7 @@ namespace HighTempRadiantSystem {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
-            state.dataHighTempRadSys->QHTRadSource(RadSysNum) = 0.0;
+            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource = 0.0;
 
         } else { // Unit might be on-->this section is intended to control the output of the
             // high temperature radiant heater (temperature controlled)
@@ -989,7 +981,8 @@ namespace HighTempRadiantSystem {
             if (HeatFrac > 1.0) HeatFrac = 1.0;
 
             // Set the heat source for the high temperature electric radiant system
-            state.dataHighTempRadSys->QHTRadSource(RadSysNum) = HeatFrac * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).MaxPowerCapac;
+            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource =
+                HeatFrac * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).MaxPowerCapac;
         }
     }
 
@@ -1058,7 +1051,7 @@ namespace HighTempRadiantSystem {
 
         // initialize local variables
         ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
-        state.dataHighTempRadSys->QHTRadSource(RadSysNum) = 0.0;
+        state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource = 0.0;
 
         if (GetCurrentScheduleValue(state, state.dataHighTempRadSys->HighTempRadSys(RadSysNum).SchedPtr) > 0) {
 
@@ -1111,7 +1104,8 @@ namespace HighTempRadiantSystem {
                     }
 
                     // Set the heat source for the high temperature radiant system
-                    state.dataHighTempRadSys->QHTRadSource(RadSysNum) = HeatFrac * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).MaxPowerCapac;
+                    state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource =
+                        HeatFrac * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).MaxPowerCapac;
 
                     // Now, distribute the radiant energy of all systems to the appropriate
                     // surfaces, to people, and the air; determine the latent portion
@@ -1199,25 +1193,23 @@ namespace HighTempRadiantSystem {
         int ZoneNum; // Zone index number for the current radiant system
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
+        auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
 
         // First, update the running average if necessary...
-        if (state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) == SysTimeElapsed) {
+        if (thisHTR.LastSysTimeElapsed == SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
             // not valid
-            state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) -= state.dataHighTempRadSys->LastQHTRadSrc(RadSysNum) *
-                                                                 state.dataHighTempRadSys->LastTimeStepSys(RadSysNum) /
-                                                                 state.dataGlobal->TimeStepZone;
+            thisHTR.QHTRRadSrcAvg -= thisHTR.LastQHTRRadSrc * thisHTR.LastTimeStepSys / state.dataGlobal->TimeStepZone;
         }
 
         // Update the running average and the "last" values with the current values of the appropriate variables
-        state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) +=
-            state.dataHighTempRadSys->QHTRadSource(RadSysNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+        thisHTR.QHTRRadSrcAvg += thisHTR.QHTRRadSource * TimeStepSys / state.dataGlobal->TimeStepZone;
 
-        state.dataHighTempRadSys->LastQHTRadSrc(RadSysNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum);
-        state.dataHighTempRadSys->LastSysTimeElapsed(RadSysNum) = SysTimeElapsed;
-        state.dataHighTempRadSys->LastTimeStepSys(RadSysNum) = TimeStepSys;
+        thisHTR.LastQHTRRadSrc = thisHTR.QHTRRadSource;
+        thisHTR.LastSysTimeElapsed = SysTimeElapsed;
+        thisHTR.LastTimeStepSys = TimeStepSys;
 
-        switch (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType) {
+        switch (thisHTR.ControlType) {
         case RadControlType::MATControl:
         case RadControlType::MRTControl:
         case RadControlType::OperativeControl: {
@@ -1227,7 +1219,7 @@ namespace HighTempRadiantSystem {
             DistributeHTRadGains(state);
 
             // Now "simulate" the system by recalculating the heat balances
-            ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
+            ZoneNum = thisHTR.ZonePtr;
             HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
             HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
         } break;
@@ -1235,11 +1227,11 @@ namespace HighTempRadiantSystem {
             break;
         }
 
-        if (state.dataHighTempRadSys->QHTRadSource(RadSysNum) <= 0.0) {
+        if (thisHTR.QHTRRadSource <= 0.0) {
             LoadMet = 0.0; // System wasn't running so it can't meet a load
         } else {
-            ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
-            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum)) +
+            ZoneNum = thisHTR.ZonePtr;
+            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - thisHTR.ZeroHTRSourceSumHATsurf) +
                       state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
         }
     }
@@ -1290,19 +1282,20 @@ namespace HighTempRadiantSystem {
         HighTempRadSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(state.dataHighTempRadSys->QHTRadSrcAvg)) return;
+        if (state.dataHighTempRadSys->NumOfHighTempRadSys == 0) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
         for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
-            if (state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) != 0.0) {
+            if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSrcAvg != 0.0) {
                 HighTempRadSysOn = true;
                 break; // DO loop
             }
         }
 
-        state.dataHighTempRadSys->QHTRadSource = state.dataHighTempRadSys->QHTRadSrcAvg;
+        state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSrcAvg;
 
-        DistributeHTRadGains(state); // state.dataHighTempRadSys->QHTRadSource has been modified so we need to redistribute gains
+        DistributeHTRadGains(
+            state); // state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource has been modified so we need to redistribute gains
     }
 
     void DistributeHTRadGains(EnergyPlusData &state)
@@ -1350,23 +1343,23 @@ namespace HighTempRadiantSystem {
 
             ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
 
-            state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
+            state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource *
                                                                       state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
                                                                       state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribPerson;
 
             state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) +=
-                state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect;
+                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect;
 
             state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) +=
-                state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracLatent;
+                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracLatent;
 
             for (RadSurfNum = 1; RadSurfNum <= state.dataHighTempRadSys->HighTempRadSys(RadSysNum).TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
-                    ThisSurfIntensity =
-                        (state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
-                         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribToSurf(RadSurfNum) /
-                         state.dataSurface->Surface(SurfNum).Area);
+                    ThisSurfIntensity = (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource *
+                                         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
+                                         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracDistribToSurf(RadSurfNum) /
+                                         state.dataSurface->Surface(SurfNum).Area);
                     state.dataHeatBalFanSys->SurfQHTRadSys(SurfNum) += ThisSurfIntensity;
                     state.dataHeatBalSurf->AnyRadiantSystems = true;
 
@@ -1422,8 +1415,8 @@ namespace HighTempRadiantSystem {
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
         if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Gas) {
-            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower =
-                state.dataHighTempRadSys->QHTRadSource(RadSysNum) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).CombustionEffic;
+            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource /
+                                                                           state.dataHighTempRadSys->HighTempRadSys(RadSysNum).CombustionEffic;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasEnergy =
                 state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower * TimeStepSysSec;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = 0.0;
@@ -1431,13 +1424,13 @@ namespace HighTempRadiantSystem {
         } else if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Electric) {
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower = 0.0;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasEnergy = 0.0;
-            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = state.dataHighTempRadSys->QHTRadSource(RadSysNum);
+            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecEnergy =
                 state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower * TimeStepSysSec;
         } else {
             ShowWarningError(state, "Someone forgot to add a high temperature radiant heater type to the reporting subroutine");
         }
-        state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower = state.dataHighTempRadSys->QHTRadSource(RadSysNum);
+        state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource;
         state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatEnergy =
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatPower * TimeStepSysSec;
     }
