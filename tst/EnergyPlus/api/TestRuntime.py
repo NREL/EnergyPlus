@@ -102,5 +102,17 @@ v = api.runtime.run_energyplus(state2, sys.argv[1:])
 if v != 0:
     print("EnergyPlus Failed!")
     sys.exit(1)
-
 print("MUTED E+ RUN DONE")
+
+print("Attempting a run that kills EnergyPlus")
+state3 = api.state_manager.new_state()
+new_api = EnergyPlusAPI()
+def callback_that_kills(_state) -> None:
+    print("Going to call stop_simulation!")
+    api.runtime.stop_simulation(_state)
+api.runtime.callback_begin_system_timestep_before_predictor(state3, callback_that_kills)
+v = api.runtime.run_energyplus(state3, sys.argv[1:])
+if v != 0:
+    print("EnergyPlus Failed to Abort Cleanly; Task Succeeded Unsuccessfully!")
+    sys.exit(1)
+print("Killed EnergyPlus Run completed!")
