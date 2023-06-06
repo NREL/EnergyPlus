@@ -637,6 +637,10 @@ int AbortEnergyPlus(EnergyPlusData &state)
         state.files.flushAll();
     }
 
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
+
     return EXIT_FAILURE;
 }
 
@@ -775,6 +779,10 @@ int EndEnergyPlus(EnergyPlusData &state)
     if (state.dataGlobal->eplusRunningViaAPI) {
         state.files.flushAll();
     }
+
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
 
     return EXIT_SUCCESS;
 }
