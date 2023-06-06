@@ -4209,12 +4209,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     SolarShading::InitSolarCalculations(*state);
+    state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::SkyDifSolarShading(*state);
+    state->dataSolarShading->CalcSkyDifShading = false;
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->BeginEnvrnFlag = false;
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state); // prevents crash in GetDaylightingParametersInput
     SolarShading::PerformSolarCalculations(*state);
-    state->dataSolarShading->CalcSkyDifShading = false;
 
     // Get surface nums
     int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
@@ -4637,12 +4638,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     SolarShading::InitSolarCalculations(*state);
+    state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::SkyDifSolarShading(*state);
+    state->dataSolarShading->CalcSkyDifShading = false;
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->BeginEnvrnFlag = false;
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state); // prevents crash in GetDaylightingParametersInput
     SolarShading::PerformSolarCalculations(*state);
-    state->dataSolarShading->CalcSkyDifShading = false;
 
     // Get surface nums
     int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
@@ -4997,12 +4999,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     SolarShading::InitSolarCalculations(*state);
+    state->dataSolarShading->CalcSkyDifShading = true;
     SolarShading::SkyDifSolarShading(*state);
+    state->dataSolarShading->CalcSkyDifShading = false;
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->BeginEnvrnFlag = false;
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state); // prevents crash in GetDaylightingParametersInput
     SolarShading::PerformSolarCalculations(*state);
-    state->dataSolarShading->CalcSkyDifShading = false;
 
     // Get surface nums
     int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
