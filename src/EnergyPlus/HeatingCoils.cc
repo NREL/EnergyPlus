@@ -2469,9 +2469,8 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using Curve::CurveValue;
-        auto &ElecHeatingCoilPower = state.dataHVACGlobal->ElecHeatingCoilPower;
-        auto &MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
-        auto &MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
+        Real64 const MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
+        Real64 const MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
 
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTdbFnHW;
@@ -2559,7 +2558,7 @@ namespace HeatingCoils {
                 heatingCoil.ElecUseLoad =
                     PartLoadRat * heatingCoil.MSParasiticElecLoad(StageNumHS) + (1.0 - PartLoadRat) * heatingCoil.MSParasiticElecLoad(StageNumLS);
 
-                ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
+                state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
                 heatingCoil.HeatingCoilLoad = MSHPMassFlowRateHigh * (HSFullLoadOutAirEnth - InletAirEnthalpy) * PartLoadRat +
                                               MSHPMassFlowRateLow * (LSFullLoadOutAirEnth - InletAirEnthalpy) * (1.0 - PartLoadRat);
                 EffAvg = (EffHS * PartLoadRat) + (EffLS * (1.0 - PartLoadRat));
@@ -2628,7 +2627,7 @@ namespace HeatingCoils {
                 //   parasitics are calculated when the coil is off (1-PLR)
                 heatingCoil.ElecUseLoad = heatingCoil.MSParasiticElecLoad(StageNumLS) * (1.0 - PartLoadRat);
                 heatingCoil.ParasiticFuelRate = heatingCoil.ParasiticFuelCapacity * (1.0 - PartLoadRat);
-                ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
+                state.dataHVACGlobal->ElecHeatingCoilPower = heatingCoil.ElecUseLoad;
 
                 heatingCoil.OutletAirTemp = OutletAirTemp;
                 heatingCoil.OutletAirHumRat = OutletAirHumRat;
@@ -2650,7 +2649,7 @@ namespace HeatingCoils {
             heatingCoil.HeatingCoilLoad = 0.0;
             heatingCoil.FuelUseLoad = 0.0;
             heatingCoil.ParasiticFuelRate = heatingCoil.ParasiticFuelCapacity;
-            ElecHeatingCoilPower = 0.0;
+            state.dataHVACGlobal->ElecHeatingCoilPower = 0.0;
             PartLoadRat = 0.0;
 
         } // end of on/off if - else
@@ -2819,7 +2818,7 @@ namespace HeatingCoils {
             case HeatObjTypes::COIL_COOLING_DX_NEW:
                 // get RTF and NominalCapacity from Coil:CoolingDX
                 {
-                    auto &thisCoolingCoil = state.dataCoilCooingDX->coilCoolingDXs[SourceID];
+                    auto const &thisCoolingCoil = state.dataCoilCooingDX->coilCoolingDXs[SourceID];
                     heatingCoil.RTF = thisCoolingCoil.runTimeFraction;
                     heatingCoil.NominalCapacity =
                         thisCoolingCoil.reclaimHeat.AvailCapacity * Effic - thisCoolingCoil.reclaimHeat.WaterHeatingDesuperheaterReclaimedHeatTotal;
@@ -2907,13 +2906,13 @@ namespace HeatingCoils {
             case HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE: {
                 state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeat(DesuperheaterNum) = HeatingCoilLoad;
                 state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeatTotal = 0.0;
-                for (auto &num : state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeat)
+                for (auto const &num : state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeat)
                     state.dataHeatBal->HeatReclaimRefrigeratedRack(SourceID).HVACDesuperheaterReclaimedHeatTotal += num;
             } break;
             case HeatObjTypes::CONDENSER_REFRIGERATION: {
                 state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).HVACDesuperheaterReclaimedHeat(DesuperheaterNum) = HeatingCoilLoad;
                 state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).HVACDesuperheaterReclaimedHeatTotal = 0.0;
-                for (auto &num : state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).HVACDesuperheaterReclaimedHeat)
+                for (auto const &num : state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).HVACDesuperheaterReclaimedHeat)
                     state.dataHeatBal->HeatReclaimRefrigCondenser(SourceID).HVACDesuperheaterReclaimedHeatTotal += num;
             } break;
             case HeatObjTypes::COIL_DX_COOLING:
@@ -2921,13 +2920,13 @@ namespace HeatingCoils {
             case HeatObjTypes::COIL_DX_MULTIMODE: {
                 state.dataHeatBal->HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeat(DesuperheaterNum) = HeatingCoilLoad;
                 state.dataHeatBal->HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal = 0.0;
-                for (auto &num : state.dataHeatBal->HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeat)
+                for (auto const &num : state.dataHeatBal->HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeat)
                     state.dataHeatBal->HeatReclaimDXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal += num;
             } break;
             case HeatObjTypes::COIL_DX_VARIABLE_COOLING: {
                 state.dataHeatBal->HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeat(DesuperheaterNum) = HeatingCoilLoad;
                 state.dataHeatBal->HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal = 0.0;
-                for (auto &num : state.dataHeatBal->HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeat)
+                for (auto const &num : state.dataHeatBal->HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeat)
                     state.dataHeatBal->HeatReclaimVS_DXCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal += num;
             } break;
             default:
@@ -2951,8 +2950,8 @@ namespace HeatingCoils {
         // Data is moved from the coil data structure to the coil outlet nodes.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
-        auto &airInletNode = state.dataLoopNodes->Node(heatingCoil.AirInletNodeNum);
+        auto const &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
+        auto const &airInletNode = state.dataLoopNodes->Node(heatingCoil.AirInletNodeNum);
         auto &airOuletNode = state.dataLoopNodes->Node(heatingCoil.AirOutletNodeNum);
 
         // Set the outlet air nodes of the HeatingCoil
