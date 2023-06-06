@@ -212,7 +212,7 @@ void GetGshpInput(EnergyPlusData &state)
 
         thisGSHP.COP = NumArray(1);
         if (NumArray(1) == 0.0) {
-            ShowSevereError(state, format("{}:COP = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:COP = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
@@ -228,60 +228,60 @@ void GetGshpInput(EnergyPlusData &state)
 
         thisGSHP.LoadSideVolFlowRate = NumArray(6);
         if (NumArray(6) == 0.0) {
-            ShowSevereError(state, format("{}:Load Side Vol Flow Rate = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Load Side Vol Flow Rate = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.SourceSideVolFlowRate = NumArray(7);
         if (NumArray(7) == 0.0) {
-            ShowSevereError(state, format("{}:Source Side Vol Flow Rate = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Source Side Vol Flow Rate = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.LoadSideUACoeff = NumArray(8);
         if (NumArray(9) == 0.0) {
-            ShowSevereError(state, format("{}:Load Side Heat Transfer Coefficient = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Load Side Heat Transfer Coefficient = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.SourceSideUACoeff = NumArray(9);
         if (NumArray(8) == 0.0) {
-            ShowSevereError(state, format("{}:Source Side Heat Transfer Coefficient = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Source Side Heat Transfer Coefficient = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.CompPistonDisp = NumArray(10);
         if (NumArray(10) == 0.0) {
-            ShowSevereError(state, format("{}:Compressor Piston displacement/Stroke = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Compressor Piston displacement/Stroke = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.CompClearanceFactor = NumArray(11);
         if (NumArray(11) == 0.0) {
-            ShowSevereError(state, format("{}:Compressor Clearance Factor = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Compressor Clearance Factor = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.CompSucPressDrop = NumArray(12);
         if (NumArray(12) == 0.0) {
-            ShowSevereError(state, format("{}: Pressure Drop = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}: Pressure Drop = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.SuperheatTemp = NumArray(13);
         if (NumArray(13) == 0.0) {
-            ShowSevereError(state, format("{}:Source Side SuperHeat = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Source Side SuperHeat = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
         thisGSHP.PowerLosses = NumArray(14);
         if (NumArray(14) == 0.0) {
-            ShowSevereError(state, format("{}:Compressor Power Loss = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Compressor Power Loss = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
         thisGSHP.LossFactor = NumArray(15);
         if (NumArray(15) == 0.0) {
-            ShowSevereError(state, format("{}:Efficiency = 0.0, Heatpump={}", ModuleCompName, AlphArray(1)));
+            ShowSevereError(state, format("{}:Efficiency = 0.0, Heatpump={}", ModuleCompName, thisGSHP.Name));
             ErrorsFound = true;
         }
 
@@ -295,58 +295,52 @@ void GetGshpInput(EnergyPlusData &state)
             thisGSHP.LowPressCutoff = 0.0;
         }
 
-        thisGSHP.SourceSideInletNodeNum =
-            GetOnlySingleNode(state,
-                              AlphArray(2),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
-                              AlphArray(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Inlet,
-                              NodeInputManager::CompFluidStream::Primary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.SourceSideInletNodeNum = GetOnlySingleNode(state,
+                                                            AlphArray(2),
+                                                            ErrorsFound,
+                                                            DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                                                            thisGSHP.Name,
+                                                            DataLoopNode::NodeFluidType::Water,
+                                                            DataLoopNode::ConnectionType::Inlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
+                                                            DataLoopNode::ObjectIsNotParent);
 
-        thisGSHP.SourceSideOutletNodeNum =
-            GetOnlySingleNode(state,
-                              AlphArray(3),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
-                              AlphArray(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Outlet,
-                              NodeInputManager::CompFluidStream::Primary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.SourceSideOutletNodeNum = GetOnlySingleNode(state,
+                                                             AlphArray(3),
+                                                             ErrorsFound,
+                                                             DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                                                             thisGSHP.Name,
+                                                             DataLoopNode::NodeFluidType::Water,
+                                                             DataLoopNode::ConnectionType::Outlet,
+                                                             NodeInputManager::CompFluidStream::Primary,
+                                                             DataLoopNode::ObjectIsNotParent);
 
-        thisGSHP.LoadSideInletNodeNum =
-            GetOnlySingleNode(state,
-                              AlphArray(4),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
-                              AlphArray(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Inlet,
-                              NodeInputManager::CompFluidStream::Secondary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.LoadSideInletNodeNum = GetOnlySingleNode(state,
+                                                          AlphArray(4),
+                                                          ErrorsFound,
+                                                          DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                                                          thisGSHP.Name,
+                                                          DataLoopNode::NodeFluidType::Water,
+                                                          DataLoopNode::ConnectionType::Inlet,
+                                                          NodeInputManager::CompFluidStream::Secondary,
+                                                          DataLoopNode::ObjectIsNotParent);
 
-        thisGSHP.LoadSideOutletNodeNum =
-            GetOnlySingleNode(state,
-                              AlphArray(5),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
-                              AlphArray(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Outlet,
-                              NodeInputManager::CompFluidStream::Secondary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.LoadSideOutletNodeNum = GetOnlySingleNode(state,
+                                                           AlphArray(5),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterParameterEstimationCooling,
+                                                           thisGSHP.Name,
+                                                           DataLoopNode::NodeFluidType::Water,
+                                                           DataLoopNode::ConnectionType::Outlet,
+                                                           NodeInputManager::CompFluidStream::Secondary,
+                                                           DataLoopNode::ObjectIsNotParent);
 
         // Test node sets
-        BranchNodeConnections::TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(2), AlphArray(3), "Condenser Water Nodes");
-        BranchNodeConnections::TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(4), AlphArray(5), "Chilled Water Nodes");
+        BranchNodeConnections::TestCompSet(state, ModuleCompNameUC, thisGSHP.Name, AlphArray(2), AlphArray(3), "Condenser Water Nodes");
+        BranchNodeConnections::TestCompSet(state, ModuleCompNameUC, thisGSHP.Name, AlphArray(4), AlphArray(5), "Chilled Water Nodes");
 
         // save the design source side flow rate for use by plant loop sizing algorithms
-        PlantUtilities::RegisterPlantCompDesignFlow(state,
-                                                    thisGSHP.SourceSideInletNodeNum,
-                                                    0.5 * thisGSHP.SourceSideVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, thisGSHP.SourceSideInletNodeNum, 0.5 * thisGSHP.SourceSideVolFlowRate);
 
         thisGSHP.QLoad = 0.0;
         thisGSHP.QSource = 0.0;
