@@ -5010,8 +5010,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     // Get surface nums
     int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
-    int shade1SurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE1", state->dataSurface->Surface);
-    int shade2SurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE2", state->dataSurface->Surface);
 
     // Use the base transmittance schedules (no EMS override)
     // shade1 transmittance = 0.5, shade2 transmittance = 0.8
