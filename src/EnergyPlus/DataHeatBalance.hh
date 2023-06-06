@@ -595,31 +595,31 @@ namespace DataHeatBalance {
         Real64 ExtNetWallArea = 0.0;              // Exterior Wall Area for Zone (Net)
         Real64 TotalSurfArea = 0.0;               // Total surface area for Zone
         // (ignoring windows as they will be included in their base surfaces)
-        Real64 ExteriorTotalGroundSurfArea = 0.0;       // Total surface area of all surfaces for Zone with ground contact
-        Real64 ExtGrossGroundWallArea = 0.0;            // Ground contact Wall Area for Zone (Gross)
-        Real64 ExtGrossGroundWallArea_Multiplied = 0.0; // Ground contact Wall Area for Zone (Gross) with multipliers
-        bool IsControlled = false;                      // True when this is a controlled zone.
-        bool IsSupplyPlenum = false;                    // True when this zone is a supply plenum
-        bool IsReturnPlenum = false;                    // True when this zone is a return plenum
-        int PlenumCondNum = 0;                          // Supply or return plenum conditions number, 0 if this is not a plenum zone
-        int TempControlledZoneIndex = 0;                // this is the index number for TempControlledZone structure for lookup
-        int humidityControlZoneIndex = 0;               // this is the index number for HumidityControlZone structure for lookup
-        int AllSurfaceFirst = 0;                        // First surface in zone including air boundaries
-        int AllSurfaceLast = -1;                        // Last  surface in zone including air boundaries
-        int InsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple; // Ref: appropriate values for Inside Convection solution
-        int NumSurfaces = 0;                                                // Number of surfaces for this zone
-        int NumSubSurfaces = 0;     // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
-        int NumShadingSurfaces = 0; // Number of shading surfaces for this zone
-        int OutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple; // Ref: appropriate values for Outside Convection solution
-        Vector Centroid;                                                     // Center of the zone found by averaging wall, floor, and roof centroids
-        Real64 MinimumX = 0.0;                                               // Minimum X value for entire zone
-        Real64 MaximumX = 0.0;                                               // Maximum X value for entire zone
-        Real64 MinimumY = 0.0;                                               // Minimum Y value for entire zone
-        Real64 MaximumY = 0.0;                                               // Maximum Y value for entire zone
-        Real64 MinimumZ = 0.0;                                               // Minimum Z value for entire zone
-        Real64 MaximumZ = 0.0;                                               // Maximum Z value for entire zone
-        std::vector<int> ZoneHTSurfaceList;          // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
-        std::vector<int> ZoneIZSurfaceList;          // List of interzone surfaces in this zone
+        Real64 ExteriorTotalGroundSurfArea = 0.0;                  // Total surface area of all surfaces for Zone with ground contact
+        Real64 ExtGrossGroundWallArea = 0.0;                       // Ground contact Wall Area for Zone (Gross)
+        Real64 ExtGrossGroundWallArea_Multiplied = 0.0;            // Ground contact Wall Area for Zone (Gross) with multipliers
+        bool IsControlled = false;                                 // True when this is a controlled zone.
+        bool IsSupplyPlenum = false;                               // True when this zone is a supply plenum
+        bool IsReturnPlenum = false;                               // True when this zone is a return plenum
+        int PlenumCondNum = 0;                                     // Supply or return plenum conditions number, 0 if this is not a plenum zone
+        int TempControlledZoneIndex = 0;                           // this is the index number for TempControlledZone structure for lookup
+        int humidityControlZoneIndex = 0;                          // this is the index number for HumidityControlZone structure for lookup
+        int AllSurfaceFirst = 0;                                   // First surface in zone including air boundaries
+        int AllSurfaceLast = -1;                                   // Last  surface in zone including air boundaries
+        Convect::HcInt IntConvAlgo = Convect::HcInt::ASHRAESimple; // Ref: appropriate values for Inside Convection solution
+        int NumSurfaces = 0;                                       // Number of surfaces for this zone
+        int NumSubSurfaces = 0;                                    // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
+        int NumShadingSurfaces = 0;                                // Number of shading surfaces for this zone
+        Convect::HcExt ExtConvAlgo = Convect::HcExt::ASHRAESimple; // Ref: appropriate values for Outside Convection solution
+        Vector Centroid;                                           // Center of the zone found by averaging wall, floor, and roof centroids
+        Real64 MinimumX = 0.0;                                     // Minimum X value for entire zone
+        Real64 MaximumX = 0.0;                                     // Maximum X value for entire zone
+        Real64 MinimumY = 0.0;                                     // Minimum Y value for entire zone
+        Real64 MaximumY = 0.0;                                     // Maximum Y value for entire zone
+        Real64 MinimumZ = 0.0;                                     // Minimum Z value for entire zone
+        Real64 MaximumZ = 0.0;                                     // Maximum Z value for entire zone
+        std::vector<int> ZoneHTSurfaceList;                        // List of HT surfaces related to this zone (includes adjacent interzone surfaces)
+        std::vector<int> ZoneIZSurfaceList;                        // List of interzone surfaces in this zone
         std::vector<int> ZoneHTNonWindowSurfaceList; // List of non-window HT surfaces related to this zone (includes adjacent interzone surfaces)
         std::vector<int> ZoneHTWindowSurfaceList;    // List of window surfaces related to this zone (includes adjacent interzone surfaces)
         int zoneRadEnclosureFirst = -1;              // For Zone resimulation, need a range of enclosures for CalcInteriorRadExchange
@@ -1846,8 +1846,8 @@ struct HeatBalanceData : BaseGlobalStruct
     Real64 BuildingAzimuth = 0.0;           // North Axis of Building
     Real64 LoadsConvergTol = 0.0;           // Tolerance value for Loads Convergence
     Real64 TempConvergTol = 0.0;            // Tolerance value for Temperature Convergence
-    int DefaultInsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
-    int DefaultOutsideConvectionAlgo = ConvectionConstants::HcExt_ASHRAESimple;
+    Convect::HcInt DefaultIntConvAlgo = Convect::HcInt::ASHRAESimple;
+    Convect::HcExt DefaultExtConvAlgo = Convect::HcExt::ASHRAESimple;
     DataHeatBalance::Shadowing SolarDistribution = DataHeatBalance::Shadowing::FullExterior;                // Solar Distribution Algorithm
     int InsideSurfIterations = 0;                                                                           // Counts inside surface iterations
     DataSurfaces::HeatTransferModel OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel::CTF; // Global HeatBalanceAlgorithm setting
