@@ -1154,8 +1154,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimRefrigeratedRack(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
@@ -1185,8 +1184,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimRefrigCondenser(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.9) {
@@ -1209,8 +1207,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimDXCoil(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
@@ -1234,8 +1231,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimVS_DXCoil(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
@@ -1258,8 +1254,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimDXCoil(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
@@ -1282,8 +1277,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimDXCoil(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                         }
                         HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                         if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
@@ -1309,8 +1303,7 @@ namespace HeatingCoils {
                     state.dataCoilCooingDX->coilCoolingDXs[heatingCoil.ReclaimHeatingSourceIndexNum].reclaimHeat;
                 if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                     HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                    for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                        num = 0.0;
+                    std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                 }
                 HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                 if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
@@ -1567,8 +1560,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimRefrigeratedRack(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                             HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                                 ShowSevereError(
@@ -1594,8 +1586,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimRefrigCondenser(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                             HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.9) {
                                 ShowSevereError(
@@ -1623,8 +1614,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimDXCoil(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                             HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                                 ShowSevereError(
@@ -1650,8 +1640,7 @@ namespace HeatingCoils {
                             state.dataHeatBal->HeatReclaimVS_DXCoil(heatingCoil.ReclaimHeatingSourceIndexNum);
                         if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                             HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                            for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                                num = 0.0;
+                            std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                             HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                             if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                                 ShowSevereError(
@@ -1671,8 +1660,7 @@ namespace HeatingCoils {
                     state.dataCoilCooingDX->coilCoolingDXs[heatingCoil.ReclaimHeatingSourceIndexNum].reclaimHeat;
                 if (!allocated(HeatReclaim.HVACDesuperheaterReclaimedHeat)) {
                     HeatReclaim.HVACDesuperheaterReclaimedHeat.allocate(state.dataHeatingCoils->NumDesuperheaterCoil);
-                    for (auto &num : HeatReclaim.HVACDesuperheaterReclaimedHeat)
-                        num = 0.0;
+                    std::fill(HeatReclaim.HVACDesuperheaterReclaimedHeat.begin(), HeatReclaim.HVACDesuperheaterReclaimedHeat.end(), 0.0);
                     HeatReclaim.ReclaimEfficiencyTotal += heatingCoil.Efficiency;
                     if (HeatReclaim.ReclaimEfficiencyTotal > 0.3) {
                         ShowSevereError(
