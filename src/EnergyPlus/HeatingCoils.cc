@@ -3369,20 +3369,14 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the heating coil index number if it is a desuperheating coil.
         // If incorrect coil type or name is given, ErrorsFound is returned as true and index number is returned
         // as zero.
 
-        // Return value
-        int CoilFound; // returned index number of matched coil
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         bool GetCoilErrFlag;
-        bool SuppressWarning;
         int NumCoil;
         int CoilNum(0);
 
@@ -3392,8 +3386,8 @@ namespace HeatingCoils {
             state.dataHeatingCoils->GetCoilsInputFlag = false;
         }
 
-        SuppressWarning = true;
-        CoilFound = 0;
+        bool SuppressWarning = true;
+        int CoilFound = 0;
 
         // note should eventually get rid of this string comparison
         if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
@@ -3437,20 +3431,11 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   June 2007
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the control node number.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
         // as zero.
-
-        // Return value
-        int NodeNumber; // returned node number of matched coil
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WhichCoil;
-        int FoundType; // Integer equivalent of coil type
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (state.dataHeatingCoils->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -3458,26 +3443,18 @@ namespace HeatingCoils {
             state.dataHeatingCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = 0;
-        NodeNumber = 0;
-        FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
+        int FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
         if (FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel ||
             FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHeatingCoils->HeatingCoil);
+            int WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHeatingCoils->HeatingCoil);
             if (WhichCoil != 0) {
-                NodeNumber = state.dataHeatingCoils->HeatingCoil(WhichCoil).TempSetPointNodeNum;
+                return state.dataHeatingCoils->HeatingCoil(WhichCoil).TempSetPointNodeNum;
             }
-        } else {
-            WhichCoil = 0;
         }
 
-        if (WhichCoil == 0) {
-            ShowSevereError(state, format("GetCoilControlNodeNum: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
-            ErrorsFound = true;
-            NodeNumber = 0;
-        }
-
-        return NodeNumber;
+        ShowSevereError(state, format("GetCoilControlNodeNum: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
+        ErrorsFound = true;
+        return 0;
     }
 
     int GetHeatingCoilTypeNum(EnergyPlusData &state,
@@ -3490,20 +3467,11 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the type number.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and type number is returned
         // as zero.
-
-        // Return value
-        int TypeNum; // returned type number of matched coil
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WhichCoil;
-        int FoundType; // Integer equivalent of coil type
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (state.dataHeatingCoils->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -3511,26 +3479,18 @@ namespace HeatingCoils {
             state.dataHeatingCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = 0;
-        TypeNum = 0;
-        FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
+        int FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
         if (FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel ||
             FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHeatingCoils->HeatingCoil);
+            int WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHeatingCoils->HeatingCoil);
             if (WhichCoil != 0) {
-                TypeNum = state.dataHeatingCoils->HeatingCoil(WhichCoil).HCoilType_Num;
+                return state.dataHeatingCoils->HeatingCoil(WhichCoil).HCoilType_Num;
             }
-        } else {
-            WhichCoil = 0;
         }
 
-        if (WhichCoil == 0) {
-            ShowSevereError(state, format("GetHeatingCoilTypeNum: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
-            ErrorsFound = true;
-            TypeNum = 0;
-        }
-
-        return TypeNum;
+        ShowSevereError(state, format("GetHeatingCoilTypeNum: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
+        ErrorsFound = true;
+        return 0;
     }
 
     int GetHeatingCoilIndex(EnergyPlusData &state,
@@ -3543,19 +3503,11 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the index into the structure.  If
         // incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
         // as zero.
-
-        // Return value
-        int WhichCoil; // returned index number of matched coil
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int FoundType; // Integer equivalent of coil type
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (state.dataHeatingCoils->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -3563,13 +3515,11 @@ namespace HeatingCoils {
             state.dataHeatingCoils->GetCoilsInputFlag = false;
         }
 
-        WhichCoil = 0;
-        FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
+        int WhichCoil = 0;
+        int FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
         if (FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel ||
             FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHeatingCoils->HeatingCoil);
-        } else {
-            WhichCoil = 0;
         }
 
         if (WhichCoil == 0) {
@@ -3590,8 +3540,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   December 2008
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the PLF curve index.  If
@@ -3599,35 +3547,26 @@ namespace HeatingCoils {
         // is returned as true and curve index is returned as zero.
         // If not a gas or electric heating coil, ErrorsFound is unchanged and index is 0.
 
-        // Return value
-        int IndexNum; // returned PLF curve index of matched coil
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        int WhichCoil;
-        int FoundType; // Integer equivalent of coil type
-
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (state.dataHeatingCoils->GetCoilsInputFlag) { // First time subroutine has been entered
             GetHeatingCoilInput(state);
             state.dataHeatingCoils->GetCoilsInputFlag = false;
         }
 
-        FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
+        int FoundType = UtilityRoutines::FindItem(CoilType, cAllCoilTypes, NumAllCoilTypes);
         if (FoundType == Coil_HeatingElectric || FoundType == Coil_HeatingElectric_MultiStage || FoundType == Coil_HeatingGasOrOtherFuel ||
             FoundType == Coil_HeatingGas_MultiStage || FoundType == Coil_HeatingDesuperheater) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHeatingCoils->HeatingCoil);
+            int WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHeatingCoils->HeatingCoil);
             if (WhichCoil != 0) {
-                IndexNum = state.dataHeatingCoils->HeatingCoil(WhichCoil).PLFCurveIndex;
+                return state.dataHeatingCoils->HeatingCoil(WhichCoil).PLFCurveIndex;
             } else {
                 ShowSevereError(state, format("GetHeatingCoilPLFCurveIndex: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
                 ErrorsFound = true;
-                IndexNum = 0;
+                return 0;
             }
         } else {
-            IndexNum = 0;
+            return 0;
         }
-
-        return IndexNum;
     }
 
     int GetHeatingCoilNumberOfStages(EnergyPlusData &state,
