@@ -242,7 +242,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     // Load data structure for cooling coil
     for (int HPNum = 1; HPNum <= NumCoolCoil; ++HPNum) {
 
-        int GSHPNum = HPNum;
+        auto &thisGSHP = state.dataHPWaterToWaterSimple->GSHP(HPNum);
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  HPEqFitCoolingUC,
@@ -256,117 +256,105 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHPWaterToWaterSimple->HeatPumpWaterUniqueNames, state.dataIPShortCut->cAlphaArgs(1), HPEqFitCoolingUC, ErrorsFound);
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPType = DataPlant::PlantEquipmentType::HPWaterEFCooling;
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowCool = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowCool == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedLoadVolFlowCoolWasAutoSized = true;
+        thisGSHP.WWHPType = DataPlant::PlantEquipmentType::HPWaterEFCooling;
+        thisGSHP.Name = state.dataIPShortCut->cAlphaArgs(1);
+        thisGSHP.RatedLoadVolFlowCool = state.dataIPShortCut->rNumericArgs(1);
+        if (thisGSHP.RatedLoadVolFlowCool == DataSizing::AutoSize) {
+            thisGSHP.ratedLoadVolFlowCoolWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedSourceVolFlowCool = state.dataIPShortCut->rNumericArgs(2);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedSourceVolFlowCool == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedSourceVolFlowCoolWasAutoSized = true;
+        thisGSHP.RatedSourceVolFlowCool = state.dataIPShortCut->rNumericArgs(2);
+        if (thisGSHP.RatedSourceVolFlowCool == DataSizing::AutoSize) {
+            thisGSHP.ratedSourceVolFlowCoolWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapCool = state.dataIPShortCut->rNumericArgs(3);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapCool == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedCapCoolWasAutoSized = true;
+        thisGSHP.RatedCapCool = state.dataIPShortCut->rNumericArgs(3);
+        if (thisGSHP.RatedCapCool == DataSizing::AutoSize) {
+            thisGSHP.ratedCapCoolWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerCool = state.dataIPShortCut->rNumericArgs(4);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerCool == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerCoolWasAutoSized = true;
+        thisGSHP.RatedPowerCool = state.dataIPShortCut->rNumericArgs(4);
+        if (thisGSHP.RatedPowerCool == DataSizing::AutoSize) {
+            thisGSHP.ratedPowerCoolWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex > 0) {
+        thisGSHP.CoolCapCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+        thisGSHP.CoolPowCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+        if (thisGSHP.CoolCapCurveIndex > 0) {
+            ErrorsFound |= Curve::CheckCurveDims(
+                state, thisGSHP.CoolCapCurveIndex, {4}, "GetWatertoWaterHPInput", HPEqFitCoolingUC, thisGSHP.Name, "Cooling Capacity Curve Name");
+        }
+        if (thisGSHP.CoolPowCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolCapCurveIndex,
+                                                 thisGSHP.CoolPowCurveIndex,
                                                  {4},
                                                  "GetWatertoWaterHPInput",
                                                  HPEqFitCoolingUC,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                 "Cooling Capacity Curve Name");
-        }
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex > 0) {
-            ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).CoolPowCurveIndex,
-                                                 {4},
-                                                 "GetWatertoWaterHPInput",
-                                                 HPEqFitCoolingUC,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 thisGSHP.Name,
                                                  "Cooling Compressor Power Curve Name");
         }
 
         if (NumNums > 4) {
             if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = state.dataIPShortCut->rNumericArgs(5);
+                thisGSHP.refCOP = state.dataIPShortCut->rNumericArgs(5);
             } else {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = 8.0;
+                thisGSHP.refCOP = 8.0;
             }
 
         } else {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = 8.0;
+            thisGSHP.refCOP = 8.0;
         }
 
         // calculate reference COP if hard sized
-        if (!state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerCoolWasAutoSized &&
-            !state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedCapCoolWasAutoSized &&
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerCool > 0.0) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP =
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapCool / state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerCool;
+        if (!thisGSHP.ratedPowerCoolWasAutoSized && !thisGSHP.ratedCapCoolWasAutoSized && thisGSHP.RatedPowerCool > 0.0) {
+            thisGSHP.refCOP = thisGSHP.RatedCapCool / thisGSHP.RatedPowerCool;
         }
 
         if (NumNums > 5) {
             if (!state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = state.dataIPShortCut->rNumericArgs(6);
+                thisGSHP.sizFac = state.dataIPShortCut->rNumericArgs(6);
             } else {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = 1.0;
+                thisGSHP.sizFac = 1.0;
             }
         } else {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = 1.0;
+            thisGSHP.sizFac = 1.0;
         }
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).SourceSideInletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(2),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Inlet,
-                              NodeInputManager::CompFluidStream::Primary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.SourceSideInletNodeNum = GetOnlySingleNode(state,
+                                                            state.dataIPShortCut->cAlphaArgs(2),
+                                                            ErrorsFound,
+                                                            DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
+                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            DataLoopNode::NodeFluidType::Water,
+                                                            DataLoopNode::ConnectionType::Inlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
+                                                            DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).SourceSideOutletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(3),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Outlet,
-                              NodeInputManager::CompFluidStream::Primary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.SourceSideOutletNodeNum = GetOnlySingleNode(state,
+                                                             state.dataIPShortCut->cAlphaArgs(3),
+                                                             ErrorsFound,
+                                                             DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
+                                                             state.dataIPShortCut->cAlphaArgs(1),
+                                                             DataLoopNode::NodeFluidType::Water,
+                                                             DataLoopNode::ConnectionType::Outlet,
+                                                             NodeInputManager::CompFluidStream::Primary,
+                                                             DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideInletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(4),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Inlet,
-                              NodeInputManager::CompFluidStream::Secondary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.LoadSideInletNodeNum = GetOnlySingleNode(state,
+                                                          state.dataIPShortCut->cAlphaArgs(4),
+                                                          ErrorsFound,
+                                                          DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
+                                                          state.dataIPShortCut->cAlphaArgs(1),
+                                                          DataLoopNode::NodeFluidType::Water,
+                                                          DataLoopNode::ConnectionType::Inlet,
+                                                          NodeInputManager::CompFluidStream::Secondary,
+                                                          DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideOutletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(5),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Outlet,
-                              NodeInputManager::CompFluidStream::Secondary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.LoadSideOutletNodeNum = GetOnlySingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(5),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitCooling,
+                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           DataLoopNode::NodeFluidType::Water,
+                                                           DataLoopNode::ConnectionType::Outlet,
+                                                           NodeInputManager::CompFluidStream::Secondary,
+                                                           DataLoopNode::ObjectIsNotParent);
 
         // Test node sets
         BranchNodeConnections::TestCompSet(state,
@@ -383,17 +371,17 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                            "Chilled Water Nodes");
 
         if (NumAlphas > 7 && !state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = state.dataIPShortCut->cAlphaArgs(8);
+            thisGSHP.companionName = state.dataIPShortCut->cAlphaArgs(8);
         }
 
         // CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
         SetupOutputVariable(state,
                             "Heat Pump Electricity Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportEnergy,
+                            thisGSHP.reportEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                            thisGSHP.Name,
                             {},
                             "Electricity",
                             "Cooling",
@@ -402,23 +390,24 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportQLoadEnergy,
+                            thisGSHP.reportQLoadEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportQSourceEnergy,
+                            thisGSHP.reportQSourceEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
     }
 
     // Load data structure for heating coil
     for (int HPNum = 1; HPNum <= NumHeatCoil; ++HPNum) {
 
         int GSHPNum = NumCoolCoil + HPNum;
+        auto &thisGSHP = state.dataHPWaterToWaterSimple->GSHP(GSHPNum);
 
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  HPEqFitHeatingUC,
@@ -432,120 +421,108 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks);
         GlobalNames::VerifyUniqueInterObjectName(
             state, state.dataHPWaterToWaterSimple->HeatPumpWaterUniqueNames, state.dataIPShortCut->cAlphaArgs(1), HPEqFitHeatingUC, ErrorsFound);
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).WWHPType = DataPlant::PlantEquipmentType::HPWaterEFHeating;
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowHeat = state.dataIPShortCut->rNumericArgs(1);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedLoadVolFlowHeat == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedLoadVolFlowHeatWasAutoSized = true;
+        thisGSHP.WWHPType = DataPlant::PlantEquipmentType::HPWaterEFHeating;
+        thisGSHP.Name = state.dataIPShortCut->cAlphaArgs(1);
+        thisGSHP.RatedLoadVolFlowHeat = state.dataIPShortCut->rNumericArgs(1);
+        if (thisGSHP.RatedLoadVolFlowHeat == DataSizing::AutoSize) {
+            thisGSHP.ratedLoadVolFlowHeatWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedSourceVolFlowHeat = state.dataIPShortCut->rNumericArgs(2);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedSourceVolFlowHeat == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedSourceVolFlowHeatWasAutoSized = true;
+        thisGSHP.RatedSourceVolFlowHeat = state.dataIPShortCut->rNumericArgs(2);
+        if (thisGSHP.RatedSourceVolFlowHeat == DataSizing::AutoSize) {
+            thisGSHP.ratedSourceVolFlowHeatWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapHeat = state.dataIPShortCut->rNumericArgs(3);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapHeat == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedCapHeatWasAutoSized = true;
+        thisGSHP.RatedCapHeat = state.dataIPShortCut->rNumericArgs(3);
+        if (thisGSHP.RatedCapHeat == DataSizing::AutoSize) {
+            thisGSHP.ratedCapHeatWasAutoSized = true;
         }
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerHeat = state.dataIPShortCut->rNumericArgs(4);
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerHeat == DataSizing::AutoSize) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerHeatWasAutoSized = true;
+        thisGSHP.RatedPowerHeat = state.dataIPShortCut->rNumericArgs(4);
+        if (thisGSHP.RatedPowerHeat == DataSizing::AutoSize) {
+            thisGSHP.ratedPowerHeatWasAutoSized = true;
         }
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex > 0) {
-            ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatCapCurveIndex,
-                                                 {4},
-                                                 "GetWatertoWaterHPInput",
-                                                 HPEqFitHeatingUC,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
-                                                 "Heating Capacity Curve Name");
+        thisGSHP.HeatCapCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+        thisGSHP.HeatPowCurveIndex = Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+        if (thisGSHP.HeatCapCurveIndex > 0) {
+            ErrorsFound |= Curve::CheckCurveDims(
+                state, thisGSHP.HeatCapCurveIndex, {4}, "GetWatertoWaterHPInput", HPEqFitHeatingUC, thisGSHP.Name, "Heating Capacity Curve Name");
         }
-        if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex > 0) {
+        if (thisGSHP.HeatPowCurveIndex > 0) {
             ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).HeatPowCurveIndex,
+                                                 thisGSHP.HeatPowCurveIndex,
                                                  {4},
                                                  "GetWatertoWaterHPInput",
                                                  HPEqFitHeatingUC,
-                                                 state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                                                 thisGSHP.Name,
                                                  "Heating Compressor Power Curve Name");
         }
         if (NumNums > 4) {
             if (!state.dataIPShortCut->lNumericFieldBlanks(5)) {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = state.dataIPShortCut->rNumericArgs(5);
+                thisGSHP.refCOP = state.dataIPShortCut->rNumericArgs(5);
             } else {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = 7.5;
+                thisGSHP.refCOP = 7.5;
             }
 
         } else {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP = 7.5;
+            thisGSHP.refCOP = 7.5;
         }
 
         // calculate reference COP if hard sized
-        if (!state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedPowerHeatWasAutoSized &&
-            !state.dataHPWaterToWaterSimple->GSHP(GSHPNum).ratedCapHeatWasAutoSized &&
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerHeat > 0.0) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).refCOP =
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedCapHeat / state.dataHPWaterToWaterSimple->GSHP(GSHPNum).RatedPowerHeat;
+        if (!thisGSHP.ratedPowerHeatWasAutoSized && !thisGSHP.ratedCapHeatWasAutoSized && thisGSHP.RatedPowerHeat > 0.0) {
+            thisGSHP.refCOP = thisGSHP.RatedCapHeat / thisGSHP.RatedPowerHeat;
         }
 
         if (NumNums > 5) {
             if (!state.dataIPShortCut->lNumericFieldBlanks(6)) {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = state.dataIPShortCut->rNumericArgs(6);
+                thisGSHP.sizFac = state.dataIPShortCut->rNumericArgs(6);
             } else {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = 1.0;
+                thisGSHP.sizFac = 1.0;
             }
         } else {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).sizFac = 1.0;
+            thisGSHP.sizFac = 1.0;
         }
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).SourceSideInletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(2),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Inlet,
-                              NodeInputManager::CompFluidStream::Primary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.SourceSideInletNodeNum = GetOnlySingleNode(state,
+                                                            state.dataIPShortCut->cAlphaArgs(2),
+                                                            ErrorsFound,
+                                                            DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
+                                                            state.dataIPShortCut->cAlphaArgs(1),
+                                                            DataLoopNode::NodeFluidType::Water,
+                                                            DataLoopNode::ConnectionType::Inlet,
+                                                            NodeInputManager::CompFluidStream::Primary,
+                                                            DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).SourceSideOutletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(3),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Outlet,
-                              NodeInputManager::CompFluidStream::Primary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.SourceSideOutletNodeNum = GetOnlySingleNode(state,
+                                                             state.dataIPShortCut->cAlphaArgs(3),
+                                                             ErrorsFound,
+                                                             DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
+                                                             state.dataIPShortCut->cAlphaArgs(1),
+                                                             DataLoopNode::NodeFluidType::Water,
+                                                             DataLoopNode::ConnectionType::Outlet,
+                                                             NodeInputManager::CompFluidStream::Primary,
+                                                             DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideInletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(4),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Inlet,
-                              NodeInputManager::CompFluidStream::Secondary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.LoadSideInletNodeNum = GetOnlySingleNode(state,
+                                                          state.dataIPShortCut->cAlphaArgs(4),
+                                                          ErrorsFound,
+                                                          DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
+                                                          state.dataIPShortCut->cAlphaArgs(1),
+                                                          DataLoopNode::NodeFluidType::Water,
+                                                          DataLoopNode::ConnectionType::Inlet,
+                                                          NodeInputManager::CompFluidStream::Secondary,
+                                                          DataLoopNode::ObjectIsNotParent);
 
-        state.dataHPWaterToWaterSimple->GSHP(GSHPNum).LoadSideOutletNodeNum =
-            GetOnlySingleNode(state,
-                              state.dataIPShortCut->cAlphaArgs(5),
-                              ErrorsFound,
-                              DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
-                              state.dataIPShortCut->cAlphaArgs(1),
-                              DataLoopNode::NodeFluidType::Water,
-                              DataLoopNode::ConnectionType::Outlet,
-                              NodeInputManager::CompFluidStream::Secondary,
-                              DataLoopNode::ObjectIsNotParent);
+        thisGSHP.LoadSideOutletNodeNum = GetOnlySingleNode(state,
+                                                           state.dataIPShortCut->cAlphaArgs(5),
+                                                           ErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::HeatPumpWaterToWaterEquationFitHeating,
+                                                           state.dataIPShortCut->cAlphaArgs(1),
+                                                           DataLoopNode::NodeFluidType::Water,
+                                                           DataLoopNode::ConnectionType::Outlet,
+                                                           NodeInputManager::CompFluidStream::Secondary,
+                                                           DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 7 && !state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName = state.dataIPShortCut->cAlphaArgs(8);
+            thisGSHP.companionName = state.dataIPShortCut->cAlphaArgs(8);
         }
 
         // Test node sets
@@ -566,10 +543,10 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Heat Pump Electricity Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportEnergy,
+                            thisGSHP.reportEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name,
+                            thisGSHP.Name,
                             {},
                             "Electricity",
                             "Heating",
@@ -578,32 +555,32 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportQLoadEnergy,
+                            thisGSHP.reportQLoadEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Energy",
                             OutputProcessor::Unit::J,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportQSourceEnergy,
+                            thisGSHP.reportQSourceEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
     }
 
     // now process companion coils, if any
     for (int GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
-        if (!state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName.empty()) {
-            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionIndex =
-                UtilityRoutines::FindItemInList(state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName, state.dataHPWaterToWaterSimple->GSHP);
-            if (state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionIndex == 0) {
+        auto &thisGSHP = state.dataHPWaterToWaterSimple->GSHP(GSHPNum);
+        if (!thisGSHP.companionName.empty()) {
+            thisGSHP.companionIndex = UtilityRoutines::FindItemInList(thisGSHP.companionName, state.dataHPWaterToWaterSimple->GSHP);
+            if (thisGSHP.companionIndex == 0) {
                 ShowSevereError(state,
                                 format("GetEquationFitWaterToWater Input: did not find companion heat pump named '{}' in heat pump called {}",
-                                       state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionName,
-                                       state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name));
+                                       thisGSHP.companionName,
+                                       thisGSHP.Name));
                 ErrorsFound = true;
             } else {
-                state.dataHPWaterToWaterSimple->GSHP(GSHPNum).companionIdentified = true;
+                thisGSHP.companionIdentified = true;
             }
         }
     }
@@ -613,70 +590,71 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     }
 
     for (int GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
+        auto &thisGSHP = state.dataHPWaterToWaterSimple->GSHP(GSHPNum);
         // setup output variables
         SetupOutputVariable(state,
                             "Heat Pump Electricity Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportPower,
+                            thisGSHP.reportPower,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportQLoad,
+                            thisGSHP.reportQLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
                             OutputProcessor::Unit::W,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportQSource,
+                            thisGSHP.reportQSource,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Outlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportLoadSideOutletTemp,
+                            thisGSHP.reportLoadSideOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Inlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportLoadSideInletTemp,
+                            thisGSHP.reportLoadSideInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Outlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportSourceSideOutletTemp,
+                            thisGSHP.reportSourceSideOutletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Inlet Temperature",
                             OutputProcessor::Unit::C,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportSourceSideInletTemp,
+                            thisGSHP.reportSourceSideInletTemp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportLoadSideMassFlowRate,
+                            thisGSHP.reportLoadSideMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).reportSourceSideMassFlowRate,
+                            thisGSHP.reportSourceSideMassFlowRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
-                            state.dataHPWaterToWaterSimple->GSHP(GSHPNum).Name);
+                            thisGSHP.Name);
     }
 }
 
