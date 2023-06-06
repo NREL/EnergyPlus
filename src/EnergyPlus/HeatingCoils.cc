@@ -1731,7 +1731,6 @@ namespace HeatingCoils {
         int FieldNum = 2;           // IDD numeric field number where input field description is found
         int NumCoilsSized = 0;      // counter used to deallocate temporary string array after all coils have been sized
 
-        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
         auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
 
         if (heatingCoil.HCoilType_Num == Coil_HeatingElectric_MultiStage) {
@@ -1769,9 +1768,9 @@ namespace HeatingCoils {
                 state.dataSize->DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                 if (state.dataSize->CurOASysNum > 0) {
-                    OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
-                    OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow =
-                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                    auto &OASysEqSizing(state.dataSize->OASysEqSizing(state.dataSize->CurOASysNum));
+                    OASysEqSizing.AirFlow = true;
+                    OASysEqSizing.AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                 }
                 state.dataSize->DataDesicDehumNum = 0;
                 bPRINT = true;
@@ -1796,6 +1795,7 @@ namespace HeatingCoils {
             if (IsAutoSize) {
                 NumOfStages = heatingCoil.NumOfStages;
                 for (StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
+                    ThisStageAutoSize = false;
                     FieldNum = 1 + StageNum * ((heatingCoil.HCoilType_Num == Coil_HeatingElectric_MultiStage) ? 2 : 3);
                     SizingString = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
                     if (heatingCoil.MSNominalCapacity(StageNum) == AutoSize) {
@@ -1918,23 +1918,16 @@ namespace HeatingCoils {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow; // [kg/sec]
-        Real64 TempAirIn;   // [C]
         Real64 TempAirOut;  // [C]
-        Real64 Win;
-        Real64 Effic;
-        Real64 CapacitanceAir;
         Real64 HeatingCoilLoad;
         Real64 QCoilCap;
-        Real64 TempSetPoint;
-        int Control;
 
         auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
 
-        Effic = heatingCoil.Efficiency;
-        TempAirIn = heatingCoil.InletAirTemp;
-        Win = heatingCoil.InletAirHumRat;
-        Control = heatingCoil.Control;
-        TempSetPoint = heatingCoil.DesiredOutletTemp;
+        Real64 Effic = heatingCoil.Efficiency;
+        Real64 TempAirIn = heatingCoil.InletAirTemp;
+        Real64 Win = heatingCoil.InletAirHumRat;
+        Real64 TempSetPoint = heatingCoil.DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor
         if (heatingCoil.FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
@@ -1958,7 +1951,7 @@ namespace HeatingCoils {
             AirMassFlow = heatingCoil.InletAirMassFlowRate;
         }
 
-        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
+        Real64 CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If the coil is operating there should be some heating capacitance
         //  across the coil, so do the simulation. If not set outlet to inlet and no load.
@@ -2278,7 +2271,6 @@ namespace HeatingCoils {
         Real64 HeatingCoilLoad;
         Real64 QCoilCap;
         Real64 TempSetPoint;
-        int Control;
         Real64 PartLoadRat;
         Real64 PLF;
 
@@ -2287,7 +2279,6 @@ namespace HeatingCoils {
         Effic = heatingCoil.Efficiency;
         TempAirIn = heatingCoil.InletAirTemp;
         Win = heatingCoil.InletAirHumRat;
-        Control = heatingCoil.Control;
         TempSetPoint = heatingCoil.DesiredOutletTemp;
         AirMassFlow = heatingCoil.InletAirMassFlowRate;
 
