@@ -91,13 +91,11 @@ namespace Vectors {
     void VecRound(Vector &vec, Real64 const roundto);
 
     void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
-                                 int const NSides,            // Number of sides to surface
                                  Real64 &Azimuth,             // Outward Normal Azimuth Angle
                                  Real64 &Tilt,                // Tilt angle of surface
                                  Vector &lcsx,
                                  Vector &lcsy,
                                  Vector &lcsz,
-                                 Real64 const surfaceArea,
                                  Vector const &NewellSurfaceNormalVector);
 
     void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface

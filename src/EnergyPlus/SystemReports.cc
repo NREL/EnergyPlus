@@ -2205,7 +2205,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
     Array1D_string UnitsStrings;                       // UnitsStrings for each variable
     Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
-    std::map<int, Constant::eResource> ResourceTypes;  // ResourceTypes for each variable
+    Array1D<Constant::eResource> ResourceTypes;        // ResourceTypes for each variable
     Array1D_string EndUses;                            // EndUses for each variable
     Array1D_string Groups;                             // Groups for each variable
     Array1D_string Names;                              // Variable Names for each variable
@@ -2364,11 +2364,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         VarTypes.allocate(NumVariables);
                         IndexTypes.allocate(NumVariables);
                         unitsForVar.allocate(NumVariables);
-
-                        for (int idx = 1; idx <= NumVariables; ++idx) {
-                            ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                        }
-
+                        ResourceTypes.allocate(NumVariables);
                         EndUses.allocate(NumVariables);
                         Groups.allocate(NumVariables);
                         Names.allocate(NumVariables);
@@ -2396,7 +2392,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisVar.ReportVarIndex = VarIndexes(VarNum);
                                 thisVar.ReportVarIndexType = IndexTypes(VarNum);
                                 thisVar.ReportVarType = VarTypes(VarNum);
-                                thisVar.ResourceType = ResourceTypes.at(VarNum);
+                                thisVar.ResourceType = ResourceTypes(VarNum);
                                 thisVar.EndUse = EndUses(VarNum);
                                 if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -2419,6 +2415,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         VarTypes.deallocate();
                         IndexTypes.deallocate();
                         unitsForVar.deallocate();
+                        ResourceTypes.deallocate();
                         EndUses.deallocate();
                         Groups.deallocate();
                         Names.deallocate();
@@ -2433,10 +2430,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             VarTypes.allocate(NumVariables);
                             IndexTypes.allocate(NumVariables);
                             unitsForVar.allocate(NumVariables);
-                            ResourceTypes.clear();
-                            for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                            }
+                            ResourceTypes.allocate(NumVariables);
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
                             Names.allocate(NumVariables);
@@ -2464,7 +2458,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     thisVar.ReportVarIndex = VarIndexes(VarNum);
                                     thisVar.ReportVarIndexType = IndexTypes(VarNum);
                                     thisVar.ReportVarType = VarTypes(VarNum);
-                                    thisVar.ResourceType = ResourceTypes.at(VarNum);
+                                    thisVar.ResourceType = ResourceTypes(VarNum);
                                     thisVar.EndUse = EndUses(VarNum);
                                     if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -2504,10 +2498,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 VarTypes.allocate(NumVariables);
                                 IndexTypes.allocate(NumVariables);
                                 unitsForVar.allocate(NumVariables);
-                                ResourceTypes.clear();
-                                for (int idx = 1; idx <= NumVariables; ++idx) {
-                                    ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                                }
+                                ResourceTypes.allocate(NumVariables);
                                 EndUses.allocate(NumVariables);
                                 Groups.allocate(NumVariables);
                                 Names.allocate(NumVariables);
@@ -2535,7 +2526,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                         thisVar.ReportVarIndex = VarIndexes(VarNum);
                                         thisVar.ReportVarIndexType = IndexTypes(VarNum);
                                         thisVar.ReportVarType = VarTypes(VarNum);
-                                        thisVar.ResourceType = ResourceTypes.at(VarNum);
+                                        thisVar.ResourceType = ResourceTypes(VarNum);
                                         thisVar.EndUse = EndUses(VarNum);
                                         if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -2618,10 +2609,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     VarTypes.allocate(NumVariables);
                     IndexTypes.allocate(NumVariables);
                     unitsForVar.allocate(NumVariables);
-                    ResourceTypes.clear();
-                    for (int idx = 1; idx <= NumVariables; ++idx) {
-                        ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                    }
+                    ResourceTypes.allocate(NumVariables);
                     EndUses.allocate(NumVariables);
                     Groups.allocate(NumVariables);
                     Names.allocate(NumVariables);
@@ -2649,7 +2637,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             thisVar.ReportVarIndex = VarIndexes(VarNum);
                             thisVar.ReportVarIndexType = IndexTypes(VarNum);
                             thisVar.ReportVarType = VarTypes(VarNum);
-                            thisVar.ResourceType = ResourceTypes.at(VarNum);
+                            thisVar.ResourceType = ResourceTypes(VarNum);
                             thisVar.EndUse = EndUses(VarNum);
                             if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -2784,10 +2772,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         VarTypes.allocate(NumVariables);
                         IndexTypes.allocate(NumVariables);
                         unitsForVar.allocate(NumVariables);
-                        ResourceTypes.clear();
-                        for (int idx = 1; idx <= NumVariables; ++idx) {
-                            ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                        }
+                        ResourceTypes.allocate(NumVariables);
                         EndUses.allocate(NumVariables);
                         Groups.allocate(NumVariables);
                         Names.allocate(NumVariables);
@@ -2815,7 +2800,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 thisVar.ReportVarIndex = VarIndexes(VarNum);
                                 thisVar.ReportVarIndexType = IndexTypes(VarNum);
                                 thisVar.ReportVarType = VarTypes(VarNum);
-                                thisVar.ResourceType = ResourceTypes.at(VarNum);
+                                thisVar.ResourceType = ResourceTypes(VarNum);
                                 thisVar.EndUse = EndUses(VarNum);
                                 if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -2854,10 +2839,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             VarTypes.allocate(NumVariables);
                             IndexTypes.allocate(NumVariables);
                             unitsForVar.allocate(NumVariables);
-                            ResourceTypes.clear();
-                            for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                            }
+                            ResourceTypes.allocate(NumVariables);
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
                             Names.allocate(NumVariables);
@@ -2885,7 +2867,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     thisVar.ReportVarIndex = VarIndexes(VarNum);
                                     thisVar.ReportVarIndexType = IndexTypes(VarNum);
                                     thisVar.ReportVarType = VarTypes(VarNum);
-                                    thisVar.ResourceType = ResourceTypes.at(VarNum);
+                                    thisVar.ResourceType = ResourceTypes(VarNum);
                                     thisVar.EndUse = EndUses(VarNum);
                                     if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -3092,10 +3074,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             VarTypes.allocate(NumVariables);
                             IndexTypes.allocate(NumVariables);
                             unitsForVar.allocate(NumVariables);
-                            ResourceTypes.clear();
-                            for (int idx = 1; idx <= NumVariables; ++idx) {
-                                ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                            }
+                            ResourceTypes.allocate(NumVariables);
                             EndUses.allocate(NumVariables);
                             Groups.allocate(NumVariables);
                             Names.allocate(NumVariables);
@@ -3124,7 +3103,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     thisVar.ReportVarIndex = VarIndexes(VarNum);
                                     thisVar.ReportVarIndexType = IndexTypes(VarNum);
                                     thisVar.ReportVarType = VarTypes(VarNum);
-                                    thisVar.ResourceType = ResourceTypes.at(VarNum);
+                                    thisVar.ResourceType = ResourceTypes(VarNum);
                                     thisVar.EndUse = EndUses(VarNum);
                                     if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -3161,10 +3140,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 VarTypes.allocate(NumVariables);
                                 IndexTypes.allocate(NumVariables);
                                 unitsForVar.allocate(NumVariables);
-                                ResourceTypes.clear();
-                                for (int idx = 1; idx <= NumVariables; ++idx) {
-                                    ResourceTypes.insert(std::pair<int, Constant::eResource>(idx, Constant::eResource::Invalid));
-                                }
+                                ResourceTypes.allocate(NumVariables);
                                 EndUses.allocate(NumVariables);
                                 Groups.allocate(NumVariables);
                                 Names.allocate(NumVariables);
@@ -3192,7 +3168,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                         thisVar.ReportVarIndex = VarIndexes(VarNum);
                                         thisVar.ReportVarIndexType = IndexTypes(VarNum);
                                         thisVar.ReportVarType = VarTypes(VarNum);
-                                        thisVar.ResourceType = ResourceTypes.at(VarNum);
+                                        thisVar.ResourceType = ResourceTypes(VarNum);
                                         thisVar.EndUse = EndUses(VarNum);
                                         if (thisVar.EndUse == "HEATINGCOILS" && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
@@ -4635,7 +4611,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         if (mechVentFlow > SmallAirVolFlow) {
             int thisOAControlNum = state.dataAirLoop->AirLoopControlInfo(sysNum).OACtrlNum;
             if (thisOAControlNum > 0) {
-                int limitFactorIndex = state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor;
+                int limitFactorIndex = static_cast<int>(state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor);
                 thisSysPreDefRep.TimeAtOALimit[limitFactorIndex] += TimeStepSys;
                 if (thisSysVentRepVars.AnyZoneOccupied) {
                     thisSysPreDefRep.TimeAtOALimitOcc[limitFactorIndex] += TimeStepSys;

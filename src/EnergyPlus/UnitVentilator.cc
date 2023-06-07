@@ -1082,8 +1082,6 @@ namespace UnitVentilator {
         // Uses the status flags to trigger initializations.
 
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         static constexpr std::string_view RoutineName("InitUnitVentilator");
@@ -1257,7 +1255,8 @@ namespace UnitVentilator {
         }
 
         if (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) > 0) {
-            if ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff) {
+            if ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) > 0 || state.dataHVACGlobal->TurnFansOn) &&
+                !state.dataHVACGlobal->TurnFansOff) {
                 if ((std::abs(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired) < DataHVACGlobals::SmallLoad) ||
                     (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum))) {
                     SetMassFlowRateToZero = true;
@@ -2391,8 +2390,6 @@ namespace UnitVentilator {
         // ASHRAE Systems and Equipment Handbook (SI), 1996. page 31.3
 
         // Using/Aliasing
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         // Smallest allowed temperature difference for comparisons (below this value the temperatures are assumed equal)
@@ -2477,7 +2474,8 @@ namespace UnitVentilator {
         if ((std::abs(state.dataUnitVentilators->QZnReq) < DataHVACGlobals::SmallLoad) ||
             (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
             (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) <= 0) ||
-            ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff)) {
+            ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) <= 0 && !state.dataHVACGlobal->TurnFansOn) ||
+             state.dataHVACGlobal->TurnFansOff)) {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
@@ -3042,8 +3040,6 @@ namespace UnitVentilator {
         // that a cooling coil must be present in order to call a cooling coil
         // simulation.  Other than that, the subroutine is very straightforward.
 
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         Real64 mdot; // hot water or steam mass flow rate for current time step
@@ -3071,11 +3067,10 @@ namespace UnitVentilator {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
             if (unitVent.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
-                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
             }
 
             if (unitVent.CCoilPresent) {
@@ -3160,10 +3155,9 @@ namespace UnitVentilator {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
             if (unitVent.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
-                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
             }
 
             if (unitVent.CCoilPresent) {

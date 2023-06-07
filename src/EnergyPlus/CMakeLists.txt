@@ -875,45 +875,47 @@ add_custom_command(
     -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}" -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}" -P
     "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake")
 
-install(
-  TARGETS energyplusapi energyplus
-  EXPORT energyplus
-  RUNTIME DESTINATION ./
-  LIBRARY DESTINATION ./
-  ARCHIVE DESTINATION ./
-  INCLUDES DESTINATION include
-                       include/EnergyPlus/api
-)
+if(NOT BUILD_STATIC_ENERGYPLUS_API)
+  install(
+    TARGETS energyplusapi energyplus
+    EXPORT energyplus
+    RUNTIME DESTINATION ./
+    LIBRARY DESTINATION ./
+    ARCHIVE DESTINATION ./
+    INCLUDES DESTINATION include
+                         include/EnergyPlus/api
+  )
 
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-  "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
-  VERSION ${ENERGYPLUS_VERSION}
-  COMPATIBILITY AnyNewerVersion
-)
-
-export(
-  EXPORT
-  energyplus
-       NAMESPACE "energyplus::"
-       FILE "${PROJECT_BINARY_DIR}/energyplusConfig.cmake"
-)
-
-install(
-  EXPORT energyplus
-        DESTINATION lib/cmake/energyplus
-        NAMESPACE "energyplus::"
-        COMPONENT "CPPAPI"
-  FILE energyplusConfig.cmake
-)
-
-install(
-  FILES
+  include(CMakePackageConfigHelpers)
+  write_basic_package_version_file(
     "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
-  DESTINATION
-    lib/cmake/energyplus/
-  COMPONENT "CPPAPI"
-)
+    VERSION ${ENERGYPLUS_VERSION}
+    COMPATIBILITY AnyNewerVersion
+  )
+
+  export(
+    EXPORT
+    energyplus
+         NAMESPACE "energyplus::"
+         FILE "${PROJECT_BINARY_DIR}/energyplusConfig.cmake"
+  )
+
+  install(
+    EXPORT energyplus
+          DESTINATION lib/cmake/energyplus
+          NAMESPACE "energyplus::"
+          COMPONENT "CPPAPI"
+    FILE energyplusConfig.cmake
+  )
+
+  install(
+    FILES
+      "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
+    DESTINATION
+      lib/cmake/energyplus/
+    COMPONENT "CPPAPI"
+  )
+endif()
 
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
@@ -996,7 +998,8 @@ if(BUILD_TESTING)
   set(IDF_FILE "${PROJECT_SOURCE_DIR}/testfiles/1ZoneUncontrolled.idf")
 
   add_executable(TestAPI_Functional_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c)
-  target_link_libraries(TestAPI_Functional_C PRIVATE energyplusapi project_options project_fp_options project_warnings)
+  #  project_warnings is essentially a C++ interface, and not included here because this is C, not C++
+  target_link_libraries(TestAPI_Functional_C PRIVATE energyplusapi project_options project_fp_options)
   if(NOT MSVC)
     target_compile_options(TestAPI_Functional_C PRIVATE -Wno-unused -Wno-unused-parameter)
   endif()
@@ -1028,7 +1031,8 @@ if(BUILD_TESTING)
   set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange")
   file(MAKE_DIRECTORY ${TEST_DIR})
   add_executable(TestAPI_DataTransfer_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.c)
-  target_link_libraries(TestAPI_DataTransfer_C PRIVATE energyplusapi project_options project_fp_options project_warnings)
+  #  project_warnings is essentially a C++ interface, and not included here because this is C, not C++
+  target_link_libraries(TestAPI_DataTransfer_C PRIVATE energyplusapi project_options project_fp_options)
   add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
   # set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/autosizing") file(MAKE_DIRECTORY

@@ -4545,7 +4545,7 @@ namespace UnitarySystems {
                         this->m_CondenserNodeNum = thisCoolCoil.CondenserInletNodeNum(1);
 
                         if (this->m_FanExists) {
-                            thisCoolCoil.SupplyFanName = loc_m_FanName;
+                            thisCoolCoil.SupplyFanName = this->m_FanName;
                             thisCoolCoil.SupplyFanIndex = this->m_FanIndex;
                             thisCoolCoil.SupplyFan_TypeNum = this->m_FanType_Num;
                             if (this->m_FanType_Num > -1) {
@@ -7857,19 +7857,9 @@ namespace UnitarySystems {
         }
         if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -7960,19 +7950,9 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _, _, _);
+                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -10440,7 +10420,7 @@ namespace UnitarySystems {
 
         if (this->m_SuppCoilExists) {
             if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
-                if (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_HeatPump) {
+                if (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_CoolCoilExists) {
                     state.dataUnitarySystems->HeatingLoad = false;
                     state.dataUnitarySystems->CoolingLoad = true;
                 }
@@ -11041,28 +11021,11 @@ namespace UnitarySystems {
 
         // BEGIN - refactor/move this to Init during FirstHVACIteration, need struct or module level global for turnFansOn and turnFansOff
         // If the unitary system is scheduled on or nightime cycle overrides fan schedule. Uses same logic as fan.
-        if (this->m_FanExists) {
-            FanOn = false;
-            if (ScheduleManager::GetCurrentScheduleValue(state, this->m_FanAvailSchedPtr) > 0) FanOn = true;
-        } else {
-            FanOn = true;
-        }
-        // combine above and below into 1 logical
-        bool turnFansOn = false;
-        bool turnFansOff = false;
-        if (this->m_IsZoneEquipment) {
-            turnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
-            turnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-            // set global flag to act on the fan operation
-            state.dataHVACGlobal->TurnFansOn = turnFansOn;
-            state.dataHVACGlobal->TurnFansOff = turnFansOff;
-        } else {
-            turnFansOn = state.dataHVACGlobal->TurnFansOn;
-            turnFansOff = state.dataHVACGlobal->TurnFansOff;
-        }
+        FanOn = (this->m_FanExists) ? ScheduleManager::GetCurrentScheduleValue(state, this->m_FanAvailSchedPtr) > 0 : true;
         // END - move this to Init during FirstHVACIteration
 
-        if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0 && ((FanOn || turnFansOn) && !turnFansOff)) {
+        if (ScheduleManager::GetCurrentScheduleValue(state, this->m_SysAvailSchedPtr) > 0.0 &&
+            ((FanOn || state.dataHVACGlobal->TurnFansOn) && !state.dataHVACGlobal->TurnFansOff)) {
             if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
                 // set point based equipment should use VAV terminal units to set the flow.
                 // zone equipment needs to set flow since no other device regulates flow (ZoneHVAC /= AirLoopEquipment)
@@ -11181,8 +11144,6 @@ namespace UnitarySystems {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
-                                                                       _,
-                                                                       _,
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
@@ -11217,8 +11178,6 @@ namespace UnitarySystems {
             if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                           _,
-                                                                           _,
                                                                            _,
                                                                            _,
                                                                            state.dataUnitarySystems->m_massFlow1,
@@ -11271,8 +11230,6 @@ namespace UnitarySystems {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
                                                                            _,
-                                                                           _,
-                                                                           _,
                                                                            state.dataUnitarySystems->m_massFlow1,
                                                                            state.dataUnitarySystems->m_runTimeFraction1,
                                                                            state.dataUnitarySystems->m_massFlow2,
@@ -11303,8 +11260,6 @@ namespace UnitarySystems {
         if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
-                                                                       _,
-                                                                       _,
                                                                        _,
                                                                        _,
                                                                        state.dataUnitarySystems->m_massFlow1,
@@ -15492,25 +15447,13 @@ namespace UnitarySystems {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
-                                                                       _,
-                                                                       _,
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
@@ -15554,25 +15497,13 @@ namespace UnitarySystems {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
-                                                                       _,
-                                                                       _,
                                                                        state.dataUnitarySystems->m_massFlow1,
                                                                        state.dataUnitarySystems->m_runTimeFraction1,
                                                                        state.dataUnitarySystems->m_massFlow2,
                                                                        state.dataUnitarySystems->m_runTimeFraction2,
                                                                        _);
             } else {
-                if (this->m_IsZoneEquipment) {
-                    Fans::SimulateFanComponents(state,
-                                                blankString,
-                                                FirstHVACIteration,
-                                                this->m_FanIndex,
-                                                state.dataUnitarySystems->FanSpeedRatio,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOn,
-                                                state.dataHVACGlobal->ZoneCompTurnFansOff);
-                } else {
-                    Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
-                }
+                Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
         }
 
