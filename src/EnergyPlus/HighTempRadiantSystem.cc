@@ -84,8 +84,6 @@ namespace HighTempRadiantSystem {
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   February 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // The purpose of this module is to simulate high temperature radiant systems.
@@ -105,31 +103,17 @@ namespace HighTempRadiantSystem {
     //   energy analysis program", M.S. thesis, University of Illinois at
     //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
-    // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-
-    // Data
     // MODULE PARAMETER DEFINITIONS:
-    constexpr const char *cGas("Gas");
-    constexpr const char *cNaturalGas("NaturalGas");
-    constexpr const char *cElectric("Electric");
-    constexpr const char *cElectricity("Electricity");
-    constexpr const char *cMATControl("MeanAirTemperature");                   // Control for using mean air temperature
-    constexpr const char *cMRTControl("MeanRadiantTemperature");               // Control for using mean radiant temperature
-    constexpr const char *cOperativeControl("OperativeTemperature");           // Control for using operative temperature
-    constexpr const char *cMATSPControl("MeanAirTemperatureSetpoint");         // Control for to MAT setpoint
-    constexpr const char *cMRTSPControl("MeanRadiantTemperatureSetpoint");     // Control for to MRT setpoint
-    constexpr const char *cOperativeSPControl("OperativeTemperatureSetpoint"); // Control for operative temperature setpoint
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
-
-    // Functions
+    constexpr std::string_view cGas = "Gas";
+    constexpr std::string_view cNaturalGas = "NaturalGas";
+    constexpr std::string_view cElectric = "Electric";
+    constexpr std::string_view cElectricity = "Electricity";
+    constexpr std::string_view cMATControl = "MeanAirTemperature";                   // Control for using mean air temperature
+    constexpr std::string_view cMRTControl = "MeanRadiantTemperature";               // Control for using mean radiant temperature
+    constexpr std::string_view cOperativeControl = "OperativeTemperature";           // Control for using operative temperature
+    constexpr std::string_view cMATSPControl = "MeanAirTemperatureSetpoint";         // Control for to MAT setpoint
+    constexpr std::string_view cMRTSPControl = "MeanRadiantTemperatureSetpoint";     // Control for to MRT setpoint
+    constexpr std::string_view cOperativeSPControl = "OperativeTemperatureSetpoint"; // Control for operative temperature setpoint
 
     void SimHighTempRadiantSystem(EnergyPlusData &state,
                                   std::string_view CompName,     // name of the low temperature radiant system
@@ -141,8 +125,6 @@ namespace HighTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the "manager" for the high temperature radiant
@@ -152,10 +134,8 @@ namespace HighTempRadiantSystem {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus manager subroutine layout
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int RadSysNum;         // Radiant system number/index in local derived types
+        int RadSysNum; // Radiant system number/index in local derived types
 
         if (state.dataHighTempRadSys->GetInputFlag) {
             bool ErrorsFoundInGet = false;
@@ -222,8 +202,6 @@ namespace HighTempRadiantSystem {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   February 2001
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the input for high temperature radiant systems
@@ -813,7 +791,7 @@ namespace HighTempRadiantSystem {
         Real64 MaxPowerCapacDes;  // Design maximum capacity for reproting
         Real64 MaxPowerCapacUser; // User hard-sized maximum capacity for reproting
 
-        Real64 TempSize;          // autosized value of coil input field
+        Real64 TempSize; // autosized value of coil input field
 
         MaxPowerCapacDes = 0.0;
         MaxPowerCapacUser = 0.0;
