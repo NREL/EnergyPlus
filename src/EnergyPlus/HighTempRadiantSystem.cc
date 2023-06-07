@@ -1292,11 +1292,9 @@ namespace HighTempRadiantSystem {
 
         // If it was allocated, then we have to check to see if this was running at all...
         for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
-            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSrcAvg;
-            if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSrcAvg != 0.0) {
-                HighTempRadSysOn = true;
-                break; // DO loop
-            }
+            auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
+            thisHTR.QHTRRadSource = thisHTR.QHTRRadSrcAvg;
+            if (thisHTR.QHTRRadSrcAvg != 0.0) HighTempRadSysOn = true;
         }
 
         DistributeHTRadGains(
