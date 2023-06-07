@@ -649,7 +649,7 @@ namespace BaseboardRadiator {
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    std::string_view const SizingString = this->FieldNames(FieldNum) + " [W]";
+                    std::string_view SizingString = this->FieldNames(FieldNum) + " [W]";
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
