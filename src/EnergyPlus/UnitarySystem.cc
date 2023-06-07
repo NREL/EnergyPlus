@@ -4594,7 +4594,7 @@ namespace UnitarySystems {
                         this->m_CondenserNodeNum = thisCoolCoil.CondenserInletNodeNum(1);
 
                         if (this->m_FanExists) {
-                            thisCoolCoil.SupplyFanName = loc_m_FanName;
+                            thisCoolCoil.SupplyFanName = this->m_FanName;
                             thisCoolCoil.SupplyFanIndex = this->m_FanIndex;
                             thisCoolCoil.SupplyFan_TypeNum = this->m_FanType_Num;
                             if (this->m_FanType_Num > -1) {
@@ -10597,7 +10597,7 @@ namespace UnitarySystems {
 
         if (this->m_SuppCoilExists) {
             if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
-                if (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_HeatPump) {
+                if (state.dataUnitarySystems->MoistureLoad < 0.0 && this->m_CoolCoilExists) {
                     state.dataUnitarySystems->HeatingLoad = false;
                     state.dataUnitarySystems->CoolingLoad = true;
                 }
