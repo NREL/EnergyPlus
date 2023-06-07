@@ -227,7 +227,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
 
          "Coil:Cooling:DX:CurveFit:Performance,",
          "  Coil Cooling DX Curve Fit Performance 1, !- Name",
-         "  0,                                      !- Crankcase Heater Capacity {W}",
+         "  10,                                      !- Crankcase Heater Capacity {W}",
          "  -25,                                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
          "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
          "  773.3,                                  !- Unit Internal Static Air Pressure {Pa}",
@@ -296,5 +296,5 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
                                   condOutletNode,
                                   singleMode,
                                   LoadSHR);
-    EXPECT_EQ(thisCoil.performance.crankcaseHeaterPower, 12.0);
+    EXPECT_EQ(thisCoil.performance.crankcaseHeaterPower, 120.0);
 }

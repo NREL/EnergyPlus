@@ -1169,8 +1169,8 @@
     
   Curve:Linear,
     heaterCapCurve,          !- Name
-    60.0,                    !- Coefficient1 Constant
-    -2.,                     !- Coefficient2 x
+    0.571428571428572,       !- Coefficient1 Constant
+    -0.0142857142857143,     !- Coefficient2 x
     -30,                     !- Minimum Value of x
     40;                      !- Maximum Value of x
 

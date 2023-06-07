@@ -9397,7 +9397,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
         if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
-            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
+            CrankcaseHeatingPower *= Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
         }
     } else {
         CrankcaseHeatingPower = 0.0;
@@ -10379,7 +10379,7 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
         if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
-            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
+            CrankcaseHeatingPower *= Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
         }
     } else {
         CrankcaseHeatingPower = 0.0;
@@ -11036,7 +11036,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
         if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
-            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
+            CrankcaseHeatingPower *= Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
         }
     } else {
         CrankcaseHeatingPower = 0.0;
@@ -12802,7 +12802,7 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     if (OutdoorDryBulb < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
         if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
-            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+            CrankcaseHeatingPower *= Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
         }
     } else {
         CrankcaseHeatingPower = 0.0;
@@ -13637,7 +13637,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     if (OutdoorDryBulb < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
         if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
-            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+            CrankcaseHeatingPower *= Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
         }
     } else {
         CrankcaseHeatingPower = 0.0;
@@ -16740,7 +16740,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     if (CompAmbTemp < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
         if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
-            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
+            CrankcaseHeatingPower *= Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, CompAmbTemp);
         }
     } else {
         CrankcaseHeatingPower = 0.0;
@@ -17153,7 +17153,7 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
     if (OutdoorDryBulb < thisDXCoil.MaxOATCrankcaseHeater) {
         CrankcaseHeatingPower = thisDXCoil.CrankcaseHeaterCapacity;
         if (thisDXCoil.CrankcaseHeaterCapacityCurveIndex > 0) {
-            CrankcaseHeatingPower = Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
+            CrankcaseHeatingPower *= Curve::CurveValue(state, thisDXCoil.CrankcaseHeaterCapacityCurveIndex, OutdoorDryBulb);
         }
     } else {
         CrankcaseHeatingPower = 0.0;

@@ -1105,7 +1105,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                        !- Evaporative Condenser Effectiveness {dimensionless}",
         ",                        !- Evaporative Condenser Air Flow Rate {m3/s}",
         ",                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
-        ",                        !- Crankcase Heater Capacity {W}",
+        "10,                      !- Crankcase Heater Capacity {W}",
         ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         ",                        !- Supply Water Storage Tank Name",
         ",                        !- Condensate Collection Water Storage Tank Name",
@@ -1137,7 +1137,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "  -8,                                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "  ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "  5,                                      !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
-        "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  10,                                     !- Crankcase Heater Capacity {W}",
         "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  Resistive,                              !- Defrost Strategy",
         "  Timed,                                  !- Defrost Control",
@@ -1165,7 +1165,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                                         !- Condensate Collection Water Storage Tank Name",
         "No,                                       !- Apply Part Load Fraction to Speeds Greater than 1",
         "No,                                       !- Apply Latent Degradation to Speeds Greater than 1",
-        "200.0,                                    !- Crankcase Heater Capacity{ W }",
+        "10.0,                                    !- Crankcase Heater Capacity{ W }",
         "10.0,                                     !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         ",                                         !- Basin Heater Capacity{ W / K }",
         ",                                         !- Basin Heater Setpoint Temperature{ C }",
@@ -1262,7 +1262,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "   ashp unitary system Heating Coil - Supplemental Coil Node, !- Air Outlet Node Name",
         "   -17.7777777777778,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "   ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
-        "   50,                                     !- Crankcase Heater Capacity {W}",
+        "   10,                                     !- Crankcase Heater Capacity {W}",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   Biquadratic,                            !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "   4.44444444444444,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
@@ -1359,7 +1359,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
-        "    0.0,                     !- Crankcase Heater Capacity {W}",
+        "    10,                      !- Crankcase Heater Capacity {W}",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -1485,7 +1485,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    -5.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
-        "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    10.0,                   !- Crankcase Heater Capacity {W}",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
@@ -1588,7 +1588,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                        !- Availability Schedule Name",
         "DOAS Supply Fan Outlet,  !- Air Inlet Node Name",
         "DOAS Cooling Coil Outlet,!- Air Outlet Node Name",
-        ",                        !- Crankcase Heater Capacity {W}",
+        "10,                      !- Crankcase Heater Capacity {W}",
         ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "2,                       !- Number of Capacity Stages",
         "1,                       !- Number of Enhanced Dehumidification Modes",
@@ -1620,7 +1620,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Yes,                     !- Evaporator Fan Power Included in Rated COP",
         "    HPWH Air Inlet Node_1,   !- Evaporator Air Inlet Node Name",
         "    HPWH CoilAirOutlet FanAirInlet_1,  !- Evaporator Air Outlet Node Name",
-        "    0,                       !- Crankcase Heater Capacity {W}",
+        "    10,                      !- Crankcase Heater Capacity {W}",
         "    0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    Biquadratic,             !- Heating Capacity Function of Temperature Curve Name",
@@ -1649,7 +1649,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Zone4DXCoilAirOutletNode,!- Evaporator Air Outlet Node Name",
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
-        "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    10.0,                    !- Crankcase Heater Capacity {W}",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    Cubic,                   !- Heating Capacity Function of Temperature Curve Name",
@@ -1679,7 +1679,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    HPOutdoorAirOutletNode,  	  !- Evaporator Air Outlet Node Name",
         "    HPOutdoorWaterInletNode, 	 !- Condenser Water Inlet Node Name",
         "    HPOutdoorWaterOutletNode,	 !- Condenser Water Outlet Node Name",
-        "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    10.0,                   !- Crankcase Heater Capacity {W}",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    Biquadratic,             !- Part Load Fraction Correlation Curve Name",
@@ -1975,11 +1975,11 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     int DXCoilNum = 1;
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
     //    power = 10 - 2x
-    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 20.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 200.0);
     DXCoilNum = 3;
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
     //    power = 15 - 2x
-    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 25.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 250.0);
 
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
@@ -2006,7 +2006,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
                                                 OnOffAirFlowRatio,
                                                 SpeedRatio,
                                                 state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds);
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 16.0);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 160.0);
 
     VarSpeedCoilNum = 2;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 0.5;
@@ -2026,7 +2026,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
                                                 state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).NumOfSpeeds);
     // here the runtime fraction is 1.0 when the number of speed is more than 1. crankcase heater capacity is modified but power is not affected as a
     // result
-    EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 18.0);
+    EXPECT_EQ(state->dataVariableSpeedCoils->CrankcaseHeatingPower, 180.0);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).CrankcaseHeaterPower, 0.0);
 
     // VarSpeedCoilNum = 3;
@@ -2053,7 +2053,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate = 2.0;
     CalcMultiSpeedDXCoilCooling(
         *state, DXCoilNum, SpeedRatio, CycRatio, state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds, FanOpMode, CompressorOp, SingleMode);
-    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 37.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 370.0);
 
     // Coil:Heating:DX:MultiSpeed
     DXCoilNum = 7;
@@ -2063,14 +2063,14 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     state->dataDXCoils->DXCoil(DXCoilNum).MSRatedAirMassFlowRate = 2.0;
     CalcMultiSpeedDXCoilCooling(
         *state, DXCoilNum, SpeedRatio, CycRatio, state->dataDXCoils->DXCoil(DXCoilNum).NumOfSpeeds, FanOpMode, CompressorOp, SingleMode);
-    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 15.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 150.0);
 
     // Coil:Cooling:DX:TwoStageWithHumidityControlMode
     DXCoilNum = 2;
     bool FirstHVACIteration = true;
     Real64 AirFlowRatio = 1.0;
     DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
-    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 19.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 190.0);
 
     // Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     // for water heaters, the following temperature is used in heater capacity curve calculation
@@ -2078,14 +2078,14 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     DXCoilNum = 4;
     DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
     // heaterCapCurve9, power = 31 + 2x
-    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 19.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 190.0);
 
     // Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
     DXCoilNum = 5;
     state->dataHVACGlobal->HPWHCrankcaseDBTemp = -7.0;
     DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
     // heaterCapCurve8, power = 30 + 2x
-    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 16.0);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 160.0);
 }
 
 TEST_F(EnergyPlusFixture, TestDXCoilIndoorOrOutdoor)

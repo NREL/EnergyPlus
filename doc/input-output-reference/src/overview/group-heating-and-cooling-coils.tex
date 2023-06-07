@@ -2257,10 +2257,12 @@ This input field is name of a conditioned or unconditioned zone where the second
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for a Coil:Cooling:DX:SingleSpeed coil.
 
@@ -2736,10 +2738,12 @@ This alpha field contains the name of the basin heater operating schedule. This 
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-1}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example IDF use of the object:
 
@@ -2988,10 +2992,12 @@ This input field is name of a conditioned or unconditioned zone where the second
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-2}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for this multispeed DX cooling coil.
 
@@ -4239,10 +4245,12 @@ This input field is name of sensible heat ratio modifier curve as function of se
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-4}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for the object.
 
@@ -4534,10 +4542,12 @@ This input field is name of sensible heat ratio modifier curve as function of se
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-5}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for a multi-speed heating DX coil.
 
@@ -6057,10 +6067,12 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-7}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! object:
 
@@ -6274,10 +6286,12 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-8}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped! object:
 
@@ -6641,10 +6655,12 @@ The output of this curve is multiplied by the rated COP at this specific speed a
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{vshpwhheating-outdoor-temperature-dependent-crankcase-heater-capacity-curve-name}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! object:
 

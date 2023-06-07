@@ -129,10 +129,12 @@ If there are 3 operating modes, it represents a subcool-reheat mode coil. The Op
 
 \paragraph{Field: Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-0}
 
-The name of a Curve:* or Table:Lookup object encoding the relationship between
-the crankcase heater capacity and the outdoor air temperature. This curve can be
-any uni-variate curve or table. If this field is missing or empty, constant
-crankcase heater capacity will be assumed.
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 \subsection{Coil:Cooling:DX:CurveFit:OperatingMode}\label{coilcoolingdxcurvefitoperatingmode}
 

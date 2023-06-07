@@ -367,7 +367,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
     if (state.dataEnvrn->OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
         this->crankcaseHeaterPower = this->crankcaseHeaterCap;
         if (this->crankcaseHeaterCapacityCurveIndex > 0) {
-            this->crankcaseHeaterPower = Curve::CurveValue(state, this->crankcaseHeaterCapacityCurveIndex, state.dataEnvrn->OutDryBulbTemp);
+            this->crankcaseHeaterPower *= Curve::CurveValue(state, this->crankcaseHeaterCapacityCurveIndex, state.dataEnvrn->OutDryBulbTemp);
         }
     } else {
         this->crankcaseHeaterPower = 0.0;
