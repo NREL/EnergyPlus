@@ -281,8 +281,6 @@ namespace HeatingCoils {
         int ElecCoilNum;
         int FuelCoilNum;
         int DesuperheaterCoilNum;        // Index to desuperheater heating coil
-        std::string SourceTypeString;    // character string used in error message for desuperheating coil
-        std::string SourceNameString;    // character string used in error message for desuperheating coil
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string Alphas;           // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -367,7 +365,6 @@ namespace HeatingCoils {
                                                                      cNumericFields);
 
             heatingCoilNumericFields.FieldNames.allocate(state.dataHeatingCoils->MaxNums);
-            heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -501,7 +498,6 @@ namespace HeatingCoils {
                                                                      cNumericFields);
 
             heatingCoilNumericFields.FieldNames.allocate(state.dataHeatingCoils->MaxNums);
-            heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -642,7 +638,6 @@ namespace HeatingCoils {
                                                                      cNumericFields);
 
             heatingCoilNumericFields.FieldNames.allocate(state.dataHeatingCoils->MaxNums);
-            heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -848,7 +843,6 @@ namespace HeatingCoils {
                                                                      cNumericFields);
 
             heatingCoilNumericFields.FieldNames.allocate(state.dataHeatingCoils->MaxNums);
-            heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -1046,7 +1040,6 @@ namespace HeatingCoils {
                                                                      cNumericFields);
 
             heatingCoilNumericFields.FieldNames.allocate(state.dataHeatingCoils->MaxNums);
-            heatingCoilNumericFields.FieldNames = "";
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -1428,10 +1421,6 @@ namespace HeatingCoils {
         // Using/Aliasing
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int CondNum;   // Index to refrigeration condenser
-        int DXCoilNum; // Index to DX cooling coil
-
         auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
 
         if (state.dataHeatingCoils->MyOneTimeFlag) {
@@ -1577,7 +1566,7 @@ namespace HeatingCoils {
                 }
             } break;
             case HeatObjTypes::CONDENSER_REFRIGERATION: {
-                for (CondNum = 1; CondNum <= state.dataRefrigCase->NumRefrigCondensers; ++CondNum) {
+                for (int CondNum = 1; CondNum <= state.dataRefrigCase->NumRefrigCondensers; ++CondNum) {
                     if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimRefrigCondenser(CondNum).Name, heatingCoil.ReclaimHeatingCoilName))
                         continue;
                     heatingCoil.ReclaimHeatingSourceIndexNum = CondNum;
@@ -1605,7 +1594,7 @@ namespace HeatingCoils {
             case HeatObjTypes::COIL_DX_COOLING:
             case HeatObjTypes::COIL_DX_MULTISPEED:
             case HeatObjTypes::COIL_DX_MULTIMODE: {
-                for (DXCoilNum = 1; DXCoilNum <= state.dataDXCoils->NumDXCoils; ++DXCoilNum) {
+                for (int DXCoilNum = 1; DXCoilNum <= state.dataDXCoils->NumDXCoils; ++DXCoilNum) {
                     if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name, heatingCoil.ReclaimHeatingCoilName))
                         continue;
                     heatingCoil.ReclaimHeatingSourceIndexNum = DXCoilNum;
@@ -1631,7 +1620,7 @@ namespace HeatingCoils {
                 }
             } break;
             case HeatObjTypes::COIL_DX_VARIABLE_COOLING: {
-                for (DXCoilNum = 1; DXCoilNum <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++DXCoilNum) {
+                for (int DXCoilNum = 1; DXCoilNum <= state.dataVariableSpeedCoils->NumVarSpeedCoils; ++DXCoilNum) {
                     if (!UtilityRoutines::SameString(state.dataHeatBal->HeatReclaimVS_DXCoil(DXCoilNum).Name, heatingCoil.ReclaimHeatingCoilName))
                         continue;
                     heatingCoil.ReclaimHeatingSourceIndexNum = DXCoilNum;
@@ -1720,9 +1709,7 @@ namespace HeatingCoils {
         std::string CompName;       // component name
         std::string CompType;       // component type
         std::string SizingString;   // input field sizing description (e.g., Nominal Capacity)
-        bool IsAutoSize;            // Indicator to autosize for reporting
         bool bPRINT = true;         // TRUE if sizing is reported to output (eio)
-        bool ThisStageAutoSize;     // Indicator to autosize at each stage for reporting
         Real64 NominalCapacityDes;  // Autosized nominal capacity for reporting
         Real64 NominalCapacityUser; // Hardsized nominal capacity for reporting
         Real64 TempCap;             // autosized capacity of heating coil [W]
@@ -1786,7 +1773,7 @@ namespace HeatingCoils {
 
         if (heatingCoil.HCoilType_Num == Coil_HeatingElectric_MultiStage || heatingCoil.HCoilType_Num == Coil_HeatingGas_MultiStage) {
             heatingCoil.MSNominalCapacity(heatingCoil.NumOfStages) = TempCap;
-            IsAutoSize = false;
+            bool IsAutoSize = false;
             int NumOfStages; // total number of stages of multi-stage heating coil
             if (any_eq(heatingCoil.MSNominalCapacity, AutoSize)) {
                 IsAutoSize = true;
@@ -1794,7 +1781,7 @@ namespace HeatingCoils {
             if (IsAutoSize) {
                 NumOfStages = heatingCoil.NumOfStages;
                 for (int StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
-                    ThisStageAutoSize = false;
+                    bool ThisStageAutoSize = false;
                     FieldNum = 1 + StageNum * ((heatingCoil.HCoilType_Num == Coil_HeatingElectric_MultiStage) ? 2 : 3);
                     SizingString = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
                     if (heatingCoil.MSNominalCapacity(StageNum) == AutoSize) {
