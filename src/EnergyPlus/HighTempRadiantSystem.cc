@@ -732,7 +732,7 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // Intermediate variable for keeping track of the zone number
-        int Loop;
+        int HTRnum;
 
         if (state.dataHighTempRadSys->firstTime) {
             state.dataHighTempRadSys->MySizeFlag.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, true);
@@ -742,12 +742,12 @@ namespace HighTempRadiantSystem {
         // need to check all units to see if they are on Zone Equipment List or issue warning
         if (!state.dataHighTempRadSys->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataHighTempRadSys->ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Loop) {
-                if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", state.dataHighTempRadSys->HighTempRadSys(Loop).Name)) continue;
+            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", state.dataHighTempRadSys->HighTempRadSys(HTRnum).Name)) continue;
                 ShowSevereError(state,
                                 format("InitHighTempRadiantSystem: Unit=[ZoneHVAC:HighTemperatureRadiant,{}] is not on any ZoneHVAC:EquipmentList.  "
                                        "It will not be simulated.",
-                                       state.dataHighTempRadSys->HighTempRadSys(Loop).Name));
+                                       state.dataHighTempRadSys->HighTempRadSys(HTRnum).Name));
             }
         }
 
@@ -761,14 +761,14 @@ namespace HighTempRadiantSystem {
             state.dataHighTempRadSys->MyEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            for (int HTRnum = 1; state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
+            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
                 state.dataHighTempRadSys->HighTempRadSys(HTRnum).LastQHTRRadSrc = 0.0;
             }
             state.dataHighTempRadSys->MyEnvrnFlag = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
-            for (int HTRnum = 1; state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
+            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
                 auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(HTRnum);
                 ZoneNum = thisHTR.ZonePtr;
                 thisHTR.ZeroHTRSourceSumHATsurf =
@@ -1286,13 +1286,12 @@ namespace HighTempRadiantSystem {
 
         // If it was allocated, then we have to check to see if this was running at all...
         for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
+            state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSrcAvg;
             if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSrcAvg != 0.0) {
                 HighTempRadSysOn = true;
                 break; // DO loop
             }
         }
-
-        state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSrcAvg;
 
         DistributeHTRadGains(
             state); // state.dataHighTempRadSys->HighTempRadSys(RadSysNum).QHTRRadSource has been modified so we need to redistribute gains

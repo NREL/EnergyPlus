@@ -1010,11 +1010,6 @@ namespace SteamBaseboardRadiator {
             state.dataLoopNodes->Node(SteamInletNode).Quality = 1.0;
             state.dataLoopNodes->Node(SteamInletNode).HumRat = 0.0;
 
-            state.dataSteamBaseboardRadiator->MyEnvrnFlag(BaseboardNum) = false;
-        }
-
-        if (!state.dataGlobal->BeginEnvrnFlag) {
-            state.dataSteamBaseboardRadiator->MyEnvrnFlag(BaseboardNum) = true;
             // Initializes radiant sources
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZeroBBSteamSourceSumHATsurf = 0.0;
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSource = 0.0;
@@ -1022,6 +1017,12 @@ namespace SteamBaseboardRadiator {
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LastQBBSteamRadSrc = 0.0;
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LastSysTimeElapsed = 0.0;
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).LastTimeStepSys = 0.0;
+
+            state.dataSteamBaseboardRadiator->MyEnvrnFlag(BaseboardNum) = false;
+        }
+
+        if (!state.dataGlobal->BeginEnvrnFlag) {
+            state.dataSteamBaseboardRadiator->MyEnvrnFlag(BaseboardNum) = true;
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
