@@ -404,7 +404,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
                    state.dataHeatBal->SurfQdotRadIntGainsInPerArea(wl) + // internal gains
                    state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(wl);  // HVAC
 
-        Real64 &A = state.dataSurface->Surface(wl).Area;
+        Real64 const &A = state.dataSurface->Surface(wl).Area;
 
         Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(state, wl, false);
         Real64 Tconv = state.dataHeatBal->SurfTempEffBulkAir(wl);
@@ -998,8 +998,8 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
 
                 fnd.polygon = floorPolygon;
 
-                std::pair<EnergyPlusData *, std::string> contextPair{&state, format("Foundation:Kiva=\"{}\"", foundationInputs[surface.OSCPtr].name)};
-                Kiva::setMessageCallback(kivaErrorCallback, &contextPair);
+                std::pair<EnergyPlusData *, std::string> contexPair2{&state, format("Foundation:Kiva=\"{}\"", foundationInputs[surface.OSCPtr].name)};
+                Kiva::setMessageCallback(kivaErrorCallback, &contexPair2);
 
                 // point surface to associated ground instance(s)
                 kivaInstances.emplace_back(state,
@@ -1051,16 +1051,16 @@ bool KivaManager::setupKivaInstances(EnergyPlusData &state)
     }
 
     // Loop through Foundation surfaces and make sure they are all assigned to an instance
-    for (int surfNum : state.dataSurface->AllHTKivaSurfaceList) {
-        if (surfaceMap[surfNum].size() == 0) {
+    for (int surfNum2 : state.dataSurface->AllHTKivaSurfaceList) {
+        if (surfaceMap[surfNum2].size() == 0) {
             ErrorsFound = true;
             ShowSevereError(state, format("Surface=\"{}\" has a 'Foundation' Outside Boundary Condition", Surfaces(surfNum).Name));
             ShowContinueError(state, format("  referencing Foundation:Kiva=\"{}\".", foundationInputs[Surfaces(surfNum).OSCPtr].name));
-            if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Wall) {
+            if (Surfaces(surfNum2).Class == DataSurfaces::SurfaceClass::Wall) {
                 ShowContinueError(state, format("  You must also reference Foundation:Kiva=\"{}\"", foundationInputs[Surfaces(surfNum).OSCPtr].name));
                 ShowContinueError(state,
                                   format("  in a floor surface within the same Zone=\"{}\".", state.dataHeatBal->Zone(Surfaces(surfNum).Zone).Name));
-            } else if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Floor) {
+            } else if (Surfaces(surfNum2).Class == DataSurfaces::SurfaceClass::Floor) {
                 ShowContinueError(state, "  However, this floor was never assigned to a Kiva instance.");
                 ShowContinueError(state, "  This should not occur for floor surfaces. Please report to EnergyPlus Development Team.");
             } else {
@@ -1257,7 +1257,7 @@ void KivaManager::addDefaultFoundation()
 int KivaManager::findFoundation(std::string const &name)
 {
     int fndNum = 0;
-    for (auto &fnd : foundationInputs) {
+    for (auto const &fnd : foundationInputs) {
         // Check if foundation exists
         if (fnd.name == name) {
             return fndNum;

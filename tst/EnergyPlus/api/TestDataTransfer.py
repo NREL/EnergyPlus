@@ -81,6 +81,11 @@ def time_step_handler(state):
             # val = api.exchange.list_available_api_data_csv()
             # with open('/tmp/data.csv', 'w') as f:
             #     f.write(val.decode(encoding='utf-8'))
+            api.exchange.get_api_data(state)  # inspect this to see what's available to exchange
+            surfaces = api.exchange.get_object_names(state, "BuildingSurface:Detailed")
+            if len(surfaces) == 0:
+                print("Called TestDataTransfer.py with an input file that has no BuildingSurface:Detailed, aborting")
+                raise RuntimeError("Bad input file for TestDataTransfer.py")
             outdoor_temp_sensor = api.exchange.get_variable_handle(
                 state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT"
             )
@@ -91,7 +96,7 @@ def time_step_handler(state):
                 state, "Weather Data", "Outdoor Dew Point", "Environment"
             )
             zone1_wall1_actuator_handle = api.exchange.get_actuator_handle(
-                state, "Surface", "Construction State", "Zn001:Wall001"
+                state, "Surface", "Construction State", surfaces[0]
             )
 
             wall_construction_handle = api.exchange.get_construction_handle(state, "R13WALL")
