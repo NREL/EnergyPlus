@@ -1407,9 +1407,6 @@ namespace HeatingCoils {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // Using/Aliasing
-        using EMSManager::CheckIfNodeSetPointManagedByEMS;
-
         auto &heatingCoil = state.dataHeatingCoils->HeatingCoil(CoilNum);
 
         if (state.dataHeatingCoils->MyOneTimeFlag) {
@@ -1689,10 +1686,6 @@ namespace HeatingCoils {
         // currently only handles single values) and associated string representing that sizing variable.
         // Sizer functions handles the actual sizing and reporting.
 
-        // Using/Aliasing
-        using namespace DataSizing;
-        using namespace OutputReportPredefined;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("SizeHeatingCoil: "); // include trailing blank space
 
@@ -1728,7 +1721,7 @@ namespace HeatingCoils {
         state.dataSize->DataCoolCoilCap =
             0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 
-        if (TempCap == AutoSize) {
+        if (TempCap == DataSizing::AutoSize) {
             if (heatingCoil.DesiccantRegenerationCoil) {
                 state.dataSize->DataDesicRegCoil = true;
                 bPRINT = false;
@@ -1767,7 +1760,7 @@ namespace HeatingCoils {
             heatingCoil.MSNominalCapacity(heatingCoil.NumOfStages) = TempCap;
             bool IsAutoSize = false;
             int NumOfStages; // total number of stages of multi-stage heating coil
-            if (any_eq(heatingCoil.MSNominalCapacity, AutoSize)) {
+            if (any_eq(heatingCoil.MSNominalCapacity, DataSizing::AutoSize)) {
                 IsAutoSize = true;
             }
             if (IsAutoSize) {
@@ -1776,7 +1769,7 @@ namespace HeatingCoils {
                     bool ThisStageAutoSize = false;
                     FieldNum = 1 + StageNum * ((heatingCoil.HCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage) ? 2 : 3);
                     SizingString = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
-                    if (heatingCoil.MSNominalCapacity(StageNum) == AutoSize) {
+                    if (heatingCoil.MSNominalCapacity(StageNum) == DataSizing::AutoSize) {
                         ThisStageAutoSize = true;
                     }
                     NominalCapacityDes = TempCap * StageNum / NumOfStages;
@@ -1841,33 +1834,39 @@ namespace HeatingCoils {
         // create predefined report entries
         switch (heatingCoil.HCoilType_Num) {
         case DataHVACGlobals::Coil_HeatingElectric: {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Electric");
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.NominalCapacity);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.Efficiency);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Electric");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.NominalCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.Efficiency);
         } break;
         case DataHVACGlobals::Coil_HeatingElectric_MultiStage: {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Electric:MultiStage");
-            PreDefTableEntry(
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Electric:MultiStage");
+            OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.MSNominalCapacity(heatingCoil.NumOfStages));
-            PreDefTableEntry(
+            OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.MSEfficiency(heatingCoil.NumOfStages));
         } break;
         case DataHVACGlobals::Coil_HeatingGasOrOtherFuel: {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Fuel");
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.NominalCapacity);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.Efficiency);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Fuel");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.NominalCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.Efficiency);
         } break;
         case DataHVACGlobals::Coil_HeatingGas_MultiStage: {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Gas:MultiStage");
-            PreDefTableEntry(
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Gas:MultiStage");
+            OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.MSNominalCapacity(heatingCoil.NumOfStages));
-            PreDefTableEntry(
+            OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.MSEfficiency(heatingCoil.NumOfStages));
         } break;
         case DataHVACGlobals::Coil_HeatingDesuperheater: {
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Desuperheater");
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.NominalCapacity);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.Efficiency);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilType, heatingCoil.Name, "Coil:Heating:Desuperheater");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilNomCap, heatingCoil.Name, heatingCoil.NominalCapacity);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilNomEff, heatingCoil.Name, heatingCoil.Efficiency);
         } break;
         default:
             break;
@@ -1890,9 +1889,6 @@ namespace HeatingCoils {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates a simple Electric heating coil with an efficiency
-
-        // Using/Aliasing
-        using DataHVACGlobals::TempControlTol;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow; // [kg/sec]
@@ -1955,7 +1951,7 @@ namespace HeatingCoils {
             // Control coil output to meet a setpoint temperature.
         } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
                    (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq == DataLoopNode::SensedLoadFlagValue) &&
-                   (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
+                   (std::abs(TempSetPoint - TempAirIn) > DataHVACGlobals::TempControlTol)) {
 
             QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
             // check to see if setpoint above enetering temperature. If not, set
@@ -2043,17 +2039,10 @@ namespace HeatingCoils {
         // the performance at high stage and that at low stage. If the output needed is below
         // that produced at low stage, the coil cycles between off and low stage.
 
-        // Using/Aliasing
-        using Curve::CurveValue;
-        using Psychrometrics::PsyRhFnTdbWPb;
-        using Psychrometrics::PsyTdbFnHW;
-        using Psychrometrics::PsyTsatFnHPb;
-        using Psychrometrics::PsyWFnTdbH;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("CalcMultiStageElectricHeatingCoil");
-        static constexpr std::string_view RoutineNameAverageLoad("CalcMultiStageElectricHeatingCoil:Averageload");
-        static constexpr std::string_view RoutineNameFullLoad("CalcMultiStageElectricHeatingCoil:fullload");
+        static constexpr std::string_view RoutineName = "CalcMultiStageElectricHeatingCoil";
+        static constexpr std::string_view RoutineNameAverageLoad = "CalcMultiStageElectricHeatingCoil:Averageload";
+        static constexpr std::string_view RoutineNameFullLoad = "CalcMultiStageElectricHeatingCoil:fullload";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;          // dry air mass flow rate through coil [kg/s]
@@ -2124,12 +2113,12 @@ namespace HeatingCoils {
                 heatingCoil.HeatingCoilLoad = TotCapHS * SpeedRatio + TotCapLS * (1.0 - SpeedRatio);
 
                 OutletAirEnthalpy = InletAirEnthalpy + heatingCoil.HeatingCoilLoad / heatingCoil.InletAirMassFlowRate;
-                OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(state, OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
+                OutletAirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
+                FullLoadOutAirRH = Psychrometrics::PsyRhFnTdbWPb(state, OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    OutletAirTemp = PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure, RoutineName);
-                    OutletAirHumRat = PsyWFnTdbH(state, OutletAirTemp, OutletAirEnthalpy, RoutineName);
+                    OutletAirTemp = Psychrometrics::PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure, RoutineName);
+                    OutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, OutletAirTemp, OutletAirEnthalpy, RoutineName);
                 }
 
                 heatingCoil.OutletAirTemp = OutletAirTemp;
@@ -2155,14 +2144,15 @@ namespace HeatingCoils {
                 // Calculate full load outlet conditions
                 FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
                 FullLoadOutAirHumRat = InletAirHumRat;
-                FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(state, FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
+                FullLoadOutAirTemp = Psychrometrics::PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
+                FullLoadOutAirRH =
+                    Psychrometrics::PsyRhFnTdbWPb(state, FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure, RoutineName);
+                    FullLoadOutAirTemp = Psychrometrics::PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure, RoutineName);
                     //  Eventually inlet air conditions will be used in electric Coil, these lines are commented out and marked with this comment
                     //  line FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-                    FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+                    FullLoadOutAirHumRat = Psychrometrics::PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
                 }
 
                 // Set outlet conditions from the full load calculation
