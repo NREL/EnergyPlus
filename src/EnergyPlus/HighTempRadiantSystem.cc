@@ -155,11 +155,10 @@ namespace HighTempRadiantSystem {
         // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFoundInGet; // Set to true when there are severe errors during the Get routine
         int RadSysNum;         // Radiant system number/index in local derived types
 
         if (state.dataHighTempRadSys->GetInputFlag) {
-            ErrorsFoundInGet = false;
+            bool ErrorsFoundInGet = false;
             GetHighTempRadiantSystem(state, ErrorsFoundInGet);
             if (ErrorsFoundInGet)
                 ShowFatalError(state, "GetHighTempRadiantSystem: Errors found in input.  Preceding condition(s) cause termination.");
@@ -730,10 +729,6 @@ namespace HighTempRadiantSystem {
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum; // Intermediate variable for keeping track of the zone number
-        int Loop;
-
         if (state.dataHighTempRadSys->firstTime) {
             state.dataHighTempRadSys->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataHighTempRadSys->QHTRadSource.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, 0.0);
@@ -748,7 +743,7 @@ namespace HighTempRadiantSystem {
         // need to check all units to see if they are on Zone Equipment List or issue warning
         if (!state.dataHighTempRadSys->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataHighTempRadSys->ZoneEquipmentListChecked = true;
-            for (Loop = 1; Loop <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Loop) {
+            for (int Loop = 1; Loop <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", state.dataHighTempRadSys->HighTempRadSys(Loop).Name)) continue;
                 ShowSevereError(state,
                                 format("InitHighTempRadiantSystem: Unit=[ZoneHVAC:HighTemperatureRadiant,{}] is not on any ZoneHVAC:EquipmentList.  "
@@ -777,7 +772,7 @@ namespace HighTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
-            ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
+            int ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
             state.dataHighTempRadSys->ZeroSourceSumHATsurf(ZoneNum) =
                 state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);  // Set this to figure out what part of the load the radiant system meets
             state.dataHighTempRadSys->QHTRadSrcAvg(RadSysNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
@@ -814,9 +809,6 @@ namespace HighTempRadiantSystem {
         using namespace DataSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr const char *RoutineName("SizeHighTempRadiantSystem");
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS
         Real64 MaxPowerCapacDes;  // Design maximum capacity for reproting
         Real64 MaxPowerCapacUser; // User hard-sized maximum capacity for reproting
@@ -833,8 +825,6 @@ namespace HighTempRadiantSystem {
             auto &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
             auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
 
-            std::string CompType = "ZoneHVAC:HighTemperatureRadiant";
-            std::string CompName = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).Name;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
             // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
@@ -847,6 +837,8 @@ namespace HighTempRadiantSystem {
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
+                std::string const CompType = "ZoneHVAC:HighTemperatureRadiant";
+                std::string const CompName = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).Name;
 
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity == AutoSize) {
@@ -879,6 +871,7 @@ namespace HighTempRadiantSystem {
                 }
                 bool PrintFlag = true;
                 bool errorsFound = false;
+                constexpr std::string_view RoutineName = "SizeHighTempRadiantSystem";
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
