@@ -2445,7 +2445,6 @@ namespace HeatingCoils {
         }
 
         Real64 AirMassFlow = heatingCoil.InletAirMassFlowRate;
-        Real64 InletAirDryBulbTemp = heatingCoil.InletAirTemp;
         Real64 InletAirEnthalpy = heatingCoil.InletAirEnthalpy;
         Real64 InletAirHumRat = heatingCoil.InletAirHumRat;
         Real64 OutdoorPressure = state.dataEnvrn->OutBaroPress;
