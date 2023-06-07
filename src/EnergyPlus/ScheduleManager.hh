@@ -121,6 +121,14 @@ namespace ScheduleManager {
         Num
     };
 
+    enum class Clusive
+    {
+        Invalid = -1,
+        Inclusive,
+        Exclusive,
+        Num
+    };
+
     struct ScheduleTypeData
     {
         // Members
@@ -273,12 +281,20 @@ namespace ScheduleManager {
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const ScheduleIndex,      // Which Schedule being tested
-                                  std::string const &MinString, // Minimum indicator ('>', '>=')
+                                  std::string_view MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum,         // Minimum desired value
-                                  std::string const &MaxString, // Maximum indicator ('<', ',=')
+                                  std::string_view MaxString, // Maximum indicator ('<', ',=')
                                   Real64 const Maximum          // Maximum desired value
     );
 
+    bool CheckScheduleValueMinMax(EnergyPlusData &state,
+                                  int const ScheduleIndex,      // Which Schedule being tested
+                                  Clusive clusiveMin,            // true ? '>' : '>='
+                                  Real64 const Minimum,         // Minimum desired value
+                                  Clusive clusiveMax,            // true ? '<' : '<='
+                                  Real64 const Maximum          // Maximum desired value
+    );
+        
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')

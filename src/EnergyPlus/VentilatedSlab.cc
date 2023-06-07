@@ -499,7 +499,7 @@ namespace VentilatedSlab {
                                            cAlphaFields(7),
                                            state.dataIPShortCut->cAlphaArgs(7)));
                     ErrorsFound = true;
-                } else if (!CheckScheduleValueMinMax(state, ventSlab.MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
+                } else if (!CheckScheduleValueMinMax(state, ventSlab.MaxOASchedPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=\"{}\" values out of range [0,1].",
                                            CurrentModuleObject,
