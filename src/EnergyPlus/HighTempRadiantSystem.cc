@@ -758,12 +758,18 @@ namespace HighTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHighTempRadSys->MyEnvrnFlag) {
+            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
+                auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(HTRnum);
+                thisHTR.ZeroHTRSourceSumHATsurf = 0.0;
+                thisHTR.QHTRRadSource = 0.0;
+                thisHTR.QHTRRadSrcAvg = 0.0;
+                thisHTR.LastQHTRRadSrc = 0.0;
+                thisHTR.LastSysTimeElapsed = 0.0;
+                thisHTR.LastTimeStepSys = 0.0;
+            }
             state.dataHighTempRadSys->MyEnvrnFlag = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
-                state.dataHighTempRadSys->HighTempRadSys(HTRnum).LastQHTRRadSrc = 0.0;
-            }
             state.dataHighTempRadSys->MyEnvrnFlag = true;
         }
 

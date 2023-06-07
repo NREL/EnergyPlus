@@ -517,12 +517,11 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
         int ZoneNum = this->ZonePtr;
         this->ZeroPoolSourceSumHATsurf =
             state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what the impact of the swimming pool on all zone surfaces
-        int SurfNum = this->SurfacePtr;
-        this->QPoolSrcAvg = 0.0;        // Initialize this variable to zero (pool parameters "off")
-        this->HeatTransCoefsAvg = 0.0;  // Initialize this variable to zero (pool parameters "off")
-        this->LastQPoolSrc = 0.0;       // At the start of a time step, reset to zero so average calculation can begin again
-        this->LastSysTimeElapsed = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-        this->LastTimeStepSys = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+        this->QPoolSrcAvg = 0.0;                                // Initialize this variable to zero (pool parameters "off")
+        this->HeatTransCoefsAvg = 0.0;                          // Initialize this variable to zero (pool parameters "off")
+        this->LastQPoolSrc = 0.0;                               // At the start of a time step, reset to zero so average calculation can begin again
+        this->LastSysTimeElapsed = 0.0;                         // At the start of a time step, reset to zero so average calculation can begin again
+        this->LastTimeStepSys = 0.0;                            // At the start of a time step, reset to zero so average calculation can begin again
     }
 
     // initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature

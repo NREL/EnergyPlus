@@ -146,9 +146,9 @@ namespace HighTempRadiantSystem {
         HighTempRadiantSystemData()
             : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Invalid), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
               FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Invalid), ThrottlRange(0.0), SetptSchedPtr(0),
-              FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0),
-              HeatEnergy(0.0), HeatingCapMethod(0), ZeroHTRSourceSumHATsurf(0.0), QHTRRadSource(0.0), QHTRRadSrcAvg(0.0), LastSysTimeElapsed(0.0),
-              LastTimeStepSys(0.0), LastQHTRRadSrc(0.0), ScaledHeatingCapacity(0.0)
+              FracDistribPerson(0.0), TotSurfToDistrib(0), ZeroHTRSourceSumHATsurf(0.0), QHTRRadSource(0.0), QHTRRadSrcAvg(0.0),
+              LastSysTimeElapsed(0.0), LastTimeStepSys(0.0), LastQHTRRadSrc(0.0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0),
+              HeatPower(0.0), HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }
     };
