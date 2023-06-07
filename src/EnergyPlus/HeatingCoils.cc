@@ -2227,10 +2227,6 @@ namespace HeatingCoils {
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates a simple Gas heating coil with a burner efficiency
 
-        // Using/Aliasing
-        using Curve::CurveValue;
-        using DataHVACGlobals::TempControlTol;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow; // [kg/sec]
         Real64 TempAirIn;   // [C]
@@ -2292,7 +2288,7 @@ namespace HeatingCoils {
             // Control coil output to meet a setpoint temperature.
         } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
                    (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq == DataLoopNode::SensedLoadFlagValue) &&
-                   (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
+                   (std::abs(TempSetPoint - TempAirIn) > DataHVACGlobals::TempControlTol)) {
 
             QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
             // check to see if setpoint above entering temperature. If not, set
@@ -2335,7 +2331,7 @@ namespace HeatingCoils {
             if (PartLoadRat == 0) {
                 heatingCoil.FuelUseLoad = 0.0;
             } else {
-                PLF = CurveValue(state, heatingCoil.PLFCurveIndex, PartLoadRat);
+                PLF = Curve::CurveValue(state, heatingCoil.PLFCurveIndex, PartLoadRat);
                 if (PLF < 0.7) {
                     if (heatingCoil.PLFErrorCount < 1) {
                         ++heatingCoil.PLFErrorCount;
@@ -2431,15 +2427,8 @@ namespace HeatingCoils {
         // the performance at high stage and that at low stage. If the output needed is below
         // that produced at low stage, the coil cycles between off and low stage.
 
-        // Using/Aliasing
-        using Curve::CurveValue;
         Real64 const MSHPMassFlowRateHigh = state.dataHVACGlobal->MSHPMassFlowRateHigh;
         Real64 const MSHPMassFlowRateLow = state.dataHVACGlobal->MSHPMassFlowRateLow;
-
-        using Psychrometrics::PsyRhFnTdbWPb;
-        using Psychrometrics::PsyTdbFnHW;
-        using Psychrometrics::PsyTsatFnHPb;
-        using Psychrometrics::PsyWFnTdbH;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("CalcMultiStageGasHeatingCoil");
@@ -2531,12 +2520,12 @@ namespace HeatingCoils {
                 heatingCoil.ParasiticFuelRate = 0.0;
 
                 OutletAirEnthalpy = InletAirEnthalpy + heatingCoil.HeatingCoilLoad / heatingCoil.InletAirMassFlowRate;
-                OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(state, OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
+                OutletAirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
+                FullLoadOutAirRH = Psychrometrics::PsyRhFnTdbWPb(state, OutletAirTemp, OutletAirHumRat, OutdoorPressure, RoutineNameAverageLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    OutletAirTemp = PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure, RoutineName);
-                    OutletAirHumRat = PsyWFnTdbH(state, OutletAirTemp, OutletAirEnthalpy, RoutineName);
+                    OutletAirTemp = Psychrometrics::PsyTsatFnHPb(state, OutletAirEnthalpy, OutdoorPressure, RoutineName);
+                    OutletAirHumRat = Psychrometrics::PsyWFnTdbH(state, OutletAirTemp, OutletAirEnthalpy, RoutineName);
                 }
 
                 heatingCoil.OutletAirTemp = OutletAirTemp;
@@ -2561,14 +2550,15 @@ namespace HeatingCoils {
                 // Calculate full load outlet conditions
                 FullLoadOutAirEnth = InletAirEnthalpy + TotCap / AirMassFlow;
                 FullLoadOutAirHumRat = InletAirHumRat;
-                FullLoadOutAirTemp = PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
-                FullLoadOutAirRH = PsyRhFnTdbWPb(state, FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
+                FullLoadOutAirTemp = Psychrometrics::PsyTdbFnHW(FullLoadOutAirEnth, FullLoadOutAirHumRat);
+                FullLoadOutAirRH =
+                    Psychrometrics::PsyRhFnTdbWPb(state, FullLoadOutAirTemp, FullLoadOutAirHumRat, OutdoorPressure, RoutineNameFullLoad);
 
                 if (FullLoadOutAirRH > 1.0) { // Limit to saturated conditions at FullLoadOutAirEnth
-                    FullLoadOutAirTemp = PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure, RoutineName);
+                    FullLoadOutAirTemp = Psychrometrics::PsyTsatFnHPb(state, FullLoadOutAirEnth, OutdoorPressure, RoutineName);
                     //  Eventually inlet air conditions will be used in Gas Coil, these lines are commented out and marked with this comment line
                     //  FullLoadOutAirTemp = PsyTsatFnHPb(FullLoadOutAirEnth,InletAirPressure)
-                    FullLoadOutAirHumRat = PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
+                    FullLoadOutAirHumRat = Psychrometrics::PsyWFnTdbH(state, FullLoadOutAirTemp, FullLoadOutAirEnth, RoutineName);
                 }
 
                 // Set outlet conditions from the full load calculation
@@ -2581,7 +2571,7 @@ namespace HeatingCoils {
                         PartLoadRat * AirMassFlow / heatingCoil.InletAirMassFlowRate * (FullLoadOutAirEnth - InletAirEnthalpy) + InletAirEnthalpy;
                     OutletAirHumRat =
                         PartLoadRat * AirMassFlow / heatingCoil.InletAirMassFlowRate * (FullLoadOutAirHumRat - InletAirHumRat) + InletAirHumRat;
-                    OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
+                    OutletAirTemp = Psychrometrics::PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
 
                 EffLS = heatingCoil.MSEfficiency(StageNumLS);
@@ -2623,7 +2613,7 @@ namespace HeatingCoils {
         // The PLF curve is only used when the coil cycles.
         if (heatingCoil.PLFCurveIndex > 0) {
             if (PartLoadRat > 0.0 && StageNum < 2) {
-                PLF = CurveValue(state, heatingCoil.PLFCurveIndex, PartLoadRat);
+                PLF = Curve::CurveValue(state, heatingCoil.PLFCurveIndex, PartLoadRat);
                 if (PLF < 0.7) {
                     if (heatingCoil.PLFErrorCount < 1) {
                         ++heatingCoil.PLFErrorCount;
