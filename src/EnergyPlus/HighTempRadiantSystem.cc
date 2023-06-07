@@ -820,7 +820,6 @@ namespace HighTempRadiantSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS
         Real64 MaxPowerCapacDes;  // Design maximum capacity for reproting
         Real64 MaxPowerCapacUser; // User hard-sized maximum capacity for reproting
-        bool IsAutoSize;          // Indicator to autosizing nominal capacity
 
         std::string CompName;     // component name
         std::string CompType;     // component type
@@ -833,7 +832,6 @@ namespace HighTempRadiantSystem {
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
-        IsAutoSize = false;
         MaxPowerCapacDes = 0.0;
         MaxPowerCapacUser = 0.0;
         state.dataSize->DataScalableCapSizingON = false;
@@ -1046,12 +1044,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ConvergFlag; // convergence flag for temperature control
-        // unused  INTEGER, SAVE :: ErrIterCount=0   ! number of time max iterations has been exceeded
-        float HeatFrac;       // fraction of maximum energy input to radiant system [dimensionless]
-        float HeatFracMax;    // maximum range of heat fraction
-        float HeatFracMin;    // minimum range of heat fraction
-        int IterNum;          // iteration number
         Real64 SetPtTemp;     // Setpoint temperature [C]
         int ZoneNum;          // number of zone being served
         Real64 ZoneTemp(0.0); // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
@@ -1096,10 +1088,11 @@ namespace HighTempRadiantSystem {
             if (ZoneTemp < (SetPtTemp - TempConvToler)) {
 
                 // Use simple interval halving to find the best operating fraction to achieve proper temperature control
-                IterNum = 0;
-                ConvergFlag = false;
-                HeatFracMax = 1.0;
-                HeatFracMin = 0.0;
+                int IterNum = 0;
+                bool ConvergFlag = false;
+                float HeatFrac; // fraction of maximum energy input to radiant system [dimensionless]
+                float HeatFracMax = 1.0;
+                float HeatFracMin = 0.0;
 
                 while ((IterNum <= MaxIterations) && (!ConvergFlag)) {
 
