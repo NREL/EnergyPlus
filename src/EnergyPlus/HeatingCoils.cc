@@ -92,7 +92,6 @@ namespace HeatingCoils {
     //       AUTHOR         Richard J. Liesen
     //       DATE WRITTEN   May 2000
     //       MODIFIED       Therese Stovall June 2008 to add references to refrigeration condensers
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // To encapsulate the data and algorithms required to
@@ -115,8 +114,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages HeatingCoil component simulation.
@@ -248,8 +245,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains input data for coils and stores it in coil data structures
@@ -1399,7 +1394,6 @@ namespace HeatingCoils {
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   May 2000
         //       MODIFIED       B. Griffith, May 2009 added EMS setpoint check
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the HeatingCoil Components.
@@ -1885,7 +1879,6 @@ namespace HeatingCoils {
         //       AUTHOR         Rich Liesen
         //       DATE WRITTEN   May 2000
         //       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates a simple Electric heating coil with an efficiency
@@ -2027,8 +2020,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the air-side performance and electrical energy use of multistage electric heating coil.
@@ -2222,7 +2213,6 @@ namespace HeatingCoils {
         //       AUTHOR         Rich Liesen
         //       DATE WRITTEN   May 2000
         //       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates a simple Gas heating coil with a burner efficiency
@@ -2415,8 +2405,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Chandan Sharma, FSEC
         //       DATE WRITTEN   January 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the air-side performance and energy use of a multi stage gas heating coil.
@@ -2681,7 +2669,6 @@ namespace HeatingCoils {
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   January 2005
         //       MODIFIED       Jul. 2016, R. Zhang, Applied the coil supply air temperature sensor offset
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Simulates a simple desuperheater heating coil with a heat reclaim efficiency
@@ -2695,10 +2682,6 @@ namespace HeatingCoils {
         // heating setpoint (temperature based control). This subroutine is similar to
         // the electric or gas heating coil except that the NominalCapacity is variable
         // and based on the runtime fraction and heat rejection of the heat source object.
-
-        // Using/Aliasing
-        using DataHVACGlobals::TempControlTol;
-        using namespace DXCoils;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AirMassFlow;     // air mass flow through the desuperheater heating coil [kg/sec]
@@ -2813,7 +2796,7 @@ namespace HeatingCoils {
             // Control coil output to meet a setpoint temperature.
         } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
                    (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq == DataLoopNode::SensedLoadFlagValue) &&
-                   (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
+                   (std::abs(TempSetPoint - TempAirIn) > DataHVACGlobals::TempControlTol)) {
 
             QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
             // check to see if setpoint is above entering air temperature. If not, set output to zero.
@@ -2898,8 +2881,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the coil outlet nodes.
@@ -2941,8 +2922,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   May 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
@@ -3004,7 +2983,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   March 2005
-        //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -3034,8 +3012,6 @@ namespace HeatingCoils {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This routine provides a method for outside routines to check if
@@ -3101,8 +3077,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the coil capacity for the given coil and returns it.  If
@@ -3168,7 +3142,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   February 2013
-        //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
@@ -3222,8 +3195,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the inlet node number.  If
@@ -3276,8 +3247,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   August 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the outlet node number.  If
@@ -3544,8 +3513,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Chandan Sharma
         //       DATE WRITTEN   February 2013
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function looks up the given coil and returns the number of speeds for multistage coils.
@@ -3586,8 +3553,6 @@ namespace HeatingCoils {
         // FUNCTION INFORMATION:
         //       AUTHOR         Bereket Nigusse
         //       DATE WRITTEN   February 2016
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function sets data to Heating Coil using the coil index and arguments passed
