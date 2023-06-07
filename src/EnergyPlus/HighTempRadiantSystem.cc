@@ -211,27 +211,16 @@ namespace HighTempRadiantSystem {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology.
 
-        // Using/Aliasing
-        using DataSizing::AutoSize;
-        using DataSizing::CapacityPerFloorArea;
-        using DataSizing::FractionOfAutosizedHeatingCapacity;
-        using DataSizing::HeatingDesignCapacity;
-
-        using ScheduleManager::GetScheduleIndex;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr MaxCombustionEffic(1.00); // Limit the combustion efficiency to perfection
-        Real64 constexpr MaxFraction(1.0);         // Limit the highest allowed fraction for heat transfer parts
-        Real64 constexpr MinCombustionEffic(0.01); // Limit the minimum combustion efficiency
-        Real64 constexpr MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
-        Real64 constexpr MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
-        //  INTEGER,          PARAMETER :: MaxDistribSurfaces = 20    ! Maximum number of surfaces that a radiant heater can radiate to
-        int constexpr iHeatCAPMAlphaNum(4);             // get input index to High Temperature Radiant system heating capacity sizing method
-        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to High Temperature Radiant system heating capacity
-        int constexpr iHeatCapacityPerFloorAreaNumericNum(
-            2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
-        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
+        Real64 constexpr MaxCombustionEffic = 1.0;                // Limit the combustion efficiency to perfection
+        Real64 constexpr MaxFraction = 1.0;                       // Limit the highest allowed fraction for heat transfer parts
+        Real64 constexpr MinCombustionEffic = 0.01;               // Limit the minimum combustion efficiency
+        Real64 constexpr MinFraction = 0.0;                       // Limit the lowest allowed fraction for heat transfer parts
+        Real64 constexpr MinThrottlingRange = 0.5;                // Smallest throttling range allowed in degrees Celsius
+        int constexpr iHeatCAPMAlphaNum = 4;                      // get input index to High Temperature Radiant system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum = 1;          // get input index to High Temperature Radiant system heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum = 2;    // index to High Temperature Radiant system heating capacity per floor area sizing
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum = 3; // index to system capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AllFracsSummed;           // Sum of the fractions radiant, latent, and lost (must be <= 1)
@@ -281,7 +270,8 @@ namespace HighTempRadiantSystem {
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr =
+                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
                 if (state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {} entered ={} for {} = {}",
@@ -307,13 +297,13 @@ namespace HighTempRadiantSystem {
 
             // Determine High Temp Radiant heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = HeatingDesignCapacity;
+                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
 
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity < 0.0 &&
-                        state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity != AutoSize) {
+                        state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity != DataSizing::AutoSize) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
@@ -332,7 +322,7 @@ namespace HighTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = CapacityPerFloorArea;
+                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -347,7 +337,7 @@ namespace HighTempRadiantSystem {
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
-                    } else if (state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity == AutoSize) {
+                    } else if (state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity == DataSizing::AutoSize) {
                         ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
                         ShowContinueError(state,
                                           format("Input for {} = {}",
@@ -369,7 +359,7 @@ namespace HighTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
                         state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -520,7 +510,8 @@ namespace HighTempRadiantSystem {
             }
 
             state.dataHighTempRadSys->HighTempRadSys(Item).SetptSched = state.dataIPShortCut->cAlphaArgs(7);
-            state.dataHighTempRadSys->HighTempRadSys(Item).SetptSchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+            state.dataHighTempRadSys->HighTempRadSys(Item).SetptSchedPtr =
+                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
             if ((state.dataHighTempRadSys->HighTempRadSys(Item).SetptSchedPtr == 0) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
                 ShowSevereError(state, format("{} not found: {}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
