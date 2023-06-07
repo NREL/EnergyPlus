@@ -1056,23 +1056,22 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     SwimmingPoolOn = false;
 
-    // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
+    // If this was never allocated, then there are no swimming pools in this input file (just RETURN)
     for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
         if (!allocated(state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg)) return;
 
-        // If it was allocated, then we have to check to see if this was running at all
+        // If it was allocated, then we have to check to see if this pool was running at all.  If so, update pool terms also.
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg(SurfNum) != 0.0) {
                 SwimmingPoolOn = true;
+                state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) = state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg(SurfNum);
+                state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) = state.dataSwimmingPools->Pool(PoolNum).HeatTransCoefsAvg(SurfNum);
                 break; // DO loop
             }
         }
-
-        state.dataHeatBalFanSys->QPoolSurfNumerator = state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg;
-        state.dataHeatBalFanSys->PoolHeatTransCoefs = state.dataSwimmingPools->Pool(PoolNum).HeatTransCoefsAvg;
     }
 
-    // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
+    // For interzone surfaces, QPoolSrcAvg was only updated for the "active" side.  The active side
     // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
