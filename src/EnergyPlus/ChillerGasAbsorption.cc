@@ -514,9 +514,8 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(17);
 
         // Validate fuel type input
-        thisChiller.FuelType =
-            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(17)));
-        if (thisChiller.FuelType == Constant::eResource::Invalid) {
+        thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(17)));
+        if (thisChiller.FuelType == Constant::eFuel::Invalid) {
             ShowSevereError(state, format("{}=\"{}\", invalid value", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17)));
             ShowContinueError(
@@ -532,7 +531,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 
 void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
 {
-    std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
+    std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
 
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Cooling Rate",
