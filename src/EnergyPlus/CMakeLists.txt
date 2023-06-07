@@ -711,6 +711,12 @@ add_custom_command(
         "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/modify_schema.py"
 )
 
+# Since multiple targets depend on the JSON Schema, we need to make a custom target for it so the dependent targets don't try to run the custom command at the same time.
+# (see: https://cmake.org/cmake/help/latest/command/add_custom_command.html?highlight=add_custom_command#example-generating-files-for-multiple-targets)
+
+add_custom_target(epjson_schema ALL DEPENDS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
+set_target_properties(epjson_schema PROPERTIES FOLDER "Internal")
+
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
   COMMAND
@@ -722,13 +728,9 @@ add_custom_command(
         -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddable_epJSON_schema>"
         -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS generate_embeddable_epJSON_schema "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc")
+  DEPENDS generate_embeddable_epJSON_schema epjson_schema "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc")
 
-# Since multiple targets depend on EmbeddedEpJSONSchema.cc, we need to make a custom target for it so the dependent
-# targets don't try to run the custom command at the same time.
-# (see: https://cmake.org/cmake/help/latest/command/add_custom_command.html?highlight=add_custom_command#example-generating-files-for-multiple-targets)
-
-add_custom_target(embedded_epjson_source DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc")
+add_custom_target(embedded_epjson_source ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc")
 set_target_properties(embedded_epjson_source PROPERTIES FOLDER "Internal")
 
 add_subdirectory(AirflowNetwork)
