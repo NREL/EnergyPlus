@@ -154,8 +154,8 @@ void CheckSysSizing(EnergyPlusData &state,
 void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized);
 
 void CheckZoneSizing(EnergyPlusData &state,
-                     std::string_view const CompType, // Component Type (e.g. Chiller:Electric)
-                     std::string_view const CompName  // Component Name (e.g. Big Chiller)
+                     std::string_view CompType, // Component Type (e.g. Chiller:Electric)
+                     std::string_view CompName  // Component Name (e.g. Big Chiller)
 );
 
 void CheckThisZoneForSizing(EnergyPlusData &state,

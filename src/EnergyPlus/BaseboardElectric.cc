@@ -452,7 +452,7 @@ namespace BaseboardElectric {
             state.dataSize->DataZoneNumber = baseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 1;
-            std::string_view const SizingString = baseboard.FieldNames(FieldNum) + " [W]";
+            std::string SizingString = baseboard.FieldNames(FieldNum) + " [W]";
             int CapSizingMethod = baseboard.HeatingCapMethod;
             ZoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
