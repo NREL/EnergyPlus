@@ -6370,6 +6370,8 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                         state.dataSize->CalcSysSizing(AirLoopNum).SysCoolOutHumRatSeq = sysSizing.SysCoolOutHumRatSeq;
                         state.dataSize->CalcSysSizing(AirLoopNum).SysDOASHeatAddSeq = sysSizing.SysDOASHeatAddSeq;
                         state.dataSize->CalcSysSizing(AirLoopNum).SysDOASLatAddSeq = sysSizing.SysDOASLatAddSeq;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysDesCoolLoad = sysSizing.SysDesCoolLoad;
+                        state.dataSize->CalcSysSizing(AirLoopNum).SysCoolLoadTimeStepPk = sysSizing.SysCoolLoadTimeStepPk;
                     }
                     state.dataSize->CalcSysSizing(AirLoopNum).SysCoolCoinSpaceSens = sysSizing.SysCoolCoinSpaceSens;
                 }
