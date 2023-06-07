@@ -223,14 +223,10 @@ namespace HighTempRadiantSystem {
         int constexpr iHeatFracOfAutosizedCapacityNumericNum = 3; // index to system capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AllFracsSummed;           // Sum of the fractions radiant, latent, and lost (must be <= 1)
         Real64 FracOfRadPotentiallyLost; // Difference between unity and AllFracsSummed for error reporting
         int IOStatus;                    // Used in GetObjectItem
-        int Item;                        // Item to be "gotten"
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
-        int SurfNum;                     // Surface number DO loop counter
-        Real64 TotalFracToSurfs;         // Sum of fractions of radiation to surfaces
 
         // Initializations and allocations
         state.dataHighTempRadSys->NumOfHighTempRadSys =
@@ -245,7 +241,8 @@ namespace HighTempRadiantSystem {
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "ZoneHVAC:HighTemperatureRadiant";
         // Obtain all of the user data related to high temperature radiant systems...
-        for (Item = 1; Item <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Item) {
+        for (int Item = 1; Item <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Item) {
+            auto &highTempRadSys = state.dataHighTempRadSys->HighTempRadSys(Item);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
@@ -264,15 +261,14 @@ namespace HighTempRadiantSystem {
             state.dataHighTempRadSys->HighTempRadSysNumericFields(Item).FieldNames = "";
             state.dataHighTempRadSys->HighTempRadSysNumericFields(Item).FieldNames = state.dataIPShortCut->cNumericFieldNames;
             // General user input data
-            state.dataHighTempRadSys->HighTempRadSys(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
+            highTempRadSys.Name = state.dataIPShortCut->cAlphaArgs(1);
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).SchedName = state.dataIPShortCut->cAlphaArgs(2);
+            highTempRadSys.SchedName = state.dataIPShortCut->cAlphaArgs(2);
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
+                highTempRadSys.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr =
-                    ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
-                if (state.dataHighTempRadSys->HighTempRadSys(Item).SchedPtr == 0) {
+                highTempRadSys.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
+                if (highTempRadSys.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {} entered ={} for {} = {}",
                                            cCurrentModuleObject,
@@ -284,10 +280,9 @@ namespace HighTempRadiantSystem {
                 }
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).ZoneName = state.dataIPShortCut->cAlphaArgs(3);
-            state.dataHighTempRadSys->HighTempRadSys(Item).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).ZonePtr == 0) {
+            highTempRadSys.ZoneName = state.dataIPShortCut->cAlphaArgs(3);
+            highTempRadSys.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            if (highTempRadSys.ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
@@ -297,14 +292,12 @@ namespace HighTempRadiantSystem {
 
             // Determine High Temp Radiant heating design capacity sizing method
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+                highTempRadSys.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
 
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
-                    state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
-                        state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
-                    if (state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity < 0.0 &&
-                        state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity != DataSizing::AutoSize) {
-                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                    highTempRadSys.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
+                    if (highTempRadSys.ScaledHeatingCapacity < 0.0 && highTempRadSys.ScaledHeatingCapacity != DataSizing::AutoSize) {
+                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum),
@@ -312,7 +305,7 @@ namespace HighTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                     ShowContinueError(state,
                                       format("Input for {} = {}",
                                              state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -322,12 +315,11 @@ namespace HighTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+                highTempRadSys.HeatingCapMethod = DataSizing::CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
-                    state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
-                        state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
-                    if (state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity <= 0.0) {
-                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                    highTempRadSys.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
+                    if (highTempRadSys.ScaledHeatingCapacity <= 0.0) {
+                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                         ShowContinueError(state,
                                           format("Input for {} = {}",
                                                  state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -337,8 +329,8 @@ namespace HighTempRadiantSystem {
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum),
                                                  state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum)));
                         ErrorsFound = true;
-                    } else if (state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity == DataSizing::AutoSize) {
-                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                    } else if (highTempRadSys.ScaledHeatingCapacity == DataSizing::AutoSize) {
+                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                         ShowContinueError(state,
                                           format("Input for {} = {}",
                                                  state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -348,7 +340,7 @@ namespace HighTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                     ShowContinueError(state,
                                       format("Input for {} = {}",
                                              state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -359,12 +351,11 @@ namespace HighTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+                highTempRadSys.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
-                    state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
-                        state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
-                    if (state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity < 0.0) {
-                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                    highTempRadSys.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
+                    if (highTempRadSys.ScaledHeatingCapacity < 0.0) {
+                        ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                         ShowContinueError(state,
                                           format("Illegal {} = {:.7T}",
                                                  state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum),
@@ -372,7 +363,7 @@ namespace HighTempRadiantSystem {
                         ErrorsFound = true;
                     }
                 } else {
-                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                    ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                     ShowContinueError(state,
                                       format("Input for {} = {}",
                                              state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -383,7 +374,7 @@ namespace HighTempRadiantSystem {
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, state.dataHighTempRadSys->HighTempRadSys(Item).Name));
+                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
                 ShowContinueError(state,
                                   format("Illegal {} = {}",
                                          state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
@@ -392,189 +383,181 @@ namespace HighTempRadiantSystem {
             }
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cNaturalGas)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Gas;
+                highTempRadSys.HeaterType = RadHeaterType::Gas;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectricity)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Electric;
+                highTempRadSys.HeaterType = RadHeaterType::Electric;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cGas)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Gas;
+                highTempRadSys.HeaterType = RadHeaterType::Gas;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectric)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Electric;
+                highTempRadSys.HeaterType = RadHeaterType::Electric;
             } else {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType == RadHeaterType::Gas) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).CombustionEffic = state.dataIPShortCut->rNumericArgs(4);
+            if (highTempRadSys.HeaterType == RadHeaterType::Gas) {
+                highTempRadSys.CombustionEffic = state.dataIPShortCut->rNumericArgs(4);
                 // Limit the combustion efficiency to between zero and one...
-                if (state.dataHighTempRadSys->HighTempRadSys(Item).CombustionEffic < MinCombustionEffic) {
-                    state.dataHighTempRadSys->HighTempRadSys(Item).CombustionEffic = MinCombustionEffic;
+                if (highTempRadSys.CombustionEffic < MinCombustionEffic) {
+                    highTempRadSys.CombustionEffic = MinCombustionEffic;
                     ShowWarningError(
                         state,
                         format("{} was less than the allowable minimum, reset to minimum value.", state.dataIPShortCut->cNumericFieldNames(4)));
                     ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 }
-                if (state.dataHighTempRadSys->HighTempRadSys(Item).CombustionEffic > MaxCombustionEffic) {
-                    state.dataHighTempRadSys->HighTempRadSys(Item).CombustionEffic = MaxCombustionEffic;
+                if (highTempRadSys.CombustionEffic > MaxCombustionEffic) {
+                    highTempRadSys.CombustionEffic = MaxCombustionEffic;
                     ShowWarningError(
                         state,
                         format("{} was greater than the allowable maximum, reset to maximum value.", state.dataIPShortCut->cNumericFieldNames(4)));
                     ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 }
             } else {
-                state.dataHighTempRadSys->HighTempRadSys(Item).CombustionEffic = MaxCombustionEffic; // No inefficiency in the heater
+                highTempRadSys.CombustionEffic = MaxCombustionEffic; // No inefficiency in the heater
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).FracRadiant = state.dataIPShortCut->rNumericArgs(5);
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracRadiant < MinFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracRadiant = MinFraction;
+            highTempRadSys.FracRadiant = state.dataIPShortCut->rNumericArgs(5);
+            if (highTempRadSys.FracRadiant < MinFraction) {
+                highTempRadSys.FracRadiant = MinFraction;
                 ShowWarningError(
                     state, format("{} was less than the allowable minimum, reset to minimum value.", state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracRadiant > MaxFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracRadiant = MaxFraction;
+            if (highTempRadSys.FracRadiant > MaxFraction) {
+                highTempRadSys.FracRadiant = MaxFraction;
                 ShowWarningError(
                     state, format("{} was greater than the allowable maximum, reset to maximum value.", state.dataIPShortCut->cNumericFieldNames(5)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).FracLatent = state.dataIPShortCut->rNumericArgs(6);
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracLatent < MinFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracLatent = MinFraction;
+            highTempRadSys.FracLatent = state.dataIPShortCut->rNumericArgs(6);
+            if (highTempRadSys.FracLatent < MinFraction) {
+                highTempRadSys.FracLatent = MinFraction;
                 ShowWarningError(
                     state, format("{} was less than the allowable minimum, reset to minimum value.", state.dataIPShortCut->cNumericFieldNames(6)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracLatent > MaxFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracLatent = MaxFraction;
+            if (highTempRadSys.FracLatent > MaxFraction) {
+                highTempRadSys.FracLatent = MaxFraction;
                 ShowWarningError(
                     state, format("{} was greater than the allowable maximum, reset to maximum value.", state.dataIPShortCut->cNumericFieldNames(6)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).FracLost = state.dataIPShortCut->rNumericArgs(7);
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracLost < MinFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracLost = MinFraction;
+            highTempRadSys.FracLost = state.dataIPShortCut->rNumericArgs(7);
+            if (highTempRadSys.FracLost < MinFraction) {
+                highTempRadSys.FracLost = MinFraction;
                 ShowWarningError(
                     state, format("{} was less than the allowable minimum, reset to minimum value.", state.dataIPShortCut->cNumericFieldNames(7)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracLost > MaxFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracLost = MaxFraction;
+            if (highTempRadSys.FracLost > MaxFraction) {
+                highTempRadSys.FracLost = MaxFraction;
                 ShowWarningError(
                     state, format("{} was greater than the allowable maximum, reset to maximum value.", state.dataIPShortCut->cNumericFieldNames(7)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
 
             // Based on the input for fractions radiant, latent, and lost, determine the fraction convective (remaining fraction)
-            AllFracsSummed = state.dataHighTempRadSys->HighTempRadSys(Item).FracRadiant + state.dataHighTempRadSys->HighTempRadSys(Item).FracLatent +
-                             state.dataHighTempRadSys->HighTempRadSys(Item).FracLost;
+            Real64 AllFracsSummed = highTempRadSys.FracRadiant + highTempRadSys.FracLatent + highTempRadSys.FracLost;
             if (AllFracsSummed > MaxFraction) {
                 ShowSevereError(state,
                                 format("Fractions radiant, latent, and lost sum up to greater than 1 for{}", state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracConvect = 0.0;
+                highTempRadSys.FracConvect = 0.0;
             } else {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracConvect = 1.0 - AllFracsSummed;
+                highTempRadSys.FracConvect = 1.0 - AllFracsSummed;
             }
 
             // Process the temperature control type
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MATControl;
+                highTempRadSys.ControlType = RadControlType::MATControl;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MRTControl;
+                highTempRadSys.ControlType = RadControlType::MRTControl;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeControl;
+                highTempRadSys.ControlType = RadControlType::OperativeControl;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATSPControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MATSPControl;
+                highTempRadSys.ControlType = RadControlType::MATSPControl;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTSPControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MRTSPControl;
+                highTempRadSys.ControlType = RadControlType::MRTSPControl;
             } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeSPControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeSPControl;
+                highTempRadSys.ControlType = RadControlType::OperativeSPControl;
             } else {
                 ShowWarningError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("Control reset to OPERATIVE control for this {}", cCurrentModuleObject));
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeControl;
+                highTempRadSys.ControlType = RadControlType::OperativeControl;
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).ThrottlRange = state.dataIPShortCut->rNumericArgs(8);
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).ThrottlRange < MinThrottlingRange) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ThrottlRange = 1.0;
+            highTempRadSys.ThrottlRange = state.dataIPShortCut->rNumericArgs(8);
+            if (highTempRadSys.ThrottlRange < MinThrottlingRange) {
+                highTempRadSys.ThrottlRange = 1.0;
                 ShowWarningError(state, format("{} is below the minimum allowed.", state.dataIPShortCut->cNumericFieldNames(8)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Thus, the throttling range value has been reset to 1.0");
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).SetptSched = state.dataIPShortCut->cAlphaArgs(7);
-            state.dataHighTempRadSys->HighTempRadSys(Item).SetptSchedPtr =
-                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
-            if ((state.dataHighTempRadSys->HighTempRadSys(Item).SetptSchedPtr == 0) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
+            highTempRadSys.SetptSched = state.dataIPShortCut->cAlphaArgs(7);
+            highTempRadSys.SetptSchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(7));
+            if ((highTempRadSys.SetptSchedPtr == 0) && (!state.dataIPShortCut->lAlphaFieldBlanks(7))) {
                 ShowSevereError(state, format("{} not found: {}", state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson = state.dataIPShortCut->rNumericArgs(9);
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson < MinFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson = MinFraction;
+            highTempRadSys.FracDistribPerson = state.dataIPShortCut->rNumericArgs(9);
+            if (highTempRadSys.FracDistribPerson < MinFraction) {
+                highTempRadSys.FracDistribPerson = MinFraction;
                 ShowWarningError(
                     state, format("{} was less than the allowable minimum, reset to minimum value.", state.dataIPShortCut->cNumericFieldNames(9)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson > MaxFraction) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson = MaxFraction;
+            if (highTempRadSys.FracDistribPerson > MaxFraction) {
+                highTempRadSys.FracDistribPerson = MaxFraction;
                 ShowWarningError(
                     state, format("{} was greater than the allowable maximum, reset to maximum value.", state.dataIPShortCut->cNumericFieldNames(9)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             }
 
-            state.dataHighTempRadSys->HighTempRadSys(Item).TotSurfToDistrib = NumNumbers - 9;
-            //    IF (state.dataHighTempRadSys->HighTempRadSys(Item)%TotSurfToDistrib > MaxDistribSurfaces) THEN
+            highTempRadSys.TotSurfToDistrib = NumNumbers - 9;
+            //    IF (highTempRadSys%TotSurfToDistrib > MaxDistribSurfaces) THEN
             //      CALL ShowSevereError(state, 'Trying to distribute radiant energy to too many surfaces for heater
             //      '//TRIM(state.dataIPShortCut->cAlphaArgs(1))) CALL ShowContinueError(state, 'Occurs for '//TRIM(cCurrentModuleObject)//' =
             //      '//TRIM(state.dataIPShortCut->cAlphaArgs(1))) ErrorsFound=.TRUE.
             //    END IF
-            state.dataHighTempRadSys->HighTempRadSys(Item).SurfaceName.allocate(state.dataHighTempRadSys->HighTempRadSys(Item).TotSurfToDistrib);
-            state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr.allocate(state.dataHighTempRadSys->HighTempRadSys(Item).TotSurfToDistrib);
-            state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf.allocate(
-                state.dataHighTempRadSys->HighTempRadSys(Item).TotSurfToDistrib);
+            highTempRadSys.SurfaceName.allocate(highTempRadSys.TotSurfToDistrib);
+            highTempRadSys.SurfacePtr.allocate(highTempRadSys.TotSurfToDistrib);
+            highTempRadSys.FracDistribToSurf.allocate(highTempRadSys.TotSurfToDistrib);
 
-            AllFracsSummed = state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson;
-            for (SurfNum = 1; SurfNum <= state.dataHighTempRadSys->HighTempRadSys(Item).TotSurfToDistrib; ++SurfNum) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 7);
-                state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum) =
-                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
-                                                                       cCurrentModuleObject,
-                                                                       state.dataHighTempRadSys->HighTempRadSys(Item).Name,
-                                                                       state.dataHighTempRadSys->HighTempRadSys(Item).ZonePtr,
-                                                                       state.dataHighTempRadSys->HighTempRadSys(Item).SurfaceName(SurfNum),
-                                                                       ErrorsFound);
-                state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum + 9);
+            AllFracsSummed = highTempRadSys.FracDistribPerson;
+            for (int SurfNum = 1; SurfNum <= highTempRadSys.TotSurfToDistrib; ++SurfNum) {
+                highTempRadSys.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 7);
+                highTempRadSys.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(
+                    state, cCurrentModuleObject, highTempRadSys.Name, highTempRadSys.ZonePtr, highTempRadSys.SurfaceName(SurfNum), ErrorsFound);
+                highTempRadSys.FracDistribToSurf(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum + 9);
                 // Error trap for fractions that are out of range
-                if (state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum) < MinFraction) {
-                    state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum) = MinFraction;
+                if (highTempRadSys.FracDistribToSurf(SurfNum) < MinFraction) {
+                    highTempRadSys.FracDistribToSurf(SurfNum) = MinFraction;
                     ShowWarningError(state,
                                      format("{} was less than the allowable minimum, reset to minimum value.",
                                             state.dataIPShortCut->cNumericFieldNames(SurfNum + 9)));
                     ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 }
-                if (state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum) > MaxFraction) {
-                    state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum) = MaxFraction;
+                if (highTempRadSys.FracDistribToSurf(SurfNum) > MaxFraction) {
+                    highTempRadSys.FracDistribToSurf(SurfNum) = MaxFraction;
                     ShowWarningError(state,
                                      format("{} was greater than the allowable maximum, reset to maximum value.",
                                             state.dataIPShortCut->cNumericFieldNames(SurfNum + 9)));
                     ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 }
 
-                if (state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum)) = true;
+                if (highTempRadSys.SurfacePtr(SurfNum) != 0) {
+                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(highTempRadSys.SurfacePtr(SurfNum)) = true;
                 }
 
-                AllFracsSummed += state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum);
+                AllFracsSummed += highTempRadSys.FracDistribToSurf(SurfNum);
 
             } // ...end of DO loop through surfaces that the heater radiates to.
 
@@ -587,15 +570,14 @@ namespace HighTempRadiantSystem {
                 ErrorsFound = true;
             }
             if (AllFracsSummed < (MaxFraction - 0.01)) { // User didn't distribute all of the radiation warn that some will be lost
-                TotalFracToSurfs = AllFracsSummed - state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson;
+                Real64 TotalFracToSurfs = AllFracsSummed - highTempRadSys.FracDistribPerson;
                 FracOfRadPotentiallyLost = 1.0 - AllFracsSummed;
                 ShowSevereError(state,
                                 format("Fraction of radiation distributed to surfaces and people sums up to less than 1 for {}",
                                        state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "This would result in some of the radiant energy delivered by the high temp radiant heater being lost.");
                 ShowContinueError(state, format("The sum of all radiation fractions to surfaces = {:.5T}", TotalFracToSurfs));
-                ShowContinueError(
-                    state, format("The radiant fraction to people = {:.5T}", state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribPerson));
+                ShowContinueError(state, format("The radiant fraction to people = {:.5T}", highTempRadSys.FracDistribPerson));
                 ShowContinueError(state, format("So, all radiant fractions including surfaces and people = {:.5T}", AllFracsSummed));
                 ShowContinueError(state,
                                   format("This means that the fraction of radiant energy that would be lost from the high temperature radiant heater "
@@ -612,61 +594,62 @@ namespace HighTempRadiantSystem {
 
         // Set up the output variables for high temperature radiant heaters
         // cCurrentModuleObject = "ZoneHVAC:HighTemperatureRadiant"
-        for (Item = 1; Item <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Item) {
+        for (int Item = 1; Item <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++Item) {
+            auto &highTempRadSys = state.dataHighTempRadSys->HighTempRadSys(Item);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Rate",
                                 OutputProcessor::Unit::W,
-                                state.dataHighTempRadSys->HighTempRadSys(Item).HeatPower,
+                                highTempRadSys.HeatPower,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
-                                state.dataHighTempRadSys->HighTempRadSys(Item).Name);
+                                highTempRadSys.Name);
             SetupOutputVariable(state,
                                 "Zone Radiant HVAC Heating Energy",
                                 OutputProcessor::Unit::J,
-                                state.dataHighTempRadSys->HighTempRadSys(Item).HeatEnergy,
+                                highTempRadSys.HeatEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
-                                state.dataHighTempRadSys->HighTempRadSys(Item).Name,
+                                highTempRadSys.Name,
                                 {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
                                 {},
                                 "System");
-            if (state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType == RadHeaterType::Gas) {
+            if (highTempRadSys.HeaterType == RadHeaterType::Gas) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).GasPower,
+                                    highTempRadSys.GasPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).Name);
+                                    highTempRadSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Energy",
                                     OutputProcessor::Unit::J,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).GasEnergy,
+                                    highTempRadSys.GasEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).Name,
+                                    highTempRadSys.Name,
                                     {},
                                     "NaturalGas",
                                     "Heating",
                                     {},
                                     "System");
-            } else if (state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType == RadHeaterType::Electric) {
+            } else if (highTempRadSys.HeaterType == RadHeaterType::Electric) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).ElecPower,
+                                    highTempRadSys.ElecPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Average,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).Name);
+                                    highTempRadSys.Name);
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Energy",
                                     OutputProcessor::Unit::J,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).ElecEnergy,
+                                    highTempRadSys.ElecEnergy,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::Summed,
-                                    state.dataHighTempRadSys->HighTempRadSys(Item).Name,
+                                    highTempRadSys.Name,
                                     {},
                                     "ELECTRICITY",
                                     "Heating",
@@ -759,7 +742,6 @@ namespace HighTempRadiantSystem {
         //       DATE WRITTEN   February 2002
         //       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
         //                      July 2014, B. Nigusse, added scalable sizing
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for sizing high temperature radiant components for which max power input has not been
@@ -1086,9 +1068,6 @@ namespace HighTempRadiantSystem {
         // step elapsed is different, then we just need to add the new values
         // to the running average.
 
-        // REFERENCES:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // Zone index number for the current radiant system
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
@@ -1201,10 +1180,6 @@ namespace HighTempRadiantSystem {
         Real64 constexpr SmallestArea = 0.001; // Smallest area in meters squared (to avoid a divide by zero)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
-        int RadSysNum;            // Counter for the radiant systems
-        int SurfNum;              // Pointer to the Surface derived type
-        int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Initialize arrays
@@ -1213,9 +1188,9 @@ namespace HighTempRadiantSystem {
         state.dataHeatBalFanSys->SurfQHTRadSys = 0.0;
         state.dataHeatBalFanSys->ZoneQHTRadSysToPerson = 0.0;
 
-        for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
+        for (int RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
 
-            ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
+            int ZoneNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
 
             state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum) = state.dataHighTempRadSys->QHTRadSource(RadSysNum) *
                                                                       state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
@@ -1227,8 +1202,8 @@ namespace HighTempRadiantSystem {
             state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) +=
                 state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracLatent;
 
-            for (RadSurfNum = 1; RadSurfNum <= state.dataHighTempRadSys->HighTempRadSys(RadSysNum).TotSurfToDistrib; ++RadSurfNum) {
-                SurfNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).SurfacePtr(RadSurfNum);
+            for (int RadSurfNum = 1; RadSurfNum <= state.dataHighTempRadSys->HighTempRadSys(RadSysNum).TotSurfToDistrib; ++RadSurfNum) {
+                int SurfNum = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                 if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity =
                         (state.dataHighTempRadSys->QHTRadSource(RadSysNum) * state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant *
@@ -1267,7 +1242,7 @@ namespace HighTempRadiantSystem {
         // gets added to the zones, we must account for it somehow.  This assumption
         // that all energy radiated to people is converted to convective energy is
         // not very precise, but at least it conserves energy.
-        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) += state.dataHeatBalFanSys->ZoneQHTRadSysToPerson(ZoneNum);
         }
     }
