@@ -1459,8 +1459,8 @@ namespace HeatingCoils {
         // First set the conditions for the air into the coil model
         int AirOutletNodeNum = heatingCoil.AirOutletNodeNum;
         int ControlNodeNum = heatingCoil.TempSetPointNodeNum;
-        auto &airInletNode = state.dataLoopNodes->Node(heatingCoil.AirInletNodeNum);
-        auto &airOutletNode = state.dataLoopNodes->Node(AirOutletNodeNum);
+        auto const &airInletNode = state.dataLoopNodes->Node(heatingCoil.AirInletNodeNum);
+        auto const &airOutletNode = state.dataLoopNodes->Node(AirOutletNodeNum);
         heatingCoil.InletAirMassFlowRate = airInletNode.MassFlowRate;
         heatingCoil.InletAirTemp = airInletNode.Temp;
         heatingCoil.InletAirHumRat = airInletNode.HumRat;
@@ -1476,7 +1476,7 @@ namespace HeatingCoils {
         if (ControlNodeNum == 0) {
             heatingCoil.DesiredOutletTemp = 0.0;
         } else {
-            auto &controlNode = state.dataLoopNodes->Node(ControlNodeNum);
+            auto const &controlNode = state.dataLoopNodes->Node(ControlNodeNum);
             heatingCoil.DesiredOutletTemp =
                 controlNode.TempSetPoint - ((ControlNodeNum == AirOutletNodeNum) ? 0 : (controlNode.Temp - airOutletNode.Temp));
         }
@@ -1499,7 +1499,7 @@ namespace HeatingCoils {
                     state.dataHeatingCoils->HeatingCoilFatalError = true;
                     //     test 3) here (fatal message)
                 } else { // IF(ControlNode .GT. 0)THEN
-                    auto &controlNode = state.dataLoopNodes->Node(ControlNodeNum);
+                    auto const &controlNode = state.dataLoopNodes->Node(ControlNodeNum);
                     if (controlNode.TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, format("{} \"{}\"", cAllCoilTypes(heatingCoil.HCoilType_Num), heatingCoil.Name));
@@ -1726,8 +1726,6 @@ namespace HeatingCoils {
         Real64 NominalCapacityDes;  // Autosized nominal capacity for reporting
         Real64 NominalCapacityUser; // Hardsized nominal capacity for reporting
         Real64 TempCap;             // autosized capacity of heating coil [W]
-        int StageNum;               // actual stage of multi-stage heating coil
-        int NumOfStages;            // total number of stages of multi-stage heating coil
         int FieldNum = 2;           // IDD numeric field number where input field description is found
         int NumCoilsSized = 0;      // counter used to deallocate temporary string array after all coils have been sized
 
@@ -1789,12 +1787,13 @@ namespace HeatingCoils {
         if (heatingCoil.HCoilType_Num == Coil_HeatingElectric_MultiStage || heatingCoil.HCoilType_Num == Coil_HeatingGas_MultiStage) {
             heatingCoil.MSNominalCapacity(heatingCoil.NumOfStages) = TempCap;
             IsAutoSize = false;
+            int NumOfStages; // total number of stages of multi-stage heating coil
             if (any_eq(heatingCoil.MSNominalCapacity, AutoSize)) {
                 IsAutoSize = true;
             }
             if (IsAutoSize) {
                 NumOfStages = heatingCoil.NumOfStages;
-                for (StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
+                for (int StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
                     ThisStageAutoSize = false;
                     FieldNum = 1 + StageNum * ((heatingCoil.HCoilType_Num == Coil_HeatingElectric_MultiStage) ? 2 : 3);
                     SizingString = state.dataHeatingCoils->HeatingCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
@@ -1831,7 +1830,7 @@ namespace HeatingCoils {
                 }
             } else { // No autosize
                 NumOfStages = heatingCoil.NumOfStages;
-                for (StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
+                for (int StageNum = NumOfStages - 1; StageNum >= 1; --StageNum) {
                     if (heatingCoil.MSNominalCapacity(StageNum) > 0.0) {
                         BaseSizer::reportSizerOutput(
                             state, CompType, CompName, "User-Specified " + SizingString, heatingCoil.MSNominalCapacity(StageNum));
@@ -1839,7 +1838,7 @@ namespace HeatingCoils {
                 }
             }
             // Ensure capacity at lower Stage must be lower or equal to the capacity at higher Stage.
-            for (StageNum = 1; StageNum <= heatingCoil.NumOfStages - 1; ++StageNum) {
+            for (int StageNum = 1; StageNum <= heatingCoil.NumOfStages - 1; ++StageNum) {
                 if (heatingCoil.MSNominalCapacity(StageNum) > heatingCoil.MSNominalCapacity(StageNum + 1)) {
                     ShowSevereError(state,
                                     format("SizeHeatingCoil: {} {}, Stage {} Nominal Capacity ({:.2R} W) must be less than or equal to Stage {} "
@@ -3376,13 +3375,13 @@ namespace HeatingCoils {
             state.dataHeatingCoils->GetCoilsInputFlag = false;
         }
 
-        bool SuppressWarning = true;
         int CoilFound = 0;
 
         // note should eventually get rid of this string comparison
         if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+            bool SuppressWarning = true;
             GetDXCoilIndex(state, CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
             for (NumCoil = 1; NumCoil <= state.dataHeatingCoils->NumHeatingCoils; ++NumCoil) {
                 if (state.dataHeatingCoils->HeatingCoil(NumCoil).ReclaimHeatingSource != HeatObjTypes::COIL_DX_COOLING &&
