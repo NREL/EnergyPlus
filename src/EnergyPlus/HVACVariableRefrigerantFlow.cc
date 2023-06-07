@@ -9061,9 +9061,9 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
         }
     } else if (VRFCoolingMode || HRCoolingMode) {
         // IF the system is in cooling mode and/or the terminal unit requests cooling
-        if (NoCompOutput <= QZnReq && ((QZnReq <= 0.0) || (QZnReq >= DataHVACGlobals::SmallLoad && !HRCoolingMode))) {
+        if (NoCompOutput <= QZnReq) {
             DXCoolingCoilOprCtrl = false;
-            if (!this->SuppHeatingCoilPresent) {
+            if (!this->SuppHeatingCoilPresent || HRCoolingMode) {
                 PartLoadRatio = 0.0;
                 return;
             }
@@ -9089,53 +9089,48 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 
     // set supplemental heating coil calculation if the condition requires
     if (this->SuppHeatingCoilPresent) {
-        auto &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
-        if (((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
-             (((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad) && QZnReq <= 0.0)) ||
-            (this->isSetPointControlled && this->suppTempSetPoint > thisSuppHeatCoilAirInletNode.Temp)) {
-            Real64 ZoneLoad = 0.0;
-            Real64 LoadToHeatingSP = 0.0;
-            Real64 LoadToCoolingSP = 0.0;
-            if (this->isSetPointControlled) {
+        if (this->isSetPointControlled) {
+            auto &thisSuppHeatCoilAirInletNode = state.dataLoopNodes->Node(this->SuppHeatCoilAirInletNode);
+            if (this->suppTempSetPoint > thisSuppHeatCoilAirInletNode.Temp) {
                 Real64 mDot = thisSuppHeatCoilAirInletNode.MassFlowRate;
                 Real64 Tin = thisSuppHeatCoilAirInletNode.Temp;
                 Real64 Win = thisSuppHeatCoilAirInletNode.HumRat;
                 Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(Win);
                 SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
                 this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
-                if (this->DesignSuppHeatingCapacity > 0.0) {
-                    this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
-                }
             } else {
+                SuppHeatCoilLoad = 0.0;
+            }
+        } else {
+            // not sure why FirstHVAC has anything to do with this but that was already here
+            // another branch should test removing FirstHVACIteration to get same answer each iteration
+            if (!FirstHVACIteration && ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
+                                        (((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad) && QZnReq <= 0.0))) {
+                Real64 ZoneLoad = 0.0;
+                Real64 LoadToHeatingSP = 0.0;
+                Real64 LoadToCoolingSP = 0.0;
                 getVRFTUZoneLoad(state, VRFTUNum, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP, false);
-                if (((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad) ||
-                      ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0))) &&
-                    !FirstHVACIteration) {
-                    if ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0) {
-                        if (LoadToHeatingSP < 0.0 && QZnReq == 0.0) {
-                            SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
-                        } else {
-                            SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
-                        }
+                if ((QZnReq - NoCompOutput) > DataHVACGlobals::SmallLoad && QZnReq <= 0.0) {
+                    if (LoadToHeatingSP < 0.0 && QZnReq == 0.0) {
+                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
                     } else {
-                        if (QZnReq > 0.0 && (NoCompOutput - QZnReq) >= DataHVACGlobals::SmallLoad) {
-                            SuppHeatCoilLoad = 0.0;
-                        } else {
-                            SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
-                        }
+                        SuppHeatCoilLoad = max(0.0, QZnReq - FullOutput);
                     }
-                    this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
-                    if (this->DesignSuppHeatingCapacity > 0.0) {
-                        this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+                } else if (FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad) && LoadToHeatingSP > 0.0) {
+                    if (QZnReq > 0.0 && (NoCompOutput - QZnReq) >= DataHVACGlobals::SmallLoad) {
+                        SuppHeatCoilLoad = 0.0;
+                    } else {
+                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
                     }
                 } else {
                     SuppHeatCoilLoad = 0.0;
-                    this->SuppHeatPartLoadRatio = 0.0;
                 }
+            } else {
+                SuppHeatCoilLoad = 0.0;
             }
-        } else {
-            SuppHeatCoilLoad = 0.0;
-            this->SuppHeatPartLoadRatio = 0.0;
+        }
+        if (this->DesignSuppHeatingCapacity > 0.0) {
+            this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
         }
     } else { // does it matter what these are if there is no supp heater?
         SuppHeatCoilLoad = 0.0;
@@ -9147,7 +9142,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
         // If the QZnReq <= FullOutput the unit needs to run full out
         if (QZnReq <= FullOutput) {
             // if no coil present in terminal unit, no need to reset PLR?
-            if (thisVRFTU.CoolingCoilPresent) {
+            if (thisVRFTU.CoolingCoilPresent && DXCoolingCoilOprCtrl) {
                 PartLoadRatio = 1.0;
                 // the zone set point could be exceeded if set point control is used so protect against that
                 if (this->isSetPointControlled) {

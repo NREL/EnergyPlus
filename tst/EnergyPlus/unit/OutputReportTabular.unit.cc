@@ -661,6 +661,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConvertToEscaped)
     EXPECT_EQ("String with \xC2\xB1 in it", ConvertToEscaped("String with \xC2\xB1 in it"));
     EXPECT_EQ("String with &deg; in it", ConvertToEscaped(R"(String with \u00B0 in it)"));
     EXPECT_EQ("String with &deg; in it", ConvertToEscaped(R"(String with \xB0 in it)"));
+    EXPECT_EQ("String with &le; in it", ConvertToEscaped("String with ≤ in it"));
+    EXPECT_EQ("String with &ge; in it", ConvertToEscaped("String with ≥ in it"));
     EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \u in it)"));
     EXPECT_ANY_THROW(ConvertToEscaped(R"(String with \x in it)"));
 }
