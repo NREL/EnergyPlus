@@ -257,12 +257,6 @@ namespace HeatingCoils {
         // METHODOLOGY EMPLOYED:
         // Uses "Get" routines to read in data.
 
-        // Using/Aliasing
-        using BranchNodeConnections::TestCompSet;
-        using Curve::GetCurveIndex;
-        using GlobalNames::VerifyUniqueCoilName;
-        using NodeInputManager::GetOnlySingleNode;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHeatingCoilInput: "); // include trailing blank space
 
@@ -358,7 +352,8 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
+            GlobalNames::VerifyUniqueCoilName(
+                state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
 
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
@@ -408,7 +403,7 @@ namespace HeatingCoils {
                                                              DataLoopNode::ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
-            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             heatingCoil.TempSetPointNodeNum = GetOnlySingleNode(state,
@@ -491,7 +486,8 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
+            GlobalNames::VerifyUniqueCoilName(
+                state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -549,7 +545,7 @@ namespace HeatingCoils {
                                                              DataLoopNode::ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
-            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             heatingCoil.TempSetPointNodeNum = GetOnlySingleNode(state,
@@ -631,7 +627,8 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
+            GlobalNames::VerifyUniqueCoilName(
+                state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -699,7 +696,7 @@ namespace HeatingCoils {
                                                              DataLoopNode::ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
-            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
+            BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Air Nodes");
 
             errFlag = false;
             heatingCoil.TempSetPointNodeNum = GetOnlySingleNode(state,
@@ -716,7 +713,7 @@ namespace HeatingCoils {
             // parasitic electric load associated with the fuel heating coil
             heatingCoil.ParasiticElecLoad = Numbers(3);
 
-            heatingCoil.PLFCurveIndex = GetCurveIndex(state, Alphas(7)); // convert curve name to number
+            heatingCoil.PLFCurveIndex = Curve::GetCurveIndex(state, Alphas(7)); // convert curve name to number
 
             // parasitic fuel load associated with the gas heating coil (standing pilot light)
             heatingCoil.ParasiticFuelCapacity = Numbers(4);
@@ -836,7 +833,8 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
+            GlobalNames::VerifyUniqueCoilName(
+                state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -898,7 +896,7 @@ namespace HeatingCoils {
                                                              DataLoopNode::ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
-            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             errFlag = false;
             heatingCoil.TempSetPointNodeNum = GetOnlySingleNode(state,
@@ -915,7 +913,7 @@ namespace HeatingCoils {
             // parasitic electric load associated with the gas heating coil
             heatingCoil.ParasiticElecLoad = Numbers(10);
 
-            heatingCoil.PLFCurveIndex = GetCurveIndex(state, Alphas(6)); // convert curve name to number
+            heatingCoil.PLFCurveIndex = Curve::GetCurveIndex(state, Alphas(6)); // convert curve name to number
 
             // parasitic gas load associated with the gas heating coil (standing pilot light)
 
@@ -1033,7 +1031,8 @@ namespace HeatingCoils {
             heatingCoilNumericFields.FieldNames = cNumericFields;
 
             // InputErrorsFound will be set to True if problem was found, left untouched otherwise
-            VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
+            GlobalNames::VerifyUniqueCoilName(
+                state, CurrentModuleObject, Alphas(1), state.dataHeatingCoils->InputErrorsFound, CurrentModuleObject + " Name");
             heatingCoil.Name = Alphas(1);
             heatingCoil.Schedule = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -1094,7 +1093,7 @@ namespace HeatingCoils {
                                                              DataLoopNode::ObjectIsNotParent);
             state.dataHeatingCoils->InputErrorsFound = errFlag || state.dataHeatingCoils->InputErrorsFound;
 
-            TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
+            BranchNodeConnections::TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             if ((UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:AirCooled")) ||
                 (UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:EvaporativeCooled")) ||
