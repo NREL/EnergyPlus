@@ -98,14 +98,6 @@ namespace HeatingCoils {
     // To encapsulate the data and algorithms required to
     // manage the HeatingCoil System Component
 
-    // Using/Aliasing
-    using Psychrometrics::PsyCpAirFnW;
-    using Psychrometrics::PsyHFnTdbW;
-    using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using namespace ScheduleManager;
-    using DXCoils::GetDXCoilIndex;
-    using RefrigeratedCase::GetRefrigeratedRackIndex;
-
     void SimulateHeatingCoilComponents(EnergyPlusData &state,
                                        std::string_view CompName,
                                        bool const FirstHVACIteration,
@@ -373,7 +365,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
+                heatingCoil.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
@@ -505,7 +497,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
+                heatingCoil.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
@@ -645,7 +637,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
+                heatingCoil.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
@@ -850,7 +842,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
+                heatingCoil.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
@@ -1047,7 +1039,7 @@ namespace HeatingCoils {
             if (lAlphaBlanks(2)) {
                 heatingCoil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
-                heatingCoil.SchedPtr = GetScheduleIndex(state, Alphas(2));
+                heatingCoil.SchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(2));
                 if (heatingCoil.SchedPtr == 0) {
                     ShowSevereError(state,
                                     format("{}{}: Invalid {} entered ={} for {}={}",
@@ -1063,7 +1055,7 @@ namespace HeatingCoils {
 
             //       check availability schedule for values between 0 and 1
             if (heatingCoil.SchedPtr > 0) {
-                if (!CheckScheduleValueMinMax(state, heatingCoil.SchedPtr, ">=", 0.0, "<=", 1.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, heatingCoil.SchedPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{} = \"{}\"", CurrentModuleObject, heatingCoil.Name));
                     ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(2), Alphas(2)));
                     ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
@@ -1137,7 +1129,7 @@ namespace HeatingCoils {
             // (when zone equipment heating coils are included in the input, the air loop DX equipment has not yet been read in)
             if (UtilityRoutines::SameString(Alphas(5), "Refrigeration:CompressorRack")) {
                 heatingCoil.ReclaimHeatingSource = HeatObjTypes::COMPRESSORRACK_REFRIGERATEDCASE;
-                GetRefrigeratedRackIndex(
+                RefrigeratedCase::GetRefrigeratedRackIndex(
                     state, Alphas(6), heatingCoil.ReclaimHeatingSourceIndexNum, DataHeatBalance::RefrigSystemType::Rack, DXCoilErrFlag, Alphas(5));
                 if (heatingCoil.ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigeratedRack)) {
@@ -1163,12 +1155,12 @@ namespace HeatingCoils {
                        (UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:EvaporativeCooled")) ||
                        (UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:WaterCooled"))) {
                 heatingCoil.ReclaimHeatingSource = HeatObjTypes::CONDENSER_REFRIGERATION;
-                GetRefrigeratedRackIndex(state,
-                                         Alphas(6),
-                                         heatingCoil.ReclaimHeatingSourceIndexNum,
-                                         DataHeatBalance::RefrigSystemType::Detailed,
-                                         DXCoilErrFlag,
-                                         Alphas(5));
+                RefrigeratedCase::GetRefrigeratedRackIndex(state,
+                                                           Alphas(6),
+                                                           heatingCoil.ReclaimHeatingSourceIndexNum,
+                                                           DataHeatBalance::RefrigSystemType::Detailed,
+                                                           DXCoilErrFlag,
+                                                           Alphas(5));
                 if (heatingCoil.ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimRefrigCondenser)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1191,7 +1183,7 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:SingleSpeed")) {
                 heatingCoil.ReclaimHeatingSource = HeatObjTypes::COIL_DX_COOLING;
-                GetDXCoilIndex(state, Alphas(6), heatingCoil.ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                DXCoils::GetDXCoilIndex(state, Alphas(6), heatingCoil.ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
                 if (heatingCoil.ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1238,7 +1230,7 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:TwoSpeed")) {
                 heatingCoil.ReclaimHeatingSource = HeatObjTypes::COIL_DX_MULTISPEED;
-                GetDXCoilIndex(state, Alphas(6), heatingCoil.ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                DXCoils::GetDXCoilIndex(state, Alphas(6), heatingCoil.ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
                 if (heatingCoil.ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1261,7 +1253,7 @@ namespace HeatingCoils {
                 }
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                 heatingCoil.ReclaimHeatingSource = HeatObjTypes::COIL_DX_MULTIMODE;
-                GetDXCoilIndex(state, Alphas(6), heatingCoil.ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
+                DXCoils::GetDXCoilIndex(state, Alphas(6), heatingCoil.ReclaimHeatingSourceIndexNum, DXCoilErrFlag, Alphas(5));
                 if (heatingCoil.ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(state.dataHeatBal->HeatReclaimDXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1938,15 +1930,15 @@ namespace HeatingCoils {
             AirMassFlow = heatingCoil.InletAirMassFlowRate;
         }
 
-        Real64 CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
+        Real64 CapacitanceAir = Psychrometrics::PsyCpAirFnW(Win) * AirMassFlow;
 
         // If the coil is operating there should be some heating capacitance
         //  across the coil, so do the simulation. If not set outlet to inlet and no load.
         //  Also the coil has to be scheduled to be available.
 
         // Control output to meet load QCoilReq (QCoilReq is passed in if load controlled, otherwise QCoilReq=-999)
-        if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) &&
-            (QCoilReq > 0.0)) {
+        if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
+            (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq > 0.0)) {
 
             // check to see if the Required heating capacity is greater than the user specified capacity.
             if (QCoilReq > heatingCoil.NominalCapacity) {
@@ -1962,8 +1954,9 @@ namespace HeatingCoils {
             heatingCoil.ElecUseLoad = HeatingCoilLoad / Effic;
 
             // Control coil output to meet a setpoint temperature.
-        } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) &&
-                   (QCoilReq == DataLoopNode::SensedLoadFlagValue) && (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
+        } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
+                   (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq == DataLoopNode::SensedLoadFlagValue) &&
+                   (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
 
             QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
             // check to see if setpoint above enetering temperature. If not, set
@@ -2006,7 +1999,7 @@ namespace HeatingCoils {
         heatingCoil.OutletAirHumRat = heatingCoil.InletAirHumRat;
         heatingCoil.OutletAirMassFlowRate = heatingCoil.InletAirMassFlowRate;
         // Set the outlet enthalpys for air and Heating
-        heatingCoil.OutletAirEnthalpy = PsyHFnTdbW(heatingCoil.OutletAirTemp, heatingCoil.OutletAirHumRat);
+        heatingCoil.OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(heatingCoil.OutletAirTemp, heatingCoil.OutletAirHumRat);
 
         QCoilActual = HeatingCoilLoad;
         if (std::abs(heatingCoil.NominalCapacity) < 1.e-8) {
@@ -2107,7 +2100,8 @@ namespace HeatingCoils {
 
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
+        if ((AirMassFlow > 0.0) && (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) &&
+            ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
             if (StageNum > 1) {
 
@@ -2269,7 +2263,7 @@ namespace HeatingCoils {
         TempSetPoint = heatingCoil.DesiredOutletTemp;
         AirMassFlow = heatingCoil.InletAirMassFlowRate;
 
-        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
+        CapacitanceAir = Psychrometrics::PsyCpAirFnW(Win) * AirMassFlow;
 
         // If there is a fault of coil SAT Sensor
         if (heatingCoil.FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
@@ -2286,8 +2280,8 @@ namespace HeatingCoils {
         //  Also the coil has to be scheduled to be available.
 
         // Control output to meet load QCoilReq (QCoilReq is passed in if load controlled, otherwise QCoilReq=-999)
-        if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) &&
-            (QCoilReq > 0.0)) {
+        if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
+            (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq > 0.0)) {
 
             // check to see if the Required heating capacity is greater than the user specified capacity.
             if (QCoilReq > heatingCoil.NominalCapacity) {
@@ -2307,8 +2301,9 @@ namespace HeatingCoils {
             heatingCoil.ParasiticFuelRate = heatingCoil.ParasiticFuelCapacity * (1.0 - PartLoadRat);
 
             // Control coil output to meet a setpoint temperature.
-        } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) &&
-                   (QCoilReq == DataLoopNode::SensedLoadFlagValue) && (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
+        } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
+                   (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq == DataLoopNode::SensedLoadFlagValue) &&
+                   (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
 
             QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
             // check to see if setpoint above entering temperature. If not, set
@@ -2410,7 +2405,7 @@ namespace HeatingCoils {
         heatingCoil.OutletAirHumRat = heatingCoil.InletAirHumRat;
         heatingCoil.OutletAirMassFlowRate = heatingCoil.InletAirMassFlowRate;
         // Set the outlet enthalpys for air and Heating
-        heatingCoil.OutletAirEnthalpy = PsyHFnTdbW(heatingCoil.OutletAirTemp, heatingCoil.OutletAirHumRat);
+        heatingCoil.OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(heatingCoil.OutletAirTemp, heatingCoil.OutletAirHumRat);
 
         QCoilActual = HeatingCoilLoad;
         if (heatingCoil.AirLoopNum > 0) {
@@ -2511,7 +2506,8 @@ namespace HeatingCoils {
 
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
 
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
+        if ((AirMassFlow > 0.0) && (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) &&
+            ((CycRatio > 0.0) || (SpeedRatio > 0.0))) {
 
             if (StageNum > 1) {
 
@@ -2744,7 +2740,7 @@ namespace HeatingCoils {
         AirMassFlow = heatingCoil.InletAirMassFlowRate;
         TempAirIn = heatingCoil.InletAirTemp;
         Win = heatingCoil.InletAirHumRat;
-        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
+        CapacitanceAir = Psychrometrics::PsyCpAirFnW(Win) * AirMassFlow;
         TempSetPoint = heatingCoil.DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor
@@ -2815,7 +2811,7 @@ namespace HeatingCoils {
         }
 
         // Control output to meet load (QCoilReq)
-        if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq > 0.0)) {
+        if ((AirMassFlow > 0.0) && (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq > 0.0)) {
 
             // check to see if the Required heating capacity is greater than the available heating capacity.
             if (QCoilReq > heatingCoil.NominalCapacity) {
@@ -2836,8 +2832,9 @@ namespace HeatingCoils {
             }
 
             // Control coil output to meet a setpoint temperature.
-        } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) && (GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) &&
-                   (QCoilReq == DataLoopNode::SensedLoadFlagValue) && (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
+        } else if ((AirMassFlow > 0.0 && heatingCoil.NominalCapacity > 0.0) &&
+                   (ScheduleManager::GetCurrentScheduleValue(state, heatingCoil.SchedPtr) > 0.0) && (QCoilReq == DataLoopNode::SensedLoadFlagValue) &&
+                   (std::abs(TempSetPoint - TempAirIn) > TempControlTol)) {
 
             QCoilCap = CapacitanceAir * (TempSetPoint - TempAirIn);
             // check to see if setpoint is above entering air temperature. If not, set output to zero.
@@ -2872,7 +2869,7 @@ namespace HeatingCoils {
         heatingCoil.OutletAirHumRat = heatingCoil.InletAirHumRat;
         heatingCoil.OutletAirMassFlowRate = heatingCoil.InletAirMassFlowRate;
         // Set the outlet enthalpy
-        heatingCoil.OutletAirEnthalpy = PsyHFnTdbW(heatingCoil.OutletAirTemp, heatingCoil.OutletAirHumRat);
+        heatingCoil.OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(heatingCoil.OutletAirTemp, heatingCoil.OutletAirHumRat);
 
         heatingCoil.ElecUseLoad = heatingCoil.ParasiticElecLoad * heatingCoil.RTF;
         QCoilActual = HeatingCoilLoad;
@@ -3089,7 +3086,7 @@ namespace HeatingCoils {
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
             CompIndex = CoilNum;
-            Value = GetCurrentScheduleValue(state, state.dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr); // not scheduled?
         } else {
             CoilNum = CompIndex;
             if (CoilNum > state.dataHeatingCoils->NumHeatingCoils || CoilNum < 1) {
@@ -3111,7 +3108,7 @@ namespace HeatingCoils {
                                          DataHVACGlobals::cAllCoilTypes(state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num)));
                 ShowFatalError(state, "Program terminates due to preceding conditions.");
             }
-            Value = GetCurrentScheduleValue(state, state.dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr); // not scheduled?
+            Value = ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatingCoils->HeatingCoil(CoilNum).SchedPtr); // not scheduled?
         }
     }
 
@@ -3378,7 +3375,7 @@ namespace HeatingCoils {
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
             bool SuppressWarning = true;
-            GetDXCoilIndex(state, CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
+            DXCoils::GetDXCoilIndex(state, CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
             for (NumCoil = 1; NumCoil <= state.dataHeatingCoils->NumHeatingCoils; ++NumCoil) {
                 if (state.dataHeatingCoils->HeatingCoil(NumCoil).ReclaimHeatingSource != HeatObjTypes::COIL_DX_COOLING &&
                     state.dataHeatingCoils->HeatingCoil(NumCoil).ReclaimHeatingSource != HeatObjTypes::COIL_DX_MULTISPEED &&
