@@ -643,13 +643,13 @@ namespace BaseboardRadiator {
                     }
                 } else {
                     CheckZoneSizing(state, cCMO_BBRadiator_Water, this->EquipID);
-                    std::string CompType = cCMO_BBRadiator_Water;
-                    std::string CompName = this->EquipID;
+                    std::string_view const CompType = cCMO_BBRadiator_Water;
+                    std::string_view const CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    std::string SizingString = this->FieldNames(FieldNum) + " [W]";
+                    std::string_view const SizingString = this->FieldNames(FieldNum) + " [W]";
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
@@ -765,13 +765,13 @@ namespace BaseboardRadiator {
                                            RoutineName);
                     state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = rho * this->WaterVolFlowRateMax;
 
-                    std::string CompType = cCMO_BBRadiator_Water;
-                    std::string CompName = this->EquipID;
+                    std::string_view const CompType = cCMO_BBRadiator_Water;
+                    std::string_view const CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    std::string SizingString = this->FieldNames(FieldNum) + " [W]";
+                    std::string_view const SizingString = this->FieldNames(FieldNum) + " [W]";
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||

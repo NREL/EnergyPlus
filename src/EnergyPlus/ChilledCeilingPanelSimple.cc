@@ -926,8 +926,6 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false); // If errors detected in input
-    std::string CompName;    // component name
-    std::string CompType;    // component type
     bool IsAutoSize(false);  // Indicator to autosize
     Real64 DesCoilLoad;      // design autosized or user specified capacity
     Real64 TempSize;         // autosized value of coil input field
@@ -941,8 +939,8 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
 
     auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
 
-    CompType = "ZoneHVAC:CoolingPanel:RadiantConvective:Water";
-    CompName = ThisCP.EquipID;
+    std::string_view const CompType = "ZoneHVAC:CoolingPanel:RadiantConvective:Water";
+    std::string_view const CompName = ThisCP.EquipID;
 
     IsAutoSize = false;
     if (ThisCP.ScaledCoolingCapacity == DataSizing::AutoSize) {

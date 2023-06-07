@@ -752,38 +752,34 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS
         Real64 TempSize; // autosized value of coil input field
-
-        Real64 MaxPowerCapacDes = 0.0;  // Design maximum capacity for reporting
-        Real64 MaxPowerCapacUser = 0.0; // User hard-sized maximum capacity for reporting
         state.dataSize->DataScalableCapSizingON = false;
 
         int const curZoneEqNum = state.dataSize->CurZoneEqNum;
 
         if (curZoneEqNum > 0) {
             auto &zoneEqSizing = state.dataSize->ZoneEqSizing(curZoneEqNum);
-            auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
 
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ZonePtr;
             // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 1;
-            std::string SizingString = state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
+            std::string_view const SizingString = state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
             // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
             // FractionOfAutosizedHeatingCapacity )
             int CapSizingMethod = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
                 CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {
-                std::string const CompType = "ZoneHVAC:HighTemperatureRadiant";
-                std::string const CompName = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).Name;
+                std::string_view const CompType = "ZoneHVAC:HighTemperatureRadiant";
+                std::string_view const CompName = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).Name;
 
                 if (CapSizingMethod == DataSizing::HeatingDesignCapacity) {
                     if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity == DataSizing::AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
-                        zoneEqSizing.DesHeatingLoad =
-                            finalZoneSizing.NonAirSysDesHeatLoad / (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant +
-                                                                    state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect);
+                        zoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(curZoneEqNum).NonAirSysDesHeatLoad /
+                                                      (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant +
+                                                       state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect);
                     } else {
                         zoneEqSizing.DesHeatingLoad = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
                     }
@@ -799,9 +795,9 @@ namespace HighTempRadiantSystem {
                     CheckZoneSizing(state, CompType, CompName);
                     zoneEqSizing.HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
-                    zoneEqSizing.DesHeatingLoad =
-                        finalZoneSizing.NonAirSysDesHeatLoad / (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant +
-                                                                state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect);
+                    zoneEqSizing.DesHeatingLoad = state.dataSize->FinalZoneSizing(curZoneEqNum).NonAirSysDesHeatLoad /
+                                                  (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracRadiant +
+                                                   state.dataHighTempRadSys->HighTempRadSys(RadSysNum).FracConvect);
                     TempSize = DataSizing::AutoSize;
                     state.dataSize->DataScalableCapSizingON = true;
                 } else {
