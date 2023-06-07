@@ -3483,7 +3483,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
         // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
         // involved but the fan should really run like constant volume and not cycle with compressor
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-        state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+        state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _); // vector is 0 based, but CompIndex is 1 based so shift
     } break;
     case CompType::Fan_ComponentModel: { // 'Fan:ComponentModel'
         Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);

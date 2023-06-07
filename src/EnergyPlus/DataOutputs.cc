@@ -160,14 +160,13 @@ OutputReportingVariables::OutputReportingVariables(EnergyPlusData &state, std::s
     }
 }
 
-bool FindItemInVariableList(EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName)
+bool FindItemInVariableList(const EnergyPlusData &state, std::string_view const KeyedValue, std::string_view const VariableName)
 {
 
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   July 2010
     //       MODIFIED       December 2016
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up a key and variable name value and determines if they are

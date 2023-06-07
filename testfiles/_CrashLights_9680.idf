@@ -1,5 +1,5 @@
 
-Version, 23.1;                            !- Version Identifier
+Version, 23.2;                            !- Version Identifier
 
 Timestep,
   6;                                      !- Number of Timesteps per Hour

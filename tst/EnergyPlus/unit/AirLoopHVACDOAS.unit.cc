@@ -8777,7 +8777,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanHeatAddeToCoolingCoilSize)
     // 9066
     std::string const idf_objects = delimited_string({
 
-        "  Version,23.1;",
+        "  Version,23.2;",
 
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",

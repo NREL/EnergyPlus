@@ -785,10 +785,10 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
     // accordingly.
 
-    auto &PlantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe;
-
     // One time call to set up report variables and set common pipe 'type' flag
     if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
+
+    auto &plantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum);
 
     // fill local node indexes
     int NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
@@ -796,14 +796,14 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
     int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
 
-    if (PlantCommonPipe(LoopNum).MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
-        PlantCommonPipe(LoopNum).Flow = 0.0;
-        PlantCommonPipe(LoopNum).Temp = 0.0;
-        PlantCommonPipe(LoopNum).FlowDir = NoRecircFlow;
-        PlantCommonPipe(LoopNum).MyEnvrnFlag = false;
+    if (plantCommonPipe.MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
+        plantCommonPipe.Flow = 0.0;
+        plantCommonPipe.Temp = 0.0;
+        plantCommonPipe.FlowDir = NoRecircFlow;
+        plantCommonPipe.MyEnvrnFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) {
-        PlantCommonPipe(LoopNum).MyEnvrnFlag = true;
+        plantCommonPipe.MyEnvrnFlag = true;
     }
 
     // every time inits
@@ -868,9 +868,9 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     }
 
     // Update the Common Pipe Data structure for reporting purposes.
-    PlantCommonPipe(LoopNum).Flow = max(MdotPriRCLeg, MdotSecRCLeg);
-    PlantCommonPipe(LoopNum).Temp = CommonPipeTemp;
-    PlantCommonPipe(LoopNum).FlowDir = CPFlowDir;
+    plantCommonPipe.Flow = max(MdotPriRCLeg, MdotSecRCLeg);
+    plantCommonPipe.Temp = CommonPipeTemp;
+    plantCommonPipe.FlowDir = CPFlowDir;
     state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
     state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
 
