@@ -266,9 +266,9 @@ namespace ScheduleManager {
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
-                                  std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum          // Minimum desired value
+                                  int const ScheduleIndex, // Which Schedule being tested
+                                  bool includeOrEquals,    // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum     // Minimum desired value
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,

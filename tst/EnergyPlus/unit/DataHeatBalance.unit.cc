@@ -817,8 +817,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound);                      // expect no errors
 
     ErrorsFound = false;
-    GetFrameAndDividerData(*state, ErrorsFound);
-    EXPECT_FALSE(ErrorsFound);
+    GetFrameAndDividerData(*state);
 
     SetPreConstructionInputParameters(*state);
 

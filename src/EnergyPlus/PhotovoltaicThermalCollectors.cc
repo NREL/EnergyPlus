@@ -544,10 +544,10 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
@@ -558,10 +558,10 @@ namespace PhotovoltaicThermalCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarAir",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -1115,16 +1115,16 @@ namespace PhotovoltaicThermalCollectors {
             Real64 HcExt(0.0);
             Real64 HrSky(0.0);
 
-            ConvectionCoefficients::InitExteriorConvectionCoeff(state,
-                                                                this->SurfNum,
-                                                                0.0,
-                                                                Material::SurfaceRoughness::VerySmooth,
-                                                                this->Simple.SurfEmissivity,
-                                                                this->Simple.LastCollectorTemp,
-                                                                HcExt,
-                                                                HrSky,
-                                                                HrGround,
-                                                                HrAir);
+            Convect::InitExtConvCoeff(state,
+                                      this->SurfNum,
+                                      0.0,
+                                      Material::SurfaceRoughness::VerySmooth,
+                                      this->Simple.SurfEmissivity,
+                                      this->Simple.LastCollectorTemp,
+                                      HcExt,
+                                      HrSky,
+                                      HrGround,
+                                      HrAir);
 
             Real64 WetBulbInlet(0.0);
             Real64 DewPointInlet(0.0);

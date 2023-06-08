@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, Constant::ResourceType::OtherFuel1));
+    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::OtherFuel1));
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
@@ -123,7 +123,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, Constant::ResourceType::Coal));
+    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::Coal));
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 
     ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(*state));
 
-    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType_Num, Constant::ResourceType::Propane));
+    EXPECT_TRUE(compare_enums(state->dataHeatingCoils->HeatingCoil(1).FuelType, Constant::eFuel::Propane));
 }
 
 TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
