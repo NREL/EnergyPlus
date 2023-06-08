@@ -704,11 +704,12 @@ configure_file("${PROJECT_SOURCE_DIR}/idd/Energy+.idd.in" "${CMAKE_RUNTIME_OUTPU
 add_custom_command(
         OUTPUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON"
         COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        MAIN_DEPENDENCY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd"
         DEPENDS
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd"
         "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py"
         "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/idd_parser.py"
         "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/modify_schema.py"
+        VERBATIM
 )
 
 # Since multiple targets depend on the JSON Schema, we need to make a custom target for it so the dependent targets don't try to run the custom command at the same time.
@@ -728,7 +729,8 @@ add_custom_command(
         -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddable_epJSON_schema>"
         -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS generate_embeddable_epJSON_schema epjson_schema "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc")
+  DEPENDS generate_embeddable_epJSON_schema epjson_schema "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc"
+  VERBATIM)
 
 add_custom_target(embedded_epjson_source ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc")
 set_target_properties(embedded_epjson_source PROPERTIES FOLDER "Internal")
