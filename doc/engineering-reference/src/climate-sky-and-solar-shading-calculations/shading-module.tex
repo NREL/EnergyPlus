@@ -447,13 +447,52 @@ Partially transparent shadowing surfaces can also be modeled by giving a transpa
 SunlitArea = A_1 + {\sum\limits_{i = 2}^n {A_i}*(1-\tau_i)}
 \end{equation}
 
-The actual $\tau$ of overlapping polygons i and j is the product of $\tau$\(_{i}\) and $\tau$\(_{j}\). For example, if a wall is fully shaded by two partially transparent shades, one with a transmittance of 0.8 and one with a transmittance of 0.5, the resulting sunlit fraction would be $0.8 * 0.5 = 0.4$. Because each shadow is first applied with its own transmittance, the transmittance for the overlap in the summation is the difference between the sum and the product of the shadow transmittances:
+The actual $\tau$ of overlapping polygons i and j is the product of $\tau_i$ and $\tau_j$. For example, if a wall is fully shaded by two partially transparent shades, one with a transmittance of 0.8 and one with a transmittance of 0.5, the resulting sunlit fraction would be $0.8 * 0.5 = 0.4$. Because each shadow is first applied with its own transmittance, the ``transmittance'' for the overlap correction ($\tau_k$) in the sunlit area summation is derived from the individual surface transmittance values:
 
 \begin{equation}
-\tau_i = (\tau_{i-1} + \tau_{i-2}) - (\tau_{i-1} * \tau_{i-2})
+\tau_k = (\tau_{i} + \tau_{j}) - (\tau_{i} * \tau_{j})
 \end{equation}
 
-where $\tau_i$ is the transmittance for the shadow overlap area (D in Figure~\ref{fig:multiple-shadow-overlaps}).
+where $\tau_k$ is the correction ``transmittance''  for the shadow overlap area (D in Figure~\ref{fig:multiple-shadow-overlaps}).
+
+For example, using the overlapping shadows in Figure~\ref{fig:multiple-shadow-overlaps}, the sunlit are can be calculated two ways as shown in Table~\ref{table:sunlit-area-calculation-overlapping-shadows}. Method 1 avoids any overlaps by calculating adjusted areas. Method 2 uses the EnergyPlus summation approach and shows the transmittance correction calculation for the overlap area to arrive at the same result. Stepping through Method 2: start with the full surface area A, subtract the shaded area $B*(1-\tau_b)$, subtract the shaded area $C*(1-\tau_c)$. At this point, the overlapping area D has been subtracted twice, once using $\tau_b$ and once using $\tau_c$. To correct for this, area D is added back in with the adjusted ``transmittance'' using the equation shown above for $\tau_k$.
+
+\begin{longtable}[c]{>{\raggedright}p{1.2in}p{1.5in}p{2.0in}p{2.0in}}
+\caption{Sunlit Area Calculations with Overlapping Partially Transmitting Shadows\label{table:sunlit-area-calculation-overlapping-shadows}} \tabularnewline
+\toprule
+Region & Area & Transmittance & Sunlit Area \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Sunlit Area Calculations with Overlapping Partially Transmitting Shadows} \tabularnewline
+\toprule
+Region & Area & Transmittance & Sunlit Area \tabularnewline
+\midrule
+\endhead
+
+Assumptions: \tabularnewline
+A & 20 & 1.0 \tabularnewline
+B & 10 & 0.8 \tabularnewline
+C & 8 & 0.4 \tabularnewline
+D & 3 &  \tabularnewline
+\midrule
+Method 1 & Adjusted Areas:\tabularnewline
+$A-B-C+D$ & $20-10-8+3 = 5$ & $1.0$               & $5*1.0 = 5.00$ \tabularnewline
+$B-D$     & $10-3=7$        & $0.8$               & $7*0.8 = 5.60$ \tabularnewline
+$C-D$     & $8-3=5$         & $0.4$               & $5*0.4 = 2.00$ \tabularnewline
+$D$       & $3$             & $0.8 * 0.4 = 0.32$  & $3*0.32 = 0.96$ \tabularnewline
+Total     & $20$            &                     & $13.56$ \tabularnewline
+\midrule
+Method 2 & Full Areas:\tabularnewline
+$A$   & $20$         & n/a                             & $20.00$ \tabularnewline
+$B$   & $-10$        & $0.8$                           & $-10*(1-0.8) = -2.00$ \tabularnewline
+$C$   & $-8$         & $0.4$                           & $-8*(1-0.4) = -4.80$ \tabularnewline
+$D$   & $3$          & $(0.8+0.4)-(0.8 * 0.4) = 0.88$  & $+3*(1-0.88) = 0.36$ \tabularnewline
+Total &              &                                 & $13.56 \tabularnewline
+\bottomrule
+\end{longtable}
+
+
 
 It is easy to determine the sunlit area of a window once all the shadow and overlap vertices on the wall have been computed. Consider wall 2 of Figure~\ref{fig:overall-shadowing-scheme-depiction}. First, the wall is considered a simple rectangle and the window on it is ignored. The shadow overlapping is performed and the sunlit portion of the gross wall area is computed. Then the window rectangle is overlapped with the shadow to determine its sunlit area. The sunlit area of the window is subtracted from the gross wall sunlit area to determine the net wall sunlit area. During this calculation it is not necessary to recompute the shadows, because they were precisely determined on the wall.
 
