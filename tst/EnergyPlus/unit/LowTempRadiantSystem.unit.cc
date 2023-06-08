@@ -3838,6 +3838,8 @@ TEST_F(LowTempRadiantSystemTest, GetLowTempRadiantSystem_MultipleTypes)
     state->dataSurface->Surface(6).ZoneName = "SOUTH ZONE";
     state->dataSurface->Surface(6).Zone = 3;
     state->dataSurface->Surface(6).Construction = 1;
+    state->dataSurface->surfIntConv.allocate(state->dataSurface->TotSurfaces);
+    std::fill(state->dataSurface->surfIntConv.begin(), state->dataSurface->surfIntConv.begin(), DataSurfaces::SurfIntConv());
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
     state->dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state->dataSurface->TotSurfaces);

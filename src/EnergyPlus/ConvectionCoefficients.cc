@@ -2817,10 +2817,11 @@ void SetupAdaptiveConvStaticMetaData(EnergyPlusData &state)
                         }
 
                         auto const &baseSurf = state.dataSurface->Surface(surf.BaseSurf);
+                        auto &baseSurfIntConv = state.dataSurface->surfIntConv(surf.BaseSurf);
                         if (baseSurf.ExtBoundCond != ExternalEnvironment) continue;
                         if (baseSurf.Class != SurfaceClass::Wall) continue;
                     
-                        surfIntConv.windowLocation = (baseSurf.Centroid.z < surf.Centroid.z) ?
+                        baseSurfIntConv.windowLocation = (baseSurf.Centroid.z < surf.Centroid.z) ?
                             IntConvWinLoc::WindowAboveThis : IntConvWinLoc::WindowBelowThis;
 
                     } else if (surf.Class == SurfaceClass::Wall && surfIntConv.windowLocation == IntConvWinLoc::NotSet) {
