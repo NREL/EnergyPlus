@@ -11348,13 +11348,11 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Test)
         DataVectorTypes::Vector(0, 0, 0), DataVectorTypes::Vector(1, 0, 0), DataVectorTypes::Vector(1, 1, 0), DataVectorTypes::Vector(0, 1, 0)};
     Vectors::CreateNewellSurfaceNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size(), BaseSurface.NewellSurfaceNormalVector);
     Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
-                                     BaseSurface.Vertex.size(),
                                      BaseSurface.Azimuth,
                                      BaseSurface.Tilt,
                                      BaseSurface.lcsx,
                                      BaseSurface.lcsy,
                                      BaseSurface.lcsz,
-                                     BaseSurface.GrossArea,
                                      BaseSurface.NewellSurfaceNormalVector);
 
     SubSurface.Vertex.dimension(4);
@@ -11365,13 +11363,11 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Test)
                          DataVectorTypes::Vector(0, 1, 0.0003)};
     Vectors::CreateNewellSurfaceNormalVector(SubSurface.Vertex, SubSurface.Vertex.size(), SubSurface.NewellSurfaceNormalVector);
     Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
-                                     SubSurface.Vertex.size(),
                                      SubSurface.Azimuth,
                                      SubSurface.Tilt,
                                      SubSurface.lcsx,
                                      SubSurface.lcsy,
                                      SubSurface.lcsz,
-                                     SubSurface.GrossArea,
                                      SubSurface.NewellSurfaceNormalVector);
 
     bool sameSurfNormal(false);
