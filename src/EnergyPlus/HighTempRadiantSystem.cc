@@ -104,10 +104,6 @@ namespace HighTempRadiantSystem {
     //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr std::string_view cGas = "Gas";
-    constexpr std::string_view cNaturalGas = "NaturalGas";
-    constexpr std::string_view cElectric = "Electric";
-    constexpr std::string_view cElectricity = "Electricity";
     constexpr std::string_view cMATControl = "MeanAirTemperature";                   // Control for using mean air temperature
     constexpr std::string_view cMRTControl = "MeanRadiantTemperature";               // Control for using mean radiant temperature
     constexpr std::string_view cOperativeControl = "OperativeTemperature";           // Control for using operative temperature
