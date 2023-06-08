@@ -2361,9 +2361,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     state->dataSurface->Surface(4).Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
-    state->dataSurface->SurfIntConvSurfHasActiveInIt.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfIntConvSurfHasActiveInIt = false;
     state->dataSurface->SurfIsRadSurfOrVentSlabOrPool = false;
 
     GetLowTempRadiantSystem(*state);
@@ -3842,9 +3840,7 @@ TEST_F(LowTempRadiantSystemTest, GetLowTempRadiantSystem_MultipleTypes)
     state->dataSurface->Surface(6).Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
-    state->dataSurface->SurfIntConvSurfHasActiveInIt.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfIsRadSurfOrVentSlabOrPool.allocate(state->dataSurface->TotSurfaces);
-    state->dataSurface->SurfIntConvSurfHasActiveInIt = false;
     state->dataSurface->SurfIsRadSurfOrVentSlabOrPool = false;
 
     GetLowTempRadiantSystem(*state);

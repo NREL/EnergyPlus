@@ -603,7 +603,7 @@ namespace HighTempRadiantSystem {
                 }
 
                 if (state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum)) = true;
+                    state.dataSurface->surfIntConv(state.dataHighTempRadSys->HighTempRadSys(Item).SurfacePtr(SurfNum)).getsRadiantHeat = true;
                 }
 
                 AllFracsSummed += state.dataHighTempRadSys->HighTempRadSys(Item).FracDistribToSurf(SurfNum);

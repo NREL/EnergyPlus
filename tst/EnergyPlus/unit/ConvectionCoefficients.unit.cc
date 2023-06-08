@@ -940,99 +940,99 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 30.0;
 
     Convect::DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(1), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(1).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(2), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(2).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(3), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(3).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(4), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(4).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(5), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(5).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
     //    DynamicIntConvSurfaceClassification(*state, 6);
     //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
 
     Convect::DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(7), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(7).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(8), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(8).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(9), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(9).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(10), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(10).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(11), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(11).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(12), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(12).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(13), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(13).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(14), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(14).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(15), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(15).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     // Case 2 - Zone air colder than surfaces
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 10.0;
 
     Convect::DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(1), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(1).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(2), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(2).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(3), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(3).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(4), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(4).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(5), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(5).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
     //    DynamicIntConvSurfaceClassification(*state, 6);
-    //    EXPECT_EQ(state->dataSurface->SurfIntConvClass(6), 0));
+    //    EXPECT_EQ(state->dataSurface->surfIntConv().convClass(6), 0));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(7), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(7).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(8), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(8).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(9), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(9).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(10), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(10).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(11), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(11).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(12), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(12).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(13), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(13).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(14), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(14).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(15), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(15).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 }
 
 TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
@@ -1048,6 +1048,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     state->dataSurface->Surface.allocate(1);
+    state->dataSurface->surfIntConv.allocate(1);
+    state->dataSurface->surfExtConv.allocate(1);
     state->dataConstruction->Construct.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
@@ -1176,8 +1178,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);
-    state->dataSurface->SurfIntConvCoeff.allocate(SurfNum);
-    state->dataSurface->SurfIntConvUserCoeffNum.allocate(SurfNum);
+    state->dataSurface->surfIntConv.allocate(SurfNum);
     state->dataSurface->SurfTAirRef.allocate(SurfNum);
     // Test 1: CalcWaltonUnstableHorizontalOrTilt calculation for Hn
     DeltaTemp = 1.0;
@@ -1189,8 +1190,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-    state->dataSurface->SurfIntConvCoeff(SurfNum) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum(SurfNum) = 0;
+    state->dataSurface->surfIntConv(SurfNum).coeff = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(SurfNum).userCoeffNum = 0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
@@ -1201,8 +1202,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-    state->dataSurface->SurfIntConvCoeff(SurfNum) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum(SurfNum) = 0;
+    state->dataSurface->surfIntConv(SurfNum).coeff = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(SurfNum).userCoeffNum = 0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
@@ -3008,8 +3009,8 @@ TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocati
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataSurface->SurfIntConvCoeff.allocate(2);
-    state->dataSurface->SurfExtConvCoeff.allocate(2);
+    state->dataSurface->surfIntConv.allocate(2);
+    state->dataSurface->surfExtConv.allocate(2);
 
     Convect::GetUserConvCoeffs(*state);
     EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 2u);
@@ -3035,8 +3036,8 @@ TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocati
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataSurface->SurfIntConvCoeff.allocate(2);
-    state->dataSurface->SurfExtConvCoeff.allocate(2);
+    state->dataSurface->surfIntConv.allocate(2);
+    state->dataSurface->surfExtConv.allocate(2);
 
     Convect::GetUserConvCoeffs(*state);
     EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 0u);
@@ -3060,14 +3061,12 @@ TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation1)
 
     state->dataSurface->Surface.allocate(2);
     state->dataSurface->Surface(1).Name = "FAKESURFACE";
-    state->dataSurface->SurfIntConvCoeff.allocate(1);
-    state->dataSurface->SurfIntConvCoeff(1) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfIntConvUserCoeffNum(1) = 0;
-    state->dataSurface->SurfExtConvCoeff.allocate(1);
-    state->dataSurface->SurfExtConvCoeff(1) = Convect::HcExt::SetByZone;
-    state->dataSurface->SurfExtConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfExtConvUserCoeffNum(1) = 0;
+    state->dataSurface->surfIntConv.allocate(1);
+    state->dataSurface->surfIntConv(1).coeff = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(1).userCoeffNum = 0;
+    state->dataSurface->surfExtConv.allocate(1);
+    state->dataSurface->surfExtConv(1).coeff = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv(1).userCoeffNum = 0;
 
     Convect::GetUserConvCoeffs(*state);
     EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 1u);
@@ -3091,14 +3090,12 @@ TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation2)
 
     state->dataSurface->Surface.allocate(2);
     state->dataSurface->Surface(1).Name = "FAKESURFACE";
-    state->dataSurface->SurfIntConvCoeff.allocate(1);
-    state->dataSurface->SurfIntConvCoeff(1) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfIntConvUserCoeffNum(1) = 0;
-    state->dataSurface->SurfExtConvCoeff.allocate(1);
-    state->dataSurface->SurfExtConvCoeff(1) = Convect::HcExt::SetByZone;
-    state->dataSurface->SurfExtConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfExtConvUserCoeffNum(1) = 0;
+    state->dataSurface->surfIntConv.allocate(1);
+    state->dataSurface->surfIntConv(1).coeff = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(1).userCoeffNum = 0;
+    state->dataSurface->surfExtConv.allocate(1);
+    state->dataSurface->surfExtConv(1).coeff = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv(1).userCoeffNum = 0;
 
     Convect::GetUserConvCoeffs(*state);
     EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 1u);

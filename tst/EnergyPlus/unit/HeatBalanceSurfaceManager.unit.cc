@@ -1914,7 +1914,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     // Test if local value used in surface hc calculation
     // Surface(1) - local; Surface(2) - global;
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::ASHRAESimple;
+        state->dataSurface->surfExtConv(SurfNum).coeff = Convect::HcExt::ASHRAESimple;
     }
     CalcHeatBalanceOutsideSurf(*state);
     Real64 HExt_Expect_Surf1 = Convect::CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness::Smooth, 1.5);
@@ -2475,7 +2475,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = 20; // Surf temp
         state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22;         // Air temp
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::MoWiTTHcOutside;
+        state->dataSurface->surfExtConv(SurfNum).coeff = Convect::HcExt::MoWiTTHcOutside;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }
     CalcHeatBalanceOutsideSurf(*state);
@@ -3041,7 +3041,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     InitSurfaceHeatBalance(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::ASHRAESimple;
+        state->dataSurface->surfExtConv(SurfNum).coeff = Convect::HcExt::ASHRAESimple;
     }
 
     // Test Additional Heat Source Calculation
@@ -7132,7 +7132,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = 20; // Surf temp
         state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22;         // Air temp
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::MoWiTTHcOutside;
+        state->dataSurface->surfExtConv(SurfNum).coeff = Convect::HcExt::MoWiTTHcOutside;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }
 

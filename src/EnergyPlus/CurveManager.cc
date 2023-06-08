@@ -3026,7 +3026,7 @@ namespace Curve {
     {
         ShowSevereError(state, fmt::format("{}{}=\"{}\"", eoh.routineName, eoh.objectType, eoh.objectName));
         ShowContinueError(state, format("...Invalid curve for {}.", fieldName));
-        ShowContinueError(state, format("...Input curve=\"{}\" has dimension .", curveName, dim));
+        ShowContinueError(state, format("...Input curve=\"{}\" has dimension {}.", curveName, dim));
         ShowContinueError(state, format("...Curve type must have dimension {}.", validDims));
     }
                            

@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -61,6 +62,7 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
@@ -134,8 +136,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     // set user defined conv. coeff. calculation to false
     state->dataConvect->GetUserSuppliedConvectionCoeffs = false;
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(NumOfSurf, 1.0);
-    state->dataSurface->SurfExtConvCoeff.allocate(NumOfSurf);
-    state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv.allocate(NumOfSurf);
+    state->dataSurface->surfExtConv(SurfNum).coeff = Convect::HcExt::SetByZone;
     state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(NumOfSurf);
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
     auto &surface = state->dataSurface->Surface(SurfNum);
@@ -166,7 +168,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBuoyRpt; // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(*state,
+    TranspiredCollector::CalcPassiveExteriorBaffleGap(*state,
                                  state->dataHeatBal->ExtVentedCavity(1).SurfPtrs,
                                  VentArea,
                                  Cv,
