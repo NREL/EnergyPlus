@@ -1045,16 +1045,11 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
     if (state.dataSwimmingPools->NumSwimmingPools == 0) return;
 
     for (int PoolNum = 1; PoolNum <= state.dataSwimmingPools->NumSwimmingPools; ++PoolNum) {
-        // Check to see if any of the pools were running at all
-        for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg != 0.0) {
-                SwimmingPoolOn = true;
-                break; // DO loop
-            }
-        }
-
-        state.dataHeatBalFanSys->QPoolSurfNumerator = state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg;
-        state.dataHeatBalFanSys->PoolHeatTransCoefs = state.dataSwimmingPools->Pool(PoolNum).HeatTransCoefsAvg;
+        auto &thisPool = state.dataSwimmingPools->Pool(PoolNum);
+        if (thisPool.QPoolSrcAvg != 0.0) SwimmingPoolOn = true;
+        int SurfNum = thisPool.SurfacePtr; // surface number index
+        state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) = thisPool.QPoolSrcAvg;
+        state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) = thisPool.HeatTransCoefsAvg;
     }
 
     // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
