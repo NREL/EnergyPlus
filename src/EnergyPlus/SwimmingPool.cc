@@ -1052,7 +1052,7 @@ void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn) // .TRU
         state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) = thisPool.HeatTransCoefsAvg;
     }
 
-    // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
+    // For interzone surfaces, QPoolSrcAvg was only updated for the "active" side.  The active side
     // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
         if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
