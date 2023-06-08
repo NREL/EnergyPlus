@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -371,21 +372,10 @@ namespace HighTempRadiantSystem {
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cNaturalGas)) {
-                highTempRadSys.HeaterType = RadHeaterType::Gas;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectricity)) {
-                highTempRadSys.HeaterType = RadHeaterType::Electric;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cGas)) {
-                highTempRadSys.HeaterType = RadHeaterType::Gas;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectric)) {
-                highTempRadSys.HeaterType = RadHeaterType::Electric;
-            } else {
-                ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
-                ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ErrorsFound = true;
-            }
+            highTempRadSys.HeaterType = static_cast<Constant::eResource>(
+                getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
 
-            if (highTempRadSys.HeaterType == RadHeaterType::Gas) {
+            if (highTempRadSys.HeaterType == Constant::eResource::NaturalGas) {
                 highTempRadSys.CombustionEffic = state.dataIPShortCut->rNumericArgs(4);
                 // Limit the combustion efficiency to between zero and one...
                 if (highTempRadSys.CombustionEffic < MinCombustionEffic) {
@@ -604,7 +594,7 @@ namespace HighTempRadiantSystem {
                                 "HEATINGCOILS",
                                 {},
                                 "System");
-            if (highTempRadSys.HeaterType == RadHeaterType::Gas) {
+            if (highTempRadSys.HeaterType == Constant::eResource::NaturalGas) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
@@ -624,7 +614,7 @@ namespace HighTempRadiantSystem {
                                     "Heating",
                                     {},
                                     "System");
-            } else if (highTempRadSys.HeaterType == RadHeaterType::Electric) {
+            } else if (highTempRadSys.HeaterType == Constant::eResource::Electricity) {
                 SetupOutputVariable(state,
                                     "Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
@@ -1246,14 +1236,14 @@ namespace HighTempRadiantSystem {
         // Using/Aliasing
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-        if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Gas) {
+        if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == Constant::eResource::NaturalGas) {
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower =
                 state.dataHighTempRadSys->QHTRadSource(RadSysNum) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).CombustionEffic;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasEnergy =
                 state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower * TimeStepSysSec;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = 0.0;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecEnergy = 0.0;
-        } else if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == RadHeaterType::Electric) {
+        } else if (state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeaterType == Constant::eResource::Electricity) {
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasPower = 0.0;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).GasEnergy = 0.0;
             state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ElecPower = state.dataHighTempRadSys->QHTRadSource(RadSysNum);

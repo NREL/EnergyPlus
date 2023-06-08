@@ -64,18 +64,7 @@ struct EnergyPlusData;
 
 namespace HighTempRadiantSystem {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    enum class RadHeaterType
-    {
-        Invalid = -1,
-        Gas,
-        Electric,
-        Num
-    };
+    // Types
 
     enum class RadControlType : int
     {
@@ -89,29 +78,21 @@ namespace HighTempRadiantSystem {
         Num
     };
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
-
-    // Types
-
     struct HighTempRadiantSystemData
     {
         // Members
         // Input data
-        std::string Name;         // name of hydronic radiant system
-        std::string SchedName;    // availability schedule
-        int SchedPtr;             // index to schedule
-        int ZonePtr;              // Point to this zone in the Zone derived type
-        RadHeaterType HeaterType; // Type of heater (gas or electric)
-        Real64 MaxPowerCapac;     // Maximum capacity of the radiant heater in Watts
-        Real64 CombustionEffic;   // Combustion efficiency (only valid for a gas heater)
-        Real64 FracRadiant;       // Fraction of heater power that is given off as radiant heat
-        Real64 FracLatent;        // Fraction of heater power that is given off as latent heat
-        Real64 FracLost;          // Fraction of heater power that is lost to the outside environment
-        Real64 FracConvect;       // Fraction of heater power that is given off as convective heat
+        std::string Name;               // name of hydronic radiant system
+        std::string SchedName;          // availability schedule
+        int SchedPtr;                   // index to schedule
+        int ZonePtr;                    // Point to this zone in the Zone derived type
+        Constant::eResource HeaterType; // Type of heater (NaturalGas or Electricity)
+        Real64 MaxPowerCapac;           // Maximum capacity of the radiant heater in Watts
+        Real64 CombustionEffic;         // Combustion efficiency (only valid for a gas heater)
+        Real64 FracRadiant;             // Fraction of heater power that is given off as radiant heat
+        Real64 FracLatent;              // Fraction of heater power that is given off as latent heat
+        Real64 FracLost;                // Fraction of heater power that is lost to the outside environment
+        Real64 FracConvect;             // Fraction of heater power that is given off as convective heat
         // (by definition this is 1 minus the sum of all other fractions)
         RadControlType ControlType;        // Control type for the system (MAT, MRT, or op temp)
         Real64 ThrottlRange;               // Throttling range for heating [C]
@@ -124,21 +105,21 @@ namespace HighTempRadiantSystem {
         Array1D<Real64> FracDistribToSurf; // Fraction of fraction radiant incident on the surface
         // Other parameters
         // Report data
-        Real64 ElecPower;     // system electric consumption in Watts
-        Real64 ElecEnergy;    // system electric consumption in Joules
-        Real64 GasPower;      // system gas consumption in Watts
-        Real64 GasEnergy;     // system gas consumption in Joules
-        Real64 HeatPower;     // actual heating sent to zone (convective and radiative) in Watts
-        Real64 HeatEnergy;    // actual heating sent to zone (convective and radiative) in Joules
+        Real64 ElecPower;                              // system electric consumption in Watts
+        Real64 ElecEnergy;                             // system electric consumption in Joules
+        Real64 GasPower;                               // system gas consumption in Watts
+        Real64 GasEnergy;                              // system gas consumption in Joules
+        Real64 HeatPower;                              // actual heating sent to zone (convective and radiative) in Watts
+        Real64 HeatEnergy;                             // actual heating sent to zone (convective and radiative) in Joules
         DataSizing::DesignSizingType HeatingCapMethod; // - Method for High Temperature Radiant heating capacity scalable sizing calculation
-                                           // (HeatingDesignCapacity,
-                              // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+                                                       // (HeatingDesignCapacity,
+                                                       // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64
             ScaledHeatingCapacity; // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 
         // Default Constructor
         HighTempRadiantSystemData()
-            : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Invalid), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
+            : SchedPtr(0), ZonePtr(0), HeaterType(Constant::eResource::Invalid), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
               FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Invalid), ThrottlRange(0.0), SetptSchedPtr(0),
               FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0),
               HeatEnergy(0.0), HeatingCapMethod(DataSizing::DesignSizingType::Invalid), ScaledHeatingCapacity(0.0)
