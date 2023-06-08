@@ -774,17 +774,15 @@ namespace HighTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
-            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
-                auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(HTRnum);
-                ZoneNum = thisHTR.ZonePtr;
-                thisHTR.ZeroHTRSourceSumHATsurf =
-                    state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure out what part of the load the radiant system meets
-                thisHTR.QHTRRadSource = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
-                thisHTR.QHTRRadSrcAvg = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
-                thisHTR.LastQHTRRadSrc = 0.0;     // At the beginning of a time step, reset to zero so average calculation can start again
-                thisHTR.LastSysTimeElapsed = 0.0; // At the beginning of a time step, reset to zero so average calculation can start again
-                thisHTR.LastTimeStepSys = 0.0;    // At the beginning of a time step, reset to zero so average calculation can start again
-            }
+            auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
+            ZoneNum = thisHTR.ZonePtr;
+            thisHTR.ZeroHTRSourceSumHATsurf =
+                state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure out what part of the load the radiant system meets
+            thisHTR.QHTRRadSource = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+            thisHTR.QHTRRadSrcAvg = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+            thisHTR.LastQHTRRadSrc = 0.0;     // At the beginning of a time step, reset to zero so average calculation can start again
+            thisHTR.LastSysTimeElapsed = 0.0; // At the beginning of a time step, reset to zero so average calculation can start again
+            thisHTR.LastTimeStepSys = 0.0;    // At the beginning of a time step, reset to zero so average calculation can start again
         }
     }
 
