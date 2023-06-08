@@ -3212,7 +3212,7 @@ There are a variety of rules that limit the application of indoor swimming pools
   \item The pool cannot utilize movable insulation or have a heat source or sink associated with it (something used to model low temperature radiant systems).
 \end{itemize}
 
-The following information is useful for defining and modeling an indoor pool in EnergyPlus. For more information on the algorithm used for this model or details on some of the input parameters, please reference the indoor pool section of the EnergyPlus Engineering Reference document.
+The following information is useful for defining and modeling an indoor pool in EnergyPlus. For more information on the algorithm used for this model or details on some of the input parameters, please reference the Indoor Swimming Pool section of the EnergyPlus Engineering Reference document.
 
 \subsubsection{Inputs}\label{inputs-7-012}
 
@@ -3230,11 +3230,11 @@ This field is the average depth of the pool in meters. If the pool has variable 
 
 \paragraph{Field: Activity Factor Schedule Name}\label{field-activity-factor-schedule-name}
 
-This field references a schedule that contains values for pool activity. This parameter can be varied using the schedule named here, and it has an impact on the amount of evaporation that will take place from the pool to the surrounding zone air. For example values of the activity factor and what impact it will have on the evaporation of water from the pool, please refer to the Indoor Swimming Pool section of the EnergyPlus Engineering Reference document. If left blank, the activity factor will be assumed to be unity. Note that the activity factor should not be set equal to an occupancy schedule since an activity factor of zero means that no evaporation will take place from the pool.
+This field references a schedule that contains values for pool activity. This parameter can be varied using the schedule named here, and it has an impact on the amount of evaporation that will take place from the pool to the surrounding zone air. For example values of the activity factor and what impact it will have on the evaporation of water from the pool, please refer to the Indoor Swimming Pool section of the EnergyPlus Engineering Reference document. If left blank, the activity factor will be assumed to be unity. Note that the activity factor schedule should not be set equal to an occupancy schedule since an activity factor of zero means that no evaporation will take place from the pool.
 
 \paragraph{Field: Make-up Water Supply Schedule Name}\label{field-make-up-water-supply-schedule-name}
 
-The scheduled named by this field establishes a cold water temperature {[}C{]} for the water that replaces the water which is lost from the pool due to evaporation. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
+The schedule named by this field establishes a cold water temperature {[}C{]} for the water that replaces the water which is lost from the pool due to evaporation. If blank, water temperatures are calculated by the \hyperref[sitewatermainstemperature]{Site:WaterMainsTemperature} object. This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed \hyperref[wateruseequipment]{WaterUse:Equipment} objects.
 
 \paragraph{Field: Cover Schedule Name}\label{field-cover-schedule-name}
 
@@ -3258,19 +3258,19 @@ This input field can optionally be used to modify the pool long-wavelength radia
 
 \paragraph{Field: Pool Water Inlet Node}\label{field-pool-water-inlet-node}
 
-This input is the name of the node on the demand side of a plant loop that leads into the pool. From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
+This input is the name of the node on the demand side of a plant loop that leads into the pool. From the standpoint of an EnergyPlus input file, the pool is placed on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
 
 \paragraph{Field: Pool Water Outlet Node}\label{field-pool-water-outlet-node}
 
-This input is the name of the node on the demand side of a plant loop that leads out of the pool. From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
+This input is the name of the node on the demand side of a plant loop that leads out of the pool. From the standpoint of an EnergyPlus input file, the pool is placed on a plant demand loop, and the pump and heater reside on the plant supply loop. The pool heater and pump must be defined by other existing EnergyPlus input.
 
 \paragraph{Field: Pool Water Maximum Flow Rate}\label{field-pool-water-maximum-flow-rate}
 
-This input is the maximum water volumetric flow rate in m3/s going between the pool and the water heating equipment. This along with the pool setpoint temperature and the heating plant equipment outlet temperature will establish the maximum heat addition to the pool. This flow rate to the pool will be varied in an attempt to reach the desired pool water setpoint temperature (see Setpoint Temperature Schedule below).
+This input is the maximum water volumetric flow rate in m\(^{3}\)/s going between the pool and the water heating equipment. This along with the pool setpoint temperature and the heating plant equipment outlet temperature will establish the maximum heat addition to the pool. This flow rate to the pool will be varied in an attempt to reach the desired pool water setpoint temperature (see Setpoint Temperature Schedule below).
 
 \paragraph{Field: Pool Miscellaneous Equipment Power}\label{field-pool-miscellaneous-equipment-power}
 
-This input defines the power consumption rate of miscellaneous equipment such as the filtering and chlorination technology associated with the pool. The units for this input are in power consumption per flow rate of water through the pool from the heater or W/(m3/s). This field will be multiplied by the flow rate of water through the pool to determine the power consumption of this equipment. Any heat generated by this equipment is assumed to have no effect on the pool water itself.
+This input defines the power consumption rate of miscellaneous equipment such as the filtering and chlorination technology associated with the pool. The units for this input are in power consumption per flow rate of water through the pool from the heater or W/(m\(^{3}\)/s). This field will be multiplied by the flow rate of water through the pool to determine the power consumption of this equipment. Any heat generated by this equipment is assumed to have no effect on the pool water itself.
 
 \paragraph{Field: Setpoint Temperature Schedule}\label{field-setpoint-temperature-schedule}
 
@@ -3363,11 +3363,11 @@ SwimmingPool:Indoor,
   HVAC, Average, Indoor Pool Current Cover LW Radiation Factor {[]}
 \end{itemize}
 
-\paragraph{Indoor Pool Makeup Water Rate {[}m3/s{]}}\label{indoor-pool-makeup-water-rate-m3s}
+\paragraph{Indoor Pool Makeup Water Rate {[}m\(^{3}\)/s{]}}\label{indoor-pool-makeup-water-rate-m3s}
 
 The water consumption rate for the makeup water of indoor swimming pool.
 
-\paragraph{Indoor Pool Makeup Water Volume {[}m3{]}}\label{indoor-pool-makeup-water-volume-m3}
+\paragraph{Indoor Pool Makeup Water Volume {[}m\(^{3}\){]}}\label{indoor-pool-makeup-water-volume-m3}
 
 The water consumption for the makeup water of indoor swimming pool.
 
