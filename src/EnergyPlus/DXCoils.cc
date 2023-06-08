@@ -4065,16 +4065,27 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         if (!lAlphaBlanks(11)) {
-            thisDXCoil.BasinHeaterSchedulePtr = GetScheduleIndex(state, Alphas(11));
+          thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(11));
+          ErrorsFound |= Curve::CheckCurveDims(state,
+                                               thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                               {1},                                          // Valid dimensions
+                                               RoutineName,                                  // Routine name
+                                               CurrentModuleObject,                          // Object Type
+                                               thisDXCoil.Name,                              // Object Name
+                                               cAlphaFields(11));                            // Field Name
+        }
+
+        if (!lAlphaBlanks(12)) {
+            thisDXCoil.BasinHeaterSchedulePtr = GetScheduleIndex(state, Alphas(12));
             if (thisDXCoil.BasinHeaterSchedulePtr == 0) {
                 ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(11), Alphas(11)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(12), Alphas(12)));
                 ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
             }
         }
 
-        // A12; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(12)));
+        // A13; \field Fuel type, Validate fuel type input
+        thisDXCoil.FuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, Alphas(13)));
 
         thisDXCoil.NumOfSpeeds = Numbers(6); // Number of speeds
         if (thisDXCoil.NumOfSpeeds < 2) {
@@ -4118,14 +4129,14 @@ void GetDXCoils(EnergyPlusData &state)
             thisDXCoil.MSFanPowerPerEvapAirFlowRate(I) = Numbers(11 + (I - 1) * 14);
             thisDXCoil.MSFanPowerPerEvapAirFlowRate_2023(I) = Numbers(12 + (I - 1) * 14);
 
-            thisDXCoil.MSCCapFTemp(I) = GetCurveIndex(state, Alphas(13 + (I - 1) * 6)); // convert curve name to number
+            thisDXCoil.MSCCapFTemp(I) = GetCurveIndex(state, Alphas(14 + (I - 1) * 6)); // convert curve name to number
             if (thisDXCoil.MSCCapFTemp(I) == 0) {
-                if (lAlphaBlanks(13 + (I - 1) * 6)) {
+                if (lAlphaBlanks(14 + (I - 1) * 6)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(13 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(14 + (I - 1) * 6)));
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(13 + (I - 1) * 6), Alphas(13 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(14 + (I - 1) * 6), Alphas(14 + (I - 1) * 6)));
                 }
                 ErrorsFound = true;
             } else {
@@ -4136,28 +4147,28 @@ void GetDXCoils(EnergyPlusData &state)
                                                      RoutineName,                     // Routine name
                                                      CurrentModuleObject,             // Object Type
                                                      thisDXCoil.Name,                 // Object Name
-                                                     cAlphaFields(13 + (I - 1) * 6)); // Field Name
+                                                     cAlphaFields(14 + (I - 1) * 6)); // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
                                                 std::string{RoutineName} + CurrentModuleObject,
                                                 thisDXCoil.Name,
                                                 thisDXCoil.MSCCapFTemp(I),
-                                                cAlphaFields(13 + (I - 1) * 6),
-                                                Alphas(13 + (I - 1) * 6),
+                                                cAlphaFields(14 + (I - 1) * 6),
+                                                Alphas(14 + (I - 1) * 6),
                                                 RatedInletWetBulbTemp,
                                                 RatedOutdoorAirTemp);
                 }
             }
 
-            thisDXCoil.MSCCapFFlow(I) = GetCurveIndex(state, Alphas(14 + (I - 1) * 6)); // convert curve name to number
+            thisDXCoil.MSCCapFFlow(I) = GetCurveIndex(state, Alphas(15 + (I - 1) * 6)); // convert curve name to number
             if (thisDXCoil.MSCCapFFlow(I) == 0) {
-                if (lAlphaBlanks(14 + (I - 1) * 6)) {
+                if (lAlphaBlanks(15 + (I - 1) * 6)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(14 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(15 + (I - 1) * 6)));
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(14 + (I - 1) * 6), Alphas(14 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(15 + (I - 1) * 6), Alphas(15 + (I - 1) * 6)));
                 }
                 ErrorsFound = true;
             } else {
@@ -4168,27 +4179,27 @@ void GetDXCoils(EnergyPlusData &state)
                                                      RoutineName,                     // Routine name
                                                      CurrentModuleObject,             // Object Type
                                                      thisDXCoil.Name,                 // Object Name
-                                                     cAlphaFields(14 + (I - 1) * 6)); // Field Name
+                                                     cAlphaFields(15 + (I - 1) * 6)); // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
                                                 std::string{RoutineName} + CurrentModuleObject,
                                                 thisDXCoil.Name,
                                                 thisDXCoil.MSCCapFFlow(I),
-                                                cAlphaFields(14 + (I - 1) * 6),
-                                                Alphas(14 + (I - 1) * 6),
+                                                cAlphaFields(15 + (I - 1) * 6),
+                                                Alphas(15 + (I - 1) * 6),
                                                 1.0);
                 }
             }
 
-            thisDXCoil.MSEIRFTemp(I) = GetCurveIndex(state, Alphas(15 + (I - 1) * 6)); // convert curve name to number
+            thisDXCoil.MSEIRFTemp(I) = GetCurveIndex(state, Alphas(16 + (I - 1) * 6)); // convert curve name to number
             if (thisDXCoil.MSEIRFTemp(I) == 0) {
-                if (lAlphaBlanks(15 + (I - 1) * 6)) {
+                if (lAlphaBlanks(16 + (I - 1) * 6)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(15 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(16 + (I - 1) * 6)));
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(15 + (I - 1) * 6), Alphas(15 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(16 + (I - 1) * 6), Alphas(16 + (I - 1) * 6)));
                 }
                 ErrorsFound = true;
             } else {
@@ -4199,28 +4210,28 @@ void GetDXCoils(EnergyPlusData &state)
                                                      RoutineName,                     // Routine name
                                                      CurrentModuleObject,             // Object Type
                                                      thisDXCoil.Name,                 // Object Name
-                                                     cAlphaFields(15 + (I - 1) * 6)); // Field Name
+                                                     cAlphaFields(16 + (I - 1) * 6)); // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
                                                 std::string{RoutineName} + CurrentModuleObject,
                                                 thisDXCoil.Name,
                                                 thisDXCoil.MSEIRFTemp(I),
-                                                cAlphaFields(15 + (I - 1) * 6),
-                                                Alphas(15 + (I - 1) * 6),
+                                                cAlphaFields(16 + (I - 1) * 6),
+                                                Alphas(16 + (I - 1) * 6),
                                                 RatedInletWetBulbTemp,
                                                 RatedOutdoorAirTemp);
                 }
             }
 
-            thisDXCoil.MSEIRFFlow(I) = GetCurveIndex(state, Alphas(16 + (I - 1) * 6)); // convert curve name to number
+            thisDXCoil.MSEIRFFlow(I) = GetCurveIndex(state, Alphas(17 + (I - 1) * 6)); // convert curve name to number
             if (thisDXCoil.MSEIRFFlow(I) == 0) {
-                if (lAlphaBlanks(16 + (I - 1) * 6)) {
+                if (lAlphaBlanks(17 + (I - 1) * 6)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(16 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(17 + (I - 1) * 6)));
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(16 + (I - 1) * 6), Alphas(16 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(17 + (I - 1) * 6), Alphas(17 + (I - 1) * 6)));
                 }
                 ErrorsFound = true;
             } else {
@@ -4231,27 +4242,27 @@ void GetDXCoils(EnergyPlusData &state)
                                                      RoutineName,                     // Routine name
                                                      CurrentModuleObject,             // Object Type
                                                      thisDXCoil.Name,                 // Object Name
-                                                     cAlphaFields(16 + (I - 1) * 6)); // Field Name
+                                                     cAlphaFields(17 + (I - 1) * 6)); // Field Name
 
                 if (!ErrorsFound) {
                     checkCurveIsNormalizedToOne(state,
                                                 std::string{RoutineName} + CurrentModuleObject,
                                                 thisDXCoil.Name,
                                                 thisDXCoil.MSEIRFFlow(I),
-                                                cAlphaFields(16 + (I - 1) * 6),
-                                                Alphas(16 + (I - 1) * 6),
+                                                cAlphaFields(17 + (I - 1) * 6),
+                                                Alphas(17 + (I - 1) * 6),
                                                 1.0);
                 }
             }
 
-            thisDXCoil.MSPLFFPLR(I) = GetCurveIndex(state, Alphas(17 + (I - 1) * 6)); // convert curve name to number
+            thisDXCoil.MSPLFFPLR(I) = GetCurveIndex(state, Alphas(18 + (I - 1) * 6)); // convert curve name to number
             if (thisDXCoil.MSPLFFPLR(I) == 0) {
-                if (lAlphaBlanks(17 + (I - 1) * 6)) {
+                if (lAlphaBlanks(18 + (I - 1) * 6)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(17 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(18 + (I - 1) * 6)));
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(17 + (I - 1) * 6), Alphas(16 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(18 + (I - 1) * 6), Alphas(18 + (I - 1) * 6)));
                 }
                 ErrorsFound = true;
             } else {
@@ -4262,7 +4273,7 @@ void GetDXCoils(EnergyPlusData &state)
                                                      RoutineName,                     // Routine name
                                                      CurrentModuleObject,             // Object Type
                                                      thisDXCoil.Name,                 // Object Name
-                                                     cAlphaFields(17 + (I - 1) * 6)); // Field Name
+                                                     cAlphaFields(18 + (I - 1) * 6)); // Field Name
 
                 if (!ErrorsFound) {
                     //       Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
@@ -4284,7 +4295,7 @@ void GetDXCoils(EnergyPlusData &state)
                     if (MinCurveVal < 0.7) {
                         ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                         ShowContinueError(state,
-                                          format("...{} = {} has out of range value.", cAlphaFields2(17 + (I - 1) * 6), Alphas2(17 + (I - 1) * 6)));
+                                          format("...{} = {} has out of range value.", cAlphaFields2(18 + (I - 1) * 6), Alphas2(18 + (I - 1) * 6)));
                         ShowContinueError(state,
                                           format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
                         ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
@@ -4294,7 +4305,7 @@ void GetDXCoils(EnergyPlusData &state)
                     if (MaxCurveVal > 1.0) {
                         ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                         ShowContinueError(state,
-                                          format("...{} = {} has out of range value.", cAlphaFields2(17 + (I - 1) * 6), Alphas2(17 + (I - 1) * 6)));
+                                          format("...{} = {} has out of range value.", cAlphaFields2(18 + (I - 1) * 6), Alphas2(18 + (I - 1) * 6)));
                         ShowContinueError(state,
                                           format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
                         ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
@@ -4340,7 +4351,7 @@ void GetDXCoils(EnergyPlusData &state)
             thisDXCoil.MSWasteHeatFrac(I) = Numbers(17 + (I - 1) * 14);
 
             // Read waste heat modifier curve name
-            thisDXCoil.MSWasteHeat(I) = GetCurveIndex(state, Alphas(18 + (I - 1) * 6)); // convert curve name to number
+            thisDXCoil.MSWasteHeat(I) = GetCurveIndex(state, Alphas(19 + (I - 1) * 6)); // convert curve name to number
             if (thisDXCoil.FuelType != Constant::eResource::Electricity) {
                 if (thisDXCoil.MSWasteHeat(I) > 0) {
                     // Verify Curve Object, only legal types are BiQuadratic
@@ -4350,15 +4361,15 @@ void GetDXCoils(EnergyPlusData &state)
                                                          RoutineName,                     // Routine name
                                                          CurrentModuleObject,             // Object Type
                                                          thisDXCoil.Name,                 // Object Name
-                                                         cAlphaFields(18 + (I - 1) * 6)); // Field Name
+                                                         cAlphaFields(19 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
                         CurveVal = CurveValue(state, thisDXCoil.MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
                         if (CurveVal > 1.10 || CurveVal < 0.90) {
                             ShowWarningError(state, format("{}{}=\"{}\", curve values", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                            ShowContinueError(state, format("{} = {}", cAlphaFields(18 + (I - 1) * 6), Alphas(18 + (I - 1) * 6)));
+                            ShowContinueError(state, format("{} = {}", cAlphaFields(19 + (I - 1) * 6), Alphas(19 + (I - 1) * 6)));
                             ShowContinueError(
-                                state, format("...{} output is not equal to 1.0 (+ or - 10%) at rated conditions.", cAlphaFields(18 + (I - 1) * 6)));
+                                state, format("...{} output is not equal to 1.0 (+ or - 10%) at rated conditions.", cAlphaFields(19 + (I - 1) * 6)));
                             ShowContinueError(state, format("...Curve output at rated conditions = {:.3T}", CurveVal));
                         }
                     }
@@ -4390,9 +4401,9 @@ void GetDXCoils(EnergyPlusData &state)
                 ErrorsFound = true;
             }
         }
-        // A37; \field Zone Name for Condenser Placement
-        if (!lAlphaBlanks(37) && NumAlphas > 36) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(37), state.dataHeatBal->Zone);
+        // A38; \field Zone Name for Condenser Placement
+        if (!lAlphaBlanks(38) && NumAlphas > 36) {
+            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(38), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -4402,18 +4413,8 @@ void GetDXCoils(EnergyPlusData &state)
                 thisDXCoil.IsSecondaryDXCoilInZone = true;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(37), Alphas(37)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(38), Alphas(38)));
             }
-        }
-        if (!lAlphaBlanks(38)) {
-            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(38));
-            ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
-                                                 {1},                                          // Valid dimensions
-                                                 RoutineName,                                  // Routine name
-                                                 CurrentModuleObject,                          // Object Type
-                                                 thisDXCoil.Name,                              // Object Name
-                                                 cAlphaFields(38));                            // Field Name
         }
     }
 

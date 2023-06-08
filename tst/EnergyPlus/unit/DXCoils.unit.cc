@@ -1166,6 +1166,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "No,                                       !- Apply Part Load Fraction to Speeds Greater than 1",
         "No,                                       !- Apply Latent Degradation to Speeds Greater than 1",
         "10.0,                                    !- Crankcase Heater Capacity{ W }",
+        "heaterCapCurve3,                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         "10.0,                                     !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         ",                                         !- Basin Heater Capacity{ W / K }",
         ",                                         !- Basin Heater Setpoint Temperature{ C }",
@@ -1252,8 +1253,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "0.9, !- Speed 4 Evaporative Condenser Effectiveness{ dimensionless }",
         "0.3, !- Speed 4 Evaporative Condenser Air Flow Rate{ m3 / s }",
         "100,                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption{ W }",
-        ",                                         !- Zone Name for Condenser Placement",
-        "heaterCapCurve3;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        ";                                         !- Zone Name for Condenser Placement",
 
         " Coil:Heating:DX:MultiSpeed,",
         "Coil:Heating:DX:MultiSpeed coil,                          !- Name",
