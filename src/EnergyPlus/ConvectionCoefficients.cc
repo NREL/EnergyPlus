@@ -2711,8 +2711,8 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
 
     // Get humidity ratio
     Real64 AirHumRat = (surface.Zone > 0) ?
-            AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone).ZoneAirHumRatAvg : 
-            AirHumRat = state.dataEnvrn->OutHumRat;
+            state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone).ZoneAirHumRatAvg : 
+            state.dataEnvrn->OutHumRat;
 
     Real64 Height = surface.Height;
     Real64 TiltDeg = surface.Tilt;
