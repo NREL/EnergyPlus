@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -280,7 +279,6 @@ namespace HighTempRadiantSystem {
                 }
             }
 
-            highTempRadSys.ZoneName = state.dataIPShortCut->cAlphaArgs(3);
             highTempRadSys.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (highTempRadSys.ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
@@ -291,9 +289,9 @@ namespace HighTempRadiantSystem {
             // state.dataHighTempRadSys->HighTempRadSys( Item ).MaxPowerCapac = state.dataIPShortCut->rNumericArgs( 1 );
 
             // Determine High Temp Radiant heating design capacity sizing method
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
-                highTempRadSys.HeatingCapMethod = DataSizing::HeatingDesignCapacity;
-
+            highTempRadSys.HeatingCapMethod = static_cast<DataSizing::DesignSizingType>(
+                getEnumerationValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+            if (highTempRadSys.HeatingCapMethod == DataSizing::DesignSizingType::HeatingDesignCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     highTempRadSys.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
                     if (highTempRadSys.ScaledHeatingCapacity < 0.0 && highTempRadSys.ScaledHeatingCapacity != DataSizing::AutoSize) {
@@ -314,8 +312,7 @@ namespace HighTempRadiantSystem {
                         state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
-                highTempRadSys.HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+            } else if (highTempRadSys.HeatingCapMethod == DataSizing::DesignSizingType::CapacityPerFloorArea) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     highTempRadSys.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
                     if (highTempRadSys.ScaledHeatingCapacity <= 0.0) {
@@ -350,8 +347,7 @@ namespace HighTempRadiantSystem {
                         format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
-                highTempRadSys.HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+            } else if (highTempRadSys.HeatingCapMethod == DataSizing::DesignSizingType::FractionOfAutosizedHeatingCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     highTempRadSys.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
                     if (highTempRadSys.ScaledHeatingCapacity < 0.0) {
@@ -373,13 +369,6 @@ namespace HighTempRadiantSystem {
                         format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum)));
                     ErrorsFound = true;
                 }
-            } else {
-                ShowSevereError(state, format("{} = {}", cCurrentModuleObject, highTempRadSys.Name));
-                ShowContinueError(state,
-                                  format("Illegal {} = {}",
-                                         state.dataIPShortCut->cAlphaFieldNames(iHeatCAPMAlphaNum),
-                                         state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
-                ErrorsFound = true;
             }
 
             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cNaturalGas)) {
@@ -767,7 +756,7 @@ namespace HighTempRadiantSystem {
             std::string SizingString = state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
             // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
             // FractionOfAutosizedHeatingCapacity )
-            int CapSizingMethod = state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod;
+            int CapSizingMethod = static_cast<int>(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod);
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
                 CapSizingMethod == DataSizing::FractionOfAutosizedHeatingCapacity) {

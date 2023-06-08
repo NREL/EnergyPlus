@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -103,7 +104,6 @@ namespace HighTempRadiantSystem {
         std::string Name;         // name of hydronic radiant system
         std::string SchedName;    // availability schedule
         int SchedPtr;             // index to schedule
-        std::string ZoneName;     // Name of zone the system is serving
         int ZonePtr;              // Point to this zone in the Zone derived type
         RadHeaterType HeaterType; // Type of heater (gas or electric)
         Real64 MaxPowerCapac;     // Maximum capacity of the radiant heater in Watts
@@ -130,7 +130,8 @@ namespace HighTempRadiantSystem {
         Real64 GasEnergy;     // system gas consumption in Joules
         Real64 HeatPower;     // actual heating sent to zone (convective and radiative) in Watts
         Real64 HeatEnergy;    // actual heating sent to zone (convective and radiative) in Joules
-        int HeatingCapMethod; // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity,
+        DataSizing::DesignSizingType HeatingCapMethod; // - Method for High Temperature Radiant heating capacity scalable sizing calculation
+                                           // (HeatingDesignCapacity,
                               // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64
             ScaledHeatingCapacity; // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
@@ -140,7 +141,7 @@ namespace HighTempRadiantSystem {
             : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Invalid), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0),
               FracLatent(0.0), FracLost(0.0), FracConvect(0.0), ControlType(RadControlType::Invalid), ThrottlRange(0.0), SetptSchedPtr(0),
               FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0), ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0),
-              HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+              HeatEnergy(0.0), HeatingCapMethod(DataSizing::DesignSizingType::Invalid), ScaledHeatingCapacity(0.0)
         {
         }
     };
