@@ -1008,7 +1008,6 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using ConvectionCoefficients::InitExteriorConvectionCoeff;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyCpAirFnW;
@@ -1178,7 +1177,7 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-            InitExteriorConvectionCoeff(
+            Convect::InitExtConvCoeff(
                 state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
             AbsThermSurf =

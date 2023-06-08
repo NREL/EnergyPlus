@@ -348,8 +348,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
         // Validate fuel type input
         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType =
-            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphArray(5)));
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == Constant::eResource::Invalid) {
+            static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, AlphArray(5)));
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).FuelType == Constant::eFuel::Invalid) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowSevereError(state, format("Invalid {}  = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
@@ -899,7 +899,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
 
 void MTGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
 {
-    std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
+    std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Generator Produced AC Electricity Rate",
                         OutputProcessor::Unit::W,

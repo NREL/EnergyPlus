@@ -92,7 +92,7 @@ using namespace DataHeatBalance;
 using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
 using namespace DataRoomAirModel;
-using ConvectionCoefficients::CalcDetailedHcInForDVModel;
+using Convect::CalcDetailedHcInForDVModel;
 
 void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
 {

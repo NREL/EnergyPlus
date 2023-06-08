@@ -89,7 +89,7 @@ namespace HeatBalanceManager {
 
     void GetHeatBalanceInput(EnergyPlusData &state);
 
-    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
+    void CheckUsedConstructions(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound);
 
     bool CheckValidSimulationObjects(EnergyPlusData &state);
 
@@ -117,9 +117,9 @@ namespace HeatBalanceManager {
                          std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
-                         int &NumAlphas,
+                         int const &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
-                         int &NumNumbers,
+                         int const &NumNumbers,
                          Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
