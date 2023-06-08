@@ -1239,10 +1239,22 @@ void GetDXCoils(EnergyPlusData &state)
             thisDXCoil.RatedEIR(1) = 1.0 / thisDXCoil.RatedCOP(1);
         }
 
+        // A12, \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
+        if (!lAlphaBlanks(12)) {
+          thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(12));
+          ErrorsFound |= Curve::CheckCurveDims(state,
+                                               thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                               {1},                                          // Valid dimensions
+                                               RoutineName,                                  // Routine name
+                                               CurrentModuleObject,                          // Object Type
+                                               thisDXCoil.Name,                              // Object Name
+                                               cAlphaFields(12));                            // Field Name
+        }
+
         // Get Water System tank connections
-        //  A12, \field Name of Water Storage Tank for Supply
-        thisDXCoil.EvapWaterSupplyName = Alphas(12);
-        if (lAlphaBlanks(12)) {
+        //  A13, \field Name of Water Storage Tank for Supply
+        thisDXCoil.EvapWaterSupplyName = Alphas(13);
+        if (lAlphaBlanks(13)) {
             thisDXCoil.EvapWaterSupplyMode = EvapWaterSupply::FromMains;
         } else {
             thisDXCoil.EvapWaterSupplyMode = EvapWaterSupply::FromTank;
@@ -1255,9 +1267,9 @@ void GetDXCoils(EnergyPlusData &state)
                                      thisDXCoil.EvapWaterTankDemandARRID);
         }
 
-        // A13; \field Name of Water Storage Tank for Condensate Collection
-        thisDXCoil.CondensateCollectName = Alphas(13);
-        if (lAlphaBlanks(13)) {
+        // A14; \field Name of Water Storage Tank for Condensate Collection
+        thisDXCoil.CondensateCollectName = Alphas(14);
+        if (lAlphaBlanks(14)) {
             thisDXCoil.CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
             thisDXCoil.CondensateCollectMode = CondensateCollectAction::ToTank;
@@ -1291,20 +1303,20 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (!lAlphaBlanks(14)) {
-            thisDXCoil.BasinHeaterSchedulePtr = GetScheduleIndex(state, Alphas(14));
+        if (!lAlphaBlanks(15)) {
+            thisDXCoil.BasinHeaterSchedulePtr = GetScheduleIndex(state, Alphas(15));
             if (thisDXCoil.BasinHeaterSchedulePtr == 0) {
                 ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(14), Alphas(14)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(15), Alphas(15)));
                 ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
             }
         }
 
-        if (!lAlphaBlanks(15) && NumAlphas > 14) {
-            thisDXCoil.SHRFTemp(1) = GetCurveIndex(state, Alphas(15)); // convert curve name to number
+        if (!lAlphaBlanks(16) && NumAlphas > 14) {
+            thisDXCoil.SHRFTemp(1) = GetCurveIndex(state, Alphas(16)); // convert curve name to number
             if (thisDXCoil.SHRFTemp(1) == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(15), Alphas(15)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(16), Alphas(16)));
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
                 ErrorsFound |= Curve::CheckCurveDims(state,
@@ -1313,15 +1325,15 @@ void GetDXCoils(EnergyPlusData &state)
                                                      RoutineName,            // Routine name
                                                      CurrentModuleObject,    // Object Type
                                                      thisDXCoil.Name,        // Object Name
-                                                     cAlphaFields(15));      // Field Name
+                                                     cAlphaFields(16));      // Field Name
             }
         }
 
-        if (!lAlphaBlanks(16) && NumAlphas > 15) {
-            thisDXCoil.SHRFFlow(1) = GetCurveIndex(state, Alphas(16)); // convert curve name to number
+        if (!lAlphaBlanks(17) && NumAlphas > 15) {
+            thisDXCoil.SHRFFlow(1) = GetCurveIndex(state, Alphas(17)); // convert curve name to number
             if (thisDXCoil.SHRFTemp(1) == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(16), Alphas(16)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(17), Alphas(17)));
             } else {
                 // Verify Curve Object, only legal type is Quadratic and Cubic
                 ErrorsFound |= Curve::CheckCurveDims(state,
@@ -1330,7 +1342,7 @@ void GetDXCoils(EnergyPlusData &state)
                                                      RoutineName,            // Routine name
                                                      CurrentModuleObject,    // Object Type
                                                      thisDXCoil.Name,        // Object Name
-                                                     cAlphaFields(16));      // Field Name
+                                                     cAlphaFields(17));      // Field Name
             }
         }
 
@@ -1338,18 +1350,18 @@ void GetDXCoils(EnergyPlusData &state)
             thisDXCoil.UserSHRCurveExists = true;
         }
         // get User Input flag for ASHRAE Standard 127 Standard Ratings Reporting
-        if (lAlphaBlanks(17)) {
+        if (lAlphaBlanks(18)) {
             thisDXCoil.ASHRAE127StdRprt = false;
         } else {
-            if (Alphas(17) == "YES" || Alphas(17) == "Yes") {
+            if (Alphas(18) == "YES" || Alphas(18) == "Yes") {
                 thisDXCoil.ASHRAE127StdRprt = true;
             } else {
                 thisDXCoil.ASHRAE127StdRprt = false;
             }
         }
-        // A18; \field Zone Name for Condenser Placement
-        if (!lAlphaBlanks(18) && NumAlphas > 17) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(18), state.dataHeatBal->Zone);
+        // A19; \field Zone Name for Condenser Placement
+        if (!lAlphaBlanks(19) && NumAlphas > 17) {
+            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(19), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -1359,19 +1371,8 @@ void GetDXCoils(EnergyPlusData &state)
                 thisDXCoil.IsSecondaryDXCoilInZone = true;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(18), Alphas(18)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(19), Alphas(19)));
             }
-        }
-        // A19; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
-        if (!lAlphaBlanks(19)) {
-            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(19));
-            ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
-                                                 {1},                                          // Valid dimensions
-                                                 RoutineName,                                  // Routine name
-                                                 CurrentModuleObject,                          // Object Type
-                                                 thisDXCoil.Name,                              // Object Name
-                                                 cAlphaFields(19));                            // Field Name
         }
 
     } // end of the Doe2 DX coil loop

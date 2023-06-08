@@ -1106,6 +1106,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                        !- Evaporative Condenser Air Flow Rate {m3/s}",
         ",                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve,          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         ",                        !- Supply Water Storage Tank Name",
         ",                        !- Condensate Collection Water Storage Tank Name",
@@ -1115,8 +1116,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                        !- Sensible Heat Ratio Function of Temperature Curve Name",
         ",                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name",
         ",                        !- Report ASHRAE Standard 127 Performance Ratings",
-        ",                        !- Zone Name for Condenser Placement",
-        "heaterCapCurve;          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        ";                        !- Zone Name for Condenser Placement",
 
         "Coil:Heating:DX:SingleSpeed,",
         "Coil:Heating:DX:SingleSpeed coil,      !- Name",
@@ -1974,6 +1974,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     Real64 PLR = 0.0;
     int DXCoilNum = 1;
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
+    // Coil:Cooling:DX:SingleSpeed
     //    power = 10 - 2x
     EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 200.0);
     DXCoilNum = 3;
