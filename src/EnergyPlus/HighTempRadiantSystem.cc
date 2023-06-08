@@ -104,12 +104,12 @@ namespace HighTempRadiantSystem {
     //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
     // MODULE PARAMETER DEFINITIONS:
-    constexpr std::string_view cMATControl = "MeanAirTemperature";                   // Control for using mean air temperature
-    constexpr std::string_view cMRTControl = "MeanRadiantTemperature";               // Control for using mean radiant temperature
-    constexpr std::string_view cOperativeControl = "OperativeTemperature";           // Control for using operative temperature
-    constexpr std::string_view cMATSPControl = "MeanAirTemperatureSetpoint";         // Control for to MAT setpoint
-    constexpr std::string_view cMRTSPControl = "MeanRadiantTemperatureSetpoint";     // Control for to MRT setpoint
-    constexpr std::string_view cOperativeSPControl = "OperativeTemperatureSetpoint"; // Control for operative temperature setpoint
+    constexpr std::array<std::string_view, static_cast<int>(RadControlType::Num)> radControlTypeNamesUC = {"MEANAIRTEMPERATURE",
+                                                                                                           "MEANRADIANTTEMPERATURE",
+                                                                                                           "OPERATIVETEMPERATURE",
+                                                                                                           "MEANAIRTEMPERATURESETPOINT",
+                                                                                                           "MEANRADIANTTEMPERATURESETPOINT",
+                                                                                                           "OPERATIVETEMPERATURESETPOINT"};
 
     void SimHighTempRadiantSystem(EnergyPlusData &state,
                                   std::string_view CompName,     // name of the low temperature radiant system
@@ -447,24 +447,7 @@ namespace HighTempRadiantSystem {
             }
 
             // Process the temperature control type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATControl)) {
-                highTempRadSys.ControlType = RadControlType::MATControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTControl)) {
-                highTempRadSys.ControlType = RadControlType::MRTControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeControl)) {
-                highTempRadSys.ControlType = RadControlType::OperativeControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATSPControl)) {
-                highTempRadSys.ControlType = RadControlType::MATSPControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTSPControl)) {
-                highTempRadSys.ControlType = RadControlType::MRTSPControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeSPControl)) {
-                highTempRadSys.ControlType = RadControlType::OperativeSPControl;
-            } else {
-                ShowWarningError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));
-                ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                ShowContinueError(state, format("Control reset to OPERATIVE control for this {}", cCurrentModuleObject));
-                highTempRadSys.ControlType = RadControlType::OperativeControl;
-            }
+            highTempRadSys.ControlType = static_cast<RadControlType>(getEnumerationValue(radControlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
 
             highTempRadSys.ThrottlRange = state.dataIPShortCut->rNumericArgs(8);
             if (highTempRadSys.ThrottlRange < MinThrottlingRange) {

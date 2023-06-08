@@ -69,12 +69,12 @@ namespace HighTempRadiantSystem {
     enum class RadControlType : int
     {
         Invalid = -1,
-        MATControl = 1001,
-        MRTControl = 1002,
-        OperativeControl = 1003,
-        MATSPControl = 1004,
-        MRTSPControl = 1005,
-        OperativeSPControl = 1006,
+        MATControl,
+        MRTControl,
+        OperativeControl,
+        MATSPControl,
+        MRTSPControl,
+        OperativeSPControl,
         Num
     };
 
