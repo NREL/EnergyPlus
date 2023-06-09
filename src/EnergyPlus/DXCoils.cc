@@ -1444,6 +1444,18 @@ void GetDXCoils(EnergyPlusData &state)
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
+        // A5; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
+        if (!lAlphaBlanks(5)) {
+          thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(5));
+          ErrorsFound |= Curve::CheckCurveDims(state,
+                                               thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                               {1},                                          // Valid dimensions
+                                               RoutineName,                                  // Routine name
+                                               CurrentModuleObject,                          // Object Type
+                                               thisDXCoil.Name,                              // Object Name
+                                               cAlphaFields(5));                            // Field Name
+        }
+
         // Set crankcase heater capacity
         thisDXCoil.CrankcaseHeaterCapacity = Numbers(1);
         if (thisDXCoil.CrankcaseHeaterCapacity < 0.0) {
@@ -1476,7 +1488,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         //  Set starting alpha index for coil performance inputs
-        AlphaIndex = 5;
+        AlphaIndex = 6;
         // allocate performance modes for numeric field strings used for sizing routine
         state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode.allocate(
             thisDXCoil.NumDehumidModes * 2 + thisDXCoil.NumCapacityStages * 2); // not sure this math is correct, ask MW
@@ -1857,9 +1869,9 @@ void GetDXCoils(EnergyPlusData &state)
         }     // End of multimode DX dehumidification modes loo
 
         // Get Water System tank connections
-        //  A13, \field Name of Water Storage Tank for Supply
-        thisDXCoil.EvapWaterSupplyName = Alphas(13);
-        if (lAlphaBlanks(13)) {
+        //  A14, \field Name of Water Storage Tank for Supply
+        thisDXCoil.EvapWaterSupplyName = Alphas(14);
+        if (lAlphaBlanks(14)) {
             thisDXCoil.EvapWaterSupplyMode = EvapWaterSupply::FromMains;
         } else {
             thisDXCoil.EvapWaterSupplyMode = EvapWaterSupply::FromTank;
@@ -1872,9 +1884,9 @@ void GetDXCoils(EnergyPlusData &state)
                                      thisDXCoil.EvapWaterTankDemandARRID);
         }
 
-        // A14; \field Name of Water Storage Tank for Condensate Collection
-        thisDXCoil.CondensateCollectName = Alphas(14);
-        if (lAlphaBlanks(14)) {
+        // A15; \field Name of Water Storage Tank for Condensate Collection
+        thisDXCoil.CondensateCollectName = Alphas(15);
+        if (lAlphaBlanks(15)) {
             thisDXCoil.CondensateCollectMode = CondensateCollectAction::Discard;
         } else {
             thisDXCoil.CondensateCollectMode = CondensateCollectAction::ToTank;
@@ -1913,24 +1925,13 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (!lAlphaBlanks(15)) {
-            thisDXCoil.BasinHeaterSchedulePtr = GetScheduleIndex(state, Alphas(15));
+        if (!lAlphaBlanks(16)) {
+            thisDXCoil.BasinHeaterSchedulePtr = GetScheduleIndex(state, Alphas(16));
             if (thisDXCoil.BasinHeaterSchedulePtr == 0) {
                 ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(15), Alphas(15)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(16), Alphas(16)));
                 ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
             }
-        }
-        // A16; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
-        if (!lAlphaBlanks(16)) {
-            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(16));
-            ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
-                                                 {1},                                          // Valid dimensions
-                                                 RoutineName,                                  // Routine name
-                                                 CurrentModuleObject,                          // Object Type
-                                                 thisDXCoil.Name,                              // Object Name
-                                                 cAlphaFields(16));                            // Field Name
         }
 
     } // end of the Multimode DX coil loop

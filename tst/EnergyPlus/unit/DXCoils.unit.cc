@@ -1589,6 +1589,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "DOAS Supply Fan Outlet,  !- Air Inlet Node Name",
         "DOAS Cooling Coil Outlet,!- Air Outlet Node Name",
         "10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve7,         !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         ",                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "2,                       !- Number of Capacity Stages",
         "1,                       !- Number of Enhanced Dehumidification Modes",
@@ -1605,8 +1606,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "0,                       !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         ",                        !- Basin Heater Capacity",
         ",                        !- Basin Heater Setpoint Temperature",
-        ",                        !- Basin Heater Operating Schedule Name",
-        "heaterCapCurve7;         !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        ";                        !- Basin Heater Operating Schedule Name",
 
         "Coil:WaterHeating:AirToWaterHeatPump:Wrapped,",
         "    HPWH Coil_1,             !- Name",
