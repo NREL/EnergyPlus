@@ -531,10 +531,10 @@ namespace DataSurfaces {
 
         // Special Properties
         HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
-        Convect::HcInt intConvCoeff;             // Interior convection algorithm
-        int intConvUserCoeffNum;                 // Interior convection user coefficient index
-        Convect::HcExt extConvCoeff;             // Exterior convection algorithm
-        int extConvUserCoeffNum;                 // Exterior convection user coefficient index
+        Convect::HcInt intConvModel;             // Interior convection algorithm
+        int intConvUserModelNum;                 // Interior convection user coefficient index
+        Convect::HcExt extConvModel;             // Exterior convection algorithm
+        int extConvUserModelNum;                 // Exterior convection user coefficient index
         int OSCPtr;                              // Pointer to OSC data structure
         int OSCMPtr;                             // "Pointer" to OSCM data structure (other side conditions from a model)
 
@@ -583,10 +583,10 @@ namespace DataSurfaces {
                     hash<Real64>()(ViewFactorSky),
 
                     hash<HeatTransferModel>()(HeatTransferAlgorithm),
-                    hash<Convect::HcInt>()(intConvCoeff),
-                    hash<Convect::HcExt>()(extConvCoeff),
-                    hash<int>()(intConvUserCoeffNum),
-                    hash<int>()(extConvUserCoeffNum),
+                    hash<Convect::HcInt>()(intConvModel),
+                    hash<Convect::HcExt>()(extConvModel),
+                    hash<int>()(intConvUserModelNum),
+                    hash<int>()(extConvUserModelNum),
                     hash<int>()(OSCPtr),
                     hash<int>()(OSCMPtr),
 
@@ -621,9 +621,9 @@ namespace DataSurfaces {
                     ExtEnclIndex == other.ExtEnclIndex && ExtSolar == other.ExtSolar && ExtWind == other.ExtWind &&
                     ViewFactorGround == other.ViewFactorGround && ViewFactorSky == other.ViewFactorSky &&
 
-                    HeatTransferAlgorithm == other.HeatTransferAlgorithm && intConvCoeff == other.intConvCoeff &&
-                    intConvUserCoeffNum == other.intConvUserCoeffNum && extConvUserCoeffNum == other.extConvUserCoeffNum &&
-                    extConvCoeff == other.extConvCoeff && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
+                    HeatTransferAlgorithm == other.HeatTransferAlgorithm && intConvModel == other.intConvModel &&
+                    intConvUserModelNum == other.intConvUserModelNum && extConvUserModelNum == other.extConvUserModelNum &&
+                    extConvModel == other.extConvModel && OSCPtr == other.OSCPtr && OSCMPtr == other.OSCMPtr &&
 
                     FrameDivider == other.FrameDivider && SurfWinStormWinConstr == other.SurfWinStormWinConstr &&
 
@@ -1303,8 +1303,8 @@ namespace DataSurfaces {
         Convect::IntConvClass convClass = Convect::IntConvClass::Invalid; 
         int convClassRpt = (int)Convect::IntConvClass::Invalid;
 
-        Convect::HcInt coeff = Convect::HcInt::SetByZone; // convection model
-        int userCoeffNum = 0; // user defined convection model
+        Convect::HcInt model = Convect::HcInt::SetByZone; // convection model
+        int userModelNum = 0; // user defined convection model
 
         Convect::HcInt hcModelEq = Convect::HcInt::Invalid; // current convection model
         int hcModelEqRpt = (int)Convect::HcInt::Invalid;
@@ -1326,8 +1326,8 @@ namespace DataSurfaces {
         Convect::ExtConvClass convClass = Convect::ExtConvClass::Invalid; 
         int convClassRpt = (int)Convect::ExtConvClass::Invalid;
 
-        Convect::HcExt coeff = Convect::HcExt::SetByZone; // conveciton model
-        int userCoeffNum = 0; 
+        Convect::HcExt model = Convect::HcExt::SetByZone; // conveciton model
+        int userModelNum = 0; 
            
         Convect::HcExt hfModelEq = Convect::HcExt::Invalid; // Current forced convection model
         int hfModelEqRpt = (int)Convect::HcExt::Invalid;  
@@ -1370,8 +1370,8 @@ struct SurfacesData : BaseGlobalStruct
     int TotWindows = 0;              // Total number of windows
     int TotStormWin = 0;             // Total number of storm window blocks
     int TotWinShadingControl = 0;    // Total number of window shading control blocks
-    int TotIntConvCoeffUser = 0;     // Total number of interior convection coefficient (overrides) // TODO: Should just be a local variable I think
-    int TotExtConvCoeffUser = 0;     // Total number of exterior convection coefficient (overrides) // TODO: Should just be a local variable I think
+    int TotUserIntConvModels = 0;    // Total number of interior convection coefficient (overrides) // TODO: Should just be a local variable I think
+    int TotUserExtConvModels = 0;    // Total number of exterior convection coefficient (overrides) // TODO: Should just be a local variable I think
     int TotOSC = 0;                  // Total number of Other Side Coefficient Blocks
     int TotOSCM = 0;                 // Total number of Other Side Conditions Model Blocks.
     int TotExtVentCav = 0;           // Total number of ExteriorNaturalVentedCavity
@@ -1511,8 +1511,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfTAirRef;    // Flag for reference air temperature
     Array1D<int> SurfTAirRefRpt; // Flag for reference air temperature for reporting
 
-    Array1D<DataSurfaces::SurfIntConv> surfIntConv;
-    Array1D<DataSurfaces::SurfExtConv> surfExtConv;
+    EPVector<DataSurfaces::SurfIntConv> surfIntConv;
+    EPVector<DataSurfaces::SurfExtConv> surfExtConv;
         
     // Surface Window Heat Balance
     Array1D_int SurfWinInsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
@@ -1738,8 +1738,8 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::WindowShadingControlData> WindowShadingControl;
     EPVector<DataSurfaces::OSCData> OSC;
     EPVector<DataSurfaces::OSCMData> OSCM;
-    EPVector<DataSurfaces::ConvectionCoefficient> UserIntConvCoeffs;
-    EPVector<DataSurfaces::ConvectionCoefficient> UserExtConvCoeffs;
+    EPVector<DataSurfaces::ConvectionCoefficient> userIntConvModels;
+    EPVector<DataSurfaces::ConvectionCoefficient> userExtConvModels;
     EPVector<DataSurfaces::ShadingVertexData> ShadeV;
     EPVector<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
     EPVector<DataSurfaces::SurfaceIncidentSolarMultiplier> SurfIncSolMultiplier;
@@ -1757,8 +1757,8 @@ struct SurfacesData : BaseGlobalStruct
         this->TotWindows = 0;
         this->TotStormWin = 0;
         this->TotWinShadingControl = 0;
-        this->TotIntConvCoeffUser = 0;
-        this->TotExtConvCoeffUser = 0;
+        this->TotUserIntConvModels = 0;
+        this->TotUserExtConvModels = 0;
         this->TotOSC = 0;
         this->TotOSCM = 0;
         this->TotExtVentCav = 0;
@@ -2065,8 +2065,8 @@ struct SurfacesData : BaseGlobalStruct
         this->WindowShadingControl.deallocate();
         this->OSC.deallocate();
         this->OSCM.deallocate();
-        this->UserIntConvCoeffs.deallocate();
-        this->UserExtConvCoeffs.deallocate();
+        this->userIntConvModels.deallocate();
+        this->userExtConvModels.deallocate();
         this->ShadeV.deallocate();
         this->SurfIncSolSSG.deallocate();
         this->SurfIncSolMultiplier.deallocate();

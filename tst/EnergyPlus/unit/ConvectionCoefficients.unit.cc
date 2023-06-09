@@ -1190,8 +1190,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-    state->dataSurface->surfIntConv(SurfNum).coeff = Convect::HcInt::SetByZone;
-    state->dataSurface->surfIntConv(SurfNum).userCoeffNum = 0;
+    state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
@@ -1202,8 +1202,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-    state->dataSurface->surfIntConv(SurfNum).coeff = Convect::HcInt::SetByZone;
-    state->dataSurface->surfIntConv(SurfNum).userCoeffNum = 0;
+    state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
@@ -3013,8 +3013,8 @@ TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocati
     state->dataSurface->surfExtConv.allocate(2);
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 2u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 0u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 2u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 0u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocation2)
@@ -3040,8 +3040,8 @@ TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocati
     state->dataSurface->surfExtConv.allocate(2);
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 0u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 2u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 0u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 2u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation1)
@@ -3062,15 +3062,15 @@ TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation1)
     state->dataSurface->Surface.allocate(2);
     state->dataSurface->Surface(1).Name = "FAKESURFACE";
     state->dataSurface->surfIntConv.allocate(1);
-    state->dataSurface->surfIntConv(1).coeff = Convect::HcInt::SetByZone;
-    state->dataSurface->surfIntConv(1).userCoeffNum = 0;
+    state->dataSurface->surfIntConv(1).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(1).userModelNum = 0;
     state->dataSurface->surfExtConv.allocate(1);
-    state->dataSurface->surfExtConv(1).coeff = Convect::HcExt::SetByZone;
-    state->dataSurface->surfExtConv(1).userCoeffNum = 0;
+    state->dataSurface->surfExtConv(1).model = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv(1).userModelNum = 0;
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 1u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 1u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation2)
@@ -3091,15 +3091,15 @@ TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation2)
     state->dataSurface->Surface.allocate(2);
     state->dataSurface->Surface(1).Name = "FAKESURFACE";
     state->dataSurface->surfIntConv.allocate(1);
-    state->dataSurface->surfIntConv(1).coeff = Convect::HcInt::SetByZone;
-    state->dataSurface->surfIntConv(1).userCoeffNum = 0;
+    state->dataSurface->surfIntConv(1).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(1).userModelNum = 0;
     state->dataSurface->surfExtConv.allocate(1);
-    state->dataSurface->surfExtConv(1).coeff = Convect::HcExt::SetByZone;
-    state->dataSurface->surfExtConv(1).userCoeffNum = 0;
+    state->dataSurface->surfExtConv(1).model = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv(1).userModelNum = 0;
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 1u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 1u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)

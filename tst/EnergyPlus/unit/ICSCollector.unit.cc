@@ -137,7 +137,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataConvect->GetUserSuppliedConvectionCoeffs = false;
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(NumOfSurf, 1.0);
     state->dataSurface->surfExtConv.allocate(NumOfSurf);
-    state->dataSurface->surfExtConv(SurfNum).coeff = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv(SurfNum).model = Convect::HcExt::SetByZone;
     state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(NumOfSurf);
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
     auto &surface = state->dataSurface->Surface(SurfNum);

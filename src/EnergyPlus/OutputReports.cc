@@ -1200,19 +1200,17 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
 
                 auto const &surfIntConv = state.dataSurface->surfIntConv(surf);
                 auto const &surfExtConv = state.dataSurface->surfExtConv(surf);
-                if (surfIntConv.userCoeffNum != 0) {
-                    IntConvCoeffCalc = overrideTypeStrs[static_cast<int>(
-                        state.dataSurface->UserIntConvCoeffs(surfIntConv.userCoeffNum).overrideType)];
+                if (surfIntConv.userModelNum != 0) {
+                    IntConvCoeffCalc = overrideTypeStrs[(int)state.dataSurface->userIntConvModels(surfIntConv.userModelNum).overrideType];
                 } else {
-                    Convect::HcInt hcInt = surfIntConv.coeff;
+                    Convect::HcInt hcInt = surfIntConv.model;
                     if (hcInt == Convect::HcInt::SetByZone) hcInt = state.dataHeatBal->Zone(ZoneNum).IntConvAlgo;
-                    IntConvCoeffCalc = ConvCoeffCalcs[Convect::HcIntReportVals[static_cast<int>(hcInt)] - 1];
+                    IntConvCoeffCalc = ConvCoeffCalcs[Convect::HcIntReportVals[(int)hcInt] - 1];
                 }
-                if (surfExtConv.userCoeffNum != 0) {
-                    ExtConvCoeffCalc = overrideTypeStrs[static_cast<int>(
-                        state.dataSurface->UserExtConvCoeffs(surfExtConv.userCoeffNum).overrideType)];
+                if (surfExtConv.userModelNum != 0) {
+                    ExtConvCoeffCalc = overrideTypeStrs[(int)state.dataSurface->userExtConvModels(surfExtConv.userModelNum).overrideType];
                 } else {
-                    Convect::HcExt hcExt = surfExtConv.coeff;
+                    Convect::HcExt hcExt = surfExtConv.model;
                     if (hcExt == Convect::HcExt::SetByZone) hcExt = state.dataHeatBal->Zone(ZoneNum).ExtConvAlgo;
                     ExtConvCoeffCalc = ConvCoeffCalcs[Convect::HcExtReportVals[static_cast<int>(hcExt)] - 1];
                 }

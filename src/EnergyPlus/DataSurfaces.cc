@@ -550,10 +550,10 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
 
     
     calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
-    calcHashKey.intConvCoeff = state.dataSurface->surfIntConv(SurfNum).coeff;
-    calcHashKey.extConvCoeff = state.dataSurface->surfExtConv(SurfNum).coeff;
-    calcHashKey.intConvUserCoeffNum = state.dataSurface->surfIntConv(SurfNum).userCoeffNum;
-    calcHashKey.extConvUserCoeffNum = state.dataSurface->surfExtConv(SurfNum).userCoeffNum;
+    calcHashKey.intConvModel = state.dataSurface->surfIntConv(SurfNum).model;
+    calcHashKey.extConvModel = state.dataSurface->surfExtConv(SurfNum).model;
+    calcHashKey.intConvUserModelNum = state.dataSurface->surfIntConv(SurfNum).userModelNum;
+    calcHashKey.extConvUserModelNum = state.dataSurface->surfExtConv(SurfNum).userModelNum;
     calcHashKey.OSCPtr = OSCPtr;
     calcHashKey.OSCMPtr = OSCMPtr;
 
