@@ -121,8 +121,8 @@ namespace DataSurfaces {
     // There is a bug here, the azimuth that divides West from
     // NorthWest is 292.5 not 287.5.  Keeping it like this temporarily
     // to minimize diffs.
-    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthLo = {337.5, 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5};
-    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthHi = {22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 287.5, 337.5};
+    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthLo = {337.5, 22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5};
+    constexpr std::array<Real64, static_cast<int>(Compass8::Num)> Compass8AzimuthHi = {22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5};
 
     Compass8 AzimuthToCompass8(Real64 azimuth);
 
