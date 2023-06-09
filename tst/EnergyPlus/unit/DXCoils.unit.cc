@@ -1263,6 +1263,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "   -17.7777777777778,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "   ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "   10,                                     !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve4,                           !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         "   10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   Biquadratic,                            !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "   4.44444444444444,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
@@ -1342,8 +1343,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",",
         ",",
         ",",
-        ",",
-        "heaterCapCurve4;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        ";",
 
         "  Coil:Cooling:DX:VariableSpeed,",
         "Coil:Cooling:DX:VariableSpeed coil,    !- Name",
