@@ -2199,12 +2199,25 @@ void GetDXCoils(EnergyPlusData &state)
 
         // Only required for reverse cycle heat pumps
         thisDXCoil.DefrostEIRFT = GetCurveIndex(state, Alphas(10)); // convert curve name to number
-        if (UtilityRoutines::SameString(Alphas(11), "ReverseCycle")) {
+
+        // A11; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
+        if (!lAlphaBlanks(11)) {
+          thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(11));
+          ErrorsFound |= Curve::CheckCurveDims(state,
+                                               thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
+                                               {1},                                          // Valid dimensions
+                                               RoutineName,                                  // Routine name
+                                               CurrentModuleObject,                          // Object Type
+                                               thisDXCoil.Name,                              // Object Name
+                                               cAlphaFields(11));                            // Field Name
+        }
+
+        if (UtilityRoutines::SameString(Alphas(12), "ReverseCycle")) {
             if (thisDXCoil.DefrostEIRFT == 0) {
                 if (lAlphaBlanks(10)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                     ShowContinueError(state, format("...required {} is blank.", cAlphaFields(10)));
-                    ShowContinueError(state, format("...field is required because {} is \"ReverseCycle\".", cAlphaFields(11)));
+                    ShowContinueError(state, format("...field is required because {} is \"ReverseCycle\".", cAlphaFields(12)));
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                     ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(10), Alphas(10)));
@@ -2233,20 +2246,20 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (UtilityRoutines::SameString(Alphas(11), "ReverseCycle")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
-        if (UtilityRoutines::SameString(Alphas(11), "Resistive")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+        if (UtilityRoutines::SameString(Alphas(12), "ReverseCycle")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+        if (UtilityRoutines::SameString(Alphas(12), "Resistive")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
         if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(11), Alphas(11)));
+            ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(12), Alphas(12)));
             ShowContinueError(state, "...valid values for this field are ReverseCycle or Resistive.");
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(12), "Timed")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
-        if (UtilityRoutines::SameString(Alphas(12), "OnDemand")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+        if (UtilityRoutines::SameString(Alphas(13), "Timed")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
+        if (UtilityRoutines::SameString(Alphas(13), "OnDemand")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
         if (thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(12), Alphas(12)));
+            ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(13), Alphas(13)));
             ShowContinueError(state, "...valid values for this field are Timed or OnDemand.");
             ErrorsFound = true;
         }
@@ -2309,12 +2322,12 @@ void GetDXCoils(EnergyPlusData &state)
 
         thisDXCoil.RatedEIR(1) = 1.0 / thisDXCoil.RatedCOP(1);
 
-        // A13 is optional evaporator node name
-        if (lAlphaBlanks(13)) {
+        // A14 is optional evaporator node name
+        if (lAlphaBlanks(14)) {
             thisDXCoil.CondenserInletNodeNum(1) = 0;
         } else {
             thisDXCoil.CondenserInletNodeNum(1) = GetOnlySingleNode(state,
-                                                                    Alphas(13),
+                                                                    Alphas(14),
                                                                     ErrorsFound,
                                                                     DataLoopNode::ConnectionObjectType::CoilHeatingDXSingleSpeed,
                                                                     thisDXCoil.Name,
@@ -2327,15 +2340,15 @@ void GetDXCoils(EnergyPlusData &state)
                 ShowWarningError(state, format("{}{}=\"{}\", may be invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                 ShowContinueError(
                     state,
-                    format("{}=\"{}\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.", cAlphaFields(13), Alphas(13)));
+                    format("{}=\"{}\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.", cAlphaFields(14), Alphas(14)));
                 ShowContinueError(
                     state, "This node needs to be included in an air system or the coil model will not be valid, and the simulation continues");
             }
         }
 
         // A14, \field Zone Name for Evaporator Placement
-        if (!lAlphaBlanks(14) && NumAlphas > 13) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(14), state.dataHeatBal->Zone);
+        if (!lAlphaBlanks(15) && NumAlphas > 14) {
+            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(15), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -2348,7 +2361,7 @@ void GetDXCoils(EnergyPlusData &state)
                 thisDXCoil.IsSecondaryDXCoilInZone = true;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(14), Alphas(14)));
+                ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(15), Alphas(15)));
             }
         }
         if (thisDXCoil.SecZonePtr > 0) {
@@ -2366,33 +2379,22 @@ void GetDXCoils(EnergyPlusData &state)
             } else {
                 thisDXCoil.SecCoilRatedSHR = 1.0;
             }
-            // A15, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
-            if (!lAlphaBlanks(15)) {
-                thisDXCoil.SecCoilSHRFT = GetCurveIndex(state, Alphas(15));
-                if (thisDXCoil.SecCoilSHRFT == 0) {
-                    ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(15), Alphas(15)));
-                }
-            }
-            // A16; \field Sensible Heat Ratio Function of Flow Fraction Curve Name
+            // A16, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
             if (!lAlphaBlanks(16)) {
-                thisDXCoil.SecCoilSHRFF = GetCurveIndex(state, Alphas(16));
-                if (thisDXCoil.SecCoilSHRFF == 0) {
+                thisDXCoil.SecCoilSHRFT = GetCurveIndex(state, Alphas(16));
+                if (thisDXCoil.SecCoilSHRFT == 0) {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                     ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(16), Alphas(16)));
                 }
             }
-        }
-        // A17; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
-        if (!lAlphaBlanks(17)) {
-            thisDXCoil.CrankcaseHeaterCapacityCurveIndex = Curve::GetCurveIndex(state, Alphas(17));
-            ErrorsFound |= Curve::CheckCurveDims(state,
-                                                 thisDXCoil.CrankcaseHeaterCapacityCurveIndex, // Curve index
-                                                 {1},                                          // Valid dimensions
-                                                 RoutineName,                                  // Routine name
-                                                 CurrentModuleObject,                          // Object Type
-                                                 thisDXCoil.Name,                              // Object Name
-                                                 cAlphaFields(17));                            // Field Name
+            // A17; \field Sensible Heat Ratio Function of Flow Fraction Curve Name
+            if (!lAlphaBlanks(17)) {
+                thisDXCoil.SecCoilSHRFF = GetCurveIndex(state, Alphas(17));
+                if (thisDXCoil.SecCoilSHRFF == 0) {
+                    ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(17), Alphas(17)));
+                }
+            }
         }
 
     } // end of the DX heating coil loop

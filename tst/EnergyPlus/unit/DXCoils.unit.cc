@@ -1138,6 +1138,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "  ,                                       !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "  5,                                      !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "  10,                                     !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve2,                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  Resistive,                              !- Defrost Strategy",
         "  Timed,                                  !- Defrost Control",
@@ -1150,8 +1151,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",                                         !- Secondary Coil Fan Flow Scaling Factor",
         ",                                         !- Nominal Sensible Heat Ratio of Secondary Coil",
         ",                                         !- Sensible Heat Ratio Modifier Function of Temperature Curve Name",
-        ",                                         !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
-        "heaterCapCurve2;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        ";                                         !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name",
 
         "Coil:Cooling:DX:MultiSpeed,",
         "Coil:Cooling:DX:MultiSpeed coil,                     !- Name",
