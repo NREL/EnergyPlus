@@ -4404,7 +4404,7 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
         // A38; \field Zone Name for Condenser Placement
-        if (!lAlphaBlanks(38) && NumAlphas > 36) {
+        if (!lAlphaBlanks(38) && NumAlphas > 37) {
             thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(38), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
