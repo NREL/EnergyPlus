@@ -1484,14 +1484,10 @@ namespace SteamBaseboardRadiator {
 
         // If it was allocated, then we have to check to see if this was running at all...
         for (BaseboardNum = 1; BaseboardNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++BaseboardNum) {
-            if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSrcAvg != 0.0) {
-                SteamBaseboardSysOn = true;
-                break; // DO loop
-            }
+            if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSrcAvg != 0.0) SteamBaseboardSysOn = true;
+            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSource =
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSrcAvg;
         }
-
-        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSource =
-            state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).QBBSteamRadSrcAvg;
 
         DistributeBBSteamRadGains(state); // QBBSteamRadSource has been modified so we need to redistribute gains
     }
