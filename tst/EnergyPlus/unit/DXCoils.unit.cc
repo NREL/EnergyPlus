@@ -1650,6 +1650,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    10.0,                    !- Crankcase Heater Capacity {W}",
+        "    heaterCapCurve9,         !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    Cubic,                   !- Heating Capacity Function of Temperature Curve Name",
@@ -1658,8 +1659,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Biquadratic,             !- Heating COP Function of Temperature Curve Name",
         "    ,                        !- Heating COP Function of Air Flow Fraction Curve Name",
         "    ,                        !- Heating COP Function of Water Flow Fraction Curve Name",
-        "    Cubic,                   !- Part Load Fraction Correlation Curve Name",
-        "    heaterCapCurve9;         !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        "    Cubic;                   !- Part Load Fraction Correlation Curve Name",
 
         "  Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed,",
         "    HPWHOutdoorDXCoilVS,     !- Name",
