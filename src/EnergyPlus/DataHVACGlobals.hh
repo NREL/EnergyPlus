@@ -130,7 +130,20 @@ namespace DataHVACGlobals {
     // parameters describing fan types
     int constexpr NumAllFanTypes(6);
 
-    // fan types
+    enum class FanType
+    {
+        Invalid = -1,
+        Constant,
+        VAV,
+        OnOff,
+        Exhaust,
+        Component,
+        System,
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(FanType::Num)> fanTypeNamesUC = {
+        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
+
     int constexpr FanType_SimpleConstVolume(1);
     int constexpr FanType_SimpleVAV(2);
     int constexpr FanType_SimpleOnOff(3);
@@ -145,6 +158,15 @@ namespace DataHVACGlobals {
     int constexpr CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
     int constexpr ContFanCycCoil(2); // Continuous fan, cycling coil = 2
     // Fan placement
+    enum class FanLoc
+    {
+        Invalid = -1,
+        BlowThrough,
+        DrawThrough,
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(FanLoc::Num)> fanLocNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
+
     int constexpr BlowThru(1); // fan before coil
     int constexpr DrawThru(2); // fan after coil
     // OA Controller Heat Recovery Bypass Control Types
@@ -161,6 +183,87 @@ namespace DataHVACGlobals {
     int constexpr UnitarySys_HeatPump_AirToAir(5);
     int constexpr UnitarySys_HeatPump_WaterToAir(6);
     int constexpr UnitarySys_AnyCoilType(7);
+
+    enum class CoilType
+    {
+        Invalid = -1,
+        DXCoolingSingleSpeed,
+        DXHeatingEmpirical,
+        DXCoolingTwoSpeed,
+        DXCoolingHXAssisted,
+        DXCoolingTwoStageWHumControl,
+        DXHeatPumpWaterHeaterPumped,
+        DXHeatPumpWaterHeaterWrapped,
+        DXMultiSpeedCooling,
+        DXMultiSpeedHeating,
+        HeatingGasOrOtherFuel,
+        HeatingGasMultiStage,
+        HeatingElectric,
+        HeatingElectricMultiStage,
+        HeatingDesuperheater,
+        CoolingWater,
+        CoolingWaterDetailed,
+        HeatingWater,
+        HeatingSteam,
+        WaterCoolingHXAssisted,
+        CoolingWaterToAirHP,
+        HeatingWaterToAirHP,
+        CoolingWaterToAirHPSimple,
+        HeatingWaterToAirHPSimple,
+        VRFCooling,
+        VRFHeating,
+        UserDefined,
+        DXPackagedThermalStorageCooling,
+        CoolingWaterToAirHPVSEquationFit,
+        HeatingWaterToAirHPVSEquationFit,
+        CoolingAirToAirVariableSpeed,
+        HeatingAirToAirVariableSpeed,
+        DXHeatPumpWaterHeaterVariableSpeed,
+        VRFFluidTCtrlCooling,
+        VRFFluidTCtrlHeating,
+        DXCooling,
+        DXSubcoolReheat,
+        DXCurveFitSpeed,
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(CoilType::Num)> coilTypeNamesUC = {
+        "COIL:COOLING:DX:SINGLESPEED",
+        "COIL:HEATING:DX:SINGLESPEED",
+        "COIL:COOLING:DX:TWOSPEED",
+        "COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED",
+        "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE",
+        "COIL:WATERHEATING:AIRTOWATERHEATPUMP:PUMPED",
+        "COIL:WATERHEATING:AIRTOWATERHEATPUMP:WRAPPED",
+        "COIL:COOLING:DX:MULTISPEED",
+        "COIL:HEATING:DX:MULTISPEED",
+        "COIL:HEATING:FUEL",
+        "COIL:HEATING:GAS:MULTISTAGE",
+        "COIL:HEATING:ELECTRIC",
+        "COIL:HEATING:ELECTRIC:MULTISTAGE",
+        "COIL:HEATING:DESUPERHEATER",
+        "COIL:COOLING:WATER",
+        "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+        "COIL:HEATING:WATER",
+        "COIL:HEATING:STEAM",
+        "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
+        "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+        "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+        "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+        "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+        "COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW",
+        "COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW",
+        "COIL:USERDEFINED",
+        "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
+        "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+        "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+        "COIL:COOLING:DX:VARIABLESPEED",
+        "COIL:HEATING:DX:VARIABLESPEED",
+        "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+        "COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL",
+        "COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL",
+        "COIL:COOLING:DX",
+        "COIL:COOLING:DX:SUBCOOLREHEAT",
+        "COIL:COOLING:DX:CURVEFIT:SPEED"};
 
     // parameters describing coil types
     int constexpr NumAllCoilTypes(37);
