@@ -1312,7 +1312,7 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (!lAlphaBlanks(16) && NumAlphas > 14) {
+        if (!lAlphaBlanks(16) && NumAlphas > 15) {
             thisDXCoil.SHRFTemp(1) = GetCurveIndex(state, Alphas(16)); // convert curve name to number
             if (thisDXCoil.SHRFTemp(1) == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -1329,7 +1329,7 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (!lAlphaBlanks(17) && NumAlphas > 15) {
+        if (!lAlphaBlanks(17) && NumAlphas > 16) {
             thisDXCoil.SHRFFlow(1) = GetCurveIndex(state, Alphas(17)); // convert curve name to number
             if (thisDXCoil.SHRFTemp(1) == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -1360,7 +1360,7 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
         // A19; \field Zone Name for Condenser Placement
-        if (!lAlphaBlanks(19) && NumAlphas > 17) {
+        if (!lAlphaBlanks(19) && NumAlphas > 18) {
             thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(19), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
