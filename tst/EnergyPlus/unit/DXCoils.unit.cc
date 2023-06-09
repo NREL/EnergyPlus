@@ -1360,6 +1360,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    10,                      !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve5,             !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -1469,8 +1470,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         ",",
         ",",
         ",",
-        ",,,,,,,,,,,,,,,,,,"
-        "heaterCapCurve5;                          !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        ",,,,,,,,,,,,,,,,,;"
 
         "  Coil:Heating:DX:VariableSpeed,",
         "Coil:Heating:DX:VariableSpeed coil,  !- Name",
