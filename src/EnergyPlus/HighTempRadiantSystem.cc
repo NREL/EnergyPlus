@@ -722,7 +722,7 @@ namespace HighTempRadiantSystem {
             // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 1;
-            std::string SizingString = state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum) + " [W]";
+            std::string const SizingString = format("{} [W]", state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum));
             // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
             // FractionOfAutosizedHeatingCapacity )
             int CapSizingMethod = static_cast<int>(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).HeatingCapMethod);

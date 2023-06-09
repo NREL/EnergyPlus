@@ -225,13 +225,11 @@ namespace BaseboardRadiator {
         using namespace DataSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
-        int constexpr iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
-        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
-        int constexpr iHeatCapacityPerFloorAreaNumericNum(
-            2); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
-        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autosized heating capacity
+        static constexpr std::string_view RoutineName = "GetBaseboardInput: "; // include trailing blank space
+        int constexpr iHeatCAPMAlphaNum = 5;                   // get input index to water baseboard Radiator system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum = 1;       // get input index to water baseboard Radiator system electric heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum = 2; // index to baseboard Radiator system electric heating capacity per floor area sizing
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum = 3; //  index to baseboard heating capacity fraction of autosized heating capacity
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
@@ -526,7 +524,7 @@ namespace BaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        static constexpr std::string_view RoutineName("BaseboardRadiator:InitBaseboard");
+        static constexpr std::string_view RoutineName = "BaseboardRadiator:InitBaseboard";
 
         if (this->SetLoopIndexFlag && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
@@ -603,9 +601,9 @@ namespace BaseboardRadiator {
         // calculated by numerically inverting the baseboard calculation routine.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr Acc(0.0001); // Accuracy of result
-        int constexpr MaxIte(500);    // Maximum number of iterations
-        static std::string const RoutineName(cCMO_BBRadiator_Water + ":SizeBaseboard");
+        Real64 constexpr Acc = 0.0001; // Accuracy of result
+        int constexpr MaxIte = 500;    // Maximum number of iterations
+        static std::string const RoutineName = cCMO_BBRadiator_Water + ":SizeBaseboard";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DesCoilLoad(0.0);
@@ -649,7 +647,7 @@ namespace BaseboardRadiator {
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    std::string_view SizingString = this->FieldNames(FieldNum) + " [W]";
+                    std::string const SizingString = format("{} [W]", this->FieldNames(FieldNum));
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
@@ -771,7 +769,7 @@ namespace BaseboardRadiator {
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    std::string SizingString = this->FieldNames(FieldNum) + " [W]";
+                    std::string const SizingString = format("{} [W]", this->FieldNames(FieldNum));
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||

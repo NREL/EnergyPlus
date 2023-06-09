@@ -605,7 +605,8 @@ namespace ElectricBaseboardRadiator {
             state.dataSize->DataZoneNumber = elecBaseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing; // Integer representation of sizing method name (e.g., CoolingAirflowSizing)
             int FieldNum = 1;                                          // IDD numeric field number where input field description is found
-            std::string SizingString = state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
+            std::string const SizingString =
+                format("{} [W]", state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum));
             // capacity sizing methods (e.g., HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
             int CapSizingMethod = elecBaseboard.HeatingCapMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
