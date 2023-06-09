@@ -1486,6 +1486,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    10.0,                   !- Crankcase Heater Capacity {W}",
+        "heaterCapCurve6,             !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
@@ -1580,8 +1581,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
         "    Biquadratic,             !- Speed 10 Heating Capacity Function of Temperature Curve Name",
         "    Cubic,                   !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name",
         "    Biquadratic,             !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
-        "    Cubic,                   !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
-        "heaterCapCurve6;             !- Crankcase Heater Capacity Function of Outdoor Temperature Curve Name",
+        "    Cubic;                   !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
 
         "Coil:Cooling:DX:TwoStageWithHumidityControlMode,",
         "Coil:Cooling:DX:TwoStageWithHumidityControlMode coil,       !- Name",
