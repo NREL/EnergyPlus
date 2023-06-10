@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Array4D.hh>
-#include <ObjexxFCL/Array5D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -67,7 +66,6 @@ struct MoistureBalanceData : BaseGlobalStruct
     // static constexpr Real64 Lam = 2500000.0; // heat of adsorption for building materials
     // Public Variables that will also be used in the Moisture Surface Balance
     Array3D<Real64> FluxH;  // transfer function coeff for calculating the CPF Flux history term
-    Array5D<Real64> IcoefH; // transfer function coeff for calculating the CPF history term
     Array4D<Real64> Icoef;  // transfer function coeff for calculating the CPF history term
     Array2D<Real64> DiffC;  // Thermal Diffusivity in combined potential formulation (CPF)
     // for each equation
