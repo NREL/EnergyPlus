@@ -774,17 +774,15 @@ namespace Dayltg {
 
             if (state.dataDaylightingDevices->GetTDDInputErrorsFound) ShowFatalError(state, "Errors in DaylightingDevice:Tubular input.");
             state.dataDaylightingManager->TDDTransVisBeam.allocate(Constant::HoursInDay, NumOfTDDPipes);
-            state.dataDaylightingManager->TDDFluxInc.allocate(Constant::HoursInDay, NumOfTDDPipes, static_cast<int>(SkyType::Num));
-            state.dataDaylightingManager->TDDFluxTrans.allocate(Constant::HoursInDay, NumOfTDDPipes, static_cast<int>(SkyType::Num));
-            for (int tddNum = 1; tddNum <= NumOfTDDPipes; ++tddNum) {
-                for (int hr = 1; hr <= Constant::HoursInDay; ++hr) {
+            state.dataDaylightingManager->TDDFluxInc.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            state.dataDaylightingManager->TDDFluxTrans.allocate(Constant::HoursInDay, NumOfTDDPipes);
+            for (int hr = 1; hr <= Constant::HoursInDay; ++hr) {
+                for (int tddNum = 1; tddNum <= NumOfTDDPipes; ++tddNum) {
                     state.dataDaylightingManager->TDDTransVisBeam(hr, tddNum) = 0.0;
-                    for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-                            state.dataDaylightingManager->TDDFluxInc(hr, tddNum, iSky) = 0.0;
-                        state.dataDaylightingManager->TDDFluxTrans(hr, tddNum, iSky) = 0.0;
-                    }
-                }
-            }
+                    state.dataDaylightingManager->TDDFluxInc(hr, tddNum) = Illums();
+                    state.dataDaylightingManager->TDDFluxTrans(hr, tddNum) = Illums();
+                } // for (tddNum)
+            } // for (hr)
         }
     }
 

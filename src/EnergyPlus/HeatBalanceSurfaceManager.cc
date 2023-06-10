@@ -3699,8 +3699,6 @@ void InitIntSolarDistribution(EnergyPlusData &state)
     using Dayltg::DistributeTDDAbsorbedSolar;
     using namespace DataWindowEquivalentLayer;
 
-    auto &Surface = state.dataSurface->Surface;
-
     // COMPUTE TOTAL SHORT-WAVE RADIATION ORIGINATING IN ZONE.
     // Note: If sun is not up, QS is only internal gains
     for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {

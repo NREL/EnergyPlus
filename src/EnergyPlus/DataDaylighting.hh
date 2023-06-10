@@ -53,7 +53,6 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Array4D.hh>
-#include <ObjexxFCL/Array5D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
@@ -71,13 +70,17 @@ namespace Dayltg {
     enum class SkyType 
     {
         Invalid = -1,
-        Clear = 1,
+        Clear,
         ClearTurbid,
         Intermediate,
         Overcast,
         Num
     };
 
+    struct Illums {
+        std::array<Real64, (int)SkyType::Num> sky = {0.0, 0.0, 0.0, 0.0};
+    };
+        
     enum class ExtWinType
     {
         Invalid = -1,
@@ -196,9 +199,9 @@ namespace Dayltg {
         //  3: Reference point number (1 to Total Daylighting Reference Points)
         //  4: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
         //  5: Daylit window number (1 to NumOfDayltgExtWins)
-        Array5D<Real64> DaylIllFacSky;
-        Array5D<Real64> DaylSourceFacSky;
-        Array5D<Real64> DaylBackFacSky;
+        Array4D<Dayltg::Illums> DaylIllFacSky;
+        Array4D<Dayltg::Illums> DaylSourceFacSky;
+        Array4D<Dayltg::Illums> DaylBackFacSky;
         // Arguments (dimensions) for Dayl---Sun are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
@@ -268,7 +271,7 @@ namespace Dayltg {
         //  4: Shading index (1 to MaxSlatAngs+1; 1 = bare window; 2 = with shade, or, if blinds
         //      2 = first slat position, 3 = second position, ..., MaxSlatAngs+1 = last position)
         //  5: Sky type (1 to 4; 1 = clear, 2 = clear turbid, 3 = intermediate, 4 = overcast
-        Array5D<Real64> DaylIllFacSky;
+        Array4D<Dayltg::Illums> DaylIllFacSky;
         // Arguments (dimensions) for Dayl---Sun are:
         //  1: Sun position index / HourOfDay (1 to 24)
         //  2: Daylit window number (1 to NumOfDayltgExtWins)

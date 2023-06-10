@@ -406,12 +406,6 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
     //    int loop;       // DO loop indices
     Real64 DaylFac; // sky daylight factor at ref pt i
 
-    // added for output all daylight factors
-    Real64 DFClrSky;
-    Real64 DFClrTbSky;
-    Real64 DFIntSky;
-    Real64 DFOcSky;
-
     Real64 SlatAngle;
     int ISA;
 
@@ -481,17 +475,17 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         }
     }
 
-    int numTDDPipes = static_cast<int>(state.dataDaylightingDevicesData->TDDPipe.size());
+    int numTDD = (int)state.dataDaylightingDevicesData->TDDPipe.size();
     // Zero daylighting factor arrays
-    if (numTDDPipes > 0) {
-        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-            state.dataDaylightingManager->TDDTransVisBeam = 0.0;
-            state.dataDaylightingManager->TDDFluxInc = 0.0;
-            state.dataDaylightingManager->TDDFluxTrans = 0.0;
-        } else {
-            state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->HourOfDay, {1, numTDDPipes}) = 0.0;
-            state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->HourOfDay, {1, numTDDPipes}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
-            state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->HourOfDay, {1, numTDDPipes}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
+    if (numTDD > 0) {
+        int iHrBeg = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : 1;
+        int iHrEnd = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : Constant::HoursInDay;
+        for (int iHr = iHrBeg; iHr <= iHrEnd; ++iHr) {
+            for (int iTDD = 1; iTDD <= numTDD; ++iTDD) {
+                state.dataDaylightingManager->TDDTransVisBeam(iHr, iTDD) = 0.0;
+                state.dataDaylightingManager->TDDFluxInc(iHr, iTDD) = Illums();
+                state.dataDaylightingManager->TDDFluxTrans(iHr, iTDD) = Illums();
+            }
         }
     }
 
@@ -507,7 +501,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             state.dataDaylightingManager->SPHSUNHR = 0.0;
             state.dataDaylightingManager->CPHSUNHR = 0.0;
             state.dataDaylightingManager->THSUNHR = 0.0;
-            state.dataDaylightingManager->GILSK = 0.0;
+            state.dataDaylightingManager->GILSK = Illums();
             state.dataDaylightingManager->GILSU = 0.0;
             for (int IHR = 1; IHR <= Constant::HoursInDay; ++IHR) {
                 if (state.dataSurface->SurfSunCosHourly(IHR).z < DataEnvironment::SunIsUpValue)
@@ -522,7 +516,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                 state.dataDaylightingManager->THSUN = state.dataDaylightingManager->THSUNHR(IHR);
                 state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(IHR);
                 state.dataDaylightingManager->CPHSUN = state.dataDaylightingManager->CPHSUNHR(IHR);
-                DayltgExtHorizIllum(state, state.dataDaylightingManager->GILSK(IHR, 1), state.dataDaylightingManager->GILSU(IHR));
+                DayltgExtHorizIllum(state, state.dataDaylightingManager->GILSK(IHR), state.dataDaylightingManager->GILSU(IHR));
             }
         }
     } else { // timestep integrated calculations
@@ -535,7 +529,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
         state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay) = 0.0;
         state.dataDaylightingManager->CPHSUNHR(state.dataGlobal->HourOfDay) = 0.0;
         state.dataDaylightingManager->THSUNHR(state.dataGlobal->HourOfDay) = 0.0;
-        state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay, {1, static_cast<int>(SkyType::Num)}) = 0.0;
+        state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay) = Illums();
         state.dataDaylightingManager->GILSU(state.dataGlobal->HourOfDay) = 0.0;
         if (!(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay).z < DataEnvironment::SunIsUpValue)) { // Skip if sun is below horizon
             state.dataDaylightingManager->PHSUN = Constant::PiOvr2 - std::acos(state.dataSurface->SurfSunCosHourly(state.dataGlobal->HourOfDay).z);
@@ -550,7 +544,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
             state.dataDaylightingManager->SPHSUN = state.dataDaylightingManager->SPHSUNHR(state.dataGlobal->HourOfDay);
             state.dataDaylightingManager->CPHSUN = state.dataDaylightingManager->CPHSUNHR(state.dataGlobal->HourOfDay);
             DayltgExtHorizIllum(state,
-                                state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay, 1),
+                                state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay),
                                 state.dataDaylightingManager->GILSU(state.dataGlobal->HourOfDay));
         }
     }
@@ -596,7 +590,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                                 }
 
                                 for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                                    DaylFac = thisDaylightControl.DaylIllFacSky(12, windowCounter, refPtNum, 1, static_cast<int>(skyType));
+                                        DaylFac = thisDaylightControl.DaylIllFacSky(12, windowCounter, refPtNum, 1).sky[(int)skyType];
                                     print(state.files.eio,
                                           " Sky Daylight Factors,{},{},{},{},{},{},{:.4R}\n",
                                           skyTypeString,
@@ -707,24 +701,18 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                     for (int IHR = 1; IHR <= Constant::HoursInDay; ++IHR) {
                         // For each Daylight Reference Point
                         for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                            DFClrSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, windowCounter, refPtNum, ISlatAngle, static_cast<int>(SkyType::Clear));
-                            DFClrTbSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, windowCounter, refPtNum, ISlatAngle, static_cast<int>(SkyType::ClearTurbid));
-                            DFIntSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, windowCounter, refPtNum, ISlatAngle, static_cast<int>(SkyType::Intermediate));
-                            DFOcSky = thisDaylightControl.DaylIllFacSky(
-                                IHR, windowCounter, refPtNum, ISlatAngle, static_cast<int>(SkyType::Overcast));
+                            auto &illums = thisDaylightControl.DaylIllFacSky(IHR, windowCounter, refPtNum, ISlatAngle);
 
                             // write daylight factors - 4 sky types for each daylight ref point
                             print(state.files.dfs,
                                   "{},{},{:.5R},{:.5R},{:.5R},{:.5R}\n",
                                   IHR,
                                   state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refPtNum)).Name,
-                                  DFClrSky,
-                                  DFClrTbSky,
-                                  DFIntSky,
-                                  DFOcSky);
+                                  illums.sky[(int)SkyType::Clear],
+                                  illums.sky[(int)SkyType::ClearTurbid],
+                                  illums.sky[(int)SkyType::Intermediate],
+                                  illums.sky[(int)SkyType::Overcast]);
+
                         } // for (refPtNum) Reference Point
                     }     // for (IHR) hour
                 }         // for (ISlatAngle) slat angle
@@ -889,31 +877,29 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     thisDaylightControl.BackLumFromWinAtRefPt = 0.0;
     thisDaylightControl.SourceLumFromWinAtRefPt = 0.0;
 
-    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-
-        thisDaylightControl.DaylIllFacSky = 0.0;
-        thisDaylightControl.DaylSourceFacSky = 0.0;
-        thisDaylightControl.DaylBackFacSky = 0.0;
-        thisDaylightControl.DaylIllFacSun = 0.0;
-        thisDaylightControl.DaylIllFacSunDisk = 0.0;
-        thisDaylightControl.DaylSourceFacSun = 0.0;
-        thisDaylightControl.DaylSourceFacSunDisk = 0.0;
-        thisDaylightControl.DaylBackFacSun = 0.0;
-        thisDaylightControl.DaylBackFacSunDisk = 0.0;
-    } else {
-        int numRefPts = thisDaylightControl.TotalDaylRefPoints;
-        int numExtWins = thisEnclDaylight.NumOfDayltgExtWins;
-        int numSlatAngs = state.dataSurface->actualMaxSlatAngs + 1;
-        thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
-        thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
-        thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
-        thisDaylightControl.DaylIllFacSun(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
-        thisDaylightControl.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
-        thisDaylightControl.DaylSourceFacSun(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
-        thisDaylightControl.DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
-        thisDaylightControl.DaylBackFacSun(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
-        thisDaylightControl.DaylBackFacSunDisk(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
-    }
+    int iHrBeg = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : 1;
+    int iHrEnd = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : Constant::HoursInDay;
+    int numExtWins = thisEnclDaylight.NumOfDayltgExtWins;
+    int numRefPts = thisDaylightControl.TotalDaylRefPoints;
+    int numSlatAngs = state.dataSurface->actualMaxSlatAngs + 1;
+    
+    for (int iHr = iHrBeg; iHr <= iHrEnd; ++iHr) {
+        for (int iWin = 1; iWin <= numExtWins; ++iWin) {
+            for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
+                    thisDaylightControl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    thisDaylightControl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    thisDaylightControl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    thisDaylightControl.DaylIllFacSun(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                    thisDaylightControl.DaylIllFacSunDisk(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                    thisDaylightControl.DaylSourceFacSun(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                    thisDaylightControl.DaylSourceFacSunDisk(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                    thisDaylightControl.DaylBackFacSun(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                    thisDaylightControl.DaylBackFacSunDisk(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                } // for (iSlatAng)
+            } // for (iRefPt)
+        } // for (iWin)
+    } // for (iHr)
 
     NRF = thisDaylightControl.TotalDaylRefPoints;
     BRef = 0;
@@ -1254,14 +1240,20 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
 
     illumMapCalc.DaylIllumAtMapPt = 0.0; // Daylight illuminance at reference points (lux)
     illumMapCalc.IllumFromWinAtMapPt = 0.0;
-    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-        illumMapCalc.DaylIllFacSky = 0.0;
-        illumMapCalc.DaylIllFacSun = 0.0;
-        illumMapCalc.DaylIllFacSunDisk = 0.0;
-    } else {
-        illumMapCalc.DaylIllFacSky(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
-        illumMapCalc.DaylIllFacSun(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
-        illumMapCalc.DaylIllFacSunDisk(state.dataGlobal->HourOfDay, {1, numExtWins}, {1, numRefPts}, {1, numSlatAngs}) = 0.0;
+
+    int iHrBeg = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : 1;
+    int iHrEnd = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : Constant::HoursInDay;
+    
+    for (int iHr = iHrBeg; iHr <= iHrEnd; ++iHr) {
+        for (int iWin = 1; iWin <= numExtWins; ++iWin) {
+            for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
+                    illumMapCalc.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = Illums();
+                    illumMapCalc.DaylIllFacSun(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                    illumMapCalc.DaylIllFacSunDisk(iHr, iWin, iRefPt, iSlatAng) = 0.0;
+                }
+            }
+        }
     }
 
     for (int IL = 1; IL <= numRefPts; ++IL) {
@@ -1869,24 +1861,23 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(
         }
     }
 
-    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
-        // Initialize sky and sun components of direct illuminance (arrays EDIRSK, EDIRSU, EDIRSUdisk)
-        // and average window luminance (arrays AVWLSK, AVWLSU, AVWLSUdisk), at ref pt.
-        state.dataDaylightingManager->EDIRSK = 0.0;
-        state.dataDaylightingManager->EDIRSU = 0.0;
-        state.dataDaylightingManager->EDIRSUdisk = 0.0;
-        state.dataDaylightingManager->AVWLSK = 0.0;
-        state.dataDaylightingManager->AVWLSU = 0.0;
-        state.dataDaylightingManager->AVWLSUdisk = 0.0;
-    } else {
-        int numSlatAngs = state.dataSurface->actualMaxSlatAngs + 1;
-        state.dataDaylightingManager->EDIRSK(state.dataGlobal->HourOfDay, {1, numSlatAngs}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
-        state.dataDaylightingManager->EDIRSU(state.dataGlobal->HourOfDay, {1, numSlatAngs}) = 0.0;
-        state.dataDaylightingManager->EDIRSUdisk(state.dataGlobal->HourOfDay, {1, numSlatAngs}) = 0.0;
-        state.dataDaylightingManager->AVWLSK(state.dataGlobal->HourOfDay, {1, numSlatAngs}, {1, static_cast<int>(SkyType::Num)}) = 0.0;
-        state.dataDaylightingManager->AVWLSU(state.dataGlobal->HourOfDay, {1, numSlatAngs}) = 0.0;
-        state.dataDaylightingManager->AVWLSUdisk(state.dataGlobal->HourOfDay, {1, numSlatAngs}) = 0.0;
+    int iHrBeg = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : 1;
+    int iHrEnd = state.dataSysVars->DetailedSolarTimestepIntegration ? state.dataGlobal->HourOfDay : Constant::HoursInDay;
+    int numSlatAngs = state.dataSurface->actualMaxSlatAngs + 1;
+    
+    for (int iHr = iHrBeg; iHr <= iHrEnd; ++iHr) {
+        for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
+            // Initialize sky and sun components of direct illuminance (arrays EDIRSK, EDIRSU, EDIRSUdisk)
+            // and average window luminance (arrays AVWLSK, AVWLSU, AVWLSUdisk), at ref pt.
+            state.dataDaylightingManager->EDIRSK(iHr, iSlatAng) = Illums();
+            state.dataDaylightingManager->EDIRSU(iHr, iSlatAng) = 0.0;
+            state.dataDaylightingManager->EDIRSUdisk(iHr, iSlatAng) = 0.0;
+            state.dataDaylightingManager->AVWLSK(iHr, iSlatAng) = Illums();
+            state.dataDaylightingManager->AVWLSU(iHr, iSlatAng) = 0.0;
+            state.dataDaylightingManager->AVWLSUdisk(iHr, iSlatAng) = 0.0;
+        }
     }
+
     if (CalledFrom == CalledFor::RefPoint) {
         // Initialize solid angle subtended by window wrt ref pt
         // and solid angle weighted by glare position factor
@@ -3079,11 +3070,11 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
     if (COSB <= 0.0) return;
 
-    XEDIRSK = 0.0;
+    XEDIRSK = Illums();
     //        XEDIRSU = 0.0; //Unused Set but never used
-    XAVWLSK = 0.0;
-    Real64 const Ray_3(Ray.z);
-    Real64 const DOMEGA_Ray_3(DOMEGA * Ray_3);
+    XAVWLSK = Illums();
+    Real64 const Ray_3 = Ray.z;
+    Real64 const DOMEGA_Ray_3 = DOMEGA * Ray_3;
 
     // Add contribution of this window element to glare and to
     // direct illuminance at reference point
@@ -3158,14 +3149,16 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / Constant::Pi;
             }
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
-            int l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
-            int l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
-            for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky, ++l2, ++l3) { // [ l2 ] == ( ISky, iHour ) // [ l3 ] == ( ISky, 1, iHour )
-                XAVWLSK(ISky) = state.dataDaylightingManager->GILSK[l2] * SkyReflVisLum;
-                state.dataDaylightingManager->AVWLSK[l3] += XAVWLSK(ISky) * TVISB;
+            auto &gilsk = state.dataDaylightingManager->GILSK(iHour);
+            auto &avwlsk = state.dataDaylightingManager->AVWLSK(iHour, 1);
+            auto &edirsk = state.dataDaylightingManager->EDIRSK(iHour, 1);
+
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) { 
+                XAVWLSK.sky[iSky] = gilsk.sky[iSky] * SkyReflVisLum;
+                avwlsk.sky[iSky] += XAVWLSK.sky[iSky] * TVISB;
                 if (PHRAY >= 0.0) {
-                    XEDIRSK(ISky) = state.dataDaylightingManager->GILSK[l2] * SkyReflVisLum * DOMEGA_Ray_3;
-                    state.dataDaylightingManager->EDIRSK[l3] += XEDIRSK(ISky) * TVISB;
+                    XEDIRSK.sky[iSky] = gilsk.sky[iSky] * SkyReflVisLum * DOMEGA_Ray_3;
+                    edirsk.sky[iSky] += XEDIRSK.sky[iSky] * TVISB;
                 }
             }
         }
@@ -3178,11 +3171,13 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             // Make all transmitted light diffuse for a TDD with a bare diffuser
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->WLUMSK));
             assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
-            int l3(state.dataDaylightingManager->AVWLSK.index(iHour, 1, 1));
-            for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky, ++l3) { // [ l3 ] == ( ISky, 1, iHour )
-                state.dataDaylightingManager->AVWLSK[l3] += state.dataDaylightingManager->WLUMSK[l3];
+            auto &avwlsk = state.dataDaylightingManager->AVWLSK(iHour, 1);
+            auto &edirsk = state.dataDaylightingManager->EDIRSK(iHour, 1);
+            auto &wlumsk = state.dataDaylightingManager->WLUMSK(iHour, 1);
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) { 
+                avwlsk.sky[iSky] += wlumsk.sky[iSky];
                 if (PHRAY > 0.0) 
-                    state.dataDaylightingManager->EDIRSK[l3] += state.dataDaylightingManager->WLUMSK[l3] * DOMEGA_Ray_3;
+                    edirsk.sky[iSky] += wlumsk.sky[iSky] * DOMEGA_Ray_3;
             }
 
             state.dataDaylightingManager->AVWLSU(iHour, 1) += state.dataDaylightingManager->WLUMSU(iHour, 1);
@@ -3220,20 +3215,22 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                     (state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi));
             Vector3<Real64> const SUNCOS_iHour(state.dataSurface->SurfSunCosHourly(iHour));
             assert(equal_dimensions(state.dataDaylightingManager->EDIRSK, state.dataDaylightingManager->AVWLSK));
-            int l(state.dataDaylightingManager->EDIRSK.index(iHour, 1, 1));
-            for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky, ++l) { // [ l ] == ( iHour, 1, ISky )
+            auto &edirsk = state.dataDaylightingManager->EDIRSK(iHour, 1);
+            auto &avwlsk = state.dataDaylightingManager->AVWLSK(iHour, 1);
+            
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                 if (PHRAY > 0.0) {                   // Ray heads upward to sky
-                    ELUM = DayltgSkyLuminance(state, static_cast<SkyType>(ISky), THRAY, PHRAY);
-                    XEDIRSK(ISky) = ELUM * DOMEGA_Ray_3;
-                    DEDIR = XEDIRSK(ISky) * TVISB;
-                    state.dataDaylightingManager->EDIRSK[l] += DEDIR * ObTrans;
-                    state.dataDaylightingManager->AVWLSK[l] += ELUM * TVISB_ObTrans;
-                    XAVWLSK(ISky) = ELUM * ObTrans;
+                    ELUM = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), THRAY, PHRAY);
+                    XEDIRSK.sky[iSky] = ELUM * DOMEGA_Ray_3;
+                    DEDIR = XEDIRSK.sky[iSky] * TVISB;
+                    edirsk.sky[iSky] += DEDIR * ObTrans;
+                    avwlsk.sky[iSky] += ELUM * TVISB_ObTrans;
+                    XAVWLSK.sky[iSky] = ELUM * ObTrans;
                 } else { // PHRAY <= 0.
                     // Ray heads downward to ground.
                     // Contribution from sky diffuse reflected from ground
-                    XAVWLSK(ISky) = state.dataDaylightingManager->GILSK(iHour, ISky) * GILSK_mult;
-                    state.dataDaylightingManager->AVWLSK[l] += TVISB * XAVWLSK(ISky);
+                    XAVWLSK.sky[iSky] = state.dataDaylightingManager->GILSK(iHour).sky[iSky] * GILSK_mult;
+                    avwlsk.sky[iSky] += TVISB * XAVWLSK.sky[iSky];
                     // Contribution from beam solar reflected from ground (beam reaching ground point
                     // can be obstructed [SunObstructionMult < 1.0] if CalcSolRefl = .TRUE.)
                 }     // End of check if ray is going up or down
@@ -3648,15 +3645,14 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
         for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
             // Sometimes this is JB > 2 and sometimes it's JB > 1, what gives?
             if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break; 
-            
-            for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+
+            auto &wlumsk = state.dataDaylightingManager->WLUMSK(iHour, JB + 1);
+            auto &edirsk = state.dataDaylightingManager->EDIRSK(iHour, JB + 1);
+            auto &avwlsk = state.dataDaylightingManager->AVWLSK(iHour, JB + 1);
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                 // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-                state.dataDaylightingManager->AVWLSK(iHour, JB + 1, ISky) +=
-                    state.dataDaylightingManager->WLUMSK(iHour, JB + 1, ISky) * TVisIntWinMult;
-                if (PHRAY > 0.0) {
-                    state.dataDaylightingManager->EDIRSK(iHour, JB + 1, ISky) +=
-                        state.dataDaylightingManager->WLUMSK(iHour, JB + 1, ISky) * DOMEGA_Ray_3_TVisIntWinMult;
-                }
+                avwlsk.sky[iSky] += wlumsk.sky[iSky] * TVisIntWinMult;
+                if (PHRAY > 0.0) edirsk.sky[iSky] += wlumsk.sky[iSky] * DOMEGA_Ray_3_TVisIntWinMult;
             } // for (iSky)
 
             state.dataDaylightingManager->AVWLSU(iHour, JB + 1) += state.dataDaylightingManager->WLUMSU(iHour, JB + 1) * TVisIntWinMult;
@@ -3726,21 +3722,24 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     for (int JSH = 1; JSH <= Material::MaxSlatAngs + 1; ++JSH) {
         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
 
-        for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) { // Loop over sky types
+        auto const &gilsk = state.dataDaylightingManager->GILSK(iHour);
+        auto const &edirsk = state.dataDaylightingManager->EDIRSK(iHour, JSH);
+        auto const &eintsk = state.dataDaylightingManager->EINTSK(iHour, JSH);
+        auto const &avwlsk = state.dataDaylightingManager->AVWLSK(iHour, JSH);
+        auto &illSky = thisDaylightControl.DaylIllFacSky(iHour, loopwin, iRefPoint, JSH);
+        auto &sourceSky = thisDaylightControl.DaylSourceFacSky(iHour, loopwin, iRefPoint, JSH);
+        auto &backSky = thisDaylightControl.DaylBackFacSky(iHour, loopwin, iRefPoint, JSH);
+        
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) { // Loop over sky types
 
-            if (state.dataDaylightingManager->GILSK(iHour, ISky) > tmpDFCalc) {
-                thisDaylightControl.DaylIllFacSky(iHour, loopwin, iRefPoint, JSH, ISky) =
-                    (state.dataDaylightingManager->EDIRSK(iHour, JSH, ISky) + state.dataDaylightingManager->EINTSK(iHour, JSH, ISky)) /
-                    state.dataDaylightingManager->GILSK(iHour, ISky);
-                thisDaylightControl.DaylSourceFacSky(iHour, loopwin, iRefPoint, JSH, ISky) =
-                    state.dataDaylightingManager->AVWLSK(iHour, JSH, ISky) / (NWX * NWY * state.dataDaylightingManager->GILSK(iHour, ISky));
-                thisDaylightControl.DaylBackFacSky(iHour, loopwin, iRefPoint, JSH, ISky) =
-                    state.dataDaylightingManager->EINTSK(iHour, JSH, ISky) * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect /
-                    (Constant::Pi * state.dataDaylightingManager->GILSK(iHour, ISky));
+            if (gilsk.sky[iSky] > tmpDFCalc) {
+                illSky.sky[iSky] = (edirsk.sky[iSky] + eintsk.sky[iSky]) / gilsk.sky[iSky];
+                sourceSky.sky[iSky] = avwlsk.sky[iSky] / (NWX * NWY * gilsk.sky[iSky]);
+                backSky.sky[iSky] = eintsk.sky[iSky] * state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect / (Constant::Pi * gilsk.sky[iSky]);
             } else {
-                thisDaylightControl.DaylIllFacSky(iHour, loopwin, iRefPoint, JSH, ISky) = 0.0;
-                thisDaylightControl.DaylSourceFacSky(iHour, loopwin, iRefPoint, JSH, ISky) = 0.0;
-                thisDaylightControl.DaylBackFacSky(iHour, loopwin, iRefPoint, JSH, ISky) = 0.0;
+                illSky.sky[iSky] = 0.0;
+                sourceSky.sky[iSky] = 0.0;
+                backSky.sky[iSky] = 0.0;
             }
 
         } // for (iSky)
@@ -3777,13 +3776,13 @@ void FigureRefPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
     if (ICtrl > 0 && state.dataSurface->WindowShadingControl(ICtrl).ShadingType == WinShadingType::SwitchableGlazing) {
         VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
-        for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-            thisDaylightControl.DaylIllFacSky(iHour, loopwin, iRefPoint, 2, iSky) =
-                thisDaylightControl.DaylIllFacSky(iHour, loopwin, iRefPoint, 1, iSky) * VTR;
-            thisDaylightControl.DaylSourceFacSky(iHour, loopwin, iRefPoint, 2, iSky) =
-                thisDaylightControl.DaylSourceFacSky(iHour, loopwin, iRefPoint, 1, iSky) * VTR;
-            thisDaylightControl.DaylBackFacSky(iHour, loopwin, iRefPoint, 2, iSky) =
-                thisDaylightControl.DaylBackFacSky(iHour, loopwin, iRefPoint, 1, iSky) * VTR;
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            thisDaylightControl.DaylIllFacSky(iHour, loopwin, iRefPoint, 2).sky[iSky] =
+                thisDaylightControl.DaylIllFacSky(iHour, loopwin, iRefPoint, 1).sky[iSky] * VTR;
+            thisDaylightControl.DaylSourceFacSky(iHour, loopwin, iRefPoint, 2).sky[iSky] =
+                thisDaylightControl.DaylSourceFacSky(iHour, loopwin, iRefPoint, 1).sky[iSky] * VTR;
+            thisDaylightControl.DaylBackFacSky(iHour, loopwin, iRefPoint, 2).sky[iSky] =
+                thisDaylightControl.DaylBackFacSky(iHour, loopwin, iRefPoint, 1).sky[iSky] * VTR;
         } // for (iSky)
         
         thisDaylightControl.DaylIllFacSun(iHour, loopwin, iRefPoint, 2) =
@@ -3840,46 +3839,45 @@ void FigureMapPointDayltgFactorsToAddIllums(EnergyPlusData &state,
     // Added tmpDFCalc (default to 0.05 lux) as the cap for GILSK and GILSU in calculating the daylight factors
     //  the assumption behind it is if exterior horizontal surface does not get daylight, spaces do not get daylight.
 
+    auto &illumMapCalc = state.dataDaylightingData->IllumMapCalc(MapNum);
     for (int JSH = 1; JSH <= Material::MaxSlatAngs + 1; ++JSH) {
         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
 
-        for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) { // Loop over sky types
+        auto const &gilsk = state.dataDaylightingManager->GILSK(iHour);
+        auto const &edirsk = state.dataDaylightingManager->EDIRSK(iHour, JSH);
+        auto const &eintsk = state.dataDaylightingManager->EINTSK(iHour, JSH);
+        auto &illSky = illumMapCalc.DaylIllFacSky(iHour, loopwin, iMapPoint, JSH);
 
-            if (state.dataDaylightingManager->GILSK(iHour, ISky) > tmpDFCalc) {
-                state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, loopwin, iMapPoint, JSH, ISky) =
-                    (state.dataDaylightingManager->EDIRSK(iHour, JSH, ISky) + state.dataDaylightingManager->EINTSK(iHour, JSH, ISky)) /
-                    state.dataDaylightingManager->GILSK(iHour, ISky);
-            } else {
-                state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, loopwin, iMapPoint, JSH, ISky) = 0.0;
-            }
-
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) { // Loop over sky types
+            illSky.sky[iSky] = (gilsk.sky[iSky] > tmpDFCalc) ? ((edirsk.sky[iSky] + eintsk.sky[iSky]) / gilsk.sky[iSky]) : 0.0;
         } // for (iSky)
 
         if (state.dataDaylightingManager->GILSU(iHour) > tmpDFCalc) {
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(iHour, loopwin, iMapPoint, JSH) =
+            illumMapCalc.DaylIllFacSun(iHour, loopwin, iMapPoint, JSH) =
                 (state.dataDaylightingManager->EDIRSU(iHour, JSH) + state.dataDaylightingManager->EINTSU(iHour, JSH)) /
                 (state.dataDaylightingManager->GILSU(iHour) + 0.0001);
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(iHour, loopwin, iMapPoint, JSH) =
+            illumMapCalc.DaylIllFacSunDisk(iHour, loopwin, iMapPoint, JSH) =
                 (state.dataDaylightingManager->EDIRSUdisk(iHour, JSH) + state.dataDaylightingManager->EINTSUdisk(iHour, JSH)) /
                 (state.dataDaylightingManager->GILSU(iHour) + 0.0001);
         } else {
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(iHour, loopwin, iMapPoint, JSH) = 0.0;
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(iHour, loopwin, iMapPoint, JSH) = 0.0;
+            illumMapCalc.DaylIllFacSun(iHour, loopwin, iMapPoint, JSH) = 0.0;
+            illumMapCalc.DaylIllFacSunDisk(iHour, loopwin, iMapPoint, JSH) = 0.0;
         }
     } // for (jSH)
     
     // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
     if (ICtrl > 0 && state.dataSurface->WindowShadingControl(ICtrl).ShadingType == WinShadingType::SwitchableGlazing) {
         VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
-        for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, loopwin, iMapPoint, 2, iSky) =
-                state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, loopwin, iMapPoint, 1, iSky) * VTR;
+        auto &illSky2 = illumMapCalc.DaylIllFacSky(iHour, loopwin, iMapPoint, 2);
+        auto const &illSky1 = illumMapCalc.DaylIllFacSky(iHour, loopwin, iMapPoint, 1);
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            illSky2.sky[iSky] = illSky1.sky[iSky] * VTR;
         }
 
-        state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(iHour, loopwin, iMapPoint, 2) =
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(iHour, loopwin, iMapPoint, 1) * VTR;
-        state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(iHour, loopwin, iMapPoint, 2) =
-            state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(iHour, loopwin, iMapPoint, 1) * VTR;
+        illumMapCalc.DaylIllFacSun(iHour, loopwin, iMapPoint, 2) =
+            illumMapCalc.DaylIllFacSun(iHour, loopwin, iMapPoint, 1) * VTR;
+        illumMapCalc.DaylIllFacSunDisk(iHour, loopwin, iMapPoint, 2) =
+            illumMapCalc.DaylIllFacSunDisk(iHour, loopwin, iMapPoint, 1) * VTR;
     } // ICtrl > 0
 }
 
@@ -5499,7 +5497,7 @@ void DayltgGlareWithIntWins(EnergyPlusData &state,
 }
 
 void DayltgExtHorizIllum(EnergyPlusData &state,
-                         Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
+                         Illums &HISK, // Horizontal illuminance from sky for different sky types
                          Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
 )
 {
@@ -5520,11 +5518,10 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
     // Based on DOE-2.1E subroutine DHILL.
 
     // Argument array dimensioning
-    HISK.dim(static_cast<int>(SkyType::Num));
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const DTH((2.0 * Constant::Pi) / double(NTH)); // Sky integration azimuth stepsize (radians)
-    Real64 const DPH(Constant::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
+    Real64 constexpr DTH = (2.0 * Constant::Pi) / double(NTH); // Sky integration azimuth stepsize (radians)
+    Real64 constexpr DPH = Constant::PiOvr2 / double(NPH);     // Sky integration altitude stepsize (radians)
 
     // Integrate to obtain illuminance from sky.
     // The contribution in lumens/m2 from a patch of sky at altitude PH and azimuth TH
@@ -5543,7 +5540,7 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
         state.dataDaylightingManager->DayltgExtHorizIllum_firstTime = false;
     }
 
-    HISK = 0.0;
+    HISK = Illums();
 
     // Sky integration
     for (int IPH = 1; IPH <= NPH; ++IPH) {
@@ -5551,14 +5548,14 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
         Real64 const SPHCPH_IPH(state.dataDaylightingManager->SPHCPH(IPH));
         for (int ITH = 1; ITH <= NTH; ++ITH) {
             Real64 const TH_ITH(state.dataDaylightingManager->TH(ITH));
-            for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-                HISK(ISky) += DayltgSkyLuminance(state, static_cast<SkyType>(ISky), TH_ITH, PH_IPH) * SPHCPH_IPH;
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                HISK.sky[iSky] += DayltgSkyLuminance(state, static_cast<SkyType>(iSky), TH_ITH, PH_IPH) * SPHCPH_IPH;
             }
         }
     }
 
-    for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-        HISK(ISky) *= DTH * DPH;
+    for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+        HISK.sky[iSky] *= DTH * DPH;
     }
 
     // Direct solar horizontal illum (for unit direct normal illuminance)
@@ -6128,8 +6125,8 @@ void DayltgInteriorIllum(EnergyPlusData &state,
     Real64 constexpr tmpSWIterStep(0.05); // step of switching factor, assuming maximum of 20 switching states
 
     int NREFPT; // Number of daylighting reference points
-    int ISky1;  // Sky type index values for averaging two sky types
-    int ISky2;
+    int iSky1;  // Sky type index values for averaging two sky types
+    int iSky2;
     auto &SetPnt = state.dataDaylightingManager->SetPnt; // Illuminance setpoint at reference points (lux)
     auto &GLRNDX = state.dataDaylightingManager->GLRNDX; // Glare index at reference point
     auto &GLRNEW = state.dataDaylightingManager->GLRNEW; // New glare index at reference point
@@ -6193,16 +6190,16 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
     if (state.dataEnvrn->SkyClearness > 3.0) { // Sky is average of clear and clear turbid
         SkyWeight = min(1.0, (state.dataEnvrn->SkyClearness - 3.0) / 3.0);
-        ISky1 = 1;
-        ISky2 = 2;
+        iSky1 = (int)SkyType::Clear;
+        iSky2 = (int)SkyType::ClearTurbid;
     } else if (state.dataEnvrn->SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
         SkyWeight = (state.dataEnvrn->SkyClearness - 1.2) / 1.8;
-        ISky1 = 2;
-        ISky2 = 3;
+        iSky1 = (int)SkyType::ClearTurbid;
+        iSky2 = (int)SkyType::Intermediate;
     } else { // Sky is average of intermediate and overcast
         SkyWeight = min(1.0, max(0.0, (state.dataEnvrn->SkyClearness - 1.0) / 0.2, (state.dataEnvrn->SkyBrightness - 0.05) / 0.4));
-        ISky1 = 3;
-        ISky2 = 4;
+        iSky1 = (int)SkyType::Intermediate;
+        iSky2 = (int)SkyType::Overcast;
     }
 
     // First loop over exterior windows associated with this zone. The window may be an exterior window in
@@ -6238,77 +6235,75 @@ void DayltgInteriorIllum(EnergyPlusData &state,
         for (int IL = 1; IL <= NREFPT; ++IL) {
 
             // Daylight factors for current sun position
-            for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+            auto const &illSkyCurr = thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, 1);
+            auto const &illSkyPrev = thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, 1);
+            auto &dfskhr = state.dataDaylightingManager->DFSKHR(1);
+            auto const &backSkyCurr = thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, 1);
+            auto const &backSkyPrev = thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, 1);
+            auto &bfskhr = state.dataDaylightingManager->BFSKHR(1);
+            auto const &sourceSkyCurr = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, 1);
+            auto const &sourceSkyPrev = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, 1);
+            auto &sfskhr = state.dataDaylightingManager->SFSKHR(1);
+
+            auto const &ill2SkyCurr = thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, 2);
+            auto const &ill2SkyPrev = thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, 2);
+            auto &dfskhr2 = state.dataDaylightingManager->DFSKHR(2);
+            auto const &back2SkyCurr = thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, 2);
+            auto const &back2SkyPrev = thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, 2);
+            auto &bfskhr2 = state.dataDaylightingManager->BFSKHR(2);
+            auto const &source2SkyCurr = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, 2);
+            auto const &source2SkyPrev = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, 2);
+            auto &sfskhr2 = state.dataDaylightingManager->SFSKHR(2);
+
+            int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(IWin);
+            int slatAngLo = SurfWinSlatsAngIndex + 1;
+            int slatAngHi = min(Material::MaxSlatAngs + 1, slatAngLo + 1);
+            Real64 interpFac = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
+            
+            auto const &illLoSkyCurr = thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngLo);
+            auto const &illLoSkyPrev = thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngLo);
+            auto const &illHiSkyCurr = thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngHi);
+            auto const &illHiSkyPrev = thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngHi);
+
+            auto const &backLoSkyCurr = thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngLo);
+            auto const &backLoSkyPrev = thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngLo);
+            auto const &backHiSkyCurr = thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngLo);
+            auto const &backHiSkyPrev = thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngLo);
+
+            auto const &sourceLoSkyCurr = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngLo);
+            auto const &sourceLoSkyPrev = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngLo);
+            auto const &sourceHiSkyCurr = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngHi);
+            auto const &sourceHiSkyPrev = thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngHi);
+
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
 
                 // ===Bare window===
                 // Sky daylight factor for sky type (second index), bare/shaded window (first index)
-                state.dataDaylightingManager->DFSKHR(1, ISky) = VTRatio *
-                    (wgtCurrHr * thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, 1, ISky) +
-                     wgtPrevHr * thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, 1, ISky));
-
-                // Sky background luminance factor for sky type (second index), bare/shaded window (first index)
-                state.dataDaylightingManager->BFSKHR(1, ISky) = VTRatio *
-                    (wgtCurrHr * thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, 1, ISky) +
-                     wgtPrevHr * thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, 1, ISky));
-
-                // Sky source luminance factor for sky type (second index), bare/shaded window (first index)
-                state.dataDaylightingManager->SFSKHR(1, ISky) = VTRatio *
-                    (wgtCurrHr * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, 1, ISky) +
-                     wgtPrevHr * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, 1, ISky));
+                dfskhr.sky[iSky] = VTRatio * (wgtCurrHr * illSkyCurr.sky[iSky] + wgtPrevHr * illSkyPrev.sky[iSky]);
+                bfskhr.sky[iSky] = VTRatio * (wgtCurrHr * backSkyCurr.sky[iSky] + wgtPrevHr * backSkyPrev.sky[iSky]);
+                sfskhr.sky[iSky] = VTRatio * (wgtCurrHr * sourceSkyCurr.sky[iSky] + wgtPrevHr * sourceSkyPrev.sky[iSky]);
 
                 if (ShadedOrDiffusingGlassWin) {
 
                     // ===Shaded window or window with diffusing glass===
                     if (!state.dataSurface->SurfWinMovableSlats(IWin)) {
                         // Shade, screen, blind with fixed slats, or diffusing glass
-                        state.dataDaylightingManager->DFSKHR(2, ISky) = VTRatio *
-                            (wgtCurrHr * thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, 2, ISky) +
-                             wgtPrevHr * thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, 2, ISky));
-
-                        state.dataDaylightingManager->BFSKHR(2, ISky) = VTRatio *
-                            (wgtCurrHr * thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, 2, ISky) +
-                             wgtPrevHr * thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, 2, ISky));
-
-                        state.dataDaylightingManager->SFSKHR(2, ISky) = VTRatio *
-                            (wgtCurrHr * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, 2, ISky) +
-                             wgtPrevHr * thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, 2, ISky));
+                        dfskhr2.sky[iSky] = VTRatio * (wgtCurrHr * ill2SkyCurr.sky[iSky] + wgtPrevHr * ill2SkyPrev.sky[iSky]);
+                        bfskhr2.sky[iSky] = VTRatio * (wgtCurrHr * back2SkyCurr.sky[iSky] + wgtPrevHr * back2SkyPrev.sky[iSky]);
+                        sfskhr2.sky[iSky] = VTRatio * (wgtCurrHr * source2SkyCurr.sky[iSky] + wgtPrevHr * source2SkyPrev.sky[iSky]);
 
                     } else { // Blind with movable slats
-                        int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(IWin);
-                        int slatAngLo = SurfWinSlatsAngIndex + 1;
-                        int slatAngHi = min(Material::MaxSlatAngs + 1, slatAngLo + 1);
-                        Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
-                        Real64 DaylIllFacSkyNow = General::Interp(
-                            thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngLo, ISky),
-                            thisDaylightControl.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngHi, ISky),
-                            SurfWinSlatsAngInterpFac);
-                        Real64 DaylBackFacSkyNow = General::Interp(
-                            thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngLo, ISky),
-                            thisDaylightControl.DaylBackFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngHi, ISky),
-                            SurfWinSlatsAngInterpFac);
-                        Real64 DaylSourceFacSkyNow = General::Interp(
-                            thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngLo, ISky),
-                            thisDaylightControl.DaylSourceFacSky(state.dataGlobal->HourOfDay, loop, IL, slatAngHi, ISky),
-                            SurfWinSlatsAngInterpFac);
-                        Real64 DaylIllFacSkyPrev = General::Interp(
-                            thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngLo, ISky),
-                            thisDaylightControl.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngHi, ISky),
-                            SurfWinSlatsAngInterpFac);
-                        Real64 DaylBackFacSkyPrev = General::Interp(
-                            thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngLo, ISky),
-                            thisDaylightControl.DaylBackFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngHi, ISky),
-                            SurfWinSlatsAngInterpFac);
-                        Real64 DaylSourceFacSkyPrev = General::Interp(
-                            thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngLo, ISky),
-                            thisDaylightControl.DaylSourceFacSky(state.dataGlobal->PreviousHour, loop, IL, slatAngHi, ISky),
-                            SurfWinSlatsAngInterpFac);
+                        Real64 illSkyCurr = General::Interp(illLoSkyCurr.sky[iSky], illHiSkyCurr.sky[iSky], interpFac);
+                        Real64 backSkyCurr = General::Interp(backLoSkyCurr.sky[iSky], backHiSkyCurr.sky[iSky], interpFac);
+                        Real64 sourceSkyCurr = General::Interp(sourceLoSkyCurr.sky[iSky], sourceHiSkyCurr.sky[iSky], interpFac);
 
-                        state.dataDaylightingManager->DFSKHR(2, ISky) = VTRatio *
-                            (wgtCurrHr * DaylIllFacSkyNow + wgtPrevHr * DaylIllFacSkyPrev);
-                        state.dataDaylightingManager->BFSKHR(2, ISky) = VTRatio *
-                            (wgtCurrHr * DaylBackFacSkyNow + wgtPrevHr * DaylBackFacSkyPrev);
-                        state.dataDaylightingManager->SFSKHR(2, ISky) = VTRatio *
-                            (wgtCurrHr * DaylSourceFacSkyNow + wgtPrevHr * DaylSourceFacSkyPrev);
+                        Real64 illSkyPrev = General::Interp(illLoSkyPrev.sky[iSky], illHiSkyPrev.sky[iSky], interpFac);
+                        Real64 backSkyPrev = General::Interp(backLoSkyPrev.sky[iSky], backHiSkyPrev.sky[iSky], interpFac);
+                        Real64 sourceSkyPrev = General::Interp(sourceLoSkyPrev.sky[iSky], sourceHiSkyPrev.sky[iSky], interpFac);
+
+                        dfskhr2.sky[iSky] = VTRatio * (wgtCurrHr * illSkyCurr + wgtPrevHr * illSkyPrev);
+                        bfskhr2.sky[iSky] = VTRatio * (wgtCurrHr * backSkyCurr + wgtPrevHr * backSkyPrev);
+                        sfskhr2.sky[iSky] = VTRatio * (wgtCurrHr * sourceSkyCurr + wgtPrevHr * sourceSkyPrev);
 
                     } // End of check if window has blind with movable slats
                 }     // End of check if window is shaded or has diffusing glass
@@ -6445,40 +6440,41 @@ void DayltgInteriorIllum(EnergyPlusData &state,
 
             // Adding 0.001 in the following prevents zero HorIllSky in early morning or late evening when sun
             // is up in the present time step but GILSK(ISky,HourOfDay) and GILSK(ISky,NextHour) are both zero.
-            for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+            auto const &gilskCurr = state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay);
+            auto const &gilskPrev = state.dataDaylightingManager->GILSK(state.dataGlobal->PreviousHour);
+            
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                 // Horizontal illuminance for different sky types
                 // HorIllSky(ISky) = WeightNow * GILSK(ISky,HourOfDay) + WeightNextHour * GILSK(ISky,NextHour) + 0.001
-                state.dataDaylightingManager->HorIllSky(ISky) =
-                    state.dataGlobal->WeightNow * state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay, ISky) +
-                    state.dataGlobal->WeightPreviousHour * state.dataDaylightingManager->GILSK(state.dataGlobal->PreviousHour, ISky) + 0.001;
+                state.dataDaylightingManager->HorIllSky.sky[iSky] =
+                    state.dataGlobal->WeightNow * gilskCurr.sky[iSky] + state.dataGlobal->WeightPreviousHour * gilskPrev.sky[iSky] + 0.001;
             }
 
             // HISKF is current time step horizontal illuminance from sky, calculated in DayltgLuminousEfficacy,
             // which is called in WeatherManager. HISUNF is current time step horizontal illuminance from sun,
             // also calculated in DayltgLuminousEfficacy.
-
-            HorIllSkyFac = state.dataEnvrn->HISKF / ((1 - SkyWeight) * state.dataDaylightingManager->HorIllSky(ISky2) +
-                                                     SkyWeight * state.dataDaylightingManager->HorIllSky(ISky1));
+            Real64 horIllSky1 = state.dataDaylightingManager->HorIllSky.sky[iSky1];
+            Real64 horIllSky2 = state.dataDaylightingManager->HorIllSky.sky[iSky2];
+            
+            HorIllSkyFac = state.dataEnvrn->HISKF / ((1 - SkyWeight) * horIllSky2 + SkyWeight * horIllSky1);
 
             for (int IS = 1; IS <= 2; ++IS) {
+                auto const &dfskhr = state.dataDaylightingManager->DFSKHR(IS);
+                auto const &bfskhr = state.dataDaylightingManager->BFSKHR(IS);
+                auto const &sfskhr = state.dataDaylightingManager->SFSKHR(IS);
+                
                 if (IS == 2 && !ShadedOrDiffusingGlassWin) break;
 
                 thisDaylightControl.IllumFromWinAtRefPt(loop, IS, IL) =
                     state.dataDaylightingManager->DFSUHR(IS) * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac *
-                        (state.dataDaylightingManager->DFSKHR(IS, ISky1) * SkyWeight * state.dataDaylightingManager->HorIllSky(ISky1) +
-                         state.dataDaylightingManager->DFSKHR(IS, ISky2) * (1.0 - SkyWeight) * state.dataDaylightingManager->HorIllSky(ISky2));
+                    HorIllSkyFac * (dfskhr.sky[iSky1] * SkyWeight * horIllSky1 + dfskhr.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
                 thisDaylightControl.BackLumFromWinAtRefPt(loop, IS, IL) =
                     state.dataDaylightingManager->BFSUHR(IS) * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac *
-                        (state.dataDaylightingManager->BFSKHR(IS, ISky1) * SkyWeight * state.dataDaylightingManager->HorIllSky(ISky1) +
-                         state.dataDaylightingManager->BFSKHR(IS, ISky2) * (1.0 - SkyWeight) * state.dataDaylightingManager->HorIllSky(ISky2));
+                    HorIllSkyFac * (bfskhr.sky[iSky1] * SkyWeight * horIllSky1 + bfskhr.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
 
                 thisDaylightControl.SourceLumFromWinAtRefPt(loop, IS, IL) =
                     state.dataDaylightingManager->SFSUHR(IS) * state.dataEnvrn->HISUNF +
-                    HorIllSkyFac *
-                        (state.dataDaylightingManager->SFSKHR(IS, ISky1) * SkyWeight * state.dataDaylightingManager->HorIllSky(ISky1) +
-                         state.dataDaylightingManager->SFSKHR(IS, ISky2) * (1.0 - SkyWeight) * state.dataDaylightingManager->HorIllSky(ISky2));
+                    HorIllSkyFac * (sfskhr.sky[iSky1] * SkyWeight * horIllSky1 + sfskhr.sky[iSky2] * (1.0 - SkyWeight) * horIllSky2);
 
                 thisDaylightControl.SourceLumFromWinAtRefPt(loop, IS, IL) = max(thisDaylightControl.SourceLumFromWinAtRefPt(loop, IS, IL), 0.0);
 
@@ -7138,25 +7134,22 @@ void DayltgInteriorTDDIllum(EnergyPlusData &state)
     // Calculate the TDD Pipe illuminance values
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 TDDTransVisDiffNow;  // TDD diffuse visible transmittance at the current hour
-    Real64 TDDTransVisDiffPrev; // TDD diffuse visible transmittance at the previous hour
-    auto &TDDTransVisDiff = state.dataDaylightingManager->TDDTransVisDiff;
-    int ISky1; // Sky type index values for averaging two sky types
-    int ISky2;
+    int iSky1; // Sky type index values for averaging two sky types
+    int iSky2;
     Real64 SkyWeight; // Weighting factor used to average two different sky types
 
     if (state.dataEnvrn->SkyClearness > 3.0) { // Sky is average of clear and clear turbid
         SkyWeight = min(1.0, (state.dataEnvrn->SkyClearness - 3.0) / 3.0);
-        ISky1 = 1;
-        ISky2 = 2;
+        iSky1 = (int)SkyType::Clear;
+        iSky2 = (int)SkyType::ClearTurbid;
     } else if (state.dataEnvrn->SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
         SkyWeight = (state.dataEnvrn->SkyClearness - 1.2) / 1.8;
-        ISky1 = 2;
-        ISky2 = 3;
+        iSky1 = (int)SkyType::ClearTurbid;
+        iSky2 = (int)SkyType::Intermediate;
     } else { // Sky is average of intermediate and overcast
         SkyWeight = min(1.0, max(0.0, (state.dataEnvrn->SkyClearness - 1.0) / 0.2, (state.dataEnvrn->SkyBrightness - 0.05) / 0.4));
-        ISky1 = 3;
-        ISky2 = 4;
+        iSky1 = (int)SkyType::Intermediate;
+        iSky2 = (int)SkyType::Overcast;
     }
 
     // Calculate and report TDD visible transmittances
@@ -7166,27 +7159,24 @@ void DayltgInteriorTDDIllum(EnergyPlusData &state)
             state.dataGlobal->WeightNow * state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->HourOfDay, PipeNum) +
             state.dataGlobal->WeightPreviousHour * state.dataDaylightingManager->TDDTransVisBeam(state.dataGlobal->PreviousHour, PipeNum);
 
-        for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-            if (state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->HourOfDay, PipeNum, ISky) > 0.0) {
-                TDDTransVisDiffNow = state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->HourOfDay, PipeNum, ISky) /
-                state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->HourOfDay, PipeNum, ISky);
-            } else {
-                TDDTransVisDiffNow = 0.0;
-            }
+        auto const &tddFluxIncCurr = state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->HourOfDay, PipeNum);
+        auto const &tddFluxIncPrev = state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->PreviousHour, PipeNum);
 
-            if (state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->PreviousHour, PipeNum, ISky) > 0.0) {
-                TDDTransVisDiffPrev = state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->PreviousHour, PipeNum, ISky) /
-                state.dataDaylightingManager->TDDFluxInc(state.dataGlobal->PreviousHour, PipeNum, ISky);
-            } else {
-                TDDTransVisDiffPrev = 0.0;
-            }
+        auto const &tddFluxTransCurr = state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->HourOfDay, PipeNum);
+        auto const &tddFluxTransPrev = state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->PreviousHour, PipeNum);
+        
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            Real64 tddTransVisDiffCurr = (tddFluxIncCurr.sky[iSky] > 0.0) ? (tddFluxTransCurr.sky[iSky] / tddFluxIncCurr.sky[iSky]) : 0.0;
+            Real64 tddTransVisDiffPrev = (tddFluxIncPrev.sky[iSky] > 0.0) ? (tddFluxTransPrev.sky[iSky] / tddFluxIncPrev.sky[iSky]) : 0.0;
 
-            TDDTransVisDiff(ISky) = state.dataGlobal->WeightNow * TDDTransVisDiffNow + state.dataGlobal->WeightPreviousHour * TDDTransVisDiffPrev;
-        } // ISky
+            state.dataDaylightingManager->TDDTransVisDiff.sky[iSky] =
+                state.dataGlobal->WeightNow * tddTransVisDiffCurr + state.dataGlobal->WeightPreviousHour * tddTransVisDiffPrev;
+        } // for (iSky)
 
         state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransVisDiff =
-            SkyWeight * TDDTransVisDiff(ISky1) + (1.0 - SkyWeight) * TDDTransVisDiff(ISky2);
-    } // PipeNum
+            SkyWeight * state.dataDaylightingManager->TDDTransVisDiff.sky[iSky1] +
+            (1.0 - SkyWeight) * state.dataDaylightingManager->TDDTransVisDiff.sky[iSky2];
+    } // for (PipeNum)
 }
 
 void DayltgElecLightingControl(EnergyPlusData &state)
@@ -7598,13 +7588,13 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     }
 
     // Initialize window luminance and fluxes for split-flux calculation
-    state.dataDaylightingManager->WLUMSK(IHR, _, _) = 0.0;
+    state.dataDaylightingManager->WLUMSK(IHR, _) = Illums();
     state.dataDaylightingManager->WLUMSU(IHR, _) = 0.0;
     state.dataDaylightingManager->WLUMSUdisk(IHR, _) = 0.0;
-    FLFWSK = 0.0;
+    FLFWSK = Illums();
     FLFWSU = 0.0;
     FLFWSUdisk = 0.0;
-    FLCWSK = 0.0;
+    FLCWSK = Illums();
     FLCWSU = 0.0;
 
     int const IConst = state.dataSurface->SurfActiveConstruction(IWin);
@@ -7684,7 +7674,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             if (COSB < 0.0) continue; // Sky/ground elements behind window (although there shouldn't be any)
 
             // Initialize illuminance on window for this sky/ground element
-            ZSK = 0.0;
+            ZSK = Illums();
             ZSU = 0.0;
             // Initialize illuminance on window from beam solar reflection if ray hits an obstruction
             ZSUObsRefl = 0.0;
@@ -7704,8 +7694,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             // REFLECTED FROM NEAREST OBSTRUCTION,' below.)
 
             if (PH > 0.0) { // Contribution is from sky
-                for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-                    ZSK(ISky) = DayltgSkyLuminance(state, static_cast<SkyType>(ISky), TH, PH) * COSB * DA * ObTransM(IPH, ITH);
+                for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                    ZSK.sky[iSky] = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), TH, PH) * COSB * DA * ObTransM(IPH, ITH);
                 }
             } else { // PH <= 0.0; contribution is from ground
                 if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6 && ISunPos == 1) {
@@ -7725,10 +7715,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         state, DayltgInterReflectedIllumGroundHitPt, AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
                 } // End of check if solar reflection calc is in effect
 
-                for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+                auto const &gilsk = state.dataDaylightingManager->GILSK(IHR);
+                for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                     // Below, luminance of ground in cd/m2 is illuminance on ground in lumens/m2
                     // times ground reflectance, divided by pi, times obstruction multiplier.
-                    ZSK(ISky) = (state.dataDaylightingManager->GILSK(IHR, ISky) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * COSB *
+                    ZSK.sky[iSky] = (gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * COSB *
                                 DA * ObTransM(IPH, ITH) * SkyObstructionMult(IPH, ITH);
                 }
                 // Determine if sun illuminates the point that ray hits the ground. If the solar reflection
@@ -7804,8 +7795,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                                         state.dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(1, IHR, NearestHitSurfNumX) / Constant::Pi;
                     }
                     dReflObsSky = SkyReflVisLum * COSB * DA;
-                    for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-                        ZSK(ISky) += state.dataDaylightingManager->GILSK(IHR, ISky) * dReflObsSky;
+
+                    auto const &gilsk = state.dataDaylightingManager->GILSK(IHR);
+                    for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                        ZSK.sky[iSky] += gilsk.sky[iSky] * dReflObsSky;
                     }
                 }
             } // End of check if exterior solar reflection calculation is active
@@ -7822,19 +7815,25 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                          state.dataSurface->SurfWinGlazedFrac(IWin);
 
                 // Make all transmitted light diffuse for a TDD with a bare diffuser
-                for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-                    state.dataDaylightingManager->WLUMSK(IHR, 1, ISky) += ZSK(ISky) * TVISBR / Constant::Pi;
-                    FLFWSK(1, ISky) += ZSK(ISky) * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
-                    FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                auto &wlumsk = state.dataDaylightingManager->WLUMSK(IHR, 1);
+                auto &flfwsk = FLFWSK(1);
+                auto &flcwsk = FLCWSK(1);
+
+                auto &tddFluxInc = state.dataDaylightingManager->TDDFluxInc(IHR, PipeNum);
+                auto &tddFluxTrans = state.dataDaylightingManager->TDDFluxTrans(IHR, PipeNum);
+                for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                    wlumsk.sky[iSky] += ZSK.sky[iSky] * TVISBR / Constant::Pi;
+                    flfwsk.sky[iSky] += ZSK.sky[iSky] * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                    flcwsk.sky[iSky] += ZSK.sky[iSky] * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                     // For later calculation of diffuse visible transmittance
-                    state.dataDaylightingManager->TDDFluxInc(IHR, PipeNum, ISky) += ZSK(ISky);
-                    state.dataDaylightingManager->TDDFluxTrans(IHR, PipeNum, ISky) += ZSK(ISky) * TVISBR;
+                    tddFluxInc.sky[iSky] += ZSK.sky[iSky];
+                    tddFluxTrans.sky[iSky] += ZSK.sky[iSky] * TVISBR;
 
                 } // for (iSky)
 
-                state.dataDaylightingManager->TDDFluxInc(IHR, PipeNum, static_cast<int>(SkyType::Clear)) += ZSU;
-                state.dataDaylightingManager->TDDFluxTrans(IHR, PipeNum, static_cast<int>(SkyType::Clear)) += ZSU * TVISBR;
+                tddFluxInc.sky[(int)SkyType::Clear] += ZSU;
+                tddFluxTrans.sky[(int)SkyType::Clear] += ZSU * TVISBR;
                 
                 state.dataDaylightingManager->WLUMSU(IHR, 1) += ZSU * TVISBR / Constant::Pi;
                 FLFWSU(1) += ZSU * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
@@ -7848,8 +7847,9 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 if (InShelfSurf > 0) { // Inside daylighting shelf
                     // Daylighting shelf simplification:  All light is diffuse
                     // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
-                    for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-                        FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                    auto &flcwsk = FLCWSK(1);
+                    for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                        flcwsk.sky[iSky] += ZSK.sky[iSky] * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
                     }
                     FLCWSU(1) += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
  
@@ -7885,13 +7885,15 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                         }
                     }
 
-                    for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+                    auto &flfwsk = FLFWSK(1);
+                    auto &flcwsk = FLCWSK(1);
+                    for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                         // IF (PH < 0.0d0) THEN
                         // Fixed by FCW, Nov. 2003:
                         if (PH > 0.0) {
-                            FLFWSK(1, ISky) += ZSK(ISky) * TVISBR;
+                            flfwsk.sky[iSky] += ZSK.sky[iSky] * TVISBR;
                         } else {
-                            FLCWSK(1, ISky) += ZSK(ISky) * TVISBR;
+                            flcwsk.sky[iSky] += ZSK.sky[iSky] * TVISBR;
                         }
                     } // for (iSky)
 
@@ -8051,15 +8053,20 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 for (int JB = 1; JB <= Material::MaxSlatAngs; ++JB) {
                     // EXIT after first pass if not movable slats or exterior window screen
                     if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
-                    for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
 
-                        state.dataDaylightingManager->WLUMSK(IHR, JB + 1, ISky) += ZSK(ISky) * TransMult(JB) / Constant::Pi;
-                        FLFWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
-                        FLCWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                    auto &wlumsk = state.dataDaylightingManager->WLUMSK(IHR, JB + 1);
+                    auto &flfwsk = FLFWSK(JB + 1);
+                    auto &flcwsk = FLCWSK(JB + 1);
+                    
+                    for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+
+                        wlumsk.sky[iSky] += ZSK.sky[iSky] * TransMult(JB) / Constant::Pi;
+                        flfwsk.sky[iSky] += ZSK.sky[iSky] * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                        flcwsk.sky[iSky] += ZSK.sky[iSky] * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                         if (BlindOn || ScreenOn) {
-                            if (PH > 0.0) { FLFWSK(JB + 1, ISky) += ZSK(ISky) * DayltgInterReflectedIllumTransBmBmMult(JB); }
-                            else { FLCWSK(JB + 1, ISky) += ZSK(ISky) * DayltgInterReflectedIllumTransBmBmMult(JB); }
+                            if (PH > 0.0) { flfwsk.sky[iSky] += ZSK.sky[iSky] * DayltgInterReflectedIllumTransBmBmMult(JB); }
+                            else { flcwsk.sky[iSky] += ZSK.sky[iSky] * DayltgInterReflectedIllumTransBmBmMult(JB); }
                         }
                     }
 
@@ -8082,14 +8089,16 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
         TVISBR = state.dataConstruction->Construct(IConst).TransDiffVis; // Assume diffuse transmittance for shelf illuminance
 
-        for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+        auto const &gilsk = state.dataDaylightingManager->GILSK(IHR);
+        auto &flcwsk = FLCWSK(1);
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
             // This is only an estimate because the anisotropic sky view of the shelf is not yet taken into account.
             // SurfAnisoSkyMult would be great to use but it is not available until the heat balance starts up.
-            ZSK(ISky) = state.dataDaylightingManager->GILSK(IHR, ISky) * 1.0 * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis *
+            ZSK.sky[iSky] = gilsk.sky[iSky] * 1.0 * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis *
                         state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
             // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
-            FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
+            flcwsk.sky[iSky] += ZSK.sky[iSky] * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
         } // ISKY
 
         ZSU = state.dataDaylightingManager->GILSU(IHR) * state.dataHeatBal->SurfSunlitFracHR(IHR, OutShelfSurf) *
@@ -8103,12 +8112,17 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
     for (int JSH = 1; JSH <= Material::MaxSlatAngs + 1; ++JSH) {
         if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
-        for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+
+        auto &eintsk = state.dataDaylightingManager->EINTSK(IHR, JSH);
+        auto const &flfwsk = FLFWSK(JSH);
+        auto const &flcwsk = FLCWSK(JSH);
+        
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
             // Full area of window is used in following since effect of dividers on reducing
             // effective window transmittance has already been accounted for in calc of FLFWSK and FLCWSK.
-            state.dataDaylightingManager->EINTSK(IHR, JSH, ISky) =
-                (FLFWSK(JSH, ISky) * state.dataSurface->SurfWinRhoFloorWall(IWin) +
-                 FLCWSK(JSH, ISky) * state.dataSurface->SurfWinRhoCeilingWall(IWin)) *
+            eintsk.sky[iSky] =
+                (flfwsk.sky[iSky] * state.dataSurface->SurfWinRhoFloorWall(IWin) +
+                 flcwsk.sky[iSky] * state.dataSurface->SurfWinRhoCeilingWall(IWin)) *
                 (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                 (EnclInsideSurfArea * (1.0 - state.dataDaylightingData->enclDaylight(enclNum).aveVisDiffReflect));
         } // for (iSky)
@@ -8372,7 +8386,7 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
                                    int const NBasis,
                                    int const IHR,
                                    int const iRefPoint,
-                                   Array2<Real64> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
+                                   Array1D<Illums> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
                                    Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
                                    Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
                                    CalledFor const CalledFrom,
@@ -8414,27 +8428,28 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
         // DA = ComplexWind(IWin)%Geom(CurCplxFenState)%DAInc(iIncElem)
         Altitude = complexWinGeom.pInc(iIncElem).Altitude;
         Azimuth = complexWinGeom.pInc(iIncElem).Azimuth;
+        auto &elemLumSky = ElementLuminanceSky(iIncElem);
+        auto const &gilsk = state.dataDaylightingManager->GILSK(IHR);
+        
         if (Altitude > 0.0) {
             // Ray from sky element
-            for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-                ElementLuminanceSky(iIncElem, iSky) = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc;
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                elemLumSky.sky[iSky] = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc;
             }
         } else if (Altitude < 0.0) {
             // Ray from ground element
             // BeamObstrMultiplier = ComplexWind(IWin)%DaylghtGeom(CurCplxFenState)%GndObstrMultiplier(WinEl, iIncElem)
-            for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-                ElementLuminanceSky(iIncElem, iSky) =
-                    state.dataDaylightingManager->GILSK(IHR, iSky) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                elemLumSky.sky[iSky] = gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
             }
             ElementLuminanceSun(iIncElem) =
                 state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
         } else {
             // Ray from the element which is half sky and half ground
-            for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                 // in this case half of the pach is coming from the sky and half from the ground
-                ElementLuminanceSky(iIncElem, iSky) = 0.5 * DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc;
-                ElementLuminanceSky(iIncElem, iSky) +=
-                    0.5 * state.dataDaylightingManager->GILSK(IHR, iSky) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
+                elemLumSky.sky[iSky] = 0.5 * DayltgSkyLuminance(state, static_cast<SkyType>(iSky), Azimuth, Altitude) * LambdaInc +
+                    0.5 * gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
             }
             ElementLuminanceSun(iIncElem) =
                 0.5 * state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi * LambdaInc;
@@ -8463,8 +8478,9 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
                 state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).RefSurfIndex(iReflElem, WinEl);
         }
 
-        for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-            ElementLuminanceSky(iReflElemIndex, iSky) *= ObstrTrans;
+        auto &elemLumSky = ElementLuminanceSky(iReflElemIndex);
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            elemLumSky.sky[iSky] *= ObstrTrans;
         }
         ElementLuminanceSun(iReflElemIndex) *= ObstrTrans;
         ElementLuminanceSunDisk(iReflElemIndex) *= ObstrTrans;
@@ -8493,8 +8509,9 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
             iGndElemIndex =
                 state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState).IlluminanceMap(iRefPoint, MapNum).GndIndex(iGndElem, WinEl);
         }
-        for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-            ElementLuminanceSky(iGndElemIndex, iSky) *= BeamObstrMultiplier;
+        auto &elemLumSky = ElementLuminanceSky(iGndElemIndex);
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            elemLumSky.sky[iSky] *= BeamObstrMultiplier;
         }
 
         // direct sun disk reflect off the ground
@@ -8559,15 +8576,15 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
     // the center of the window and then reflecting this
     // light from the inside surfaces of the space.
 
-    Array2D<Real64> FLSK;     // Sky related luminous flux
+    Array1D<Illums> FLSK;     // Sky related luminous flux
     Array1D<Real64> FLSU;     // Sun related luminous flux, excluding entering beam
     Array1D<Real64> FLSUdisk; // Sun related luminous flux, due to entering beam
 
-    Array2D<Real64> FirstFluxSK;     // Sky related first reflected flux
+    Array1D<Illums> FirstFluxSK;     // Sky related first reflected flux
     Array1D<Real64> FirstFluxSU;     // Sun related first reflected flux, excluding entering beam
     Array1D<Real64> FirstFluxSUdisk; // Sun related first reflected flux, due to entering beam
 
-    Array2D<Real64> ElementLuminanceSky;     // sky related luminance at window element (exterior side)
+    Array1D<Illums> ElementLuminanceSky;     // sky related luminance at window element (exterior side)
     Array1D<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
     Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
     Real64 FLSUTot;
@@ -8595,19 +8612,19 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
     iConst = state.dataSurface->SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
     NTrnBasis = complexWinGeom.Trn.NBasis;
 
-    if (!allocated(FLSK)) FLSK.allocate(NTrnBasis, static_cast<int>(SkyType::Num));
-    FLSK = 0.0;
+    if (!allocated(FLSK)) FLSK.allocate(NTrnBasis);
+    FLSK = Illums();
     if (!allocated(FLSU)) FLSU.dimension(NTrnBasis, 0.0);
     if (!allocated(FLSUdisk)) FLSUdisk.dimension(NTrnBasis, 0.0);
 
-    if (!allocated(FirstFluxSK)) FirstFluxSK.allocate(NTrnBasis, static_cast<int>(SkyType::Num));
-    FirstFluxSK = 0.0;
+    if (!allocated(FirstFluxSK)) FirstFluxSK.allocate(NTrnBasis);
+    FirstFluxSK = Illums();
     if (!allocated(FirstFluxSU)) FirstFluxSU.dimension(NTrnBasis, 0.0);
     if (!allocated(FirstFluxSUdisk)) FirstFluxSUdisk.dimension(NTrnBasis, 0.0);
 
     NIncBasis = complexWinGeom.Inc.NBasis;
-    if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(NIncBasis, static_cast<int>(SkyType::Num));
-    ElementLuminanceSky = 0.0;
+    if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(NIncBasis);
+    ElementLuminanceSky = Illums();
     if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
     if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
 
@@ -8629,7 +8646,7 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
     //        FLSKTot = 0.0;
     FLSUTot = 0.0;
     FLSUdiskTot = 0.0;
-    FFSKTot = 0.0;
+    FFSKTot = Illums();
     FFSUTot = 0.0;
     FFSUdiskTot = 0.0;
     // now calculate flux into each outgoing direction by integrating over all incoming directions
@@ -8638,18 +8655,21 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
             LambdaInc = complexWinGeom.Inc.Lamda(iIncElem);
             dirTrans = state.dataConstruction->Construct(iConst).BSDFInput.VisFrtTrans(iBackElem, iIncElem);
 
-            for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-                FLSK(iBackElem, iSky) += dirTrans * LambdaInc * ElementLuminanceSky(iIncElem, iSky);
+            auto &flsk = FLSK(iBackElem);
+            auto const &elemLumSky = ElementLuminanceSky(iIncElem);
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                flsk.sky[iSky] += dirTrans * LambdaInc * elemLumSky.sky[iSky];
             }
 
             FLSU(iBackElem) += dirTrans * LambdaInc * ElementLuminanceSun(iIncElem);
             FLSUdisk(iBackElem) += dirTrans * LambdaInc * ElementLuminanceSunDisk(iIncElem);
         }
 
-        for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-            FirstFluxSK(iBackElem, iSky) =
-                FLSK(iBackElem, iSky) * complexWinGeom.AveRhoVisOverlap(iBackElem);
-            FFSKTot(iSky) += FirstFluxSK(iBackElem, iSky);
+        auto &firstFluxSK = FirstFluxSK(iBackElem);
+        auto const &flsk = FLSK(iBackElem);
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            firstFluxSK.sky[iSky] = flsk.sky[iSky] * complexWinGeom.AveRhoVisOverlap(iBackElem);
+            FFSKTot.sky[iSky] += firstFluxSK.sky[iSky];
             //                FLSKTot( iSky ) += FLSK( iSky, iBackElem );
         }
         FirstFluxSU(iBackElem) = FLSU(iBackElem) * complexWinGeom.AveRhoVisOverlap(iBackElem);
@@ -8663,11 +8683,13 @@ void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
 
     auto const &thisEnclDaylight = state.dataDaylightingData->enclDaylight(state.dataDaylightingData->daylightControl(daylightCtrlNum).enclIndex);
     Real64 EnclInsideSurfArea = thisEnclDaylight.totInsSurfArea;
-    for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-        state.dataDaylightingManager->EINTSK(IHR, 1, iSky) = FFSKTot(iSky) *
-                                                             (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
-                                                             (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
-    }
+
+    auto &eintsk = state.dataDaylightingManager->EINTSK(IHR, 1);
+    for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+        eintsk.sky[iSky] = FFSKTot.sky[iSky] * (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
+                                               (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
+    } // for (iSky)
+    
     state.dataDaylightingManager->EINTSU(IHR, 1) = FFSUTot * (state.dataSurface->Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                                                    (EnclInsideSurfArea * (1.0 - thisEnclDaylight.aveVisDiffReflect));
     state.dataDaylightingManager->EINTSUdisk(IHR, 1) = FFSUdiskTot *
@@ -8701,7 +8723,7 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
     //       DATE WRITTEN   June 2013
 
     // Luminances from different sources to the window
-    Array2D<Real64> ElementLuminanceSky; // sky related luminance at window element (exterior side)
+    Array1D<Illums> ElementLuminanceSky; // sky related luminance at window element (exterior side)
     Array1D<Real64> ElementLuminanceSun; // sun related luminance at window element (exterior side),
     // exluding beam
     Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side),
@@ -8711,9 +8733,7 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
     auto &EDirSky = state.dataDaylightingManager->EDirSky;   // Sky related direct illuminance
     Real64 WinLumSU;                                         // Sun related window luminance, excluding entering beam
     Real64 EDirSun;                                          // Sun related direct illuminance, excluding entering beam
-    int NIncBasis;
     int RefPointIndex; // reference point patch number
-    int iConst;
 
     Real64 dirTrans;    // directional BSDF transmittance
     Real64 dOmega;      // solid view angle of current element
@@ -8722,11 +8742,11 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
 
     int CurCplxFenState = state.dataSurface->SurfaceWindow(IWin).ComplexFen.CurrentState;
     auto &complexWin = state.dataBSDFWindow->ComplexWind(IWin);
-    iConst = state.dataSurface->SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
-    NIncBasis = complexWin.Geom(CurCplxFenState).Inc.NBasis;
+    int iConst = state.dataSurface->SurfaceWindow(IWin).ComplexFen.State(CurCplxFenState).Konst;
+    int NIncBasis = complexWin.Geom(CurCplxFenState).Inc.NBasis;
 
-    if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(NIncBasis, static_cast<int>(SkyType::Num));
-    ElementLuminanceSky = 0.0;
+    if (!allocated(ElementLuminanceSky)) ElementLuminanceSky.allocate(NIncBasis);
+    ElementLuminanceSky = Illums();
     if (!allocated(ElementLuminanceSun)) ElementLuminanceSun.dimension(NIncBasis, 0.0);
     if (!allocated(ElementLuminanceSunDisk)) ElementLuminanceSunDisk.dimension(NIncBasis, 0.0);
 
@@ -8745,10 +8765,10 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
         zProjection = complexWin.IlluminanceMap(iRefPoint, MapNum).SolidAngleVec(WinEl).z;
     }
 
-    WinLumSK = 0.0;
+    WinLumSK = Illums();
     WinLumSU = 0.0;
     // WinLumSUdisk = 0.0d0
-    EDirSky = 0.0;
+    EDirSky = Illums();
     EDirSun = 0.0;
     //        EDirSunDisk = 0.0; //Unused Set but never used
 
@@ -8756,8 +8776,9 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
         // LambdaInc = ComplexWind(IWin)%Geom(CurCplxFenState)%Inc%Lamda(iIncElem)
         dirTrans = state.dataConstruction->Construct(iConst).BSDFInput.VisFrtTrans(RefPointIndex, iIncElem);
 
-        for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-            WinLumSK(iSky) += dirTrans * ElementLuminanceSky(iIncElem, iSky);
+        auto const &elemLumSky = ElementLuminanceSky(iIncElem);
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            WinLumSK.sky[iSky] += dirTrans * elemLumSky.sky[iSky];
         }
 
         WinLumSU += dirTrans * ElementLuminanceSun(iIncElem);
@@ -8766,16 +8787,19 @@ void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
     }
 
     if (zProjection > 0.0) {
-        for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-            EDirSky(iSky) = WinLumSK(iSky) * dOmega * zProjection;
+        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+            EDirSky.sky[iSky] = WinLumSK.sky[iSky] * dOmega * zProjection;
         }
         EDirSun = WinLumSU * dOmega * zProjection;
     }
 
     // Store solution in global variables
-    for (int iSky = 1; iSky < static_cast<int>(SkyType::Num); ++iSky) {
-        state.dataDaylightingManager->AVWLSK(IHR, 1, iSky) += WinLumSK(iSky);
-        state.dataDaylightingManager->EDIRSK(IHR, 1, iSky) += EDirSky(iSky);
+    auto &avwlsk = state.dataDaylightingManager->AVWLSK(IHR, 1);
+    auto &edirsk = state.dataDaylightingManager->EDIRSK(IHR, 1);
+    
+    for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+        avwlsk.sky[iSky] += WinLumSK.sky[iSky];
+        edirsk.sky[iSky] += EDirSky.sky[iSky];
     }
 
     state.dataDaylightingManager->AVWLSU(IHR, 1) += WinLumSU;
@@ -9251,25 +9275,18 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
     auto &daylight_illum = state.dataDaylightingManager->daylight_illum;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ISky1; // Sky type index values for averaging two sky types
-    int ISky2;
+    int iSky1; // Sky type index values for averaging two sky types
+    int iSky2;
     auto &DFSUHR = state.dataDaylightingManager->DFSUHR; // Sun daylight factor for bare/shaded window
-    auto &IConstShaded = state.dataDaylightingManager->IConstShaded;
+    // auto &IConstShaded = state.dataDaylightingManager->IConstShaded;
     auto &VTDark = state.dataDaylightingManager->VTDark;
-    auto &VTMULT = state.dataDaylightingManager->VTMULT;
+    // auto &VTMULT = state.dataDaylightingManager->VTMULT;
     auto &DayltgInteriorMapIllumDFSUHR = state.dataDaylightingManager->DayltgInteriorMapIllumDFSUHR;
     auto &DayltgInteriorMapIllumHorIllSky = state.dataDaylightingManager->DayltgInteriorMapIllumHorIllSky;
     auto &DFSKHR = state.dataDaylightingManager->DayltgInteriorMapIllumDFSKHR;
-    int IWin;            // Window index
-    int IS;              // IS=1 for unshaded window, =2 for shaded window
-    int ICtrl;           // Window shading control pointer
     Real64 SkyWeight;    // Weighting factor used to average two different sky types
     Real64 HorIllSkyFac; // Ratio between horizontal illuminance from sky horizontal irradiance and
     //   luminous efficacy and horizontal illuminance from averaged sky
-    int IConst;
-    Real64 VTRatio;
-    Real64 VTNow;
-    Real64 VTMaster;
 
     if (state.dataDaylightingManager->DayltgInteriorMapIllum_FirstTimeFlag) {
         daylight_illum.allocate(MaxMapRefPoints);
@@ -9291,16 +9308,16 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
 
         if (state.dataEnvrn->SkyClearness > 3.0) { // Sky is average of clear and clear turbid
             SkyWeight = min(1.0, (state.dataEnvrn->SkyClearness - 3.0) / 3.0);
-            ISky1 = 1;
-            ISky2 = 2;
+            iSky1 = (int)SkyType::Clear;
+            iSky2 = (int)SkyType::ClearTurbid;
         } else if (state.dataEnvrn->SkyClearness > 1.2) { // Sky is average of clear turbid and intermediate
             SkyWeight = (state.dataEnvrn->SkyClearness - 1.2) / 1.8;
-            ISky1 = 2;
-            ISky2 = 3;
+            iSky1 = (int)SkyType::ClearTurbid;
+            iSky2 = (int)SkyType::Intermediate;
         } else { // Sky is average of intermediate and overcast
             SkyWeight = min(1.0, max(0.0, (state.dataEnvrn->SkyClearness - 1.0) / 0.2, (state.dataEnvrn->SkyBrightness - 0.05) / 0.4));
-            ISky1 = 3;
-            ISky2 = 4;
+            iSky1 = (int)SkyType::Intermediate;
+            iSky2 = (int)SkyType::Overcast;
         }
 
         //              First loop over windows in this space.
@@ -9309,36 +9326,53 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
         //              Use shading flags set in WindowShadingManager.
 
         for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
-            IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
+            int IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
 
             // Added TH 6/29/2009 for thermochromic windows
-            VTRatio = 1.0;
+            Real64 VTRatio = 1.0;
             if (NREFPT > 0) {
-                IConst = state.dataSurface->Surface(IWin).Construction;
-                if (state.dataConstruction->Construct(IConst).TCFlag == 1) {
+                int IConst = state.dataSurface->Surface(IWin).Construction;
+                auto const &construction = state.dataConstruction->Construct(IConst);
+                if (construction.TCFlag == 1) {
                     // For thermochromic windows, daylight and glare factors are always calculated
                     //  based on the master construction. They need to be adjusted by the VTRatio, including:
                     //  ZoneDaylight()%DaylIllFacSky, DaylIllFacSun, DaylIllFacSunDisk; DaylBackFacSky,
                     //  DaylBackFacSun, DaylBackFacSunDisk, DaylSourceFacSky, DaylSourceFacSun, DaylSourceFacSunDisk
-                    VTNow = General::POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef);
-                    VTMaster = General::POLYF(
-                        1.0, state.dataConstruction->Construct(state.dataConstruction->Construct(IConst).TCMasterConst).TransVisBeamCoef);
+                    Real64 VTNow = General::POLYF(1.0, construction.TransVisBeamCoef);
+                    Real64 VTMaster = General::POLYF(1.0, state.dataConstruction->Construct(construction.TCMasterConst).TransVisBeamCoef);
                     VTRatio = VTNow / VTMaster;
                 }
             }
 
             Real64 wgtThisHr = state.dataGlobal->WeightNow;
             Real64 wgtPrevHr = state.dataGlobal->WeightPreviousHour;
+
+            auto &dfskhr = DFSKHR(1);
+            auto &dfskhr2 = DFSKHR(2);
             
+            int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(IWin);
+            int slatAngLo = SurfWinSlatsAngIndex + 1;
+            int slatAngHi = min(slatAngLo + 1, Material::MaxSlatAngs + 1);
+            Real64 interpFac = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
+
             //              Loop over reference points
             for (int ILB = 1; ILB <= NREFPT; ++ILB) {
 
+                auto const &illSkyCurr = thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, 1);
+                auto const &illSkyPrev = thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, 1);
+                auto const &ill2SkyCurr = thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, 2);
+                auto const &ill2SkyPrev = thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, 2);
+                
+                auto const &illLoSkyCurr = thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, slatAngLo);
+                auto const &illLoSkyPrev = thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, slatAngLo);
+                auto const &illHiSkyCurr = thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, slatAngHi);
+                auto const &illHiSkyPrev = thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, slatAngHi);
+                
+                
                 //          Daylight factors for current sun position
-                for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
+                for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                     //                                ===Bare window===
-                    DFSKHR(1, ISky) =
-                            VTRatio * (wgtThisHr * thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, 1, ISky) +
-                                       wgtPrevHr * thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, 1, ISky));
+                    dfskhr.sky[iSky] = VTRatio * (wgtThisHr * illSkyCurr.sky[iSky] + wgtPrevHr * illSkyPrev.sky[iSky]);
 
                     if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowModel::BSDF) &&
                         (IS_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
@@ -9346,27 +9380,13 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
                         //                                 ===Shaded window===
                         if (!state.dataSurface->SurfWinMovableSlats(IWin)) {
                             // Shade, screen, blind with fixed slats, or diffusing glass
-                            DFSKHR(2, ISky) =
-                                VTRatio *
-                                    (wgtThisHr * thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, 2, ISky) +
-                                     wgtPrevHr * thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, 2, ISky));
+                            dfskhr2.sky[iSky] = VTRatio * (wgtThisHr * ill2SkyCurr.sky[iSky] + wgtPrevHr * ill2SkyPrev.sky[iSky]);
 
                         } else { // Blind with movable slats
-                            int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(IWin);
-                            int slatAngLo = SurfWinSlatsAngIndex + 1;
-                            int slatAngHi = min(slatAngLo + 1, Material::MaxSlatAngs + 1);
-                            Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(IWin);
-                            Real64 DaylIllFacSkyNow = General::Interp(
-                                thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, slatAngLo, ISky),
-                                thisMap.DaylIllFacSky(state.dataGlobal->HourOfDay, loop, ILB, slatAngHi, ISky),
-                                SurfWinSlatsAngInterpFac);
-                            Real64 DaylIllFacSkyPrev = General::Interp(
-                                thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, slatAngLo, ISky),
-                                thisMap.DaylIllFacSky(state.dataGlobal->PreviousHour, loop, ILB, slatAngHi, ISky),
-                                SurfWinSlatsAngInterpFac);
+                            Real64 illSkyCurr = General::Interp(illLoSkyCurr.sky[iSky], illHiSkyCurr.sky[iSky], interpFac);
+                            Real64 illSkyPrev = General::Interp(illLoSkyPrev.sky[iSky], illHiSkyPrev.sky[iSky], interpFac);
 
-                            DFSKHR(2, ISky) =
-                                VTRatio * (wgtThisHr * DaylIllFacSkyNow + wgtPrevHr * DaylIllFacSkyPrev);
+                            dfskhr2.sky[iSky] = VTRatio * (wgtThisHr * illSkyCurr + wgtPrevHr * illSkyPrev);
                         } // End of check if window has blind with movable slats
                     } // End of check if window is shaded or has diffusing glass
                 } // for (iSky)
@@ -9432,26 +9452,28 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
 
                 // Adding 0.001 in the following prevents zero DayltgInteriorMapIllumHorIllSky in early morning or late evening when sun
                 // is up in the present time step but GILSK(ISky,HourOfDay) and GILSK(ISky,NextHour) are both zero.
-                for (int ISky = 1; ISky < static_cast<int>(SkyType::Num); ++ISky) {
-                    DayltgInteriorMapIllumHorIllSky(ISky) =
-                        wgtThisHr * state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay, ISky) +
-                        wgtPrevHr * state.dataDaylightingManager->GILSK(state.dataGlobal->PreviousHour, ISky) + 0.001;
+                auto const &gilskCurr = state.dataDaylightingManager->GILSK(state.dataGlobal->HourOfDay);
+                auto const &gilskPrev = state.dataDaylightingManager->GILSK(state.dataGlobal->PreviousHour);
+                for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                    DayltgInteriorMapIllumHorIllSky.sky[iSky] =
+                        wgtThisHr * gilskCurr.sky[iSky] + wgtPrevHr * gilskPrev.sky[iSky] + 0.001;
                 }
 
                 // HISKF is current time step horizontal illuminance from sky, calculated in DayltgLuminousEfficacy,
                 // which is called in WeatherManager. HISUNF is current time step horizontal illuminance from sun,
                 // also calculated in DayltgLuminousEfficacy.
                 HorIllSkyFac = state.dataEnvrn->HISKF /
-                               ((1.0 - SkyWeight) * DayltgInteriorMapIllumHorIllSky(ISky2) + SkyWeight * DayltgInteriorMapIllumHorIllSky(ISky1));
+                               ((1.0 - SkyWeight) * DayltgInteriorMapIllumHorIllSky.sky[iSky2] + SkyWeight * DayltgInteriorMapIllumHorIllSky.sky[iSky1]);
 
                 for (int IS = 1; IS <= 2; ++IS) {
                     if (IS == 2 && state.dataSurface->SurfWinWindowModelType(IWin) == WindowModel::BSDF) break;
                     if (IS == 2 && NOT_SHADED(state.dataSurface->SurfWinShadingFlag(IWin)) && !state.dataSurface->SurfWinSolarDiffusing(IWin)) break;
+                    auto const &dfskhr = DFSKHR(IS);
 
                     thisMap.IllumFromWinAtMapPt(loop, IS, ILB) =
                         DayltgInteriorMapIllumDFSUHR(IS) * state.dataEnvrn->HISUNF +
-                        HorIllSkyFac * (DFSKHR(IS, ISky1) * SkyWeight * DayltgInteriorMapIllumHorIllSky(ISky1) +
-                                        DFSKHR(IS, ISky2) * (1.0 - SkyWeight) * DayltgInteriorMapIllumHorIllSky(ISky2));
+                        HorIllSkyFac * (dfskhr.sky[iSky1] * SkyWeight * DayltgInteriorMapIllumHorIllSky.sky[iSky1] +
+                                        dfskhr.sky[iSky2] * (1.0 - SkyWeight) * DayltgInteriorMapIllumHorIllSky.sky[iSky2]);
                 }
 
             } // End of reference point loop
@@ -9462,21 +9484,21 @@ void DayltgInteriorMapIllum(EnergyPlusData &state)
         //              the space.  Use shading flags.
 
         for (int loop = 1; loop <= thisEnclDaylight.NumOfDayltgExtWins; ++loop) {
-            IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
+            int IWin = thisEnclDaylight.DayltgExtWinSurfNums(loop);
 
-            IS = findWinShadingStatus(state, IWin);
+            int IS = findWinShadingStatus(state, IWin);
 
             // CR 8057. 3/17/2010.
             // Switchable windows may be in partially switched state rather than fully dark state
-            VTMULT = 1.0;
+            Real64 VTMULT = 1.0;
 
-            ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
+            int ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
             if (state.dataSurface->Surface(IWin).HasShadeControl) {
                 if (state.dataSurface->WindowShadingControl(ICtrl).shadingControlType == WindowShadingControlType::MeetDaylIlumSetp &&
                     state.dataSurface->SurfWinShadingFlag(IWin) == WinShadingType::SwitchableGlazing) {
                     // switchable windows in partial or fully switched state,
                     //  get its intermediate VT calculated in DayltgInteriorIllum
-                    IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
+                    int IConstShaded = state.dataSurface->Surface(IWin).activeShadedConstruction;
                     if (IConstShaded > 0)
                         VTDark = General::POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) *
                                  state.dataSurface->SurfWinGlazedFrac(IWin);
@@ -10027,9 +10049,9 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
             for (int controlNum : thisEnclDaylight.daylightControlIndexes) {
                 auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
                 int refSize = thisDaylightControl.TotalDaylRefPoints;
-                thisDaylightControl.DaylIllFacSky.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs, static_cast<int>(SkyType::Num));
-                thisDaylightControl.DaylSourceFacSky.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs, static_cast<int>(SkyType::Num));
-                thisDaylightControl.DaylBackFacSky.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs, static_cast<int>(SkyType::Num));
+                thisDaylightControl.DaylIllFacSky.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs);
+                thisDaylightControl.DaylSourceFacSky.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs);
+                thisDaylightControl.DaylBackFacSky.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs);
                 thisDaylightControl.DaylIllFacSun.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs);
                 thisDaylightControl.DaylIllFacSunDisk.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs);
                 thisDaylightControl.DaylSourceFacSun.allocate(Constant::HoursInDay, winSize, refSize, numSlatAngs);
@@ -10078,22 +10100,22 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
             illumMapCalc.IllumFromWinAtMapPt.allocate(numExtWin, 2, numMapRefPts);
             illumMapCalc.IllumFromWinAtMapPt = 0.0;
 
-            illumMapCalc.DaylIllFacSky.allocate(Constant::HoursInDay, numExtWin, numMapRefPts, numSlatAngs, static_cast<int>(SkyType::Num));
+            illumMapCalc.DaylIllFacSky.allocate(Constant::HoursInDay, numExtWin, numMapRefPts, numSlatAngs);
             illumMapCalc.DaylIllFacSun.allocate(Constant::HoursInDay, numExtWin, numMapRefPts, numSlatAngs);
             illumMapCalc.DaylIllFacSunDisk.allocate(Constant::HoursInDay, numExtWin, numMapRefPts, numSlatAngs);
         }
     } // End of map loop
 
-    state.dataDaylightingManager->EINTSK.dimension(Constant::HoursInDay, numSlatAngs, static_cast<int>(SkyType::Num), 0.0);
+    state.dataDaylightingManager->EINTSK.dimension(Constant::HoursInDay, numSlatAngs, Illums());
     state.dataDaylightingManager->EINTSU.dimension(Constant::HoursInDay, numSlatAngs, 0.0);
     state.dataDaylightingManager->EINTSUdisk.dimension(Constant::HoursInDay, numSlatAngs, 0.0);
-    state.dataDaylightingManager->WLUMSK.dimension(Constant::HoursInDay, numSlatAngs, static_cast<int>(SkyType::Num), 0.0);
+    state.dataDaylightingManager->WLUMSK.dimension(Constant::HoursInDay, numSlatAngs, Illums());
     state.dataDaylightingManager->WLUMSU.dimension(Constant::HoursInDay, numSlatAngs, 0.0);
     state.dataDaylightingManager->WLUMSUdisk.dimension(Constant::HoursInDay, numSlatAngs, 0.0);
-    state.dataDaylightingManager->EDIRSK.dimension(Constant::HoursInDay, numSlatAngs, static_cast<int>(SkyType::Num));
+    state.dataDaylightingManager->EDIRSK.dimension(Constant::HoursInDay, numSlatAngs, Illums());
     state.dataDaylightingManager->EDIRSU.dimension(Constant::HoursInDay, numSlatAngs);
     state.dataDaylightingManager->EDIRSUdisk.dimension(Constant::HoursInDay, numSlatAngs);
-    state.dataDaylightingManager->AVWLSK.dimension(Constant::HoursInDay, numSlatAngs, static_cast<int>(SkyType::Num));
+    state.dataDaylightingManager->AVWLSK.dimension(Constant::HoursInDay, numSlatAngs, Illums());
     state.dataDaylightingManager->AVWLSU.dimension(Constant::HoursInDay, numSlatAngs);
     state.dataDaylightingManager->AVWLSUdisk.dimension(Constant::HoursInDay, numSlatAngs);
     state.dataDaylightingManager->FLFWSU.dimension(numSlatAngs);
@@ -10103,8 +10125,8 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     state.dataDaylightingManager->DayltgInterReflectedIllumTransBmBmMult.dimension(state.dataSurface->actualMaxSlatAngs);
     state.dataDaylightingManager->TransBmBmMult.dimension(state.dataSurface->actualMaxSlatAngs);
     state.dataDaylightingManager->TransBmBmMultRefl.dimension(state.dataSurface->actualMaxSlatAngs);
-    state.dataDaylightingManager->FLCWSK.dimension(numSlatAngs, static_cast<int>(SkyType::Num));
-    state.dataDaylightingManager->FLFWSK.dimension(numSlatAngs, static_cast<int>(SkyType::Num));
+    state.dataDaylightingManager->FLCWSK.dimension(numSlatAngs, Illums());
+    state.dataDaylightingManager->FLFWSK.dimension(numSlatAngs, Illums());
 
     static constexpr std::string_view Format_700("! <Enclosure/Window Adjacency Daylighting Counts>, Enclosure Name, Number of Exterior Windows, "
                                                  "Number of Exterior Windows in Adjacent Enclosures\n");
