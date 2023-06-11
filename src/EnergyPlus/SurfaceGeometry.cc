@@ -4157,7 +4157,7 @@ namespace SurfaceGeometry {
 
                 } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(ArgPointer), "Foundation")) {
 
-                    if (!state.dataWeatherManager->WeatherFileExists) {
+                    if (!state.dataWeather->WeatherFileExists) {
                         ShowSevereError(
                             state,
                             format("{}=\"{}\", using \"Foundation\" type Outside Boundary Condition requires specification of a weather file",

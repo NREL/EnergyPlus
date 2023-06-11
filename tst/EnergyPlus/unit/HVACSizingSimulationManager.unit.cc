@@ -67,7 +67,6 @@ using namespace EnergyPlus;
 using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
-using namespace WeatherManager;
 using namespace DataLoopNode;
 using namespace OutputProcessor;
 using namespace DataHVACGlobals;
@@ -80,13 +79,13 @@ protected:
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         // setup weather manager state needed
-        state->dataWeatherManager->NumOfEnvrn = 2;
-        state->dataWeatherManager->Environment.allocate(state->dataWeatherManager->NumOfEnvrn);
-        state->dataWeatherManager->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-        state->dataWeatherManager->Environment(1).DesignDayNum = 1;
+        state->dataWeather->NumOfEnvrn = 2;
+        state->dataWeather->Environment.allocate(state->dataWeather->NumOfEnvrn);
+        state->dataWeather->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+        state->dataWeather->Environment(1).DesignDayNum = 1;
 
-        state->dataWeatherManager->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-        state->dataWeatherManager->Environment(2).DesignDayNum = 2;
+        state->dataWeather->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+        state->dataWeather->Environment(2).DesignDayNum = 2;
 
         // setup plant sizing data structure
         state->dataSize->NumPltSizInput = 1;
@@ -122,7 +121,7 @@ protected:
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
 
         state->dataGlobal->NumOfTimeStepInHour = 4;
-        state->dataWeatherManager->TimeStepFraction = 1.0 / double(state->dataGlobal->NumOfTimeStepInHour);
+        state->dataWeather->TimeStepFraction = 1.0 / double(state->dataGlobal->NumOfTimeStepInHour);
 
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = &state->dataGlobal->TimeStepZone;
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0; // init
@@ -143,23 +142,23 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     // calls code related to coincident plant sizing with HVAC sizing simulation
     // this test runs 3 system timesteps for each zone timestep
 
-    state->dataWeatherManager->Environment.deallocate();
+    state->dataWeather->Environment.deallocate();
     // setup weather manager state needed
-    state->dataWeatherManager->NumOfEnvrn = 4;
-    state->dataWeatherManager->Environment.allocate(state->dataWeatherManager->NumOfEnvrn);
-    state->dataWeatherManager->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-    state->dataWeatherManager->Environment(1).DesignDayNum = 1;
+    state->dataWeather->NumOfEnvrn = 4;
+    state->dataWeather->Environment.allocate(state->dataWeather->NumOfEnvrn);
+    state->dataWeather->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+    state->dataWeather->Environment(1).DesignDayNum = 1;
 
-    state->dataWeatherManager->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-    state->dataWeatherManager->Environment(2).DesignDayNum = 2;
+    state->dataWeather->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+    state->dataWeather->Environment(2).DesignDayNum = 2;
 
-    state->dataWeatherManager->Environment(3).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
-    state->dataWeatherManager->Environment(3).DesignDayNum = 0;
-    state->dataWeatherManager->Environment(3).TotalDays = 4;
+    state->dataWeather->Environment(3).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
+    state->dataWeather->Environment(3).DesignDayNum = 0;
+    state->dataWeather->Environment(3).TotalDays = 4;
 
-    state->dataWeatherManager->Environment(4).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
-    state->dataWeatherManager->Environment(4).DesignDayNum = 0;
-    state->dataWeatherManager->Environment(4).TotalDays = 4;
+    state->dataWeather->Environment(4).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
+    state->dataWeather->Environment(4).DesignDayNum = 0;
+    state->dataWeather->Environment(4).TotalDays = 4;
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
@@ -169,9 +168,9 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
 
     testSizeSimManagerObj.SetupSizingAnalyses(*state);
 
-    EXPECT_EQ(4, state->dataWeatherManager->NumOfEnvrn);
-    AddDesignSetToEnvironmentStruct(*state, 1);
-    EXPECT_EQ(8, state->dataWeatherManager->NumOfEnvrn);
+    EXPECT_EQ(4, state->dataWeather->NumOfEnvrn);
+    Weather::AddDesignSetToEnvironmentStruct(*state, 1);
+    EXPECT_EQ(8, state->dataWeather->NumOfEnvrn);
 
     // now fill with three system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
@@ -182,8 +181,8 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 5;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
+    state->dataWeather->Envrn = 5;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 1;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
 
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
@@ -208,9 +207,9 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     // second HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 6;
+    state->dataWeather->Envrn = 6;
 
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
@@ -235,7 +234,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     // first HVAC Sizing Simulation WeatherFileDays emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeRunPeriodDesign;
     state->dataGlobal->DayOfSim = 0;
-    state->dataWeatherManager->Envrn = 7;
+    state->dataWeather->Envrn = 7;
     state->dataGlobal->NumOfDayInEnvrn = 4;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     while (state->dataGlobal->DayOfSim < state->dataGlobal->NumOfDayInEnvrn) {
@@ -264,7 +263,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
     // second HVAC Sizing Simulation WEatherFileDAys emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeRunPeriodDesign;
     state->dataGlobal->DayOfSim = 0;
-    state->dataWeatherManager->Envrn = 8;
+    state->dataWeather->Envrn = 8;
     state->dataGlobal->NumOfDayInEnvrn = 4;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     while (state->dataGlobal->DayOfSim < state->dataGlobal->NumOfDayInEnvrn) {
@@ -358,13 +357,13 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3)
                          .ztStepObj[96]
                          .runningAvgDataValue);
 
-    // first timestep of third sizing state->dataWeatherManager->Environment WeatherFileDays
+    // first timestep of third sizing state->dataWeather->Environment WeatherFileDays
     EXPECT_DOUBLE_EQ(0.1,
                      testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
                          .ztStepObj[192]
                          .runningAvgDataValue);
 
-    // first timestep of fourth sizing state->dataWeatherManager->Environment WeatherFileDays
+    // first timestep of fourth sizing state->dataWeather->Environment WeatherFileDays
     EXPECT_DOUBLE_EQ(0.1,
                      testSizeSimManagerObj.sizingLogger.logObjs[testSizeSimManagerObj.plantCoincAnalyObjs[0].supplyInletNodeFlow_LogIndex]
                          .ztStepObj[576]
@@ -385,10 +384,10 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
 
     testSizeSimManagerObj.SetupSizingAnalyses(*state);
 
-    EXPECT_EQ(2, state->dataWeatherManager->NumOfEnvrn);
-    AddDesignSetToEnvironmentStruct(*state, 1);
+    EXPECT_EQ(2, state->dataWeather->NumOfEnvrn);
+    Weather::AddDesignSetToEnvironmentStruct(*state, 1);
 
-    EXPECT_EQ(4, state->dataWeatherManager->NumOfEnvrn);
+    EXPECT_EQ(4, state->dataWeather->NumOfEnvrn);
 
     // now fill with three system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
@@ -399,8 +398,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 3;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
+    state->dataWeather->Envrn = 3;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 1;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
@@ -424,8 +423,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3)
     // second HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 4;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
+    state->dataWeather->Envrn = 4;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
@@ -533,9 +532,9 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
 
     testSizeSimManagerObj.SetupSizingAnalyses(*state);
 
-    EXPECT_EQ(2, state->dataWeatherManager->NumOfEnvrn);
-    AddDesignSetToEnvironmentStruct(*state, 1);
-    EXPECT_EQ(4, state->dataWeatherManager->NumOfEnvrn);
+    EXPECT_EQ(2, state->dataWeather->NumOfEnvrn);
+    Weather::AddDesignSetToEnvironmentStruct(*state, 1);
+    EXPECT_EQ(4, state->dataWeather->NumOfEnvrn);
 
     // now fill with one system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
@@ -546,8 +545,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 3;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
+    state->dataWeather->Envrn = 3;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 1;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
@@ -573,8 +572,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     // second HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 4;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
+    state->dataWeather->Envrn = 4;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
@@ -622,9 +621,9 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
 
     testSizeSimManagerObj.SetupSizingAnalyses(*state);
 
-    EXPECT_EQ(2, state->dataWeatherManager->NumOfEnvrn);
-    AddDesignSetToEnvironmentStruct(*state, 1);
-    EXPECT_EQ(4, state->dataWeatherManager->NumOfEnvrn);
+    EXPECT_EQ(2, state->dataWeather->NumOfEnvrn);
+    Weather::AddDesignSetToEnvironmentStruct(*state, 1);
+    EXPECT_EQ(4, state->dataWeather->NumOfEnvrn);
 
     // now fill with one system timesteps for each zone timestep
     state->dataGlobal->TimeStepZone = 15.0 / 60.0;
@@ -635,8 +634,8 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     // first HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 3;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 1;
+    state->dataWeather->Envrn = 3;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 1;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;
@@ -666,8 +665,8 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     // second HVAC Sizing Simulation DD emulation
     state->dataGlobal->KindOfSim = Constant::KindOfSim::HVACSizeDesignDay;
     state->dataGlobal->DayOfSim = 1;
-    state->dataWeatherManager->Envrn = 4;
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).DesignDayNum = 2;
+    state->dataWeather->Envrn = 4;
+    state->dataWeather->Environment(state->dataWeather->Envrn).DesignDayNum = 2;
     testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment(*state);
     for (state->dataGlobal->HourOfDay = 1; state->dataGlobal->HourOfDay <= 24; ++state->dataGlobal->HourOfDay) { // Begin hour loop ...
         state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 0.0;

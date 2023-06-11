@@ -159,7 +159,6 @@ namespace SimulationManager {
     using namespace DataSizing;
     using namespace DataSystemVariables;
     using namespace HeatBalanceManager;
-    using namespace WeatherManager;
     using namespace ExternalInterface;
 
     // MODULE PARAMETER DEFINITIONS:
@@ -268,7 +267,7 @@ namespace SimulationManager {
         DisplayString(state, "Initializing Simulation");
         state.dataGlobal->KickOffSimulation = true;
 
-        ResetEnvironmentCounter(state);
+        Weather::ResetEnvironmentCounter(state);
         SetupSimulation(state, ErrorsFound);
 
         FaultsManager::CheckAndReadFaults(state);
@@ -340,7 +339,7 @@ namespace SimulationManager {
         EconomicLifeCycleCost::GetInputForLifeCycleCost(state); // must be prior to WriteTabularReports -- do here before big simulation stuff.
 
         // check for variable latitude/location/etc
-        WeatherManager::ReadVariableLocationOrientation(state);
+        Weather::ReadVariableLocationOrientation(state);
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (state.dataGlobal->DoHVACSizingSimulation) {
@@ -351,7 +350,7 @@ namespace SimulationManager {
             ShowMessage(state, "Beginning Simulation");
             DisplayString(state, "Beginning Primary Simulation");
         }
-        ResetEnvironmentCounter(state);
+        Weather::ResetEnvironmentCounter(state);
 
         int EnvCount = 0;
         state.dataGlobal->WarmupFlag = true;
@@ -359,7 +358,7 @@ namespace SimulationManager {
         while (Available) {
             if (state.dataGlobal->stopSimulation) break;
 
-            GetNextEnvironment(state, Available, ErrorsFound);
+            Weather::GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -464,12 +463,12 @@ namespace SimulationManager {
                         }
 
                         if (AnyUnderwaterBoundaries) {
-                            WeatherManager::UpdateUnderwaterBoundaries(state);
+                            Weather::UpdateUnderwaterBoundaries(state);
                         }
 
                         if (state.dataEnvrn->varyingLocationSchedIndexLat > 0 || state.dataEnvrn->varyingLocationSchedIndexLong > 0 ||
                             state.dataEnvrn->varyingOrientationSchedIndex > 0) {
-                            WeatherManager::UpdateLocationAndOrientation(state);
+                            Weather::UpdateLocationAndOrientation(state);
                         }
 
                         state.dataGlobal->BeginTimeStepFlag = true;
@@ -492,14 +491,14 @@ namespace SimulationManager {
                             }
                         }
 
-                        ManageWeather(state);
+                        Weather::ManageWeather(state);
 
                         ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
                         ManageHeatBalance(state);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
-                            AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries(state);
+                            AnyUnderwaterBoundaries = Weather::CheckIfAnyUnderwaterBoundaries(state);
                             oneTimeUnderwaterBoundaryCheck = false;
                         }
 
@@ -1855,7 +1854,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(state, Available, ErrorsFound);
+            Weather::GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -1881,7 +1880,7 @@ namespace SimulationManager {
 
             state.dataGlobal->BeginTimeStepFlag = true;
 
-            ManageWeather(state);
+            Weather::ManageWeather(state);
 
             ManageExteriorEnergyUse(state);
 
@@ -1896,7 +1895,7 @@ namespace SimulationManager {
             if (state.dataSysVars->DeveloperFlag)
                 DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
 
-            ManageWeather(state);
+            Weather::ManageWeather(state);
 
             ManageExteriorEnergyUse(state);
 
@@ -1910,7 +1909,7 @@ namespace SimulationManager {
 
             if (state.dataSysVars->DeveloperFlag)
                 DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
-            ManageWeather(state);
+            Weather::ManageWeather(state);
 
             ManageExteriorEnergyUse(state);
 

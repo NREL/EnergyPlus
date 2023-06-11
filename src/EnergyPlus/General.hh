@@ -64,7 +64,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace WeatherManager {
+namespace Weather {
     enum class DateType;
     struct ReportPeriodData;
 } // namespace WeatherManager
@@ -104,7 +104,7 @@ namespace General {
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           Weather::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            ObjexxFCL::Optional_int PYear = _);
 
@@ -114,7 +114,7 @@ namespace General {
                              int &TokenDay,                      // Value of numeric field found
                              int &TokenMonth,                    // Value of Month field found (1=Jan, 2=Feb, etc)
                              int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             Weather::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,                  // Set to true if cannot process this string as a date
                              ObjexxFCL::Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
     );
@@ -244,7 +244,7 @@ namespace General {
     bool isReportPeriodBeginning(EnergyPlusData &state, int periodIdx);
 
     void findReportPeriodIdx(EnergyPlusData &state,
-                             const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                             const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                              int nReportPeriods,
                              Array1D_bool &inReportPeriodFlags);
 

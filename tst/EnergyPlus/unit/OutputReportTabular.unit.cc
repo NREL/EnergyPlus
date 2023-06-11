@@ -6598,9 +6598,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataHeatBal->Zone(1).FloorArea = 12.;
 
-    state->dataWeatherManager->DesDayInput.allocate(1);
-    state->dataWeatherManager->DesDayInput(1).Month = 5;
-    state->dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
+    state->dataWeather->DesDayInput.allocate(1);
+    state->dataWeather->DesDayInput(1).Month = 5;
+    state->dataWeather->DesDayInput(1).DayOfMonth = 21;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
@@ -7092,11 +7092,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     state->dataEnvrn->TotDesDays = numDesDays;
     state->dataEnvrn->TotRunDesPersDays = 0;
-    state->dataWeatherManager->DesDayInput.allocate(2);
-    state->dataWeatherManager->DesDayInput(1).Month = 7;
-    state->dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
-    state->dataWeatherManager->DesDayInput(2).Month = 1;
-    state->dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
+    state->dataWeather->DesDayInput.allocate(2);
+    state->dataWeather->DesDayInput(1).Month = 7;
+    state->dataWeather->DesDayInput(1).DayOfMonth = 21;
+    state->dataWeather->DesDayInput(2).Month = 1;
+    state->dataWeather->DesDayInput(2).DayOfMonth = 21;
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
@@ -10346,15 +10346,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_WriteSETHoursTableReportingPer
     columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
 
     Real64 degreeHourConversion = 1.8;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+    state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotReportPers);
+    for (int i = 1; i <= state->dataWeather->TotReportPers; i++) {
         state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, i).assign(5, 0.0);
     }
 
     int encodedMonDayHrMin;
-    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+    for (int k = 1; k <= state->dataWeather->TotReportPers; k++) {
         for (int i = 0; i < 4; i++) {
             state->dataHeatBalFanSys->ZoneLowSETHoursRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }
@@ -10430,14 +10430,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_UnmetDegreeHourRepPeriodUnitCo
     std::string tableName = "Unmet Degree-Hours";
 
     Real64 degreeHourConversion = 1.8;
-    state->dataWeatherManager->TotReportPers = 2;
+    state->dataWeather->TotReportPers = 2;
 
-    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeatherManager->TotReportPers);
-    for (int i = 1; i <= state->dataWeatherManager->TotReportPers; i++) {
+    state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod.allocate(state->dataGlobal->NumOfZones, state->dataWeather->TotReportPers);
+    for (int i = 1; i <= state->dataWeather->TotReportPers; i++) {
         state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, i).assign(columnNumUnmetDegHr, 0.0);
     }
     // state->dataHeatBal->Resilience(1).ZoneUnmetDegreeHourBins: [0, -1, 4, -9, 16, -25]
-    for (int k = 1; k <= state->dataWeatherManager->TotReportPers; k++) {
+    for (int k = 1; k <= state->dataWeather->TotReportPers; k++) {
         for (int i = 0; i < 6; i++) {
             state->dataHeatBalFanSys->ZoneUnmetDegreeHourBinsRepPeriod(1, k)[i] = float(k) * std::pow(-1.0, float(i)) * std::pow(float(i), 2.0);
         }

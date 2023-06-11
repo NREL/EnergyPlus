@@ -312,7 +312,7 @@ void ProcessDateString(EnergyPlusData &state,
                        int &PMonth,
                        int &PDay,
                        int &PWeekDay,
-                       WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                       Weather::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                        bool &ErrorsFound,
                        ObjexxFCL::Optional_int PYear)
 {
@@ -329,19 +329,19 @@ void ProcessDateString(EnergyPlusData &state,
     bool errFlag;
 
     int FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
-    DateType = WeatherManager::DateType::Invalid;
+    DateType = Weather::DateType::Invalid;
     if (!errFlag) {
         // Entered single number, do inverse JDay
         if (FstNum == 0) {
             PMonth = 0;
             PDay = 0;
-            DateType = WeatherManager::DateType::MonthDay;
+            DateType = Weather::DateType::MonthDay;
         } else if (FstNum < 0 || FstNum > 366) {
             ShowSevereError(state, format("Invalid Julian date Entered={}", String));
             ErrorsFound = true;
         } else {
             InvOrdinalDay(FstNum, PMonth, PDay, 0);
-            DateType = WeatherManager::DateType::LastDayInMonth;
+            DateType = Weather::DateType::LastDayInMonth;
         }
     } else {
         int NumTokens = 0;
@@ -356,10 +356,10 @@ void ProcessDateString(EnergyPlusData &state,
             DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
             PYear = TokenYear;
         }
-        if (DateType == WeatherManager::DateType::MonthDay) {
+        if (DateType == Weather::DateType::MonthDay) {
             PDay = TokenDay;
             PMonth = TokenMonth;
-        } else if (DateType == WeatherManager::DateType::NthDayInMonth || DateType == WeatherManager::DateType::LastDayInMonth) {
+        } else if (DateType == Weather::DateType::NthDayInMonth || DateType == Weather::DateType::LastDayInMonth) {
             // interpret as TokenDay TokenWeekday in TokenMonth
             PDay = TokenDay;
             PMonth = TokenMonth;
@@ -374,7 +374,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                          int &TokenDay,                      // Value of numeric field found
                          int &TokenMonth,                    // Value of Month field found (1=Jan, 2=Feb, etc)
                          int &TokenWeekday,                  // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                         WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                         Weather::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                          bool &ErrorsFound,                  // Set to true if cannot process this string as a date
                          ObjexxFCL::Optional_int TokenYear   // Value of Year if one appears to be present and this argument is present
 )
@@ -411,7 +411,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     TokenDay = 0;
     TokenMonth = 0;
     TokenWeekday = 0;
-    DateType = WeatherManager::DateType::Invalid;
+    DateType = Weather::DateType::Invalid;
     if (present(TokenYear)) TokenYear = 0;
     // Take out separator characters, other extraneous stuff
 
@@ -470,7 +470,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                 TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months.begin(), Months.end());
                 ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                 if (!InternalError) {
-                    DateType = WeatherManager::DateType::MonthDay;
+                    DateType = Weather::DateType::MonthDay;
                 } else {
                     ErrorsFound = true;
                 }
@@ -482,7 +482,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                     TokenDay = NumField2;
                     ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
-                        DateType = WeatherManager::DateType::MonthDay;
+                        DateType = Weather::DateType::MonthDay;
                     } else {
                         ErrorsFound = true;
                     }
@@ -491,7 +491,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
                     ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
-                        DateType = WeatherManager::DateType::MonthDay;
+                        DateType = Weather::DateType::MonthDay;
                         NumTokens = 2;
                     } else {
                         ErrorsFound = true;
@@ -513,12 +513,12 @@ void DetermineDateTokens(EnergyPlusData &state,
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months.begin(), Months.end());
                         if (TokenMonth == 0) InternalError = true;
                     }
-                    DateType = WeatherManager::DateType::NthDayInMonth;
+                    DateType = Weather::DateType::NthDayInMonth;
                     NumTokens = 3;
                     if (TokenDay < 0 || TokenDay > 5) InternalError = true;
                 } else { // first field was not numeric....
                     if (Fields(1) == "LA") {
-                        DateType = WeatherManager::DateType::LastDayInMonth;
+                        DateType = Weather::DateType::LastDayInMonth;
                         NumTokens = 3;
                         TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays.begin(), Weekdays.end());
                         if (TokenWeekday == 0) {
@@ -537,7 +537,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                 NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
                 NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                 NumField3 = int(UtilityRoutines::ProcessNumber(Fields(3), errFlag));
-                DateType = WeatherManager::DateType::MonthDay;
+                DateType = Weather::DateType::MonthDay;
                 // error detection later..
                 if (NumField1 > 100) {
                     if (present(TokenYear)) {
@@ -561,7 +561,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     }
 
     if (InternalError) {
-        DateType = WeatherManager::DateType::Invalid;
+        DateType = Weather::DateType::Invalid;
         ErrorsFound = true;
     }
 }
@@ -1375,18 +1375,18 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
 bool isReportPeriodBeginning(EnergyPlusData &state, const int periodIdx)
 {
     int currentDate;
-    int reportStartDate = state.dataWeatherManager->ReportPeriodInput(periodIdx).startJulianDate;
-    int reportStartHour = state.dataWeatherManager->ReportPeriodInput(periodIdx).startHour;
-    if (state.dataWeatherManager->ReportPeriodInput(periodIdx).startYear > 0) {
-        currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+    int reportStartDate = state.dataWeather->ReportPeriodInput(periodIdx).startJulianDate;
+    int reportStartHour = state.dataWeather->ReportPeriodInput(periodIdx).startHour;
+    if (state.dataWeather->ReportPeriodInput(periodIdx).startYear > 0) {
+        currentDate = Weather::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
     } else {
-        currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        currentDate = Weather::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
     }
     return (currentDate == reportStartDate && state.dataGlobal->HourOfDay == reportStartHour);
 }
 
 void findReportPeriodIdx(EnergyPlusData &state,
-                         const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                         const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                          const int nReportPeriods,
                          Array1D_bool &inReportPeriodFlags)
 {
@@ -1398,9 +1398,9 @@ void findReportPeriodIdx(EnergyPlusData &state,
         int reportEndDate = ReportPeriodInputData(i).endJulianDate;
         int reportEndHour = ReportPeriodInputData(i).endHour;
         if (ReportPeriodInputData(i).startYear > 0) {
-            currentDate = WeatherManager::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+            currentDate = Weather::computeJulianDate(state.dataEnvrn->Year, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
         } else {
-            currentDate = WeatherManager::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+            currentDate = Weather::computeJulianDate(0, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
         }
         if (General::BetweenDateHoursLeftInclusive(
                 currentDate, state.dataGlobal->HourOfDay, reportStartDate, reportStartHour, reportEndDate, reportEndHour)) {

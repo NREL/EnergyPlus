@@ -1741,7 +1741,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     TestAirPathIntegrity(*state, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;
@@ -3320,7 +3320,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
 
     ASSERT_ANY_THROW(SimulationManager::SetupSimulation(*state, ErrorsFound));
 }
@@ -4817,7 +4817,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateHighOA)
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(*state);
+    Weather::ResetEnvironmentCounter(*state);
     TestAirPathIntegrity(*state, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(*state, ErrorsFound);
     state->dataGlobal->KickOffSimulation = false;

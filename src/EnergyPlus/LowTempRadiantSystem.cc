@@ -5229,7 +5229,7 @@ namespace LowTempRadiantSystem {
         Real64 sum = 0.0;
         for (int hourNumber = 1; hourNumber <= Constant::HoursInDay; ++hourNumber) {
             for (int timeStepNumber = 1; timeStepNumber <= state.dataGlobal->NumOfTimeStepInHour; ++timeStepNumber) {
-                sum += state.dataWeatherManager->TodayOutDryBulbTemp(timeStepNumber, hourNumber);
+                sum += state.dataWeather->TodayOutDryBulbTemp(timeStepNumber, hourNumber);
             }
         }
         return sum / double(Constant::HoursInDay * state.dataGlobal->NumOfTimeStepInHour);

@@ -952,7 +952,7 @@ int todayWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum)
     int value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus =
-        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayIsRain, value);
+        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeather->TodayIsRain, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -964,7 +964,7 @@ int todayWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum)
     int value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus =
-        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayIsSnow, value);
+        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeather->TodayIsSnow, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -976,7 +976,7 @@ Real64 todayWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeSte
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayOutDryBulbTemp, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayOutDryBulbTemp, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -988,7 +988,7 @@ Real64 todayWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int timeSt
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayOutDewPointTemp, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayOutDewPointTemp, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1000,7 +1000,7 @@ Real64 todayWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hour, 
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayOutBaroPress, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayOutBaroPress, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1012,7 +1012,7 @@ Real64 todayWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour, in
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayOutRelHum, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayOutRelHum, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1024,7 +1024,7 @@ Real64 todayWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeStep
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayWindSpeed, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayWindSpeed, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1036,7 +1036,7 @@ Real64 todayWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int time
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus =
-        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayWindDir, value);
+        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeather->TodayWindDir, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1048,7 +1048,7 @@ Real64 todayWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int tim
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus =
-        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeatherManager->TodaySkyTemp, value);
+        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeather->TodaySkyTemp, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1060,7 +1060,7 @@ Real64 todayWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int ti
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayHorizIRSky, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayHorizIRSky, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1072,7 +1072,7 @@ Real64 todayWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, int
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayBeamSolarRad, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayBeamSolarRad, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1084,7 +1084,7 @@ Real64 todayWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hour, 
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayDifSolarRad, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayDifSolarRad, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1096,7 +1096,7 @@ Real64 todayWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStepNum
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus =
-        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayAlbedo, value);
+        EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(*thisState, hour, timeStepNum, thisState->dataWeather->TodayAlbedo, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1108,7 +1108,7 @@ Real64 todayWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour, in
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TodayLiquidPrecip, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TodayLiquidPrecip, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1121,7 +1121,7 @@ int tomorrowWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum
     int value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowIsRain, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowIsRain, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1133,7 +1133,7 @@ int tomorrowWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum
     int value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowIsSnow, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowIsSnow, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1145,7 +1145,7 @@ Real64 tomorrowWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int time
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowOutDryBulbTemp, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowOutDryBulbTemp, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1157,7 +1157,7 @@ Real64 tomorrowWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int tim
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowOutDewPointTemp, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowOutDewPointTemp, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1169,7 +1169,7 @@ Real64 tomorrowWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hou
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowOutBaroPress, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowOutBaroPress, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1181,7 +1181,7 @@ Real64 tomorrowWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour,
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowOutRelHum, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowOutRelHum, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1193,7 +1193,7 @@ Real64 tomorrowWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeS
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowWindSpeed, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowWindSpeed, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1205,7 +1205,7 @@ Real64 tomorrowWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int t
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowWindDir, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowWindDir, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1217,7 +1217,7 @@ Real64 tomorrowWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int 
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowSkyTemp, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowSkyTemp, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1229,7 +1229,7 @@ Real64 tomorrowWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowHorizIRSky, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowHorizIRSky, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1241,7 +1241,7 @@ Real64 tomorrowWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, 
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowBeamSolarRad, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowBeamSolarRad, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1253,7 +1253,7 @@ Real64 tomorrowWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hou
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowDifSolarRad, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowDifSolarRad, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1265,7 +1265,7 @@ Real64 tomorrowWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStep
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowAlbedo, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowAlbedo, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;
@@ -1277,7 +1277,7 @@ Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour,
     Real64 value = 0;
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(
-        *thisState, hour, timeStepNum, thisState->dataWeatherManager->TomorrowLiquidPrecip, value);
+        *thisState, hour, timeStepNum, thisState->dataWeather->TomorrowLiquidPrecip, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError(*thisState, "Invalid return from weather lookup, check hour and time step argument values are in range.");
         thisState->dataPluginManager->apiErrorFlag = true;

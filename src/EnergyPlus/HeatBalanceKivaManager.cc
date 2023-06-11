@@ -182,8 +182,8 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
     setInitialBoundaryConditions(state, kivaWeather, accDate, 24, state.dataGlobal->NumOfTimeStepInHour);
     instance.calculate();
     accDate += acceleratedTimestep;
-    while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
-        accDate = accDate - (365 + state.dataWeatherManager->LeapYearAdd);
+    while (accDate > 365 + state.dataWeather->LeapYearAdd) {
+        accDate = accDate - (365 + state.dataWeather->LeapYearAdd);
     }
 
     // Accelerated timestepping
@@ -192,8 +192,8 @@ void KivaInstanceMap::initGround(EnergyPlusData &state, const KivaWeatherData &k
         setInitialBoundaryConditions(state, kivaWeather, accDate, 24, state.dataGlobal->NumOfTimeStepInHour);
         instance.calculate(acceleratedTimestep * 24 * 60 * 60);
         accDate += acceleratedTimestep;
-        while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
-            accDate = accDate - (365 + state.dataWeatherManager->LeapYearAdd);
+        while (accDate > 365 + state.dataWeather->LeapYearAdd) {
+            accDate = accDate - (365 + state.dataWeather->LeapYearAdd);
         }
     }
 
@@ -207,7 +207,7 @@ int KivaInstanceMap::getAccDate(EnergyPlusData &state, const int numAccelaratedT
     int accDate =
         state.dataEnvrn->DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
     while (accDate <= 0) {
-        accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
+        accDate = accDate + 365 + state.dataWeather->LeapYearAdd;
     }
     return accDate;
 }
@@ -586,7 +586,7 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         if (WeatherDataLine.eof) {
             break;
         }
-        WeatherManager::InterpretWeatherDataLine(state,
+        Weather::InterpretWeatherDataLine(state,
                                                  WeatherDataLine.data,
                                                  ErrorFound,
                                                  WYear,
@@ -625,16 +625,16 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
 
         // Checks for missing value
         if (DryBulb >= 99.9) {
-            DryBulb = state.dataWeatherManager->Missing.DryBulb;
+            DryBulb = state.dataWeather->Missing.DryBulb;
         }
         if (DewPoint >= 99.9) {
-            DewPoint = state.dataWeatherManager->Missing.DewPoint;
+            DewPoint = state.dataWeather->Missing.DewPoint;
         }
         if (WindSpeed >= 999.0) {
-            WindSpeed = state.dataWeatherManager->Missing.WindSpd;
+            WindSpeed = state.dataWeather->Missing.WindSpd;
         }
         if (OpaqueSkyCover >= 99.0) {
-            OpaqueSkyCover = state.dataWeatherManager->Missing.OpaqSkyCvr;
+            OpaqueSkyCover = state.dataWeather->Missing.OpaqSkyCvr;
         }
 
         kivaWeather.dryBulb.push_back(DryBulb);

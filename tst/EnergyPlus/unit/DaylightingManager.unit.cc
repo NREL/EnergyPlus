@@ -3632,8 +3632,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgIlluminanceMap)
     state->dataGlobal->CurrentTime = 12.0;
     state->dataHeatBalMgr->CountWarmupDayPoints = 0;
     state->dataGlobal->EndDayFlag = false;
-    state->dataWeatherManager->Envrn = 1;
-    WeatherManager::ManageWeather(*state);
+    state->dataWeather->Envrn = 1;
+    Weather::ManageWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
     EXPECT_NEAR(16051, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(5), 1);
     EXPECT_NEAR(203, state->dataDaylightingData->IllumMapCalc(1).DaylIllumAtMapPt(10), 1);

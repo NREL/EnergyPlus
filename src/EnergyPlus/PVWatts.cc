@@ -152,9 +152,9 @@ namespace PVWatts {
 
         // Initialize m_pvwattsData
         // Location
-        ssc_data_set_number(pvwattsData_, "lat", state.dataWeatherManager->WeatherFileLatitude);
-        ssc_data_set_number(pvwattsData_, "lon", state.dataWeatherManager->WeatherFileLongitude);
-        ssc_data_set_number(pvwattsData_, "tz", state.dataWeatherManager->WeatherFileTimeZone);
+        ssc_data_set_number(pvwattsData_, "lat", state.dataWeather->WeatherFileLatitude);
+        ssc_data_set_number(pvwattsData_, "lon", state.dataWeather->WeatherFileLongitude);
+        ssc_data_set_number(pvwattsData_, "tz", state.dataWeather->WeatherFileTimeZone);
         // System Properties
         ssc_data_set_number(pvwattsData_, "time_step", state.dataGlobal->TimeStepZone);
         ssc_data_set_number(pvwattsData_, "system_capacity", dcSystemCapacity_ * 0.001);
@@ -411,7 +411,7 @@ namespace PVWatts {
         ssc_data_set_number(pvwattsData_, "diffuse", state.dataEnvrn->DifSolarRad);
         ssc_data_set_number(pvwattsData_, "tamb", state.dataEnvrn->OutDryBulbTemp);
         ssc_data_set_number(pvwattsData_, "wspd", state.dataEnvrn->WindSpeed);
-        Real64 albedo = state.dataWeatherManager->TodayAlbedo(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        Real64 albedo = state.dataWeather->TodayAlbedo(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }

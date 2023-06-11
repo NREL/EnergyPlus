@@ -180,7 +180,7 @@ void HVACSizingSimulationManager::RedoKickOffAndResize(EnergyPlusData &state)
     state.dataGlobal->KickOffSimulation = true;
     state.dataGlobal->RedoSizesHVACSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter(state);
+    Weather::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
 
     state.dataGlobal->KickOffSimulation = false;
@@ -213,20 +213,20 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
     state.dataGlobal->DoingHVACSizingSimulations = true;
     state.dataGlobal->DoOutputReporting = true;
 
-    WeatherManager::ResetEnvironmentCounter(state);
+    Weather::ResetEnvironmentCounter(state);
 
     // iterations over set of sizing periods for HVAC sizing Simulation, will break out if no more are needed
     for (HVACSizingIterCount = 1; HVACSizingIterCount <= state.dataGlobal->HVACSizingSimMaxIterations; ++HVACSizingIterCount) {
 
         // need to extend Environment structure array to distinguish the HVAC Sizing Simulations from the regular run of that sizing period, repeats
         // for each set
-        WeatherManager::AddDesignSetToEnvironmentStruct(state, HVACSizingIterCount);
+        Weather::AddDesignSetToEnvironmentStruct(state, HVACSizingIterCount);
 
         state.dataGlobal->WarmupFlag = true;
         bool Available = true;
-        for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) { // loop over environments
+        for (int i = 1; i <= state.dataWeather->NumOfEnvrn; ++i) { // loop over environments
 
-            WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
+            Weather::GetNextEnvironment(state, Available, ErrorsFound);
             if (ErrorsFound) break;
             if (!Available) continue;
 
@@ -237,7 +237,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             if (state.dataGlobal->KindOfSim == Constant::KindOfSim::DesignDay) continue;
             if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodDesign) continue;
 
-            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
+            if (state.dataWeather->Environment(state.dataWeather->Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
 
             if (state.dataSysVars->ReportDuringHVACSizingSimulation) {
                 if (state.dataSQLiteProcedures->sqlite) {
@@ -324,7 +324,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
                             }
                         }
 
-                        WeatherManager::ManageWeather(state);
+                        Weather::ManageWeather(state);
 
                         ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 

@@ -3393,16 +3393,16 @@ void WriteTableOfContents(EnergyPlusData &state)
                 }
             }
 
-            if (state.dataWeatherManager->TotReportPers > 0) {
+            if (state.dataWeather->TotReportPers > 0) {
                 std::string ReportPeriodSummary = "Reporting Period Summary";
                 tbl_stream << "<br><a href=\"#" << MakeAnchorName(ReportPeriodSummary, Entire_Facility) << "\">"
                            << "Reporting Period Summary"
                            << "</a>\n";
                 AddTOCReportPeriod(
-                    state.dataWeatherManager->TotThermalReportPers, "Thermal", state.dataWeatherManager->ThermalReportPeriodInput, tbl_stream);
-                AddTOCReportPeriod(state.dataWeatherManager->TotCO2ReportPers, "CO2", state.dataWeatherManager->CO2ReportPeriodInput, tbl_stream);
+                    state.dataWeather->TotThermalReportPers, "Thermal", state.dataWeather->ThermalReportPeriodInput, tbl_stream);
+                AddTOCReportPeriod(state.dataWeather->TotCO2ReportPers, "CO2", state.dataWeather->CO2ReportPeriodInput, tbl_stream);
                 AddTOCReportPeriod(
-                    state.dataWeatherManager->TotVisualReportPers, "Visual", state.dataWeatherManager->VisualReportPeriodInput, tbl_stream);
+                    state.dataWeather->TotVisualReportPers, "Visual", state.dataWeather->VisualReportPeriodInput, tbl_stream);
             }
         }
     }
@@ -3410,7 +3410,7 @@ void WriteTableOfContents(EnergyPlusData &state)
 
 void AddTOCReportPeriod(const int nReportPeriods,
                         const std::string &kw,
-                        const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData,
+                        const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData,
                         std::ostream &tbl_stream)
 {
     static std::string const Entire_Facility("Entire Facility");
@@ -5268,14 +5268,14 @@ void WriteTabularReports(EnergyPlusData &state)
             WriteCO2ResilienceTables(state);                                           // code will crash if pure load calc
         if (ort->displayVisualResilienceSummary && !state.dataGlobal->DoPureLoadCalc)  // code will crash if pure load calc
             WriteVisualResilienceTables(state);                                        // code will crash if pure load calc
-        if (state.dataWeatherManager->TotReportPers > 0) WriteReportPeriodTimeConsumption(state);
-        for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+        if (state.dataWeather->TotReportPers > 0) WriteReportPeriodTimeConsumption(state);
+        for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
             WriteThermalResilienceTablesRepPeriod(state, i);
         }
-        for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
             WriteCO2ResilienceTablesRepPeriod(state, i);
         }
-        for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
             WriteVisualResilienceTablesRepPeriod(state, i);
         }
 
@@ -10754,7 +10754,7 @@ void writeRowReportPeriodInputVeri(const std::string &reportType,
                                    Array2D_string &tableBody,
                                    const int rowid,
                                    const int periodIdx,
-                                   const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
+                                   const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData)
 {
     tableBody(1, rowid) = reportType;
     tableBody(2, rowid) = std::to_string(periodIdx);
@@ -12056,7 +12056,7 @@ std::string formatReportPeriodTimestamp(const int year, const int month, const i
 void WriteReportHeaderReportingPeriod(EnergyPlusData &state,
                                       const std::string &reportKeyWord,
                                       const int periodIdx,
-                                      const Array1D<WeatherManager::ReportPeriodData> &ReportPeriodInputData)
+                                      const Array1D<Weather::ReportPeriodData> &ReportPeriodInputData)
 {
     WriteReportHeaders(
         state,
@@ -12086,7 +12086,7 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     Array1D_string rowHead;
     Array2D_string tableBody;
     int numRowsReportPeriod =
-        state.dataWeatherManager->TotThermalReportPers + state.dataWeatherManager->TotCO2ReportPers + state.dataWeatherManager->TotVisualReportPers;
+        state.dataWeather->TotThermalReportPers + state.dataWeather->TotCO2ReportPers + state.dataWeather->TotVisualReportPers;
     rowHead.allocate(numRowsReportPeriod);
     columnHead.allocate(6);
     columnWidth.allocate(6);
@@ -12113,16 +12113,16 @@ void WriteReportPeriodTimeConsumption(EnergyPlusData &state)
     }
     // loop through rows
     int rowid = 1;
-    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotThermalReportPers; periodIdx++) {
-        writeRowReportPeriodInputVeri("Thermal", tableBody, rowid, periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
+    for (int periodIdx = 1; periodIdx <= state.dataWeather->TotThermalReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("Thermal", tableBody, rowid, periodIdx, state.dataWeather->ThermalReportPeriodInput);
         rowid += 1;
     }
-    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotCO2ReportPers; periodIdx++) {
-        writeRowReportPeriodInputVeri("CO2", tableBody, rowid, periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
+    for (int periodIdx = 1; periodIdx <= state.dataWeather->TotCO2ReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("CO2", tableBody, rowid, periodIdx, state.dataWeather->CO2ReportPeriodInput);
         rowid += 1;
     }
-    for (int periodIdx = 1; periodIdx <= state.dataWeatherManager->TotVisualReportPers; periodIdx++) {
-        writeRowReportPeriodInputVeri("Visual", tableBody, rowid, periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
+    for (int periodIdx = 1; periodIdx <= state.dataWeather->TotVisualReportPers; periodIdx++) {
+        writeRowReportPeriodInputVeri("Visual", tableBody, rowid, periodIdx, state.dataWeather->VisualReportPeriodInput);
         rowid += 1;
     }
 
@@ -12157,8 +12157,8 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     }
 
     std::string tableType = "Thermal";
-    WriteReportHeaderReportingPeriod(state, tableType, periodIdx, state.dataWeatherManager->ThermalReportPeriodInput);
-    std::string periodTitle = state.dataWeatherManager->ThermalReportPeriodInput(periodIdx).title;
+    WriteReportHeaderReportingPeriod(state, tableType, periodIdx, state.dataWeather->ThermalReportPeriodInput);
+    std::string periodTitle = state.dataWeather->ThermalReportPeriodInput(periodIdx).title;
 
     int columnNum = 5;
     Array1D_int columnWidth;
@@ -13143,8 +13143,8 @@ void WriteCO2ResilienceTablesRepPeriod(EnergyPlusData &state, const int periodId
     if (ort->WriteTabularFiles) {
         return;
     }
-    WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeatherManager->CO2ReportPeriodInput);
-    std::string periodTitle = state.dataWeatherManager->CO2ReportPeriodInput(periodIdx).title;
+    WriteReportHeaderReportingPeriod(state, "CO2", periodIdx, state.dataWeather->CO2ReportPeriodInput);
+    std::string periodTitle = state.dataWeather->CO2ReportPeriodInput(periodIdx).title;
 
     Array1D_int columnWidth;
     columnWidth.allocate(numColumnCO2Tbl);
@@ -13247,8 +13247,8 @@ void WriteVisualResilienceTablesRepPeriod(EnergyPlusData &state, const int perio
         return;
     }
 
-    WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeatherManager->VisualReportPeriodInput);
-    std::string periodTitle = state.dataWeatherManager->VisualReportPeriodInput(periodIdx).title;
+    WriteReportHeaderReportingPeriod(state, "Visual", periodIdx, state.dataWeather->VisualReportPeriodInput);
+    std::string periodTitle = state.dataWeather->VisualReportPeriodInput(periodIdx).title;
 
     Array1D_int columnWidth;
     columnWidth.allocate(numColumnVisualTbl);
@@ -15753,10 +15753,10 @@ void CollectPeakZoneConditions(
 
         if (isCooling) {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).Month,
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                state.dataWeather->DesDayInput(desDaySelected).Month,
+                                                state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
                 compLoad.peakDateHrMin = state.dataSize->CoolPeakDateHrMin(zoneIndex);
@@ -15809,10 +15809,10 @@ void CollectPeakZoneConditions(
 
         } else {
             // Time of Peak Load
-            if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+            if ((size_t)desDaySelected <= state.dataWeather->DesDayInput.size()) {
                 compLoad.peakDateHrMin = format("{}/{} {}",
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).Month,
-                                                state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
+                                                state.dataWeather->DesDayInput(desDaySelected).Month,
+                                                state.dataWeather->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
                 compLoad.peakDateHrMin = state.dataSize->HeatPeakDateHrMin(zoneIndex);

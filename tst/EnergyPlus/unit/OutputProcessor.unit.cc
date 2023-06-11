@@ -69,7 +69,6 @@
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus::PurchasedAirManager;
-using namespace EnergyPlus::WeatherManager;
 using namespace EnergyPlus::OutputProcessor;
 
 namespace EnergyPlus {
@@ -4448,7 +4447,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -4736,7 +4735,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5049,7 +5048,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5310,7 +5309,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
         // OutputProcessor::TimeValue.allocate(2);
@@ -5323,7 +5322,7 @@ namespace OutputProcessor {
 
         state->dataGlobal->WarmupFlag = true;
 
-        ReportOutputFileHeaders(*state);
+        Weather::ReportOutputFileHeaders(*state);
 
         GetReportVariableInput(*state);
         Array1D<ZonePurchasedAir> PurchAir; // Used to specify purchased air parameters
@@ -5456,7 +5455,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 
@@ -5540,7 +5539,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
+        if (state->dataEnvrn->DayOfMonth == state->dataWeather->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
 

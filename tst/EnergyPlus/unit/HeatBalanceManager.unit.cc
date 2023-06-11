@@ -1580,13 +1580,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(*state);
     state->dataGlobal->DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
-    state->dataWeatherManager->Envrn = 1;
+    state->dataWeather->Envrn = 1;
 
     // Test 1 - Set time of day to morning - should use high transmittance window
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 11;
     state->dataGlobal->CurrentTime = 11.0;
-    WeatherManager::SetCurrentWeather(*state);
+    Weather::SetCurrentWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);
@@ -1603,7 +1603,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 14;
     state->dataGlobal->CurrentTime = 14.0;
-    WeatherManager::SetCurrentWeather(*state);
+    Weather::SetCurrentWeather(*state);
     HeatBalanceManager::ManageHeatBalance(*state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);

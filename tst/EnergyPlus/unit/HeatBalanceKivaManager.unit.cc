@@ -718,7 +718,7 @@ TEST_F(EnergyPlusFixture, OpaqueSkyCover_InterpretWeatherMissingOpaqueSkyCover)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/HeatBalanceKivaManagerOSkyTest.epw";
-    state->dataWeatherManager->Missing.OpaqSkyCvr = 5;
+    state->dataWeather->Missing.OpaqSkyCvr = 5;
 
     HeatBalanceKivaManager::KivaManager km;
     km.readWeatherData(*state);

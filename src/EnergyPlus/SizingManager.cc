@@ -95,13 +95,12 @@ namespace EnergyPlus::SizingManager {
 
 // Using/Aliasing
 using namespace HeatBalanceManager;
-using namespace WeatherManager;
 using namespace DataSizing;
 using DataStringGlobals::CharComma;
 using DataStringGlobals::CharSpace;
 using DataStringGlobals::CharTab;
 
-constexpr std::array<std::string_view, static_cast<int>(DataSizing::OAFlowCalcMethod::Num)> OAFlowCalcMethodNamesUC{
+constexpr std::array<std::string_view, (int)DataSizing::OAFlowCalcMethod::Num> OAFlowCalcMethodNamesUC{
     "FLOW/PERSON",
     "FLOW/ZONE",
     "FLOW/AREA",
@@ -255,7 +254,7 @@ void ManageSizing(EnergyPlusData &state)
 
         ShowMessage(state, "Beginning Zone Sizing Calculations");
 
-        ResetEnvironmentCounter(state);
+        Weather::ResetEnvironmentCounter(state);
         state.dataGlobal->KickOffSizing = true;
         SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
         state.dataGlobal->KickOffSizing = false;
@@ -275,12 +274,12 @@ void ManageSizing(EnergyPlusData &state)
 
             Available = true;
 
-            ResetEnvironmentCounter(state);
+            Weather::ResetEnvironmentCounter(state);
             state.dataSize->CurOverallSimDay = 0;
             NumSizingPeriodsPerformed = 0;
             while (Available) { // loop over environments
 
-                GetNextEnvironment(state, Available, ErrorsFound); // get an environment
+                Weather::GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
                 if (!Available) break;
                 if (ErrorsFound) break;
@@ -371,7 +370,7 @@ void ManageSizing(EnergyPlusData &state)
                                                                                                     state.dataGlobal->TimeStep,
                                                                                                     state.dataGlobal->KindOfSim);
 
-                            ManageWeather(state);
+                            Weather::ManageWeather(state);
 
                             if (!state.dataGlobal->WarmupFlag) {
                                 TimeStepInDay =
@@ -473,13 +472,13 @@ void ManageSizing(EnergyPlusData &state)
         ManageAirLoops(state, true, SimAir, SimZoneEquip);
         SizingManager::UpdateTermUnitFinalZoneSizing(state); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
         SimAirServingZones::SizeSysOutdoorAir(state);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
-        ResetEnvironmentCounter(state);
+        Weather::ResetEnvironmentCounter(state);
         state.dataSize->CurEnvirNumSimDay = 0;
         state.dataSize->CurOverallSimDay = 0;
         NumSizingPeriodsPerformed = 0;
         while (Available) { // loop over environments
 
-            GetNextEnvironment(state, Available, ErrorsFound); // get an environment
+            Weather::GetNextEnvironment(state, Available, ErrorsFound); // get an environment
 
             // check that environment is one of the design days
             if (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
@@ -545,7 +544,7 @@ void ManageSizing(EnergyPlusData &state)
                             }
                         }
 
-                        ManageWeather(state);
+                        Weather::ManageWeather(state);
 
                         UpdateSysSizing(state, Constant::CallIndicator::DuringDay);
 
@@ -2193,9 +2192,9 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     // now march through all zone timesteps for entire year to find the concurrent max
     int DaysInYear(366);  // assume leap year
     int dayOfWeekType(1); // assume year starts on Sunday
-    WeatherManager::CalcSpecialDayTypes(state);
+    Weather::CalcSpecialDayTypes(state);
     for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
-        state.dataEnvrn->HolidayIndex = state.dataWeatherManager->SpecialDayTypes(DayLoop);
+        state.dataEnvrn->HolidayIndex = state.dataWeather->SpecialDayTypes(DayLoop);
         state.dataEnvrn->DayOfYear_Schedule = DayLoop;
         state.dataEnvrn->DayOfWeek = dayOfWeekType;
         ++dayOfWeekType;
@@ -4327,7 +4326,7 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
     state.dataSize->CurOverallSimDay = 0;
     while (Available) { // do for each environment
 
-        GetNextEnvironment(state, Available, ErrorsFound);
+        Weather::GetNextEnvironment(state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -4359,7 +4358,7 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
 
         state.dataGlobal->BeginTimeStepFlag = true;
 
-        ManageWeather(state);
+        Weather::ManageWeather(state);
 
         ManageHeatBalance(state);
 
@@ -4369,7 +4368,7 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
         state.dataGlobal->BeginSimFlag = false;
 
         //          ! do another timestep=1
-        ManageWeather(state);
+        Weather::ManageWeather(state);
 
         ManageHeatBalance(state);
 
@@ -4379,7 +4378,7 @@ void SetupZoneSizing(EnergyPlusData &state, bool &ErrorsFound)
         state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
         state.dataGlobal->EndEnvrnFlag = true;
 
-        ManageWeather(state);
+        Weather::ManageWeather(state);
 
         ManageHeatBalance(state);
 

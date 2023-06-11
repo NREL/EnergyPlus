@@ -240,7 +240,7 @@ namespace ScheduleManager {
         int WkCount;
         int DyCount;
         int NumField;
-        WeatherManager::DateType PDateType;
+        Weather::DateType PDateType;
         int PWeekDay;
         int ThruField;
         int UntilFld;
@@ -1372,7 +1372,7 @@ namespace ScheduleManager {
                 CurrentThrough = Alphas(NumField);
                 ErrorHere = false;
                 ProcessDateString(state, Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
-                if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
+                if (PDateType == Weather::DateType::NthDayInMonth || PDateType == Weather::DateType::LastDayInMonth) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}\", Invalid \"Through:\" date",
                                            RoutineName,

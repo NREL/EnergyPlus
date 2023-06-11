@@ -5585,17 +5585,17 @@ void ReportThermalResilience(EnergyPlusData &state)
 {
 
     Array1D_bool reportPeriodFlags;
-    if (state.dataWeatherManager->TotReportPers > 0) {
-        reportPeriodFlags.dimension(state.dataWeatherManager->TotThermalReportPers, false);
+    if (state.dataWeather->TotReportPers > 0) {
+        reportPeriodFlags.dimension(state.dataWeather->TotThermalReportPers, false);
         General::findReportPeriodIdx(
-            state, state.dataWeatherManager->ThermalReportPeriodInput, state.dataWeatherManager->TotThermalReportPers, reportPeriodFlags);
+            state, state.dataWeather->ThermalReportPeriodInput, state.dataWeather->TotThermalReportPers, reportPeriodFlags);
     }
 
     auto &ort = state.dataOutRptTab;
-    for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+    for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
         if (reportPeriodFlags(i)) {
             int curResMeterNumber = ort->meterNumTotalsBEPS(1);
-            state.dataWeatherManager->ThermalReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+            state.dataWeather->ThermalReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
         }
     }
 
@@ -5617,7 +5617,7 @@ void ReportThermalResilience(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // the whole period
             // user specified reporting period
-            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneHeatIndexHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneHeatIndexOccupiedHourBinsRepPeriod(ZoneNum, i).assign(HINoBins, 0.0);
@@ -5778,7 +5778,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                 }
             }
 
-            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     ColdTempThresh = state.dataHeatBal->People(iPeople).ColdStressTempThresh;
@@ -5985,7 +5985,7 @@ void ReportThermalResilience(EnergyPlusData &state)
                 }
             }
 
-            for (int i = 1; i <= state.dataWeatherManager->TotThermalReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotThermalReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
 
@@ -6160,7 +6160,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
     if (state.dataHeatBalSurfMgr->reportCO2ResilienceFirstTime) {
         int NoBins = 3;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneCO2LevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneCO2LevelOccupiedHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
@@ -6188,17 +6188,17 @@ void ReportCO2Resilience(EnergyPlusData &state)
         }
 
         Array1D_bool reportPeriodFlags;
-        if (state.dataWeatherManager->TotReportPers > 0) {
-            reportPeriodFlags.dimension(state.dataWeatherManager->TotCO2ReportPers, false);
+        if (state.dataWeather->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeather->TotCO2ReportPers, false);
             General::findReportPeriodIdx(
-                state, state.dataWeatherManager->CO2ReportPeriodInput, state.dataWeatherManager->TotCO2ReportPers, reportPeriodFlags);
+                state, state.dataWeather->CO2ReportPeriodInput, state.dataWeather->TotCO2ReportPers, reportPeriodFlags);
         }
 
         auto &ort = state.dataOutRptTab;
-        for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
             if (reportPeriodFlags(i)) {
                 int curResMeterNumber = ort->meterNumTotalsBEPS(1);
-                state.dataWeatherManager->CO2ReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+                state.dataWeather->CO2ReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
             }
         }
 
@@ -6219,7 +6219,7 @@ void ReportCO2Resilience(EnergyPlusData &state)
                 state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccuHourBins[2] += NumOcc * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Resilience(ZoneNum).ZoneCO2LevelOccupiedHourBins[2] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
-            for (int i = 1; i <= state.dataWeatherManager->TotCO2ReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotCO2ReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     if (ZoneAirCO2 <= 1000) {
@@ -6252,7 +6252,7 @@ void ReportVisualResilience(EnergyPlusData &state)
     if (state.dataHeatBalSurfMgr->reportVisualResilienceFirstTime) {
         int NoBins = 4;
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
                 state.dataHeatBalFanSys->ZoneLightingLevelHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
                 state.dataHeatBalFanSys->ZoneLightingLevelOccupiedHourBinsRepPeriod(ZoneNum, i).assign(NoBins, 0.0);
@@ -6298,17 +6298,17 @@ void ReportVisualResilience(EnergyPlusData &state)
         }
 
         Array1D_bool reportPeriodFlags;
-        if (state.dataWeatherManager->TotReportPers > 0) {
-            reportPeriodFlags.dimension(state.dataWeatherManager->TotVisualReportPers, false);
+        if (state.dataWeather->TotReportPers > 0) {
+            reportPeriodFlags.dimension(state.dataWeather->TotVisualReportPers, false);
             General::findReportPeriodIdx(
-                state, state.dataWeatherManager->VisualReportPeriodInput, state.dataWeatherManager->TotVisualReportPers, reportPeriodFlags);
+                state, state.dataWeather->VisualReportPeriodInput, state.dataWeather->TotVisualReportPers, reportPeriodFlags);
         }
 
         auto &ort = state.dataOutRptTab;
-        for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+        for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
             if (reportPeriodFlags(i)) {
                 int curResMeterNumber = ort->meterNumTotalsBEPS(1);
-                state.dataWeatherManager->VisualReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
+                state.dataWeather->VisualReportPeriodInput(i).totalElectricityUse += GetCurrentMeterValue(state, curResMeterNumber);
             }
         }
 
@@ -6336,7 +6336,7 @@ void ReportVisualResilience(EnergyPlusData &state)
                 state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccuHourBins[3] += NumOcc * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->Resilience(ZoneNum).ZoneLightingLevelOccupiedHourBins[3] += (NumOcc > 0) * state.dataGlobal->TimeStepZone;
             }
-            for (int i = 1; i <= state.dataWeatherManager->TotVisualReportPers; i++) {
+            for (int i = 1; i <= state.dataWeather->TotVisualReportPers; i++) {
                 if (reportPeriodFlags(i)) {
                     int ReportPeriodIdx = i;
                     if (avgZoneIllum <= 100) {

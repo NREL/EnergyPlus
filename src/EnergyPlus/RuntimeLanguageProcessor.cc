@@ -2511,12 +2511,12 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
 
             case ErlFunc::TodayIsRain:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsRain, ReturnValue);
+                    state, ErlFunc::TodayIsRain, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayIsRain, ReturnValue);
                 break;
 
             case ErlFunc::TodayIsSnow:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayIsSnow, ReturnValue);
+                    state, ErlFunc::TodayIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayIsSnow, ReturnValue);
                 break;
 
             case ErlFunc::TodayOutDryBulbTemp:
@@ -2524,7 +2524,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TodayOutDryBulbTemp,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TodayOutDryBulbTemp,
+                                     state.dataWeather->TodayOutDryBulbTemp,
                                      ReturnValue);
                 break;
 
@@ -2533,7 +2533,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TodayOutDewPointTemp,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TodayOutDewPointTemp,
+                                     state.dataWeather->TodayOutDewPointTemp,
                                      ReturnValue);
                 break;
 
@@ -2542,33 +2542,33 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TodayOutBaroPress,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TodayOutBaroPress,
+                                     state.dataWeather->TodayOutBaroPress,
                                      ReturnValue);
                 break;
 
             case ErlFunc::TodayOutRelHum:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayOutRelHum, ReturnValue);
+                    state, ErlFunc::TodayOutRelHum, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayOutRelHum, ReturnValue);
                 break;
 
             case ErlFunc::TodayWindSpeed:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindSpeed, ReturnValue);
+                    state, ErlFunc::TodayWindSpeed, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayWindSpeed, ReturnValue);
                 break;
 
             case ErlFunc::TodayWindDir:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayWindDir, ReturnValue);
+                    state, ErlFunc::TodayWindDir, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayWindDir, ReturnValue);
                 break;
 
             case ErlFunc::TodaySkyTemp:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodaySkyTemp, ReturnValue);
+                    state, ErlFunc::TodaySkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeather->TodaySkyTemp, ReturnValue);
                 break;
 
             case ErlFunc::TodayHorizIRSky:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayHorizIRSky, ReturnValue);
+                    state, ErlFunc::TodayHorizIRSky, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayHorizIRSky, ReturnValue);
                 break;
 
             case ErlFunc::TodayBeamSolarRad:
@@ -2576,18 +2576,18 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TodayBeamSolarRad,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TodayBeamSolarRad,
+                                     state.dataWeather->TodayBeamSolarRad,
                                      ReturnValue);
                 break;
 
             case ErlFunc::TodayDifSolarRad:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayDifSolarRad, ReturnValue);
+                    state, ErlFunc::TodayDifSolarRad, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayDifSolarRad, ReturnValue);
                 break;
 
             case ErlFunc::TodayAlbedo:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TodayAlbedo, ReturnValue);
+                    state, ErlFunc::TodayAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeather->TodayAlbedo, ReturnValue);
                 break;
 
             case ErlFunc::TodayLiquidPrecip:
@@ -2595,18 +2595,18 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TodayLiquidPrecip,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TodayLiquidPrecip,
+                                     state.dataWeather->TodayLiquidPrecip,
                                      ReturnValue);
                 break;
 
             case ErlFunc::TomorrowIsRain:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsRain, ReturnValue);
+                    state, ErlFunc::TomorrowIsRain, Operand(1).Number, Operand(2).Number, state.dataWeather->TomorrowIsRain, ReturnValue);
                 break;
 
             case ErlFunc::TomorrowIsSnow:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowIsSnow, ReturnValue);
+                    state, ErlFunc::TomorrowIsSnow, Operand(1).Number, Operand(2).Number, state.dataWeather->TomorrowIsSnow, ReturnValue);
                 break;
 
             case ErlFunc::TomorrowOutDryBulbTemp:
@@ -2614,7 +2614,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowOutDryBulbTemp,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutDryBulbTemp,
+                                     state.dataWeather->TomorrowOutDryBulbTemp,
                                      ReturnValue);
                 break;
 
@@ -2623,7 +2623,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowOutDewPointTemp,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutDewPointTemp,
+                                     state.dataWeather->TomorrowOutDewPointTemp,
                                      ReturnValue);
                 break;
 
@@ -2632,7 +2632,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowOutBaroPress,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutBaroPress,
+                                     state.dataWeather->TomorrowOutBaroPress,
                                      ReturnValue);
                 break;
 
@@ -2641,7 +2641,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowOutRelHum,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowOutRelHum,
+                                     state.dataWeather->TomorrowOutRelHum,
                                      ReturnValue);
                 break;
 
@@ -2650,18 +2650,18 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowWindSpeed,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowWindSpeed,
+                                     state.dataWeather->TomorrowWindSpeed,
                                      ReturnValue);
                 break;
 
             case ErlFunc::TomorrowWindDir:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowWindDir, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowWindDir, ReturnValue);
+                    state, ErlFunc::TomorrowWindDir, Operand(1).Number, Operand(2).Number, state.dataWeather->TomorrowWindDir, ReturnValue);
                 break;
 
             case ErlFunc::TomorrowSkyTemp:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowSkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowSkyTemp, ReturnValue);
+                    state, ErlFunc::TomorrowSkyTemp, Operand(1).Number, Operand(2).Number, state.dataWeather->TomorrowSkyTemp, ReturnValue);
                 break;
 
             case ErlFunc::TomorrowHorizIRSky:
@@ -2669,7 +2669,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowHorizIRSky,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowHorizIRSky,
+                                     state.dataWeather->TomorrowHorizIRSky,
                                      ReturnValue);
                 break;
 
@@ -2678,7 +2678,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowBeamSolarRad,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowBeamSolarRad,
+                                     state.dataWeather->TomorrowBeamSolarRad,
                                      ReturnValue);
                 break;
 
@@ -2687,13 +2687,13 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowDifSolarRad,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowDifSolarRad,
+                                     state.dataWeather->TomorrowDifSolarRad,
                                      ReturnValue);
                 break;
 
             case ErlFunc::TomorrowAlbedo:
                 TodayTomorrowWeather(
-                    state, ErlFunc::TomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeatherManager->TomorrowAlbedo, ReturnValue);
+                    state, ErlFunc::TomorrowAlbedo, Operand(1).Number, Operand(2).Number, state.dataWeather->TomorrowAlbedo, ReturnValue);
                 break;
 
             case ErlFunc::TomorrowLiquidPrecip:
@@ -2701,7 +2701,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                                      ErlFunc::TomorrowLiquidPrecip,
                                      Operand(1).Number,
                                      Operand(2).Number,
-                                     state.dataWeatherManager->TomorrowLiquidPrecip,
+                                     state.dataWeather->TomorrowLiquidPrecip,
                                      ReturnValue);
                 break;
             case ErlFunc::Invalid:

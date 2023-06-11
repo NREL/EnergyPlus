@@ -1203,8 +1203,8 @@ void ReportCoilSelection::setCoilLvgAirHumRat(EnergyPlusData &state,
 std::string PeakHrMinString(EnergyPlusData &state, const int designDay, const int timeStepAtPeak)
 {
     return fmt::format("{}/{} {}",
-                       state.dataWeatherManager->DesDayInput(designDay).Month,
-                       state.dataWeatherManager->DesDayInput(designDay).DayOfMonth,
+                       state.dataWeather->DesDayInput(designDay).Month,
+                       state.dataWeather->DesDayInput(designDay).DayOfMonth,
                        ReportCoilSelection::getTimeText(state, timeStepAtPeak));
 }
 
@@ -1247,20 +1247,20 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         // These next blocks does not always work with SizingPeriod:WeatherFileDays or SizingPeriod:WeatherFileConditionType, protect against hard
         // crash
         if (SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 && SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtSensPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
+            c->desDayNameAtSensPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
             c->coilSensePeakHrMin = PeakHrMinString(state,
                                                     SysSizPeakDDNum(curSysNum).SensCoolPeakDD,
                                                     SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
         }
         if (SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 && SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtTotalPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
+            c->desDayNameAtTotalPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
             c->coilTotalPeakHrMin = PeakHrMinString(state,
                                                     SysSizPeakDDNum(curSysNum).TotCoolPeakDD,
                                                     SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
         }
 
         if (SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 && SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
+            c->desDayNameAtAirFlowPeak = state.dataWeather->DesDayInput(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
             c->airPeakHrMin = PeakHrMinString(state,
                                               SysSizPeakDDNum(curSysNum).CoolFlowPeakDD,
                                               SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
@@ -1569,7 +1569,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
             c->airPeakHrMin = PeakHrMinString(state, finalSysSizing.HeatDDNum, finalSysSizing.SysHeatAirTimeStepPk);
 
-            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(finalSysSizing.HeatDDNum).Title;
+            c->desDayNameAtAirFlowPeak = state.dataWeather->DesDayInput(finalSysSizing.HeatDDNum).Title;
         }
 
         // now set Coil Ent And Lvg Conditions
