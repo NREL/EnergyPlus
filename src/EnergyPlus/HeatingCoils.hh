@@ -87,11 +87,11 @@ namespace HeatingCoils {
         std::string HeatingCoilType;  // Type of HeatingCoil ie. Heating or Cooling
         std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
         int HCoilType_Num = 0;
-        Constant::eResource ResourceType = Constant::eResource::Invalid; // Type of fuel used, reference resource type integers
-        std::string Schedule;                                            // HeatingCoil Operation Schedule
-        int SchedPtr = 0;                                                // Pointer to the correct schedule
-        int InsuffTemperatureWarn = 0;                                   // Used for recurring error message
-        Real64 InletAirMassFlowRate = 0.0;                               // MassFlow through the HeatingCoil being Simulated [kg/Sec]
+        Constant::eFuel FuelType = Constant::eFuel::Invalid; // Type of fuel used, reference resource type integers
+        std::string Schedule;                                // HeatingCoil Operation Schedule
+        int SchedPtr = 0;                                    // Pointer to the correct schedule
+        int InsuffTemperatureWarn = 0;                       // Used for recurring error message
+        Real64 InletAirMassFlowRate = 0.0;                   // MassFlow through the HeatingCoil being Simulated [kg/Sec]
         Real64 OutletAirMassFlowRate = 0.0;
         Real64 InletAirTemp = 0.0;
         Real64 OutletAirTemp = 0.0;

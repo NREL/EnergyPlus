@@ -143,6 +143,8 @@ namespace Constant {
         OtherFuel1,
         OtherFuel2,
         DistrictCooling,
+        DistrictHeating,
+        Steam,
         DistrictHeatingWater,
         DistrictHeatingSteam,
         Num
@@ -441,6 +443,12 @@ namespace Constant {
         ReadAllWeatherData = 6,      // a weather period for reading all weather data prior to the simulation
         Num
     };
+
+    Real64 constexpr OneThird = 1.0 / 3.0;   // 1/3 in highest precision
+    Real64 constexpr OneFourth = 1.0 / 4.0;  // 1/4 in highest precision
+    Real64 constexpr OneFifth = 1.0 / 5.0;   // 1/5 in highest precision
+    Real64 constexpr OneSixth = 1.0 / 6.0;   // 1/6 in highest precision
+    Real64 constexpr FourFifths = 4.0 / 5.0; // 4/5 in highest precision
 
     Real64 constexpr MaxEXPArg = 709.78;       // maximum exponent in EXP() function
     Real64 constexpr Pi = 3.14159265358979324; // Pi 3.1415926535897932384626435
