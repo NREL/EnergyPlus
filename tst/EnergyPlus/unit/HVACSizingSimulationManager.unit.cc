@@ -711,9 +711,6 @@ TEST_F(SQLiteFixture, HVACSizing_Passes_SQL_Output)
     // * a Sizing:Plant object set to "Coincident", and,
     // * the SimulatioNControl "Do HVAC Sizing Simulation for Sizing Periods" set to Yes
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
-    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-
     std::string const idf_objects = delimited_string({
 
         "Timestep,",
