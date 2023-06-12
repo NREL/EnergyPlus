@@ -9782,19 +9782,16 @@ void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state)
         return;
     }
 
-    // local vars
-    Real64 SrdSurfaceTemp;
-    Real64 SrdSurfViewFactor;
-    Real64 SrdSurfaceTempSum;
     for (auto &surface : state.dataSurface->Surface) {
         if (!surface.SurfHasSurroundingSurfProperty) continue;
+        // local vars
+        Real64 SrdSurfaceTemp = 0.0;
+        Real64 SrdSurfaceTempSum = 0.0;
         auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum);
-        SrdSurfaceTempSum = 0.0;
         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-            SrdSurfViewFactor = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
             SrdSurfaceTemp =
                 ScheduleManager::GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
-            SrdSurfaceTempSum += SrdSurfViewFactor * pow_4(SrdSurfaceTemp);
+            SrdSurfaceTempSum += SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor * pow_4(SrdSurfaceTemp);
         }
         surface.SrdSurfTemp = root_4(SrdSurfaceTempSum / surface.ViewFactorSrdSurfs) - Constant::KelvinConv;
     }
