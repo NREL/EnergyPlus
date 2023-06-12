@@ -82,58 +82,77 @@ const int SQLite::RowNameId = 4;
 const int SQLite::ColumnNameId = 5;
 const int SQLite::UnitsId = 6;
 
+
+bool ParseSQLiteInput(EnergyPlusData &state, bool &writeOutputToSQLite, bool &writeTabularDataToSQLite)
+{
+    auto &ip = state.dataInputProcessing->inputProcessor;
+    auto const instances = ip->epJSON.find("Output:SQLite");
+    if (instances != ip->epJSON.end()) {
+
+        auto find_input = [=, &state](nlohmann::json const &fields, std::string const &field_name) -> std::string {
+            std::string input;
+            auto found = fields.find(field_name);
+            if (found != fields.end()) {
+                input = found.value().get<std::string>();
+            } else {
+                state.dataInputProcessing->inputProcessor->getDefaultValue(state, "Output:SQLite", field_name, input);
+            }
+            return input;
+        };
+
+        auto &sql_ort = state.dataOutRptTab;
+
+        // There can only be 1 "Output:SQLite"
+        auto const instance = instances.value().begin();
+        auto const &fields = instance.value();
+        ip->markObjectAsUsed("Output:SQLite", instance.key());
+
+        { // "option_type"
+            std::string outputType = find_input(fields, "option_type");
+            if ("SimpleAndTabular" == outputType) {
+                writeTabularDataToSQLite = true;
+                writeOutputToSQLite = true;
+            } else if ("Simple" == outputType) {
+                writeTabularDataToSQLite = false;
+                writeOutputToSQLite = true;
+            }
+        }
+        { // "unit_conversion_for_tabular_data"
+            std::string tabularDataUnitConversion = find_input(fields, "unit_conversion_for_tabular_data");
+            if ("UseOutputControlTableStyles" == tabularDataUnitConversion) {
+                // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
+                // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point;
+                // This will be updated again and got concretely assigned first thing in OutputReportTabular::WriteTabularReports().
+                sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::NotFound;
+            } else if ("None" == tabularDataUnitConversion) {
+                sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::None;
+            } else if ("JtoKWH" == tabularDataUnitConversion) {
+                sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
+            } else if ("JtoMJ" == tabularDataUnitConversion) {
+                sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoMJ;
+            } else if ("JtoGJ" == tabularDataUnitConversion) {
+                sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoGJ;
+            } else if ("InchPound" == tabularDataUnitConversion) {
+                sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
 {
     if (!state.files.outputControl.sqlite) {
         return nullptr;
     }
     try {
-        int numberOfSQLiteObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Output:SQLite");
         bool writeOutputToSQLite = false;
         bool writeTabularDataToSQLite = false;
-
-        if (numberOfSQLiteObjects == 0) {
+        bool parsedSQLite = ParseSQLiteInput(state, writeOutputToSQLite, writeTabularDataToSQLite);
+        if (!parsedSQLite) {
             state.files.outputControl.sqlite = false;
             return nullptr;
-        } else if (numberOfSQLiteObjects == 1) {
-            Array1D_string alphas(5);
-            int numAlphas;
-            Array1D<Real64> numbers(2);
-            int numNumbers;
-            int status;
-
-            auto &sql_ort = state.dataOutRptTab;
-
-            state.dataInputProcessing->inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
-            if (numAlphas > 0) {
-                std::string option = alphas(1);
-                if (UtilityRoutines::SameString(option, "SimpleAndTabular")) {
-                    writeTabularDataToSQLite = true;
-                    writeOutputToSQLite = true;
-
-                    if (numAlphas > 1) {
-                        std::string option2 = alphas(2);
-                        if (UtilityRoutines::SameString(option2, "None")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::None;
-                        } else if (UtilityRoutines::SameString(option2, "JtoKWH")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
-                        } else if (UtilityRoutines::SameString(option2, "JtoMJ")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoMJ;
-                        } else if (UtilityRoutines::SameString(option2, "JtoGJ")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoGJ;
-                        } else if (UtilityRoutines::SameString(option2, "InchPound")) {
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
-                        } else { // (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
-                            // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
-                            // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point;
-                            // This will be updated again and got concretely assigned first thing in OutputReportTabular::WriteTabularReports().
-                            sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::NotFound; // sql_ort->unitsStyle;
-                        }
-                    }
-                } else if (UtilityRoutines::SameString(option, "Simple")) {
-                    writeOutputToSQLite = true;
-                }
-            }
         }
         auto errorStream = std::make_shared<std::ofstream>(state.dataStrGlobals->outputSqliteErrFilePath, std::ofstream::out | std::ofstream::trunc);
         return std::make_unique<SQLite>(errorStream,

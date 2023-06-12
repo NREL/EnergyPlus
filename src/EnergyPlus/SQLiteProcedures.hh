@@ -1011,6 +1011,8 @@ private:
     std::vector<std::unique_ptr<SQLite::RoomAirModel>> roomAirModels;
 };
 
+bool ParseSQLiteInput(EnergyPlusData &state, bool &writeOutputToSQLite, bool &writeTabularDataToSQLite);
+
 std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state);
 
 void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
