@@ -1205,26 +1205,28 @@ namespace Weather {
 
     void AddDesignSetToEnvironmentStruct(EnergyPlusData &state, int const HVACSizingIterCount)
     {
-        int OrigNumOfEnvrn{state.dataWeather->NumOfEnvrn};
+        int OrigNumOfEnvrn = state.dataWeather->NumOfEnvrn;
 
         for (int i = 1; i <= OrigNumOfEnvrn; ++i) {
-            auto &environI = state.dataWeather->Environment(i);
-            if (environI.KindOfEnvrn == Constant::KindOfSim::DesignDay) {
+            // Gotcha: references may no longer be valid after a redimension! Cannot declare reference to Environment(i) here.
+            if (state.dataWeather->Environment(i).KindOfEnvrn == Constant::KindOfSim::DesignDay) {
                 state.dataWeather->Environment.redimension(++state.dataWeather->NumOfEnvrn);
-                auto &environNum = state.dataWeather->Environment(state.dataWeather->NumOfEnvrn);
-                environNum = environI; // copy over seed data from current array element
-                environNum.SeedEnvrnNum = i;
-                environNum.KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
-                environNum.Title = format("{} HVAC Sizing Pass {}", environI.Title, HVACSizingIterCount);
-                environNum.HVACSizingIterationNum = HVACSizingIterCount;
-            } else if (environI.KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign) {
+                auto &envBase = state.dataWeather->Environment(i);
+                auto &envNew = state.dataWeather->Environment(state.dataWeather->NumOfEnvrn);
+                envNew = envBase; // copy over seed data from current array element
+                envNew.SeedEnvrnNum = i;
+                envNew.KindOfEnvrn = Constant::KindOfSim::HVACSizeDesignDay;
+                envNew.Title = format("{} HVAC Sizing Pass {}", envBase.Title, HVACSizingIterCount);
+                envNew.HVACSizingIterationNum = HVACSizingIterCount;
+            } else if (state.dataWeather->Environment(i).KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign) {
                 state.dataWeather->Environment.redimension(++state.dataWeather->NumOfEnvrn);
-                auto &environNum = state.dataWeather->Environment(state.dataWeather->NumOfEnvrn);
-                environNum = environI; // copy over seed data
-                environNum.SeedEnvrnNum = i;
-                environNum.KindOfEnvrn = Constant::KindOfSim::HVACSizeRunPeriodDesign;
-                environNum.Title = format("{} HVAC Sizing Pass {}", environI.Title, HVACSizingIterCount);
-                environNum.HVACSizingIterationNum = HVACSizingIterCount;
+                auto &envBase = state.dataWeather->Environment(i);
+                auto &envNew = state.dataWeather->Environment(state.dataWeather->NumOfEnvrn);
+                envNew = envBase; // copy over seed data
+                envNew.SeedEnvrnNum = i;
+                envNew.KindOfEnvrn = Constant::KindOfSim::HVACSizeRunPeriodDesign;
+                envNew.Title = format("{} HVAC Sizing Pass {}", envBase.Title, HVACSizingIterCount);
+                envNew.HVACSizingIterationNum = HVACSizingIterCount;
             }
         } // for each loop over Environment data strucure
     }
@@ -1719,14 +1721,14 @@ namespace Weather {
 
         } // ... end of DataGlobals::BeginSimFlag IF-THEN block.
 
-        auto &environ = state.dataWeather->Environment(state.dataWeather->Envrn);
+        auto &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
         if (state.dataGlobal->BeginEnvrnFlag) {
 
             // Call and setup the Design Day environment
-            if (environ.KindOfEnvrn != Constant::KindOfSim::RunPeriodWeather) {
-                if (environ.DesignDayNum > 0) {
-                    SetUpDesignDay(state, environ.DesignDayNum);
-                    state.dataEnvrn->EnvironmentName = environ.Title;
+            if (envCurr.KindOfEnvrn != Constant::KindOfSim::RunPeriodWeather) {
+                if (envCurr.DesignDayNum > 0) {
+                    SetUpDesignDay(state, envCurr.DesignDayNum);
+                    state.dataEnvrn->EnvironmentName = envCurr.Title;
                 }
             }
 
@@ -1791,7 +1793,7 @@ namespace Weather {
                 (state.dataGlobal->KindOfSim != Constant::KindOfSim::HVACSizeDesignDay)) {
                 ReadWeatherForDay(state, 1, state.dataWeather->Envrn, false); // Read first day's weather
             } else {
-                state.dataWeather->TomorrowVariables = state.dataWeather->DesignDay(environ.DesignDayNum);
+                state.dataWeather->TomorrowVariables = state.dataWeather->DesignDay(envCurr.DesignDayNum);
             }
 
         } // ... end of DataGlobals::BeginEnvrnFlag IF-THEN block.
@@ -1812,23 +1814,23 @@ namespace Weather {
             // appropriately.
 
             if ((!state.dataGlobal->WarmupFlag) &&
-                ((environ.KindOfEnvrn != Constant::KindOfSim::DesignDay) && (environ.KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay))) {
+                ((envCurr.KindOfEnvrn != Constant::KindOfSim::DesignDay) && (envCurr.KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay))) {
                 if (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) {
                     if (state.dataGlobal->DayOfSim == state.dataWeather->curSimDayForEndOfRunPeriod) {
-                        state.dataWeather->curSimDayForEndOfRunPeriod += environ.RawSimDays;
+                        state.dataWeather->curSimDayForEndOfRunPeriod += envCurr.RawSimDays;
                         if (state.dataWeather->StartDatesCycleShouldBeReset) {
                             ResetWeekDaysByMonth(state,
-                                                 environ.MonWeekDay,
+                                                 envCurr.MonWeekDay,
                                                  state.dataWeather->LeapYearAdd,
-                                                 environ.StartMonth,
-                                                 environ.StartDay,
-                                                 environ.EndMonth,
-                                                 environ.EndDay,
-                                                 environ.RollDayTypeOnRepeat);
+                                                 envCurr.StartMonth,
+                                                 envCurr.StartDay,
+                                                 envCurr.EndMonth,
+                                                 envCurr.EndDay,
+                                                 envCurr.RollDayTypeOnRepeat);
                             if (state.dataWeather->DaylightSavingIsActive) {
-                                SetDSTDateRanges(state, environ.MonWeekDay, state.dataWeather->DSTIndex);
+                                SetDSTDateRanges(state, envCurr.MonWeekDay, state.dataWeather->DSTIndex);
                             }
-                            SetSpecialDayDates(state, environ.MonWeekDay);
+                            SetSpecialDayDates(state, envCurr.MonWeekDay);
                         }
                         ++state.dataWeather->YearOfSim;
                         ReadWeatherForDay(state, 1, state.dataWeather->Envrn, false); // Read tomorrow's weather
@@ -1851,13 +1853,13 @@ namespace Weather {
             state.dataEnvrn->HolidayIndexTomorrow = state.dataWeather->TomorrowVariables.HolidayIndex;
             state.dataEnvrn->YearTomorrow = state.dataWeather->TomorrowVariables.Year;
 
-            if (environ.KindOfEnvrn == Constant::KindOfSim::RunPeriodWeather) {
-                if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && environ.ActualWeather) {
+            if (envCurr.KindOfEnvrn == Constant::KindOfSim::RunPeriodWeather) {
+                if (state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1 && envCurr.ActualWeather) {
                     if (state.dataWeather->DatesShouldBeReset) {
-                        if (environ.TreatYearsAsConsecutive) {
-                            ++environ.CurrentYear;
-                            environ.IsLeapYear = isLeapYear(environ.CurrentYear);
-                            state.dataEnvrn->CurrentYearIsLeapYear = environ.IsLeapYear;
+                        if (envCurr.TreatYearsAsConsecutive) {
+                            ++envCurr.CurrentYear;
+                            envCurr.IsLeapYear = isLeapYear(envCurr.CurrentYear);
+                            state.dataEnvrn->CurrentYearIsLeapYear = envCurr.IsLeapYear;
                             if (state.dataEnvrn->CurrentYearIsLeapYear) {
                                 if (state.dataWeather->WFAllowsLeapYears) {
                                     state.dataWeather->LeapYearAdd = 1;
@@ -1868,11 +1870,11 @@ namespace Weather {
                                 state.dataWeather->LeapYearAdd = 0;
                             }
                             // need to reset MonWeekDay and WeekDayTypes
-                            int JDay5Start = General::OrdinalDay(environ.StartMonth, environ.StartDay, state.dataWeather->LeapYearAdd);
-                            int JDay5End = General::OrdinalDay(environ.EndMonth, environ.EndDay, state.dataWeather->LeapYearAdd);
-                            if (!environ.ActualWeather)
+                            int JDay5Start = General::OrdinalDay(envCurr.StartMonth, envCurr.StartDay, state.dataWeather->LeapYearAdd);
+                            int JDay5End = General::OrdinalDay(envCurr.EndMonth, envCurr.EndDay, state.dataWeather->LeapYearAdd);
+                            if (!envCurr.ActualWeather)
                                 state.dataWeather->curSimDayForEndOfRunPeriod =
-                                    state.dataGlobal->DayOfSim + environ.RawSimDays + state.dataWeather->LeapYearAdd - 1;
+                                    state.dataGlobal->DayOfSim + envCurr.RawSimDays + state.dataWeather->LeapYearAdd - 1;
 
                             {
                                 int i = JDay5Start;
@@ -1886,25 +1888,25 @@ namespace Weather {
                                 }
                             }
                             ResetWeekDaysByMonth(state,
-                                                 environ.MonWeekDay,
+                                                 envCurr.MonWeekDay,
                                                  state.dataWeather->LeapYearAdd,
-                                                 environ.StartMonth,
-                                                 environ.StartDay,
-                                                 environ.EndMonth,
-                                                 environ.EndDay,
-                                                 environ.RollDayTypeOnRepeat);
+                                                 envCurr.StartMonth,
+                                                 envCurr.StartDay,
+                                                 envCurr.EndMonth,
+                                                 envCurr.EndDay,
+                                                 envCurr.RollDayTypeOnRepeat);
                             if (state.dataWeather->DaylightSavingIsActive) {
-                                SetDSTDateRanges(state, environ.MonWeekDay, state.dataWeather->DSTIndex);
+                                SetDSTDateRanges(state, envCurr.MonWeekDay, state.dataWeather->DSTIndex);
                             }
-                            SetSpecialDayDates(state, environ.MonWeekDay);
+                            SetSpecialDayDates(state, envCurr.MonWeekDay);
                         }
                     }
                 } else if ((state.dataEnvrn->Month == 1 && state.dataEnvrn->DayOfMonth == 1) && state.dataWeather->DatesShouldBeReset &&
                            (state.dataWeather->Jan1DatesShouldBeReset)) {
-                    if (environ.TreatYearsAsConsecutive) {
-                        ++environ.CurrentYear;
-                        environ.IsLeapYear = isLeapYear(environ.CurrentYear);
-                        state.dataEnvrn->CurrentYearIsLeapYear = environ.IsLeapYear;
+                    if (envCurr.TreatYearsAsConsecutive) {
+                        ++envCurr.CurrentYear;
+                        envCurr.IsLeapYear = isLeapYear(envCurr.CurrentYear);
+                        state.dataEnvrn->CurrentYearIsLeapYear = envCurr.IsLeapYear;
                         if (state.dataEnvrn->CurrentYearIsLeapYear && !state.dataWeather->WFAllowsLeapYears)
                             state.dataEnvrn->CurrentYearIsLeapYear = false;
                         if (state.dataGlobal->DayOfSim < state.dataWeather->curSimDayForEndOfRunPeriod &&
@@ -1923,33 +1925,33 @@ namespace Weather {
 
                     if (state.dataGlobal->DayOfSim < state.dataWeather->curSimDayForEndOfRunPeriod) {
                         ResetWeekDaysByMonth(state,
-                                             environ.MonWeekDay,
+                                             envCurr.MonWeekDay,
                                              state.dataWeather->LeapYearAdd,
-                                             environ.StartMonth,
-                                             environ.StartDay,
-                                             environ.EndMonth,
-                                             environ.EndDay,
-                                             environ.RollDayTypeOnRepeat,
-                                             environ.RollDayTypeOnRepeat || state.dataEnvrn->CurrentYearIsLeapYear);
+                                             envCurr.StartMonth,
+                                             envCurr.StartDay,
+                                             envCurr.EndMonth,
+                                             envCurr.EndDay,
+                                             envCurr.RollDayTypeOnRepeat,
+                                             envCurr.RollDayTypeOnRepeat || state.dataEnvrn->CurrentYearIsLeapYear);
                         if (state.dataWeather->DaylightSavingIsActive) {
-                            SetDSTDateRanges(state, environ.MonWeekDay, state.dataWeather->DSTIndex);
+                            SetDSTDateRanges(state, envCurr.MonWeekDay, state.dataWeather->DSTIndex);
                         }
-                        SetSpecialDayDates(state, environ.MonWeekDay);
+                        SetSpecialDayDates(state, envCurr.MonWeekDay);
                     }
                 }
             }
 
             // at the end of each day find the min/max weather used for DOAS sizing
             if (state.dataGlobal->AirLoopHVACDOASUsedInSim) {
-                if (environ.KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign || environ.KindOfEnvrn == Constant::KindOfSim::DesignDay) {
+                if (envCurr.KindOfEnvrn == Constant::KindOfSim::RunPeriodDesign || envCurr.KindOfEnvrn == Constant::KindOfSim::DesignDay) {
                     for (size_t i = 0; i < state.dataWeather->TodayOutDryBulbTemp.size(); ++i) {
-                        if (state.dataWeather->TodayOutDryBulbTemp[i] > environ.maxCoolingOATSizing) {
-                            environ.maxCoolingOATSizing = state.dataWeather->TodayOutDryBulbTemp[i];
-                            environ.maxCoolingOADPSizing = state.dataWeather->TodayOutDewPointTemp[i];
+                        if (state.dataWeather->TodayOutDryBulbTemp[i] > envCurr.maxCoolingOATSizing) {
+                            envCurr.maxCoolingOATSizing = state.dataWeather->TodayOutDryBulbTemp[i];
+                            envCurr.maxCoolingOADPSizing = state.dataWeather->TodayOutDewPointTemp[i];
                         }
-                        if (state.dataWeather->TodayOutDryBulbTemp[i] < environ.minHeatingOATSizing) {
-                            environ.minHeatingOATSizing = state.dataWeather->TodayOutDryBulbTemp[i];
-                            environ.minHeatingOADPSizing = state.dataWeather->TodayOutDewPointTemp[i];
+                        if (state.dataWeather->TodayOutDryBulbTemp[i] < envCurr.minHeatingOATSizing) {
+                            envCurr.minHeatingOATSizing = state.dataWeather->TodayOutDryBulbTemp[i];
+                            envCurr.minHeatingOADPSizing = state.dataWeather->TodayOutDewPointTemp[i];
                         }
                     }
                 }
@@ -1958,16 +1960,16 @@ namespace Weather {
         } // ... end of DataGlobals::BeginDayFlag IF-THEN block.
 
         if (!state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&
-            (state.dataEnvrn->Month != environ.StartMonth ||
-             state.dataEnvrn->DayOfMonth != environ.StartDay) &&
+            (state.dataEnvrn->Month != envCurr.StartMonth ||
+             state.dataEnvrn->DayOfMonth != envCurr.StartDay) &&
             !state.dataWeather->DatesShouldBeReset &&
-            environ.KindOfEnvrn == Constant::KindOfSim::RunPeriodWeather) {
+            envCurr.KindOfEnvrn == Constant::KindOfSim::RunPeriodWeather) {
             state.dataWeather->DatesShouldBeReset = true;
         }
 
         if (state.dataGlobal->EndEnvrnFlag &&
-            (environ.KindOfEnvrn != Constant::KindOfSim::DesignDay) &&
-            (environ.KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay)) {
+            (envCurr.KindOfEnvrn != Constant::KindOfSim::DesignDay) &&
+            (envCurr.KindOfEnvrn != Constant::KindOfSim::HVACSizeDesignDay)) {
             state.files.inputWeatherFile.rewind();
             SkipEPlusWFHeader(state);
             ReportMissing_RangeData(state);
@@ -1978,7 +1980,7 @@ namespace Weather {
         state.dataGlobal->EndDesignDayEnvrnsFlag = false;
         if (state.dataGlobal->EndEnvrnFlag) {
             if (state.dataWeather->Envrn < state.dataWeather->NumOfEnvrn) {
-                if (environ.KindOfEnvrn !=
+                if (envCurr.KindOfEnvrn !=
                     state.dataWeather->Environment(state.dataWeather->Envrn + 1).KindOfEnvrn) {
                     state.dataGlobal->EndDesignDayEnvrnsFlag = true;
                 }
@@ -2174,8 +2176,8 @@ namespace Weather {
             state.dataWeather->SPSiteDiffuseSolarScheduleValue = -999.0;      // N/A Diffuse Solar Schedule Value
             state.dataWeather->SPSiteSkyTemperatureScheduleValue = -999.0;    // N/A SkyTemperature Modifier Schedule Value
 
-            auto const &environ = state.dataWeather->Environment(state.dataWeather->Envrn);
-            int const envrnDayNum = environ.DesignDayNum;
+            auto const &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
+            int const envrnDayNum = envCurr.DesignDayNum;
             if (state.dataWeather->DesDayInput(envrnDayNum).DBTempRangeType != DDDBRangeType::Default) {
                 state.dataWeather->SPSiteDryBulbRangeModScheduleValue(envrnDayNum) =
                     state.dataWeather->DDDBRngModifier(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
@@ -2194,9 +2196,9 @@ namespace Weather {
                     state.dataWeather->DDDiffuseSolarValues(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
 
-            if (environ.skyTempModel == SkyTempModel::ScheduleValue ||
-                environ.skyTempModel == SkyTempModel::DryBulbDelta ||
-                environ.skyTempModel == SkyTempModel::DewPointDelta) {
+            if (envCurr.skyTempModel == SkyTempModel::ScheduleValue ||
+                envCurr.skyTempModel == SkyTempModel::DryBulbDelta ||
+                envCurr.skyTempModel == SkyTempModel::DewPointDelta) {
                 state.dataWeather->SPSiteSkyTemperatureScheduleValue(envrnDayNum) =
                     state.dataWeather->DDSkyTempScheduleValues(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, envrnDayNum);
             }
@@ -2647,7 +2649,7 @@ namespace Weather {
                 }
             }
 
-            auto const &environ = state.dataWeather->Environment(state.dataWeather->Envrn);
+            auto const &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
             // Why do some things here use state.dataWeather->Envrn and some the parameter Environ?
             
             // Positioned to proper day
@@ -2656,16 +2658,16 @@ namespace Weather {
                 if (!thisEnviron.RollDayTypeOnRepeat) {
                     SetDayOfWeekInitialValues(thisEnviron.DayOfWeek, state.dataWeather->CurDayOfWeek);
                     if (state.dataWeather->DaylightSavingIsActive) {
-                        SetDSTDateRanges(state, environ.MonWeekDay, state.dataWeather->DSTIndex);
+                        SetDSTDateRanges(state, envCurr.MonWeekDay, state.dataWeather->DSTIndex);
                     }
-                    SetSpecialDayDates(state, environ.MonWeekDay);
+                    SetSpecialDayDates(state, envCurr.MonWeekDay);
                 } else if (thisEnviron.CurrentCycle == 1) {
                     SetDayOfWeekInitialValues(thisEnviron.DayOfWeek, state.dataWeather->CurDayOfWeek);
                     thisEnviron.SetWeekDays = true;
                     if (state.dataWeather->DaylightSavingIsActive) {
-                        SetDSTDateRanges(state, environ.MonWeekDay, state.dataWeather->DSTIndex);
+                        SetDSTDateRanges(state, envCurr.MonWeekDay, state.dataWeather->DSTIndex);
                     }
-                    SetSpecialDayDates(state, environ.MonWeekDay);
+                    SetSpecialDayDates(state, envCurr.MonWeekDay);
                 } else {
                     state.dataWeather->CurDayOfWeek = state.dataEnvrn->DayOfWeekTomorrow;
                 }
@@ -3619,7 +3621,7 @@ namespace Weather {
         // Object Data
         HourlyWeatherData Wthr;
 
-        auto &environ = state.dataWeather->Environment(EnvrnNum);
+        auto &envCurr = state.dataWeather->Environment(EnvrnNum);
         
         bool SaveWarmupFlag = state.dataGlobal->WarmupFlag;
         state.dataGlobal->WarmupFlag = true;
@@ -3962,7 +3964,7 @@ namespace Weather {
                 double DryBulb = state.dataWeather->TomorrowOutDryBulbTemp(ts, hour);
                 double RelHum = state.dataWeather->TomorrowOutRelHum(ts, hour) * 0.01;
                 Real64 ESky = CalcSkyEmissivity(state,
-                                                environ.skyTempModel,
+                                                envCurr.skyTempModel,
                                                 OSky,
                                                 DryBulb,
                                                 state.dataWeather->TomorrowOutDewPointTemp(ts, hour),
@@ -3970,10 +3972,10 @@ namespace Weather {
                 state.dataWeather->TomorrowHorizIRSky(ts, hour) =
                     ESky * state.dataWeather->Sigma * pow_4(DryBulb + Constant::KelvinConv);
 
-                if (environ.skyTempModel == SkyTempModel::Brunt ||
-                    environ.skyTempModel == SkyTempModel::Idso ||
-                    environ.skyTempModel == SkyTempModel::BerdahlMartin ||
-                    environ.skyTempModel == SkyTempModel::ClarkAllen) {
+                if (envCurr.skyTempModel == SkyTempModel::Brunt ||
+                    envCurr.skyTempModel == SkyTempModel::Idso ||
+                    envCurr.skyTempModel == SkyTempModel::BerdahlMartin ||
+                    envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
                     // Design day not scheduled
                     state.dataWeather->TomorrowSkyTemp(ts, hour) = (DryBulb + Constant::KelvinConv) * root_4(ESky) - Constant::KelvinConv;
                 }
@@ -4111,20 +4113,20 @@ namespace Weather {
         }
 
 
-        if (environ.WP_Type1 != 0) {
+        if (envCurr.WP_Type1 != 0) {
 
-            switch (state.dataWeather->WPSkyTemperature(environ.WP_Type1).skyTempModel) {
+            switch (state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).skyTempModel) {
             case SkyTempModel::ScheduleValue:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
-                    state.dataWeather->WPSkyTemperature(environ.WP_Type1).SchedulePtr,
+                    state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).SchedulePtr,
                     state.dataWeather->TomorrowSkyTemp);
                 state.dataWeather->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeather->TomorrowSkyTemp;
                 break;
             case SkyTempModel::DryBulbDelta:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
-                    state.dataWeather->WPSkyTemperature(environ.WP_Type1).SchedulePtr,
+                    state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).SchedulePtr,
                     state.dataWeather->TomorrowSkyTemp);
                 state.dataWeather->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeather->TomorrowSkyTemp;
                 for (int hour = 1; hour <= 24; ++hour) {
@@ -4137,7 +4139,7 @@ namespace Weather {
             case SkyTempModel::DewPointDelta:
                 ScheduleManager::GetSingleDayScheduleValues(
                     state,
-                    state.dataWeather->WPSkyTemperature(environ.WP_Type1).SchedulePtr,
+                    state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).SchedulePtr,
                     state.dataWeather->TomorrowSkyTemp);
                 state.dataWeather->DDSkyTempScheduleValues(_, _, EnvrnNum) = state.dataWeather->TomorrowSkyTemp;
                 for (int hour = 1; hour <= 24; ++hour) {
@@ -6384,10 +6386,10 @@ namespace Weather {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            auto &environ = state.dataWeather->Environment(EnvrnNum);
+            auto &envCurr = state.dataWeather->Environment(EnvrnNum);
             auto &designDayInput = state.dataWeather->DesDayInput(EnvrnNum);
             designDayInput.Title = ipsc->cAlphaArgs(1); // Environment name
-            environ.Title = designDayInput.Title;
+            envCurr.Title = designDayInput.Title;
 
             //   N3,  \field Maximum Dry-Bulb Temperature
             //   N4,  \field Daily Dry-Bulb Temperature Range
@@ -7229,20 +7231,20 @@ namespace Weather {
             }
 
             auto &designDay = state.dataWeather->DesignDay(EnvrnNum);
-            environ.Title = designDayInput.Title;
-            environ.KindOfEnvrn = Constant::KindOfSim::DesignDay;
-            environ.DesignDayNum = EnvrnNum;
-            environ.RunPeriodDesignNum = 0;
-            environ.TotalDays = 1;
-            environ.StartMonth = designDayInput.Month;
-            environ.StartDay = designDayInput.DayOfMonth;
-            environ.EndMonth = environ.StartMonth;
-            environ.EndDay = environ.StartDay;
-            environ.DayOfWeek = 0;
-            environ.UseDST = false;
-            environ.UseHolidays = false;
-            environ.StartJDay = designDay.DayOfYear;
-            environ.EndJDay = environ.StartJDay;
+            envCurr.Title = designDayInput.Title;
+            envCurr.KindOfEnvrn = Constant::KindOfSim::DesignDay;
+            envCurr.DesignDayNum = EnvrnNum;
+            envCurr.RunPeriodDesignNum = 0;
+            envCurr.TotalDays = 1;
+            envCurr.StartMonth = designDayInput.Month;
+            envCurr.StartDay = designDayInput.DayOfMonth;
+            envCurr.EndMonth = envCurr.StartMonth;
+            envCurr.EndDay = envCurr.StartDay;
+            envCurr.DayOfWeek = 0;
+            envCurr.UseDST = false;
+            envCurr.UseHolidays = false;
+            envCurr.StartJDay = designDay.DayOfYear;
+            envCurr.EndJDay = envCurr.StartJDay;
 
             // create predefined report on design day
             std::string envTitle = designDayInput.Title;
@@ -7536,10 +7538,10 @@ namespace Weather {
                 wpSkyTemp.UseWeatherFileHorizontalIR = true;
             }
         }
-        for (auto &environ : state.dataWeather->Environment) {
-            if (environ.WP_Type1 != 0 && state.dataWeather->NumWPSkyTemperatures >= environ.WP_Type1) {
-                environ.skyTempModel = state.dataWeather->WPSkyTemperature(environ.WP_Type1).skyTempModel;
-                environ.UseWeatherFileHorizontalIR = state.dataWeather->WPSkyTemperature(environ.WP_Type1).UseWeatherFileHorizontalIR;
+        for (auto &envCurr : state.dataWeather->Environment) {
+            if (envCurr.WP_Type1 != 0 && state.dataWeather->NumWPSkyTemperatures >= envCurr.WP_Type1) {
+                envCurr.skyTempModel = state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).skyTempModel;
+                envCurr.UseWeatherFileHorizontalIR = state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).UseWeatherFileHorizontalIR;
             }
         }
     }
@@ -9009,125 +9011,125 @@ namespace Weather {
         // Sizing Periods from Weather File
         for (int iRunPer = 1; iRunPer <= state.dataWeather->TotRunDesPers; ++iRunPer, ++state.dataWeather->Envrn) {
             auto const &runPer = state.dataWeather->RunPeriodDesignInput(iRunPer);
-            auto &environ = state.dataWeather->Environment(state.dataWeather->Envrn);
+            auto &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
         
-            environ.StartMonth = runPer.startMonth;
-            environ.StartDay = runPer.startDay;
-            environ.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, state.dataWeather->LeapYearAdd);
-            environ.TotalDays = runPer.totalDays;
-            environ.EndMonth = runPer.endMonth;
-            environ.EndDay = runPer.endDay;
-            environ.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, state.dataWeather->LeapYearAdd);
-            environ.NumSimYears = runPer.numSimYears;
-            if (environ.StartJDay <= environ.EndJDay) {
-                environ.TotalDays = (environ.EndJDay - environ.StartJDay + 1) * environ.NumSimYears;
+            envCurr.StartMonth = runPer.startMonth;
+            envCurr.StartDay = runPer.startDay;
+            envCurr.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, state.dataWeather->LeapYearAdd);
+            envCurr.TotalDays = runPer.totalDays;
+            envCurr.EndMonth = runPer.endMonth;
+            envCurr.EndDay = runPer.endDay;
+            envCurr.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, state.dataWeather->LeapYearAdd);
+            envCurr.NumSimYears = runPer.numSimYears;
+            if (envCurr.StartJDay <= envCurr.EndJDay) {
+                envCurr.TotalDays = (envCurr.EndJDay - envCurr.StartJDay + 1) * envCurr.NumSimYears;
             } else {
-                environ.TotalDays =
-                    (General::OrdinalDay(12, 31, state.dataWeather->LeapYearAdd) - environ.StartJDay + 1 + environ.EndJDay) * environ.NumSimYears;
+                envCurr.TotalDays =
+                    (General::OrdinalDay(12, 31, state.dataWeather->LeapYearAdd) - envCurr.StartJDay + 1 + envCurr.EndJDay) * envCurr.NumSimYears;
             }
-            state.dataEnvrn->TotRunDesPersDays += environ.TotalDays;
-            environ.UseDST = runPer.useDST;
-            environ.UseHolidays = runPer.useHolidays;
-            environ.Title = runPer.title;
-            environ.cKindOfEnvrn = runPer.periodType;
-            environ.KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
-            environ.DesignDayNum = 0;
-            environ.RunPeriodDesignNum = iRunPer;
-            environ.DayOfWeek = runPer.dayOfWeek;
-            environ.MonWeekDay = runPer.monWeekDay;
-            environ.SetWeekDays = false;
-            environ.ApplyWeekendRule = runPer.applyWeekendRule;
-            environ.UseRain = runPer.useRain;
-            environ.UseSnow = runPer.useSnow;
-            environ.firstHrInterpUseHr1 = runPer.firstHrInterpUsingHr1; // this will just the default
+            state.dataEnvrn->TotRunDesPersDays += envCurr.TotalDays;
+            envCurr.UseDST = runPer.useDST;
+            envCurr.UseHolidays = runPer.useHolidays;
+            envCurr.Title = runPer.title;
+            envCurr.cKindOfEnvrn = runPer.periodType;
+            envCurr.KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
+            envCurr.DesignDayNum = 0;
+            envCurr.RunPeriodDesignNum = iRunPer;
+            envCurr.DayOfWeek = runPer.dayOfWeek;
+            envCurr.MonWeekDay = runPer.monWeekDay;
+            envCurr.SetWeekDays = false;
+            envCurr.ApplyWeekendRule = runPer.applyWeekendRule;
+            envCurr.UseRain = runPer.useRain;
+            envCurr.UseSnow = runPer.useSnow;
+            envCurr.firstHrInterpUseHr1 = runPer.firstHrInterpUsingHr1; // this will just the default
         }
 
         // RunPeriods from weather file
         for (int iRunPer = 1; iRunPer <= state.dataWeather->TotRunPers; ++iRunPer, ++state.dataWeather->Envrn) { 
             auto const &runPer = state.dataWeather->RunPeriodInput(iRunPer);
-            auto &environ = state.dataWeather->Environment(state.dataWeather->Envrn);
+            auto &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
 
-            environ.StartMonth = runPer.startMonth;
-            environ.StartDay = runPer.startDay;
-            environ.StartYear = runPer.startYear;
-            environ.EndMonth = runPer.endMonth;
-            environ.EndDay = runPer.endDay;
-            environ.EndYear = runPer.endYear;
-            environ.NumSimYears = runPer.numSimYears;
-            environ.CurrentYear = runPer.startYear;
-            environ.IsLeapYear = runPer.isLeapYear;
-            environ.TreatYearsAsConsecutive = true;
+            envCurr.StartMonth = runPer.startMonth;
+            envCurr.StartDay = runPer.startDay;
+            envCurr.StartYear = runPer.startYear;
+            envCurr.EndMonth = runPer.endMonth;
+            envCurr.EndDay = runPer.endDay;
+            envCurr.EndYear = runPer.endYear;
+            envCurr.NumSimYears = runPer.numSimYears;
+            envCurr.CurrentYear = runPer.startYear;
+            envCurr.IsLeapYear = runPer.isLeapYear;
+            envCurr.TreatYearsAsConsecutive = true;
             if (runPer.actualWeather) {
                 // This will require leap years to be present, thus Julian days can be used for all the calculations
-                environ.StartJDay = environ.StartDate = runPer.startJulianDate;
-                environ.EndJDay = environ.EndDate = runPer.endJulianDate;
-                environ.TotalDays = environ.EndDate - environ.StartDate + 1;
-                environ.RawSimDays = environ.EndDate - environ.StartDate + 1;
-                environ.MatchYear = true;
-                environ.ActualWeather = true;
+                envCurr.StartJDay = envCurr.StartDate = runPer.startJulianDate;
+                envCurr.EndJDay = envCurr.EndDate = runPer.endJulianDate;
+                envCurr.TotalDays = envCurr.EndDate - envCurr.StartDate + 1;
+                envCurr.RawSimDays = envCurr.EndDate - envCurr.StartDate + 1;
+                envCurr.MatchYear = true;
+                envCurr.ActualWeather = true;
             } else { // std RunPeriod
-                environ.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-                if (environ.StartYear == environ.EndYear) {
+                envCurr.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+                if (envCurr.StartYear == envCurr.EndYear) {
                     // Short-circuit all the calculations, we're in a single year
                     int LocalLeapYearAdd = 0;
-                    if (isLeapYear(environ.StartYear)) {
+                    if (isLeapYear(envCurr.StartYear)) {
                         // If a leap year is supported by the weather file, do it.
                         if (state.dataWeather->WFAllowsLeapYears) {
-                            environ.IsLeapYear = true; // explicit set, this might be unwise
+                            envCurr.IsLeapYear = true; // explicit set, this might be unwise
                             LocalLeapYearAdd = 1;
                         } else {
-                            environ.IsLeapYear = false; // explicit set, this might be unwise
+                            envCurr.IsLeapYear = false; // explicit set, this might be unwise
                         }
                     }
-                    environ.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LocalLeapYearAdd);
-                    environ.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LocalLeapYearAdd);
-                    environ.RawSimDays = (environ.EndJDay - environ.StartJDay + 1);
-                    environ.TotalDays = environ.RawSimDays;
+                    envCurr.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LocalLeapYearAdd);
+                    envCurr.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LocalLeapYearAdd);
+                    envCurr.RawSimDays = (envCurr.EndJDay - envCurr.StartJDay + 1);
+                    envCurr.TotalDays = envCurr.RawSimDays;
                 } else {
                     // Environment crosses year boundaries
-                    environ.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-                    environ.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, runPer.isLeapYear ? 1 : 0);
-                    environ.EndJDay = General::OrdinalDay(
+                    envCurr.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
+                    envCurr.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, runPer.isLeapYear ? 1 : 0);
+                    envCurr.EndJDay = General::OrdinalDay(
                         runPer.endMonth, runPer.endDay, isLeapYear(runPer.endYear) && state.dataWeather->WFAllowsLeapYears ? 1 : 0);
-                    environ.TotalDays = 366 - environ.StartJDay + environ.EndJDay + 365 * std::max(environ.NumSimYears - 2, 0);
+                    envCurr.TotalDays = 366 - envCurr.StartJDay + envCurr.EndJDay + 365 * std::max(envCurr.NumSimYears - 2, 0);
                     if (state.dataWeather->WFAllowsLeapYears) {
                         // First year
-                        if (environ.StartJDay < 59) {
-                            if (isLeapYear(environ.StartYear)) {
-                                ++environ.TotalDays;
+                        if (envCurr.StartJDay < 59) {
+                            if (isLeapYear(envCurr.StartYear)) {
+                                ++envCurr.TotalDays;
                             }
                         }
                         // Middle years
-                        for (int yr = environ.StartYear + 1; yr < environ.EndYear; ++yr) {
+                        for (int yr = envCurr.StartYear + 1; yr < envCurr.EndYear; ++yr) {
                             if (isLeapYear(yr)) {
-                                ++environ.TotalDays;
+                                ++envCurr.TotalDays;
                             }
                         }
                         // Last year not needed, the end ordinal date will take this into account
                     }
-                    environ.RawSimDays = environ.TotalDays;
+                    envCurr.RawSimDays = envCurr.TotalDays;
                 }
             }
-            environ.UseDST = runPer.useDST;
-            environ.UseHolidays = runPer.useHolidays;
+            envCurr.UseDST = runPer.useDST;
+            envCurr.UseHolidays = runPer.useHolidays;
             if (runPer.title.empty()) {
-                environ.Title = state.dataEnvrn->WeatherFileLocationTitle;
+                envCurr.Title = state.dataEnvrn->WeatherFileLocationTitle;
             } else {
-                environ.Title = runPer.title;
+                envCurr.Title = runPer.title;
             }
-            if (environ.KindOfEnvrn == Constant::KindOfSim::ReadAllWeatherData) {
-                environ.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
+            if (envCurr.KindOfEnvrn == Constant::KindOfSim::ReadAllWeatherData) {
+                envCurr.cKindOfEnvrn = "ReadAllWeatherDataRunPeriod";
             } else {
-                environ.cKindOfEnvrn = "WeatherFileRunPeriod";
-                environ.KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
+                envCurr.cKindOfEnvrn = "WeatherFileRunPeriod";
+                envCurr.KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
             }
-            environ.DayOfWeek = runPer.dayOfWeek;
-            environ.MonWeekDay = runPer.monWeekDay;
-            environ.SetWeekDays = false;
-            environ.ApplyWeekendRule = runPer.applyWeekendRule;
-            environ.UseRain = runPer.useRain;
-            environ.UseSnow = runPer.useSnow;
-            environ.firstHrInterpUseHr1 = runPer.firstHrInterpUsingHr1; // first hour interpolation choice
+            envCurr.DayOfWeek = runPer.dayOfWeek;
+            envCurr.MonWeekDay = runPer.monWeekDay;
+            envCurr.SetWeekDays = false;
+            envCurr.ApplyWeekendRule = runPer.applyWeekendRule;
+            envCurr.UseRain = runPer.useRain;
+            envCurr.UseSnow = runPer.useSnow;
+            envCurr.firstHrInterpUseHr1 = runPer.firstHrInterpUsingHr1; // first hour interpolation choice
         } // for (i)
     }
 
@@ -9517,15 +9519,15 @@ namespace Weather {
     {
         if (IRHoriz <= 0.0) IRHoriz = 9999.0;
 
-        auto const &environ = state.dataWeather->Environment(state.dataWeather->Envrn);
-        if (!environ.UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+        auto const &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
+        if (!envCurr.UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
-            Real64 ESky = CalcSkyEmissivity(state, environ.skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+            Real64 ESky = CalcSkyEmissivity(state, envCurr.skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
             HorizIRSky = ESky * state.dataWeather->Sigma * pow_4(DryBulb + Constant::KelvinConv);
-            if (environ.skyTempModel == SkyTempModel::Brunt ||
-                environ.skyTempModel == SkyTempModel::Idso ||
-                environ.skyTempModel == SkyTempModel::BerdahlMartin ||
-                environ.skyTempModel == SkyTempModel::ClarkAllen) {
+            if (envCurr.skyTempModel == SkyTempModel::Brunt ||
+                envCurr.skyTempModel == SkyTempModel::Idso ||
+                envCurr.skyTempModel == SkyTempModel::BerdahlMartin ||
+                envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
                 SkyTemp = (DryBulb + Constant::KelvinConv) * root_4(ESky) - Constant::KelvinConv;
             } else {
                 SkyTemp = 0.0; // dealt with later
@@ -9533,10 +9535,10 @@ namespace Weather {
         } else {
             // Valid IR from weather files
             HorizIRSky = IRHoriz;
-            if (environ.skyTempModel == SkyTempModel::Brunt ||
-                environ.skyTempModel == SkyTempModel::Idso ||
-                environ.skyTempModel == SkyTempModel::BerdahlMartin ||
-                environ.skyTempModel == SkyTempModel::ClarkAllen) {
+            if (envCurr.skyTempModel == SkyTempModel::Brunt ||
+                envCurr.skyTempModel == SkyTempModel::Idso ||
+                envCurr.skyTempModel == SkyTempModel::BerdahlMartin ||
+                envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
                 SkyTemp = root_4(IRHoriz / state.dataWeather->Sigma) - Constant::KelvinConv;
             } else {
                 SkyTemp = 0.0; // dealt with later
