@@ -1114,7 +1114,7 @@ namespace PhotovoltaicThermalCollectors {
             Real64 HrAir(0.0);
             Real64 HcExt(0.0);
             Real64 HrSky(0.0);
-			Real64 HrSrdSurf(0.0);
+            Real64 HrSrdSurf(0.0);
 
             Convect::InitExtConvCoeff(state,
                                       this->SurfNum,
