@@ -2285,7 +2285,7 @@ namespace WindowManager {
 
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
             // of window layer heat balance solution.
-            if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) {
+            if (state.dataSurface->SurfIntConvCoeff(SurfNum) == Convect::HcInt::SetByZone) {
                 if (state.dataWindowManager->hcin <=
                     state.dataHeatBal->LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
                     //  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
@@ -2677,7 +2677,7 @@ namespace WindowManager {
             if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
                 // update SurfHSrdSurfExt if the windows has exterior shade or blind
                 state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) =
-                    ConvectionCoefficients::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
+                    Convect::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
                 rad_out_lw_srd_per_area = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (surface.SrdSurfTemp - SurfOutsideTemp);
             }
         }
@@ -3525,7 +3525,7 @@ namespace WindowManager {
         // by LU decomposition.
 
         // Using/Aliasing
-        using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
+        using Convect::CalcISO15099WindowIntConvCoeff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3635,9 +3635,9 @@ namespace WindowManager {
             }
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
-            if (((state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) &&
-                 (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ConvectionConstants::HcInt_ASHRAETARP)) ||
-                (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == -2)) {
+            if (((state.dataSurface->SurfIntConvCoeff(SurfNum) == Convect::HcInt::SetByZone) &&
+                 (state.dataHeatBal->Zone(ZoneNum).IntConvAlgo == Convect::HcInt::ASHRAETARP)) ||
+                (state.dataSurface->SurfIntConvCoeff(SurfNum) == Convect::HcInt::ASHRAETARP)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {

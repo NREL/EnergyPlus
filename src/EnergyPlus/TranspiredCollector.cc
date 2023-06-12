@@ -1008,7 +1008,6 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using ConvectionCoefficients::InitExteriorConvectionCoeff;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyCpAirFnW;
@@ -1030,7 +1029,7 @@ namespace TranspiredCollector {
         Array1D<Real64> HPlenARR;
         Array1D<Real64> LocalWindArr;
         Array1D<Real64> HSrdSurfARR;
-
+		
         // working variables
         Real64 RhoAir;                        // density of air
         Real64 CpAir;                         // specific heat of air
@@ -1169,7 +1168,7 @@ namespace TranspiredCollector {
         //  ALLOCATE(TsoARR(NumSurfs))
         //  TsoARR = 0.0
         HSrdSurfARR.dimension(NumSurfs, 0.0);
-
+		
         Roughness = state.dataTranspiredCollector->UTSC(UTSCNum).CollRoughness;
         SolAbs = state.dataTranspiredCollector->UTSC(UTSCNum).SolAbsorp;
         AbsExt = state.dataTranspiredCollector->UTSC(UTSCNum).LWEmitt;
@@ -1180,17 +1179,8 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-            InitExteriorConvectionCoeff(state,
-                                        SurfPtr,
-                                        HMovInsul,
-                                        Roughness,
-                                        AbsExt,
-                                        TempExt,
-                                        HExt,
-                                        HSkyARR(ThisSurf),
-                                        HGroundARR(ThisSurf),
-                                        HAirARR(ThisSurf),
-                                        HSrdSurfARR(ThisSurf));
+            Convect::InitExtConvCoeff(
+                state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf), HSrdSurfARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
             AbsThermSurf =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
