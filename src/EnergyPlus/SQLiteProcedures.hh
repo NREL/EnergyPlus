@@ -207,26 +207,26 @@ public:
 
     void addSQLiteZoneSizingRecord(std::string_view ZoneName,   // the name of the zone
                                    std::string_view LoadType,   // the description of the input variable
-                                   Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
-                                   Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
-                                   Real64 const CalcDesFlow,      // calculated design air flow rate [m3/s]
-                                   Real64 const UserDesFlow,      // user input or modified design air flow rate [m3/s]
+                                   Real64 const CalcDesLoad,    // the value from the sizing calculation [W]
+                                   Real64 const UserDesLoad,    // the value from the sizing calculation modified by user input [W]
+                                   Real64 const CalcDesFlow,    // calculated design air flow rate [m3/s]
+                                   Real64 const UserDesFlow,    // user input or modified design air flow rate [m3/s]
                                    std::string_view DesDayName, // the name of the design day that produced the peak
                                    std::string_view PeakHrMin,  // time stamp of the peak
-                                   Real64 const PeakTemp,         // temperature at peak [C]
-                                   Real64 const PeakHumRat,       // humidity ratio at peak [kg water/kg dry air]
-                                   Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
-                                   Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
+                                   Real64 const PeakTemp,       // temperature at peak [C]
+                                   Real64 const PeakHumRat,     // humidity ratio at peak [kg water/kg dry air]
+                                   Real64 const MinOAVolFlow,   // zone design minimum outside air flow rate [m3/s]
+                                   Real64 const DOASHeatAddRate // zone design heat addition rate from the DOAS [W]
     );
 
-    void addSQLiteSystemSizingRecord(std::string_view SysName,    // the name of the system
+    void addSQLiteSystemSizingRecord(std::string_view SysName,      // the name of the system
                                      std::string_view LoadType,     // either "Cooling" or "Heating"
                                      std::string_view PeakLoadType, // either "Sensible" or "Total"
                                      Real64 const UserDesCap,       // User  Design Capacity
                                      Real64 const CalcDesVolFlow,   // Calculated Cooling Design Air Flow Rate
                                      Real64 const UserDesVolFlow,   // User Cooling Design Air Flow Rate
-                                     std::string_view DesDayName, // the name of the design day that produced the peak
-                                     std::string_view PeakHrMin   // time stamp of the peak
+                                     std::string_view DesDayName,   // the name of the design day that produced the peak
+                                     std::string_view PeakHrMin     // time stamp of the peak
     );
 
     void addSQLiteComponentSizingRecord(std::string_view CompType, // the type of the component
@@ -235,12 +235,8 @@ public:
                                         Real64 const VarValue      // the value from the sizing calculation
     );
 
-    void createSQLiteDaylightMapTitle(int const mapNum,
-                                      std::string_view mapName,
-                                      std::string_view environmentName,
-                                      int const zone,
-                                      std::string_view refPts,
-                                      Real64 const zCoord);
+    void createSQLiteDaylightMapTitle(
+        int const mapNum, std::string_view mapName, std::string_view environmentName, int const zone, std::string_view refPts, Real64 const zCoord);
 
     void createSQLiteDaylightMap(int const mapNum,
                                  int const year,

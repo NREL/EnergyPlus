@@ -7543,8 +7543,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableCoilHumRat)
                                       "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
                                   "TabularDataWithStrings");
 
-
-
         EXPECT_EQ(1u, result.size());
         // Because the table has 8 cols
         EXPECT_EQ(8u, result[0].size());
@@ -7998,7 +7996,6 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
-
 }
 
 TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
@@ -8142,7 +8139,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
 
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
-
 
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
@@ -8894,7 +8890,6 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
-
 }
 
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
@@ -9084,7 +9079,6 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
             EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
         }
     }
-
 }
 
 TEST_F(EnergyPlusFixture, ORT_LoadSummaryUnitConversion_OverLoad_DualUnits)
@@ -9679,7 +9673,6 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
     OutputReportTabular::WriteBEPSTable(*state);
     OutputReportTabular::WriteDemandEndUseSummary(*state);
 
-
     // We test for Heating and Total, since they should be the same
     std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
     std::vector<std::string> endUseSubCategoryNames = {"General", "AnotherEndUseSubCat"};
@@ -9901,8 +9894,6 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
                                       "\""
                                       "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
                                   "TabularDataWithStrings");
-
-
 
         EXPECT_EQ(1u, result.size());
         // Because the table has 8 cols

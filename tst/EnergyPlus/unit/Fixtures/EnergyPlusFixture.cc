@@ -62,8 +62,8 @@
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
