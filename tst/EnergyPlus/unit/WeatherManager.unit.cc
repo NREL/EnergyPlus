@@ -160,10 +160,10 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 {
     // setup environment state
     state->dataWeather->Environment.allocate(4);
-    state->dataWeather->Environment(1).SkyTempModel = Weather::SkyTempCalcType::ClarkAllenModel;
-    state->dataWeather->Environment(2).SkyTempModel = Weather::SkyTempCalcType::BruntModel;
-    state->dataWeather->Environment(3).SkyTempModel = Weather::SkyTempCalcType::IdsoModel;
-    state->dataWeather->Environment(4).SkyTempModel = Weather::SkyTempCalcType::BerdahlMartinModel;
+    state->dataWeather->Environment(1).skyTempModel = Weather::SkyTempModel::ClarkAllen;
+    state->dataWeather->Environment(2).skyTempModel = Weather::SkyTempModel::Brunt;
+    state->dataWeather->Environment(3).skyTempModel = Weather::SkyTempModel::Idso;
+    state->dataWeather->Environment(4).skyTempModel = Weather::SkyTempModel::BerdahlMartin;
 
     // init local variables
     Real64 OpaqueSkyCover(0.0);
@@ -172,24 +172,24 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
     Real64 RelHum(0.6);
 
     EXPECT_NEAR(
-        0.832, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.832, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(
-        0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(
-        0.867, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.867, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(
-        0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.862, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 
     DryBulb = 5.0;
     DewPoint = -2.13;
     EXPECT_NEAR(
-        0.781, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.781, CalcSkyEmissivity(*state, state->dataWeather->Environment(1).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(
-        0.746, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.746, CalcSkyEmissivity(*state, state->dataWeather->Environment(2).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(
-        0.760, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.760, CalcSkyEmissivity(*state, state->dataWeather->Environment(3).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(
-        0.747, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+        0.747, CalcSkyEmissivity(*state, state->dataWeather->Environment(4).skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
@@ -1174,7 +1174,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataWeather->Environment.allocate(1);
-    state->dataWeather->Environment(1).SkyTempModel = Weather::SkyTempCalcType::ClarkAllenModel;
+    state->dataWeather->Environment(1).skyTempModel = Weather::SkyTempModel::ClarkAllen;
 
     Weather::AllocateWeatherData(*state);
     Weather::OpenWeatherFile(*state, ErrorsFound);
@@ -1266,7 +1266,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataWeather->Environment.allocate(1);
-    state->dataWeather->Environment(1).SkyTempModel = Weather::SkyTempCalcType::ClarkAllenModel;
+    state->dataWeather->Environment(1).skyTempModel = Weather::SkyTempModel::ClarkAllen;
     state->dataWeather->Environment(1).StartMonth = 1;
     state->dataWeather->Environment(1).StartDay = 1;
 
@@ -1349,7 +1349,7 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
     Weather::GetNextEnvironment(*state, Available, ErrorsFound);
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
-    state->dataWeather->Environment(1).SkyTempModel = Weather::SkyTempCalcType::ClarkAllenModel;
+    state->dataWeather->Environment(1).skyTempModel = Weather::SkyTempModel::ClarkAllen;
     state->dataWeather->Environment(1).StartMonth = 1;
     state->dataWeather->Environment(1).StartDay = 1;
 
@@ -1486,7 +1486,7 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
 
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataWeather->Environment.allocate(1);
-    state->dataWeather->Environment(1).SkyTempModel = Weather::SkyTempCalcType::ClarkAllenModel;
+    state->dataWeather->Environment(1).skyTempModel = Weather::SkyTempModel::ClarkAllen;
     state->dataWeather->Environment(1).StartMonth = 1;
     state->dataWeather->Environment(1).StartDay = 1;
 
