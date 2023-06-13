@@ -107,6 +107,8 @@ namespace Dayltg {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)DaylightingMethod::Num> DaylightingMethodNamesUC = {"NONE", "SPLITFLUX", "DELIGHT"};
+                
     // Parameters for "Lighting Control Type" - these are the values expected by DElight
     enum class LtgCtrlType
     {
@@ -116,6 +118,8 @@ namespace Dayltg {
         ContinuousOff = 3,
         Num
     };
+
+        
 
     static constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
 

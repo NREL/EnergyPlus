@@ -100,7 +100,7 @@ namespace Dayltg {
         int const daylightCtrlNum, // zero if called for map points
         int const iRefPoint,
         int const loopwin,
-        Dayltg::CalledFor const CalledFrom, // indicate  which type of routine called this routine
+        CalledFor const CalledFrom, // indicate  which type of routine called this routine
         Vector3<Real64> const &RREF,                 // Location of a reference point in absolute coordinate system
         Vector3<Real64> const &VIEWVC,               // View vector in absolute coordinate system
         int &IWin,
@@ -117,7 +117,7 @@ namespace Dayltg {
         DataSurfaces::WinShadingType &ShType,    // Window shading type
         int &BlNum,                              // Window blind number
         Vector3<Real64> &WNORM2,                 // Unit vector normal to window
-        Dayltg::ExtWinType &ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        ExtWinType &ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
         int &IConst,                             // Construction counter
         Vector3<Real64> &RREF2,                  // Location of virtual reference point in absolute coordinate system
         Real64 &DWX,                             // Horizontal dimension of window element (m)
@@ -136,7 +136,7 @@ namespace Dayltg {
         int const daylightCtrlNum, // Current daylighting control number (only used when called from RefPoint)
         int const iRefPoint,
         int const loopwin,
-        Dayltg::CalledFor const CalledFrom, // indicate  which type of routine called this routine
+        CalledFor const CalledFrom, // indicate  which type of routine called this routine
         int const WinEl,                             // Current window element number
         int const IWin,
         int const IWin2,
@@ -168,7 +168,7 @@ namespace Dayltg {
         bool &hitIntObs,                              // True iff interior obstruction hit
         bool &hitExtObs,                              // True iff ray from ref pt to ext win hits an exterior obstruction
         Vector3<Real64> const &WNORM2,                // Unit vector normal to window
-        Dayltg::ExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        ExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
         int const IConst,                             // Construction counter
         Vector3<Real64> const &RREF2,                 // Location of virtual reference point in absolute coordinate system
         bool const Triangle,
@@ -184,7 +184,7 @@ namespace Dayltg {
                                   Vector3<Real64> const &RefPoint, // reference point coordinates
                                   int const NRefPts,               // Number of reference points
                                   int const iRefPoint,             // Reference points counter
-                                  Dayltg::CalledFor const CalledFrom,
+                                  CalledFor const CalledFrom,
                                   int const MapNum = 0);
 
     void InitializeCFSStateData(EnergyPlusData &state,
@@ -266,13 +266,13 @@ namespace Dayltg {
         int const BlNum,                              // Window blind number
         Real64 const THRAY,                           // Azimuth of ray from reference point to window element (radians)
         Vector3<Real64> const &WNORM2,                // Unit vector normal to window
-        Dayltg::ExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
+        ExtWinType const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
         int const IConst,                             // Construction counter
         Real64 const AZVIEW,                          // Azimuth of view vector in absolute coord system for glare calculation (radians)
         Vector3<Real64> const &RREF2,                 // Location of virtual reference point in absolute coordinate system
         bool const hitIntObs,                         // True iff interior obstruction hit
         bool const hitExtObs,                         // True iff ray from ref pt to ext win hits an exterior obstruction
-        Dayltg::CalledFor const CalledFrom,  // indicate  which type of routine called this routine
+        CalledFor const CalledFrom,  // indicate  which type of routine called this routine
         Real64 TVISIntWin,                            // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 &TVISIntWinDisk,                       // Visible transmittance of int win at COSBIntWin for sun
         int const MapNum = 0);
@@ -387,7 +387,7 @@ namespace Dayltg {
                                        Array1D<Illums> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
                                        Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
                                        Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
-                                       Dayltg::CalledFor const CalledFrom,
+                                       CalledFor const CalledFrom,
                                        int const MapNum = 0);
 
     void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
@@ -396,7 +396,7 @@ namespace Dayltg {
                                                       int const IHR,             // Hour of day
                                                       int const daylightCtrlNum, // Daylighting control number
                                                       int const iRefPoint,       // reference point counter
-                                                      Dayltg::CalledFor const CalledFrom,
+                                                      CalledFor const CalledFrom,
                                                       int const MapNum = 0);
 
     void DayltgDirectIllumComplexFenestration(EnergyPlusData &state,
@@ -404,7 +404,7 @@ namespace Dayltg {
                                               int const WinEl,     // Current window element counter
                                               int const IHR,       // Hour of day
                                               int const iRefPoint, // reference point index
-                                              Dayltg::CalledFor const CalledFrom,
+                                              CalledFor const CalledFrom,
                                               int const MapNum = 0);
 
     void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
@@ -413,7 +413,7 @@ namespace Dayltg {
                                                 int const iRefPoint,
                                                 int const NumEl,                             // Total number of window elements
                                                 Real64 const AZVIEW,                         // Azimuth of view vector in absolute coord system for
-                                                Dayltg::CalledFor const CalledFrom, // indicate  which type of routine called this routine
+                                                CalledFor const CalledFrom, // indicate  which type of routine called this routine
                                                 int const MapNum = 0);
 
     Real64 DayltgSkyLuminance(EnergyPlusData const &state,
