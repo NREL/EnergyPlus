@@ -56,6 +56,7 @@
 import sys
 from pyenergyplus.api import EnergyPlusAPI
 
+progressValue = 0
 
 def environment_handler(_state) -> None:
     print("OH HAI ENVIRONMENT")
@@ -68,6 +69,8 @@ def common_callback_handler(_state) -> None:
 
 
 def progress_handler(progress: int) -> None:
+    global progressValue
+    progressValue = progress
     if 49 < progress < 51:
         print("HALFWAY THERE!!")
         sys.stdout.flush()
@@ -91,6 +94,7 @@ v = api.runtime.run_energyplus(state, sys.argv[1:])
 if v != 0:
     print("EnergyPlus Failed!")
     sys.exit(1)
+assert(progressValue == 100)
 
 print("MUTING CONSOLE OUTPUT")
 state2 = api.state_manager.new_state()
