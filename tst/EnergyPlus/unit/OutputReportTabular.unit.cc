@@ -2259,6 +2259,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "   ,                      !- Evaporative Condenser Air Flow Rate",
         "   autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
         "   0.0,                   !- Crankcase Heater Capacity",
+        "   ,                      !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
         "   10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "Coil:Heating:Fuel,",

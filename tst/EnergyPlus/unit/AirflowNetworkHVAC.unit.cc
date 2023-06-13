@@ -5674,6 +5674,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  ,                                                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor",
         "  5,                                                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "  0,                                                       !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
         "  0,                                                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ReverseCycle,                                            !- Defrost Strategy",
         "  Timed,                                                   !- Defrost Control",
@@ -5772,6 +5773,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
         "  ,                                                        !- Evaporative Condenser Air Flow Rate",
         "  0,                                                       !- Evaporative Condenser Pump Rated Power Consumption",
         "  0,                                                       !- Crankcase Heater Capacity",
+        "  ,                                                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
         "  10;                                                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation",
 
         "Curve:Biquadratic,",
@@ -13959,6 +13961,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
         "    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}",
         "    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
         "    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
 
         "Coil:Heating:Electric,",
@@ -16117,6 +16120,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
