@@ -1374,6 +1374,7 @@
     -8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     -5.0,                    !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     HPACDefrostCAPFT,        !- Defrost Energy Input Ratio Function of Temperature Curve Name
     7.22,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
@@ -1751,6 +1752,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}

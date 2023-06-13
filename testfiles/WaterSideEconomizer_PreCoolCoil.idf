@@ -2851,6 +2851,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     DX Clg Coil Performance, !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}

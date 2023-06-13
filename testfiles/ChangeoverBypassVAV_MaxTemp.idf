@@ -1427,6 +1427,7 @@
     DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes

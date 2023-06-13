@@ -142,6 +142,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
+    heaterCapCurve,          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
     35.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
@@ -236,8 +237,7 @@
     HPACHeatCapFT,           !- Speed 10 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-    HPACHeatEIRFFF,          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    heaterCapCurve;
+    HPACHeatEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Curve:Biquadratic,
     HPACHeatCapFT,           !- Name
@@ -292,6 +292,7 @@
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     ,                        !- Crankcase Heater Capacity {W}
+    heaterCapCurve,          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
     35.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
@@ -418,8 +419,7 @@
     HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
     HPACCoolCapFFF,          !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPACCOOLEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
-    HPACCOOLEIRFFF,          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    heaterCapCurve;
+    HPACCOOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Building,
     NONE,                    !- Name
