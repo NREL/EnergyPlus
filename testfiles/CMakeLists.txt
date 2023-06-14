@@ -574,6 +574,7 @@ add_simulation_test(IDF_FILE Standard621SimplifiedProcedure_VAVterminal.idf EPW_
 add_simulation_test(IDF_FILE SteamSystemAutoSize.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StormWindow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StripMallZoneEvapCooler.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
+add_simulation_test(IDF_FILE StripMallZoneEvapCoolerRHcutoff.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 add_simulation_test(IDF_FILE StripMallZoneEvapCoolerAutosized.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 add_simulation_test(IDF_FILE SuperMarketDetailed_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE SuperMarket_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
