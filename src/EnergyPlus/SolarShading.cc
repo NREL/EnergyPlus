@@ -4637,8 +4637,6 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Legacy Code
-    //       DATE WRITTEN
-    //       MODIFIED       na
     //       RE-ENGINEERED  Lawrie, Oct 2000
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -4667,20 +4665,11 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
     // REFERENCES:
     // BLAST/IBLAST code, original author George Walton
 
-    // Using/Aliasing
-
-    int N;    // Loop index
-    int NV1;  // Number of vertices of figure NS1
-    int NV2;  // Number of vertices of figure NS2
-    int NV3;  // Number of vertices of figure NS3 (the overlap of NS1 and NS2)
-    int NIN1; // Number of vertices of NS1 within NS2
-    int NIN2; // Number of vertices of NS2 within NS1
-
-    // Check for exceeding array limits.
 #ifdef EP_Count_Calls
     ++state.dataTimingsData->NumDetPolyOverlap_Calls;
 #endif
 
+    // Check for exceeding array limits.
     if (NS3 > state.dataSolarShading->MaxHCS) {
 
         state.dataSolarShading->OverlapStatus = TooManyFigures;
@@ -4705,9 +4694,11 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
     }
 
     state.dataSolarShading->OverlapStatus = PartialOverlap;
-    NV1 = state.dataSolarShading->HCNV(NS1);
-    NV2 = state.dataSolarShading->HCNV(NS2);
-    NV3 = 0;
+    int NV1 = state.dataSolarShading->HCNV(NS1); // Number of vertices of figure NS1
+    int NV2 = state.dataSolarShading->HCNV(NS2); // Number of vertices of figure NS2
+    int NV3 = 0;                                 // Number of vertices of figure NS3 (the overlap of NS1 and NS2)
+    int NIN1 = 0;                                // Number of vertices of NS1 within NS2
+    int NIN2 = 0;                                // Number of vertices of NS2 within NS1
 
     if (!state.dataSysVars->SutherlandHodgman) {
         INCLOS(state, NS1, NV1, NS2, NV2, NV3, NIN1); // Find vertices of NS1 within NS2.
@@ -4740,14 +4731,14 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
         CLIPPOLY(state, NS1, NS2, NV1, NV2, NV3);
     }
 
-    if (NV3 < state.dataSolarShading->MaxHCV && NS3 <= state.dataSolarShading->MaxHCS) {
+    if (NV3 < state.dataSolarShading->MaxHCV) {
 
         if (!state.dataSysVars->SutherlandHodgman) {
             ORDER(state, NV3, NS3); // Put vertices in clockwise order.
         } else {
             assert(equal_dimensions(state.dataSolarShading->HCX, state.dataSolarShading->HCY));
             int l = state.dataSolarShading->HCX.index(NS3, 1);
-            for (N = 1; N <= NV3; ++N, ++l) {
+            for (int N = 1; N <= NV3; ++N, ++l) {
                 state.dataSolarShading->HCX[l] = nint64(state.dataSolarShading->XTEMP(N)); // [ l ] == ( N, NS3 )
                 state.dataSolarShading->HCY[l] = nint64(state.dataSolarShading->YTEMP(N));
             }
@@ -4759,20 +4750,23 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
         if (std::abs(state.dataSolarShading->HCAREA(NS3)) * HCMULT < std::abs(state.dataSolarShading->HCAREA(NS1))) {
             state.dataSolarShading->OverlapStatus = NoOverlap;
         } else {
-            if (state.dataSolarShading->HCAREA(NS1) * state.dataSolarShading->HCAREA(NS2) > 0.0)
+            if (state.dataSolarShading->HCAREA(NS1) * state.dataSolarShading->HCAREA(NS2) > 0.0) {
                 state.dataSolarShading->HCAREA(NS3) = -state.dataSolarShading->HCAREA(NS3); // Determine sign of area of overlap
-            Real64 const HCT_1(state.dataSolarShading->HCT(NS1));
-            Real64 const HCT_2(state.dataSolarShading->HCT(NS2));
-            Real64 HCT_3(HCT_2 * HCT_1); // Determine transmission of overlap
-            if (HCT_2 >= 0.5 && HCT_1 >= 0.5) {
-                if (HCT_2 != 1.0 && HCT_1 != 1.0) {
-                    HCT_3 = 1.0 - HCT_3;
-                }
             }
-            state.dataSolarShading->HCT(NS3) = HCT_3;
+            Real64 const HCT_1 = state.dataSolarShading->HCT(NS1);
+            Real64 const HCT_2 = state.dataSolarShading->HCT(NS2);
+            if (HCT_2 == 1.0 || HCT_1 == 1.0) {
+                state.dataSolarShading->HCT(NS3) = HCT_1 * HCT_2;
+            } else {
+                // Determine transmission of overlap which corrects for prior shadows
+                // The resulting transmission of overlapping shadows is HCT_1 * HCT_2
+                // Shadows with HCT_1 and HCT_2 have already been applied in the overlapping area
+                // so the correction is the difference between (HCT_1+HCT_2) and (HCT_1*HCT_2)
+                state.dataSolarShading->HCT(NS3) = (HCT_1 + HCT_2) - HCT_1 * HCT_2;
+            }
         }
 
-    } else if (NV3 > state.dataSolarShading->MaxHCV) {
+    } else {
 
         state.dataSolarShading->OverlapStatus = TooManyVertices;
 
@@ -4789,26 +4783,6 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
             state.dataSolarShading->TrackTooManyVertices(state.dataSolarShading->NumTooManyVertices).SurfIndex1 =
                 state.dataSolarShading->CurrentShadowingSurface;
             state.dataSolarShading->TrackTooManyVertices(state.dataSolarShading->NumTooManyVertices).SurfIndex2 =
-                state.dataSolarShading->CurrentSurfaceBeingShadowed;
-        }
-
-    } else if (NS3 > state.dataSolarShading->MaxHCS) {
-
-        state.dataSolarShading->OverlapStatus = TooManyFigures;
-
-        if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
-            ShowWarningError(state,
-                             format("DeterminePolygonOverlap: Too many figures [>{}]  detected in an overlap calculation. Use "
-                                    "Output:Diagnostics,DisplayExtraWarnings; for more details.",
-                                    state.dataSolarShading->MaxHCS));
-            state.dataSolarShading->TooManyFiguresMessage = true;
-        }
-
-        if (state.dataGlobal->DisplayExtraWarnings) {
-            state.dataSolarShading->TrackTooManyFigures.redimension(++state.dataSolarShading->NumTooManyFigures);
-            state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex1 =
-                state.dataSolarShading->CurrentShadowingSurface;
-            state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex2 =
                 state.dataSolarShading->CurrentSurfaceBeingShadowed;
         }
     }

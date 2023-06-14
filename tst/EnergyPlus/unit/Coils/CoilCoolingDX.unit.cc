@@ -1841,8 +1841,6 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
 
     // size cooling coil dx
     this_dx_clg_coil.size(*state);
-    // We need to commit, so that the ComponentSizes is actually written
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // check the normal operating mode names
     EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[0].name, "DX COOLING COIL SPEED 1 PERFORMANCE");
@@ -1939,6 +1937,4 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
             EXPECT_NEAR(testQuery.expectedValue, return_val, 0.0001) << "Failed for " << testQuery.displayString;
         }
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }

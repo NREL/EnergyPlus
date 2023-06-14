@@ -187,8 +187,9 @@ namespace SimulationManager {
 
         state.files.debug.ensure_open(state, "OpenOutputFiles", state.files.outputControl.dbg);
 
-        // CreateSQLiteDatabase();
-        state.dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(state);
+        if (!state.dataSQLiteProcedures->sqlite) {
+            state.dataSQLiteProcedures->sqlite = EnergyPlus::CreateSQLiteDatabase(state);
+        }
 
         if (state.dataSQLiteProcedures->sqlite) {
             state.dataSQLiteProcedures->sqlite->sqliteBegin();
