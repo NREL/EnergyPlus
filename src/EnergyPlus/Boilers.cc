@@ -206,7 +206,7 @@ void GetBoilerInput(EnergyPlusData &state)
         thisBoiler.Type = DataPlant::PlantEquipmentType::Boiler_Simple;
 
         // Validate fuel type input
-        thisBoiler.FuelType = static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+        thisBoiler.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
 
         thisBoiler.NomCap = state.dataIPShortCut->rNumericArgs(1);
         if (state.dataIPShortCut->rNumericArgs(1) == 0.0) {
@@ -358,7 +358,7 @@ void GetBoilerInput(EnergyPlusData &state)
 
 void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
 {
-    std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
+    std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Boiler Heating Rate",
                         OutputProcessor::Unit::W,
