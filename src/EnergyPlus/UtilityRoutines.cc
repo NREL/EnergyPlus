@@ -776,6 +776,13 @@ int EndEnergyPlus(EnergyPlusData &state)
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
 
+    if (state.dataGlobal->fProgressPtr) {
+        state.dataGlobal->fProgressPtr(100);
+    }
+    if (state.dataGlobal->progressCallback) {
+        state.dataGlobal->progressCallback(100);
+    }
+
     if (state.dataGlobal->eplusRunningViaAPI) {
         state.files.flushAll();
     }
