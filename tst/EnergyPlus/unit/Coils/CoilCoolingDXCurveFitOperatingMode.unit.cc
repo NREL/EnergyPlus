@@ -72,7 +72,6 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput)
 TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
 {
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string idf_objects = delimited_string({
@@ -151,9 +150,6 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
 
     thisMode.size(*state);
 
-    // We need to commit, so that the ComponentSizes is actually written
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
-
     EXPECT_EQ(ratedEvapAirFlowRate, thisMode.ratedEvapAirFlowRate);
     Real64 ratedGrossTotalCap = thisMode.ratedGrossTotalCap;
     EXPECT_EQ(ratedGrossTotalCap, thisMode.ratedGrossTotalCap);
@@ -209,8 +205,6 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
             EXPECT_NEAR(testQuery.expectedValue, return_val, 0.01) << "Failed for " << testQuery.displayString;
         }
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
