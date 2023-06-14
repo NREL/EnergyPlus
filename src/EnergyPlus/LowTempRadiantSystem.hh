@@ -151,6 +151,11 @@ namespace LowTempRadiantSystem {
         Array1D<Real64> SurfaceFrac;          // Fraction of flow/pipe length or electric power for a particular surface
         Real64 TotalSurfaceArea = 0.0;        // Total surface area for all surfaces that are part of this radiant system
         Real64 ZeroLTRSourceSumHATsurf = 0.0; // Equal to SumHATsurf for all the walls in a zone with no source
+        Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
+        // Record keeping variables used to calculate QRadSysSrcAvg locally
+        Array1D<Real64> LastQRadSysSrc;                                                  // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastSysTimeElapsed;                                              // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastTimeStepSys;                                                 // Need to keep the last value in case we are still iterating
         LowTempRadiantControlTypes controlType = LowTempRadiantControlTypes::MATControl; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
                                                                                          // Surface Face Temp, Surface Interior Temp, Running Mean
                                                                                          // Temp for Constant Flow systems only)
@@ -568,12 +573,6 @@ struct LowTempRadiantSystemData : BaseGlobalStruct
     Real64 LowTempHeating = -200.0; // Used to indicate that a user does not have a heating control temperature
     Real64 HighTempCooling = 200.0; // Used to indicate that a user does not have a cooling control temperature
 
-    Array1D<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
-    // Record keeping variables used to calculate QRadSysSrcAvg locally
-    Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-
     Array1D<Real64> Ckj; // Coefficients for individual surfaces within a radiant system
     Array1D<Real64> Cmj;
     Array1D<Real64> WaterTempOut; // Array of outlet water temperatures for
@@ -629,10 +628,6 @@ struct LowTempRadiantSystemData : BaseGlobalStruct
         warnTooHigh = false;
         //
 
-        QRadSysSrcAvg.clear();
-        LastQRadSysSrc.clear();
-        LastSysTimeElapsed.clear();
-        LastTimeStepSys.clear();
         Ckj.clear();
         Cmj.clear();
         WaterTempOut.clear();
