@@ -797,7 +797,7 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
         bool sensLoadCtrlUnitarySystemFound = false;
         if (primaryAirSystems.EconomizerStagingCheckFlag == false) {
             OAControllerNum = UtilityRoutines::FindItemInList(CtrlName, state.dataMixedAir->OAController);
-            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingOperation == DataHVACGlobals::EconomizerStaging::EconomizerFirst) {
+            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingType == DataHVACGlobals::EconomizerStagingType::EconomizerFirst) {
                 for (int BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
                     for (int CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
                         if (primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::CompType::UnitarySystemModel) {
@@ -809,7 +809,8 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
                                 if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
                                         DataHVACGlobals::CoilDX_MultiSpeedCooling ||
                                     state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
-                                        Coil_CoolingAirToAirVariableSpeed) {
+                                        Coil_CoolingAirToAirVariableSpeed ||
+                                    state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num == CoilDX_Cooling) {
                                     sensLoadCtrlUnitarySystemFound = true;
                                     break;
                                 }
@@ -2434,10 +2435,10 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     if (NumAlphas > 19) {
         if (!lAlphaBlanks(20)) {
             if (UtilityRoutines::SameString(AlphArray(20), "EconomizerFirst")) {
-                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation = DataHVACGlobals::EconomizerStaging::EconomizerFirst;
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType = DataHVACGlobals::EconomizerStagingType::EconomizerFirst;
             } else {
-                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingOperation =
-                    DataHVACGlobals::EconomizerStaging::InterlockedWithMechanicalCooling;
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType =
+                    DataHVACGlobals::EconomizerStagingType::InterlockedWithMechanicalCooling;
             }
         }
     }

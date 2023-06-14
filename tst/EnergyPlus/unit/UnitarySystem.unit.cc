@@ -82,6 +82,7 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -21232,4 +21233,116 @@ Coil:Heating:Gas:MultiStage,
     EXPECT_EQ(thisSys->m_StageNum, 1);
     EXPECT_TRUE(state->dataUnitarySystems->HeatingLoad);
     EXPECT_FALSE(state->dataUnitarySystems->CoolingLoad);
+}
+
+TEST_F(EnergyPlusFixture, SetEconomizerStagingOperationSpeedTest)
+{
+    // initialization
+    bool zoneEquipment = false;
+    bool ErrorsFound = false;
+    bool firstHVACIteration = true;
+    state->dataEnvrn->StdRhoAir = 1.2;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataZoneEquip->ZoneEquipInputsFilled = false;
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+
+    // nodes
+    // 1: outdoor air
+    // 2: fan outlet
+    // 3: zone and return air
+    // 4: mixed air node and fan inlet
+    state->dataLoopNodes->Node.allocate(4);
+
+    // unitary system
+    UnitarySystems::UnitarySys thisSys;
+    thisSys.m_FanType_Num = DataHVACGlobals::FanType_SimpleVAV;
+    thisSys.ControlZoneNum = 1;
+    Real64 thisSysCoolMassFlowRate = 0.22951 * state->dataEnvrn->StdRhoAir;
+    thisSys.m_NumOfSpeedCooling = 4;
+    thisSys.m_CoolMassFlowRate.resize(5);
+    thisSys.m_CoolMassFlowRate[1] = thisSysCoolMassFlowRate * 0.25;
+    thisSys.m_CoolMassFlowRate[2] = thisSysCoolMassFlowRate * 0.5;
+    thisSys.m_CoolMassFlowRate[3] = thisSysCoolMassFlowRate * 0.75;
+    thisSys.m_CoolMassFlowRate[4] = thisSysCoolMassFlowRate;
+    thisSys.m_FanIndex = 1;
+
+    // controller outdoor air
+    MixedAir::GetOAControllerInputs(*state);
+    state->dataMixedAir->OAController.allocate(1);
+    thisSys.OAControllerIndex = 1;
+    state->dataMixedAir->OAController(1).MinOA = thisSysCoolMassFlowRate * 0.25;
+    state->dataMixedAir->OAController(1).InletNode = 1;
+    state->dataMixedAir->OAController(1).RetNode = 3;
+    state->dataMixedAir->OAController(1).MixNode = 4;
+
+    // set node properties
+    state->dataLoopNodes->Node(1).HumRat = 0.00085;
+    state->dataLoopNodes->Node(1).Temp = 13.0;
+    state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
+    state->dataLoopNodes->Node(4).HumRat = state->dataLoopNodes->Node(1).HumRat;
+    state->dataLoopNodes->Node(4).Temp = state->dataLoopNodes->Node(1).Temp;
+    state->dataLoopNodes->Node(4).Enthalpy = state->dataLoopNodes->Node(1).Enthalpy;
+
+    // fan
+    state->dataFans->GetFanInputFlag = false;
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->NumFans = 1;
+    state->dataFans->CheckEquipName.dimension(state->dataFans->NumFans, false);
+    state->dataFans->MySizeFlag.dimension(state->dataFans->NumFans, false);
+    auto &thisFan(state->dataFans->Fan(1));
+    thisFan.FanType = "Fan:VariableVolume";
+    thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleVAV;
+    thisFan.MaxAirFlowRate = 0.22951;
+    thisFan.DeltaPress = 600.0;
+    thisFan.FanEff = 0.7;
+    thisFan.MotEff = 0.9;
+    thisFan.MotInAirFrac = 1.0;
+    thisFan.AvailSchedPtrNum = -1.0;
+    thisFan.MinAirMassFlowRate = 0.0;
+    thisFan.FanCoeff(1) = 0.0015302446;
+    thisFan.FanCoeff(2) = 0.0052080574;
+    thisFan.FanCoeff(3) = 1.1086242;
+    thisFan.FanCoeff(4) = -0.11635563;
+    thisFan.FanCoeff(5) = 0.000;
+    thisFan.InletNodeNum = 4;
+    thisFan.OutletNodeNum = 2;
+    state->dataLoopNodes->Node(4).MassFlowRateMaxAvail = thisSysCoolMassFlowRate;
+    state->dataLoopNodes->Node(2).MassFlowRateMax = thisSysCoolMassFlowRate;
+
+    // zone
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 3;
+    state->dataLoopNodes->Node(3).Temp = 26.0;
+
+    // case 1
+    Real64 zoneLoad = 3000; // W
+    thisSys.setEconomizerStagingOperationSpeed(*state, firstHVACIteration, zoneLoad);
+    EXPECT_EQ(thisSys.m_EconoSpeedNum, 4);
+    EXPECT_EQ(thisSys.m_EconoPartLoadRatio, 1.0);
+    EXPECT_EQ(thisSys.m_LowSpeedEconRuntime, 0.0);
+
+    // case 2
+    zoneLoad = 2000; // W
+    thisSys.setEconomizerStagingOperationSpeed(*state, firstHVACIteration, zoneLoad);
+    EXPECT_EQ(thisSys.m_EconoSpeedNum, 3);
+    EXPECT_EQ(thisSys.m_EconoPartLoadRatio, 1.0);
+    EXPECT_EQ(thisSys.m_LowSpeedEconRuntime, 0.0);
+
+    // case 3
+    zoneLoad = 1050; // W
+    state->dataLoopNodes->Node(3).Temp = 23.0;
+    state->dataLoopNodes->Node(1).HumRat = 0.00085;
+    state->dataLoopNodes->Node(1).Temp = 10.0;
+    state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
+    state->dataLoopNodes->Node(4).HumRat = state->dataLoopNodes->Node(1).HumRat;
+    state->dataLoopNodes->Node(4).Temp = state->dataLoopNodes->Node(1).Temp;
+    state->dataLoopNodes->Node(4).Enthalpy = state->dataLoopNodes->Node(1).Enthalpy;
+    state->dataMixedAir->OAController(1).MinOA = 0.095; // Increase the minimum OA to trigger a run at an average of low and high speed
+    thisSys.setEconomizerStagingOperationSpeed(*state, firstHVACIteration, zoneLoad);
+    EXPECT_EQ(thisSys.m_EconoSpeedNum, 2);
+    EXPECT_NEAR(thisSys.m_EconoPartLoadRatio, 0.1890, 0.001);
+    EXPECT_NEAR(thisSys.m_LowSpeedEconRuntime, 0.8101, 0.001);
+    thisSys.calcMixedTempAirSPforEconomizerStagingOperation(*state, 0, firstHVACIteration, zoneLoad);
+    EXPECT_NEAR(state->dataLoopNodes->Node(4).TempSetPoint, 10.02, 0.01);
 }

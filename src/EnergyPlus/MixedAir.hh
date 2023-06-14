@@ -230,12 +230,12 @@ namespace MixedAir {
         Real64 EMSOARateValue = 0.0;            // Value EMS is directing to use. [kg/s]
         int HeatRecoveryBypassControlType =
             DataHVACGlobals::BypassWhenWithinEconomizerLimits; // User input selects type of heat recovery optimization
-        DataHVACGlobals::EconomizerStaging EconomizerStagingOperation =
-            DataHVACGlobals::EconomizerStaging::InterlockedWithMechanicalCooling; // User input select type of economizer staging operation
-        bool ManageDemand = false;                                                // Used by demand manager to manage ventilation
-        Real64 DemandLimitFlowRate = 0.0;                                         // Current demand limit if demand manager is ON
-        Real64 MaxOAFracBySetPoint = 0.0;                                         // The maximum OA fraction due to freezing cooling coil check
-        int MixedAirSPMNum = 0;                                                   // index of mixed air setpoint manager
+        DataHVACGlobals::EconomizerStagingType EconomizerStagingType =
+            DataHVACGlobals::EconomizerStagingType::InterlockedWithMechanicalCooling; // User input select type of economizer staging operation
+        bool ManageDemand = false;                                                    // Used by demand manager to manage ventilation
+        Real64 DemandLimitFlowRate = 0.0;                                             // Current demand limit if demand manager is ON
+        Real64 MaxOAFracBySetPoint = 0.0;                                             // The maximum OA fraction due to freezing cooling coil check
+        int MixedAirSPMNum = 0;                                                       // index of mixed air setpoint manager
         bool CoolCoilFreezeCheck = false; // if true, cooling coil freezing is prevented by recalculating the amount of OA
         bool EconoActive = false;         // if true economizer is active
         bool HighHumCtrlActive = false;   // if true high humidity control is active

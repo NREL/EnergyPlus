@@ -1137,7 +1137,7 @@ namespace UnitarySystems {
             if (this->OASysIndex > 0) {
                 this->OAControllerIndex = state.dataAirLoop->OutsideAirSys(this->OASysIndex).OAControllerIndex;
                 if (this->OAControllerIndex > 0) {
-                    this->OAControllerEconomizerStaging = state.dataMixedAir->OAController(this->OAControllerIndex).EconomizerStagingOperation;
+                    this->OAControllerEconomizerStagingType = state.dataMixedAir->OAController(this->OAControllerIndex).EconomizerStagingType;
                 }
             }
         }
@@ -8506,8 +8506,8 @@ namespace UnitarySystems {
         }
 
         this->m_EconoSpeedNum = 0;
-        if (this->OAControllerEconomizerStaging == DataHVACGlobals::EconomizerStaging::EconomizerFirst) {
-            CoolingSpeedForEconomizerOperation(state, AirLoopNum, FirstHVACIteration, ZoneLoad);
+        if (this->OAControllerEconomizerStagingType == DataHVACGlobals::EconomizerStagingType::EconomizerFirst) {
+            manageEconomizerStagingOperation(state, AirLoopNum, FirstHVACIteration, ZoneLoad);
         }
 
         // if a variable speed unit, the SensOutputOff at SpeedNum=1 must be checked to see if it exceeds the ZoneLoad
@@ -18214,94 +18214,120 @@ namespace UnitarySystems {
         return fanDT;
     }
 
+    void UnitarySys::setEconomizerStagingOperationSpeed(EnergyPlusData &state, bool const firstHVACIteration, Real64 const zoneLoad)
+    {
+        this->m_LowSpeedEconOutput = 0;
+        this->m_LowSpeedEconRuntime = 0;
+        this->m_EconoPartLoadRatio = 0;
+        this->m_EconoSpeedNum = 0;
+        auto outdoorAirController = state.dataMixedAir->OAController(this->OAControllerIndex);
+        Real64 mixedTempAtMinOA = 0;
+        Real64 highSpeedEconMassFlowRate = 0;
+        Real64 highSpeedFanDT = 0;
+        Real64 econClgOutput = 0;
+        Real64 lowSpeedEconMassFlowRate = 0;
+        Real64 lowSpeedFanDT = 0;
+        Real64 highSpeedEconRuntime = 0;
+        Real64 econClgOutputMinOA = 0;
+        // determine outdoor air properties
+        using Psychrometrics::PsyCpAirFnW;
+        Real64 cpAir = PsyCpAirFnW(state.dataLoopNodes->Node(outdoorAirController.InletNode).HumRat);
+        Real64 outdoorAirTemp = state.dataLoopNodes->Node(outdoorAirController.InletNode).Temp;
+        Real64 zoneTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode).Temp;
+        // iterate through the unitarys system's cooling speed to see at which
+        // air flow rate the load can be met at 100% outdoor air fraction
+        for (int clgSpd = 1; clgSpd <= this->m_NumOfSpeedCooling; ++clgSpd) {
+            // calculations for "high speed" refer to operation at the current
+            //  cooling speed, "clgSpd", and "low speed" is "clgSpd -1"
+            highSpeedEconMassFlowRate = this->m_CoolMassFlowRate[clgSpd];
+            // determine air temperature difference for across the fan at this air flow rate
+            highSpeedFanDT = this->getFanDeltaTemp(state,
+                                                   firstHVACIteration,
+                                                   highSpeedEconMassFlowRate,
+                                                   highSpeedEconMassFlowRate / this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling]);
+            econClgOutput = cpAir * highSpeedEconMassFlowRate * (zoneTemp - (outdoorAirTemp + highSpeedFanDT));
+            // check if economizer alone can meet the load, or if we have reached the maximumm cooling speed
+            if (econClgOutput > std::abs(zoneLoad) || clgSpd == this->m_NumOfSpeedCooling) {
+                // low speed economizer operation is handled through normal process (i.e., no staging operation)
+                if (clgSpd > 1) {
+                    // check that the system output at the minimum outdoor air flow rate doesn't "overcool" at this speed
+                    mixedTempAtMinOA = 0;
+                    if (highSpeedEconMassFlowRate - outdoorAirController.MinOA > 0) {
+                        mixedTempAtMinOA =
+                            (outdoorAirTemp * outdoorAirController.MinOA + state.dataLoopNodes->Node(outdoorAirController.RetNode).Temp *
+                                                                               (highSpeedEconMassFlowRate - outdoorAirController.MinOA)) /
+                            highSpeedEconMassFlowRate;
+                    } else {
+                        mixedTempAtMinOA = outdoorAirTemp;
+                    }
+                    econClgOutputMinOA = cpAir * highSpeedEconMassFlowRate * (zoneTemp - (mixedTempAtMinOA + highSpeedFanDT));
+                    if (econClgOutputMinOA < std::abs(zoneLoad)) {
+                        highSpeedEconRuntime = 1.0;
+                    } else {
+                        // if running at this speed would "overcool", we run partly at the lower speed and partly at this speed
+                        lowSpeedEconMassFlowRate = this->m_CoolMassFlowRate[clgSpd - 1];
+                        lowSpeedFanDT = this->getFanDeltaTemp(state,
+                                                              firstHVACIteration,
+                                                              lowSpeedEconMassFlowRate,
+                                                              lowSpeedEconMassFlowRate / this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling]);
+                        this->m_LowSpeedEconOutput = cpAir * lowSpeedEconMassFlowRate * (zoneTemp - (outdoorAirTemp + lowSpeedFanDT));
+                        // determine this speed's runtime
+                        highSpeedEconRuntime = (std::abs(zoneLoad) - this->m_LowSpeedEconOutput) / (econClgOutput - this->m_LowSpeedEconOutput);
+                    }
+                } else {
+                    highSpeedEconRuntime = 1.0;
+                }
+                // set economizer air flow "speed"
+                this->m_EconoSpeedNum = clgSpd;
+                // set economizer PLR, a.k.a the system fan part load ratio, and runtime at each speed
+                this->m_EconoPartLoadRatio = highSpeedEconRuntime;
+                this->m_LowSpeedEconRuntime = 1 - highSpeedEconRuntime;
+                break;
+            }
+        }
+    }
+
+    void UnitarySys::calcMixedTempAirSPforEconomizerStagingOperation(EnergyPlusData &state,
+                                                                     int const airLoopNum,
+                                                                     bool const firstHVACIteration,
+                                                                     Real64 const zoneLoad)
+    {
+        auto outdoorAirController = state.dataMixedAir->OAController(this->OAControllerIndex);
+        using Psychrometrics::PsyCpAirFnW;
+        Real64 cpAir = PsyCpAirFnW(state.dataLoopNodes->Node(outdoorAirController.InletNode).HumRat);
+        Real64 zoneTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode).Temp;
+        // determine and set new air loop mixed air flow rate
+        Real64 mixedAirFlowRate = this->m_EconoPartLoadRatio * this->m_CoolMassFlowRate[this->m_EconoSpeedNum] +
+                                  this->m_LowSpeedEconRuntime * this->m_CoolMassFlowRate[this->m_EconoSpeedNum - 1];
+        if (airLoopNum > 0) {
+            // request fixed mixed flow rate
+            state.dataAirLoop->AirLoopControlInfo(airLoopNum).LoopFlowRateSet = true;
+            state.dataAirLoop->AirLoopFlow(airLoopNum).ReqSupplyFrac = mixedAirFlowRate / this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling];
+            // adjust mixed air flow rate for rated air flow rate adjustment (variable speed coils only)
+            state.dataAirLoop->AirLoopFlow(airLoopNum).ReqSupplyFrac *=
+                this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling] / state.dataAirLoop->AirLoopFlow(airLoopNum).DesSupply;
+        }
+        // determine air temperature difference across fan based on new mixed air flow rate
+        int mixedAirNode = outdoorAirController.MixNode;
+        Real64 fanDTAtMixedAirFlowRate = this->getFanDeltaTemp(
+            state, firstHVACIteration, mixedAirFlowRate, mixedAirFlowRate / this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling]);
+        // determine new mixed air setpoint
+        Real64 newMixedAirSP = zoneTemp - std::abs(zoneLoad) / (cpAir * mixedAirFlowRate);
+        state.dataLoopNodes->Node(mixedAirNode).TempSetPoint = newMixedAirSP - fanDTAtMixedAirFlowRate;
+    }
+
     void
-    UnitarySys::CoolingSpeedForEconomizerOperation(EnergyPlusData &state, int const airLoopNum, bool const firstHVACIteration, Real64 const zoneLoad)
+    UnitarySys::manageEconomizerStagingOperation(EnergyPlusData &state, int const airLoopNum, bool const firstHVACIteration, Real64 const zoneLoad)
     {
         if (airLoopNum > 0) {
             if (state.dataAirLoop->AirLoopControlInfo(airLoopNum).EconoActive == true && state.dataGlobal->WarmupFlag == false &&
                 state.dataUnitarySystems->CoolingLoad) {
-                Real64 lowSpeedEconOutput = 0;
-                Real64 lowSpeedEconRuntime = 0;
-                Real64 highSpeedEconRuntime = 0;
-                Real64 econClgOutputMinOA = 0;
-                this->m_EconoPartLoadRatio = 0;
-                auto OACtrl = state.dataMixedAir->OAController(this->OAControllerIndex);
-                int clgSpdNum = this->m_NumOfSpeedCooling;
-                // determine outdoor air properties
-                using Psychrometrics::PsyCpAirFnW;
-                Real64 cpAir = PsyCpAirFnW(state.dataLoopNodes->Node(OACtrl.InletNode).HumRat);
-                Real64 outdoorAirTemp = state.dataLoopNodes->Node(OACtrl.InletNode).Temp;
-                Real64 zoneTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode).Temp;
-                // iterate through system's cooling speed to see which air flow rate can be used to meet the load
-                // "high speed" refers to current clgSpd; "low speed" is clgSpd -1;
-                for (int clgSpd = 1; clgSpd <= clgSpdNum; ++clgSpd) {
-                    // assume 100% outdoor air for now
-                    Real64 highSpeedEconMassFlowRate = this->m_CoolMassFlowRate[clgSpd];
-                    // determine fan heat temperature difference for this air flow rate
-                    Real64 highSpeedFanDT = 0;
-                    highSpeedFanDT = this->getFanDeltaTemp(
-                        state, firstHVACIteration, highSpeedEconMassFlowRate, highSpeedEconMassFlowRate / this->m_CoolMassFlowRate[clgSpdNum]);
-                    Real64 econClgOutput = cpAir * highSpeedEconMassFlowRate * (zoneTemp - (outdoorAirTemp + highSpeedFanDT));
-                    // check if economizer alone can meet the load OR if we've reached the maximumm cooling speed
-                    if (econClgOutput > std::abs(zoneLoad) || clgSpd == this->m_NumOfSpeedCooling) {
-                        if (clgSpd > 1) {
-                            // check that the system output at the minimum outdoor air flow rate doesn't "overcool" at this speed
-                            auto thisOAController = state.dataMixedAir->OAController(this->OAControllerIndex);
-                            Real64 mixedTempAtMinOA = 0;
-                            if (highSpeedEconMassFlowRate - thisOAController.MinOA > 0) {
-                                mixedTempAtMinOA =
-                                    (outdoorAirTemp * thisOAController.MinOA + state.dataLoopNodes->Node(thisOAController.RetNode).Temp *
-                                                                                   (highSpeedEconMassFlowRate - thisOAController.MinOA)) /
-                                    highSpeedEconMassFlowRate;
-                            } else {
-                                mixedTempAtMinOA = outdoorAirTemp;
-                            }
-                            econClgOutputMinOA = cpAir * highSpeedEconMassFlowRate * (zoneTemp - (mixedTempAtMinOA + highSpeedFanDT));
-                            if (econClgOutputMinOA < std::abs(zoneLoad)) {
-                                highSpeedEconRuntime = 1.0;
-                            } else {
-                                // if running at this speed would "overcool", we run partly at the lower speed and partly at this speed
-                                Real64 lowSpeedEconMassFlowRate = this->m_CoolMassFlowRate[clgSpd - 1];
-                                Real64 lowSpeedFanDT = 0;
-                                lowSpeedFanDT = this->getFanDeltaTemp(state,
-                                                                      firstHVACIteration,
-                                                                      lowSpeedEconMassFlowRate,
-                                                                      lowSpeedEconMassFlowRate / this->m_CoolMassFlowRate[clgSpdNum]);
-                                Real64 lowSpeedEconOutput = cpAir * lowSpeedEconMassFlowRate * (zoneTemp - (outdoorAirTemp + lowSpeedFanDT));
-                                // determine this speed's runtime
-                                highSpeedEconRuntime = (std::abs(zoneLoad) - lowSpeedEconOutput) / (econClgOutput - lowSpeedEconOutput);
-                            }
-                        } else {
-                            highSpeedEconRuntime = 1.0;
-                        }
-                        // set economizer air flow "speed"
-                        this->m_EconoSpeedNum = clgSpd;
-                        // set economizer PLR, a.k.a the system fan part load ratio, and runtime at each speed
-                        this->m_EconoPartLoadRatio = highSpeedEconRuntime;
-                        lowSpeedEconRuntime = 1 - highSpeedEconRuntime;
-                        break;
-                    }
-                }
+                this->setEconomizerStagingOperationSpeed(state, firstHVACIteration, zoneLoad);
+
                 // adjustments are only needed when economizer speed is greater than the lowest speed
                 if (this->m_EconoSpeedNum > 1) {
-                    // request fixed mixed flow rate
-                    state.dataAirLoop->AirLoopControlInfo(airLoopNum).LoopFlowRateSet = true;
-                    // determine and set new air loop mixed air flow rate
-                    Real64 mixedAirFlowRate = highSpeedEconRuntime * this->m_CoolMassFlowRate[this->m_EconoSpeedNum] +
-                                              lowSpeedEconRuntime * this->m_CoolMassFlowRate[this->m_EconoSpeedNum - 1];
-                    state.dataAirLoop->AirLoopFlow(airLoopNum).ReqSupplyFrac = mixedAirFlowRate / this->m_CoolMassFlowRate[clgSpdNum];
-                    // adjust mixed air flow rate for rated air flow rate adjustment (variable speed coils only)
-                    state.dataAirLoop->AirLoopFlow(airLoopNum).ReqSupplyFrac *=
-                        this->m_CoolMassFlowRate[clgSpdNum] / state.dataAirLoop->AirLoopFlow(airLoopNum).DesSupply;
-                    // determine fan dTemp based on new mixed air flow rate
-                    Real64 lowSpeedfanDT = 0;
-                    int mixedAirNode = OACtrl.MixNode;
-                    Real64 fanDTAtMixedAirFlowRate = 0;
-                    fanDTAtMixedAirFlowRate =
-                        this->getFanDeltaTemp(state, firstHVACIteration, mixedAirFlowRate, mixedAirFlowRate / this->m_CoolMassFlowRate[clgSpdNum]);
-                    // determine new mixed air setpoint
-                    Real64 newMixedAirSP = zoneTemp - std::abs(zoneLoad) / (cpAir * mixedAirFlowRate);
-                    state.dataLoopNodes->Node(mixedAirNode).TempSetPoint = newMixedAirSP - fanDTAtMixedAirFlowRate;
+                    this->calcMixedTempAirSPforEconomizerStagingOperation(state, airLoopNum, firstHVACIteration, zoneLoad);
+
                     // recalculate the outdoor air fraction to meet the new mixed air setpoint at the new mixed air flow rate
                     MixedAir::ManageOutsideAirSystem(
                         state, state.dataAirLoop->OutsideAirSys(this->OASysIndex).Name, firstHVACIteration, airLoopNum, this->OASysIndex);
