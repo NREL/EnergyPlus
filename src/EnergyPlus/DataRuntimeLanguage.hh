@@ -446,18 +446,238 @@ namespace DataRuntimeLanguage {
         }
     };
 
-    struct OperatorType
+    struct Operator
     {
         // Members
         // structure for operators and functions, used to look up information about each operator or function
-        std::string Symbol; // string representation of operator or function (for reporting)
-        ErlFunc Code;       // integer code 1..64, identifies operator or function
-        int NumOperands;    // count of operands or function arguments.
+        std::string_view symbol = ""; // string representation of operator or function (for reporting)
+        int numOperands = 0;    // count of operands or function arguments.
+    };
 
-        // Default Constructor
-        OperatorType() : Code(ErlFunc::Invalid), NumOperands(0)
-        {
-        }
+    static constexpr std::array<std::string_view, (int)ErlFunc::Num> ErlFuncNamesUC = {
+        "",  // Null
+        "", // Literal
+        "-", // Negative
+        "/",  // Divide
+        "*",  // Multiply
+        "-",  // Subtract
+        "+",  // Add
+        "==",  // Equal
+        "<>",  // NotEqual
+        "<=",  // LessOrEqual
+        ">=",  // GreaterOrEqual
+        "<",  // LessThan
+        ">",  // GreaterThan
+        "^",  // RaiseToPower
+        "&&",  // LogicalAND
+        "||",  // LogicalOR
+        // note there is an important check "> 15" to distinguish operators from functions
+        //  so be careful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
+
+        // parameters for built-in Erl functions, these are processed like operators and numbering
+        // must be sequential with the operators.
+        // math functions
+        "@ROUND",  // Round
+        "@MOD",  // Mod
+        "@SIN",  // Sin
+        "@COS",  // Cos
+        "@ARCSIN",  // ArcSin
+        "@ARCCOS",  // ArcCos
+        "@DEGTORAD", // DegToRad
+        "@RADTODEG", // RadToDeg
+        "@EXP",      // Exp
+        "@LN",       // Ln
+        "@MAX",      // Max
+        "@MIN",      // Min
+        "@ABS",      // Abs
+        "@RANDOMUNIFORMU", // RandU
+        "@RANDOMGAUSSIAN", // RandG
+        "@SEEDRANDOM", // RandSeed
+
+        // begin psychrometric routines
+        "@RHOAIRFNPBTDBW", // RhoAirFnPbTdbW
+        "@CPAIRFNW", // CpAirFnW
+        "@HFGAIRFNWTDB", // HfgAirFnWTdb
+        "@HGAIRFNWTDB", // HgAirFnWTdb
+        "@TDPFNTDBTWBPB", // TdpFnTdbTwbPb
+        "@TDPFNWPB", // TdpFnWPb
+        "@HFNTDBW", // HFnTdbW
+        "@HFNTDBRHPB", // HFnTdbRhPb
+        "@TDBFNHW", // TdbFnHW
+        "@RHOVFNTDBRH", // RhovFnTdbRh
+        "@RHOVFNTDBRHLBND0C", // RhovFnTdbRhLBnd0C
+        "@RHOVFNTDBWPB", // RhovFnTdbWPb
+        "@RHFNTDBRHOV", // RhFnTdbRhov
+        "@RHFNTDBRHOVBND0C", // RhFnTdbRhovLBnd0C
+        "@RHFNTDBWPB", // RhFnTdbWPb
+        "@TWBFNTDBWPB", // TwbFnTdbWPb
+        "@VFNTDBWPB", // VFnTdbWPb
+        "@WFNTDPPB", // WFnTdpPb
+        "@WFNTDBH", // WFnTdbH
+        "@WFNTDBTWBPB", // WFnTdbTwbPb
+        "@WFNTDBRHPB", // WFnTdbRhPb
+        "@PSATFNTEMP", // PsatFnTemp
+        "@TSATFNHPB", // TsatFnHPb
+        "@TSATFNPB", // TsatFnPb
+        "@CPCW", // CpCW
+        "@CPHW", // CpHW
+        "@RHOH2O", // RhoH2O
+
+        // Simulation Management Functions
+        "@FATALHALTEP", // FatalHaltEp
+        "@SEVEREWARNEP", // SevereWarnEp
+        "@WARNEP", // WarnEp
+
+        // Trend variable handling Functions
+        "@TRENDVALUE", // TrendValue
+        "@TRENDAVERAGE", // TrendAverage
+        "@TRENDMAX", // TrendMax
+        "@TRENDMIN", // TrendMin
+        "@TRENDDIRECTION", // TrendDirection
+        "@TRENDSUM", // TrendSum
+
+        // Curve and Table access function
+        "@CURVEVALUE", // CurveValue
+
+        // Weather data query functions
+        "@TODAYISRAIN", // TodayIsRain
+        "@TODAYISSNOW", // TodayIsSnow
+        "@TODAYOUTDRYBULBTEMP", // TodayOutDryBulbTemp
+        "@TODAYOUTDEWPOINTTEMP", // TodayOutDewPointTemp
+        "@TODAYOUTBAROPRESS", // TodayOutBaroPress
+        "@TODAYOUTRELHUM", // TodayOutRelHum
+        "@TODAYWINDSPEED", // TodayWindSpeed
+        "@TODAYWINDDIR", // TodayWindDir
+        "@TODAYSKYTEMP", // TodaySkyTemp
+        "@TODAYHORIZRSKY", // TodayHorizIRSky
+        "@TODAYBEAMSOLARRAD", // TodayBeamSolarRad
+        "@TODAYDIFSOLARRAD", // TodayDifSolarRad
+        "@TODAYALBEDO", // TodayAlbedo
+        "@TODAYLIQUIDPRECIP", // TodayLiquidPrecip
+        "@TOMORROWISRAIN", // TomorrowIsRain
+        "@TOMORROWISSNOW", // TomorrowIsSnow
+        "@TOMORROWOUTDRYBULBTEMP", // TomorrowOutDryBulbTemp
+        "@TOMORROWOUTDEWPOINTTEMP", // TomorrowOutDewPointTemp
+        "@TOMORROWOUTBAROPRESS", // TomorrowOutBaroPress
+        "@TOMORROWOUTRELHUM", // TomorrowOutRelHum
+        "@TOMORROWWINDSPEED", // TomorrowWindSpeed
+        "@TOMORROWWINDDIR", // TomorrowWindDir
+        "@TOMORROWSKYTEMP", // TomorrowSkyTemp
+        "@TOMORROWHORIZRSKY", // TomorrowHorizIRSky
+        "@TOMORROWBEAMSOLARRAD", // TomorrowBeamSolarRad
+        "@TOMORROWDIFSOLARRAD", // TomorrowDifSolarRad
+        "@TOMORROWALBEDO", // TomorrowAlbedo
+        "@TOMORROWLIQUIDPRECIP" // TomorrowLiquidPrecip
+    };
+        
+    static constexpr std::array<int, (int)ErlFunc::Num> ErlFuncNumOperands = {
+        0, // Null
+        1, // Literal
+        0, // Negative
+        2, // Divide
+        2, // Multiply
+        2, // Subtract
+        2, // Add
+        2, // Equal
+        2, // NotEqual
+        2, // LessOrEqual
+        2, // GreaterOrEqual
+        2, // LessThan
+        2, // GreaterThan
+        2, // RaiseToPower
+        2, // LogicalAND
+        2, // LogicalOR
+        1, // Round
+        2, // Mod
+        1, // Sin
+        1, // Cos
+        1, // ArcSin
+        1, // ArcCos
+        1, // DegToRad
+        1, // RadToDeg
+        1, // Exp
+        1, // Ln
+        2, // Max
+        2, // Min
+        1, // ABS
+        2, // RandU
+        4, // RandG
+        1, // RandSeed
+
+        // begin psychrometric routines
+        3, // RhoAirFnPbTdbW
+        1, // CpAirFnW
+        2, // HfgAirFnWTdb
+        2, // HgAirFnWTdb
+        3, // TdpFnTdbTwbPb
+        2, // TdpFnWPb
+        2, // HFnTdbW
+        3, // HFnTdbRhPb
+        2, // TdbFnHW
+        2, // RhovFnTdbRh
+        2, // RhovFnTdbRhLBnd0C
+        3, // RhovFnTdbWPb
+        2, // RhFnTdbRhov
+        2, // RhFnTdbRhovLBnd0C
+        3, // RhFnTdbWPb
+        3, // TwbFnTdbWPb
+        3, // VFnTdbWPb
+        2, // WFnTdpPb
+        2, // WFnTdbH
+        3, // WFnTdbTwbPb
+        4, // WFnTdbRhPb
+        1, // PsatFnTemp
+        2, // TsatFnHPb
+        1, // TsatFnPb
+        1, // CpCW
+        1, // CpHW
+        1, // RhoH2O
+
+        // Simulation Management Functions
+        1, // FatalHaltEp
+        1, // SevereWarnEp
+        1, // WarnEp
+
+        // Trend variable handling Functions
+        2, // TrendValue
+        2, // TrendAverage
+        2, // TrendMax
+        2, // TrendMin
+        2, // TrendDirection
+        2, // TrendSum
+
+        // Curve and Table access function
+        6, // CurveValue
+
+        // Weather data query functions
+        2, // TodayIsRain
+        2, // TodayIsSnow
+        2, // TodayOutDryBulbTemp
+        2, // TodayOutDewPointTemp
+        2, // TodayOutBaroPress
+        2, // TodayOutRelHum
+        2, // TodayWindSpeed
+        2, // TodayWindDir
+        2, // TodaySkyTemp
+        2, // TodayHorizIRSky
+        2, // TodayBeamSolarRad
+        2, // TodayDifSolarRad
+        2, // TodayAlbedo
+        2, // TodayLiquidPrecip
+        2, // TomorrowIsRain
+        2, // TomorrowIsSnow
+        2, // TomorrowOutDryBulbTemp
+        2, // TomorrowOutDewPointTemp
+        2, // TomorrowOutBaroPress
+        2, // TomorrowOutRelHum
+        2, // TomorrowWindSpeed
+        2, // TomorrowWindDir
+        2, // TomorrowSkyTemp
+        2, // TomorrowHorizIRSky
+        2, // TomorrowBeamSolarRad
+        2, // TomorrowDifSolarRad
+        2, // TomorrowAlbedo
+        2 // TomorrowLiquidPrecip
     };
 
     struct TrendVariableType
@@ -567,7 +787,6 @@ struct RuntimeLanguageData : BaseGlobalStruct
     Array1D<DataRuntimeLanguage::ErlVariableType> ErlVariable;                        // holds Erl variables in a structure array
     Array1D<DataRuntimeLanguage::ErlStackType> ErlStack;                              // holds Erl programs in separate "stacks"
     Array1D<DataRuntimeLanguage::ErlExpressionType> ErlExpression;                    // holds Erl expressions in structure array
-    Array1D<DataRuntimeLanguage::OperatorType> PossibleOperators;                     // hard library of available operators and functions
     Array1D<DataRuntimeLanguage::TrendVariableType> TrendVariable;                    // holds Erl trend variables in a structure array
     Array1D<DataRuntimeLanguage::OutputVarSensorType> Sensor;                         // EMS:SENSOR objects used (from output variables)
     Array1D<DataRuntimeLanguage::EMSActuatorAvailableType> EMSActuatorAvailable;      // actuators that could be used
@@ -626,7 +845,6 @@ struct RuntimeLanguageData : BaseGlobalStruct
         this->ErlVariable.deallocate();
         this->ErlStack.deallocate();
         this->ErlExpression.deallocate();
-        this->PossibleOperators.deallocate();
         this->TrendVariable.deallocate();
         this->Sensor.deallocate();
         this->EMSActuatorAvailable.deallocate();

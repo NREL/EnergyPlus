@@ -152,24 +152,6 @@ namespace RuntimeLanguageProcessor {
 
     ErlValueType EvaluateExpression(EnergyPlusData &state, int ExpressionNum, bool &seriousErrorFound);
 
-    void TodayTomorrowWeather(EnergyPlusData &state,
-                              ErlFunc FunctionCode,
-                              Real64 Operand1,
-                              Real64 Operand2,
-                              Array2D<Real64> &TodayTomorrowWeatherSource,
-                              ErlValueType &ReturnVal);
-
-    void TodayTomorrowWeather(EnergyPlusData &state,
-                              ErlFunc FunctionCode,
-                              Real64 Operand1,
-                              Real64 Operand2,
-                              Array2D_bool &TodayTomorrowWeatherSource,
-                              ErlValueType &ReturnVal);
-
-    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
-
-    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
-
     void GetRuntimeLanguageUserInput(EnergyPlusData &state);
 
     void ReportRuntimeLanguage(EnergyPlusData &state);
@@ -185,8 +167,6 @@ namespace RuntimeLanguageProcessor {
                         int StackNum);
 
     int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int StackNum, ObjexxFCL::Optional<ErlValueType const> Value = _);
-
-    void SetupPossibleOperators(EnergyPlusData &state);
 
     void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
                                          int varNum,  // The variable index to be written during run time

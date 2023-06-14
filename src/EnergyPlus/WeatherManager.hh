@@ -749,6 +749,26 @@ namespace Weather {
                  Real64 RelHum,
                  Real64 IRHoriz);
 
+    struct WeatherVars {
+        bool IsRain;
+        bool IsSnow;
+        Real64 OutDryBulbTemp;
+        Real64 OutDewPointTemp;
+        Real64 OutBaroPress;
+        Real64 OutRelHum;
+        Real64 WindSpeed;
+        Real64 WindDir;
+        Real64 SkyTemp;
+        Real64 HorizIRSky;
+        Real64 BeamSolarRad;
+        Real64 DifSolarRad;
+        Real64 Albedo;
+        Real64 LiquidPrecip;
+        Real64 TotalSkyCover;
+        Real64 OpaqueSkyCover;
+    };
+
+    void ForAllHrTs(EnergyPlusData &state, std::function<void(int, int)> f);
 } // namespace Weather
 
 struct WeatherManagerData : BaseGlobalStruct
@@ -766,8 +786,6 @@ struct WeatherManagerData : BaseGlobalStruct
     bool WaterMainsParameterReport; // should only be done once
     bool PrintEnvrnStamp;           // Set to true when the environment header should be printed
     bool PrintDDHeader;
-
-    Real64 const Sigma; // Stefan-Boltzmann constant
 
     int YearOfSim; // The Present year of Simulation.
     int const NumDaysInYear;
@@ -821,7 +839,11 @@ struct WeatherManagerData : BaseGlobalStruct
     int NumOfEnvrn;                 // Number of environments to be simulated
     int NumEPWTypExtSets;           // Number of Typical/Extreme on weather file.
     int NumWPSkyTemperatures;       // Number of WeatherProperty:SkyTemperature items in input file
+    
+    Array2D<Weather::WeatherVars> today;
+    Array2D<Weather::WeatherVars> tomorrow;
 
+#ifdef GET_OUT        
     Array2D_bool TodayIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
     Array2D_bool TodayIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air NOLINT(cert-err58-cpp)
@@ -855,7 +877,7 @@ struct WeatherManagerData : BaseGlobalStruct
     Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover {tenth of sky}(cert-err58-cpp)
     Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover {tenth of sky}(cert-err58-cpp)
-
+#endif //
     Array3D<Real64> DDDBRngModifier;      // Design Day Dry-bulb Temperature Range Modifier NOLINT(cert-err58-cpp)
     Array3D<Real64> DDHumIndModifier;     // Design Day relative humidity values or wet-bulb modifiers (per HumIndType) NOLINT(cert-err58-cpp)
     Array3D<Real64> DDBeamSolarValues;    // Design Day Beam Solar Values NOLINT(cert-err58-cpp)
@@ -1028,6 +1050,9 @@ struct WeatherManagerData : BaseGlobalStruct
         this->NumOfEnvrn = 0;                       // Number of environments to be simulated
         this->NumEPWTypExtSets = 0;                 // Number of Typical/Extreme on weather file.
         this->NumWPSkyTemperatures = 0;             // Number of WeatherProperty:SkyTemperature items in input file
+        this->today.deallocate();
+        this->tomorrow.deallocate();
+#ifdef GET_OUT        
         this->TodayIsRain.deallocate();             // Rain indicator, true=rain
         this->TodayIsSnow.deallocate();             // Snow indicator, true=snow
         this->TodayOutDryBulbTemp.deallocate();     // Dry bulb temperature of outside air
@@ -1060,6 +1085,7 @@ struct WeatherManagerData : BaseGlobalStruct
         this->TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
         this->TomorrowTotalSkyCover.deallocate();   // Total Sky Cover {tenth of sky}
         this->TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
+#endif        
         this->DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
         this->DDHumIndModifier.deallocate();        // Design Day relative humidity values
         this->DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
@@ -1183,7 +1209,7 @@ struct WeatherManagerData : BaseGlobalStruct
     // Default Constructor
     WeatherManagerData()
         : GetBranchInputOneTimeFlag(true), GetEnvironmentFirstCall(true), PrntEnvHeaders(true), FirstCall(true), WaterMainsParameterReport(true),
-          PrintEnvrnStamp(false), Sigma(5.6697e-8), YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""),
+          PrintEnvrnStamp(false), YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""),
           WeatherFileExists(false), LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0), WeatherFileTimeZone(0.0),
           WeatherFileElevation(0.0), GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
           SnowGndRefModifierForDayltg(1.0), WaterMainsTempsMethod{Weather::WaterMainsTempCalcMethod::FixedDefault}, WaterMainsTempsSchedule(0),

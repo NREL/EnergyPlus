@@ -411,7 +411,7 @@ namespace PVWatts {
         ssc_data_set_number(pvwattsData_, "diffuse", state.dataEnvrn->DifSolarRad);
         ssc_data_set_number(pvwattsData_, "tamb", state.dataEnvrn->OutDryBulbTemp);
         ssc_data_set_number(pvwattsData_, "wspd", state.dataEnvrn->WindSpeed);
-        Real64 albedo = state.dataWeather->TodayAlbedo(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+        Real64 albedo = state.dataWeather->today(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay).Albedo;
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }
