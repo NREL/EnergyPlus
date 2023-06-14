@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,23.1;
+  Version,23.2;
 
   Timestep,4;
 
@@ -14201,6 +14201,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3,                       !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     PACKAGED VAV WITH REHEAT_OA-PACKAGED VAV WITH REHEAT_CoolCNode,  !- Air Inlet Node Name
     PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- Air Outlet Node Name
@@ -14213,6 +14215,8 @@
     0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
     3,                       !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
     PACKAGED VAV WITH REHEAT_CoolC Cond OA node;  !- Condenser Air Inlet Node Name

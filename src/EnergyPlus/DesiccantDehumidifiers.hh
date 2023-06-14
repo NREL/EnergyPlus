@@ -297,17 +297,12 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     int NumDesicDehums = 0;                    // number of desiccant dehumidifiers of all types
     int NumSolidDesicDehums = 0;               // number of solid desiccant dehumidifiers
     int NumGenericDesicDehums = 0;             // number of generic desiccant dehumidifiers
-    Real64 TempSteamIn = 100.0;                // steam coil steam inlet temperature
     bool GetInputDesiccantDehumidifier = true; // First time, input is "gotten"
     bool InitDesiccantDehumidifierOneTimeFlag = true;
     bool MySetPointCheckFlag = true; // I think this actually needs to be a vector or a member variable on the struct, not just a single bool
     Array1D<DesiccantDehumidifiers::DesiccantDehumidifierData> DesicDehum;
     std::unordered_map<std::string, std::string> UniqueDesicDehumNames;
 
-    int MaxNums = 0;           // Maximum number of numeric input fields
-    int MaxAlphas = 0;         // Maximum number of alpha input fields
-    int TotalArgs = 0;         // Total number of alpha and numeric arguments (max) for a certain object in the input file
-    Real64 SteamDensity = 0.0; // density of steam at 100C
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
     Real64 QRegen = 0.0;          // required coil load passed to sim heating coil routine (W)

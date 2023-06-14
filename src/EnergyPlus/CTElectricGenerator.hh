@@ -53,11 +53,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -72,7 +74,7 @@ namespace CTElectricGenerator {
         std::string Name;                                   // user identifier
         std::string TypeOf = "Generator:CombustionTurbine"; // Type of Generator
         GeneratorType CompType_Num = GeneratorType::CombTurbine;
-        std::string FuelType;           // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eFuel FuelType;       // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput = 0.0;  // W - design nominal capacity of Generator
         int ElectricCircuitNode = 0;    // Electric Circuit Node
         Real64 MinPartLoadRat = 0.0;    // (CT MIN) min allowed operating frac full load

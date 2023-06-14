@@ -100,9 +100,10 @@
 ! HTML Report:                    Yes
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
-Version,23.1;
 
-Building,
+  Version,23.2;
+
+  Building,
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain

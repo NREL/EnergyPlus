@@ -298,15 +298,6 @@ endif()
 # E+ required libraries
 add_subdirectory(idd)
 
-execute_process(
-  COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
-  TIMEOUT 30
-  RESULT_VARIABLE generate_epJSON_schema_result)
-if(${generate_epJSON_schema_result} MATCHES ".*timeout.*")
-  message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
-endif()
-configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd")
-configure_file(idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
 configure_file(idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd")
 configure_file(idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd")
 
@@ -322,7 +313,6 @@ configure_file("workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/work
 # of course E+ itself
 add_subdirectory(src/EnergyPlus)
 set_target_properties(airflownetworklib PROPERTIES FOLDER "Internal")
-set_target_properties(GenerateEmbeddedEpJSONSchema PROPERTIES FOLDER "Internal")
 set_target_properties(energyplusparser PROPERTIES FOLDER "Internal")
 
 if(BUILD_TESTING)
@@ -371,9 +361,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V22-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V23-1-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 22-2-0 to 23-1-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "idd/V23-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V23-2-0-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables 23-1-0 to 23-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement

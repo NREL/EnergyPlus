@@ -61,6 +61,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -83,9 +84,9 @@ namespace Boilers {
     {
         // Members
         std::string Name;                                                            // user identifier
-        Constant::ResourceType FuelType = Constant::ResourceType::None;              // resource type assignment
+        Constant::eFuel FuelType = Constant::eFuel::Invalid;                         // resource type assignment
         DataPlant::PlantEquipmentType Type = DataPlant::PlantEquipmentType::Invalid; // plant loop type identifier
-        PlantLocation plantLoc;
+        PlantLocation plantLoc{};
         bool Available = false;                                      // TRUE if machine available in current time step
         bool ON = false;                                             // TRUE: simulate the machine at it's operating part load ratio
         Real64 NomCap = 0.0;                                         // W - design nominal capacity of Boiler
@@ -135,13 +136,6 @@ namespace Boilers {
         Real64 FuelConsumed = 0.0;             // J - Boiler Fuel consumed integrated over time
         Real64 BoilerInletTemp = 0.0;          // C - Boiler inlet temperature
         Real64 ParasiticElecConsumption = 0.0; // J - Parasitic Electrical Consumption (e.g. forced draft fan)
-
-        std::string BoilerFuelTypeForOutputVariable = "";
-
-        // Default Constructor
-        BoilerSpecs() : plantLoc{}
-        {
-        }
 
         void simulate([[maybe_unused]] EnergyPlusData &state,
                       const PlantLocation &calledFromLocation,

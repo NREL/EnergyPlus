@@ -89,7 +89,7 @@ namespace HeatBalanceManager {
 
     void GetHeatBalanceInput(EnergyPlusData &state);
 
-    void CheckUsedConstructions(EnergyPlusData &state, bool &ErrorsFound);
+    void CheckUsedConstructions(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound);
 
     bool CheckValidSimulationObjects(EnergyPlusData &state);
 
@@ -117,9 +117,9 @@ namespace HeatBalanceManager {
                          std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
-                         int &NumAlphas,
+                         int const &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
-                         int &NumNumbers,
+                         int const &NumNumbers,
                          Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
@@ -145,7 +145,7 @@ namespace HeatBalanceManager {
 
     void OpenShadingFile(EnergyPlusData &state);
 
-    void GetFrameAndDividerData(EnergyPlusData &state, bool &ErrorsFound); // set to true if errors found in input
+    void GetFrameAndDividerData(EnergyPlusData &state); // set to true if errors found in input
 
     void SearchWindow5DataFile(EnergyPlusData &state,
                                fs::path const &DesiredFilePath,            // File path (or just name) that contains the Window5 constructions.

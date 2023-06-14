@@ -313,13 +313,11 @@ namespace WeatherManager {
                 Real64 SurfWorldAz = 0.0;
                 Real64 SurfTilt = 0.0;
                 Vectors::DetermineAzimuthAndTilt(state.dataSurface->Surface(SurfNum).NewVertex,
-                                                 state.dataSurface->Surface(SurfNum).Sides,
                                                  SurfWorldAz,
                                                  SurfTilt,
                                                  state.dataSurface->Surface(SurfNum).lcsx,
                                                  state.dataSurface->Surface(SurfNum).lcsy,
                                                  state.dataSurface->Surface(SurfNum).lcsz,
-                                                 state.dataSurface->Surface(SurfNum).GrossArea,
                                                  state.dataSurface->Surface(SurfNum).NewellSurfaceNormalVector);
                 state.dataSurface->Surface(SurfNum).Azimuth = SurfWorldAz;
                 state.dataSurface->Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);

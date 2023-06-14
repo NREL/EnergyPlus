@@ -58,6 +58,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -314,9 +315,9 @@ namespace CTElectricGenerator {
             }
 
             // Validate fuel type input
-            bool FuelTypeError(false);
-            UtilityRoutines::ValidateFuelType(state, AlphArray(11), state.dataCTElectricGenerator->CTGenerator(genNum).FuelType, FuelTypeError);
-            if (FuelTypeError) {
+            state.dataCTElectricGenerator->CTGenerator(genNum).FuelType =
+                static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, AlphArray(11)));
+            if (state.dataCTElectricGenerator->CTGenerator(genNum).FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(11), AlphArray(11)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
@@ -357,6 +358,7 @@ namespace CTElectricGenerator {
 
     void CTGeneratorData::setupOutputVars(EnergyPlusData &state)
     {
+        std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
                             OutputProcessor::Unit::W,
@@ -379,7 +381,7 @@ namespace CTElectricGenerator {
                             "Plant");
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Rate",
+                            format("Generator {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->FuelEnergyUseRate,
                             OutputProcessor::SOVTimeStepType::System,
@@ -387,14 +389,14 @@ namespace CTElectricGenerator {
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Energy",
+                            format("Generator {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
                             {},
-                            this->FuelType,
+                            sFuelType,
                             "COGENERATION",
                             {},
                             "Plant");
@@ -417,7 +419,7 @@ namespace CTElectricGenerator {
                             this->Name);
 
         SetupOutputVariable(state,
-                            "Generator " + this->FuelType + " Mass Flow Rate",
+                            format("Generator {} Mass Flow Rate", sFuelType),
                             OutputProcessor::Unit::kg_s,
                             this->FuelMdot,
                             OutputProcessor::SOVTimeStepType::System,

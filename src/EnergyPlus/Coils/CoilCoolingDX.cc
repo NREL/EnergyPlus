@@ -308,23 +308,24 @@ void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
                         {},
                         "System");
 
-    if (this->performance.compressorFuelType != Constant::ResourceType::Electricity) {
+    if (this->performance.compressorFuelType != Constant::eFuel::Electricity) {
+        std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->performance.compressorFuelType)];
         SetupOutputVariable(state,
-                            "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Rate",
+                            format("Cooling Coil {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->performance.compressorFuelRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
-                            "Cooling Coil " + this->performance.compressorFuelTypeForOutput + " Energy",
+                            format("Cooling Coil {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->performance.compressorFuelConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->name,
                             {},
-                            this->performance.compressorFuelTypeForOutput,
+                            sFuelType,
                             "COOLING",
                             {},
                             "System");
@@ -994,7 +995,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
         Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr std::string_view Format_990(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
+            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER1 {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
         print(state.files.eio, "{}", Format_990);
         for (auto &coil : state.dataCoilCooingDX->coilCoolingDXs) {
             coil.performance.calcStandardRatings210240(state);
@@ -1025,7 +1026,16 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
             OutputReportPredefined::addFootNoteSubTable(
-                state, state.dataOutRptPredefined->pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+                state,
+                state.dataOutRptPredefined->pdstDXCoolCoil,
+                "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                "1 - EnergyPlus object type. <br/>"
+                "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2017. <br/>"
+                "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2007. <br/>"
+                "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                "from the appropriate AHRI standard.");
 
             // AHRI 2023 Standard SEER2 Calculations
             static constexpr std::string_view Format_991_(
@@ -1039,7 +1049,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
                   coil.performance.standardRatingEER2 * ConvFromSIToIP,
                   coil.performance.standardRatingSEER2_User * ConvFromSIToIP,
                   coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
-                  ' ');
+                  coil.performance.standardRatingIEER2 * ConvFromSIToIP);
 
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, coil.name, "Coil:Cooling:DX");
             OutputReportPredefined::PreDefTableEntry(
@@ -1060,10 +1070,20 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
                                                      coil.name,
                                                      coil.performance.standardRatingSEER2_Standard * ConvFromSIToIP,
                                                      2);
-            // OutputReportPredefined::PreDefTableEntry(
-            // state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, coil.name, coil.performance.standardRatingIEER2 * ConvFromSIToIP, 2);
             OutputReportPredefined::addFootNoteSubTable(
-                state, state.dataOutRptPredefined->pdstDXCoolCoil_2023, "ANSI/AHRI 2023 ratings account for supply air fan heat and electric power.");
+                state,
+                state.dataOutRptPredefined->pdstDXCoolCoil_2023,
+                "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
+                "1 - EnergyPlus object type. <br/>"
+                "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2023. <br/>"
+                "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2022. <br/>"
+                "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                "from the appropriate AHRI standard. <br/>"
+                "4 - Value for the Full Speed of the coil.");
         }
     }
     state.dataCoilCooingDX->stillNeedToReportStandardRatings = false;
