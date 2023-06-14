@@ -2290,6 +2290,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
         "  ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        ",",
         "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
@@ -2381,7 +2382,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     bool FirstHVAC = true;
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
-    /*
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state->dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
@@ -2446,7 +2446,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_EQ(state->dataLoopNodes->Node(Desuperheater.WaterInletNode).Temp, 50);
     EXPECT_GT(Tank.SourceInletTemp, 50);
     EXPECT_GT(Tank.TankTemp, 50);
-    */
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
@@ -3612,8 +3611,8 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
         "  ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
-        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         ",",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  0,                       !- Basin Heater Capacity {W/K}",
