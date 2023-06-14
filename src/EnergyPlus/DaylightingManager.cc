@@ -8335,7 +8335,6 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
     //       AUTHOR         Simon Vidanovic
     //       DATE WRITTEN   June 2013
 
-    bool hitObs;                // True iff obstruction is hit
     auto &ComplexFenestrationLuminancesObsHitPt =
         state.dataDaylightingManager->ComplexFenestrationLuminancesObsHitPt; // Coordinates of hit point on an obstruction (m)
     auto &ComplexFenestrationLuminancesGroundHitPt =
@@ -8384,64 +8383,102 @@ void ComplexFenestrationLuminances(EnergyPlusData &state,
     }
 
     auto const &complexWinDaylightGeom = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CurCplxFenState);
-    auto const &complexWinRefPoint = complexWinDaylightGeom.RefPoint(iRefPoint);
-    auto const &complexWinIllumMap = complexWinDaylightGeom.IlluminanceMap(iRefPoint, MapNum);
-    
-    // add exterior obstructions transmittances to calculated luminances
-    int NRefl = (CalledFrom == CalledFor::RefPoint) ? complexWinRefPoint.NReflSurf(WinEl) : complexWinIllumMap.NReflSurf(WinEl);
 
-    for (int iReflElem = 1; iReflElem <= NRefl; ++iReflElem) {
-        int ObstrTrans = (CalledFrom == CalledFor::RefPoint) ?
-                complexWinRefPoint.TransOutSurf(iReflElem, WinEl) : complexWinIllumMap.TransOutSurf(iReflElem, WinEl);
+    if (CalledFrom == CalledFor::RefPoint) {
+        auto const &complexWinRefPoint = complexWinDaylightGeom.RefPoint(iRefPoint);
+        // add exterior obstructions transmittances to calculated luminances
+        for (int iReflElem = 1; iReflElem <= complexWinRefPoint.NReflSurf(WinEl); ++iReflElem) {
+            Real64 ObstrTrans = complexWinRefPoint.TransOutSurf(iReflElem, WinEl);
+            int iReflElemIndex = complexWinRefPoint.RefSurfIndex(iReflElem, WinEl);
 
-        int iReflElemIndex = (CalledFrom == CalledFor::RefPoint) ?
-                complexWinRefPoint.RefSurfIndex(iReflElem, WinEl) : complexWinIllumMap.RefSurfIndex(iReflElem, WinEl);
-
-        auto &elemLumSky = ElementLuminanceSky(iReflElemIndex);
-        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-            elemLumSky.sky[iSky] *= ObstrTrans;
-        }
-        ElementLuminanceSun(iReflElemIndex) *= ObstrTrans;
-        ElementLuminanceSunDisk(iReflElemIndex) *= ObstrTrans;
-    }
-
-    // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
-    // sun reaches the ground for that point
-    int NGnd = (CalledFrom == CalledFor::RefPoint) ? complexWinRefPoint.NGnd(WinEl) : complexWinIllumMap.NGnd(WinEl);
-
-    Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SurfSunCosHourly(IHR);
-    for (int iGndElem = 1; iGndElem <= NGnd; ++iGndElem) {
-        // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
-        // were hit in the process
-        Real64 BeamObstrMultiplier = (CalledFrom == CalledFor::RefPoint) ?
-                complexWinRefPoint.GndObstrMultiplier(iGndElem, WinEl) : complexWinIllumMap.GndObstrMultiplier(iGndElem, WinEl);
-        int iGndElemIndex = (CalledFrom == CalledFor::RefPoint) ?
-                complexWinRefPoint.GndIndex(iGndElem, WinEl) : complexWinIllumMap.GndIndex(iGndElem, WinEl);
-
-        auto &elemLumSky = ElementLuminanceSky(iGndElemIndex);
-        for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-            elemLumSky.sky[iSky] *= BeamObstrMultiplier;
-        }
-
-        // direct sun disk reflect off the ground
-        Real64 SunObstrMultiplier = 1.0;
-        if (state.dataSurface->CalcSolRefl) {
-            // Sun reaches ground point if vector from this point to the sun is unobstructed
-            hitObs = false;
-            for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
-                if (CalledFrom == CalledFor::RefPoint) {
-                    ComplexFenestrationLuminancesGroundHitPt = complexWinRefPoint.GndPt(iGndElem, WinEl);
-                } else {
-                    ComplexFenestrationLuminancesGroundHitPt = complexWinIllumMap.GndPt(iGndElem, WinEl);
-                }
-
-                PierceSurface(state, ObsSurfNum, ComplexFenestrationLuminancesGroundHitPt, SUNCOS_IHR, ComplexFenestrationLuminancesObsHitPt, hitObs);
-                if (hitObs) break;
+            auto &elemLumSky = ElementLuminanceSky(iReflElemIndex);
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                elemLumSky.sky[iSky] *= ObstrTrans;
             }
-            if (hitObs) SunObstrMultiplier = 0.0;
+            ElementLuminanceSun(iReflElemIndex) *= ObstrTrans;
+            ElementLuminanceSunDisk(iReflElemIndex) *= ObstrTrans;
         }
-        ElementLuminanceSun(iGndElemIndex) *= SunObstrMultiplier;
-    }
+
+        // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
+        // sun reaches the ground for that point
+        Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SurfSunCosHourly(IHR);
+        for (int iGndElem = 1; iGndElem <= complexWinRefPoint.NGnd(WinEl); ++iGndElem) {
+            // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
+            // were hit in the process
+        
+            Real64 BeamObstrMultiplier = complexWinRefPoint.GndObstrMultiplier(iGndElem, WinEl);
+            int iGndElemIndex = complexWinRefPoint.GndIndex(iGndElem, WinEl);
+
+            auto &elemLumSky = ElementLuminanceSky(iGndElemIndex);
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                elemLumSky.sky[iSky] *= BeamObstrMultiplier;
+            }
+
+            // direct sun disk reflect off the ground
+            Real64 SunObstrMultiplier = 1.0;
+            if (state.dataSurface->CalcSolRefl) {
+                // Sun reaches ground point if vector from this point to the sun is unobstructed
+                for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
+                    ComplexFenestrationLuminancesGroundHitPt = complexWinRefPoint.GndPt(iGndElem, WinEl);
+                    bool hitObs = false;
+                    PierceSurface(state, ObsSurfNum, ComplexFenestrationLuminancesGroundHitPt, SUNCOS_IHR, ComplexFenestrationLuminancesObsHitPt, hitObs);
+                    if (hitObs) {
+                        SunObstrMultiplier = 0.0;
+                        break;
+                    }
+                }
+            }
+            ElementLuminanceSun(iGndElemIndex) *= SunObstrMultiplier;
+        }
+
+    } else { // if (CalledFrom != RefPoint)
+
+        auto const &complexWinIllumMap = complexWinDaylightGeom.IlluminanceMap(iRefPoint, MapNum);
+        // add exterior obstructions transmittances to calculated luminances
+        for (int iReflElem = 1; iReflElem <= complexWinIllumMap.NReflSurf(WinEl); ++iReflElem) {
+            Real64 ObstrTrans = complexWinIllumMap.TransOutSurf(iReflElem, WinEl);
+            int iReflElemIndex = complexWinIllumMap.RefSurfIndex(iReflElem, WinEl);
+            auto &elemLumSky = ElementLuminanceSky(iReflElemIndex);
+
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                elemLumSky.sky[iSky] *= ObstrTrans;
+            }
+            ElementLuminanceSun(iReflElemIndex) *= ObstrTrans;
+            ElementLuminanceSunDisk(iReflElemIndex) *= ObstrTrans;
+        }
+
+        // add exterior ground element obstruction multipliers to calculated luminances. For sun reflection, calculate if
+        // sun reaches the ground for that point
+        Vector3<Real64> const SUNCOS_IHR = state.dataSurface->SurfSunCosHourly(IHR);
+        for (int iGndElem = 1; iGndElem <= complexWinIllumMap.NGnd(WinEl); ++iGndElem) {
+            // case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
+            // were hit in the process
+            Real64 BeamObstrMultiplier = complexWinIllumMap.GndObstrMultiplier(iGndElem, WinEl);
+            int iGndElemIndex = complexWinIllumMap.GndIndex(iGndElem, WinEl);
+            
+            auto &elemLumSky = ElementLuminanceSky(iGndElemIndex);
+            for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
+                elemLumSky.sky[iSky] *= BeamObstrMultiplier;
+            }
+
+            // direct sun disk reflect off the ground
+            Real64 SunObstrMultiplier = 1.0;
+            if (state.dataSurface->CalcSolRefl) {
+                // Sun reaches ground point if vector from this point to the sun is unobstructed
+                for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
+                    ComplexFenestrationLuminancesGroundHitPt = complexWinIllumMap.GndPt(iGndElem, WinEl);
+
+                    bool hitObs = false;
+                    PierceSurface(state, ObsSurfNum, ComplexFenestrationLuminancesGroundHitPt, SUNCOS_IHR, ComplexFenestrationLuminancesObsHitPt, hitObs);
+                    if (hitObs) {
+                        SunObstrMultiplier = 0.0;
+                        break;
+                    }
+                }
+            }
+            ElementLuminanceSun(iGndElemIndex) *= SunObstrMultiplier;
+        }
+    } // if (CalledFrom == RefPoint)
 }
 
 void DayltgInterReflectedIllumComplexFenestration(EnergyPlusData &state,
