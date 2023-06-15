@@ -18095,7 +18095,7 @@ namespace UnitarySystems {
             FanInletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->inletNodeNum;
             FanOutletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->outletNodeNum;
             state.dataLoopNodes->Node(FanInletNode).MassFlowRate = massFlowRate;
-            state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, airFlowRatio, _, _, _, _, _, _, _, _);
+            state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, airFlowRatio, _, _, _, _, _);
         } else {
             FanInletNode = state.dataFans->Fan(this->m_FanIndex).InletNodeNum;
             FanOutletNode = state.dataFans->Fan(this->m_FanIndex).OutletNodeNum;
@@ -18217,7 +18217,7 @@ namespace UnitarySystems {
                 this->setEconomizerStagingOperationSpeed(state, firstHVACIteration, zoneLoad);
 
                 // adjustments are only needed when economizer speed is greater than the lowest speed
-                if (this->m_EconoSpeedNum > 1) {
+                if (this->m_EconoSpeedNum > 0) {
                     this->calcMixedTempAirSPforEconomizerStagingOperation(state, airLoopNum, firstHVACIteration, zoneLoad);
 
                     // recalculate the outdoor air fraction to meet the new mixed air setpoint at the new mixed air flow rate
