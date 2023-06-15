@@ -6,6 +6,7 @@ Extend Spaces to Sizing and HVAC
  - Original April 26, 2023
  - Revised May 5, 2023 - and now for something somewhat different
  - Revised May 19, 2023 - add conf call and email comments, add design
+ - Revised Jun 14, 2023 - some editing and more design
 
 ## Table of Contents ##
 
@@ -123,18 +124,6 @@ Some new objects and some changes to existing objects are proposed.
 * When a thermostat is assigned to a Zone, it will calculate the lumped loads to setpoint for all spaces in the zone.
 * When a thermostat is assigned to a Space, it will calculate the loads to setpoint for that Space.
 
-### ZoneHVAC:EquipmentConnections
-* *Add a new ield to list ZoneHVAC:SpaceDistribution objects.*
-
-```
-ZoneHVAC:EquipmentConnections,
-
-  A9, \field Space Distribution List Name
-      \type object-list
-      \object-list SpaceDistributionLists
-```
-
-
 ### SpaceHVAC:EquipmentConnections
 * *New object to connect nodes to a Space, same as ZoneHVAC:EquipmentConnections, but for Spaces.*
 
@@ -146,38 +135,19 @@ SpaceHVAC:EquipmentConnections,
        \required-field
        \type object-list
        \object-list SpaceNames
-  A2 , \field Space Air Node Name
-       \required-field
+  A2 , \field Space Air Inlet Node or NodeList Name
        \type node
-  A3 ; \field Space Air Inlet Node or NodeList Name
+  A3 , \field Space Air Exhaust Node or NodeList Name
+       \type node
+  A4 , \field Space Air Node Name
+       \required-field
        \type node
 ```
 
-### ZoneHVAC:SpaceDistributionList
-* *New object to list ZoneHVAC:SpaceDistribution objects for a Zone.*
-```
-  A1 , \field Name
-       \ memo List of ZoneHVAC:SpaceDisribution objects for a given Zone.
-       \ memo There must be one space distribution object for each piece of equipment in the ZoneHVAC:EquipmentList (order does not matter).
-       \extensible:2
-       \required-field
-       \reference SpaceDistributionLists
-  A2 , \field Space Distribution 1 Object Type
-       \begin-extensible
-       \required-field
-       \type choice
-       \key ZoneHVAC:SpaceDistribution:AirFlow
-       \key ZoneHVAC:SpaceDistribution:ANonirFlow
-  A3 , \field Space Distribution 1 Name
-       \required-field
-       \type object-list
-       \object-list SpaceDistributionNames
-    
-```
-
-### ZoneHVAC:SpaceDistribution:AirFlow
-* *New object, splits the air flow from a single piece of zone equipment to one or more Spaces.*
-* *Would likely also add a ZoneHVAC:SpaceDistributionList that's referenced at the end of the ZoneHVAC:EquuipmentConnections object
+### ZoneHVAC:SpaceDistribution:AirFlow and ZoneHVAC:SpaceDistribution:NonAirFlow
+* *New objects, split the air flow or non-air output from a single piece of zone equipment to one or more Spaces.*
+* *References a piece of zone equipment to attach to, similar to AirTerminal:SingleDuct:Mixer.*
+* *Listed in a ZoneHVAC:SpaceDistributionList that's referenced at the end of the ZoneHVAC:EquuipmentConnections object
 ```
 ZoneHVAC:SpaceDistribution:AirFlow,
        \extensible:3
@@ -260,12 +230,7 @@ ZoneHVAC:SpaceDistribution:AirFlow,
        \units m3/s
        \minimum 0.0
        \autosizable
-```
 
-### ZoneHVAC:SpaceDistribution:NonAirFlow
-* *New object, splits the output from a single piece of zone equipment to one or more Spaces.*
-* *Would likely also add a ZoneHVAC:SpaceDistributionList that's referenced at the end of the ZoneHVAC:EquuipmentConnections object
-```
 ZoneHVAC:SpaceDistribution:NonAirFlow,
        \extensible:2
        \memo Distributes the output from a piece of zone equipment to one or more Spaces in the Zone.
@@ -328,22 +293,36 @@ ZoneHVAC:SpaceDistribution:NonAirFlow,
        \autosizable
 ```
 
-### SpaceHVAC:EquipmentConnections
-* *New object to connect nodes to a Space, same as ZoneHVAC:EquipmentConnections, but for Spaces.*
-
+### ZoneHVAC:SpaceDistributionList
+* *New object to list ZoneHVAC:SpaceDistribution objects for a Zone.*
 ```
-SpaceHVAC:EquipmentConnections,
-       \memo Specifies the HVAC equipment connections for a Space. Node names are specified for the
-       \memo Space air node and air inlet nodes.
-  A1 , \field Space Name
+  A1 , \field Name
+       \ memo List of ZoneHVAC:SpaceDisribution objects for a given Zone.
+       \ memo There must be one space distribution object for each piece of equipment in the ZoneHVAC:EquipmentList (order does not matter).
+       \extensible:2
+       \required-field
+       \reference SpaceDistributionLists
+  A2 , \field Space Distribution 1 Object Type
+       \begin-extensible
+       \required-field
+       \type choice
+       \key ZoneHVAC:SpaceDistribution:AirFlow
+       \key ZoneHVAC:SpaceDistribution:NonAirFlow
+  A3 , \field Space Distribution 1 Name
        \required-field
        \type object-list
-       \object-list SpaceNames
-  A2 , \field Space Air Node Name
-       \required-field
-       \type node
-  A3 ; \field Space Air Inlet Node or NodeList Name
-       \type node
+       \object-list SpaceDistributionNames   
+```
+
+### ZoneHVAC:EquipmentConnections
+* *Add a new field to reference a ZoneHVAC:SpaceDistributionList object.*
+
+```
+ZoneHVAC:EquipmentConnections,
+
+  A9, \field Space Distribution List Name
+      \type object-list
+      \object-list SpaceDistributionLists
 ```
 
 ### ZoneRefrigerationDoorMixing
@@ -363,14 +342,14 @@ SpaceHVAC:EquipmentConnections,
 ### idf Example
 ```
 ZoneHVAC:EquipmentConnections,
-  Zone 1,                !- Zone Name
-  Zone 1 Eq,             !- Zone Conditioning Equipment List Name
-  Zone 1 In Node,        !- Zone Air Inlet Node or NodeList Name
-  ,                      !- Zone Air Exhaust Node or NodeList Name
-  Zone 1 Node,           !- Zone Air Node Name
-  Zone 1 Out Node;       !- Zone Return Air Node or NodeList Name
-  ,                      !- Zone Return Air Node 1 Flow Rate Fraction Schedule Name
-  ,                      !- Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name
+  Zone 1,                  !- Zone Name
+  Zone 1 Eq,               !- Zone Conditioning Equipment List Name
+  Zone 1 In Node,          !- Zone Air Inlet Node or NodeList Name
+  ,                        !- Zone Air Exhaust Node or NodeList Name
+  Zone 1 Node,             !- Zone Air Node Name
+  Zone 1 Out Node;         !- Zone Return Air Node or NodeList Name
+  ,                        !- Zone Return Air Node 1 Flow Rate Fraction Schedule Name
+  ,                        !- Zone Return Air Node 1 Flow Rate Basis Node or NodeList Name
   Zone 1 Space Distribution; !- Space Distribution List Name
   
 ZoneHVAC:EquipmentList,
@@ -392,46 +371,48 @@ ZoneHVAC:EquipmentList,
 ZoneHVAC:SpaceDistributionList,
   Zone 1 Space Distribution,  !- Name
   ZoneHVAC:SpaceDistribution:AirFlow, !- Space Distribution 1 Object Type
-  Zone 1 VAV Splitter,   !- Space Distribution 1 Object Name
+  Zone 1 VAV Splitter,     !- Space Distribution 1 Object Name
   ZoneHVAC:SpaceDistribution:NonAirFlow, !- Space Distribution 1 Object Type
   Zone 1 Baseboard Splitter; !- Space Distribution 2 Object Name
     
 SpaceHVAC:EquipmentConnections,
-  Space 1A, !-Space Name
-  Space 1A Node, !-Space Air Node Name
-  Space 1A VAV Supply Node; !-Space Air Inlet Node or NodeList Name
+  Space 1A,                !-Space Name
+  Space 1A VAV Supply Node, !-Space Air Inlet Node or NodeList Name
+  ,                        !-Space Air Exhanust Node or NodeList Name
+  Space 1A Node;           !-Space Air Node Name
 
 SpaceHVAC:EquipmentConnections,
-  Space 1B, !-Space Name
-  Space 1B Node, !-Space Air Node Name
-  Space 1B VAV Supply Node; !-Space Air Inlet Node or NodeList Name
-
+  Space 1B,                !-Space Name
+  Space 1B VAV Supply Node, !-Space Air Inlet Node or NodeList Name
+  ,                        !-Space Air Exhanust Node or NodeList Name
+  Space 1B Node;           !-Space Air Node Name
+ 
 ZoneHVAC:SpaceDistribution:AirFlow,
-   Zone 1 VAV Splitter, !-Name
+   Zone 1 VAV Splitter,    !-Name
    ZoneHVAC:AirDistributionUnit, !-Zone Equipment Object Type
-   Zone 1 VAV Box,      !-Zone Equipment Name
+   Zone 1 VAV Box,         !-Zone Equipment Name
    Zone 1 VAV Outlet Node, !-Zone Equipment Outlet Node Name
-   SingleSpace,         !-Thermostat Control Method
-   Space 1A,            !-Thermostat Space Name
-   DesignLoad,          !-Space Sizing Basis
-   Space 1A,            !-Space 1 Name
+   SingleSpace,            !-Thermostat Control Method
+   Space 1A,               !-Thermostat Space Name
+   DesignLoad,             !-Space Sizing Basis
+   Space 1A,               !-Space 1 Name
    Space 1A VAV Supply Node, !-Space 1 Supply Node Name
-   autosize,            !-Space 2 Maximum Air Flow Rate {m3/s}
-   Space 1B,            !-Space 2 Name
+   autosize,               !-Space 2 Maximum Air Flow Rate {m3/s}
+   Space 1B,               !-Space 2 Name
    Space 1B VAV Supply Node, !-Space 2 Supply Node Name
-   autosize;            !-Space 2 Maximum Air Flow Rate {m3/s}
+   autosize;               !-Space 2 Maximum Air Flow Rate {m3/s}
 
 ZoneHVAC:SpaceDistribution:NonAirFlow,
    Zone 1 Baseboard Splitter, !-Name
    ZoneHVAC:Baseboard:Convective:Electric, !-Zone Equipment Object Type
-   Zone 1 Baseboard,    !-Zone Equipment Name
-   SpaceAverage,        !-Thermostat Control Method
-   Space 1A,            !-Thermostat Space Name
-   PerimeterLength,     !-Space Sizing Basis
-   Space 1A,            !-Space 1 Name
-   autosize,            !-Space 1 Output Fraction
-   Space 1B,            !-Space 2 Name
-   autosize;            !-Space 2 Output Fraction
+   Zone 1 Baseboard,       !-Zone Equipment Name
+   SpaceAverage,           !-Thermostat Control Method
+   Space 1A,               !-Thermostat Space Name
+   PerimeterLength,        !-Space Sizing Basis
+   Space 1A,               !-Space 1 Name
+   autosize,               !-Space 1 Output Fraction
+   Space 1B,               !-Space 2 Name
+   autosize;               !-Space 2 Output Fraction
 ```
 
 
@@ -581,3 +562,28 @@ The main calculation flow for Zone sizing is:
          * It's possible that only `FinalZoneSizing` is needed at the zone level. But will need to search the code to see if any of the other zone sizing arrays might be accessed elsewhere outside of the zone sizing calcs.
          
 ### HVAC ###
+
+The main calculation flow for Zone and Space HVAC in `HVACManager:ManageHVAC` is as follows, with notes about changes required for Space-HVAC.
+
+* `ZoneTempPredictorCorrector::ManageZoneAirUpdates(... GetZoneSetPoints)`
+    * `CalcZoneAirTempSetPoints`
+       * Add Space-level thermostats
+* `ZoneTempPredictorCorrector::ManageZoneAirUpdates(... PredictStep)`
+    * `PredictSystemLoads`
+       * Add Space-level thermostats.
+       * Space-level predicted loads are already implemented.
+       * Some "TODO: For Now" comments need to be replaced with full Space-level assignments
+* `SimHVAC`
+    * `SetPointManager::ManageSetPoints(state);`
+    * `SimSelectedEquipment`
+        * `SimAirServingZones::ManageAirLoops`
+        * `ZoneEquipmentManager::ManageZoneEquipment`
+            * Add functions here to distribute zone-level airflows and non-air HVAC equipment output to Spaces
+        * `PlantManager::ManagePlantLoops`
+* `ZoneTempPredictorCorrector::ManageZoneAirUpdates(... CorrectStep)`
+    * `correctZoneAirTemps`
+       * Space-level corrections for air temps and humidity are already implemented.
+       * Some "TODO: For Now" comments need to be replaced with full Space-level assignments
+
+
+
