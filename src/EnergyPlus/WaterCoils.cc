@@ -5923,7 +5923,6 @@ Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
     Real64 MaxWaterFlowRate; // returned max water flow rate of matched coil
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
 
     // Obtains and Allocates WaterCoil related parameters from input file
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
@@ -5931,7 +5930,7 @@ Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    WhichCoil = 0;
+    int WhichCoil = 0;
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
         WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
@@ -6026,7 +6025,6 @@ int GetCoilOutletNode(EnergyPlusData &state,
     int NodeNumber; // returned node number of matched coil
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -6034,7 +6032,7 @@ int GetCoilOutletNode(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    WhichCoil = 0;
+    int WhichCoil = 0;
     NodeNumber = 0;
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
@@ -6079,7 +6077,6 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
     int NodeNumber; // returned node number of matched coil
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -6088,7 +6085,7 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
     }
 
     NodeNumber = 0;
-    WhichCoil = 0;
+    int WhichCoil = 0;
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
         WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
@@ -6179,7 +6176,6 @@ void SetCoilDesFlow(EnergyPlusData &state,
     // an input parameter and it is needed for calculating capacity for output reporting.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil; // index to coil
 
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
         GetWaterCoilInput(state);
@@ -6188,7 +6184,7 @@ void SetCoilDesFlow(EnergyPlusData &state,
 
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+        int WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             if (state.dataWaterCoils->WaterCoil(WhichCoil).DesAirVolFlowRate <= 0.0) {
                 state.dataWaterCoils->WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
@@ -6221,7 +6217,6 @@ Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state,
     // an input parameter and it is needed for calculating capacity for output reporting.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil; // index to coil
     Real64 CoilDesAirFlow;
 
     CoilDesAirFlow = 0.0;
@@ -6232,7 +6227,7 @@ Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state,
     }
 
     if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+        int WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             CoilDesAirFlow = state.dataWaterCoils->WaterCoil(WhichCoil).DesAirVolFlowRate;
         } else {
@@ -6265,8 +6260,6 @@ void CheckActuatorNode(EnergyPlusData &state,
     // the water inlet node number of some water coil
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
-    int CoilNum;
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -6274,14 +6267,13 @@ void CheckActuatorNode(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    WhichCoil = 0;
     WaterCoilType = DataPlant::PlantEquipmentType::Invalid;
     NodeNotFound = true;
-    for (CoilNum = 1; CoilNum <= state.dataWaterCoils->NumWaterCoils; ++CoilNum) {
+    for (int CoilNum = 1; CoilNum <= state.dataWaterCoils->NumWaterCoils; ++CoilNum) {
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum == ActuatorNodeNum) {
-            WhichCoil = CoilNum;
             WaterCoilType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType;
             NodeNotFound = false;
+            break;
         }
     }
 }
@@ -6312,10 +6304,6 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("CheckForSensorAndSetpointNode: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;             // water coil index
-    int CoilNum;               // counter
-    std::string WaterCoilType; // water coil type
-    bool EMSSetPointErrorFlag; // flag true is EMS is used to set node setpoints
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -6323,10 +6311,10 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    WhichCoil = 0;
+    int WhichCoil = 0;
     NodeNotFound = true;
 
-    for (CoilNum = 1; CoilNum <= state.dataWaterCoils->NumWaterCoils; ++CoilNum) {
+    for (int CoilNum = 1; CoilNum <= state.dataWaterCoils->NumWaterCoils; ++CoilNum) {
         if (SensorNodeNum != state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) continue;
         NodeNotFound = false;
         WhichCoil = CoilNum;
@@ -6336,14 +6324,15 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
     // a setpoint is also specified on the water coil outlet node
     if (!NodeNotFound) {
         if (WhichCoil > 0) {
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
+            std::string WaterCoilType; // water coil type
+            if (state.dataWaterCoils->WaterCoil(WhichCoil).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
                 WaterCoilType = "Coil:Cooling:Water:DetailedGeometry";
-            } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
+            } else if (state.dataWaterCoils->WaterCoil(WhichCoil).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                 WaterCoilType = "Coil:Cooling:Water";
-            } else if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
+            } else if (state.dataWaterCoils->WaterCoil(WhichCoil).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
                 WaterCoilType = "Coil:Heating:Water";
             }
-            EMSSetPointErrorFlag = false;
+            bool EMSSetPointErrorFlag = false;
             switch (ControlledVar) {
             case HVACControllers::CtrlVarType::Temperature: {
                 CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::TemperatureSetPoint, EMSSetPointErrorFlag);
