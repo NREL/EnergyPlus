@@ -1118,7 +1118,7 @@ namespace VariableSpeedCoils {
                                           RoutineName,                                                                             // Routine name
                                           CurrentModuleObject,                                                                     // Object Type
                                           state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                              // Object Name
-                                          cAlphaFields(7));                                                                       // Field Name
+                                          cAlphaFields(7));                                                                        // Field Name
             }
 
             // Get Water System tank connections
@@ -2118,7 +2118,7 @@ namespace VariableSpeedCoils {
                                           RoutineName,                                                                             // Routine name
                                           CurrentModuleObject,                                                                     // Object Type
                                           state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                              // Object Name
-                                          cAlphaFields(6));                                                                       // Field Name
+                                          cAlphaFields(6));                                                                        // Field Name
             }
 
             if (UtilityRoutines::SameString(AlphArray(7), "ReverseCycle")) {
@@ -2715,7 +2715,7 @@ namespace VariableSpeedCoils {
                                           RoutineName,                                                                             // Routine name
                                           CurrentModuleObject,                                                                     // Object Type
                                           state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,                              // Object Name
-                                          cAlphaFields(9));                                                                       // Field Name
+                                          cAlphaFields(9));                                                                        // Field Name
             }
 
             if (UtilityRoutines::SameString(AlphArray(10), "DryBulbTemperature")) {
@@ -6824,9 +6824,10 @@ namespace VariableSpeedCoils {
             if (state.dataEnvrn->OutDryBulbTemp < state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
                 CrankcaseHeatingPower = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity;
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex > 0) {
-                    CrankcaseHeatingPower *= Curve::CurveValue(state,
-                                                              state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
-                                                              state.dataEnvrn->OutDryBulbTemp);
+                    CrankcaseHeatingPower *=
+                        Curve::CurveValue(state,
+                                          state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacityCurveIndex,
+                                          state.dataEnvrn->OutDryBulbTemp);
                 }
             };
         }

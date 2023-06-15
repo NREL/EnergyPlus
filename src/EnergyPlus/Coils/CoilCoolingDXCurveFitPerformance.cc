@@ -179,7 +179,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
             input_specs.unit_internal_static_air_pressure = state.dataIPShortCut->rNumericArgs(4);
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-          input_specs.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name = state.dataIPShortCut->cAlphaArgs(2);
+            input_specs.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name = state.dataIPShortCut->cAlphaArgs(2);
         }
         input_specs.capacity_control = state.dataIPShortCut->cAlphaArgs(3);
         input_specs.basin_heater_capacity = state.dataIPShortCut->rNumericArgs(5);
