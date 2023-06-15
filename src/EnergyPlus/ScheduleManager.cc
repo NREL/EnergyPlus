@@ -3699,7 +3699,7 @@ namespace ScheduleManager {
     {
         auto &sched = state.dataScheduleMgr->Schedule(SchedNum);
         if (sched.MaxMinSet) return;
-        
+
         if (state.dataScheduleMgr->CheckScheduleValueMinMaxRunOnceOnly) {
             for (int Loop = 0; Loop <= state.dataScheduleMgr->NumDaySchedules; ++Loop) {
                 auto &daySched = state.dataScheduleMgr->DaySchedule(Loop);
@@ -3730,7 +3730,7 @@ namespace ScheduleManager {
         sched.MinValue = MinValue;
         sched.MaxValue = MaxValue;
     }
-        
+
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const ScheduleIndex,    // Which Schedule being tested
                                   bool const includeOrEquals, // Minimum indicator ('>', '>=')
@@ -3783,11 +3783,11 @@ namespace ScheduleManager {
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const schedNum,      // Which Schedule being tested
+                                  int const schedNum,         // Which Schedule being tested
                                   std::string_view MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum,         // Minimum desired value
+                                  Real64 const Minimum,       // Minimum desired value
                                   std::string_view MaxString, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum)          // Maximum desired value
+                                  Real64 const Maximum)       // Maximum desired value
     {
         Clusive clusiveMin = (MinString == ">=") ? Clusive::Inclusive : ((MinString == ">") ? Clusive::Exclusive : Clusive::Invalid);
         Clusive clusiveMax = (MaxString == "<=") ? Clusive::Inclusive : ((MaxString == "<") ? Clusive::Exclusive : Clusive::Invalid);
@@ -3799,11 +3799,11 @@ namespace ScheduleManager {
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const schedNum,      // Which Schedule being tested
-                                  Clusive clusiveMin,            // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum,         // Minimum desired value
-                                  Clusive clusiveMax,            // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum          // Maximum desired value
+                                  int const schedNum,   // Which Schedule being tested
+                                  Clusive clusiveMin,   // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum, // Minimum desired value
+                                  Clusive clusiveMax,   // Maximum indicator ('<', ',=')
+                                  Real64 const Maximum  // Maximum desired value
     )
     {
         // FUNCTION INFORMATION:
@@ -3845,7 +3845,7 @@ namespace ScheduleManager {
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const schedNum,      // Which Schedule being tested
+                                  int const schedNum,           // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum          // Minimum desired value
     )
@@ -3882,7 +3882,7 @@ namespace ScheduleManager {
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const schedNum,      // Which Schedule being tested
+                                  int const schedNum,           // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')

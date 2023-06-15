@@ -1660,5 +1660,5 @@ void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, s
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state, format("{} = {}, invalid key", fieldName, fieldVal));
 }
-        
+
 } // namespace EnergyPlus

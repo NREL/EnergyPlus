@@ -1296,15 +1296,16 @@ namespace DataSurfaces {
     };
 
     // Surface interior convection
-    struct SurfIntConv {
+    struct SurfIntConv
+    {
 
         // convection class determined by surface orientation,
         // heating/cooling system, and temperature regime
-        Convect::IntConvClass convClass = Convect::IntConvClass::Invalid; 
+        Convect::IntConvClass convClass = Convect::IntConvClass::Invalid;
         int convClassRpt = (int)Convect::IntConvClass::Invalid;
 
         Convect::HcInt model = Convect::HcInt::SetByZone; // convection model
-        int userModelNum = 0; // user defined convection model
+        int userModelNum = 0;                             // user defined convection model
 
         Convect::HcInt hcModelEq = Convect::HcInt::Invalid; // current convection model
         int hcModelEqRpt = (int)Convect::HcInt::Invalid;
@@ -1320,23 +1321,24 @@ namespace DataSurfaces {
         bool hasActiveInIt = false;
     };
 
-    // Surface exterior convection 
-    struct SurfExtConv {
+    // Surface exterior convection
+    struct SurfExtConv
+    {
         // current classification for outside face wind regime and convection orientation
-        Convect::ExtConvClass convClass = Convect::ExtConvClass::Invalid; 
+        Convect::ExtConvClass convClass = Convect::ExtConvClass::Invalid;
         int convClassRpt = (int)Convect::ExtConvClass::Invalid;
 
         Convect::HcExt model = Convect::HcExt::SetByZone; // conveciton model
-        int userModelNum = 0; 
-           
+        int userModelNum = 0;
+
         Convect::HcExt hfModelEq = Convect::HcExt::Invalid; // Current forced convection model
-        int hfModelEqRpt = (int)Convect::HcExt::Invalid;  
+        int hfModelEqRpt = (int)Convect::HcExt::Invalid;
         int hfUserCurveNum = 0;
-            
+
         Convect::HcExt hnModelEq = Convect::HcExt::Invalid; // Current natural convection model
         int hnModelEqRpt = (int)Convect::HcExt::Invalid;
         int hnUserCurveNum = 0;
-            
+
         Real64 faceArea = 0.0; // Geometry parameters
         Real64 facePerimeter = 0.0;
         Real64 faceHeight = 0.0;
@@ -1513,7 +1515,7 @@ struct SurfacesData : BaseGlobalStruct
 
     EPVector<DataSurfaces::SurfIntConv> surfIntConv;
     EPVector<DataSurfaces::SurfExtConv> surfExtConv;
-        
+
     // Surface Window Heat Balance
     Array1D_int SurfWinInsideGlassCondensationFlag;   // 1 if innermost glass inside surface temp < zone air dew point;  0 otherwise
     Array1D_int SurfWinInsideFrameCondensationFlag;   // 1 if frame inside surface temp < zone air dew point; 0 otherwise

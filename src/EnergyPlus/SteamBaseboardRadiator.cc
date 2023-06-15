@@ -755,8 +755,8 @@ namespace SteamBaseboardRadiator {
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
                 }
                 if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->surfIntConv(
-                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum)).getsRadiantHeat = true;
+                    state.dataSurface->surfIntConv(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum))
+                        .getsRadiantHeat = true;
                 }
 
                 AllFracsSummed += state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);

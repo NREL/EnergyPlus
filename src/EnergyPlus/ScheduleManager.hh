@@ -280,21 +280,21 @@ namespace ScheduleManager {
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
+                                  int const ScheduleIndex,    // Which Schedule being tested
                                   std::string_view MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum,         // Minimum desired value
+                                  Real64 const Minimum,       // Minimum desired value
                                   std::string_view MaxString, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum          // Maximum desired value
+                                  Real64 const Maximum        // Maximum desired value
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
-                                  Clusive clusiveMin,            // true ? '>' : '>='
-                                  Real64 const Minimum,         // Minimum desired value
-                                  Clusive clusiveMax,            // true ? '<' : '<='
-                                  Real64 const Maximum          // Maximum desired value
+                                  int const ScheduleIndex, // Which Schedule being tested
+                                  Clusive clusiveMin,      // true ? '>' : '>='
+                                  Real64 const Minimum,    // Minimum desired value
+                                  Clusive clusiveMax,      // true ? '<' : '<='
+                                  Real64 const Maximum     // Maximum desired value
     );
-        
+
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')

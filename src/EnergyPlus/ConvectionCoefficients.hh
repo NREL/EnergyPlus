@@ -320,12 +320,12 @@ namespace Convect {
     );
 
     Real64 CalcNusselt(EnergyPlusData &state,
-                     int SurfNum, // Surface number
-                     Real64 asp,  // Aspect ratio: window height to gap width
-                     Real64 tso,  // Temperature of gap surface closest to outside (K)
-                     Real64 tsi,  // Temperature of gap surface closest to zone (K)
-                     Real64 gr,   // Gap gas Grashof number
-                     Real64 pr    // Gap gas Prandtl number
+                       int SurfNum, // Surface number
+                       Real64 asp,  // Aspect ratio: window height to gap width
+                       Real64 tso,  // Temperature of gap surface closest to outside (K)
+                       Real64 tsi,  // Temperature of gap surface closest to zone (K)
+                       Real64 gr,   // Gap gas Grashof number
+                       Real64 pr    // Gap gas Prandtl number
     );
 
     Real64 SetExtConvCoeff(EnergyPlusData &state, int SurfNum); // Surface Number
@@ -372,18 +372,16 @@ namespace Convect {
 
     Real64 CalcUserDefinedExtHcModel(EnergyPlusData &state, int SurfNum, int UserCurveNum);
 
-
-
     void ShowWarningHydraulicDiameterZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
-        
+
     void ShowWarningDeltaTempZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
-        
+
     void ShowWarningWindowLocation(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh, IntConvWinLoc winLoc);
 
     void ShowWarningPerimeterLengthZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
 
     void ShowWarningFaceAreaZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
-        
+
     //** Begin catalog of Hc equation functions. **** !*************************************************
 
     inline Real64 CalcASHRAEVerticalWall(Real64 const DeltaTemp) // [C] temperature difference between surface and air
@@ -739,15 +737,21 @@ namespace Convect {
 
     SurfOrientation GetSurfConvOrientation(Real64 const Tilt);
 
+    void ShowSevereValueOutOfRange(EnergyPlusData &state,
+                                   ErrorObjectHeader const &eoh,
+                                   std::string_view fieldName,
+                                   Real64 fieldVal,
+                                   Real64 lo,
+                                   Real64 hi,
+                                   std::string const &msg);
 
-    void ShowSevereValueOutOfRange(EnergyPlusData &state, ErrorObjectHeader const &eoh,
-                                   std::string_view fieldName, Real64 fieldVal,
-                                   Real64 lo, Real64 hi, std::string const &msg);
-
-    void ShowSevereScheduleOutOfRange(EnergyPlusData &state, ErrorObjectHeader const &eoh,
-                                      std::string_view fieldName, std::string_view fieldVal,
-                                      Real64 lo, Real64 hi, std::string const &msg);
-        
+    void ShowSevereScheduleOutOfRange(EnergyPlusData &state,
+                                      ErrorObjectHeader const &eoh,
+                                      std::string_view fieldName,
+                                      std::string_view fieldVal,
+                                      Real64 lo,
+                                      Real64 hi,
+                                      std::string const &msg);
 
 } // namespace Convect
 
