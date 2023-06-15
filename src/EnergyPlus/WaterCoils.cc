@@ -2453,12 +2453,10 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 bPRINT = false;       // do not print this sizing request since this coil does not have a design inlet air temp input field (we
                                       // should print this!)
                 TempSize = AutoSize;  // not an input for this model
-                SizingString.clear(); // doesn't matter
             } else {
                 FieldNum = 4; //  N4 , \field Design Inlet Air Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp; // preserve input if entered
-                SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [C]";
             }
 
             CoolingWaterDesAirInletTempSizer sizerCWDesInletAirTemp;
@@ -2469,12 +2467,10 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 bPRINT = false;       // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize;  // coil report
-                SizingString.clear(); // doesn't matter
             } else {
                 FieldNum = 3; //  N3 , \field Design Inlet Water Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp; // preserve input if entered
-                SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [C]";
             }
             CoolingWaterDesWaterInletTempSizer sizerCWDesWaterInTemp;
             sizerCWDesWaterInTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
@@ -2506,12 +2502,10 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
                 bPRINT = false;       // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize;  // coil report
-                SizingString.clear(); // doesn't matter
             } else {
                 FieldNum = 5; //  N5 , \field Design Outlet Air Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp; // preserve input if entered
-                SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [C]";
             }
 
             state.dataSize->DataDesInletWaterTemp = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp; // used for warning messages
@@ -2930,7 +2924,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 sizerHWDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = sizerHWDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
-                TempSize = AutoSize; // these data are initially 0, set to autosize to receive a result from Sizers
                 HeatingWaterDesAirInletHumRatSizer sizerHWAirInletHumRat;
                 sizerHWAirInletHumRat.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat = sizerHWAirInletHumRat.size(state, DataSizing::AutoSize, ErrorsFound);
