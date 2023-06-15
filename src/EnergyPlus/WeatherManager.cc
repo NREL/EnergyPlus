@@ -3638,13 +3638,10 @@ namespace Weather {
         }
 
         // verify that design WB or DP <= design DB
-        if (designDayInput.HumIndType == DDHumIndType::DewPoint &&
-            designDayInput.DewPointNeedsSet) {
+        if (designDayInput.HumIndType == DDHumIndType::DewPoint && designDayInput.DewPointNeedsSet) {
             // dew-point
-            Real64 testval = Psychrometrics::PsyWFnTdbRhPb(
-                state, designDayInput.MaxDryBulb, 1.0, designDayInput.PressBarom);
-            designDayInput.HumIndValue =
-                Psychrometrics::PsyTdpFnWPb(state, testval, designDayInput.PressBarom);
+            Real64 testval = Psychrometrics::PsyWFnTdbRhPb(state, designDayInput.MaxDryBulb, 1.0, designDayInput.PressBarom);
+            designDayInput.HumIndValue = Psychrometrics::PsyTdpFnWPb(state, testval, designDayInput.PressBarom);
         }
 
         // Day of week defaults to Monday, if day type specified, then that is used.
@@ -3767,34 +3764,34 @@ namespace Weather {
         bool ConstantHumidityRatio;
 
         switch (designDayInput.HumIndType) {
-        case DDHumIndType::WetBulb:
+        case DDHumIndType::WetBulb: {
             HumidityRatio = Psychrometrics::PsyWFnTdbTwbPb(state,
                                                            designDayInput.MaxDryBulb,
                                                            designDayInput.HumIndValue,
                                                            designDayInput.PressBarom,
                                                            RoutineNamePsyWFnTdbTwbPb);
             ConstantHumidityRatio = true;
-            break;
-        case DDHumIndType::DewPoint:
+        } break;
+        case DDHumIndType::DewPoint: {
             HumidityRatio = Psychrometrics::PsyWFnTdpPb(state,
                                                         designDayInput.HumIndValue,
                                                         designDayInput.PressBarom,
                                                         RoutineNamePsyWFnTdpPb);
             ConstantHumidityRatio = true;
-            break;
-        case DDHumIndType::HumRatio:
+        } break;
+        case DDHumIndType::HumRatio: {
             HumidityRatio = designDayInput.HumIndValue;
             ConstantHumidityRatio = true;
-            break;
-        case DDHumIndType::Enthalpy:
+        } break;
+        case DDHumIndType::Enthalpy: {
             // HumIndValue is already in J/kg, so no conversions needed
             HumidityRatio = Psychrometrics::PsyWFnTdbH(state,
                                                        designDayInput.MaxDryBulb,
                                                        designDayInput.HumIndValue,
                                                        RoutineNamePsyWFnTdbH);
             ConstantHumidityRatio = true;
-            break;
-        case DDHumIndType::RelHumSch:
+        } break;
+        case DDHumIndType::RelHumSch: {
             // nothing to do -- DDHumIndModifier already contains the scheduled Relative Humidity
             ConstantHumidityRatio = false;
             for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
@@ -3802,17 +3799,17 @@ namespace Weather {
                     state.dataWeather->tomorrow(iTS, iHr).OutRelHum = state.dataWeather->DDHumIndModifier(iTS, iHr, EnvrnNum);
                 }
             }
-            break;
+        } break;
         case DDHumIndType::WBProfDef:
         case DDHumIndType::WBProfDif:
-        case DDHumIndType::WBProfMul:
+        case DDHumIndType::WBProfMul: {
             ConstantHumidityRatio = false;
-            break;
-        default:
+        } break;
+        default: {
             ShowSevereError(state, "SetUpDesignDay: Invalid Humidity Indicator type");
             ShowContinueError(state, format("Occurred in Design Day={}", designDayInput.Title));
-            break;
-        }
+        } break;
+        } // switch
 
         int OSky; // Opaque Sky Cover (tenths)
         if (designDayInput.RainInd != 0) {
@@ -3889,13 +3886,7 @@ namespace Weather {
                         OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(state, tomorrowTS.OutDryBulbTemp, WetBulb, designDayInput.PressBarom);
                     }
                     tomorrowTS.OutDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, OutHumRat, designDayInput.PressBarom);
-                    tomorrowTS.OutRelHum =
-                        Psychrometrics::PsyRhFnTdbWPb(state,
-                                                      tomorrowTS.OutDryBulbTemp,
-                                                      OutHumRat,
-                                                      designDayInput.PressBarom,
-                                                      WeatherManager) *
-                        100.0;
+                    tomorrowTS.OutRelHum = Psychrometrics::PsyRhFnTdbWPb(state, tomorrowTS.OutDryBulbTemp, OutHumRat, designDayInput.PressBarom, WeatherManager) * 100.0;
                 } else {
                     HumidityRatio = Psychrometrics::PsyWFnTdbRhPb(state,
                                                                   tomorrowTS.OutDryBulbTemp,
@@ -3914,12 +3905,7 @@ namespace Weather {
 
                 double DryBulb = tomorrowTS.OutDryBulbTemp;
                 double RelHum = tomorrowTS.OutRelHum * 0.01;
-                Real64 ESky = CalcSkyEmissivity(state,
-                                                envCurr.skyTempModel,
-                                                OSky,
-                                                DryBulb,
-                                                tomorrowTS.OutDewPointTemp,
-                                                RelHum); // Emissivitity of Sky
+                Real64 ESky = CalcSkyEmissivity(state, envCurr.skyTempModel, OSky, DryBulb, tomorrowTS.OutDewPointTemp, RelHum); // Emissivitity of Sky
                 tomorrowTS.HorizIRSky = ESky * Constant::StefanBoltzmann * pow_4(DryBulb + Constant::KelvinConv);
 
                 if (envCurr.skyTempModel == SkyTempModel::Brunt ||
@@ -4063,19 +4049,13 @@ namespace Weather {
             switch (state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).skyTempModel) {
             case SkyTempModel::ScheduleValue: {
                 Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
-                ScheduleManager::GetSingleDayScheduleValues(
-                    state,
-                    state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).SchedulePtr,
-                    tmp);
+                ScheduleManager::GetSingleDayScheduleValues(state, state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).SchedulePtr, tmp);
                 ForAllHrTs(state, [&state, &tmp, EnvrnNum](int iHr, int iTS) {
                                 state.dataWeather->tomorrow(iTS, iHr).SkyTemp = state.dataWeather->DDSkyTempScheduleValues(iTS, iHr, EnvrnNum) = tmp(iTS, iHr); });
             } break;
             case SkyTempModel::DryBulbDelta: {
                 Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
-                ScheduleManager::GetSingleDayScheduleValues(
-                    state,
-                    state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).SchedulePtr,
-                    tmp);
+                ScheduleManager::GetSingleDayScheduleValues(state, state.dataWeather->WPSkyTemperature(envCurr.WP_Type1).SchedulePtr, tmp);
                 for (int hour = 1; hour <= 24; ++hour) {
                     for (int ts = 1; ts <= state.dataGlobal->NumOfTimeStepInHour; ++ts) {
                         state.dataWeather->DDSkyTempScheduleValues(ts, hour, EnvrnNum) = tmp(ts, hour);
@@ -5200,7 +5180,8 @@ namespace Weather {
             // Loop = RP + Ptr;
             // Note JM 2018-11-20: IDD allows blank name, but input processor will create a name such as "RUNPERIOD 1" anyways
             // which is fine for our reporting below
-            state.dataWeather->RunPeriodInput(i).title = ipsc->cAlphaArgs(1);
+            auto &runPeriodInput = state.dataWeather->RunPeriodInput(i);
+            runPeriodInput.title = ipsc->cAlphaArgs(1);
 
             // set the start and end day of month from user input
             // N1 , \field Begin Month
@@ -5209,47 +5190,47 @@ namespace Weather {
             // N4 , \field End Month
             // N5 , \field End Day of Month
             // N6,  \field End Year
-            state.dataWeather->RunPeriodInput(i).startMonth = int(ipsc->rNumericArgs(1));
-            state.dataWeather->RunPeriodInput(i).startDay = int(ipsc->rNumericArgs(2));
-            state.dataWeather->RunPeriodInput(i).startYear = int(ipsc->rNumericArgs(3));
-            state.dataWeather->RunPeriodInput(i).endMonth = int(ipsc->rNumericArgs(4));
-            state.dataWeather->RunPeriodInput(i).endDay = int(ipsc->rNumericArgs(5));
-            state.dataWeather->RunPeriodInput(i).endYear = int(ipsc->rNumericArgs(6));
-            state.dataWeather->RunPeriodInput(i).TreatYearsAsConsecutive = true;
+            runPeriodInput.startMonth = int(ipsc->rNumericArgs(1));
+            runPeriodInput.startDay = int(ipsc->rNumericArgs(2));
+            runPeriodInput.startYear = int(ipsc->rNumericArgs(3));
+            runPeriodInput.endMonth = int(ipsc->rNumericArgs(4));
+            runPeriodInput.endDay = int(ipsc->rNumericArgs(5));
+            runPeriodInput.endYear = int(ipsc->rNumericArgs(6));
+            runPeriodInput.TreatYearsAsConsecutive = true;
 
             if (state.dataSysVars->FullAnnualRun && i == 1) {
-                state.dataWeather->RunPeriodInput(i).startMonth = 1;
-                state.dataWeather->RunPeriodInput(i).startDay = 1;
-                state.dataWeather->RunPeriodInput(i).endMonth = 12;
-                state.dataWeather->RunPeriodInput(i).endDay = 31;
+                runPeriodInput.startMonth = 1;
+                runPeriodInput.startDay = 1;
+                runPeriodInput.endMonth = 12;
+                runPeriodInput.endDay = 31;
             }
 
             // Validate year inputs
-            if (state.dataWeather->RunPeriodInput(i).startYear == 0) {
-                if (state.dataWeather->RunPeriodInput(i).endYear != 0) { // Have to have an input start year to input an end year
+            if (runPeriodInput.startYear == 0) {
+                if (runPeriodInput.endYear != 0) { // Have to have an input start year to input an end year
                     ShowSevereError(state,
                                     format("{}: object={}, end year cannot be specified if the start year is not.",
                                            ipsc->cCurrentModuleObject,
-                                           state.dataWeather->RunPeriodInput(i).title));
+                                           runPeriodInput.title));
                     ErrorsFound = true;
                 }
-            } else if (state.dataWeather->RunPeriodInput(i).startYear < 1583) { // Bail on the proleptic Gregorian calendar
+            } else if (runPeriodInput.startYear < 1583) { // Bail on the proleptic Gregorian calendar
                 ShowSevereError(state,
                                 format("{}: object={}, start year ({}) is too early, please choose a date after 1582.",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
-                                       state.dataWeather->RunPeriodInput(i).startYear));
+                                       runPeriodInput.title,
+                                       runPeriodInput.startYear));
                 ErrorsFound = true;
             }
 
-            if (state.dataWeather->RunPeriodInput(i).endYear != 0 &&
-                state.dataWeather->RunPeriodInput(i).startYear > state.dataWeather->RunPeriodInput(i).endYear) {
+            if (runPeriodInput.endYear != 0 &&
+                runPeriodInput.startYear > runPeriodInput.endYear) {
                 ShowSevereError(state,
                                 format("{}: object={}, start year ({}) is after the end year ({}).",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
-                                       state.dataWeather->RunPeriodInput(i).startYear,
-                                       state.dataWeather->RunPeriodInput(i).endYear));
+                                       runPeriodInput.title,
+                                       runPeriodInput.startYear,
+                                       runPeriodInput.endYear));
                 ErrorsFound = true;
             }
 
@@ -5261,296 +5242,297 @@ namespace Weather {
                     ShowWarningError(state,
                                      format("{}: object={}{} invalid (Day of Week) [{}] for Start is not valid, Sunday will be used.",
                                             ipsc->cCurrentModuleObject,
-                                            state.dataWeather->RunPeriodInput(i).title,
+                                            runPeriodInput.title,
                                             ipsc->cAlphaFieldNames(2),
                                             ipsc->cAlphaArgs(2)));
-                    state.dataWeather->RunPeriodInput(i).startWeekDay = ScheduleManager::DayType::Sunday;
+                    runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
                 } else {
-                    state.dataWeather->RunPeriodInput(i).startWeekDay = static_cast<ScheduleManager::DayType>(dayType);
+                    runPeriodInput.startWeekDay = static_cast<ScheduleManager::DayType>(dayType);
                     inputWeekday = true;
                 }
             } else { // No input, set the default as Sunday. This may get overriden below
-                state.dataWeather->RunPeriodInput(i).startWeekDay = ScheduleManager::DayType::Sunday;
+                runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
             }
 
             // Validate the dates now that the weekday field has been looked at
-            if (state.dataWeather->RunPeriodInput(i).startMonth == 2 && state.dataWeather->RunPeriodInput(i).startDay == 29) {
+            if (runPeriodInput.startMonth == 2 && runPeriodInput.startDay == 29) {
                 // Requested start date is a leap year
-                if (state.dataWeather->RunPeriodInput(i).startYear == 0) { // No input starting year
+                if (runPeriodInput.startYear == 0) { // No input starting year
                     if (inputWeekday) {
-                        state.dataWeather->RunPeriodInput(i).startYear =
-                            findLeapYearForWeekday(state.dataWeather->RunPeriodInput(i).startMonth,
-                                                   state.dataWeather->RunPeriodInput(i).startDay,
-                                                   state.dataWeather->RunPeriodInput(i).startWeekDay);
+                        runPeriodInput.startYear =
+                            findLeapYearForWeekday(runPeriodInput.startMonth,
+                                                   runPeriodInput.startDay,
+                                                   runPeriodInput.startWeekDay);
                     } else {
                         // 2012 is the default year, 1/1 is a Sunday
-                        state.dataWeather->RunPeriodInput(i).startYear = 2012;
-                        state.dataWeather->RunPeriodInput(i).startWeekDay =
+                        runPeriodInput.startYear = 2012;
+                        runPeriodInput.startWeekDay =
                             calculateDayOfWeek(state,
-                                               state.dataWeather->RunPeriodInput(i).startYear,
-                                               state.dataWeather->RunPeriodInput(i).startMonth,
-                                               state.dataWeather->RunPeriodInput(i).startDay);
+                                               runPeriodInput.startYear,
+                                               runPeriodInput.startMonth,
+                                               runPeriodInput.startDay);
                     }
                 } else {                                                                      // Have an input start year
-                    if (!isLeapYear(state.dataWeather->RunPeriodInput(i).startYear)) { // Start year is not a leap year
+                    if (!isLeapYear(runPeriodInput.startYear)) { // Start year is not a leap year
                         ShowSevereError(state,
                                         format("{}: object={}, start year ({}) is not a leap year but the requested start date is 2/29.",
                                                ipsc->cCurrentModuleObject,
-                                               state.dataWeather->RunPeriodInput(i).title,
-                                               state.dataWeather->RunPeriodInput(i).startYear));
+                                               runPeriodInput.title,
+                                               runPeriodInput.startYear));
                         ErrorsFound = true;
                     } else { // Start year is a leap year
                         ScheduleManager::DayType weekday = calculateDayOfWeek(state,
-                                                                              state.dataWeather->RunPeriodInput(i).startYear,
-                                                                              state.dataWeather->RunPeriodInput(i).startMonth,
-                                                                              state.dataWeather->RunPeriodInput(i).startDay);
+                                                                              runPeriodInput.startYear,
+                                                                              runPeriodInput.startMonth,
+                                                                              runPeriodInput.startDay);
                         if (inputWeekday) { // Check for correctness of input
-                            if (weekday != state.dataWeather->RunPeriodInput(i).startWeekDay) {
+                            if (weekday != runPeriodInput.startWeekDay) {
                                 ShowWarningError(state,
                                                  format("{}: object={}, start weekday ({}) does not match the start year ({}), corrected to {}.",
                                                         ipsc->cCurrentModuleObject,
-                                                        state.dataWeather->RunPeriodInput(i).title,
+                                                        runPeriodInput.title,
                                                         ipsc->cAlphaArgs(2),
-                                                        state.dataWeather->RunPeriodInput(i).startYear,
+                                                        runPeriodInput.startYear,
                                                         ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday)]));
-                                state.dataWeather->RunPeriodInput(i).startWeekDay = weekday;
+                                runPeriodInput.startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
-                            state.dataWeather->RunPeriodInput(i).startWeekDay = weekday;
+                            runPeriodInput.startWeekDay = weekday;
                         }
                     }
                 }
             } else {
                 // Non leap-day start date
-                if (!validMonthDay(state.dataWeather->RunPeriodInput(i).startMonth, state.dataWeather->RunPeriodInput(i).startDay)) {
+                if (!validMonthDay(runPeriodInput.startMonth, runPeriodInput.startDay)) {
                     ShowSevereError(state,
                                     format("{}: object={}, Invalid input start month/day ({}/{})",
                                            ipsc->cCurrentModuleObject,
-                                           state.dataWeather->RunPeriodInput(i).title,
-                                           state.dataWeather->RunPeriodInput(i).startMonth,
-                                           state.dataWeather->RunPeriodInput(i).startDay));
+                                           runPeriodInput.title,
+                                           runPeriodInput.startMonth,
+                                           runPeriodInput.startDay));
                     ErrorsFound = true;
                 } else {                                                              // Month/day is valid
-                    if (state.dataWeather->RunPeriodInput(i).startYear == 0) { // No input starting year
+                    if (runPeriodInput.startYear == 0) { // No input starting year
                         if (inputWeekday) {
-                            state.dataWeather->RunPeriodInput(i).startYear =
-                                findYearForWeekday(state.dataWeather->RunPeriodInput(i).startMonth,
-                                                   state.dataWeather->RunPeriodInput(i).startDay,
-                                                   state.dataWeather->RunPeriodInput(i).startWeekDay);
+                            runPeriodInput.startYear =
+                                findYearForWeekday(runPeriodInput.startMonth,
+                                                   runPeriodInput.startDay,
+                                                   runPeriodInput.startWeekDay);
                         } else {
                             // 2017 is the default year, 1/1 is a Sunday
-                            state.dataWeather->RunPeriodInput(i).startYear = 2017;
-                            state.dataWeather->RunPeriodInput(i).startWeekDay =
+                            runPeriodInput.startYear = 2017;
+                            runPeriodInput.startWeekDay =
                                 calculateDayOfWeek(state,
-                                                   state.dataWeather->RunPeriodInput(i).startYear,
-                                                   state.dataWeather->RunPeriodInput(i).startMonth,
-                                                   state.dataWeather->RunPeriodInput(i).startDay);
+                                                   runPeriodInput.startYear,
+                                                   runPeriodInput.startMonth,
+                                                   runPeriodInput.startDay);
                         }
                     } else { // Have an input starting year
                         ScheduleManager::DayType weekday = calculateDayOfWeek(state,
-                                                                              state.dataWeather->RunPeriodInput(i).startYear,
-                                                                              state.dataWeather->RunPeriodInput(i).startMonth,
-                                                                              state.dataWeather->RunPeriodInput(i).startDay);
+                                                                              runPeriodInput.startYear,
+                                                                              runPeriodInput.startMonth,
+                                                                              runPeriodInput.startDay);
                         if (inputWeekday) { // Check for correctness of input
-                            if (weekday != state.dataWeather->RunPeriodInput(i).startWeekDay) {
+                            if (weekday != runPeriodInput.startWeekDay) {
                                 ShowWarningError(state,
                                                  format("{}: object={}, start weekday ({}) does not match the start year ({}), corrected to {}.",
                                                         ipsc->cCurrentModuleObject,
-                                                        state.dataWeather->RunPeriodInput(i).title,
+                                                        runPeriodInput.title,
                                                         ipsc->cAlphaArgs(2),
-                                                        state.dataWeather->RunPeriodInput(i).startYear,
+                                                        runPeriodInput.startYear,
                                                         ScheduleManager::dayTypeNamesUC[static_cast<int>(weekday)]));
-                                state.dataWeather->RunPeriodInput(i).startWeekDay = weekday;
+                                runPeriodInput.startWeekDay = weekday;
                             }
                         } else { // Set the weekday if it was not input
-                            state.dataWeather->RunPeriodInput(i).startWeekDay = weekday;
+                            runPeriodInput.startWeekDay = weekday;
                         }
                     }
                 }
             }
 
             // Compute the Julian date of the start date
-            state.dataWeather->RunPeriodInput(i).startJulianDate = computeJulianDate(state.dataWeather->RunPeriodInput(i).startYear,
-                                                                                            state.dataWeather->RunPeriodInput(i).startMonth,
-                                                                                            state.dataWeather->RunPeriodInput(i).startDay);
+            runPeriodInput.startJulianDate = computeJulianDate(runPeriodInput.startYear,
+                                                                                            runPeriodInput.startMonth,
+                                                                                            runPeriodInput.startDay);
 
             // Validate the end date
-            if (state.dataWeather->RunPeriodInput(i).endMonth == 2 && state.dataWeather->RunPeriodInput(i).endDay == 29) {
+            if (runPeriodInput.endMonth == 2 && runPeriodInput.endDay == 29) {
                 // Requested end date is a leap year
-                if (state.dataWeather->RunPeriodInput(i).endYear == 0) { // No input end year
-                    if (isLeapYear(state.dataWeather->RunPeriodInput(i).startYear) &&
-                        state.dataWeather->RunPeriodInput(i).startMonth < 3) {
+                if (runPeriodInput.endYear == 0) { // No input end year
+                    if (isLeapYear(runPeriodInput.startYear) &&
+                        runPeriodInput.startMonth < 3) {
                         // The run period is from some date on or before 2/29 through 2/29
-                        state.dataWeather->RunPeriodInput(i).endYear = state.dataWeather->RunPeriodInput(i).startYear;
+                        runPeriodInput.endYear = runPeriodInput.startYear;
                     } else {
                         // There might be a better approach here, but for now just loop forward for the next leap year
-                        for (int yr = state.dataWeather->RunPeriodInput(i).startYear + 1;
-                             yr < state.dataWeather->RunPeriodInput(i).startYear + 10;
+                        for (int yr = runPeriodInput.startYear + 1;
+                             yr < runPeriodInput.startYear + 10;
                              yr++) {
                             if (isLeapYear(yr)) {
-                                state.dataWeather->RunPeriodInput(i).endYear = yr;
+                                runPeriodInput.endYear = yr;
                                 break;
                             }
                         }
                     }
                 } else {                                                                    // Have an input end year
-                    if (!isLeapYear(state.dataWeather->RunPeriodInput(i).endYear)) { // End year is not a leap year
+                    if (!isLeapYear(runPeriodInput.endYear)) { // End year is not a leap year
                         ShowSevereError(state,
                                         format("{}: object={}, end year ({}) is not a leap year but the requested end date is 2/29.",
                                                ipsc->cCurrentModuleObject,
-                                               state.dataWeather->RunPeriodInput(i).title,
-                                               state.dataWeather->RunPeriodInput(i).startYear));
+                                               runPeriodInput.title,
+                                               runPeriodInput.startYear));
                         ErrorsFound = true;
                     } else {
-                        state.dataWeather->RunPeriodInput(i).endJulianDate =
-                            computeJulianDate(state.dataWeather->RunPeriodInput(i).endYear,
-                                              state.dataWeather->RunPeriodInput(i).endMonth,
-                                              state.dataWeather->RunPeriodInput(i).endDay);
-                        if (state.dataWeather->RunPeriodInput(i).startJulianDate > state.dataWeather->RunPeriodInput(i).endJulianDate) {
+                        runPeriodInput.endJulianDate =
+                            computeJulianDate(runPeriodInput.endYear,
+                                              runPeriodInput.endMonth,
+                                              runPeriodInput.endDay);
+                        if (runPeriodInput.startJulianDate > runPeriodInput.endJulianDate) {
                             ShowSevereError(state,
                                             format("{}: object={}, start Julian date ({}) is after the end Julian date ({}).",
                                                    ipsc->cCurrentModuleObject,
-                                                   state.dataWeather->RunPeriodInput(i).title,
-                                                   state.dataWeather->RunPeriodInput(i).startJulianDate,
-                                                   state.dataWeather->RunPeriodInput(i).endJulianDate));
+                                                   runPeriodInput.title,
+                                                   runPeriodInput.startJulianDate,
+                                                   runPeriodInput.endJulianDate));
                             ErrorsFound = true;
                         }
                     }
                 }
             } else {
                 // Non leap-day end date
-                if (!validMonthDay(state.dataWeather->RunPeriodInput(i).endMonth, state.dataWeather->RunPeriodInput(i).endDay)) {
+                if (!validMonthDay(runPeriodInput.endMonth, runPeriodInput.endDay)) {
                     ShowSevereError(state,
                                     format("{}: object={}, Invalid input end month/day ({}/{})",
                                            ipsc->cCurrentModuleObject,
-                                           state.dataWeather->RunPeriodInput(i).title,
-                                           state.dataWeather->RunPeriodInput(i).startMonth,
-                                           state.dataWeather->RunPeriodInput(i).startDay));
+                                           runPeriodInput.title,
+                                           runPeriodInput.startMonth,
+                                           runPeriodInput.startDay));
                     ErrorsFound = true;
                 } else {                                                            // Month/day is valid
-                    if (state.dataWeather->RunPeriodInput(i).endYear == 0) { // No input end year
+                    if (runPeriodInput.endYear == 0) { // No input end year
                         // Assume same year as start year
-                        state.dataWeather->RunPeriodInput(i).endYear = state.dataWeather->RunPeriodInput(i).startYear;
-                        state.dataWeather->RunPeriodInput(i).endJulianDate =
-                            computeJulianDate(state.dataWeather->RunPeriodInput(i).endYear,
-                                              state.dataWeather->RunPeriodInput(i).endMonth,
-                                              state.dataWeather->RunPeriodInput(i).endDay);
-                        if (state.dataWeather->RunPeriodInput(i).startJulianDate > state.dataWeather->RunPeriodInput(i).endJulianDate) {
-                            state.dataWeather->RunPeriodInput(i).endJulianDate = 0; // Force recalculation later
-                            state.dataWeather->RunPeriodInput(i).endYear += 1;
+                        runPeriodInput.endYear = runPeriodInput.startYear;
+                        runPeriodInput.endJulianDate =
+                            computeJulianDate(runPeriodInput.endYear,
+                                              runPeriodInput.endMonth,
+                                              runPeriodInput.endDay);
+                        if (runPeriodInput.startJulianDate > runPeriodInput.endJulianDate) {
+                            runPeriodInput.endJulianDate = 0; // Force recalculation later
+                            runPeriodInput.endYear += 1;
                         }
                     } else { // Have an input end year
-                        state.dataWeather->RunPeriodInput(i).endJulianDate =
-                            computeJulianDate(state.dataWeather->RunPeriodInput(i).endYear,
-                                              state.dataWeather->RunPeriodInput(i).endMonth,
-                                              state.dataWeather->RunPeriodInput(i).endDay);
-                        if (state.dataWeather->RunPeriodInput(i).startJulianDate > state.dataWeather->RunPeriodInput(i).endJulianDate) {
+                        runPeriodInput.endJulianDate =
+                            computeJulianDate(runPeriodInput.endYear,
+                                              runPeriodInput.endMonth,
+                                              runPeriodInput.endDay);
+                        if (runPeriodInput.startJulianDate > runPeriodInput.endJulianDate) {
                             ShowSevereError(state,
                                             format("{}: object={}, start Julian date ({}) is after the end Julian date ({}).",
                                                    ipsc->cCurrentModuleObject,
-                                                   state.dataWeather->RunPeriodInput(i).title,
-                                                   state.dataWeather->RunPeriodInput(i).startJulianDate,
-                                                   state.dataWeather->RunPeriodInput(i).endJulianDate));
+                                                   runPeriodInput.title,
+                                                   runPeriodInput.startJulianDate,
+                                                   runPeriodInput.endJulianDate));
                             ErrorsFound = true;
                         }
                     }
                 }
             }
 
-            if (state.dataWeather->RunPeriodInput(i).endJulianDate == 0) {
-                state.dataWeather->RunPeriodInput(i).endJulianDate = computeJulianDate(state.dataWeather->RunPeriodInput(i).endYear,
-                                                                                              state.dataWeather->RunPeriodInput(i).endMonth,
-                                                                                              state.dataWeather->RunPeriodInput(i).endDay);
+            if (runPeriodInput.endJulianDate == 0) {
+                runPeriodInput.endJulianDate = computeJulianDate(runPeriodInput.endYear,
+                                                                                              runPeriodInput.endMonth,
+                                                                                              runPeriodInput.endDay);
             }
 
-            state.dataWeather->RunPeriodInput(i).numSimYears =
-                state.dataWeather->RunPeriodInput(i).endYear - state.dataWeather->RunPeriodInput(i).startYear + 1;
+            runPeriodInput.numSimYears =
+                runPeriodInput.endYear - runPeriodInput.startYear + 1;
 
             // A3,  \field Use Weather File Holidays and Special Days
-            if (ipsc->lAlphaFieldBlanks(3) || UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "YES")) {
-                state.dataWeather->RunPeriodInput(i).useHolidays = true;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "NO")) {
-                state.dataWeather->RunPeriodInput(i).useHolidays = false;
+            BooleanSwitch b;
+            if (ipsc->lAlphaFieldBlanks(3)) {
+                runPeriodInput.useHolidays = true;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
+                runPeriodInput.useHolidays = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={}{} invalid [{}]",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
+                                       runPeriodInput.title,
                                        ipsc->cAlphaFieldNames(3),
                                        ipsc->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
 
             // A4,  \field Use Weather File Daylight Saving Period
-            if (ipsc->lAlphaFieldBlanks(4) || UtilityRoutines::SameString(ipsc->cAlphaArgs(4), "YES")) {
-                state.dataWeather->RunPeriodInput(i).useDST = true;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(4), "NO")) {
-                state.dataWeather->RunPeriodInput(i).useDST = false;
+            if (ipsc->lAlphaFieldBlanks(4)) {
+                runPeriodInput.useDST = true;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+                runPeriodInput.useDST = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={}{} invalid [{}]",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
+                                       runPeriodInput.title,
                                        ipsc->cAlphaFieldNames(4),
                                        ipsc->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
 
             // A5,  \field Apply Weekend Holiday Rule
-            if (ipsc->lAlphaFieldBlanks(5) || UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "YES")) {
-                state.dataWeather->RunPeriodInput(i).applyWeekendRule = true;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "NO")) {
-                state.dataWeather->RunPeriodInput(i).applyWeekendRule = false;
+            if (ipsc->lAlphaFieldBlanks(5)) { 
+                runPeriodInput.applyWeekendRule = true;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
+                runPeriodInput.applyWeekendRule = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={}{} invalid [{}]",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
+                                       runPeriodInput.title,
                                        ipsc->cAlphaFieldNames(5),
                                        ipsc->cAlphaArgs(5)));
                 ErrorsFound = true;
             }
 
             // A6,  \field Use Weather File Rain Indicators
-            if (ipsc->lAlphaFieldBlanks(6) || UtilityRoutines::SameString(ipsc->cAlphaArgs(6), "YES")) {
-                state.dataWeather->RunPeriodInput(i).useRain = true;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(6), "NO")) {
-                state.dataWeather->RunPeriodInput(i).useRain = false;
+            if (ipsc->lAlphaFieldBlanks(6)) {
+                runPeriodInput.useRain = true;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(6)))) != BooleanSwitch::Invalid) {
+                runPeriodInput.useRain = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={}{} invalid [{}]",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
+                                       runPeriodInput.title,
                                        ipsc->cAlphaFieldNames(6),
                                        ipsc->cAlphaArgs(6)));
                 ErrorsFound = true;
             }
 
             // A7,  \field Use Weather File Snow Indicators
-            if (ipsc->lAlphaFieldBlanks(7) || UtilityRoutines::SameString(ipsc->cAlphaArgs(7), "YES")) {
-                state.dataWeather->RunPeriodInput(i).useSnow = true;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(7), "NO")) {
-                state.dataWeather->RunPeriodInput(i).useSnow = false;
+            if (ipsc->lAlphaFieldBlanks(7)) {
+                runPeriodInput.useSnow = true;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
+                runPeriodInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={}{} invalid [{}]",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
+                                       runPeriodInput.title,
                                        ipsc->cAlphaFieldNames(7),
                                        ipsc->cAlphaArgs(7)));
                 ErrorsFound = true;
             }
 
             // A8,  \field Treat Weather as Actual
-            if (ipsc->lAlphaFieldBlanks(8) || UtilityRoutines::SameString(ipsc->cAlphaArgs(8), "NO")) {
-                state.dataWeather->RunPeriodInput(i).actualWeather = false;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(8), "YES")) {
-                state.dataWeather->RunPeriodInput(i).actualWeather = true;
+            if (ipsc->lAlphaFieldBlanks(8)) {
+                runPeriodInput.actualWeather = false;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
+                runPeriodInput.actualWeather = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={}{} invalid [{}]",
                                        ipsc->cCurrentModuleObject,
-                                       state.dataWeather->RunPeriodInput(i).title,
+                                       runPeriodInput.title,
                                        ipsc->cAlphaFieldNames(8),
                                        ipsc->cAlphaArgs(8)));
                 ErrorsFound = true;
@@ -5558,25 +5540,21 @@ namespace Weather {
 
             // A9,  \field First Hour Interpolation Starting Values
             if (ipsc->lAlphaFieldBlanks(9) || UtilityRoutines::SameString(ipsc->cAlphaArgs(8), "Hour24")) {
-                state.dataWeather->RunPeriodInput(i).firstHrInterpUsingHr1 = false;
+                runPeriodInput.firstHrInterpUsingHr1 = false;
             } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(9), "Hour1")) {
-                state.dataWeather->RunPeriodInput(i).firstHrInterpUsingHr1 = true;
+                runPeriodInput.firstHrInterpUsingHr1 = true;
             } else {
                 // fail-safe default
-                state.dataWeather->RunPeriodInput(i).firstHrInterpUsingHr1 = false;
+                runPeriodInput.firstHrInterpUsingHr1 = false;
             }
 
-            state.dataWeather->RunPeriodInput(i).dayOfWeek = static_cast<int>(state.dataWeather->RunPeriodInput(i).startWeekDay);
-            state.dataWeather->RunPeriodInput(i).isLeapYear = isLeapYear(state.dataWeather->RunPeriodInput(i).startYear);
+            runPeriodInput.dayOfWeek = static_cast<int>(runPeriodInput.startWeekDay);
+            runPeriodInput.isLeapYear = isLeapYear(runPeriodInput.startYear);
 
             // calculate the annual start and end days from the user inputted month and day
-            state.dataWeather->RunPeriodInput(i).monWeekDay = 0;
-            if (state.dataWeather->RunPeriodInput(i).dayOfWeek != 0 && !ErrorsFound) {
-                SetupWeekDaysByMonth(state,
-                                     state.dataWeather->RunPeriodInput(i).startMonth,
-                                     state.dataWeather->RunPeriodInput(i).startDay,
-                                     state.dataWeather->RunPeriodInput(i).dayOfWeek,
-                                     state.dataWeather->RunPeriodInput(i).monWeekDay);
+            runPeriodInput.monWeekDay = 0;
+            if (runPeriodInput.dayOfWeek != 0 && !ErrorsFound) {
+                SetupWeekDaysByMonth(state, runPeriodInput.startMonth, runPeriodInput.startDay, runPeriodInput.dayOfWeek, runPeriodInput.monWeekDay);
             }
         }
 
@@ -5715,28 +5693,25 @@ namespace Weather {
             }
 
             if (ipsc->lAlphaFieldBlanks(2)) {
-                runPerDesInput.dayOfWeek =
-                    static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
+                runPerDesInput.dayOfWeek = (int)ScheduleManager::DayType::Monday; // Defaults to Monday
             } else {
-                runPerDesInput.dayOfWeek =
-                    getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
-                if (runPerDesInput.dayOfWeek < 1 ||
-                    runPerDesInput.dayOfWeek == 8) {
+                runPerDesInput.dayOfWeek = getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
+                if (runPerDesInput.dayOfWeek < 1 || runPerDesInput.dayOfWeek == 8) {
                     ShowWarningError(state,
                                      format("{}: object={} {} invalid (Day of Week) [{} for Start is not Valid, Monday will be Used.",
                                             ipsc->cCurrentModuleObject,
                                             runPerDesInput.title,
                                             ipsc->cAlphaFieldNames(1),
                                             ipsc->cAlphaArgs(1)));
-                    runPerDesInput.dayOfWeek =
-                        static_cast<int>(ScheduleManager::DayType::Monday); // Defaults to Monday
+                    runPerDesInput.dayOfWeek = (int)ScheduleManager::DayType::Monday; // Defaults to Monday
                 }
             }
 
-            if (ipsc->lAlphaFieldBlanks(3) || UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "YES")) {
+            BooleanSwitch b;
+            if (ipsc->lAlphaFieldBlanks(3)) {
                 runPerDesInput.useDST = true;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "NO")) {
-                runPerDesInput.useDST = false;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
+                runPerDesInput.useDST = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={} {} invalid [{}]",
@@ -5747,12 +5722,10 @@ namespace Weather {
                 ErrorsFound = true;
             }
 
-            if (ipsc->lAlphaFieldBlanks(4) || UtilityRoutines::SameString(ipsc->cAlphaArgs(4), "YES")) {
-                runPerDesInput.useRain = true;
-                runPerDesInput.useSnow = true;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(4), "NO")) {
-                runPerDesInput.useRain = false;
-                runPerDesInput.useSnow = false;
+            if (ipsc->lAlphaFieldBlanks(4)) {
+                runPerDesInput.useRain = runPerDesInput.useSnow = true;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+                runPerDesInput.useRain = runPerDesInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
                                 format("{}: object={} {} invalid [{}]",
@@ -5764,34 +5737,22 @@ namespace Weather {
             }
 
             // calculate the annual start and end days from the user inputted month and day
-            runPerDesInput.startJulianDate =
-                General::OrdinalDay(runPerDesInput.startMonth,
-                                    runPerDesInput.startDay,
-                                    state.dataWeather->LeapYearAdd);
-            runPerDesInput.endJulianDate =
-                General::OrdinalDay(runPerDesInput.endMonth,
-                                    runPerDesInput.endDay,
-                                    state.dataWeather->LeapYearAdd);
-            if (runPerDesInput.startJulianDate <=
-                runPerDesInput.endJulianDate) {
-                runPerDesInput.totalDays =
-                    (runPerDesInput.endJulianDate -
-                     runPerDesInput.startJulianDate + 1) *
-                    runPerDesInput.numSimYears;
+            runPerDesInput.startJulianDate = General::OrdinalDay(runPerDesInput.startMonth, runPerDesInput.startDay, state.dataWeather->LeapYearAdd);
+            runPerDesInput.endJulianDate = General::OrdinalDay(runPerDesInput.endMonth, runPerDesInput.endDay, state.dataWeather->LeapYearAdd);
+            if (runPerDesInput.startJulianDate <= runPerDesInput.endJulianDate) {
+                runPerDesInput.totalDays = (runPerDesInput.endJulianDate - runPerDesInput.startJulianDate + 1) * runPerDesInput.numSimYears;
             } else {
-                runPerDesInput.totalDays =
-                    (General::OrdinalDay(12, 31, state.dataWeather->LeapYearAdd) -
-                     runPerDesInput.startJulianDate + 1 +
-                     runPerDesInput.endJulianDate) *
+                runPerDesInput.totalDays = (General::OrdinalDay(12, 31, state.dataWeather->LeapYearAdd) - runPerDesInput.startJulianDate + 1 + runPerDesInput.endJulianDate) *
                     runPerDesInput.numSimYears;
             }
             runPerDesInput.monWeekDay = 0;
-            if (state.dataWeather->RunPeriodDesignInput(1).dayOfWeek != 0 && !ErrorsFound) {
+            auto &runPeriodDesignInput1 = state.dataWeather->RunPeriodDesignInput(1);
+            if (runPeriodDesignInput1.dayOfWeek != 0 && !ErrorsFound) {
                 SetupWeekDaysByMonth(state,
-                                     state.dataWeather->RunPeriodDesignInput(1).startMonth,
-                                     state.dataWeather->RunPeriodDesignInput(1).startDay,
-                                     state.dataWeather->RunPeriodDesignInput(1).dayOfWeek,
-                                     state.dataWeather->RunPeriodDesignInput(1).monWeekDay);
+                                     runPeriodDesignInput1.startMonth,
+                                     runPeriodDesignInput1.startDay,
+                                     runPeriodDesignInput1.dayOfWeek,
+                                     runPeriodDesignInput1.monWeekDay);
             }
         }
 
@@ -5895,13 +5856,14 @@ namespace Weather {
                                        ipsc->cCurrentModuleObject, runPerDesInput.title, ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                 ErrorsFound = true;
             }
-            state.dataWeather->RunPeriodDesignInput(1).monWeekDay = 0;
-            if (state.dataWeather->RunPeriodDesignInput(1).dayOfWeek != 0 && !ErrorsFound) {
+            auto &runPeriodDesignInput1 = state.dataWeather->RunPeriodDesignInput(1);
+            runPeriodDesignInput1.monWeekDay = 0;
+            if (runPeriodDesignInput1.dayOfWeek != 0 && !ErrorsFound) {
                 SetupWeekDaysByMonth(state,
-                                     state.dataWeather->RunPeriodDesignInput(1).startMonth,
-                                     state.dataWeather->RunPeriodDesignInput(1).startDay,
-                                     state.dataWeather->RunPeriodDesignInput(1).dayOfWeek,
-                                     state.dataWeather->RunPeriodDesignInput(1).monWeekDay);
+                                     runPeriodDesignInput1.startMonth,
+                                     runPeriodDesignInput1.startDay,
+                                     runPeriodDesignInput1.dayOfWeek,
+                                     runPeriodDesignInput1.monWeekDay);
             }
         }
     }
@@ -6326,26 +6288,28 @@ namespace Weather {
                 designDayInput.suppressBegEnvReset = true;
             }
             //   A7,  \field Rain Indicator
-            if (UtilityRoutines::SameString(ipsc->cAlphaArgs(7), "Yes")) {
-                designDayInput.RainInd = 1;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(7), "No") || ipsc->lAlphaFieldBlanks(7)) {
+            BooleanSwitch b;
+
+            if (ipsc->lAlphaFieldBlanks(7)) {
                 designDayInput.RainInd = 0;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
+                designDayInput.RainInd = (int)b;
             } else {
                 ShowWarningError(state,
                                  format("{}=\"{}\", invalid field: {}=\"{}\".",
                                         ipsc->cCurrentModuleObject,
                                         designDayInput.Title,
-                                        ipsc->cAlphaFieldNames(7),
-                                        ipsc->cAlphaArgs(7)));
+                                        ipsc->cAlphaFieldNames(8),
+                                        ipsc->cAlphaArgs(8)));
                 ShowContinueError(state, "\"No\" will be used.");
                 designDayInput.RainInd = 0;
             }
 
             //   A8,  \field Snow Indicator
-            if (UtilityRoutines::SameString(ipsc->cAlphaArgs(8), "Yes")) {
-                designDayInput.SnowInd = 1;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(8), "No") || ipsc->lAlphaFieldBlanks(8)) {
+            if (ipsc->lAlphaFieldBlanks(8)) {
                 designDayInput.SnowInd = 0;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
+                designDayInput.SnowInd = (int)b;
             } else {
                 ShowWarningError(state,
                                  format("{}=\"{}\", invalid field: {}=\"{}\".",
@@ -6359,39 +6323,25 @@ namespace Weather {
 
             //   A3,  \field Dry-Bulb Temperature Range Modifier Type
             // check DB profile input
-            if (ipsc->lAlphaFieldBlanks(3) ||
-                UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "DefaultMultipliers")) {
-                ipsc->cAlphaArgs(3) = "DefaultMultipliers";
+            if (ipsc->lAlphaFieldBlanks(3)) {
                 designDayInput.DBTempRangeType = DDDBRangeType::Default;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "Multiplier") ||
-                       UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "MultiplierSchedule")) {
-                ipsc->cAlphaArgs(3) = "MultiplierSchedule";
-                designDayInput.DBTempRangeType = DDDBRangeType::Multiplier;
+            } else if ((designDayInput.DBTempRangeType = static_cast<DDDBRangeType>(getEnumerationValue(DDDBRangeTypeNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(3))))) != DDDBRangeType::Invalid) {
+            } else {
+                ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
+                ErrorsFound = true;
+                designDayInput.DBTempRangeType = DDDBRangeType::Default;
+            }
+
+            if (designDayInput.DBTempRangeType == DDDBRangeType::Multiplier) {
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "Difference") ||
-                       UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "Delta") ||
-                       UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "DifferenceSchedule") ||
-                       UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "DeltaSchedule")) {
-                ipsc->cAlphaArgs(3) = "DifferenceSchedule";
-                designDayInput.DBTempRangeType = DDDBRangeType::Difference;
+            } else if (designDayInput.DBTempRangeType == DDDBRangeType::Difference) { 
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(3), "TemperatureProfileSchedule")) {
-                ipsc->cAlphaArgs(3) = "TemperatureProfileSchedule";
-                designDayInput.DBTempRangeType = DDDBRangeType::Profile;
+            } else if (designDayInput.DBTempRangeType == DDDBRangeType::Profile) {
                 units = "[C]";
                 unitType = OutputProcessor::Unit::C;
-            } else {
-                ShowSevereError(state,
-                                format("{}=\"{}\", invalid data.",
-                                       ipsc->cCurrentModuleObject,
-                                       designDayInput.Title));
-                ShowContinueError(
-                    state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
-                ErrorsFound = true;
-                ipsc->cAlphaArgs(3) = "invalid field";
-                designDayInput.DBTempRangeType = DDDBRangeType::Default;
             }
 
             if (designDayInput.DBTempRangeType != DDDBRangeType::Profile && !MaxDryBulbEntered &&
@@ -6544,8 +6494,10 @@ namespace Weather {
             }
 
             //   A5,  \field Humidity Condition Type
-            if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "WetBulb")) {
-                ipsc->cAlphaArgs(5) = "WetBulb";
+            designDayInput.HumIndType = static_cast<DDHumIndType>(getEnumerationValue(DesDayHumIndTypeNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(5))));
+            
+            switch (designDayInput.HumIndType) {
+            case DDHumIndType::WetBulb: {
                 //   N5,  \field Wetbulb or DewPoint at Maximum Dry-Bulb
                 if (!ipsc->lNumericFieldBlanks(5)) {
                     designDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
@@ -6556,7 +6508,7 @@ namespace Weather {
                     ErrorsFound = true;
                 }
                 bool errFlag = false;
-                designDayInput.HumIndType = DDHumIndType::WetBulb;
+
                 state.dataInputProcessing->inputProcessor->rangeCheck(state,
                                                                       errFlag,
                                                                       ipsc->cAlphaFieldNames(5) + " - Wet-Bulb",
@@ -6569,28 +6521,20 @@ namespace Weather {
                                                                       {},
                                                                       designDayInput.Title);
                 if (errFlag) {
-                    //        CALL ShowContinueError(state, TRIM(ipsc->cCurrentModuleObject)//': Occured in
-                    //        '//TRIM(DesDayInput(EnvrnNum)%Title))
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "DewPoint")) {
-                ipsc->cAlphaArgs(5) = "DewPoint";
+            } break;
+
+            case DDHumIndType::DewPoint: {
                 if (!ipsc->lNumericFieldBlanks(5)) {
                     designDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state,
-                                      format("..field is required when {}=\"{}\".",
-                                             ipsc->cAlphaFieldNames(5),
-                                             ipsc->cAlphaArgs(5)));
+                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
                 bool errFlag = false;
-                designDayInput.HumIndType = DDHumIndType::DewPoint;
                 state.dataInputProcessing->inputProcessor->rangeCheck(state,
                                                                       errFlag,
                                                                       ipsc->cAlphaFieldNames(5) + " - Dew-Point",
@@ -6605,26 +6549,20 @@ namespace Weather {
                 if (errFlag) {
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "HumidityRatio")) {
-                ipsc->cAlphaArgs(5) = "HumidityRatio";
+            } break;
+
+            case DDHumIndType::HumRatio: {
                 //   N6,  \field Humidity Ratio at Maximum Dry-Bulb
                 if (!ipsc->lNumericFieldBlanks(6)) {
-                    designDayInput.HumIndValue =
-                        ipsc->rNumericArgs(6); // Humidity Indicating Conditions at Max Dry-Bulb
+                    designDayInput.HumIndValue = ipsc->rNumericArgs(6); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(6)));
-                    ShowContinueError(state,
-                                      format("..field is required when {}=\"{}\".",
-                                             ipsc->cAlphaFieldNames(5),
-                                             ipsc->cAlphaArgs(5)));
+                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
                 bool errFlag = false;
-                designDayInput.HumIndType = DDHumIndType::HumRatio;
+                
                 state.dataInputProcessing->inputProcessor->rangeCheck(state,
                                                                       errFlag,
                                                                       ipsc->cAlphaFieldNames(5) + " - Humidity-Ratio",
@@ -6639,22 +6577,16 @@ namespace Weather {
                 if (errFlag) {
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "Enthalpy")) {
-                ipsc->cAlphaArgs(5) = "Enthalpy";
+            } break;
+
+            case DDHumIndType::Enthalpy: {
                 //   N7,  \field Enthalpy at Maximum Dry-Bulb {J/kg}.
                 if (!ipsc->lNumericFieldBlanks(7)) {
-                    designDayInput.HumIndValue =
-                        ipsc->rNumericArgs(7); // Humidity Indicating Conditions at Max Dry-Bulb
+                    designDayInput.HumIndValue = ipsc->rNumericArgs(7); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(7)));
-                    ShowContinueError(state,
-                                      format("..field is required when {}=\"{}\".",
-                                             ipsc->cAlphaFieldNames(5),
-                                             ipsc->cAlphaArgs(5)));
+                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
                 bool errFlag = false;
@@ -6673,185 +6605,120 @@ namespace Weather {
                 if (errFlag) {
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "RelativeHumiditySchedule")) {
-                ipsc->cAlphaArgs(5) = "RelativeHumiditySchedule";
-                designDayInput.HumIndType = DDHumIndType::RelHumSch;
+            } break;
+                    
+            case DDHumIndType::RelHumSch: {
                 units = "[%]";
                 unitType = OutputProcessor::Unit::Perc;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "WetBulbProfileMultiplierSchedule")) {
-                ipsc->cAlphaArgs(5) = "WetBulbProfileMultiplierSchedule";
-                designDayInput.HumIndType = DDHumIndType::WBProfMul;
+            } break;
+
+            case DDHumIndType::WBProfMul: {
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
                 if (!ipsc->lNumericFieldBlanks(5)) {
-                    designDayInput.HumIndValue =
-                        ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
+                    designDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state,
-                                      format("..field is required when {}=\"{}\".",
-                                             ipsc->cAlphaFieldNames(5),
-                                             ipsc->cAlphaArgs(5)));
+                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "WetBulbProfileDifferenceSchedule")) {
-                ipsc->cAlphaArgs(5) = "WetBulbProfileDifferenceSchedule";
-                designDayInput.HumIndType = DDHumIndType::WBProfDif;
+            } break;
+                    
+            case DDHumIndType::WBProfDif: {
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
                 if (!ipsc->lNumericFieldBlanks(5)) {
-                    designDayInput.HumIndValue =
-                        ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
+                    designDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state,
-                                      format("..field is required when {}=\"{}\".",
-                                             ipsc->cAlphaFieldNames(5),
-                                             ipsc->cAlphaArgs(5)));
+                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(5), "WetBulbProfileDefaultMultipliers")) {
-                ipsc->cAlphaArgs(5) = "WetBulbProfileDefaultMultipliers";
-                designDayInput.HumIndType = DDHumIndType::WBProfDef;
+            } break;
+
+            case DDHumIndType::WBProfDef: {
                 if (!ipsc->lNumericFieldBlanks(5)) {
-                    designDayInput.HumIndValue =
-                        ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
+                    designDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state,
-                                      format("..field is required when {}=\"{}\".",
-                                             ipsc->cAlphaFieldNames(5),
-                                             ipsc->cAlphaArgs(5)));
+                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-            } else {
-                ShowWarningError(state,
-                                 format("{}=\"{}\", invalid data.",
-                                        ipsc->cCurrentModuleObject,
-                                        designDayInput.Title));
-                ShowContinueError(
-                    state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+            } break;
+
+            default: {
+                ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                 ShowContinueError(state, "WetBulb will be used. Maximum Dry Bulb will be used as WetBulb at Maximum Dry Bulb.");
-                ipsc->cAlphaArgs(5) = "WetBulb";
                 designDayInput.HumIndType = DDHumIndType::WetBulb;
                 designDayInput.HumIndValue = ipsc->rNumericArgs(3);
-            }
+            } break;
+            } // switch (designDayInput.HumIndType)
 
             // resolve humidity schedule if needed
             //   A6,  \field Humidity Condition Day Schedule Name
-            if (designDayInput.HumIndType == DDHumIndType::RelHumSch ||
-                designDayInput.HumIndType == DDHumIndType::WBProfMul ||
+            if (designDayInput.HumIndType == DDHumIndType::RelHumSch || designDayInput.HumIndType == DDHumIndType::WBProfMul ||
                 designDayInput.HumIndType == DDHumIndType::WBProfDif) {
                 if (ipsc->lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cAlphaFieldNames(6)));
-                    ShowContinueError(state,
-                                      format("..field is required when {}=\"{}\".",
-                                             ipsc->cAlphaFieldNames(3),
-                                             ipsc->cAlphaArgs(3)));
+                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
                     ErrorsFound = true;
+                } else if ((designDayInput.HumIndSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(6))) == 0) {
+                    ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                    ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
+                    ShowContinueError(state, "Default Humidity will be used (constant for day using Humidity Indicator Temp).");
+                    // reset HumIndType ?
                 } else {
-                    designDayInput.HumIndSchPtr =
-                        ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(6));
-                    if (designDayInput.HumIndSchPtr == 0) {
-                        ShowWarningError(state,
-                                         format("{}=\"{}\", invalid data.",
-                                                ipsc->cCurrentModuleObject,
-                                                designDayInput.Title));
-                        ShowContinueError(
-                            state,
-                            format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
-                        ShowContinueError(state, "Default Humidity will be used (constant for day using Humidity Indicator Temp).");
-                        // reset HumIndType ?
-                    } else {
+                    ScheduleManager::GetSingleDayScheduleValues(state, designDayInput.HumIndSchPtr, state.dataWeather->DDHumIndModifier(_, _, EnvrnNum));
 
-                        ScheduleManager::GetSingleDayScheduleValues(state,
-                                                                    designDayInput.HumIndSchPtr,
-                                                                    state.dataWeather->DDHumIndModifier(_, _, EnvrnNum));
-
-                        int schPtr = General::FindNumberInList(designDayInput.HumIndSchPtr,
-                                                               state.dataWeather->SPSiteScheduleNamePtr,
-                                                               state.dataWeather->NumSPSiteScheduleNamePtrs);
-                        if ((schPtr == 0) || (state.dataWeather->SPSiteScheduleUnits(schPtr) != units)) {
-                            ++state.dataWeather->NumSPSiteScheduleNamePtrs;
-                            state.dataWeather->SPSiteScheduleNamePtr(state.dataWeather->NumSPSiteScheduleNamePtrs) =
-                                designDayInput.HumIndSchPtr;
-                            state.dataWeather->SPSiteScheduleUnits(state.dataWeather->NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable(state,
-                                                "Sizing Period Site Humidity Condition Schedule Value",
-                                                unitType,
-                                                state.dataWeather->SPSiteHumidityConditionScheduleValue(EnvrnNum),
-                                                OutputProcessor::SOVTimeStepType::Zone,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                ipsc->cAlphaArgs(6));
-                        }
-
-                        switch (designDayInput.HumIndType) {
-                        case DDHumIndType::RelHumSch:
-                            if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, designDayInput.HumIndSchPtr, 0.0, false, 100.0, false)) {
-                                ShowSevereError(state,
-                                                format("{}=\"{}\", invalid data.",
-                                                       ipsc->cCurrentModuleObject,
-                                                       designDayInput.Title));
-                                ShowContinueError(state,
-                                                  format("..invalid field: {}=\"{}\".",
-                                                         ipsc->cAlphaFieldNames(6),
-                                                         ipsc->cAlphaArgs(6)));
-                                ShowContinueError(state, "Specified [Scheduled] Relative Humidity Values are not within [0.0, 100.0]");
-                                ErrorsFound = true;
-                            }
-                            break;
-                        case DDHumIndType::WBProfMul:
-                            // multiplier: use schedule value, check 0 <= v <= 1
-                            if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, designDayInput.HumIndSchPtr, 0.0, false, 1.0, false)) {
-                                ShowSevereError(state,
-                                                format("{}=\"{}\", invalid data.",
-                                                       ipsc->cCurrentModuleObject,
-                                                       designDayInput.Title));
-                                ShowContinueError(state,
-                                                  format("..invalid field: {}=\"{}\".",
-                                                         ipsc->cAlphaFieldNames(6),
-                                                         ipsc->cAlphaArgs(6)));
-                                ShowContinueError(state, "..Specified [Schedule] Wet-bulb Profile Range Multiplier Values are not within [0.0, 1.0]");
-                                ErrorsFound = true;
-                            }
-                            break;
-                        case DDHumIndType::WBProfDif:
-                            if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                    state, designDayInput.HumIndSchPtr, 0.0, false)) {
-                                ShowSevereError(state,
-                                                format("{}=\"{}\", invalid data.",
-                                                       ipsc->cCurrentModuleObject,
-                                                       designDayInput.Title));
-                                ShowContinueError(state,
-                                                  format("..invalid field: {}=\"{}\".",
-                                                         ipsc->cAlphaFieldNames(6),
-                                                         ipsc->cAlphaArgs(6)));
-                                ShowSevereError(state, "Some [Schedule] Wet-bulb Profile Difference Values are < 0.0 [would make max larger].");
-                                ErrorsFound = true;
-                            }
-                        default:
-                            break;
-                        }
+                    int schPtr = General::FindNumberInList(designDayInput.HumIndSchPtr, state.dataWeather->SPSiteScheduleNamePtr, state.dataWeather->NumSPSiteScheduleNamePtrs);
+                    if ((schPtr == 0) || (state.dataWeather->SPSiteScheduleUnits(schPtr) != units)) {
+                        ++state.dataWeather->NumSPSiteScheduleNamePtrs;
+                        state.dataWeather->SPSiteScheduleNamePtr(state.dataWeather->NumSPSiteScheduleNamePtrs) = designDayInput.HumIndSchPtr;
+                        state.dataWeather->SPSiteScheduleUnits(state.dataWeather->NumSPSiteScheduleNamePtrs) = units;
+                        SetupOutputVariable(state,
+                                            "Sizing Period Site Humidity Condition Schedule Value",
+                                            unitType,
+                                            state.dataWeather->SPSiteHumidityConditionScheduleValue(EnvrnNum),
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            ipsc->cAlphaArgs(6));
                     }
-                }
+
+                    switch (designDayInput.HumIndType) {
+                    case DDHumIndType::RelHumSch: {
+                        if (!ScheduleManager::CheckDayScheduleValueMinMax(state, designDayInput.HumIndSchPtr, 0.0, false, 100.0, false)) {
+                            ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                            ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
+                            ShowContinueError(state, "Specified [Scheduled] Relative Humidity Values are not within [0.0, 100.0]");
+                            ErrorsFound = true;
+                        }
+                    } break;
+                    case DDHumIndType::WBProfMul: {
+                        // multiplier: use schedule value, check 0 <= v <= 1
+                        if (!ScheduleManager::CheckDayScheduleValueMinMax(state, designDayInput.HumIndSchPtr, 0.0, false, 1.0, false)) {
+                            ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                            ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
+                            ShowContinueError(state, "..Specified [Schedule] Wet-bulb Profile Range Multiplier Values are not within [0.0, 1.0]");
+                            ErrorsFound = true;
+                        }
+                    } break;
+                    case DDHumIndType::WBProfDif: {
+                        if (!ScheduleManager::CheckDayScheduleValueMinMax(state, designDayInput.HumIndSchPtr, 0.0, false)) {
+                            ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                            ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
+                            ShowSevereError(state, "Some [Schedule] Wet-bulb Profile Difference Values are < 0.0 [would make max larger].");
+                            ErrorsFound = true;
+                        }
+                    } break;
+                    default: {
+                    } break;
+                    } // switch (designDayInput.HumIndType)
+                } // if (designDayInput.HumIndSchPtr == 0)
 
             } else if (designDayInput.HumIndType == DDHumIndType::WBProfDef) {
                 // re WetBulbProfileDefaultMultipliers
@@ -6893,24 +6760,12 @@ namespace Weather {
             }
 
             //   A10, \field Solar Model Indicator
-            if (ipsc->lAlphaFieldBlanks(10) || UtilityRoutines::SameString(ipsc->cAlphaArgs(10), "ASHRAEClearSky") ||
-                UtilityRoutines::SameString(ipsc->cAlphaArgs(10), "CLEARSKY")) {
+            if (ipsc->lAlphaFieldBlanks(10)) {
                 designDayInput.SolarModel = DesignDaySolarModel::ASHRAE_ClearSky;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(10), "ZhangHuang")) {
-                designDayInput.SolarModel = DesignDaySolarModel::Zhang_Huang;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(10), "ASHRAETau")) {
-                designDayInput.SolarModel = DesignDaySolarModel::ASHRAE_Tau;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(10), "ASHRAETau2017")) {
-                designDayInput.SolarModel = DesignDaySolarModel::ASHRAE_Tau2017;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(10), "Schedule")) {
-                designDayInput.SolarModel = DesignDaySolarModel::SolarModel_Schedule;
-            } else {
-                ShowWarningError(state,
-                                 format("{}=\"{}\", invalid data.",
-                                        ipsc->cCurrentModuleObject,
-                                        designDayInput.Title));
-                ShowContinueError(
-                    state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(10), ipsc->cAlphaArgs(10)));
+            } else if ((designDayInput.SolarModel = static_cast<DesignDaySolarModel>(getEnumerationValue(DesDaySolarModelNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(10))))) != DesignDaySolarModel::Invalid) {
+            } else { 
+                ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(10), ipsc->cAlphaArgs(10)));
                 ShowContinueError(state, "Model used will be ASHRAE ClearSky");
                 designDayInput.SolarModel = DesignDaySolarModel::ASHRAE_ClearSky;
             }
@@ -6921,13 +6776,8 @@ namespace Weather {
                     designDayInput.BeamSolarSchPtr =
                         ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(11));
                     if (designDayInput.BeamSolarSchPtr == 0) {
-                        ShowSevereError(state,
-                                        format("{}=\"{}\", invalid data.",
-                                               ipsc->cCurrentModuleObject,
-                                               designDayInput.Title));
-                        ShowContinueError(
-                            state,
-                            format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(11), ipsc->cAlphaArgs(11)));
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(11), ipsc->cAlphaArgs(11)));
                         ShowContinueError(state, format("..Required when {} indicates \"Schedule\".", ipsc->cAlphaFieldNames(10)));
                         ErrorsFound = true;
                     } else {
@@ -6941,8 +6791,7 @@ namespace Weather {
                         unitType = OutputProcessor::Unit::W_m2;
                         if ((schPtr == 0) || (state.dataWeather->SPSiteScheduleUnits(schPtr) != units)) {
                             ++state.dataWeather->NumSPSiteScheduleNamePtrs;
-                            state.dataWeather->SPSiteScheduleNamePtr(state.dataWeather->NumSPSiteScheduleNamePtrs) =
-                                designDayInput.BeamSolarSchPtr;
+                            state.dataWeather->SPSiteScheduleNamePtr(state.dataWeather->NumSPSiteScheduleNamePtrs) = designDayInput.BeamSolarSchPtr;
                             state.dataWeather->SPSiteScheduleUnits(state.dataWeather->NumSPSiteScheduleNamePtrs) = units;
                             SetupOutputVariable(state,
                                                 "Sizing Period Site Beam Solar Schedule Value",
@@ -6952,40 +6801,24 @@ namespace Weather {
                                                 OutputProcessor::SOVStoreType::Average,
                                                 ipsc->cAlphaArgs(11));
                         }
-                        if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                state, designDayInput.BeamSolarSchPtr, 0.0, false)) {
-                            ShowSevereError(state,
-                                            format("{}=\"{}\", invalid data.",
-                                                   ipsc->cCurrentModuleObject,
-                                                   designDayInput.Title));
-                            ShowContinueError(state,
-                                              format("..invalid field: {}=\"{}\".",
-                                                     ipsc->cAlphaFieldNames(11),
-                                                     ipsc->cAlphaArgs(11)));
+                        if (!ScheduleManager::CheckDayScheduleValueMinMax(state, designDayInput.BeamSolarSchPtr, 0.0, false)) {
+                            ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                            ShowContinueError(state,format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(11), ipsc->cAlphaArgs(11)));
                             ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
                             ErrorsFound = true;
                         }
                     }
                 } else { // should have entered beam schedule
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cAlphaFieldNames(11)));
                     ErrorsFound = true;
                 }
                 //   A12, \field Diffuse Solar Day Schedule Name
                 if (!ipsc->lAlphaFieldBlanks(12)) {
-                    designDayInput.DiffuseSolarSchPtr =
-                        ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(12));
+                    designDayInput.DiffuseSolarSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(12));
                     if (designDayInput.DiffuseSolarSchPtr == 0) {
-                        ShowSevereError(state,
-                                        format("{}=\"{}\", invalid data.",
-                                               ipsc->cCurrentModuleObject,
-                                               designDayInput.Title));
-                        ShowContinueError(
-                            state,
-                            format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(12), ipsc->cAlphaArgs(12)));
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(12), ipsc->cAlphaArgs(12)));
                         ShowContinueError(state, format("..Required when {} indicates \"Schedule\".", ipsc->cAlphaFieldNames(10)));
                         ErrorsFound = true;
                     } else {
@@ -7010,25 +6843,15 @@ namespace Weather {
                                                 OutputProcessor::SOVStoreType::Average,
                                                 ipsc->cAlphaArgs(12));
                         }
-                        if (!ScheduleManager::CheckDayScheduleValueMinMax(
-                                state, designDayInput.DiffuseSolarSchPtr, 0.0, false)) {
-                            ShowSevereError(state,
-                                            format("{}=\"{}\", invalid data.",
-                                                   ipsc->cCurrentModuleObject,
-                                                   designDayInput.Title));
-                            ShowContinueError(state,
-                                              format("..invalid field: {}=\"{}\".",
-                                                     ipsc->cAlphaFieldNames(12),
-                                                     ipsc->cAlphaArgs(12)));
+                        if (!ScheduleManager::CheckDayScheduleValueMinMax(state, designDayInput.DiffuseSolarSchPtr, 0.0, false)) {
+                            ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                            ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(12),ipsc->cAlphaArgs(12)));
                             ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
                             ErrorsFound = true;
                         }
                     }
                 } else { // should have entered diffuse schedule
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cAlphaFieldNames(12)));
                     ErrorsFound = true;
                 }
@@ -7036,10 +6859,7 @@ namespace Weather {
 
             if (designDayInput.SolarModel == DesignDaySolarModel::ASHRAE_ClearSky) {
                 if (ipsc->lNumericFieldBlanks(14)) {
-                    ShowWarningError(state,
-                                     format("{}=\"{}\", invalid data.",
-                                            ipsc->cCurrentModuleObject,
-                                            designDayInput.Title));
+                    ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(14)));
                     ShowContinueError(state, "..Zero clear sky (no solar) will be used.");
                 }
@@ -7048,55 +6868,39 @@ namespace Weather {
             // Validate Design Day Month
 
             switch (designDayInput.Month) {
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12:
+            case 1: case 3: case 5: case 7: case 8: case 10: case 12: {
                 if (designDayInput.DayOfMonth > 31) {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", invalid data.",
-                                           ipsc->cCurrentModuleObject,
-                                           designDayInput.Title));
-                    ShowContinueError(state,
-                                      format(".. invalid field: {}=[{}], Month=[{}].",
-                                             ipsc->cNumericFieldNames(2),
-                                             designDayInput.DayOfMonth,
-                                             designDayInput.Month));
+                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                    ShowContinueError(state, format(".. invalid field: {}=[{}], Month=[{}].", ipsc->cNumericFieldNames(2), designDayInput.DayOfMonth, designDayInput.Month));
                     ErrorsFound = true;
                 }
-                break;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
+            } break;
+            case 4: case 6: case 9: case 11: {
                 if (designDayInput.DayOfMonth > 30) {
                     ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format(".. invalid {}=[{}], Month=[{}].", ipsc->cNumericFieldNames(2), designDayInput.DayOfMonth, designDayInput.Month));
                     ErrorsFound = true;
                 }
-                break;
-            case 2:
+            } break;
+            case 2: {
                 if (designDayInput.DayOfMonth > 28) {
                     ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                     ShowContinueError(state, format(".. invalid {}=[{}], Month=[{}].", ipsc->cNumericFieldNames(2), designDayInput.DayOfMonth, designDayInput.Month));
                     ErrorsFound = true;
                 }
-                break;
-            default:
+            } break;
+            default: {
                 ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                 ShowContinueError(state, format(".. invalid {} invalid (Month) [{}].", ipsc->cNumericFieldNames(1), designDayInput.Month));
                 ErrorsFound = true;
-                break;
-            }
+            } break;
+            } // switch (designDayInput.Month)
 
             //   A9,  \field Daylight Saving Time Indicator
-            if (UtilityRoutines::SameString(ipsc->cAlphaArgs(9), "Yes")) {
-                designDayInput.DSTIndicator = 1;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(9), "No") || ipsc->lAlphaFieldBlanks(9)) {
+            if (ipsc->lAlphaFieldBlanks(9)) {
                 designDayInput.DSTIndicator = 0;
+            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(9)))) != BooleanSwitch::Invalid) {
+                designDayInput.DSTIndicator = (int)b;
             } else {
                 ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                 ShowContinueError(state, format("..invalid field: {}=\"{} (\"No\" will be used)", ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9)));
@@ -7409,11 +7213,10 @@ namespace Weather {
                 }
             }
 
+            BooleanSwitch b;
             if (!wpSkyTemp.IsSchedule && !ipsc->lAlphaFieldBlanks(4)) {
-                if (UtilityRoutines::SameString(ipsc->cAlphaArgs(4), "Yes")) {
-                    wpSkyTemp.UseWeatherFileHorizontalIR = true;
-                } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(4), "No")) {
-                    wpSkyTemp.UseWeatherFileHorizontalIR = false;
+                if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+                    wpSkyTemp.UseWeatherFileHorizontalIR = static_cast<bool>(b);
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid {}.", RoutineName, ipsc->cCurrentModuleObject,ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(4)));
                     ShowContinueError(state, format("...entered value=\"{}\", should be Yes or No.", ipsc->cAlphaArgs(4)));
@@ -8640,7 +8443,6 @@ namespace Weather {
                                 dataPeriod.NumDays = (365 - dataPeriod.DataStJDay + 1) + (dataPeriod.DataEnJDay - 1 + 1);
                             }
                         } else { // weather file has actual year(s)
-                            auto &dataPeriod = state.dataWeather->DataPeriods(CurCount);
                             dataPeriod.DataStJDay = computeJulianDate(dataPeriod.StYear, dataPeriod.StMon, dataPeriod.StDay);
                             dataPeriod.DataEnJDay = computeJulianDate(dataPeriod.EnYear, dataPeriod.EnMon, dataPeriod.EnDay);
                             dataPeriod.NumDays = dataPeriod.DataEnJDay - dataPeriod.DataStJDay + 1;
@@ -9436,6 +9238,7 @@ namespace Weather {
             for (int iTS = 1; iTS <= state.dataGlobal->NumOfTimeStepInHour; ++iTS)
                 f(iHr, iTS);
     }
+            
 } // namespace Weather
 
 } // namespace EnergyPlus

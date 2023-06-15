@@ -118,6 +118,9 @@ namespace Weather {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)DesignDaySolarModel::Num> DesDaySolarModelNamesUC = {
+        "ASHRAECLEARSKY", "ZHANGHUANG", "SCHEDULE", "ASHRAETAU", "ASHRAETAU2017" };
+                                                                                                             
     // Design Day Humidity Indicating Type
     enum class DDHumIndType
     {
@@ -133,6 +136,10 @@ namespace Weather {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)DDHumIndType::Num> DesDayHumIndTypeNamesUC = {
+        "WETBULB", "DEWPOINT", "ENTHALPY", "HUMIDITYRATIO", "RELATIVEHUMIDITYSCHEDULE",
+        "WETBULBPROFILEDEFAULTMULTIPLIERS", "WETBULBPROFILEDIFFERENCESCHEDULE", "WETBULBPROFILEMULTIPLIERSCHEDULE"};
+                
     // Design Day DryBulb Range Type
     enum class DDDBRangeType
     {
@@ -143,6 +150,9 @@ namespace Weather {
         Profile,    // Temperature Profile
         Num
     };
+
+    static constexpr std::array<std::string_view, (int)DDDBRangeType::Num> DDDBRangeTypeNamesUC = {
+        "DEFAULTMULTIPLIERS", "MULTIPLIERSCHEDULE", "DIFFERENCESCHEDULE", "TEMPERATUREPROFILESCHEDULE"};
 
     enum class SkyTempModel
     {
@@ -768,7 +778,8 @@ namespace Weather {
         Real64 OpaqueSkyCover;
     };
 
-    void ForAllHrTs(EnergyPlusData &state, std::function<void(int, int)> f);
+    // Here's a fun little function
+    void ForAllHrTs(EnergyPlusData &state, std::function<void(int, int)> f); 
 } // namespace Weather
 
 struct WeatherManagerData : BaseGlobalStruct

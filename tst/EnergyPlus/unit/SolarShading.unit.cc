@@ -4171,10 +4171,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -4600,10 +4600,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -4961,10 +4961,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
