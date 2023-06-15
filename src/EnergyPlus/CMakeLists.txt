@@ -908,6 +908,12 @@ if(NOT BUILD_STATIC_ENERGYPLUS_API)
                          include/EnergyPlus/api
   )
 
+  install(
+    DIRECTORY api
+    DESTINATION "include/EnergyPlus"
+    FILES_MATCHING PATTERN "*.h"
+  )
+
   include(CMakePackageConfigHelpers)
   write_basic_package_version_file(
     "${PROJECT_BINARY_DIR}/energyplusConfigVersion.cmake"
