@@ -3789,20 +3789,20 @@ namespace ScheduleManager {
                                   std::string_view MaxString, // Maximum indicator ('<', ',=')
                                   Real64 const Maximum)       // Maximum desired value
     {
-        Clusive clusiveMin = (MinString == ">=") ? Clusive::Inclusive : ((MinString == ">") ? Clusive::Exclusive : Clusive::Invalid);
-        Clusive clusiveMax = (MaxString == "<=") ? Clusive::Inclusive : ((MaxString == "<") ? Clusive::Exclusive : Clusive::Invalid);
+        Clusivity clusiveMin = (MinString == ">=") ? Clusivity::Inclusive : ((MinString == ">") ? Clusivity::Exclusive : Clusivity::Invalid);
+        Clusivity clusiveMax = (MaxString == "<=") ? Clusivity::Inclusive : ((MaxString == "<") ? Clusivity::Exclusive : Clusivity::Invalid);
 
-        if (clusiveMin == Clusive::Invalid) ShowFatalError(state, format("CheckScheduleValueMinMax: illegal MinString {}", MinString));
-        if (clusiveMax == Clusive::Invalid) ShowFatalError(state, format("CheckScheduleValueMinMax: illegal MaxString {}", MaxString));
+        if (clusiveMin == Clusivity::Invalid) ShowFatalError(state, format("CheckScheduleValueMinMax: illegal MinString {}", MinString));
+        if (clusiveMax == Clusivity::Invalid) ShowFatalError(state, format("CheckScheduleValueMinMax: illegal MaxString {}", MaxString));
 
         return CheckScheduleValueMinMax(state, schedNum, clusiveMin, Minimum, clusiveMax, Maximum);
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const schedNum,   // Which Schedule being tested
-                                  Clusive clusiveMin,   // Minimum indicator ('>', '>=')
+                                  Clusivity clusiveMin, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum, // Minimum desired value
-                                  Clusive clusiveMax,   // Maximum indicator ('<', ',=')
+                                  Clusivity clusiveMax, // Maximum indicator ('<', ',=')
                                   Real64 const Maximum  // Maximum desired value
     )
     {
@@ -3823,11 +3823,11 @@ namespace ScheduleManager {
         bool MaxValueOk = true;
 
         if (schedNum == -1) {
-            assert(clusiveMin == Clusive::Inclusive && clusiveMax == Clusive::Inclusive);
+            assert(clusiveMin == Clusivity::Inclusive && clusiveMax == Clusivity::Inclusive);
             MinValueOk = (Minimum == 1.0);
             MaxValueOk = (Maximum == 1.0);
         } else if (schedNum == 0) {
-            assert(clusiveMin == Clusive::Inclusive && clusiveMax == Clusive::Inclusive);
+            assert(clusiveMin == Clusivity::Inclusive && clusiveMax == Clusivity::Inclusive);
             MinValueOk = (Minimum == 0.0);
             MaxValueOk = (Maximum == 0.0);
         } else if (schedNum > 0 && schedNum <= state.dataScheduleMgr->NumSchedules) {
@@ -3835,8 +3835,8 @@ namespace ScheduleManager {
             if (!sched.MaxMinSet) {
                 SetScheduleMinMax(state, schedNum);
             }
-            MinValueOk = (clusiveMin == Clusive::Exclusive) ? (sched.MinValue > Minimum) : (FLT_EPSILON >= Minimum - sched.MinValue);
-            MaxValueOk = (clusiveMax == Clusive::Exclusive) ? (sched.MaxValue < Maximum) : (sched.MaxValue - Maximum <= FLT_EPSILON);
+            MinValueOk = (clusiveMin == Clusivity::Exclusive) ? (sched.MinValue > Minimum) : (FLT_EPSILON >= Minimum - sched.MinValue);
+            MaxValueOk = (clusiveMax == Clusivity::Exclusive) ? (sched.MaxValue < Maximum) : (sched.MaxValue - Maximum <= FLT_EPSILON);
         } else {
             ShowFatalError(state, "CheckScheduleValueMinMax called with ScheduleIndex out of range");
         }

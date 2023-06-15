@@ -1096,9 +1096,9 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                         ErrorsFound = true;
                     } else if (!ScheduleManager::CheckScheduleValueMinMax(state,
                                                                           userExtConvModel.ScheduleIndex,
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->LowHConvLimit, // >=
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->HighHConvLimit)) { // <=
                         ShowSevereScheduleOutOfRange(state,
                                                      eoh,
@@ -1231,9 +1231,9 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                         ErrorsFound = true;
                     } else if (!ScheduleManager::CheckScheduleValueMinMax(state,
                                                                           userIntConvModel.ScheduleIndex,
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->LowHConvLimit,
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->HighHConvLimit)) {
                         ShowSevereScheduleOutOfRange(state,
                                                      eoh,
@@ -1366,9 +1366,9 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                         ErrorsFound = true;
                     } else if (!ScheduleManager::CheckScheduleValueMinMax(state,
                                                                           userExtConvModel.ScheduleIndex,
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->LowHConvLimit, // >=
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->HighHConvLimit)) { // <=
                         ShowSevereScheduleOutOfRange(state,
                                                      eoh,
@@ -1483,9 +1483,9 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                         ErrorsFound = true;
                     } else if (!ScheduleManager::CheckScheduleValueMinMax(state,
                                                                           userIntConvModel.ScheduleIndex,
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->LowHConvLimit, // >=
-                                                                          ScheduleManager::Clusive::Inclusive,
+                                                                          ScheduleManager::Clusivity::Inclusive,
                                                                           state.dataHeatBal->HighHConvLimit)) { // <=
                         ShowSevereScheduleOutOfRange(state,
                                                      eoh,

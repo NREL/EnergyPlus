@@ -121,7 +121,7 @@ namespace ScheduleManager {
         Num
     };
 
-    enum class Clusive
+    enum class Clusivity
     {
         Invalid = -1,
         Inclusive,
@@ -289,9 +289,9 @@ namespace ScheduleManager {
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const ScheduleIndex, // Which Schedule being tested
-                                  Clusive clusiveMin,      // true ? '>' : '>='
+                                  Clusivity clusiveMin,    // true ? '>' : '>='
                                   Real64 const Minimum,    // Minimum desired value
-                                  Clusive clusiveMax,      // true ? '<' : '<='
+                                  Clusivity clusiveMax,    // true ? '<' : '<='
                                   Real64 const Maximum     // Maximum desired value
     );
 
