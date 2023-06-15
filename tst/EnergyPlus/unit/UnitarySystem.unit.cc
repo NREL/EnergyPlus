@@ -8870,7 +8870,8 @@ Coil:Heating:DX:VariableSpeed,
       Temperature,             !- Input Unit Type for X
       Temperature,             !- Input Unit Type for Y
       Dimensionless;           !- Output Unit Type
-
+                                                   )IDF"
+                                             R"IDF(" // split line for MSVC long string C2026
 Coil:Heating:Fuel,
   Humidistat Reheat Coil 1, !- Name
   FanAndCoilAvailSched, !- Availability Schedule Name
