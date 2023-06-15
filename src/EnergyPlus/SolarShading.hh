@@ -371,18 +371,18 @@ struct SolarShadingData : BaseGlobalStruct
     Array1D<Real64> SurfMultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
     Array1D<Real64> SurfMultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
 
-    int FBKSHC;                     // HC location of first back surface
-    int FGSSHC;                     // HC location of first general shadowing surface
-    int FINSHC;                     // HC location of first back surface overlap
-    int FRVLHC;                     // HC location of first reveal surface
-    int FSBSHC;                     // HC location of first subsurface
+    int FBKSHC = 0;                 // HC location of first back surface
+    int FGSSHC = 0;                 // HC location of first general shadowing surface
+    int FINSHC = 0;                 // HC location of first back surface overlap
+    int FRVLHC = 0;                 // HC location of first reveal surface
+    int FSBSHC = 0;                 // HC location of first subsurface
     int LOCHCA = 0;                 // Location of highest data in the HC arrays
-    int NBKSHC;                     // Number of back surfaces in the HC arrays
-    int NGSSHC;                     // Number of general shadowing surfaces in the HC arrays
-    int NINSHC;                     // Number of back surface overlaps in the HC arrays
-    int NRVLHC;                     // Number of reveal surfaces in HC array
-    int NSBSHC;                     // Number of subsurfaces in the HC arrays
-    bool CalcSkyDifShading;         // True when sky diffuse solar shading is
+    int NBKSHC = 0;                 // Number of back surfaces in the HC arrays
+    int NGSSHC = 0;                 // Number of general shadowing surfaces in the HC arrays
+    int NINSHC = 0;                 // Number of back surface overlaps in the HC arrays
+    int NRVLHC = 0;                 // Number of reveal surfaces in HC array
+    int NSBSHC = 0;                 // Number of subsurfaces in the HC arrays
+    bool CalcSkyDifShading = false; // True when sky diffuse solar shading is
     int ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
     int ShadowingDaysLeft = 0;      // Days left in current shadowing period
 

@@ -905,7 +905,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         // Initializations for this surface
         Real64 HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-        ConvectionCoefficients::InitExteriorConvectionCoeff(
+        Convect::InitExtConvCoeff(
             state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         int ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         Real64 AbsThermSurf =

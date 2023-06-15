@@ -4385,7 +4385,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.EvapCondPumpElecConsumption + thisDXCoil.BasinHeaterConsumption +
                                                                  thisDXCoil.EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-            if (thisDXCoil.FuelType != Constant::eResource::Electricity) {
+            if (thisDXCoil.FuelType != Constant::eFuel::Electricity) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.MSFuelWasteHeat * TimeStepSysSec;
             }
         } else if (thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
@@ -15595,9 +15595,12 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = true;
 
         // DOAS
-        resultCells(LoadCompCol::SensInst, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
+        Real64 const mult = state.dataHeatBal->Zone(zoneIndex).Multiplier * state.dataHeatBal->Zone(zoneIndex).ListMultiplier;
+        resultCells(LoadCompCol::SensInst, LoadCompRow::DOAS) =
+            state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax) / mult;
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::DOAS) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
+        resultCells(LoadCompCol::Latent, LoadCompRow::DOAS) =
+            state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax) / mult;
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::DOAS) = true;
 
         // INFILTRATION
@@ -17328,6 +17331,12 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
             s += "&gt;";
         } else if (c == char(176)) {
             s += "&deg;";
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(164)) { // ≤
+            s += "&le;";
+            index += 2;
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(165)) { // ≥
+            s += "&ge;";
+            index += 2;
         } else if (c == '\xC2') {
             if (index == inputSize) {
                 s += '\xC2';
