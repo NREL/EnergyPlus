@@ -2318,14 +2318,12 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     Real64 rho;
     int FieldNum = 2;                      // IDD numeric field number where input field description is found
     std::string CompType;                  // component type
-    int SizingType;                        // type of sizing to perform
     std::string SizingString;              // input field sizing description (e.g., Nominal Capacity)
     bool bPRINT = true;                    // TRUE if sizing is reported to output (eio)
     Real64 TempSize;                       // autosized value
     Real64 DesCoilWaterInTempSaved;        // coil water inlet temp used for error checking UA sizing
     Real64 DesCoilInletWaterTempUsed(0.0); // coil design inlet water temp for UA sizing only
     Real64 Cp;
-    bool NomCapUserInp = false; // flag for whether user has onput a nominal heating capacity
 
     bool ErrorsFound = false;
     bool LoopErrorsFound = false;
@@ -2337,7 +2335,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
 
     auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
-    auto &OASysEqSizing = state.dataSize->OASysEqSizing;
+    // auto &OASysEqSizing = state.dataSize->OASysEqSizing;
 
     // cooling coils
     if (((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
@@ -2747,7 +2745,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
         if (PltSizHeatNum > 0) {
 
-            //bool ErrorsFound = false;
+            bool NomCapUserInp = false; // flag for whether user has onput a nominal heating capacity
 
             state.dataSize->DataPltSizHeatNum = PltSizHeatNum;
             state.dataSize->DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum;
@@ -2792,6 +2790,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 state.dataSize->DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                 if (state.dataSize->CurOASysNum > 0) {
+                    auto &OASysEqSizing = state.dataSize->OASysEqSizing;
                     OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
                     OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow =
                         state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
@@ -2819,7 +2818,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 TempSize = AutoSize;
             }
             if (state.dataSize->CurSysNum > 0) {
-                SizingType = HeatingCapacitySizing;
+                int SizingType = HeatingCapacitySizing;
                 FieldNum = 3; //  N3 , \field Rated Capacity
                 SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
                 ErrorsFound = false;
@@ -3288,13 +3287,7 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CoefPointer;
     //    INTEGER :: CoolCoilErrs = 0
-    int PartWetIterations;
-    int WaterTempConvgLoop;
-
-    bool CoilPartWetConvg;
-    bool WaterTempConvg;
 
     Real64 AirEnthAtRsdInletWaterTemp;
     Real64 AirExitEnthlAtCoilSurfTemp;
@@ -3561,7 +3554,7 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
         //);             } // CoefPointer
         auto const &dry_fin_eff_coef = state.dataWaterCoils->WaterCoil(CoilNum).DryFinEfficncyCoef;
         Real64 DryFinEfficncy_pow = 1.0;
-        for (CoefPointer = 1; CoefPointer <= 5; ++CoefPointer) {
+        for (int CoefPointer = 1; CoefPointer <= 5; ++CoefPointer) {
             DryCoilEfficiency += dry_fin_eff_coef(CoefPointer) * DryFinEfficncy_pow;
             DryFinEfficncy_pow *= DryFinEfficncy;
         } // CoefPointer
@@ -3580,8 +3573,8 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
         //       perform initialisations for all wet solution
         WetSideEffctvWaterTemp =
             state.dataWaterCoils->WaterCoil(CoilNum).MeanWaterTempSaved + (TempWaterIn - state.dataWaterCoils->WaterCoil(CoilNum).InWaterTempSaved);
-        WaterTempConvgLoop = 0;
-        WaterTempConvg = false;
+        int WaterTempConvgLoop = 0;
+        bool WaterTempConvg = false;
         //       Loop to solve coil as if all wet, converges on MeanWaterTemp eq WetSideEffctvWaterTemp
         //       if conv=.TRUE. at any time program exits loop and proceeds
         //       to part wet / part dry solution
@@ -3654,9 +3647,9 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
         state.dataWaterCoils->WaterCoil(CoilNum).MeanWaterTempSaved = MeanWaterTemp;
         //      now simulate wet dry coil - test outlet condition from all
         //      wet case to give an idea of the expected solution
-        PartWetIterations = 0;
+        int PartWetIterations = 0;
         WetDryInterSurfTempError = 0.0;
-        CoilPartWetConvg = false;
+        bool CoilPartWetConvg = false;
         //      Surface temp at coil water outlet (air inlet) is less than
         //      the dew point - Coil must be completely wet so no need to
         //      simulate wet/dry case
