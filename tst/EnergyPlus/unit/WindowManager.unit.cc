@@ -508,9 +508,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalSurf->SurfTempInTmp.allocate(3);
     state->dataHeatBalSurf->SurfHAirExt.allocate(3);
 
-    int surfNum1 = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
-    int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
-    int surfNum3 = UtilityRoutines::FindItemInList("FLOOR", state->dataSurface->Surface);
+    int surfNum1 = Util::FindItemInList("WALL", state->dataSurface->Surface);
+    int surfNum2 = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int surfNum3 = Util::FindItemInList("FLOOR", state->dataSurface->Surface);
 
     state->dataSurface->Surface(surfNum1).HeatTransSurf = true;
     state->dataSurface->Surface(surfNum2).HeatTransSurf = true;
@@ -2770,9 +2770,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     state->dataLoopNodes->Node.allocate(4);
 
-    int surfNum1 = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
-    int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
-    int surfNum3 = UtilityRoutines::FindItemInList("FLOOR", state->dataSurface->Surface);
+    int surfNum1 = Util::FindItemInList("WALL", state->dataSurface->Surface);
+    int surfNum2 = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int surfNum3 = Util::FindItemInList("FLOOR", state->dataSurface->Surface);
 
     state->dataSurface->Surface(surfNum1).HeatTransSurf = true;
     state->dataSurface->Surface(surfNum2).HeatTransSurf = true;

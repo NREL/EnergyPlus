@@ -124,7 +124,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
             ZonePlenumNum =
-                UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
+                Util::FindItemInList(CompName, state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZonePlenumName);
             if (ZonePlenumNum == 0) {
                 ShowFatalError(state, format("SimAirZonePlenum: AirLoopHVAC:ReturnPlenum not found={}", CompName));
             }
@@ -162,7 +162,7 @@ void SimAirZonePlenum(EnergyPlusData &state,
         // Find the correct ZonePlenumNumber
         if (CompIndex == 0) {
             ZonePlenumNum =
-                UtilityRoutines::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
+                Util::FindItemInList(CompName, state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZonePlenumName);
             if (ZonePlenumNum == 0) {
                 ShowFatalError(state, format("SimAirZonePlenum: AirLoopHVAC:SupplyPlenum not found={}", CompName));
             }
@@ -298,13 +298,13 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
         auto &thisRetPlenum = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum);
         thisRetPlenum.ZonePlenumName = AlphArray(1);
 
         // Check if this zone is also used in another return plenum
-        IOStat = UtilityRoutines::FindItemInList(
+        IOStat = Util::FindItemInList(
             AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
@@ -315,7 +315,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
         }
         thisRetPlenum.ZoneName = AlphArray(2);
         // put the X-Ref to the zone heat balance data structure
-        thisRetPlenum.ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), state.dataHeatBal->Zone);
+        thisRetPlenum.ActualZoneNum = Util::FindItemInList(AlphArray(2), state.dataHeatBal->Zone);
         if (thisRetPlenum.ActualZoneNum == 0) {
             ShowSevereError(state, format("For {} = {}, {} = {} not found.", CurrentModuleObject, AlphArray(1), cAlphaFields(2), AlphArray(2)));
             ErrorsFound = true;
@@ -325,7 +325,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
             state.dataHeatBal->Zone(thisRetPlenum.ActualZoneNum).PlenumCondNum = ZonePlenumNum;
         }
         //  Check if this zone is used as a controlled zone
-        ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
+        ZoneEquipConfigLoop = Util::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
         if (ZoneEquipConfigLoop != 0) {
             ShowSevereError(
                 state,
@@ -484,13 +484,13 @@ void GetZonePlenumInput(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
         auto &thisSupPlenum = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum);
         thisSupPlenum.ZonePlenumName = AlphArray(1);
 
         // Check if this zone is also used in another plenum
-        IOStat = UtilityRoutines::FindItemInList(
+        IOStat = Util::FindItemInList(
             AlphArray(2), state.dataZonePlenum->ZoneSupPlenCond, &ZoneSupplyPlenumConditions::ZoneName, ZonePlenumNum - 1);
         if (IOStat != 0) {
             ShowSevereError(state,
@@ -500,7 +500,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (state.dataZonePlenum->NumZoneReturnPlenums > 0) { // Check if this zone is also used in another plenum
-            IOStat = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName);
+            IOStat = Util::FindItemInList(AlphArray(2), state.dataZonePlenum->ZoneRetPlenCond, &ZoneReturnPlenumConditions::ZoneName);
             if (IOStat != 0) {
                 ShowSevereError(state,
                                 format("{}{} \"{}\" is used more than once as a {} or AirLoopHVAC:ReturnPlenum.",
@@ -516,7 +516,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
         }
         thisSupPlenum.ZoneName = AlphArray(2);
         // put the X-Ref to the zone heat balance data structure
-        thisSupPlenum.ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), state.dataHeatBal->Zone);
+        thisSupPlenum.ActualZoneNum = Util::FindItemInList(AlphArray(2), state.dataHeatBal->Zone);
         if (thisSupPlenum.ActualZoneNum == 0) {
             ShowSevereError(state, format("For {} = {}, {} = {} not found.", CurrentModuleObject, AlphArray(1), cAlphaFields(2), AlphArray(2)));
             ErrorsFound = true;
@@ -529,7 +529,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
         if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) {
                 return e.IsControlled;
             })) {
-            ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
+            ZoneEquipConfigLoop = Util::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneEquipConfigLoop != 0) {
                 ShowSevereError(state,
                                 format("{}{} \"{}\" is a controlled zone. It cannot be used as a {} or AirLoopHVAC:ReturnPlenum.",
@@ -544,7 +544,7 @@ void GetZonePlenumInput(EnergyPlusData &state)
         // Check if this is also used as a return plenum
         //  *** This next IF loop looks wrong.  Sent e-mail to Peter/Brent 8/14/08 for clarification ****
         //      IF (NumZoneReturnPlenums > 0) THEN
-        //        IOSTAT=UtilityRoutines::FindItemInList(AlphArray(1),ZoneRetPlenCond%ZoneName,NumZoneReturnPlenums)
+        //        IOSTAT=Util::FindItemInList(AlphArray(1),ZoneRetPlenCond%ZoneName,NumZoneReturnPlenums)
         //        IF (IOStat /= 0) THEN
         //          CALL ShowSevereError(state, RoutineName//'Plenum "'//TRIM(AlphArray(2))//  &
         //                               '" is a controlled zone.  It cannot be used as a '//  &

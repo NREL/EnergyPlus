@@ -132,7 +132,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // Find the correct HXAssistedCoolingCoil number
         if (CompIndex == 0) {
-            HXAssistedCoilNum = UtilityRoutines::FindItemInList(HXAssistedCoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            HXAssistedCoilNum = Util::FindItemInList(HXAssistedCoilName, state.dataHVACAssistedCC->HXAssistedCoil);
             if (HXAssistedCoilNum == 0) {
                 ShowFatalError(state, format("HX Assisted Coil not found={}", HXAssistedCoilName));
             }
@@ -305,11 +305,11 @@ namespace HVACHXAssistedCoolingCoil {
             thisHXCoil.HeatExchangerType = AlphArray(2);
             thisHXCoil.HeatExchangerName = AlphArray(3);
 
-            if (UtilityRoutines::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
+            if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
                 thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_GENERIC;
-            } else if (UtilityRoutines::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
+            } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
                 thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_FLATPLATE;
-            } else if (UtilityRoutines::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow")) {
+            } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow")) {
                 thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_DESICCANT_BALANCED;
             } else {
                 ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
@@ -320,7 +320,7 @@ namespace HVACHXAssistedCoolingCoil {
             thisHXCoil.CoolingCoilType = AlphArray(4);
             thisHXCoil.CoolingCoilName = AlphArray(5);
 
-            if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX")) {
+            if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX")) {
                 thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::CoilDX_Cooling;
                 thisHXCoil.HXAssistedCoilType = CurrentModuleObject;
                 thisHXCoil.HXAssistedCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
@@ -342,7 +342,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, format("...occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
+            } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
                 thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
                 thisHXCoil.HXAssistedCoilType = CurrentModuleObject;
                 thisHXCoil.HXAssistedCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
@@ -353,7 +353,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, format("...occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
+            } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                 thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
                 thisHXCoil.HXAssistedCoilType = CurrentModuleObject;
                 thisHXCoil.HXAssistedCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
@@ -399,7 +399,7 @@ namespace HVACHXAssistedCoolingCoil {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
-            if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX")) {
+            if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX")) {
                 CoolingCoilInletNodeNum = state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].evapInletNodeIndex;
                 if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
@@ -436,7 +436,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
 
-            } else if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
+            } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
                 CoolingCoilInletNodeNum =
@@ -483,7 +483,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
 
-            } else if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
+            } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
                 CoolingCoilInletNodeNum = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
@@ -634,12 +634,12 @@ namespace HVACHXAssistedCoolingCoil {
             thisHXCoil.HeatExchangerType = AlphArray(2);
             thisHXCoil.HeatExchangerName = AlphArray(3);
 
-            if (UtilityRoutines::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
+            if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
                 thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_GENERIC;
-            } else if (UtilityRoutines::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
+            } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
                 thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_FLATPLATE;
                 //       balanced desiccant HX not allowed with water coils at this time
-                //       ELSEIF(UtilityRoutines::SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow'))
+                //       ELSEIF(Util::SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow'))
                 //       THEN
                 //         HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType_Num = HX_DESICCANT_BALANCED
             } else {
@@ -675,11 +675,11 @@ namespace HVACHXAssistedCoolingCoil {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
-            if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water") ||
-                UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
-                if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+            if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water") ||
+                Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+                if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
                     thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterDetailed;
-                } else if (UtilityRoutines::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water")) {
+                } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water")) {
                     thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
                 }
 
@@ -1080,7 +1080,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            HXDXCoilIndex = UtilityRoutines::FindItem(HXDXCoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            HXDXCoilIndex = Util::FindItem(HXDXCoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         } else {
             HXDXCoilIndex = 0;
         }
@@ -1124,7 +1124,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Find the correct Coil number
         if (CompIndex == 0) {
             if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-                HXAssistedCoilNum = UtilityRoutines::FindItem(CompName, state.dataHVACAssistedCC->HXAssistedCoil);
+                HXAssistedCoilNum = Util::FindItem(CompName, state.dataHVACAssistedCC->HXAssistedCoil);
             } else {
                 HXAssistedCoilNum = 0;
             }
@@ -1187,10 +1187,10 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
-        if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
+        if (Util::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
             if (WhichCoil != 0) {
                 // coil does not have capacity in input so mine information from DX cooling coil
 
@@ -1215,7 +1215,7 @@ namespace HVACHXAssistedCoolingCoil {
                         state, "Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", state.dataHVACAssistedCC->ErrCount);
                 }
             }
-        } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+        } else if (Util::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
             if (WhichCoil != 0) {
                 // coil does not have capacity in input so mine information from DX cooling coil
                 CoilCapacity = WaterCoils::GetWaterCoilCapacity(state,
@@ -1271,7 +1271,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         } else {
             WhichCoil = 0;
         }
@@ -1315,7 +1315,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1355,7 +1355,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1396,7 +1396,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1453,7 +1453,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1491,7 +1491,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1529,7 +1529,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1567,7 +1567,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1606,7 +1606,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1644,7 +1644,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
         }
 
         if (WhichCoil != 0) {
@@ -1688,9 +1688,9 @@ namespace HVACHXAssistedCoolingCoil {
 
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
 
-            int WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            int WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
 
-            if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
+            if (Util::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
                     // coil does not specify MaxWaterFlowRate
                     MaxWaterFlowRate = 0.0;
@@ -1698,7 +1698,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                    "Requested Max Water Flow Rate from CoilSystem:Cooling:DX:HeatExchangerAssisted N/A",
                                                    state.dataHVACAssistedCC->ErrCount2);
                 }
-            } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+            } else if (Util::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
                     MaxWaterFlowRate =
                         WaterCoils::GetCoilMaxWaterFlowRate(state, CoilType, GetHXDXCoilName(state, CoilType, CoilName, ErrorsFound), ErrorsFound);
@@ -1750,10 +1750,10 @@ namespace HVACHXAssistedCoolingCoil {
 
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
 
-            int WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
+            int WhichCoil = Util::FindItem(CoilName, state.dataHVACAssistedCC->HXAssistedCoil);
 
-            if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
-                UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
+            if (Util::SameString(CoilType, "CoilSystem:Cooling:DX:HeatExchangerAssisted") ||
+                Util::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
                     MaxAirFlowRate =
                         HeatRecovery::GetSupplyAirFlowRate(state, state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HeatExchangerName, ErrorsFound);
@@ -1799,11 +1799,11 @@ namespace HVACHXAssistedCoolingCoil {
 
         int WhichCoil = 0;
         if (state.dataHVACAssistedCC->TotalNumHXAssistedCoils > 0) {
-            WhichCoil = UtilityRoutines::FindItem(HXName, state.dataHVACAssistedCC->HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName);
+            WhichCoil = Util::FindItem(HXName, state.dataHVACAssistedCC->HXAssistedCoil, &HXAssistedCoilParameters::HeatExchangerName);
         }
 
         if (WhichCoil != 0) {
-            if (UtilityRoutines::SameString(state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HeatExchangerType, HXType)) {
+            if (Util::SameString(state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HeatExchangerType, HXType)) {
                 return true;
             }
         }

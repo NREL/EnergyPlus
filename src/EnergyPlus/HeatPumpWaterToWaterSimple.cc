@@ -572,7 +572,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     for (int GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
         auto &thisGSHP = state.dataHPWaterToWaterSimple->GSHP(GSHPNum);
         if (!thisGSHP.companionName.empty()) {
-            thisGSHP.companionIndex = UtilityRoutines::FindItemInList(thisGSHP.companionName, state.dataHPWaterToWaterSimple->GSHP);
+            thisGSHP.companionIndex = Util::FindItemInList(thisGSHP.companionName, state.dataHPWaterToWaterSimple->GSHP);
             if (thisGSHP.companionIndex == 0) {
                 ShowSevereError(state,
                                 format("GetEquationFitWaterToWater Input: did not find companion heat pump named '{}' in heat pump called {}",

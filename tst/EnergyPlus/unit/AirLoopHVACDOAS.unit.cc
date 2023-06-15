@@ -4033,7 +4033,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SimAirServingZones::GetAirPathData(*state);
 
     auto getNodeByName = [this](std::string_view nodeName) -> NodeData & {
-        const int idx = UtilityRoutines::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        const int idx = Util::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
         if (idx == 0) {
             throw;
         }
@@ -8370,7 +8370,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     SimAirServingZones::GetAirPathData(*state);
 
     auto getNodeByName = [this](std::string_view nodeName) -> NodeData & {
-        const int idx = UtilityRoutines::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        const int idx = Util::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
         if (idx == 0) {
             throw;
         }

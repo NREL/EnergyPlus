@@ -94,7 +94,7 @@ extern "C" {
 
 namespace EnergyPlus {
 
-namespace UtilityRoutines {
+namespace Util {
 
     Real64 ProcessNumber(std::string_view String, bool &ErrorFlag)
     {
@@ -274,7 +274,7 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int FindItem = UtilityRoutines::FindItemInList(String, ListOfItems, NumItems);
+        int FindItem = Util::FindItemInList(String, ListOfItems, NumItems);
         if (FindItem != 0) return FindItem;
 
         for (int Count = 1; Count <= NumItems; ++Count) {
@@ -299,7 +299,7 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int FindItem = UtilityRoutines::FindItemInList(String, ListOfItems, NumItems);
+        int FindItem = Util::FindItemInList(String, ListOfItems, NumItems);
         if (FindItem != 0) return FindItem;
 
         for (int Count = 1; Count <= NumItems; ++Count) {
@@ -486,7 +486,7 @@ namespace UtilityRoutines {
         return calctime;
     }
 
-} // namespace UtilityRoutines
+} // namespace Util
 
 int AbortEnergyPlus(EnergyPlusData &state)
 {
@@ -588,7 +588,7 @@ int AbortEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
     // catch up with timings if in middle
-    state.dataSysVars->Time_Finish = UtilityRoutines::epElapsedTime();
+    state.dataSysVars->Time_Finish = Util::epElapsedTime();
     if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
     state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
     if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
@@ -728,11 +728,11 @@ int EndEnergyPlus(EnergyPlusData &state)
     NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
     strip(NumSevereDuringSizing);
 
-    state.dataSysVars->Time_Finish = UtilityRoutines::epElapsedTime();
+    state.dataSysVars->Time_Finish = Util::epElapsedTime();
     if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
     state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
     if (state.dataGlobal->createPerfLog) {
-        UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
+        Util::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
     }
     Hours = state.dataSysVars->Elapsed_Time / 3600.0;
     state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
@@ -748,9 +748,9 @@ int EndEnergyPlus(EnergyPlusData &state)
     state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
     if (state.dataGlobal->createPerfLog) {
-        UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
-        UtilityRoutines::appendPerfLog(state, "Number of Warnings", NumWarnings);
-        UtilityRoutines::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
+        Util::appendPerfLog(state, "Run Time [string]", Elapsed);
+        Util::appendPerfLog(state, "Number of Warnings", NumWarnings);
+        Util::appendPerfLog(state, "Number of Severe", NumSevere, true); // last item so write the perfLog file
     }
     ShowMessage(
         state,
@@ -1268,7 +1268,7 @@ void ShowRecurringSevereErrorAtEnd(EnergyPlusData &state,
     }
     bool bNewMessageFound = true;
     for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Severe  ** " + Message)) {
             bNewMessageFound = false;
             MsgIndex = Loop;
             break;
@@ -1323,7 +1323,7 @@ void ShowRecurringWarningErrorAtEnd(EnergyPlusData &state,
     }
     bool bNewMessageFound = true;
     for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " ** Warning ** " + Message)) {
             bNewMessageFound = false;
             MsgIndex = Loop;
             break;
@@ -1378,7 +1378,7 @@ void ShowRecurringContinueErrorAtEnd(EnergyPlusData &state,
     }
     bool bNewMessageFound = true;
     for (int Loop = 1; Loop <= state.dataErrTracking->NumRecurringErrors; ++Loop) {
-        if (UtilityRoutines::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
+        if (Util::SameString(state.dataErrTracking->RecurringErrors(Loop).Message, " **   ~~~   ** " + Message)) {
             bNewMessageFound = false;
             MsgIndex = Loop;
             break;

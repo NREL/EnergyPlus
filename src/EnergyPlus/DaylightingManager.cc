@@ -4322,7 +4322,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataDaylightingData->IllumMap(MapNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataDaylightingData->IllumMap(MapNum).zoneIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), Zone);
+            state.dataDaylightingData->IllumMap(MapNum).zoneIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), Zone);
 
             if (state.dataDaylightingData->IllumMap(MapNum).zoneIndex == 0) {
                 ShowSevereError(state,
@@ -4751,7 +4751,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         daylightControl.Name = state.dataIPShortCut->cAlphaArgs(1);
 
         // Is it a space or zone name?
-        int const spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
+        int const spaceNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
         if (spaceNum > 0) {
             daylightControl.spaceIndex = spaceNum;
             daylightControl.zoneIndex = state.dataHeatBal->space(spaceNum).zoneNum;
@@ -4768,7 +4768,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
                 continue;
             }
         } else {
-            int const zoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+            int const zoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (zoneNum == 0) {
                 ShowSevereError(state,
                                 format("{}: invalid {}=\"{}\".",
@@ -4813,10 +4813,10 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).daylightControlIndexes.emplace_back(controlNum);
         daylightControl.ZoneName = state.dataHeatBal->Zone(daylightControl.zoneIndex).Name;
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SPLITFLUX")) { // Field: Daylighting Method
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "SPLITFLUX")) { // Field: Daylighting Method
             daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
             state.dataDaylightingData->enclDaylight(daylightControl.enclIndex).hasSplitFluxDaylighting = true;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DELIGHT")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "DELIGHT")) {
             daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::DElight;
         } else if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             daylightControl.DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
@@ -4849,7 +4849,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
 
-        int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
+        int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
         daylightControl.LightControlType = static_cast<DataDaylighting::LtgCtrlType>(typeNum);
         if (daylightControl.LightControlType == DataDaylighting::LtgCtrlType::Invalid) {
             ShowWarningError(state,
@@ -4872,7 +4872,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) { // Field: Glare Calculation Daylighting Reference Point Name
             daylightControl.glareRefPtNumber =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6),
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6),
                                                 state.dataDaylightingData->DaylRefPt,
                                                 &DataDaylighting::RefPointData::Name); // Field: Glare Calculation Daylighting Reference Point Name
             if (daylightControl.glareRefPtNumber == 0) {
@@ -4948,7 +4948,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         int countRefPts = 0;
         for (int refPtNum = 1; refPtNum <= curTotalDaylRefPts; ++refPtNum) {
             daylightControl.DaylRefPtNum(refPtNum) =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(6 + refPtNum),
                                                 state.dataDaylightingData->DaylRefPt,
                                                 &DataDaylighting::RefPointData::Name); // Field: Daylighting Reference Point Name
             if (daylightControl.DaylRefPtNum(refPtNum) == 0) {
@@ -5230,9 +5230,9 @@ void GetInputDayliteRefPt(EnergyPlusData &state, bool &ErrorsFound)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
         pt.Name = state.dataIPShortCut->cAlphaArgs(1);
-        pt.ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+        pt.ZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (pt.ZoneNum == 0) {
-            int spaceNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
+            int spaceNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->space);
             if (spaceNum == 0) {
                 ShowSevereError(state,
                                 format("{}=\"{}\", invalid {}=\"{}\".",
@@ -5324,7 +5324,7 @@ void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state)
         if (state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName.empty()) continue;
         int found = -1;
         for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
-            if (UtilityRoutines::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName,
+            if (Util::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName,
                                             state.dataDaylightingData->daylightControl(daylightCtrlNum).Name)) {
                 found = daylightCtrlNum;
                 break;
@@ -5392,7 +5392,7 @@ void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound) // If errors fou
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
+        int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
         if (SurfNum == 0) {
             ShowSevereError(state,
                             format("{}: invalid {}=\"{}\" not found.",

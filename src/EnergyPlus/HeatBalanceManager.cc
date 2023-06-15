@@ -360,9 +360,9 @@ namespace HeatBalanceManager {
                                                                          NumNumbers,
                                                                          Status);
                 if (ONum == 5) {
-                    CNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct);
+                    CNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct);
                 } else {
-                    CNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
+                    CNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataConstruction->Construct);
                 }
                 if (CNum == 0) continue;
                 state.dataConstruction->Construct(CNum).IsUsed = true;
@@ -1110,7 +1110,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
-                    int FlowTypeNum = getEnumerationValue(DataHeatBalance::AdjustmentTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(1)));
+                    int FlowTypeNum = getEnumerationValue(DataHeatBalance::AdjustmentTypeNamesUC, Util::MakeUPPERCase(AlphaName(1)));
                     state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = static_cast<DataHeatBalance::AdjustmentType>(FlowTypeNum);
                     AlphaName(1) = DataHeatBalance::AdjustmentTypeNamesCC[FlowTypeNum];
                     DataHeatBalance::AdjustmentType ZoneFlowAdjustment = state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment;
@@ -1134,7 +1134,7 @@ namespace HeatBalanceManager {
             }
             if (NumAlpha > 1) {
                 {
-                    int FlowTypeNum = getEnumerationValue(DataHeatBalance::InfiltrationFlowTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(2)));
+                    int FlowTypeNum = getEnumerationValue(DataHeatBalance::InfiltrationFlowTypeNamesUC, Util::MakeUPPERCase(AlphaName(2)));
                     state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = static_cast<DataHeatBalance::InfiltrationFlow>(FlowTypeNum);
                     AlphaName(2) = DataHeatBalance::InfiltrationFlowTypeNamesCC[FlowTypeNum];
                     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add ||
@@ -1163,7 +1163,7 @@ namespace HeatBalanceManager {
                 if (NumAlpha > 2) {
                     {
                         int FlowTypeNum =
-                            getEnumerationValue(DataHeatBalance::InfiltrationZoneTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(3)));
+                            getEnumerationValue(DataHeatBalance::InfiltrationZoneTypeNamesUC, Util::MakeUPPERCase(AlphaName(3)));
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = static_cast<DataHeatBalance::InfiltrationZoneType>(FlowTypeNum);
                         AlphaName(3) = DataHeatBalance::InfiltrationZoneTypeNamesCC[FlowTypeNum];
                         if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Invalid) {
@@ -1608,7 +1608,7 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
 
-                thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
+                thisConstruct.LayerPoint(Layer) = Util::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
 
                 // count number of glass layers
                 if (thisConstruct.LayerPoint(Layer) > 0) {
@@ -1633,7 +1633,7 @@ namespace HeatBalanceManager {
 
                 if (thisConstruct.LayerPoint(Layer) == 0) {
                     // This may be a TC GlazingGroup
-                    thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInList(ConstructAlphas(Layer), state.dataHeatBal->TCGlazings);
+                    thisConstruct.LayerPoint(Layer) = Util::FindItemInList(ConstructAlphas(Layer), state.dataHeatBal->TCGlazings);
 
                     if (thisConstruct.LayerPoint(Layer) > 0) {
                         // reset layer pointer to the first glazing in the TC GlazingGroup
@@ -1703,9 +1703,9 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                std::string const thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = Util::MakeUPPERCase(instance.key());
 
-                std::string construction_name = UtilityRoutines::MakeUPPERCase(fields.at("construction_name").get<std::string>());
+                std::string construction_name = Util::MakeUPPERCase(fields.at("construction_name").get<std::string>());
                 int source_after_layer_number = fields.at("thermal_source_present_after_layer_number").get<int>();
                 int calculation_after_layer_number = fields.at("temperature_calculation_requested_after_layer_number").get<int>();
                 int ctf_dimensions = fields.at("dimensions_for_the_ctf_calculation").get<int>();
@@ -1718,7 +1718,7 @@ namespace HeatBalanceManager {
                 Real64 calculation_position = fields.at("two_dimensional_temperature_calculation_position").get<Real64>();
 
                 // Find the construction
-                int construction_index = UtilityRoutines::FindItemInList(construction_name, state.dataConstruction->Construct);
+                int construction_index = Util::FindItemInList(construction_name, state.dataConstruction->Construct);
 
                 if (construction_index == 0) {
                     ShowSevereError(state,
@@ -1822,7 +1822,7 @@ namespace HeatBalanceManager {
 
                 // Find the material in the list of materials
                 state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) =
-                    UtilityRoutines::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
+                    Util::FindItemInPtrList(ConstructAlphas(Layer), state.dataMaterial->Material);
 
                 if (state.dataConstruction->Construct(TotRegConstructs + ConstrNum).LayerPoint(Layer) == 0) {
                     ShowSevereError(state,
@@ -2033,7 +2033,7 @@ namespace HeatBalanceManager {
                 TMP = index(state.dataIPShortCut->cAlphaArgs(1), char(2));
             }
 
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound))
+            if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound))
                 continue;
 
             ++ZoneLoop;
@@ -2086,7 +2086,7 @@ namespace HeatBalanceManager {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 state.dataHeatBal->ZoneList(ListNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                if (UtilityRoutines::FindItemInList(state.dataHeatBal->ZoneList(ListNum).Name, state.dataHeatBal->Zone) > 0) {
+                if (Util::FindItemInList(state.dataHeatBal->ZoneList(ListNum).Name, state.dataHeatBal->Zone) > 0) {
                     ShowWarningError(
                         state,
                         format(
@@ -2109,7 +2109,7 @@ namespace HeatBalanceManager {
                         std::string ZoneName = state.dataIPShortCut->cAlphaArgs(ZoneNum + 1);
                         state.dataHeatBal->ZoneList(ListNum).MaxZoneNameLength =
                             max(state.dataHeatBal->ZoneList(ListNum).MaxZoneNameLength, len(ZoneName));
-                        state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) = UtilityRoutines::FindItemInList(ZoneName, state.dataHeatBal->Zone);
+                        state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) = Util::FindItemInList(ZoneName, state.dataHeatBal->Zone);
                         if (state.dataHeatBal->ZoneList(ListNum).Zone(ZoneNum) == 0) {
                             ShowSevereError(state,
                                             format("{}{}=\"{}\":  {} {} not found.",
@@ -2167,7 +2167,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->ZoneGroup(GroupNum).Multiplier = state.dataIPShortCut->rNumericArgs(1);
 
                 // Zone list
-                int ListNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
+                int ListNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
                 state.dataHeatBal->ZoneGroup(GroupNum).ZoneList = ListNum;
 
                 if (ListNum == 0) {
@@ -2266,7 +2266,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             // Assign surface number
-            int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
+            int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataSurface->Surface);
             if (SurfNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -2372,7 +2372,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->ZoneLocalEnvironment(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Assign zone number
-                int ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+                int ZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
                 if (ZoneNum == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -2505,9 +2505,9 @@ namespace HeatBalanceManager {
         // Process the input field:    Part of Total Floor Area
         //   The default value is YES and so only NO needs to be handled
         if (NumAlphas > 3) {
-            if (UtilityRoutines::SameString("No", cAlphaArgs(4))) {
+            if (Util::SameString("No", cAlphaArgs(4))) {
                 state.dataHeatBal->Zone(ZoneLoop).isPartOfTotalArea = false;
-            } else if (UtilityRoutines::SameString("Yes", cAlphaArgs(4)) || lAlphaFieldBlanks(4)) {
+            } else if (Util::SameString("Yes", cAlphaArgs(4)) || lAlphaFieldBlanks(4)) {
                 state.dataHeatBal->Zone(ZoneLoop).isPartOfTotalArea = true;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, cCurrentModuleObject, state.dataHeatBal->Zone(ZoneLoop).Name));
@@ -2567,13 +2567,13 @@ namespace HeatBalanceManager {
                 ++spaceNum;
                 auto const &objectFields = instance.value();
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                thisSpace.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                thisSpace.Name = Util::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
                 thisSpace.CeilingHeight = ip->getRealFieldValue(objectFields, objectSchemaProps, "ceiling_height");
                 thisSpace.Volume = ip->getRealFieldValue(objectFields, objectSchemaProps, "volume");
                 thisSpace.userEnteredFloorArea = ip->getRealFieldValue(objectFields, objectSchemaProps, "floor_area");
-                int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+                int zoneNum = Util::FindItemInList(zoneName, state.dataHeatBal->Zone);
                 if (zoneNum > 0) {
                     thisSpace.zoneNum = zoneNum;
                     state.dataHeatBal->Zone(zoneNum).spaceIndexes.emplace_back(spaceNum);
@@ -2586,7 +2586,7 @@ namespace HeatBalanceManager {
                 thisSpace.spaceType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_type");
                 bool spaceTypeFound = false;
                 for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->numSpaceTypes; ++spaceTypePtr) {
-                    if (UtilityRoutines::SameString(thisSpace.spaceType, state.dataHeatBal->spaceTypes(spaceTypePtr))) {
+                    if (Util::SameString(thisSpace.spaceType, state.dataHeatBal->spaceTypes(spaceTypePtr))) {
                         thisSpace.spaceTypeNum = spaceTypePtr;
                         spaceTypeFound = true;
                         break;
@@ -2626,15 +2626,15 @@ namespace HeatBalanceManager {
                 ++spaceListNum;
                 auto const &objectFields = instance.value();
                 auto &thisSpaceList = state.dataHeatBal->spaceList(spaceListNum);
-                thisSpaceList.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                thisSpaceList.Name = Util::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
-                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Zone) > 0) {
+                if (Util::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Zone) > 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}\":  is a duplicate of a zone name.", RoutineName, cCurrentModuleObject, thisSpaceList.Name));
                     ErrorsFound = true;
                 }
-                if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->space) > 0) {
+                if (Util::FindItemInList(thisSpaceList.Name, state.dataHeatBal->space) > 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}\":  is a duplicate of a space name.", RoutineName, cCurrentModuleObject, thisSpaceList.Name));
                     ErrorsFound = true;
@@ -2648,7 +2648,7 @@ namespace HeatBalanceManager {
                     auto &extensiblesArray = extensibles.value();
                     for (auto &extensibleInstance : extensiblesArray) {
                         std::string thisSpaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
-                        int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                        int thisSpaceNum = Util::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                         if (thisSpaceNum > 0) {
                             thisSpaceList.spaces.emplace_back(thisSpaceNum);
                             ++thisSpaceList.numListSpaces;
@@ -2697,7 +2697,7 @@ namespace HeatBalanceManager {
         bool generalSpaceTypeExists = false;
         int generalSpaceTypeNum = 0;
         for (int spaceTypePtr = 1; spaceTypePtr <= state.dataGlobal->numSpaceTypes; ++spaceTypePtr) {
-            if (UtilityRoutines::SameString(state.dataHeatBal->spaceTypes(spaceTypePtr), "GENERAL")) {
+            if (Util::SameString(state.dataHeatBal->spaceTypes(spaceTypePtr), "GENERAL")) {
                 generalSpaceTypeNum = spaceTypePtr;
                 generalSpaceTypeExists = true;
                 break;
@@ -3902,7 +3902,7 @@ namespace HeatBalanceManager {
 
         // Get window name and check for match
         W5Name = std::string{DataLine(4).substr(19)};
-        WindowNameInW5DataFile = UtilityRoutines::MakeUPPERCase(W5Name);
+        WindowNameInW5DataFile = Util::MakeUPPERCase(W5Name);
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found
         Label20:;
@@ -3923,7 +3923,7 @@ namespace HeatBalanceManager {
             if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             bool error = false;
-            NGlSys = static_cast<int>(UtilityRoutines::ProcessNumber(NextLine.data.substr(19), error));
+            NGlSys = static_cast<int>(Util::ProcessNumber(NextLine.data.substr(19), error));
             if (NGlSys <= 0 || NGlSys > 2 || error) {
                 ShowFatalError(
                     state,
@@ -4008,7 +4008,7 @@ namespace HeatBalanceManager {
             MullionOrientation = "Vertical";
             if (NGlSys == 2) {
                 error = false;
-                MullionWidth = UtilityRoutines::ProcessNumber(DataLine(10).substr(19), error);
+                MullionWidth = Util::ProcessNumber(DataLine(10).substr(19), error);
                 if (error) {
                     ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Width.");
                     ShowContinueError(state,
@@ -4016,7 +4016,7 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
                 MullionWidth *= 0.001;
-                MullionOrientation = UtilityRoutines::ProcessNumber(DataLine(10).substr(88), error);
+                MullionOrientation = Util::ProcessNumber(DataLine(10).substr(88), error);
                 if (error) {
                     ShowSevereError(state, "HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Orientation.");
                     ShowContinueError(state,
@@ -4415,9 +4415,9 @@ namespace HeatBalanceManager {
                 thisConstruct.FromWindow5DataFile = true;
                 thisConstruct.W5FileGlazingSysHeight = WinHeight(IGlSys);
                 thisConstruct.W5FileGlazingSysWidth = WinWidth(IGlSys);
-                if (UtilityRoutines::SameString(MullionOrientation, "Vertical")) {
+                if (Util::SameString(MullionOrientation, "Vertical")) {
                     thisConstruct.W5FileMullionOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
-                } else if (UtilityRoutines::SameString(MullionOrientation, "Horizontal")) {
+                } else if (Util::SameString(MullionOrientation, "Horizontal")) {
                     thisConstruct.W5FileMullionOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
                 } else {
                 }
@@ -4596,14 +4596,14 @@ namespace HeatBalanceManager {
                     state.dataSurface->FrameDivider(FrDivNum).FrameVisAbsorp = FrameVisAbsorp;
                     state.dataSurface->FrameDivider(FrDivNum).FrameEmis = FrameEmis;
                     state.dataSurface->FrameDivider(FrDivNum).FrameEdgeWidth = 0.06355; // 2.5 in
-                    if (UtilityRoutines::SameString(MullionOrientation, "Vertical")) {
+                    if (Util::SameString(MullionOrientation, "Vertical")) {
                         state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
-                    } else if (UtilityRoutines::SameString(MullionOrientation, "Horizontal")) {
+                    } else if (Util::SameString(MullionOrientation, "Horizontal")) {
                         state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
                     }
-                    if (UtilityRoutines::SameString(DividerType(IGlSys), "DividedLite")) {
+                    if (Util::SameString(DividerType(IGlSys), "DividedLite")) {
                         state.dataSurface->FrameDivider(FrDivNum).DividerType = DataSurfaces::FrameDividerType::DividedLite;
-                    } else if (UtilityRoutines::SameString(DividerType(IGlSys), "Suspended")) {
+                    } else if (Util::SameString(DividerType(IGlSys), "Suspended")) {
                         state.dataSurface->FrameDivider(FrDivNum).DividerType = DataSurfaces::FrameDividerType::Suspended;
                     }
                     state.dataSurface->FrameDivider(FrDivNum).DividerWidth = DividerWidth(IGlSys);
@@ -4733,7 +4733,7 @@ namespace HeatBalanceManager {
         int iFCConcreteLayer; // Layer pointer to the materials array
 
         // First get the concrete layer
-        iFCConcreteLayer = UtilityRoutines::FindItemInPtrList("~FC_Concrete", state.dataMaterial->Material);
+        iFCConcreteLayer = Util::FindItemInPtrList("~FC_Concrete", state.dataMaterial->Material);
         Rcon = state.dataMaterial->Material(iFCConcreteLayer)->Resistance;
 
         // Count number of constructions defined with Ffactor or Cfactor method
@@ -4827,7 +4827,7 @@ namespace HeatBalanceManager {
             thisConstruct.LayerPoint(2) = iFCConcreteLayer;
 
             // The fictitious insulation is the outside layer
-            MaterNum = UtilityRoutines::FindItemInPtrList(format("~FC_Insulation_{}", Loop), state.dataMaterial->Material);
+            MaterNum = Util::FindItemInPtrList(format("~FC_Insulation_{}", Loop), state.dataMaterial->Material);
             thisConstruct.LayerPoint(1) = MaterNum;
 
             // Calculate the thermal resistance of the fictitious insulation layer
@@ -4922,7 +4922,7 @@ namespace HeatBalanceManager {
 
             // The fictitious insulation is the outside layer
             MaterNum =
-                UtilityRoutines::FindItemInPtrList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
+                Util::FindItemInPtrList("~FC_Insulation_" + fmt::to_string(Loop + TotFfactorConstructs), state.dataMaterial->Material);
             thisConstruct.LayerPoint(1) = MaterNum;
 
             // CR 8886 Rsoil should be in SI unit. From ASHRAE 90.1-2010 SI
@@ -4988,7 +4988,7 @@ namespace HeatBalanceManager {
                 ++constrNum;
                 auto &thisConstruct = state.dataConstruction->Construct(constrNum);
 
-                thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisConstruct.Name = Util::MakeUPPERCase(thisObjectName);
                 thisConstruct.TypeIsAirBoundary = true;
                 thisConstruct.IsUsedCTF = false;
 
@@ -4997,7 +4997,7 @@ namespace HeatBalanceManager {
                 if (fields.find("air_exchange_method") != fields.end()) {
                     airMethod = fields.at("air_exchange_method").get<std::string>();
                 }
-                if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
+                if (Util::SameString(airMethod, "SimpleMixing")) {
                     thisConstruct.TypeIsAirBoundaryMixing = true;
                     if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
                         thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour").get<Real64>();
@@ -5009,7 +5009,7 @@ namespace HeatBalanceManager {
                     }
                     if (fields.find("simple_mixing_schedule_name") != fields.end()) {
                         const std::string &schedName = fields.at("simple_mixing_schedule_name").get<std::string>();
-                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(schedName));
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, Util::MakeUPPERCase(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
                             ShowSevereError(state,
                                             format("{}{}=\"{}\", invalid (not found) Simple Mixing Schedule Name=\"{}\".",
@@ -5089,7 +5089,7 @@ namespace HeatBalanceManager {
                 state.dataSurface->SurfIncSolSSG(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -5121,7 +5121,7 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign construction number
-                ConstrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct);
+                ConstrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct);
                 if (ConstrNum == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -5187,7 +5187,7 @@ namespace HeatBalanceManager {
                 state.dataSurface->FenLayAbsSSG(Loop).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -5206,7 +5206,7 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign construction number
-                ConstrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct);
+                ConstrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataConstruction->Construct);
                 auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
                 if (ConstrNum == 0) {
                     ShowSevereError(state,
@@ -5776,7 +5776,7 @@ namespace HeatBalanceManager {
             }
 
             if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-                thisMaterial->GasPointer = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
+                thisMaterial->GasPointer = Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(2), state.dataMaterial->Material);
             } else {
                 ShowSevereError(state,
                                 format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -5788,11 +5788,11 @@ namespace HeatBalanceManager {
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 thisMaterial->DeflectionStatePtr =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->DeflectionState);
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->DeflectionState);
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 thisMaterial->SupportPillarPtr =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->SupportPillar);
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->SupportPillar);
             }
         }
 
@@ -6418,7 +6418,7 @@ namespace HeatBalanceManager {
             }
 
             // Simon: Assign thermal model number
-            ThermalModelNum = UtilityRoutines::FindItemInList(locAlphaArgs(4), state.dataMaterial->WindowThermalModel);
+            ThermalModelNum = Util::FindItemInList(locAlphaArgs(4), state.dataMaterial->WindowThermalModel);
             if (ThermalModelNum == 0) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}, object. Illegal value for {} has been found.",
@@ -6666,7 +6666,7 @@ namespace HeatBalanceManager {
                     AlphaIndex = 9 + (Layer * 3) - 2;
                     currentOpticalLayer = int(Layer / 2) + 1;
                     // Material info is contained in the thermal construct
-                    thisConstruct.LayerPoint(Layer) = UtilityRoutines::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
+                    thisConstruct.LayerPoint(Layer) = Util::FindItemInPtrList(locAlphaArgs(AlphaIndex), state.dataMaterial->Material);
 
                     // Simon: Load only if optical layer
                     if (mod(Layer, 2) != 0) {

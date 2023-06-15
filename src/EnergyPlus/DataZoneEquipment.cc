@@ -290,7 +290,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  cAlphaFields,
                                                                  cNumericFields); // Get Equipment | data for one zone
 
-        int ControlledZoneNum = UtilityRoutines::FindItemInList(AlphArray(1), Zone);
+        int ControlledZoneNum = Util::FindItemInList(AlphArray(1), Zone);
 
         if (ControlledZoneNum == 0) {
             ShowSevereError(state, format("{}{}: {}=\"{}\"", RoutineName, CurrentModuleObject, cAlphaFields(1), AlphArray(1)));
@@ -393,7 +393,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
             std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
             thisZoneEquipList.LoadDistScheme = static_cast<DataZoneEquipment::LoadDist>(
-                getEnumerationValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::MakeUPPERCase(loadDistName)));
+                getEnumerationValue(DataZoneEquipment::LoadDistNamesUC, Util::MakeUPPERCase(loadDistName)));
             if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
                 ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
                 ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));
@@ -521,7 +521,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     }
 
                     thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = static_cast<ZoneEquip>(
-                        getEnumerationValue(ZoneEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(thisZoneEquipList.EquipType(ZoneEquipTypeNum))));
+                        getEnumerationValue(ZoneEquipTypeNamesUC, Util::MakeUPPERCase(thisZoneEquipList.EquipType(ZoneEquipTypeNum))));
 
                     if (thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::ZoneUnitarySys ||
                         thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::PkgTermACAirToAir ||
@@ -792,7 +792,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // map ZoneEquipConfig%EquipListIndex to ZoneEquipList%Name
 
     for (int ControlledZoneLoop = 1; ControlledZoneLoop <= state.dataGlobal->NumOfZones; ++ControlledZoneLoop) {
-        state.dataZoneEquip->GetZoneEquipmentDataFound = UtilityRoutines::FindItemInList(
+        state.dataZoneEquip->GetZoneEquipmentDataFound = Util::FindItemInList(
             state.dataZoneEquip->ZoneEquipList(ControlledZoneLoop).Name, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::EquipListName);
         if (state.dataZoneEquip->GetZoneEquipmentDataFound > 0)
             state.dataZoneEquip->ZoneEquipConfig(state.dataZoneEquip->GetZoneEquipmentDataFound).EquipListIndex = ControlledZoneLoop;
@@ -975,13 +975,13 @@ bool CheckZoneEquipmentList(EnergyPlusData &state,
     for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {           // NumOfZoneEquipLists
         if (state.dataZoneEquip->ZoneEquipList(Loop).Name.empty()) continue; // dimensioned by NumOfZones.  Only valid ones have names.
         for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(Loop).NumOfEquipTypes; ++ListLoop) {
-            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipType(ListLoop), ComponentType)) continue;
+            if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipType(ListLoop), ComponentType)) continue;
             if (ComponentName == "*") {
                 IsOnList = true;
                 CtrlZoneNumLocal = Loop;
                 goto EquipList_exit;
             }
-            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipName(ListLoop), ComponentName)) continue;
+            if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipName(ListLoop), ComponentName)) continue;
             IsOnList = true;
             CtrlZoneNumLocal = Loop;
             goto EquipList_exit;
@@ -1010,7 +1010,7 @@ int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) /
         state.dataZoneEquip->ZoneEquipInputsFilled = true;
     }
 
-    return UtilityRoutines::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
+    return Util::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
 }
 
 int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
@@ -1242,7 +1242,7 @@ int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::Zone
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
         for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
             if (ZoneEquipTypeNum == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(Num) &&
-                UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num))) {
+                Util::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num))) {
                 return ControlZoneNum = CtrlZone;
             }
         }

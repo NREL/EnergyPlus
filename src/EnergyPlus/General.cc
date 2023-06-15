@@ -328,7 +328,7 @@ void ProcessDateString(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool errFlag;
 
-    int FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
+    int FstNum = int(Util::ProcessNumber(String, errFlag));
     DateType = Weather::DateType::Invalid;
     if (!errFlag) {
         // Entered single number, do inverse JDay
@@ -457,17 +457,17 @@ void DetermineDateTokens(EnergyPlusData &state,
         } else if (Loop == 2) {
             // Field must be Day Month or Month Day (if both numeric, mon / day)
             InternalError = false;
-            NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
+            NumField1 = int(Util::ProcessNumber(Fields(1), errFlag));
             if (errFlag) {
                 // Month day, but first field is not numeric, 2nd must be
-                NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
+                NumField2 = int(Util::ProcessNumber(Fields(2), errFlag));
                 if (errFlag) {
                     ShowSevereError(state, format("Invalid date field={}", String));
                     InternalError = true;
                 } else {
                     TokenDay = NumField2;
                 }
-                TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months.begin(), Months.end());
+                TokenMonth = Util::FindItemInList(Fields(1).substr(0, 3), Months.begin(), Months.end());
                 ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                 if (!InternalError) {
                     DateType = Weather::DateType::MonthDay;
@@ -476,7 +476,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                 }
             } else {
                 // Month Day, first field was numeric, if 2nd is, then it's month<num> day<num>
-                NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
+                NumField2 = int(Util::ProcessNumber(Fields(2), errFlag));
                 if (!errFlag) {
                     TokenMonth = NumField1;
                     TokenDay = NumField2;
@@ -488,7 +488,7 @@ void DetermineDateTokens(EnergyPlusData &state,
                     }
                 } else { // 2nd field was not numeric.  Must be Month
                     TokenDay = NumField1;
-                    TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
+                    TokenMonth = Util::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
                     ValidateMonthDay(state, String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
                         DateType = Weather::DateType::MonthDay;
@@ -501,16 +501,16 @@ void DetermineDateTokens(EnergyPlusData &state,
         } else if (Loop == 3) {
             // Field must be some combination of <num> Weekday Month (if WkDayInMonth true)
             if (WkDayInMonth) {
-                NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
+                NumField1 = int(Util::ProcessNumber(Fields(1), errFlag));
                 if (!errFlag) { // the expected result
                     TokenDay = NumField1;
-                    TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays.begin(), Weekdays.end());
+                    TokenWeekday = Util::FindItemInList(Fields(2).substr(0, 3), Weekdays.begin(), Weekdays.end());
                     if (TokenWeekday == 0) {
-                        TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
-                        TokenWeekday = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Weekdays.begin(), Weekdays.end());
+                        TokenMonth = Util::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
+                        TokenWeekday = Util::FindItemInList(Fields(3).substr(0, 3), Weekdays.begin(), Weekdays.end());
                         if (TokenMonth == 0 || TokenWeekday == 0) InternalError = true;
                     } else {
-                        TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months.begin(), Months.end());
+                        TokenMonth = Util::FindItemInList(Fields(3).substr(0, 3), Months.begin(), Months.end());
                         if (TokenMonth == 0) InternalError = true;
                     }
                     DateType = Weather::DateType::NthDayInMonth;
@@ -520,13 +520,13 @@ void DetermineDateTokens(EnergyPlusData &state,
                     if (Fields(1) == "LA") {
                         DateType = Weather::DateType::LastDayInMonth;
                         NumTokens = 3;
-                        TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays.begin(), Weekdays.end());
+                        TokenWeekday = Util::FindItemInList(Fields(2).substr(0, 3), Weekdays.begin(), Weekdays.end());
                         if (TokenWeekday == 0) {
-                            TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
-                            TokenWeekday = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Weekdays.begin(), Weekdays.end());
+                            TokenMonth = Util::FindItemInList(Fields(2).substr(0, 3), Months.begin(), Months.end());
+                            TokenWeekday = Util::FindItemInList(Fields(3).substr(0, 3), Weekdays.begin(), Weekdays.end());
                             if (TokenMonth == 0 || TokenWeekday == 0) InternalError = true;
                         } else {
-                            TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months.begin(), Months.end());
+                            TokenMonth = Util::FindItemInList(Fields(3).substr(0, 3), Months.begin(), Months.end());
                             if (TokenMonth == 0) InternalError = true;
                         }
                     } else { // error....
@@ -534,9 +534,9 @@ void DetermineDateTokens(EnergyPlusData &state,
                     }
                 }
             } else { // mm/dd/yyyy or yyyy/mm/dd
-                NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
-                NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
-                NumField3 = int(UtilityRoutines::ProcessNumber(Fields(3), errFlag));
+                NumField1 = int(Util::ProcessNumber(Fields(1), errFlag));
+                NumField2 = int(Util::ProcessNumber(Fields(2), errFlag));
+                NumField3 = int(Util::ProcessNumber(Fields(3), errFlag));
                 DateType = Weather::DateType::MonthDay;
                 // error detection later..
                 if (NumField1 > 100) {
@@ -1133,7 +1133,7 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             ReportType checkReportType =
-                static_cast<ReportType>(getEnumerationValue(ReportTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+                static_cast<ReportType>(getEnumerationValue(ReportTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
 
             switch (checkReportType) {
             case ReportType::DXF: {
@@ -1199,15 +1199,15 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "CONSTRUCTIONS")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), "CONSTRUCTIONS")) {
                 state.dataGeneral->Constructions = true;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "MATERIALS")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), "MATERIALS")) {
                 state.dataGeneral->Materials = true;
             }
             if (NumNames > 1) {
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "CONSTRUCTIONS")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "CONSTRUCTIONS")) {
                     state.dataGeneral->Constructions = true;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "MATERIALS")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "MATERIALS")) {
                     state.dataGeneral->Materials = true;
                 }
             }
@@ -1232,17 +1232,17 @@ void ScanForReports(EnergyPlusData &state,
             state.dataGeneral->EMSoutput = true;
 
             AvailRpt CheckAvailRpt =
-                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
             state.dataRuntimeLang->OutputEMSActuatorAvailSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSActuatorAvailFull = (CheckAvailRpt == AvailRpt::Verbose);
 
             CheckAvailRpt =
-                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
             state.dataRuntimeLang->OutputEMSInternalVarsSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSInternalVarsFull = (CheckAvailRpt == AvailRpt::Verbose);
 
             ERLdebugOutputLevel CheckERLlevel = static_cast<ERLdebugOutputLevel>(
-                getEnumerationValue(ERLdebugOutputLevelNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+                getEnumerationValue(ERLdebugOutputLevelNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
             state.dataRuntimeLang->OutputEMSErrors =
                 (CheckERLlevel == ERLdebugOutputLevel::ErrorsOnly || CheckERLlevel == ERLdebugOutputLevel::Verbose);
             state.dataRuntimeLang->OutputFullEMSTrace = (CheckERLlevel == ERLdebugOutputLevel::Verbose);
@@ -1255,12 +1255,12 @@ void ScanForReports(EnergyPlusData &state,
     DoReport = false;
 
     ReportName rptName =
-        static_cast<ReportName>(getEnumerationValue(ReportNamesUC, UtilityRoutines::MakeUPPERCase(UtilityRoutines::MakeUPPERCase(reportName))));
+        static_cast<ReportName>(getEnumerationValue(ReportNamesUC, Util::MakeUPPERCase(Util::MakeUPPERCase(reportName))));
     switch (rptName) {
     case ReportName::Constructions: {
         if (present(ReportKey)) {
-            if (UtilityRoutines::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
-            if (UtilityRoutines::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
+            if (Util::SameString(ReportKey(), "Constructions")) DoReport = state.dataGeneral->Constructions;
+            if (Util::SameString(ReportKey(), "Materials")) DoReport = state.dataGeneral->Materials;
         }
     } break;
     case ReportName::Viewfactorinfo: {
@@ -1276,7 +1276,7 @@ void ScanForReports(EnergyPlusData &state,
         //      IF (PRESENT(Option1)) Option1=SchRptOption
     } break;
     case ReportName::Surfaces: {
-        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, UtilityRoutines::MakeUPPERCase(ReportKey())));
+        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, Util::MakeUPPERCase(ReportKey())));
         switch (rptKey) { // Autodesk:OPTIONAL ReportKey used without PRESENT check
         case RptKey::Costinfo: {
             DoReport = state.dataGeneral->CostInfo;
@@ -1361,7 +1361,7 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
         TooLong = true;
     }
 
-    int FoundItem = UtilityRoutines::FindItemInList(ResultName, ItemNames, NumItems);
+    int FoundItem = Util::FindItemInList(ResultName, ItemNames, NumItems);
 
     if (FoundItem != 0) {
         ShowSevereError(state, fmt::format("{}{}=\"{}\", Duplicate Generated name encountered.", calledFrom, CurrentObject, ItemName));

@@ -166,7 +166,7 @@ void SimDXCoil(EnergyPlusData &state,
     }
 
     if (CompIndex == 0) {
-        DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataDXCoils->DXCoil);
+        DXCoilNum = Util::FindItemInList(CompName, state.dataDXCoils->DXCoil);
         if (DXCoilNum == 0) {
             ShowFatalError(state, format("DX Coil not found={}", CompName));
         }
@@ -294,7 +294,7 @@ void SimDXCoilMultiSpeed(EnergyPlusData &state,
     //  find correct DX Coil
 
     if (CompIndex == 0) {
-        DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataDXCoils->DXCoil);
+        DXCoilNum = Util::FindItemInList(CompName, state.dataDXCoils->DXCoil);
         if (DXCoilNum == 0) {
             ShowFatalError(state, format("DX Coil not found={}", CompName));
         }
@@ -445,7 +445,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
 
     //  find correct DX Coil
     if (CompIndex == 0) {
-        DXCoilNum = UtilityRoutines::FindItemInList(CompName, state.dataDXCoils->DXCoil);
+        DXCoilNum = Util::FindItemInList(CompName, state.dataDXCoils->DXCoil);
         if (DXCoilNum == 0) {
             ShowFatalError(state, format("DX Coil not found={}", CompName));
         }
@@ -1187,9 +1187,9 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if ((UtilityRoutines::SameString(Alphas(11), "AirCooled")) || lAlphaBlanks(11)) {
+        if ((Util::SameString(Alphas(11), "AirCooled")) || lAlphaBlanks(11)) {
             thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
-        } else if (UtilityRoutines::SameString(Alphas(11), "EvaporativelyCooled")) {
+        } else if (Util::SameString(Alphas(11), "EvaporativelyCooled")) {
             thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::Evap;
             thisDXCoil.ReportEvapCondVars = true;
         } else {
@@ -1349,7 +1349,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
         // A18; \field Zone Name for Condenser Placement
         if (!lAlphaBlanks(18) && NumAlphas > 17) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(18), state.dataHeatBal->Zone);
+            thisDXCoil.SecZonePtr = Util::FindItemInList(Alphas(18), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -1483,7 +1483,7 @@ void GetDXCoils(EnergyPlusData &state)
                     PerfObjectName = Alphas(AlphaIndex + 1);
                     PerfModeNum = DehumidModeNum * 2 + CapacityStageNum;
                     thisDXCoil.CoilPerformanceType(PerfModeNum) = PerfObjectType;
-                    if (UtilityRoutines::SameString(PerfObjectType, "CoilPerformance:DX:Cooling")) {
+                    if (Util::SameString(PerfObjectType, "CoilPerformance:DX:Cooling")) {
                         thisDXCoil.CoilPerformanceType_Num(PerfModeNum) = CoilPerfDX_CoolBypassEmpirical;
                     } else {
                         ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -1732,7 +1732,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 Alphas2(7),
                                 ErrorsFound,
                                 (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                                        UtilityRoutines::MakeUPPERCase(PerfObjectType)),
+                                                                                        Util::MakeUPPERCase(PerfObjectType)),
                                 PerfObjectName,
                                 DataLoopNode::NodeFluidType::Air,
                                 DataLoopNode::ConnectionType::OutsideAirReference,
@@ -1747,9 +1747,9 @@ void GetDXCoils(EnergyPlusData &state)
                                                   "simulation continues");
                             }
                         }
-                        if ((UtilityRoutines::SameString(Alphas2(8), "AirCooled")) || lAlphaBlanks2(8)) {
+                        if ((Util::SameString(Alphas2(8), "AirCooled")) || lAlphaBlanks2(8)) {
                             thisDXCoil.CondenserType(PerfModeNum) = DataHeatBalance::RefrigCondenserType::Air;
-                        } else if (UtilityRoutines::SameString(Alphas2(8), "EvaporativelyCooled")) {
+                        } else if (Util::SameString(Alphas2(8), "EvaporativelyCooled")) {
                             thisDXCoil.CondenserType(PerfModeNum) = DataHeatBalance::RefrigCondenserType::Evap;
                             thisDXCoil.ReportEvapCondVars = true;
                         } else {
@@ -2176,7 +2176,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         // Only required for reverse cycle heat pumps
         thisDXCoil.DefrostEIRFT = GetCurveIndex(state, Alphas(10)); // convert curve name to number
-        if (UtilityRoutines::SameString(Alphas(11), "ReverseCycle")) {
+        if (Util::SameString(Alphas(11), "ReverseCycle")) {
             if (thisDXCoil.DefrostEIRFT == 0) {
                 if (lAlphaBlanks(10)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -2210,8 +2210,8 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (UtilityRoutines::SameString(Alphas(11), "ReverseCycle")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
-        if (UtilityRoutines::SameString(Alphas(11), "Resistive")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+        if (Util::SameString(Alphas(11), "ReverseCycle")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+        if (Util::SameString(Alphas(11), "Resistive")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
         if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(11), Alphas(11)));
@@ -2219,8 +2219,8 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(12), "Timed")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
-        if (UtilityRoutines::SameString(Alphas(12), "OnDemand")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+        if (Util::SameString(Alphas(12), "Timed")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
+        if (Util::SameString(Alphas(12), "OnDemand")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
         if (thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(12), Alphas(12)));
@@ -2312,7 +2312,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         // A14, \field Zone Name for Evaporator Placement
         if (!lAlphaBlanks(14) && NumAlphas > 13) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(14), state.dataHeatBal->Zone);
+            thisDXCoil.SecZonePtr = Util::FindItemInList(Alphas(14), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -2725,9 +2725,9 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if ((UtilityRoutines::SameString(Alphas(13), "AirCooled")) || lAlphaBlanks(13)) {
+        if ((Util::SameString(Alphas(13), "AirCooled")) || lAlphaBlanks(13)) {
             thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
-        } else if (UtilityRoutines::SameString(Alphas(13), "EvaporativelyCooled")) {
+        } else if (Util::SameString(Alphas(13), "EvaporativelyCooled")) {
             thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::Evap;
             thisDXCoil.ReportEvapCondVars = true;
         } else {
@@ -2924,7 +2924,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
         // A21; \field Zone Name for Condenser Placement
         if (!lAlphaBlanks(21) && NumAlphas > 20) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(21), state.dataHeatBal->Zone);
+            thisDXCoil.SecZonePtr = Util::FindItemInList(Alphas(21), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -3052,9 +3052,9 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (UtilityRoutines::SameString(Alphas(2), "Yes") || UtilityRoutines::SameString(Alphas(2), "No")) {
+        if (Util::SameString(Alphas(2), "Yes") || Util::SameString(Alphas(2), "No")) {
             //  initialized to TRUE on allocate
-            if (UtilityRoutines::SameString(Alphas(2), "No")) thisDXCoil.FanPowerIncludedInCOP = false;
+            if (Util::SameString(Alphas(2), "No")) thisDXCoil.FanPowerIncludedInCOP = false;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(2), Alphas(2)));
@@ -3062,9 +3062,9 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(3), "Yes") || UtilityRoutines::SameString(Alphas(3), "No")) {
+        if (Util::SameString(Alphas(3), "Yes") || Util::SameString(Alphas(3), "No")) {
             //  initialized to FALSE on allocate
-            if (UtilityRoutines::SameString(Alphas(3), "Yes")) thisDXCoil.CondPumpPowerInCOP = true;
+            if (Util::SameString(Alphas(3), "Yes")) thisDXCoil.CondPumpPowerInCOP = true;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(3), Alphas(3)));
@@ -3072,9 +3072,9 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(4), "Yes") || UtilityRoutines::SameString(Alphas(4), "No")) {
+        if (Util::SameString(Alphas(4), "Yes") || Util::SameString(Alphas(4), "No")) {
             //  initialized to FALSE on allocate
-            if (UtilityRoutines::SameString(Alphas(4), "Yes")) thisDXCoil.CondPumpHeatInCapacity = true;
+            if (Util::SameString(Alphas(4), "Yes")) thisDXCoil.CondPumpHeatInCapacity = true;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(4), Alphas(4)));
@@ -3159,9 +3159,9 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(9), "DryBulbTemperature")) {
+        if (Util::SameString(Alphas(9), "DryBulbTemperature")) {
             thisDXCoil.InletAirTemperatureType = DryBulbIndicator;
-        } else if (UtilityRoutines::SameString(Alphas(9), "WetBulbTemperature")) {
+        } else if (Util::SameString(Alphas(9), "WetBulbTemperature")) {
             thisDXCoil.InletAirTemperatureType = WetBulbIndicator;
         } else {
             //   wrong temperature type selection
@@ -3522,9 +3522,9 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (UtilityRoutines::SameString(Alphas(2), "Yes") || UtilityRoutines::SameString(Alphas(2), "No")) {
+        if (Util::SameString(Alphas(2), "Yes") || Util::SameString(Alphas(2), "No")) {
             //  initialized to TRUE on allocate
-            if (UtilityRoutines::SameString(Alphas(2), "No")) thisDXCoil.FanPowerIncludedInCOP = false;
+            if (Util::SameString(Alphas(2), "No")) thisDXCoil.FanPowerIncludedInCOP = false;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format(",,,invalid choice for {}.  Entered choice = {}", cAlphaFields(2), Alphas(2)));
@@ -3596,9 +3596,9 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(5), "DryBulbTemperature")) {
+        if (Util::SameString(Alphas(5), "DryBulbTemperature")) {
             thisDXCoil.InletAirTemperatureType = DryBulbIndicator;
-        } else if (UtilityRoutines::SameString(Alphas(5), "WetBulbTemperature")) {
+        } else if (Util::SameString(Alphas(5), "WetBulbTemperature")) {
             thisDXCoil.InletAirTemperatureType = WetBulbIndicator;
         } else {
             //   wrong temperature type selection
@@ -3907,9 +3907,9 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if ((UtilityRoutines::SameString(Alphas(6), "AirCooled")) || lAlphaBlanks(6)) {
+        if ((Util::SameString(Alphas(6), "AirCooled")) || lAlphaBlanks(6)) {
             thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::Air;
-        } else if (UtilityRoutines::SameString(Alphas(6), "EvaporativelyCooled")) {
+        } else if (Util::SameString(Alphas(6), "EvaporativelyCooled")) {
             thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::Evap;
             thisDXCoil.ReportEvapCondVars = true;
         } else {
@@ -3965,9 +3965,9 @@ void GetDXCoils(EnergyPlusData &state)
         // Set crankcase heater cutout temperature
         thisDXCoil.MaxOATCrankcaseHeater = Numbers(3);
 
-        if (UtilityRoutines::SameString(Alphas(9), "Yes")) {
+        if (Util::SameString(Alphas(9), "Yes")) {
             thisDXCoil.PLRImpact = true;
-        } else if (UtilityRoutines::SameString(Alphas(9), "No")) {
+        } else if (Util::SameString(Alphas(9), "No")) {
             thisDXCoil.PLRImpact = false;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -3976,9 +3976,9 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(10), "Yes")) {
+        if (Util::SameString(Alphas(10), "Yes")) {
             thisDXCoil.LatentImpact = true;
-        } else if (UtilityRoutines::SameString(Alphas(10), "No")) {
+        } else if (Util::SameString(Alphas(10), "No")) {
             thisDXCoil.LatentImpact = false;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -4335,7 +4335,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
         // A37; \field Zone Name for Condenser Placement
         if (!lAlphaBlanks(37) && NumAlphas > 36) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(37), state.dataHeatBal->Zone);
+            thisDXCoil.SecZonePtr = Util::FindItemInList(Alphas(37), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -4441,7 +4441,7 @@ void GetDXCoils(EnergyPlusData &state)
 
         // Only required for reverse cycle heat pumps
         thisDXCoil.DefrostEIRFT = GetCurveIndex(state, Alphas(5)); // convert curve name to number
-        if (UtilityRoutines::SameString(Alphas(6), "ReverseCycle")) {
+        if (Util::SameString(Alphas(6), "ReverseCycle")) {
             if (thisDXCoil.DefrostEIRFT == 0) {
                 if (lAlphaBlanks(5)) {
                     ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -4474,8 +4474,8 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        if (UtilityRoutines::SameString(Alphas(6), "ReverseCycle")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
-        if (UtilityRoutines::SameString(Alphas(6), "Resistive")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+        if (Util::SameString(Alphas(6), "ReverseCycle")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
+        if (Util::SameString(Alphas(6), "Resistive")) thisDXCoil.DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
         if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(6), Alphas(6)));
@@ -4483,8 +4483,8 @@ void GetDXCoils(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (UtilityRoutines::SameString(Alphas(7), "Timed")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
-        if (UtilityRoutines::SameString(Alphas(7), "OnDemand")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
+        if (Util::SameString(Alphas(7), "Timed")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::Timed;
+        if (Util::SameString(Alphas(7), "OnDemand")) thisDXCoil.DefrostControl = StandardRatings::HPdefrostControl::OnDemand;
         if (thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
             ShowContinueError(state, format("...illegal {}=\"{}\".", cAlphaFields(7), Alphas(7)));
@@ -4509,9 +4509,9 @@ void GetDXCoils(EnergyPlusData &state)
             ShowContinueError(state, format("...{} = 0.0 for defrost strategy = RESISTIVE.", cNumericFields(7)));
         }
 
-        if (UtilityRoutines::SameString(Alphas(8), "Yes")) {
+        if (Util::SameString(Alphas(8), "Yes")) {
             thisDXCoil.PLRImpact = true;
-        } else if (UtilityRoutines::SameString(Alphas(8), "No")) {
+        } else if (Util::SameString(Alphas(8), "No")) {
             thisDXCoil.PLRImpact = false;
         } else {
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -4796,7 +4796,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
         // A34; \field Zone Name for Condenser Placement
         if (!lAlphaBlanks(34) && NumAlphas > 33) {
-            thisDXCoil.SecZonePtr = UtilityRoutines::FindItemInList(Alphas(34), state.dataHeatBal->Zone);
+            thisDXCoil.SecZonePtr = Util::FindItemInList(Alphas(34), state.dataHeatBal->Zone);
             if (thisDXCoil.SecZonePtr > 0) {
                 SetupZoneInternalGain(state,
                                       thisDXCoil.SecZonePtr,
@@ -14963,7 +14963,7 @@ void GetFanIndexForTwoSpeedCoil(
                 if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
                     SimAirServingZones::CompType::DXSystem) {
 
-                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                    if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                                     state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
                         FoundBranch = BranchNum;
                         FoundAirSysNum = AirSysNum;
@@ -14973,7 +14973,7 @@ void GetFanIndexForTwoSpeedCoil(
                 } else if (state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num ==
                            SimAirServingZones::CompType::UnitarySystemModel) {
 
-                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
+                    if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                                     state.dataDXCoils->DXCoil(CoolingCoilIndex).CoilSystemName)) {
                         FoundBranch = BranchNum;
                         FoundAirSysNum = AirSysNum;
@@ -15031,7 +15031,7 @@ void GetDXCoilIndex(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    DXCoilIndex = UtilityRoutines::FindItemInList(DXCoilName, state.dataDXCoils->DXCoil);
+    DXCoilIndex = Util::FindItemInList(DXCoilName, state.dataDXCoils->DXCoil);
     if (DXCoilIndex == 0) {
         if (!SuppressWarning) {
             //     No warning printed if only searching for the existence of a DX Coil
@@ -15107,25 +15107,25 @@ Real64 GetCoilCapacity(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:DX:SingleSpeed") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:SingleSpeed")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataDXCoils->DXCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:DX:SingleSpeed") ||
+        Util::SameString(CoilType, "Coil:Cooling:DX:SingleSpeed")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataDXCoils->DXCoil);
         if (WhichCoil != 0) {
             CoilCapacity = state.dataDXCoils->DXCoil(WhichCoil).RatedTotCap(1);
         }
-    } else if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataDXCoils->DXCoil);
+    } else if (Util::SameString(CoilType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataDXCoils->DXCoil);
         if (WhichCoil != 0) {
             CoilCapacity = state.dataDXCoils->DXCoil(WhichCoil).RatedTotCap(state.dataDXCoils->DXCoil(WhichCoil).NumCapacityStages);
         }
-    } else if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:TwoSpeed")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataDXCoils->DXCoil);
+    } else if (Util::SameString(CoilType, "Coil:Cooling:DX:TwoSpeed")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataDXCoils->DXCoil);
         if (WhichCoil != 0) {
             CoilCapacity = state.dataDXCoils->DXCoil(WhichCoil).RatedTotCap(1);
         }
-    } else if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:DX:MultiSpeed") ||
-               UtilityRoutines::SameString(CoilType, "Coil:Heating:DX:MultiSpeed")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataDXCoils->DXCoil);
+    } else if (Util::SameString(CoilType, "Coil:Cooling:DX:MultiSpeed") ||
+               Util::SameString(CoilType, "Coil:Heating:DX:MultiSpeed")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataDXCoils->DXCoil);
         if (WhichCoil != 0) {
             CoilCapacity = state.dataDXCoils->DXCoil(WhichCoil).MSRatedTotCap(state.dataDXCoils->DXCoil(WhichCoil).NumOfSpeeds);
         }
@@ -15232,7 +15232,7 @@ int GetCoilTypeNum(EnergyPlusData &state,
         PrintMessage = true;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         TypeNum = state.dataDXCoils->DXCoil(WhichCoil).DXCoilType_Num;
     } else {
@@ -15296,7 +15296,7 @@ int GetCoilInletNode(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         NodeNumber = state.dataDXCoils->DXCoil(WhichCoil).AirInNode;
     } else {
@@ -15361,7 +15361,7 @@ int GetCoilOutletNode(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         NodeNumber = state.dataDXCoils->DXCoil(WhichCoil).AirOutNode;
     } else {
@@ -15427,7 +15427,7 @@ int GetCoilCondenserInletNode(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         CondNode = state.dataDXCoils->DXCoil(WhichCoil).CondenserInletNodeNum(1);
     } else {
@@ -15467,7 +15467,7 @@ Real64 GetDXCoilBypassedFlowFrac(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         BypassFraction = state.dataDXCoils->DXCoil(WhichCoil).BypassedFlowFrac(1);
     } else {
@@ -15504,14 +15504,14 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
     DXCoolingCoilIndex = 0;
 
     DataLoopNode::ConnectionObjectType HeatingCoilTypeNum = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(HeatingCoilType)));
+        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::MakeUPPERCase(HeatingCoilType)));
 
     DataLoopNode::ConnectionObjectType CompSetsParentType; // Parent object type which uses DX heating coil pass into this function
     std::string CompSetsParentName;
     for (WhichComp = 1; WhichComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichComp) {
 
         if (HeatingCoilTypeNum != state.dataBranchNodeConnections->CompSets(WhichComp).ComponentObjectType ||
-            !UtilityRoutines::SameString(HeatingCoilName, state.dataBranchNodeConnections->CompSets(WhichComp).CName))
+            !Util::SameString(HeatingCoilName, state.dataBranchNodeConnections->CompSets(WhichComp).CName))
             continue;
         CompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichComp).ParentObjectType;
         CompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichComp).ParentCName;
@@ -15522,27 +15522,27 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
             (CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitarySystem)) {
             //       Search for DX cooling coils
             for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
-                if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
+                if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
                     (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
                      DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed))
                     continue;
                 DXCoolingCoilIndex =
-                    UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
+                    Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
                 break;
             }
             for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
-                if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
+                if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
                     (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
                      DataLoopNode::ConnectionObjectType::CoilCoolingDXMultiSpeed))
                     continue;
                 DXCoolingCoilIndex =
-                    UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
+                    Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
                 break;
             }
             //       Search for Heat Exchanger Assisted DX cooling coils
             if (DXCoolingCoilIndex == 0) {
                 for (WhichHXAssistedComp = 1; WhichHXAssistedComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichHXAssistedComp) {
-                    if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ParentCName,
+                    if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ParentCName,
                                                      CompSetsParentName) ||
                         (state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType !=
                          DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted))
@@ -15551,12 +15551,12 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
                     HXCompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType;
                     std::string const &HXCompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CName;
                     for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
-                        if (!UtilityRoutines::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName,
+                        if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName,
                                                          HXCompSetsParentName) ||
                             (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
                              DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed))
                             continue;
-                        DXCoolingCoilIndex = UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName,
+                        DXCoolingCoilIndex = Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName,
                                                                              state.dataDXCoils->DXCoil);
                         break;
                     }
@@ -15624,7 +15624,7 @@ int GetDXCoilNumberOfSpeeds(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         NumberOfSpeeds = state.dataDXCoils->DXCoil(WhichCoil).NumOfSpeeds;
     } else {
@@ -15676,7 +15676,7 @@ int GetDXCoilAvailSchPtr(EnergyPlusData &state,
             WhichCoil = CoilIndex;
         }
     } else {
-        WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+        WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     }
     if (WhichCoil != 0) {
         SchPtr = state.dataDXCoils->DXCoil(WhichCoil).SchedPtr;
@@ -15722,7 +15722,7 @@ Real64 GetDXCoilAirFlow(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         switch (state.dataDXCoils->DXCoil(WhichCoil).DXCoilType_Num) {
         case CoilDX_CoolingSingleSpeed:
@@ -15996,7 +15996,7 @@ void SetCoilSystemHeatingDXFlag(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         state.dataDXCoils->DXCoil(WhichCoil).FindCompanionUpStreamCoil = false;
     } else {
@@ -16024,7 +16024,7 @@ void SetCoilSystemCoolingData(EnergyPlusData &state,
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         state.dataDXCoils->DXCoil(WhichCoil).CoilSystemName = CoilSystemName;
     } else {
@@ -16112,7 +16112,7 @@ void SetDXCoilTypeData(EnergyPlusData &state, std::string const &CoilName) // mu
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         state.dataDXCoils->DXCoil(WhichCoil).ISHundredPercentDOASDXCoil = true;
     } else {
@@ -17781,7 +17781,7 @@ void SetDXCoilAirLoopNumber(EnergyPlusData &state, std::string const &CoilName, 
         state.dataDXCoils->GetCoilsInputFlag = false;
     }
 
-    WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
+    WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
         state.dataDXCoils->DXCoil(WhichCoil).AirLoopNum = AirLoopNum;
     } else {

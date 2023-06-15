@@ -188,7 +188,7 @@ namespace ThermalChimney {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+            if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                 continue;
             }
 
@@ -197,7 +197,7 @@ namespace ThermalChimney {
 
             // Second Alpha is Zone Name
             state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr == 0) {
                 ShowSevereError(state, format("{}=\"{} invalid Zone", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
@@ -276,7 +276,7 @@ namespace ThermalChimney {
             for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZoneName(TCZoneNum) = state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3);
                 state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum) =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3), state.dataHeatBal->Zone);
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(TCZoneNum + 3), state.dataHeatBal->Zone);
                 state.dataThermalChimneys->ThermalChimneySys(Loop).DistanceThermChimInlet(TCZoneNum) =
                     state.dataIPShortCut->rNumericArgs(3 * TCZoneNum + 1);
                 state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) =

@@ -137,7 +137,7 @@ void InitEnergyReports(EnergyPlusData &state)
             auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             if (!thisZoneEquipConfig.IsControlled) continue;
             thisZoneEquipConfig.EquipListIndex =
-                UtilityRoutines::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
+                Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             auto &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(thisZoneEquipConfig.EquipListIndex);
             for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
                 int AirLoopNum = thisZoneEquipConfig.InletNodeAirLoopNum(ZoneInletNodeNum);
@@ -295,7 +295,7 @@ void InitEnergyReports(EnergyPlusData &state)
             auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum);
             if (!thisZoneEquipConfig.IsControlled) continue;
             thisZoneEquipConfig.EquipListIndex =
-                UtilityRoutines::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
+                Util::FindItemInList(thisZoneEquipConfig.EquipListName, state.dataZoneEquip->ZoneEquipList);
             int ListNum = thisZoneEquipConfig.EquipListIndex;
             // loop over the zone supply air path inlet nodes
             for (int ZoneInletNodeNum = 1; ZoneInletNodeNum <= thisZoneEquipConfig.NumInletNodes; ++ZoneInletNodeNum) {
@@ -4008,7 +4008,7 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     default:
         int found = 0;
         if (state.dataSysRpts->NumCompTypes > 0) {
-            found = UtilityRoutines::FindItemInList(
+            found = Util::FindItemInList(
                 CompType, state.dataSysRpts->CompTypeErrors, &CompTypeError::CompType, state.dataSysRpts->NumCompTypes);
         }
         if (found == 0) {
@@ -4778,12 +4778,12 @@ void FindDemandSideMatch(EnergyPlusData &state,
                      PassCompNum <=
                      state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
-                    if (UtilityRoutines::SameString(CompType,
+                    if (Util::SameString(CompType,
                                                     state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
                                                         .Branch(PassBranchNum)
                                                         .Comp(PassCompNum)
                                                         .TypeOf) &&
-                        UtilityRoutines::SameString(CompName,
+                        Util::SameString(CompName,
                                                     state.dataPlnt->VentRepPlant[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
                                                         .Branch(PassBranchNum)
                                                         .Comp(PassCompNum)
@@ -4812,12 +4812,12 @@ void FindDemandSideMatch(EnergyPlusData &state,
                      PassCompNum <=
                      state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum).Branch(PassBranchNum).TotalComponents;
                      ++PassCompNum) {
-                    if (UtilityRoutines::SameString(CompType,
+                    if (Util::SameString(CompType,
                                                     state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
                                                         .Branch(PassBranchNum)
                                                         .Comp(PassCompNum)
                                                         .TypeOf) &&
-                        UtilityRoutines::SameString(CompName,
+                        Util::SameString(CompName,
                                                     state.dataPlnt->VentRepCond[static_cast<int>(LoopSideLocation::Demand)](PassLoopNum)
                                                         .Branch(PassBranchNum)
                                                         .Comp(PassCompNum)

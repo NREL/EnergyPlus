@@ -196,7 +196,7 @@ void ControlCompOutput(EnergyPlusData &state,
     if (ControlCompTypeNum != 0) {
         SimCompNum = ControlCompTypeNum;
     } else {
-        SimCompNum = UtilityRoutines::FindItemInSortedList(CompType, ListOfComponents, NumComponents);
+        SimCompNum = Util::FindItemInSortedList(CompType, ListOfComponents, NumComponents);
         ControlCompTypeNum = SimCompNum;
     }
 
@@ -1263,7 +1263,7 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                   PrimaryAirLoopName);
 
             AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumerationValue(
-                AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count))));
+                AirLoopHVACCompTypeNamesUC, Util::MakeUPPERCase(state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count))));
 
             switch (CompType) {
             case AirLoopHVACCompType::SupplyPlenum: {
@@ -1554,7 +1554,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                   state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count),
                   PrimaryAirLoopName);
 
-            if (UtilityRoutines::SameString(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count), "AirLoopHVAC:ZoneMixer")) {
+            if (Util::SameString(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count), "AirLoopHVAC:ZoneMixer")) {
                 ++MixerCount;
             }
         }
@@ -1572,7 +1572,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
         if (NumComp > 0) {
 
             AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumerationValue(
-                AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp))));
+                AirLoopHVACCompTypeNamesUC, Util::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp))));
 
             switch (CompType) {
             case AirLoopHVACCompType::ZoneMixer: {
@@ -1659,7 +1659,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
             for (int Count3 = 1; Count3 <= NumComp - 1; ++Count3) {
 
                 AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumerationValue(
-                    AirLoopHVACCompTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count3))));
+                    AirLoopHVACCompTypeNamesUC, Util::MakeUPPERCase(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count3))));
 
                 switch (CompType) {
                 case AirLoopHVACCompType::ZoneMixer: {

@@ -146,7 +146,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         ++ChillerNum;
         auto &thisChiller = state.dataChillerElectricASHRAE205->Electric205Chiller(ChillerNum);
-        thisChiller.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+        thisChiller.Name = Util::MakeUPPERCase(thisObjectName);
         ip->markObjectAsUsed(state.dataIPShortCut->cCurrentModuleObject, thisObjectName);
 
         std::string const rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
@@ -169,7 +169,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             ErrorsFound = true;
         }
         thisChiller.InterpolationType =
-            InterpMethods[UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
+            InterpMethods[Util::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
 
         const auto &compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
         // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
@@ -295,7 +295,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
 
         thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumerationValue(
-            AmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
+            AmbientTempNamesUC, Util::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
         switch (thisChiller.AmbientTempType) {
         case AmbientTempIndicator::Schedule: {
             std::string const ambient_temp_schedule = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_schedule");
@@ -313,7 +313,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
         case AmbientTempIndicator::TempZone: {
             std::string const ambient_temp_zone_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_zone_name");
-            thisChiller.AmbientTempZone = UtilityRoutines::FindItemInList(ambient_temp_zone_name, state.dataHeatBal->Zone);
+            thisChiller.AmbientTempZone = Util::FindItemInList(ambient_temp_zone_name, state.dataHeatBal->Zone);
             if (thisChiller.AmbientTempZone == 0) {
                 ShowSevereError(state,
                                 format("{} = {}:  Ambient Temperature Zone not found = {}",

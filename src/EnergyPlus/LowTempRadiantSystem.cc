@@ -180,7 +180,7 @@ namespace LowTempRadiantSystem {
 
         // Find the correct Low Temp Radiant System
         if (CompIndex == 0) {
-            RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataLowTempRadSys->RadSysTypes);
+            RadSysNum = Util::FindItemInList(CompName, state.dataLowTempRadSys->RadSysTypes);
             if (RadSysNum == 0) {
                 ShowFatalError(state, format("SimLowTempRadiantSystem: Unit not found={}", CompName));
             }
@@ -189,15 +189,15 @@ namespace LowTempRadiantSystem {
             switch (SystemType) {
             case LowTempRadiantSystem::SystemType::HydronicSystem: {
                 state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex =
-                    UtilityRoutines::FindItemInList(CompName, state.dataLowTempRadSys->HydrRadSys);
+                    Util::FindItemInList(CompName, state.dataLowTempRadSys->HydrRadSys);
             } break;
             case LowTempRadiantSystem::SystemType::ConstantFlowSystem: {
                 state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex =
-                    UtilityRoutines::FindItemInList(CompName, state.dataLowTempRadSys->CFloRadSys);
+                    Util::FindItemInList(CompName, state.dataLowTempRadSys->CFloRadSys);
             } break;
             case LowTempRadiantSystem::SystemType::ElectricSystem: {
                 state.dataLowTempRadSys->RadSysTypes(RadSysNum).CompIndex =
-                    UtilityRoutines::FindItemInList(CompName, state.dataLowTempRadSys->ElecRadSys);
+                    Util::FindItemInList(CompName, state.dataLowTempRadSys->ElecRadSys);
             } break;
             default:
                 break;
@@ -464,9 +464,9 @@ namespace LowTempRadiantSystem {
 
             // Determine Low Temp Radiant heating design capacity sizing method
             thisRadSysDesign.DesignHeatingCapMethodInput = Alphas(5);
-            if (UtilityRoutines::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "HeatingDesignCapacity")) {
+            if (Util::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "HeatingDesignCapacity")) {
                 thisRadSysDesign.DesignHeatingCapMethod = HeatingDesignCapacity;
-            } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "CapacityPerFloorArea")) {
+            } else if (Util::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "CapacityPerFloorArea")) {
                 thisRadSysDesign.DesignHeatingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(4)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(4);
@@ -487,7 +487,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(4)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "FractionOfAutosizedHeatingCapacity")) {
+            } else if (Util::SameString(thisRadSysDesign.DesignHeatingCapMethodInput, "FractionOfAutosizedHeatingCapacity")) {
                 thisRadSysDesign.DesignHeatingCapMethod = FractionOfAutosizedHeatingCapacity;
                 if (!lNumericBlanks(5)) {
                     thisRadSysDesign.DesignScaledHeatingCapacity = Numbers(5);
@@ -520,9 +520,9 @@ namespace LowTempRadiantSystem {
 
             // Determine Low Temp Radiant cooling design capacity sizing method
             thisRadSysDesign.DesignCoolingCapMethodInput = Alphas(7);
-            if (UtilityRoutines::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "CoolingDesignCapacity")) {
+            if (Util::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "CoolingDesignCapacity")) {
                 thisRadSysDesign.DesignCoolingCapMethod = CoolingDesignCapacity;
-            } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "CapacityPerFloorArea")) {
+            } else if (Util::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "CapacityPerFloorArea")) {
                 thisRadSysDesign.DesignCoolingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(7)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(7);
@@ -544,7 +544,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(7)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "FractionOfAutosizedCoolingCapacity")) {
+            } else if (Util::SameString(thisRadSysDesign.DesignCoolingCapMethodInput, "FractionOfAutosizedCoolingCapacity")) {
                 thisRadSysDesign.DesignCoolingCapMethod = FractionOfAutosizedCoolingCapacity;
                 if (!lNumericBlanks(8)) {
                     thisRadSysDesign.DesignScaledCoolingCapacity = Numbers(8);
@@ -575,11 +575,11 @@ namespace LowTempRadiantSystem {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(9), Off)) {
+            if (Util::SameString(Alphas(9), Off)) {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlNone;
-            } else if (UtilityRoutines::SameString(Alphas(9), SimpleOff)) {
+            } else if (Util::SameString(Alphas(9), SimpleOff)) {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlSimpleOff;
-            } else if (UtilityRoutines::SameString(Alphas(9), VariableOff)) {
+            } else if (Util::SameString(Alphas(9), VariableOff)) {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlVariedOff;
             } else {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlSimpleOff;
@@ -634,7 +634,7 @@ namespace LowTempRadiantSystem {
             thisRadSys.Name = Alphas(1);
 
             thisRadSys.designObjectName = Alphas(2);
-            thisRadSys.DesignObjectPtr = UtilityRoutines::FindItemInList(thisRadSys.designObjectName, VarFlowRadDesignNames);
+            thisRadSys.DesignObjectPtr = Util::FindItemInList(thisRadSys.designObjectName, VarFlowRadDesignNames);
             VarFlowRadDesignData variableFlowDesignDataObject{state.dataLowTempRadSys->HydronicRadiantSysDesign(
                 thisRadSys.DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
@@ -651,7 +651,7 @@ namespace LowTempRadiantSystem {
             }
 
             thisRadSys.ZoneName = Alphas(4);
-            thisRadSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
+            thisRadSys.ZonePtr = Util::FindItemInList(Alphas(4), Zone);
             if (thisRadSys.ZonePtr == 0) {
                 ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(3), Alphas(4)));
                 ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -661,7 +661,7 @@ namespace LowTempRadiantSystem {
             thisRadSys.SurfListName = Alphas(5);
             SurfListNum = 0;
             if (state.dataSurfLists->NumOfSurfaceLists > 0)
-                SurfListNum = UtilityRoutines::FindItemInList(thisRadSys.SurfListName, state.dataSurfLists->SurfList);
+                SurfListNum = Util::FindItemInList(thisRadSys.SurfListName, state.dataSurfLists->SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
                 thisRadSys.NumOfSurfaces = state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces;
                 thisRadSys.SurfacePtr.allocate(thisRadSys.NumOfSurfaces);
@@ -683,7 +683,7 @@ namespace LowTempRadiantSystem {
                 thisRadSys.SurfaceFrac.allocate(thisRadSys.NumOfSurfaces);
                 thisRadSys.NumCircuits.allocate(thisRadSys.NumOfSurfaces);
                 thisRadSys.SurfaceName(1) = thisRadSys.SurfListName;
-                thisRadSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisRadSys.SurfaceName(1), Surface);
+                thisRadSys.SurfacePtr(1) = Util::FindItemInList(thisRadSys.SurfaceName(1), Surface);
                 thisRadSys.SurfaceFrac(1) = 1.0;
                 thisRadSys.NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
@@ -821,9 +821,9 @@ namespace LowTempRadiantSystem {
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(8), Alphas(9), "Chilled Water Nodes");
             }
 
-            if (UtilityRoutines::SameString(Alphas(10), OnePerSurf)) {
+            if (Util::SameString(Alphas(10), OnePerSurf)) {
                 thisRadSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(10), CalcFromLength)) {
+            } else if (Util::SameString(Alphas(10), CalcFromLength)) {
                 thisRadSys.NumCircCalcMethod = CircuitCalc::CalculateFromLength;
             } else {
                 thisRadSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
@@ -883,11 +883,11 @@ namespace LowTempRadiantSystem {
             thisRadSysDesign.MotorEffic = Numbers(5);
             thisRadSysDesign.FracMotorLossToFluid = Numbers(6);
 
-            if (UtilityRoutines::SameString(Alphas(4), Off)) {
+            if (Util::SameString(Alphas(4), Off)) {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlNone;
-            } else if (UtilityRoutines::SameString(Alphas(4), SimpleOff)) {
+            } else if (Util::SameString(Alphas(4), SimpleOff)) {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlSimpleOff;
-            } else if (UtilityRoutines::SameString(Alphas(4), VariableOff)) {
+            } else if (Util::SameString(Alphas(4), VariableOff)) {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlVariedOff;
             } else {
                 thisRadSysDesign.CondCtrlType = CondContrlType::CondCtrlSimpleOff;
@@ -933,7 +933,7 @@ namespace LowTempRadiantSystem {
 
             thisCFloSys.Name = Alphas(1);
             thisCFloSys.designObjectName = Alphas(2);
-            thisCFloSys.DesignObjectPtr = UtilityRoutines::FindItemInList(thisCFloSys.designObjectName, CFlowRadDesignNames);
+            thisCFloSys.DesignObjectPtr = Util::FindItemInList(thisCFloSys.designObjectName, CFlowRadDesignNames);
             ConstantFlowRadDesignData ConstantFlowRadDesignDataObject{
                 state.dataLowTempRadSys->CflowRadiantSysDesign(thisCFloSys.DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
 
@@ -950,7 +950,7 @@ namespace LowTempRadiantSystem {
             }
 
             thisCFloSys.ZoneName = Alphas(4);
-            thisCFloSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
+            thisCFloSys.ZonePtr = Util::FindItemInList(Alphas(4), Zone);
             if (thisCFloSys.ZonePtr == 0) {
                 ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(4), Alphas(4)));
                 ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -960,7 +960,7 @@ namespace LowTempRadiantSystem {
             thisCFloSys.SurfListName = Alphas(5);
             SurfListNum = 0;
             if (state.dataSurfLists->NumOfSurfaceLists > 0)
-                SurfListNum = UtilityRoutines::FindItemInList(thisCFloSys.SurfListName, state.dataSurfLists->SurfList);
+                SurfListNum = Util::FindItemInList(thisCFloSys.SurfListName, state.dataSurfLists->SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
                 thisCFloSys.NumOfSurfaces = state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces;
                 thisCFloSys.SurfacePtr.allocate(thisCFloSys.NumOfSurfaces);
@@ -985,7 +985,7 @@ namespace LowTempRadiantSystem {
                 thisCFloSys.NumCircuits.allocate(thisCFloSys.NumOfSurfaces);
                 state.dataLowTempRadSys->MaxCloNumOfSurfaces = max(state.dataLowTempRadSys->MaxCloNumOfSurfaces, thisCFloSys.NumOfSurfaces);
                 thisCFloSys.SurfaceName(1) = thisCFloSys.SurfListName;
-                thisCFloSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisCFloSys.SurfaceName(1), Surface);
+                thisCFloSys.SurfacePtr(1) = Util::FindItemInList(thisCFloSys.SurfaceName(1), Surface);
                 thisCFloSys.SurfaceFrac(1) = 1.0;
                 thisCFloSys.NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
@@ -1136,9 +1136,9 @@ namespace LowTempRadiantSystem {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(Alphas(19), OnePerSurf)) {
+            if (Util::SameString(Alphas(19), OnePerSurf)) {
                 thisCFloSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
-            } else if (UtilityRoutines::SameString(Alphas(19), CalcFromLength)) {
+            } else if (Util::SameString(Alphas(19), CalcFromLength)) {
                 thisCFloSys.NumCircCalcMethod = CircuitCalc::CalculateFromLength;
             } else {
                 thisCFloSys.NumCircCalcMethod = CircuitCalc::OneCircuit;
@@ -1195,7 +1195,7 @@ namespace LowTempRadiantSystem {
             }
 
             thisElecSys.ZoneName = Alphas(3);
-            thisElecSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
+            thisElecSys.ZonePtr = Util::FindItemInList(Alphas(3), Zone);
             if (thisElecSys.ZonePtr == 0) {
                 ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(3), Alphas(3)));
                 ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -1205,7 +1205,7 @@ namespace LowTempRadiantSystem {
             thisElecSys.SurfListName = Alphas(4);
             SurfListNum = 0;
             if (state.dataSurfLists->NumOfSurfaceLists > 0)
-                SurfListNum = UtilityRoutines::FindItemInList(thisElecSys.SurfListName, state.dataSurfLists->SurfList);
+                SurfListNum = Util::FindItemInList(thisElecSys.SurfListName, state.dataSurfLists->SurfList);
             if (SurfListNum > 0) { // Found a valid surface list
                 thisElecSys.NumOfSurfaces = state.dataSurfLists->SurfList(SurfListNum).NumOfSurfaces;
                 thisElecSys.SurfacePtr.allocate(thisElecSys.NumOfSurfaces);
@@ -1222,7 +1222,7 @@ namespace LowTempRadiantSystem {
                 thisElecSys.SurfaceName.allocate(thisElecSys.NumOfSurfaces);
                 thisElecSys.SurfaceFrac.allocate(thisElecSys.NumOfSurfaces);
                 thisElecSys.SurfaceName(1) = thisElecSys.SurfListName;
-                thisElecSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisElecSys.SurfaceName(1), Surface);
+                thisElecSys.SurfacePtr(1) = Util::FindItemInList(thisElecSys.SurfaceName(1), Surface);
                 thisElecSys.SurfaceFrac(1) = 1.0;
                 // Error checking for single surfaces
                 if (thisElecSys.SurfacePtr(1) == 0) {
@@ -1245,7 +1245,7 @@ namespace LowTempRadiantSystem {
 
             // Heating user input data
             // Determine Low Temp Radiant heating design capacity sizing method
-            if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
+            if (Util::SameString(Alphas(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
                 thisElecSys.HeatingCapMethod = HeatingDesignCapacity;
                 if (!lNumericBlanks(iHeatDesignCapacityNumericNum)) {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatDesignCapacityNumericNum);
@@ -1263,7 +1263,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatDesignCapacityNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
+            } else if (Util::SameString(Alphas(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
                 thisElecSys.HeatingCapMethod = CapacityPerFloorArea;
                 if (!lNumericBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatCapacityPerFloorAreaNumericNum);
@@ -1288,7 +1288,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError(state, format("Blank field not allowed for {}", cNumericFields(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(Alphas(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
+            } else if (Util::SameString(Alphas(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
                 thisElecSys.HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
                 if (!lNumericBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     thisElecSys.ScaledHeatingCapacity = Numbers(iHeatFracOfAutosizedCapacityNumericNum);
@@ -1802,9 +1802,9 @@ namespace LowTempRadiantSystem {
 
     FluidToSlabHeatTransferTypes HydronicSystemBaseData::getFluidToSlabHeatTransferInput(EnergyPlusData &state, std::string const &userInput)
     {
-        if (UtilityRoutines::SameString(userInput, "ConvectionOnly")) {
+        if (Util::SameString(userInput, "ConvectionOnly")) {
             return FluidToSlabHeatTransferTypes::ConvectionOnly;
-        } else if (UtilityRoutines::SameString(userInput, "ISOStandard")) {
+        } else if (Util::SameString(userInput, "ISOStandard")) {
             return FluidToSlabHeatTransferTypes::ISOStandard;
         } else {
             ShowWarningError(state, format("Invalid Fluid to Slab Heat Transfer Model Input = {}", userInput));
@@ -1819,21 +1819,21 @@ namespace LowTempRadiantSystem {
                                                                                        std::string const &controlInputField,
                                                                                        LowTempRadiantSystem::SystemType const typeOfRadiantSystem)
     {
-        if (UtilityRoutines::SameString(controlInput, "MeanAirTemperature")) {
+        if (Util::SameString(controlInput, "MeanAirTemperature")) {
             return LowTempRadiantControlTypes::MATControl;
-        } else if (UtilityRoutines::SameString(controlInput, "MeanRadiantTemperature")) {
+        } else if (Util::SameString(controlInput, "MeanRadiantTemperature")) {
             return LowTempRadiantControlTypes::MRTControl;
-        } else if (UtilityRoutines::SameString(controlInput, "OperativeTemperature")) {
+        } else if (Util::SameString(controlInput, "OperativeTemperature")) {
             return LowTempRadiantControlTypes::OperativeControl;
-        } else if (UtilityRoutines::SameString(controlInput, "OutdoorDryBulbTemperature")) {
+        } else if (Util::SameString(controlInput, "OutdoorDryBulbTemperature")) {
             return LowTempRadiantControlTypes::ODBControl;
-        } else if (UtilityRoutines::SameString(controlInput, "OutdoorWetBulbTemperature")) {
+        } else if (Util::SameString(controlInput, "OutdoorWetBulbTemperature")) {
             return LowTempRadiantControlTypes::OWBControl;
-        } else if (UtilityRoutines::SameString(controlInput, "SurfaceFaceTemperature")) {
+        } else if (Util::SameString(controlInput, "SurfaceFaceTemperature")) {
             return LowTempRadiantControlTypes::SurfFaceTempControl;
-        } else if (UtilityRoutines::SameString(controlInput, "SurfaceInteriorTemperature")) {
+        } else if (Util::SameString(controlInput, "SurfaceInteriorTemperature")) {
             return LowTempRadiantControlTypes::SurfIntTempControl;
-        } else if (UtilityRoutines::SameString(controlInput, "RunningMeanOutdoorDryBulbTemperature") &&
+        } else if (Util::SameString(controlInput, "RunningMeanOutdoorDryBulbTemperature") &&
                    typeOfRadiantSystem == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
             state.dataLowTempRadSys->anyRadiantSystemUsingRunningMeanAverage = true;
             return LowTempRadiantControlTypes::RunningMeanODBControl;
@@ -1849,9 +1849,9 @@ namespace LowTempRadiantSystem {
                                                                                          std::string const &controlInput,
                                                                                          std::string const &controlInputField)
     {
-        if (UtilityRoutines::SameString(controlInput, "HalfFlowPower")) {
+        if (Util::SameString(controlInput, "HalfFlowPower")) {
             return LowTempRadiantSetpointTypes::HalfFlowPower;
-        } else if (UtilityRoutines::SameString(controlInput, "ZeroFlowPower")) {
+        } else if (Util::SameString(controlInput, "ZeroFlowPower")) {
             return LowTempRadiantSetpointTypes::ZeroFlowPower;
         } else {
             ShowWarningError(state, format("Invalid {} = {}", controlInputField, controlInput));

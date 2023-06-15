@@ -236,7 +236,7 @@ namespace UserDefinedComponents {
 
         // Find the correct Equipment
         if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(EquipName, state.dataUserDefinedComponents->UserCoil);
+            CompNum = Util::FindItemInList(EquipName, state.dataUserDefinedComponents->UserCoil);
             if (CompNum == 0) {
                 ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
@@ -341,7 +341,7 @@ namespace UserDefinedComponents {
 
         // Find the correct Equipment
         if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserZoneAirHVAC);
+            CompNum = Util::FindItemInList(CompName, state.dataUserDefinedComponents->UserZoneAirHVAC);
             if (CompNum == 0) {
                 ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
@@ -457,7 +457,7 @@ namespace UserDefinedComponents {
 
         // Find the correct Equipment
         if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserAirTerminal);
+            CompNum = Util::FindItemInList(CompName, state.dataUserDefinedComponents->UserAirTerminal);
             if (CompNum == 0) {
                 ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
@@ -570,13 +570,13 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -627,7 +627,7 @@ namespace UserDefinedComponents {
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
                                 static_cast<DataPlant::HowMet>(
-                                    getEnumerationValue(DataPlant::HowMetTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 2))));
+                                    getEnumerationValue(DataPlant::HowMetTypeNamesUC, Util::MakeUPPERCase(cAlphaArgs(aArgCount + 2))));
                             if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed ==
                                 DataPlant::HowMet::ByNominalCapLowOutLimit) {
                                 // actuator for low out limit
@@ -654,13 +654,13 @@ namespace UserDefinedComponents {
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
                                 static_cast<DataPlant::LoopFlowStatus>(getEnumerationValue(
-                                    DataPlant::LoopFlowStatusTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(aArgCount + 3))));
+                                    DataPlant::LoopFlowStatusTypeNamesUC, Util::MakeUPPERCase(cAlphaArgs(aArgCount + 3))));
                         }
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 4)) {
                             int StackMngrNum =
-                                UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 4), state.dataRuntimeLang->EMSProgramCallManager);
+                                Util::FindItemInList(cAlphaArgs(aArgCount + 4), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr = StackMngrNum;
                             } else {
@@ -679,7 +679,7 @@ namespace UserDefinedComponents {
                         // find program to call for model simulations for just this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 5)) {
                             int StackMngrNum =
-                                UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 5), state.dataRuntimeLang->EMSProgramCallManager);
+                                Util::FindItemInList(cAlphaArgs(aArgCount + 5), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr = StackMngrNum;
                             } else {
@@ -898,7 +898,7 @@ namespace UserDefinedComponents {
                 if (!lAlphaFieldBlanks(31)) {
 
                     state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(31), state.dataHeatBal->Zone);
+                        Util::FindItemInList(cAlphaArgs(31), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(31)));
@@ -1016,7 +1016,7 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
                 GlobalNames::VerifyUniqueCoilName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
@@ -1025,7 +1025,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1042,7 +1042,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1279,7 +1279,7 @@ namespace UserDefinedComponents {
                     if (!lAlphaFieldBlanks(13)) {
 
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum =
-                            UtilityRoutines::FindItemInList(cAlphaArgs(13), state.dataHeatBal->Zone);
+                            Util::FindItemInList(cAlphaArgs(13), state.dataHeatBal->Zone);
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum == 0) {
                             ShowSevereError(
                                 state, format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(13)));
@@ -1409,12 +1409,12 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1431,7 +1431,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -1754,7 +1754,7 @@ namespace UserDefinedComponents {
                 if (!lAlphaFieldBlanks(16)) {
 
                     state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(16), state.dataHeatBal->Zone);
+                        Util::FindItemInList(cAlphaArgs(16), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(16)));
@@ -1858,12 +1858,12 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -1880,7 +1880,7 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
@@ -2260,7 +2260,7 @@ namespace UserDefinedComponents {
                 if (!lAlphaFieldBlanks(14)) {
 
                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(14), state.dataHeatBal->Zone);
+                        Util::FindItemInList(cAlphaArgs(14), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(14)));
@@ -2862,7 +2862,7 @@ namespace UserDefinedComponents {
         }
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
-            CoilIndex = UtilityRoutines::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
+            CoilIndex = Util::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
         } else {
             CoilIndex = 0;
         }
@@ -2896,7 +2896,7 @@ namespace UserDefinedComponents {
         }
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
-            CoilIndex = UtilityRoutines::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
+            CoilIndex = Util::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
         } else {
             CoilIndex = 0;
         }
@@ -2933,7 +2933,7 @@ namespace UserDefinedComponents {
         }
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
-            CoilIndex = UtilityRoutines::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
+            CoilIndex = Util::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
         } else {
             CoilIndex = 0;
         }

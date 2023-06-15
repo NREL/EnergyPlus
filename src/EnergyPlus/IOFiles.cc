@@ -326,7 +326,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
-                input = UtilityRoutines::MakeUPPERCase(input);
+                input = Util::MakeUPPERCase(input);
             } else {
                 state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }

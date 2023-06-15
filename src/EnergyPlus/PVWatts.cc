@@ -293,7 +293,7 @@ namespace PVWatts {
         if (lAlphaFieldBlanks(AlphaFields::SURFACE_NAME)) {
             surfaceNum = 0;
         } else {
-            surfaceNum = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), state.dataSurface->Surface);
+            surfaceNum = Util::FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), state.dataSurface->Surface);
         }
 
         if (errorsFound) {

@@ -502,7 +502,7 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         }
         if (Pos != std::string::npos) LineResult.data.erase(0, Pos + 1);
 
-        if (UtilityRoutines::MakeUPPERCase(Header(HdLine)) == "DATA PERIODS") {
+        if (Util::MakeUPPERCase(Header(HdLine)) == "DATA PERIODS") {
             bool IOStatus;
             uppercase(LineResult.data);
             int NumHdArgs = 2;
@@ -525,11 +525,11 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
 
                 switch (Count) {
                 case 1:
-                    NumHdArgs += 4 * UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
+                    NumHdArgs += 4 * Util::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
                     // TODO: Error if more than one period? Less than full year?
                     break;
                 case 2:
-                    kivaWeather.intervalsPerHour = UtilityRoutines::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
+                    kivaWeather.intervalsPerHour = Util::ProcessNumber(LineResult.data.substr(0, Pos), IOStatus);
                     break;
                 default:
                     break;

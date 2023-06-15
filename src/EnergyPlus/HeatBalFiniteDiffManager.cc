@@ -172,7 +172,7 @@ namespace HeatBalFiniteDiffManager {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(1)) {
                 {
                     state.dataHeatBalFiniteDiffMgr->CondFDSchemeType = static_cast<CondFDScheme>(
-                        getEnumerationValue(CondFDSchemeTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+                        getEnumerationValue(CondFDSchemeTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
                     if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType == CondFDScheme::Invalid) {
                         ShowSevereError(state,
                                         format("{}: invalid {} entered={}, must match CrankNicholsonSecondOrder or FullyImplicitFirstOrder.",
@@ -226,7 +226,7 @@ namespace HeatBalFiniteDiffManager {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 // Load the material derived type from the input data.
-                MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
+                MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {} entered={}, must match to a valid Material name.",
@@ -327,7 +327,7 @@ namespace HeatBalFiniteDiffManager {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 // Load the material derived type from the input data.
-                MaterNum = UtilityRoutines::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
+                MaterNum = Util::FindItemInPtrList(MaterialNames(1), state.dataMaterial->Material);
                 if (MaterNum == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {} entered={}, must match to a valid Material name.",

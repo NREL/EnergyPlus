@@ -82,9 +82,10 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
         state.dataCoilCooingDX->coilCoolingDXGetInputFlag = false;
     }
     int handle = -1;
+    std::string coilNameUpper = Util::MakeUPPERCase(coilName);
     for (auto const &thisCoil : state.dataCoilCooingDX->coilCoolingDXs) {
         handle++;
-        if (EnergyPlus::UtilityRoutines::MakeUPPERCase(coilName) == EnergyPlus::UtilityRoutines::MakeUPPERCase(thisCoil.name)) {
+        if (coilNameUpper == Util::MakeUPPERCase(thisCoil.name)) {
             return handle;
         }
     }
@@ -92,7 +93,7 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
     return -1;
 }
 
-void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state)
+void CoilCoolingDX::getInput(EnergyPlusData &state)
 {
     int numCoolingCoilDXs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, state.dataCoilCooingDX->coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
@@ -127,7 +128,7 @@ void CoilCoolingDX::getInput(EnergyPlus::EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data)
+void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification &input_data)
 {
     static constexpr std::string_view routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
@@ -237,7 +238,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     }
 }
 
-void CoilCoolingDX::oneTimeInit(EnergyPlus::EnergyPlusData &state)
+void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
 {
 
     // setup output variables, needs to be done after object is instantiated and emplaced
@@ -667,13 +668,13 @@ Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
     }
 }
 
-void CoilCoolingDX::size(EnergyPlus::EnergyPlusData &state)
+void CoilCoolingDX::size(EnergyPlusData &state)
 {
     this->performance.parentName = this->name;
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
+void CoilCoolingDX::simulate(EnergyPlusData &state,
                              int useAlternateMode,
                              Real64 PLR,
                              int speedNum,
@@ -721,7 +722,7 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state,
                                condOutletNode,
                                singleMode,
                                LoadSHR);
-    EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
+    CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
     Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
@@ -977,7 +978,7 @@ void CoilCoolingDX::setToHundredPercentDOAS()
     }
 }
 
-void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, EnergyPlus::DataLoopNode::NodeData &out)
+void CoilCoolingDX::passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out)
 {
     // pass through all the other node variables that we don't update as a part of this model calculation
     out.MassFlowRate = in.MassFlowRate;
@@ -989,7 +990,7 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
 
-void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
+void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
 {
     if (!state.dataCoilCooingDX->coilCoolingDXs.empty()) {
         Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]

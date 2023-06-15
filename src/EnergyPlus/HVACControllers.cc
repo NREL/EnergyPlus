@@ -229,7 +229,7 @@ void ManageControllers(EnergyPlusData &state,
 
     if (ControllerIndex == 0) {
         ControlNum =
-            UtilityRoutines::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
+            Util::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
         if (ControlNum == 0) {
             ShowFatalError(
                 state,
@@ -2541,7 +2541,7 @@ void CheckControllerListOrder(EnergyPlusData &state)
             // first see how many are water coil controllers
             int WaterCoilContrlCount = 0; // init
             for (int ContrlNum = 1; ContrlNum <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).NumControllers; ++ContrlNum) {
-                if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerType(ContrlNum),
+                if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerType(ContrlNum),
                                                 "CONTROLLER:WATERCOIL")) {
                     ++WaterCoilContrlCount;
                 }
@@ -2552,11 +2552,11 @@ void CheckControllerListOrder(EnergyPlusData &state)
                 ContrlSensedNodeNums = 0;
                 int SensedNodeIndex = 0;
                 for (int ContrlNum = 1; ContrlNum <= state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).NumControllers; ++ContrlNum) {
-                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerType(ContrlNum),
+                    if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerType(ContrlNum),
                                                     "CONTROLLER:WATERCOIL")) {
                         ++SensedNodeIndex;
                         int foundControl =
-                            UtilityRoutines::FindItemInList(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerName(ContrlNum),
+                            Util::FindItemInList(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerName(ContrlNum),
                                                             state.dataHVACControllers->ControllerProps,
                                                             &ControllerPropsType::ControllerName);
                         if (foundControl > 0) {
@@ -2696,7 +2696,7 @@ void GetControllerActuatorNodeNum(EnergyPlusData &state,
 
     NodeNotFound = true;
     int ControlNum =
-        UtilityRoutines::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
+        Util::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
     if (ControlNum > 0 && ControlNum <= state.dataHVACControllers->NumControllers) {
         WaterInletNodeNum = state.dataHVACControllers->ControllerProps(ControlNum).ActuatedNode;
         NodeNotFound = false;
@@ -2719,7 +2719,7 @@ int GetControllerIndex(EnergyPlusData &state, std::string const &ControllerName 
     }
 
     int ControllerIndex =
-        UtilityRoutines::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
+        Util::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
     if (ControllerIndex == 0) {
         ShowFatalError(state,
                        format("ManageControllers: Invalid controller={}. The only valid controller type for an AirLoopHVAC is Controller:WaterCoil.",

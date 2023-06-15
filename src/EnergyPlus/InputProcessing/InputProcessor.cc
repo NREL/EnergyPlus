@@ -144,7 +144,7 @@ json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &
     if (it2 == objs.end()) {
         // HACK: this is not ideal and should be removed once everything is case sensitive internally
         for (auto it3 = objs.begin(); it3 != objs.end(); ++it3) {
-            if (UtilityRoutines::MakeUPPERCase(it3.key()) == objectName) {
+            if (Util::MakeUPPERCase(it3.key()) == objectName) {
                 return it3.value();
             }
         }
@@ -556,7 +556,7 @@ bool InputProcessor::findDefault(std::string &default_value, json const &schema_
             default_value = s;
         }
         if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-            default_value = UtilityRoutines::MakeUPPERCase(default_value);
+            default_value = Util::MakeUPPERCase(default_value);
         }
         return true;
     }
@@ -736,7 +736,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-        output.first = UtilityRoutines::MakeUPPERCase(output.first);
+        output.first = Util::MakeUPPERCase(output.first);
     }
     return output;
 }
@@ -1041,7 +1041,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
             if (name_iter.find("retaincase") != name_iter.end()) {
                 Alphas(alpha_index) = objectInfo.objectName;
             } else {
-                Alphas(alpha_index) = UtilityRoutines::MakeUPPERCase(objectInfo.objectName);
+                Alphas(alpha_index) = Util::MakeUPPERCase(objectInfo.objectName);
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
@@ -1224,9 +1224,9 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = UtilityRoutines::MakeUPPERCase(ObjName);
+    std::string const upperObjName = Util::MakeUPPERCase(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        if (UtilityRoutines::MakeUPPERCase(it.key()) == upperObjName) {
+        if (Util::MakeUPPERCase(it.key()) == upperObjName) {
             found = true;
             break;
         }
@@ -1262,11 +1262,11 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = UtilityRoutines::MakeUPPERCase(ObjName);
+    std::string const upperObjName = Util::MakeUPPERCase(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (UtilityRoutines::MakeUPPERCase(it2.value().get<std::string>()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (Util::MakeUPPERCase(it2.value().get<std::string>()) == upperObjName)) {
             found = true;
             break;
         }
@@ -2115,7 +2115,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    std::string const report_name = UtilityRoutines::MakeUPPERCase(extensions.at("report_name").get<std::string>());
+                    std::string const report_name = Util::MakeUPPERCase(extensions.at("report_name").get<std::string>());
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));
@@ -2513,8 +2513,8 @@ void InputProcessor::addRecordToOutputVariableStructure(EnergyPlusData &state, s
     if (found == state.dataOutput->OutputVariablesForSimulation.end()) {
         std::map<std::string,
                  DataOutputs::OutputReportingVariables,
-                 // UtilityRoutines::case_insensitive_hasher,
-                 UtilityRoutines::case_insensitive_comparator>
+                 // Util::case_insensitive_hasher,
+                 Util::case_insensitive_comparator>
             data;
         // data.reserve(32);
         data.emplace(KeyValue, DataOutputs::OutputReportingVariables(state, KeyValue, VarName));

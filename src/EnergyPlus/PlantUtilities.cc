@@ -1669,7 +1669,7 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                 for (CompCtr = 1; CompCtr <= this_branch.TotalComponents; ++CompCtr) {
                     auto &this_component = this_branch.Comp(CompCtr);
                     if (this_component.Type == CompType) {
-                        if (UtilityRoutines::SameString(CompName, this_component.Name)) {
+                        if (Util::SameString(CompName, this_component.Name)) {
                             FoundCompName = true;
                             if (present(InletNodeNumber)) {
                                 if (InletNodeNumber > 0) {
@@ -1953,7 +1953,7 @@ int MyPlantSizingIndex(EnergyPlusData &state,
 
     if (MyPltLoopNum > 0) {
         if (state.dataSize->NumPltSizInput > 0) {
-            MyPltSizNum = UtilityRoutines::FindItemInList(
+            MyPltSizNum = Util::FindItemInList(
                 state.dataPlnt->PlantLoop(MyPltLoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
         }
         if (MyPltSizNum == 0) {

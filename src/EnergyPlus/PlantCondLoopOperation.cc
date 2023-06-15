@@ -374,7 +374,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
     for (OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(
             state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
+        if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
     }
 
     CurrentModuleObject = "CondenserEquipmentOperationSchemes";
@@ -382,7 +382,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
     for (OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum) {
         state.dataInputProcessing->inputProcessor->getObjectItem(
             state, CurrentModuleObject, OpNum, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-        if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
+        if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound)) continue;
     }
 
     // Load the Plant data structure
@@ -830,7 +830,7 @@ void FindRangeBasedOrUncontrolledInput(EnergyPlusData &state,
         for (Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
             if (Num == NumSchemes) {
                 ShowSevereError(state,
                                 format("{} = \"{}\", could not find {} = \"{}\".",
@@ -1054,7 +1054,7 @@ void FindDeltaTempRangeInput(EnergyPlusData &state,
     if (NumSchemes > 0) {
         for (Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state, cmoStr, Num, AlphArray, NumAlphas, NumArray, NumNums, IOStat);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, AlphArray(1))) break;
             if (Num == NumSchemes) {
                 ShowSevereError(state,
                                 format("{} = \"{}\", could not find {} = \"{}\".",
@@ -1294,7 +1294,7 @@ void LoadEquipList(EnergyPlusData &state,
     FoundIntendedList = false;
     // find name in set of possible list
     for (Num = 1; Num <= state.dataPlantCondLoopOp->TotNumLists; ++Num) {
-        if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name,
+        if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(ListNum).Name,
                                         state.dataPlantCondLoopOp->EquipListsNameList(Num))) {
             FoundIntendedList = true;
             // get object item for real this time
@@ -1395,7 +1395,7 @@ void FindCompSPInput(EnergyPlusData &state,
     SchemeNameFound = true;
 
     DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(CurrentModuleObject)));
+        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::MakeUPPERCase(CurrentModuleObject)));
 
     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
         LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
@@ -1407,7 +1407,7 @@ void FindCompSPInput(EnergyPlusData &state,
         for (int Num = 1; Num <= NumSchemes; ++Num) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, CurrentModuleObject, Num, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1))) break;
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1))) break;
             if (Num == NumSchemes) {
                 ShowSevereError(state,
                                 format("{} = \"{}\", could not find {} = \"{}\".",
@@ -1887,7 +1887,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1)))
+            if (Util::SameString(state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).Name, state.dataIPShortCut->cAlphaArgs(1)))
                 break;               // found the correct one
             if (Num == NumSchemes) { // did not find it
                 ShowSevereError(state,
@@ -1934,7 +1934,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).EMSIntVarRemainingLoadValue);
                 }
             }
-            StackMngrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+            StackMngrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
             if (StackMngrNum > 0) { // found it
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).ErlSimProgramMngr = StackMngrNum;
             } else {
@@ -1948,7 +1948,7 @@ void GetUserDefinedOpSchemeInput(EnergyPlusData &state,
                 }
             }
             if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                StackMngrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                StackMngrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                 if (StackMngrNum > 0) { // found it
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).ErlInitProgramMngr = StackMngrNum;
                 } else {
@@ -2064,7 +2064,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip = this_equip_list.Comp(EquipNum);
                         Type = static_cast<DataPlant::PlantEquipmentType>(
-                            getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
+                            getEnumerationValue(PlantEquipTypeNamesUC, Util::MakeUPPERCase(this_equip.TypeOf)));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
 

@@ -138,7 +138,7 @@ namespace Humidifiers {
 
         // Get the humidifier unit index
         if (CompIndex == 0) {
-            HumNum = UtilityRoutines::FindItemInList(CompName, Humidifier);
+            HumNum = Util::FindItemInList(CompName, Humidifier);
             if (HumNum == 0) {
                 ShowFatalError(state, format("SimHumidifier: Unit not found={}", CompName));
             }
@@ -1427,7 +1427,7 @@ namespace Humidifiers {
             state.dataHumidifiers->GetInputFlag = false;
         }
 
-        WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
+        WhichHumidifier = Util::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
         if (WhichHumidifier != 0) {
             NodeNum = state.dataHumidifiers->Humidifier(WhichHumidifier).AirInNode;
         } else {
@@ -1450,7 +1450,7 @@ namespace Humidifiers {
             state.dataHumidifiers->GetInputFlag = false;
         }
 
-        int WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
+        int WhichHumidifier = Util::FindItemInList(HumidifierName, state.dataHumidifiers->Humidifier);
         if (WhichHumidifier != 0) {
             return state.dataHumidifiers->Humidifier(WhichHumidifier).AirOutNode;
         } else {

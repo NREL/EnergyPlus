@@ -155,7 +155,7 @@ void SimPurchasedAir(EnergyPlusData &state,
 
     // Find the correct PurchasedAir Equipment
     if (CompIndex == 0) {
-        PurchAirNum = UtilityRoutines::FindItemInList(PurchAirName, state.dataPurchasedAirMgr->PurchAir);
+        PurchAirNum = Util::FindItemInList(PurchAirName, state.dataPurchasedAirMgr->PurchAir);
         if (PurchAirNum == 0) {
             ShowFatalError(state, format("SimPurchasedAir: Unit not found={}", PurchAirName));
         }
@@ -257,7 +257,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames.allocate(NumNums);
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames = "";
             state.dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             PurchAir(PurchAirNum).Name = state.dataIPShortCut->cAlphaArgs(1);
             // get optional  availability schedule
@@ -338,21 +338,21 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).MaxHeatSuppAirHumRat = state.dataIPShortCut->rNumericArgs(3);
             PurchAir(PurchAirNum).MinCoolSuppAirHumRat = state.dataIPShortCut->rNumericArgs(4);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "NoLimit")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "NoLimit")) {
                 PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRate")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRate")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(5)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRate;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitCapacity;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRateAndCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "LimitFlowRateAndCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(5) && state.dataIPShortCut->lNumericFieldBlanks(6)) {
                     PurchAir(PurchAirNum).HeatingLimit = LimitType::NoLimit;
                 } else if (state.dataIPShortCut->lNumericFieldBlanks(5)) {
@@ -372,21 +372,21 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).MaxHeatVolFlowRate = state.dataIPShortCut->rNumericArgs(5);
             PurchAir(PurchAirNum).MaxHeatSensCap = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "NoLimit")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "NoLimit")) {
                 PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRate")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRate")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(7)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitFlowRate;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(8)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::LimitCapacity;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRateAndCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "LimitFlowRateAndCapacity")) {
                 if (state.dataIPShortCut->lNumericFieldBlanks(7) && state.dataIPShortCut->lNumericFieldBlanks(8)) {
                     PurchAir(PurchAirNum).CoolingLimit = LimitType::NoLimit;
                 } else if (state.dataIPShortCut->lNumericFieldBlanks(7)) {
@@ -435,13 +435,13 @@ void GetPurchasedAir(EnergyPlusData &state)
                 }
             }
             // get Dehumidification control type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "None")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "None")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::None;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSensibleHeatRatio")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSensibleHeatRatio")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::ConstantSensibleHeatRatio;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "Humidistat")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "Humidistat")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::Humidistat;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSupplyHumidityRatio")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "ConstantSupplyHumidityRatio")) {
                 PurchAir(PurchAirNum).DehumidCtrlType = HumControl::ConstantSupplyHumidityRatio;
             } else {
                 ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -453,11 +453,11 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).CoolSHR = state.dataIPShortCut->rNumericArgs(9);
 
             // get Humidification control type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "None")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "None")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::None;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "Humidistat")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "Humidistat")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::Humidistat;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(11), "ConstantSupplyHumidityRatio")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(11), "ConstantSupplyHumidityRatio")) {
                 PurchAir(PurchAirNum).HumidCtrlType = HumControl::ConstantSupplyHumidityRatio;
             } else {
                 ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -470,7 +470,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             // get Design specification outdoor air object
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                 PurchAir(PurchAirNum).OARequirementsPtr =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(12), state.dataSize->OARequirements);
                 if (PurchAir(PurchAirNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                     ShowContinueError(
@@ -528,11 +528,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                 if (UniqueNodeError) ErrorsFound = true;
 
                 // get Demand controlled ventilation type
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "None")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(14), "None")) {
                     PurchAir(PurchAirNum).DCVType = DCV::None;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "OccupancySchedule")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(14), "OccupancySchedule")) {
                     PurchAir(PurchAirNum).DCVType = DCV::OccupancySchedule;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(14), "CO2Setpoint")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(14), "CO2Setpoint")) {
                     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                         PurchAir(PurchAirNum).DCVType = DCV::CO2SetPoint;
                     } else {
@@ -556,11 +556,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 // get Outdoor air economizer type
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "NoEconomizer")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "NoEconomizer")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::NoEconomizer;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialDryBulb")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialDryBulb")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::DifferentialDryBulb;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialEnthalpy")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "DifferentialEnthalpy")) {
                     PurchAir(PurchAirNum).EconomizerType = Econ::DifferentialEnthalpy;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -570,11 +570,11 @@ void GetPurchasedAir(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 // get Outdoor air heat recovery type and effectiveness
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "None")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "None")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::None;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Sensible")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "Sensible")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Sensible;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "Enthalpy")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "Enthalpy")) {
                     PurchAir(PurchAirNum).HtRecType = HeatRecovery::Enthalpy;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid data", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -604,7 +604,7 @@ void GetPurchasedAir(EnergyPlusData &state)
             PurchAir(PurchAirNum).HVACSizingIndex = 0;
             if (!state.dataIPShortCut->lAlphaFieldBlanks(17)) {
                 PurchAir(PurchAirNum).HVACSizingIndex =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(17), state.dataSize->ZoneHVACSizing);
                 if (PurchAir(PurchAirNum).HVACSizingIndex == 0) {
                     ShowSevereError(state,
                                     format("{} = {} not found.", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17)));

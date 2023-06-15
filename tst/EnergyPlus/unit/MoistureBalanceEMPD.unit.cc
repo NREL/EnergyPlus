@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -241,7 +241,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataConstruction->Construct.allocate(1);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(1);
     construction.TotLayers = 1;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("CONCRETE", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataConstruction->Construct.allocate(constNum);
     Construction::ConstructionProps &construction = state->dataConstruction->Construct(constNum);
     construction.TotLayers = constNum;
-    construction.LayerPoint(construction.TotLayers) = UtilityRoutines::FindItemInPtrList("WOOD", state->dataMaterial->Material);
+    construction.LayerPoint(construction.TotLayers) = Util::FindItemInPtrList("WOOD", state->dataMaterial->Material);
 
     // Initialize and get inputs
     MoistureBalanceEMPDManager::InitMoistureBalanceEMPD(*state);

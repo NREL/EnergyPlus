@@ -892,7 +892,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
 
         outUserCurve.Name = ipsc->cAlphaArgs(1);
 
-        outUserCurve.windSpeedType = static_cast<RefWind>(getEnumerationValue(RefWindNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(2))));
+        outUserCurve.windSpeedType = static_cast<RefWind>(getEnumerationValue(RefWindNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(2))));
         if (outUserCurve.windSpeedType == RefWind::Invalid) {
             ShowSevereError(state,
                             format("GetUserSuppliedConvectionCoefficients: {}: Invalid Key choice Entered, for {}={}",
@@ -1073,7 +1073,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                                                                  ipsc->lAlphaFieldBlanks,
                                                                  ipsc->cAlphaFieldNames,
                                                                  ipsc->cNumericFieldNames);
-        int surfNum = UtilityRoutines::FindItemInList(Alphas(1), Surface);
+        int surfNum = Util::FindItemInList(Alphas(1), Surface);
         if (surfNum == 0) {
             ShowSevereError(
                 state,
@@ -1166,7 +1166,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userOutConvCoef.WhichSurface = surfNum;
                     userOutConvCoef.overrideType = OverrideType::UserCurve;
                     userOutConvCoef.UserCurveIndex =
-                        UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcExtUserCurve);
+                        Util::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcExtUserCurve);
                     if (userOutConvCoef.UserCurveIndex == 0) {
                         ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                         ShowContinueError(state, format(" Invalid {} entered={}", ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3)));
@@ -1294,7 +1294,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userInConvCoef.SurfaceName = Alphas(1);
                     userInConvCoef.WhichSurface = surfNum;
                     userInConvCoef.overrideType = OverrideType::UserCurve;
-                    userInConvCoef.UserCurveIndex = UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcIntUserCurve);
+                    userInConvCoef.UserCurveIndex = Util::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcIntUserCurve);
                     if (userInConvCoef.UserCurveIndex == 0) {
                         ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                         ShowContinueError(state, format(" Invalid {} entered={}", ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3)));
@@ -1427,7 +1427,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userOutConvCoef.WhichSurface = -999;
                     userOutConvCoef.overrideType = OverrideType::UserCurve;
                     userOutConvCoef.UserCurveIndex =
-                        UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcExtUserCurve);
+                        Util::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcExtUserCurve);
                     if (userOutConvCoef.UserCurveIndex == 0) {
                         ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                         ShowContinueError(state, format(" Invalid {} entered={}", ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3)));
@@ -1537,7 +1537,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     userInConvCoef.SurfaceName = Alphas(Ptr);
                     userInConvCoef.WhichSurface = -999;
                     userInConvCoef.overrideType = OverrideType::UserCurve;
-                    userInConvCoef.UserCurveIndex = UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcIntUserCurve);
+                    userInConvCoef.UserCurveIndex = Util::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->hcIntUserCurve);
                     if (state.dataSurface->UserIntConvCoeffs(state.dataSurface->TotIntConvCoeffUser).UserCurveIndex == 0) {
                         ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, Alphas(1)));
                         ShowContinueError(state, format(" Invalid {} entered={}", ipsc->cAlphaFieldNames(Ptr + 3), Alphas(Ptr + 3)));
@@ -1673,7 +1673,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                 ErrorsFound = true;
             } else if (state.dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[iInConvClass] == HcInt::UserCurve) {
                 state.dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassUserCurveNums[iInConvClass] =
-                    UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvectionCoefficient->hcIntUserCurve);
+                    Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvectionCoefficient->hcIntUserCurve);
                 if (state.dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassUserCurveNums[iInConvClass] == 0) {
                     ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, ipsc->cAlphaArgs(i)));
                     ShowContinueError(state,
@@ -1714,7 +1714,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
 
             } else if (state.dataConvectionCoefficient->extAdaptiveConvAlgo.extConvClass2EqNums[iOutConvClass] == HcExt::UserCurve) {
                 state.dataConvectionCoefficient->extAdaptiveConvAlgo.extConvClass2UserCurveNums[iOutConvClass] =
-                    UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvectionCoefficient->hcExtUserCurve);
+                    Util::FindItemInList(ipsc->cAlphaArgs(i + 1), state.dataConvectionCoefficient->hcExtUserCurve);
                 if (state.dataConvectionCoefficient->extAdaptiveConvAlgo.extConvClass2UserCurveNums[iOutConvClass] == 0) {
                     ShowSevereError(state, format("{}{}=\"{}, invalid value", RoutineName, CurrentModuleObject, ipsc->cAlphaArgs(i)));
                     ShowContinueError(state,

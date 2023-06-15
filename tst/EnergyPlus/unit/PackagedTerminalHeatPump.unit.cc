@@ -4299,9 +4299,9 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", isZoneEquipment, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
-    int zoneSupplyInlet = UtilityRoutines::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneExhaustNode = UtilityRoutines::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneNum = UtilityRoutines::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
+    int zoneSupplyInlet = Util::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneExhaustNode = Util::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneNum = Util::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
 
     // Test 1 - PTAC Inlet node is zone exhaust node
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
@@ -4324,7 +4324,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     ASSERT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(errorsFound);
     int plenumInducedNode =
-        UtilityRoutines::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        Util::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_EQ(plenumInducedNode, thisSys.AirInNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
@@ -4354,7 +4354,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
 
     ASSERT_TRUE(compare_err_stream(error_string, true));
     ASSERT_TRUE(errorsFound);
-    int someOtherNode = UtilityRoutines::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int someOtherNode = Util::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_EQ(someOtherNode, thisSys.AirInNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
@@ -4567,9 +4567,9 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     EXPECT_FALSE(errorsFound);
 
     int zoneSupplyInlet =
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        Util::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     int zoneExhaustNode =
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     // test PTHP node connections
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", thisSys.UnitType);
@@ -4586,19 +4586,19 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
 
     // set zone air conditions
     auto &zoneAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        Util::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneAirNode.Temp = 20.0;
     zoneAirNode.HumRat = 0.003;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
     // set mixed air conditions
     auto &mixedAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        Util::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     mixedAirNode.Temp = 10.0;
     mixedAirNode.HumRat = 0.003;
     mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
     // set zone exhaust node
     auto &zoneExhNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneExhNode.Temp = 20.0;
     zoneExhNode.HumRat = 0.003;
     zoneExhNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneExhNode.Temp, zoneExhNode.HumRat);

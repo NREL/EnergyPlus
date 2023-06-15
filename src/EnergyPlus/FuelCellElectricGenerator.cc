@@ -127,7 +127,7 @@ namespace FuelCellElectricGenerator {
 
         // Now look for this object
         for (auto &thisFC : state.dataFuelCellElectGen->FuelCell) {
-            if (UtilityRoutines::MakeUPPERCase(thisFC.NameExhaustHX) == UtilityRoutines::MakeUPPERCase(objectName)) {
+            if (Util::MakeUPPERCase(thisFC.NameExhaustHX) == Util::MakeUPPERCase(objectName)) {
                 return &thisFC;
             }
         }
@@ -240,13 +240,13 @@ namespace FuelCellElectricGenerator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCPM);
+            int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCPM);
             if (thisFuelCell > 0) {
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.Name = AlphArray(1);
-                if (UtilityRoutines::SameString(AlphArray(2), "ANNEX42"))
+                if (Util::SameString(AlphArray(2), "ANNEX42"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode = DataGenerators::CurveMode::Direct;
-                if (UtilityRoutines::SameString(AlphArray(2), "NORMALIZED"))
+                if (Util::SameString(AlphArray(2), "NORMALIZED"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode = DataGenerators::CurveMode::Normalized;
                 if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.EffMode == DataGenerators::CurveMode::Invalid) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
@@ -282,11 +282,11 @@ namespace FuelCellElectricGenerator {
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ShutDownElectConsum = NumArray(16);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ANC0 = NumArray(17);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ANC1 = NumArray(18);
-                if (UtilityRoutines::SameString(AlphArray(4), "ConstantRate"))
+                if (Util::SameString(AlphArray(4), "ConstantRate"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::SkinLoss::ConstantRate;
-                if (UtilityRoutines::SameString(AlphArray(4), "UAForProcessGasTemperature"))
+                if (Util::SameString(AlphArray(4), "UAForProcessGasTemperature"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::SkinLoss::UADT;
-                if (UtilityRoutines::SameString(AlphArray(4), "QUADRATIC FUNCTION OF FUEL RATE"))
+                if (Util::SameString(AlphArray(4), "QUADRATIC FUNCTION OF FUEL RATE"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode = DataGenerators::SkinLoss::QuadraticFuelNdot;
                 if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.SkinLossMode == DataGenerators::SkinLoss::Invalid) {
                     // throw error
@@ -296,7 +296,7 @@ namespace FuelCellElectricGenerator {
                 }
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ZoneName = AlphArray(5);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ZoneID =
-                    UtilityRoutines::FindItemInList(state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ZoneName, state.dataHeatBal->Zone);
+                    Util::FindItemInList(state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ZoneName, state.dataHeatBal->Zone);
                 if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.ZoneID == 0 && !lAlphaBlanks(5)) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
                     ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -347,7 +347,7 @@ namespace FuelCellElectricGenerator {
 
                 // check for other FuelCell using the same power module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
-                    if (UtilityRoutines::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).FCPM.Name,
+                    if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).FCPM.Name,
                                                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).FCPM = state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM;
                     }
@@ -367,7 +367,7 @@ namespace FuelCellElectricGenerator {
 
         // set fuel supply ID in Fuel cell structure
         for (int GeneratorNum = 1; GeneratorNum <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++GeneratorNum) {
-            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FuelSupNum = UtilityRoutines::FindItemInList(
+            state.dataFuelCellElectGen->FuelCell(GeneratorNum).FuelSupNum = Util::FindItemInList(
                 state.dataFuelCellElectGen->FuelCell(GeneratorNum).NameFCFuelSup, state.dataGenerator->FuelSupply); // Fuel Supply ID
             if (state.dataFuelCellElectGen->FuelCell(GeneratorNum).FuelSupNum == 0) {
                 ShowSevereError(state,
@@ -400,7 +400,7 @@ namespace FuelCellElectricGenerator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCAirSup);
+            int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCAirSup);
 
             if (thisFuelCell > 0) {
 
@@ -428,11 +428,11 @@ namespace FuelCellElectricGenerator {
                 }
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.BlowerHeatLossFactor = NumArray(1);
 
-                if (UtilityRoutines::SameString(AlphArray(4), "AirRatiobyStoics")) {
+                if (Util::SameString(AlphArray(4), "AirRatiobyStoics")) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.AirSupRateMode = DataGenerators::AirSupRateMode::ConstantStoicsAirRat;
-                } else if (UtilityRoutines::SameString(AlphArray(4), "QuadraticFunctionofElectricPower")) {
+                } else if (Util::SameString(AlphArray(4), "QuadraticFunctionofElectricPower")) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.AirSupRateMode = DataGenerators::AirSupRateMode::QuadraticFuncofPel;
-                } else if (UtilityRoutines::SameString(AlphArray(4), "QUADRATIC FUNCTION OF FUEL RATE")) {
+                } else if (Util::SameString(AlphArray(4), "QUADRATIC FUNCTION OF FUEL RATE")) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.AirSupRateMode = DataGenerators::AirSupRateMode::QuadraticFuncofNdot;
                 } else {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
@@ -464,18 +464,18 @@ namespace FuelCellElectricGenerator {
                     ErrorsFound = true;
                 }
 
-                if (UtilityRoutines::SameString("RecoverBurnerInverterStorage", AlphArray(7))) {
+                if (Util::SameString("RecoverBurnerInverterStorage", AlphArray(7))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.IntakeRecoveryMode = DataGenerators::RecoverMode::RecoverBurnInvertBatt;
-                } else if (UtilityRoutines::SameString("RecoverAuxiliaryBurner", AlphArray(7))) {
+                } else if (Util::SameString("RecoverAuxiliaryBurner", AlphArray(7))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.IntakeRecoveryMode =
                         DataGenerators::RecoverMode::RecoverAuxiliaryBurner;
-                } else if (UtilityRoutines::SameString("RecoverInverterandStorage", AlphArray(7))) {
+                } else if (Util::SameString("RecoverInverterandStorage", AlphArray(7))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.IntakeRecoveryMode = DataGenerators::RecoverMode::RecoverInverterBatt;
-                } else if (UtilityRoutines::SameString("RecoverInverter", AlphArray(7))) {
+                } else if (Util::SameString("RecoverInverter", AlphArray(7))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.IntakeRecoveryMode = DataGenerators::RecoverMode::RecoverInverter;
-                } else if (UtilityRoutines::SameString("RecoverElectricalStorage", AlphArray(7))) {
+                } else if (Util::SameString("RecoverElectricalStorage", AlphArray(7))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.IntakeRecoveryMode = DataGenerators::RecoverMode::RecoverBattery;
-                } else if (UtilityRoutines::SameString("NoRecovery", AlphArray(7))) {
+                } else if (Util::SameString("NoRecovery", AlphArray(7))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.IntakeRecoveryMode = DataGenerators::RecoverMode::NoRecoveryOnAirIntake;
                 } else {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
@@ -483,9 +483,9 @@ namespace FuelCellElectricGenerator {
                     ErrorsFound = true;
                 }
 
-                if (UtilityRoutines::SameString("AmbientAir", AlphArray(8))) {
+                if (Util::SameString("AmbientAir", AlphArray(8))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.ConstituentMode = DataGenerators::ConstituentMode::RegularAir;
-                } else if (UtilityRoutines::SameString("UserDefinedConstituents", AlphArray(8))) {
+                } else if (Util::SameString("UserDefinedConstituents", AlphArray(8))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.ConstituentMode =
                         DataGenerators::ConstituentMode::UserDefinedConstituents;
                 } else {
@@ -546,7 +546,7 @@ namespace FuelCellElectricGenerator {
 
                 // check for other FuelCell using the same Air Supply module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
-                    if (UtilityRoutines::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).AirSup.Name,
+                    if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).AirSup.Name,
                                                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).AirSup = state.dataFuelCellElectGen->FuelCell(thisFuelCell).AirSup;
                     }
@@ -560,7 +560,7 @@ namespace FuelCellElectricGenerator {
 
         for (int GeneratorNum = 1; GeneratorNum <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++GeneratorNum) {
             // find molar fraction of oxygen in air supply
-            int thisConstituent = UtilityRoutines::FindItem("Oxygen",
+            int thisConstituent = Util::FindItem("Oxygen",
                                                             state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.ConstitName,
                                                             state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.NumConstituents);
             if (thisConstituent > 0)
@@ -572,7 +572,7 @@ namespace FuelCellElectricGenerator {
 
                 std::string thisName = state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.ConstitName(i);
 
-                int thisGasID = UtilityRoutines::FindItem(
+                int thisGasID = Util::FindItem(
                     thisName, state.dataGenerator->GasPhaseThermoChemistryData, &DataGenerators::GasPropertyDataStruct::ConstituentName);
 
                 state.dataFuelCellElectGen->FuelCell(GeneratorNum).AirSup.GasLibID(i) = static_cast<GasID>(thisGasID);
@@ -608,7 +608,7 @@ namespace FuelCellElectricGenerator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCWaterSup);
+            int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCWaterSup);
 
             if (thisFuelCell > 0) {
                 //  this is only the first instance of a FuelCell generator using this type of Water supply module
@@ -629,7 +629,7 @@ namespace FuelCellElectricGenerator {
                 }
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.PmpPowerLossFactor = NumArray(1);
 
-                if (UtilityRoutines::SameString("TemperatureFromAirNode", AlphArray(4))) {
+                if (Util::SameString("TemperatureFromAirNode", AlphArray(4))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.WaterTempMode =
                         DataGenerators::WaterTemperatureMode::WaterInReformAirNode;
 
@@ -645,7 +645,7 @@ namespace FuelCellElectricGenerator {
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
-                } else if (UtilityRoutines::SameString("TemperatureFromWaterNode", AlphArray(4))) {
+                } else if (Util::SameString("TemperatureFromWaterNode", AlphArray(4))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.WaterTempMode =
                         DataGenerators::WaterTemperatureMode::WaterInReformWaterNode;
 
@@ -661,11 +661,11 @@ namespace FuelCellElectricGenerator {
                                                             NodeInputManager::CompFluidStream::Primary,
                                                             DataLoopNode::ObjectIsNotParent);
 
-                } else if (UtilityRoutines::SameString("MainsWaterTemperature", AlphArray(4))) {
+                } else if (Util::SameString("MainsWaterTemperature", AlphArray(4))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.WaterTempMode =
                         DataGenerators::WaterTemperatureMode::WaterInReformMains;
 
-                } else if (UtilityRoutines::SameString("TemperatureFromSchedule", AlphArray(4))) {
+                } else if (Util::SameString("TemperatureFromSchedule", AlphArray(4))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.WaterTempMode =
                         DataGenerators::WaterTemperatureMode::WaterInReformSchedule;
                 } else {
@@ -686,7 +686,7 @@ namespace FuelCellElectricGenerator {
 
                 // check for other FuelCell using the same Water Supply module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
-                    if (UtilityRoutines::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).WaterSup.Name,
+                    if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).WaterSup.Name,
                                                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).WaterSup = state.dataFuelCellElectGen->FuelCell(thisFuelCell).WaterSup;
                     }
@@ -721,7 +721,7 @@ namespace FuelCellElectricGenerator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCAuxilHeat);
+            int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameFCAuxilHeat);
 
             if (thisFuelCell > 0) {
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.Name = AlphArray(1);
@@ -731,10 +731,10 @@ namespace FuelCellElectricGenerator {
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ANC1 = NumArray(3);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.UASkin = NumArray(4);
 
-                if (UtilityRoutines::SameString("SurroundingZone", AlphArray(2))) {
+                if (Util::SameString("SurroundingZone", AlphArray(2))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.SkinLossDestination =
                         DataGenerators::LossDestination::SurroundingZone;
-                } else if (UtilityRoutines::SameString("AirInletForFuelCell", AlphArray(2))) {
+                } else if (Util::SameString("AirInletForFuelCell", AlphArray(2))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.SkinLossDestination = DataGenerators::LossDestination::AirInletForFC;
                 } else {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
@@ -744,7 +744,7 @@ namespace FuelCellElectricGenerator {
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ZoneName = AlphArray(3);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ZoneID =
-                    UtilityRoutines::FindItemInList(AlphArray(3), state.dataHeatBal->Zone);
+                    Util::FindItemInList(AlphArray(3), state.dataHeatBal->Zone);
                 if ((state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.ZoneID == 0) &&
                     (state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.SkinLossDestination ==
                      DataGenerators::LossDestination::SurroundingZone)) {
@@ -762,7 +762,7 @@ namespace FuelCellElectricGenerator {
 
                 // check for other FuelCell using the same Auxiliary Heating module and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
-                    if (UtilityRoutines::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).AuxilHeat.Name,
+                    if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).AuxilHeat.Name,
                                                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).AuxilHeat = state.dataFuelCellElectGen->FuelCell(thisFuelCell).AuxilHeat;
                     }
@@ -797,7 +797,7 @@ namespace FuelCellElectricGenerator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameExhaustHX);
+            int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameExhaustHX);
 
             if (thisFuelCell > 0) {
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).Type = DataPlant::PlantEquipmentType::Generator_FCExhaust;
@@ -840,13 +840,13 @@ namespace FuelCellElectricGenerator {
                                                         NodeInputManager::CompFluidStream::Secondary,
                                                         DataLoopNode::ObjectIsNotParent);
 
-                if (UtilityRoutines::SameString("FixedEffectiveness", AlphArray(5))) {
+                if (Util::SameString("FixedEffectiveness", AlphArray(5))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.HXmodelMode = DataGenerators::ExhaustGasHX::FixedEffectiveness;
-                } else if (UtilityRoutines::SameString("EmpiricalUAeff", AlphArray(5))) {
+                } else if (Util::SameString("EmpiricalUAeff", AlphArray(5))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.HXmodelMode = DataGenerators::ExhaustGasHX::LMTDempiricalUAeff;
-                } else if (UtilityRoutines::SameString("FundementalUAeff", AlphArray(5))) {
+                } else if (Util::SameString("FundementalUAeff", AlphArray(5))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.HXmodelMode = DataGenerators::ExhaustGasHX::LMTDfundementalUAeff;
-                } else if (UtilityRoutines::SameString("CONDENSING", AlphArray(5))) {
+                } else if (Util::SameString("CONDENSING", AlphArray(5))) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.HXmodelMode = DataGenerators::ExhaustGasHX::Condensing;
                 } else {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), AlphArray(5)));
@@ -907,12 +907,12 @@ namespace FuelCellElectricGenerator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameElecStorage);
+            int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameElecStorage);
 
             if (thisFuelCell > 0) {
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ElecStorage.Name = AlphArray(1);
 
-                if (UtilityRoutines::SameString(AlphArray(2), "SimpleEfficiencyWithConstraints")) {
+                if (Util::SameString(AlphArray(2), "SimpleEfficiencyWithConstraints")) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).ElecStorage.StorageModelMode =
                         DataGenerators::ElectricalStorage::SimpleEffConstraints;
                 } else {
@@ -929,7 +929,7 @@ namespace FuelCellElectricGenerator {
 
                 // check for other FuelCell using the same Electrical Storage and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
-                    if (UtilityRoutines::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).ElecStorage.Name,
+                    if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).ElecStorage.Name,
                                                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).ElecStorage.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).ElecStorage =
                             state.dataFuelCellElectGen->FuelCell(thisFuelCell).ElecStorage;
@@ -966,14 +966,14 @@ namespace FuelCellElectricGenerator {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameInverter);
+            int thisFuelCell = Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameInverter);
 
             if (thisFuelCell > 0) {
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.Name = AlphArray(1);
 
-                if (UtilityRoutines::SameString(AlphArray(2), "QUADRATIC"))
+                if (Util::SameString(AlphArray(2), "QUADRATIC"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEfficiencyMode::Quadratic;
-                if (UtilityRoutines::SameString(AlphArray(2), "Constant"))
+                if (Util::SameString(AlphArray(2), "Constant"))
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode = DataGenerators::InverterEfficiencyMode::Constant;
                 if (state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.EffMode == DataGenerators::InverterEfficiencyMode::Invalid) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), AlphArray(2)));
@@ -994,7 +994,7 @@ namespace FuelCellElectricGenerator {
 
                 // check for other FuelCell using the same Inverter and fill
                 for (int otherFuelCell = thisFuelCell + 1; otherFuelCell <= state.dataFuelCellElectGen->NumFuelCellGenerators; ++otherFuelCell) {
-                    if (UtilityRoutines::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).Inverter.Name,
+                    if (Util::SameString(state.dataFuelCellElectGen->FuelCell(otherFuelCell).Inverter.Name,
                                                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter.Name)) {
                         state.dataFuelCellElectGen->FuelCell(otherFuelCell).Inverter = state.dataFuelCellElectGen->FuelCell(thisFuelCell).Inverter;
                     }
@@ -1025,7 +1025,7 @@ namespace FuelCellElectricGenerator {
                                                                          state.dataIPShortCut->cNumericFieldNames);
 
                 int thisFuelCell =
-                    UtilityRoutines::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameStackCooler);
+                    Util::FindItemInList(AlphArray(1), state.dataFuelCellElectGen->FuelCell, &FCDataStruct::NameStackCooler);
 
                 if (thisFuelCell > 0) {
                     state.dataFuelCellElectGen->FuelCell(thisFuelCell).Type = DataPlant::PlantEquipmentType::Generator_FCStackCooler;

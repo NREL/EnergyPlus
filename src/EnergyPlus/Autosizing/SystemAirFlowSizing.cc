@@ -932,13 +932,13 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
 
     // override sizing string
     if (this->overrideSizeString) {
-        if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
+        if (Util::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
             this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
             if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-        } else if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:UnitVentilator")) {
+        } else if (Util::SameString(this->compType, "ZoneHVAC:UnitVentilator")) {
             this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
             if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-        } else if (UtilityRoutines::SameString(this->compType, "Fan:SystemModel")) {
+        } else if (Util::SameString(this->compType, "Fan:SystemModel")) {
             this->sizingString = "Design Maximum Air Flow Rate [m3/s]";
             // if (this->isEpJSON) this->sizingString = "design_maximum_air_flow_rate [m3/s]";
         } else {

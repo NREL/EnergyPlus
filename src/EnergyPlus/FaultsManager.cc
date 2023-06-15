@@ -390,7 +390,7 @@ namespace FaultsManager {
             }
 
             // Evaporative cooler check
-            if (UtilityRoutines::SameString(faultsECFouling.EvapCoolerType, "EvaporativeCooler:Indirect:WetCoil")) {
+            if (Util::SameString(faultsECFouling.EvapCoolerType, "EvaporativeCooler:Indirect:WetCoil")) {
                 // Read in evaporative cooler is not done yet
                 if (state.dataEvapCoolers->GetInputEvapComponentsFlag) {
                     EvaporativeCoolers::GetEvapInput(state);
@@ -398,7 +398,7 @@ namespace FaultsManager {
                 }
 
                 // Check whether the evaporative cooler  name and type match each other;
-                int EvapCoolerNum = UtilityRoutines::FindItemInList(
+                int EvapCoolerNum = Util::FindItemInList(
                     faultsECFouling.EvapCoolerName, state.dataEvapCoolers->EvapCond, &EvaporativeCoolers::EvapConditions::Name);
                 if (EvapCoolerNum <= 0) {
                     ShowSevereError(
@@ -485,7 +485,7 @@ namespace FaultsManager {
             // Chiller check
             int ChillerNum;
             ChillerType ChillerTypeCheck =
-                static_cast<ChillerType>(getEnumerationValue(ChillerTypeNamesUC, UtilityRoutines::MakeUPPERCase(faultsChillerFouling.ChillerType)));
+                static_cast<ChillerType>(getEnumerationValue(ChillerTypeNamesUC, Util::MakeUPPERCase(faultsChillerFouling.ChillerType)));
             switch (ChillerTypeCheck) {
             case ChillerType::ChillerElectric: {
                 // Check whether the chiller name and chiller type match each other
@@ -529,7 +529,7 @@ namespace FaultsManager {
                 }
 
                 // Check whether the chiller name and chiller type match each other
-                ChillerNum = UtilityRoutines::FindItemInList(faultsChillerFouling.ChillerName, state.dataChillerElectricEIR->ElectricEIRChiller);
+                ChillerNum = Util::FindItemInList(faultsChillerFouling.ChillerName, state.dataChillerElectricEIR->ElectricEIRChiller);
                 if (ChillerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -563,7 +563,7 @@ namespace FaultsManager {
 
                 // Check whether the chiller name and chiller type match each other
                 ChillerNum =
-                    UtilityRoutines::FindItemInList(faultsChillerFouling.ChillerName, state.dataChillerReformulatedEIR->ElecReformEIRChiller);
+                    Util::FindItemInList(faultsChillerFouling.ChillerName, state.dataChillerReformulatedEIR->ElecReformEIRChiller);
                 if (ChillerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -770,7 +770,7 @@ namespace FaultsManager {
                     state.dataBoilers->getBoilerInputFlag = false;
                 }
                 // Check the boiler name and boiler type
-                int BoilerNum = UtilityRoutines::FindItemInList(faultsBoilerFouling.BoilerName, state.dataBoilers->Boiler);
+                int BoilerNum = Util::FindItemInList(faultsBoilerFouling.BoilerName, state.dataBoilers->Boiler);
                 if (BoilerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -855,7 +855,7 @@ namespace FaultsManager {
 
             // Coil check and link
             CoilType CoilTypeCheck =
-                static_cast<CoilType>(getEnumerationValue(CoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(faultsCoilSATFouling.CoilType)));
+                static_cast<CoilType>(getEnumerationValue(CoilTypeNamesUC, Util::MakeUPPERCase(faultsCoilSATFouling.CoilType)));
             switch (CoilTypeCheck) {
             case CoilType::CoilHeatingElectric:
             case CoilType::CoilHeatingFuel:
@@ -866,7 +866,7 @@ namespace FaultsManager {
                     state.dataHeatingCoils->GetCoilsInputFlag = false;
                 }
                 // Check the coil name and coil type
-                int CoilNum = UtilityRoutines::FindItemInList(faultsCoilSATFouling.CoilName, state.dataHeatingCoils->HeatingCoil);
+                int CoilNum = Util::FindItemInList(faultsCoilSATFouling.CoilName, state.dataHeatingCoils->HeatingCoil);
                 if (CoilNum <= 0) {
                     ShowSevereError(
                         state,
@@ -885,7 +885,7 @@ namespace FaultsManager {
                     state.dataSteamCoils->GetSteamCoilsInputFlag = false;
                 }
                 // Check the coil name and coil type
-                int CoilNum = UtilityRoutines::FindItemInList(faultsCoilSATFouling.CoilName, state.dataSteamCoils->SteamCoil);
+                int CoilNum = Util::FindItemInList(faultsCoilSATFouling.CoilName, state.dataSteamCoils->SteamCoil);
                 if (CoilNum <= 0) {
                     ShowSevereError(
                         state,
@@ -918,7 +918,7 @@ namespace FaultsManager {
                     state.dataWaterCoils->GetWaterCoilsInputFlag = false;
                 }
                 // Check the coil name and coil type
-                int CoilNum = UtilityRoutines::FindItemInList(faultsCoilSATFouling.CoilName, state.dataWaterCoils->WaterCoil);
+                int CoilNum = Util::FindItemInList(faultsCoilSATFouling.CoilName, state.dataWaterCoils->WaterCoil);
                 if (CoilNum <= 0) {
                     ShowSevereError(
                         state,
@@ -940,7 +940,7 @@ namespace FaultsManager {
                     state.dataHVACControllers->GetControllerInputFlag = false;
                 }
                 // Check the controller name
-                int ControlNum = UtilityRoutines::FindItemInList(faultsCoilSATFouling.WaterCoilControllerName,
+                int ControlNum = Util::FindItemInList(faultsCoilSATFouling.WaterCoilControllerName,
                                                                  state.dataHVACControllers->ControllerProps,
                                                                  &HVACControllers::ControllerPropsType::ControllerName);
                 if (ControlNum <= 0) {
@@ -978,7 +978,7 @@ namespace FaultsManager {
                 //}
 
                 //// Check the coil name and coil type
-                // int CoilSysNum = UtilityRoutines::FindItemInList(faultsCoilSATFouling.CoilName,
+                // int CoilSysNum = Util::FindItemInList(faultsCoilSATFouling.CoilName,
                 //                                                 state.dataHVACDXSys->DXCoolingSystem);
                 // if (CoilSysNum <= 0) {
                 //    ShowSevereError(state, format("{}{} = \"{}\" invalid {} = \"{}{}\" not found.", //, cFaultCurrentObject, cAlphaArgs(1),
@@ -997,7 +997,7 @@ namespace FaultsManager {
                 }
 
                 // Check the coil name and coil type
-                int CoilSysNum = UtilityRoutines::FindItemInList(faultsCoilSATFouling.CoilName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
+                int CoilSysNum = Util::FindItemInList(faultsCoilSATFouling.CoilName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
                 if (CoilSysNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1094,7 +1094,7 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->GetInput = false;
                 }
                 // Check the tower name and tower type
-                int TowerNum = UtilityRoutines::FindItemInList(faultsTowerFouling.TowerName, state.dataCondenserLoopTowers->towers);
+                int TowerNum = Util::FindItemInList(faultsTowerFouling.TowerName, state.dataCondenserLoopTowers->towers);
                 if (TowerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1106,7 +1106,7 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->towers(TowerNum).FaultyTowerFoulingIndex = jFault_TowerFouling;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(
+                    if (!Util::SameString(
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
                             faultsTowerFouling.TowerType)) {
                         ShowWarningError(
@@ -1215,7 +1215,7 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->GetInput = false;
                 }
                 // Check the tower name and tower type
-                int TowerNum = UtilityRoutines::FindItemInList(faultsCondSWTFouling.TowerName, state.dataCondenserLoopTowers->towers);
+                int TowerNum = Util::FindItemInList(faultsCondSWTFouling.TowerName, state.dataCondenserLoopTowers->towers);
                 if (TowerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1227,7 +1227,7 @@ namespace FaultsManager {
                     state.dataCondenserLoopTowers->towers(TowerNum).FaultyCondenserSWTIndex = jFault_CondenserSWT;
 
                     // Check the faulty tower type
-                    if (!UtilityRoutines::SameString(
+                    if (!Util::SameString(
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataCondenserLoopTowers->towers(TowerNum).TowerType)],
                             faultsCondSWTFouling.TowerType)) {
                         ShowWarningError(state,
@@ -1316,7 +1316,7 @@ namespace FaultsManager {
             // Chiller check
             int ChillerNum;
             ChillerType ChillerTypeCheck =
-                static_cast<ChillerType>(getEnumerationValue(ChillerTypeNamesUC, UtilityRoutines::MakeUPPERCase(faultsChillerSWT.ChillerType)));
+                static_cast<ChillerType>(getEnumerationValue(ChillerTypeNamesUC, Util::MakeUPPERCase(faultsChillerSWT.ChillerType)));
             switch (ChillerTypeCheck) {
             case ChillerType::ChillerElectric: {
                 // Check whether the chiller name and chiller type match each other
@@ -1346,7 +1346,7 @@ namespace FaultsManager {
                     state.dataChillerElectricEIR->getInputFlag = false;
                 }
                 // Check whether the chiller name and chiller type match each other
-                ChillerNum = UtilityRoutines::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerElectricEIR->ElectricEIRChiller);
+                ChillerNum = Util::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerElectricEIR->ElectricEIRChiller);
                 if (ChillerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1365,7 +1365,7 @@ namespace FaultsManager {
                     state.dataChillerReformulatedEIR->GetInputREIR = false;
                 }
                 // Check whether the chiller name and chiller type match each other
-                ChillerNum = UtilityRoutines::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerReformulatedEIR->ElecReformEIRChiller);
+                ChillerNum = Util::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerReformulatedEIR->ElecReformEIRChiller);
                 if (ChillerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1445,7 +1445,7 @@ namespace FaultsManager {
                     state.dataChillerAbsorber->getInput = false;
                 }
                 // Check whether the chiller name and chiller type match each other
-                ChillerNum = UtilityRoutines::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerAbsorber->absorptionChillers);
+                ChillerNum = Util::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerAbsorber->absorptionChillers);
                 if (ChillerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1464,7 +1464,7 @@ namespace FaultsManager {
                     state.dataChillerIndirectAbsorption->GetInput = false;
                 }
                 // Check whether the chiller name and chiller type match each other
-                ChillerNum = UtilityRoutines::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerIndirectAbsorption->IndirectAbsorber);
+                ChillerNum = Util::FindItemInList(faultsChillerSWT.ChillerName, state.dataChillerIndirectAbsorption->IndirectAbsorber);
                 if (ChillerNum <= 0) {
                     ShowSevereError(
                         state,
@@ -1512,7 +1512,7 @@ namespace FaultsManager {
             faultsAirFilter.FaultyAirFilterFanName = cAlphaArgs(3);
 
             // Check whether the specified fan exists in the fan list
-            if (UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataFans->Fan, &Fans::FanEquipConditions::FanName) <= 0) {
+            if (Util::FindItemInList(cAlphaArgs(3), state.dataFans->Fan, &Fans::FanEquipConditions::FanName) <= 0) {
                 ShowSevereError(
                     state,
                     format("{} = \"{}\" invalid {} = \"{}\" not found.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -1521,7 +1521,7 @@ namespace FaultsManager {
 
             // Assign fault index to the fan object
             for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-                if (UtilityRoutines::SameString(state.dataFans->Fan(FanNum).FanName, cAlphaArgs(3))) {
+                if (Util::SameString(state.dataFans->Fan(FanNum).FanName, cAlphaArgs(3))) {
                     state.dataFans->Fan(FanNum).FaultyFilterFlag = true;
                     state.dataFans->Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
                     break;
@@ -1595,7 +1595,7 @@ namespace FaultsManager {
             faultsHStat.FaultyHumidistatName = cAlphaArgs(2);
             faultsHStat.FaultyHumidistatType = cAlphaArgs(3);
 
-            if (UtilityRoutines::SameString(faultsHStat.FaultyHumidistatType, "ThermostatOffsetDependent")) {
+            if (Util::SameString(faultsHStat.FaultyHumidistatType, "ThermostatOffsetDependent")) {
                 // For Humidistat Offset Type: ThermostatOffsetDependent
 
                 // Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
@@ -1773,7 +1773,7 @@ namespace FaultsManager {
             }
 
             faultsFoulCoil.FoulingInputMethod =
-                static_cast<FouledCoil>(getEnumerationValue(FouledCoilNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(5))));
+                static_cast<FouledCoil>(getEnumerationValue(FouledCoilNamesUC, Util::MakeUPPERCase(cAlphaArgs(5))));
             if (faultsFoulCoil.FoulingInputMethod == FouledCoil::Invalid) {
                 faultsFoulCoil.FoulingInputMethod = FouledCoil::UARated;
             }
@@ -1793,7 +1793,7 @@ namespace FaultsManager {
                 }
 
                 // Check the coil name and type
-                int CoilNum = UtilityRoutines::FindItemInList(faultsFoulCoil.FouledCoilName, state.dataWaterCoils->WaterCoil);
+                int CoilNum = Util::FindItemInList(faultsFoulCoil.FouledCoilName, state.dataWaterCoils->WaterCoil);
                 if (CoilNum <= 0) {
                     ShowSevereError(state,
                                     format("{} = \"{}\". Referenced Coil named \"{}\" was not found.",
@@ -1958,7 +1958,7 @@ namespace FaultsManager {
                         format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
-                    if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == "CONTROLLER:OUTDOORAIR") {
+                    if (Util::MakeUPPERCase(cAlphaArgs(4)) == "CONTROLLER:OUTDOORAIR") {
                         state.dataFaultsMgr->FaultsEconomizer(j).ControllerTypeEnum = iController_AirEconomizer;
 
                         // CASE ...
@@ -2185,7 +2185,7 @@ namespace FaultsManager {
         FanFound = false;
 
         for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-            if (UtilityRoutines::SameString(state.dataFans->Fan(FanNum).FanName, FanName)) {
+            if (Util::SameString(state.dataFans->Fan(FanNum).FanName, FanName)) {
                 FanMaxAirFlowRate = state.dataFans->Fan(FanNum).MaxAirFlowRate;
                 FanDeltaPress = state.dataFans->Fan(FanNum).DeltaPress;
                 FanFound = true;
@@ -2210,8 +2210,8 @@ namespace FaultsManager {
         FaultyCoilSATIndex = 0;
         if (state.dataFaultsMgr->NumFaultyCoilSATSensor == 0) return;
         for (int jFault_CoilSAT = 1; jFault_CoilSAT <= state.dataFaultsMgr->NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
-            if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilType, CompType) &&
-                UtilityRoutines::SameString(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName, CompName)) {
+            if (Util::SameString(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilType, CompType) &&
+                Util::SameString(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).CoilName, CompName)) {
                 FaultyCoilSATFlag = true;
                 FaultyCoilSATIndex = jFault_CoilSAT;
                 break;

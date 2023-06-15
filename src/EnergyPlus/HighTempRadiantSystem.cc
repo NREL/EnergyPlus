@@ -168,7 +168,7 @@ namespace HighTempRadiantSystem {
 
         // Find the correct ZoneHVAC:HighTemperatureRadiant
         if (CompIndex == 0) {
-            RadSysNum = UtilityRoutines::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
+            RadSysNum = Util::FindItemInList(CompName, state.dataHighTempRadSys->HighTempRadSys);
             if (RadSysNum == 0) {
                 ShowFatalError(state, format("SimHighTempRadiantSystem: Unit not found={}", CompName));
             }
@@ -319,7 +319,7 @@ namespace HighTempRadiantSystem {
 
             state.dataHighTempRadSys->HighTempRadSys(Item).ZoneName = state.dataIPShortCut->cAlphaArgs(3);
             state.dataHighTempRadSys->HighTempRadSys(Item).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (state.dataHighTempRadSys->HighTempRadSys(Item).ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Occurs for {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -329,7 +329,7 @@ namespace HighTempRadiantSystem {
             // state.dataHighTempRadSys->HighTempRadSys( Item ).MaxPowerCapac = state.dataIPShortCut->rNumericArgs( 1 );
 
             // Determine High Temp Radiant heating design capacity sizing method
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity")) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = HeatingDesignCapacity;
 
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
@@ -354,7 +354,7 @@ namespace HighTempRadiantSystem {
                         state, format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatDesignCapacityNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea")) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = CapacityPerFloorArea;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
@@ -391,7 +391,7 @@ namespace HighTempRadiantSystem {
                         format("Blank field not allowed for {}", state.dataIPShortCut->cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity")) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
                     state.dataHighTempRadSys->HighTempRadSys(Item).ScaledHeatingCapacity =
@@ -424,13 +424,13 @@ namespace HighTempRadiantSystem {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cNaturalGas)) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), cNaturalGas)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Gas;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectricity)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectricity)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Electric;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cGas)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), cGas)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Gas;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectric)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), cElectric)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).HeaterType = RadHeaterType::Electric;
             } else {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5)));
@@ -515,17 +515,17 @@ namespace HighTempRadiantSystem {
             }
 
             // Process the temperature control type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATControl)) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATControl)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MATControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTControl)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTControl)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MRTControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeControl)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeControl)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATSPControl)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), cMATSPControl)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MATSPControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTSPControl)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), cMRTSPControl)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MRTSPControl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeSPControl)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), cOperativeSPControl)) {
                 state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeSPControl;
             } else {
                 ShowWarningError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6)));

@@ -262,7 +262,7 @@ namespace MundtSimMgr {
 
                         AirNodeFoundFlag = false;
                         for (AirNodeNum = AirNodeBeginNum; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
-                            if (UtilityRoutines::SameString(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
+                            if (Util::SameString(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType =
                                     state.dataRoomAirMod->AirNode(AirNodeNum).ClassType;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName = state.dataRoomAirMod->AirNode(AirNodeNum).Name;

@@ -367,7 +367,7 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     compare_err_stream("");
 
     std::string thisOAReqName = "DSOA ZONE 1 SPACES";
-    int oaNum = UtilityRoutines::FindItemInList(thisOAReqName, state->dataSize->OARequirements);
+    int oaNum = Util::FindItemInList(thisOAReqName, state->dataSize->OARequirements);
     EXPECT_TRUE(oaNum > 0);
     EXPECT_EQ(4, state->dataSize->OARequirements(oaNum).dsoaIndexes.size());
 
@@ -375,26 +375,26 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     state->dataHeatBal->spaceIntGain.allocate(state->dataGlobal->numSpaces);
     state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
     std::string thisSpaceName = "SPACE 1A";
-    int spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
+    int spaceNum = Util::FindItemInList(thisSpaceName, state->dataHeatBal->space);
     state->dataHeatBal->space(spaceNum).floorArea = 100.0;
     state->dataHeatBal->space(spaceNum).totOccupants = 10;
     state->dataHeatBal->spaceIntGain(spaceNum).NOFOCC = 1;
     state->dataHeatBal->space(spaceNum).maxOccupants = 12;
 
     thisSpaceName = "SPACE 1B";
-    spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
+    spaceNum = Util::FindItemInList(thisSpaceName, state->dataHeatBal->space);
     state->dataHeatBal->space(spaceNum).floorArea = 100.0;
 
     thisSpaceName = "SPACE 1C";
-    spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
+    spaceNum = Util::FindItemInList(thisSpaceName, state->dataHeatBal->space);
     state->dataHeatBal->space(spaceNum).floorArea = 100.0;
 
     thisSpaceName = "SPACE 1D";
-    spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
+    spaceNum = Util::FindItemInList(thisSpaceName, state->dataHeatBal->space);
     state->dataHeatBal->space(spaceNum).floorArea = 100.0;
 
     std::string thisZoneName = "ZONE 2";
-    zoneNum = UtilityRoutines::FindItemInList(thisZoneName, state->dataHeatBal->Zone);
+    zoneNum = Util::FindItemInList(thisZoneName, state->dataHeatBal->Zone);
     state->dataHeatBal->Zone(zoneNum).FloorArea = 400.0;
     state->dataHeatBal->Zone(zoneNum).TotOccupants = 10;
     state->dataHeatBal->ZoneIntGain(zoneNum).NOFOCC = 1;
@@ -404,20 +404,20 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     bool UseMinOASchFlag = false;
 
     thisZoneName = "ZONE 1";
-    zoneNum = UtilityRoutines::FindItemInList(thisZoneName, state->dataHeatBal->Zone);
+    zoneNum = Util::FindItemInList(thisZoneName, state->dataHeatBal->Zone);
     state->dataHeatBal->Zone(zoneNum).FloorArea = 400.0;
     thisOAReqName = "DSOA ZONE 1 SPACES";
-    oaNum = UtilityRoutines::FindItemInList(thisOAReqName, state->dataSize->OARequirements);
+    oaNum = Util::FindItemInList(thisOAReqName, state->dataSize->OARequirements);
     Real64 zone1OA = DataSizing::calcDesignSpecificationOutdoorAir(*state, oaNum, zoneNum, UseOccSchFlag, UseMinOASchFlag);
     // 0.0125/person * 10.0 + 0.001/area * 100.0 + 1.0/zone + 0.1ACH * 300.0 / 3600.0;
     Real64 expectedOA = 0.0125 * 10.0 + 0.001 * 100.0 + 1.0 + 0.1 * 300.0 / 3600.0;
     EXPECT_EQ(expectedOA, zone1OA);
 
     thisZoneName = "ZONE 2";
-    zoneNum = UtilityRoutines::FindItemInList(thisZoneName, state->dataHeatBal->Zone);
+    zoneNum = Util::FindItemInList(thisZoneName, state->dataHeatBal->Zone);
     state->dataHeatBal->Zone(zoneNum).FloorArea = 400.0;
     thisOAReqName = "DSOA SUM";
-    oaNum = UtilityRoutines::FindItemInList(thisOAReqName, state->dataSize->OARequirements);
+    oaNum = Util::FindItemInList(thisOAReqName, state->dataSize->OARequirements);
     Real64 zone2OA = DataSizing::calcDesignSpecificationOutdoorAir(*state, oaNum, zoneNum, UseOccSchFlag, UseMinOASchFlag);
     EXPECT_EQ(expectedOA, zone2OA);
 }

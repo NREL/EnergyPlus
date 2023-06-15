@@ -350,11 +350,11 @@ void GetIndirectAbsorberInput(EnergyPlusData &state)
         }
 
         if (NumAlphas > 15) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater") ||
-                UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater") ||
+                Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "HotWater")) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
                 //       Default to Steam if left blank
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), fluidNameSteam) ||
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), fluidNameSteam) ||
                        state.dataIPShortCut->cAlphaArgs(16).empty()) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             } else {

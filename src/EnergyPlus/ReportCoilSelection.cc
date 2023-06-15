@@ -937,8 +937,8 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
     int index(-1);
     for (int i = 0; i < numCoilsReported_; i++) {
         if (coilSelectionDataObjs[i] != nullptr) {
-            if (UtilityRoutines::SameString(coilSelectionDataObjs[i]->coilName_, coilName)) {
-                if (UtilityRoutines::SameString(coilSelectionDataObjs[i]->coilObjName, coilType)) {
+            if (Util::SameString(coilSelectionDataObjs[i]->coilName_, coilName)) {
+                if (Util::SameString(coilSelectionDataObjs[i]->coilObjName, coilType)) {
                     return index = i;
                 } else {
                     // throw error  coil type does not match coil name, check for unique names across coil types
@@ -958,10 +958,10 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
         bool locIsCooling(false);
         bool locIsHeating(false);
         for (int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop) {
-            if (UtilityRoutines::SameString(coilType, DataHVACGlobals::cAllCoilTypes(loop))) {
+            if (Util::SameString(coilType, DataHVACGlobals::cAllCoilTypes(loop))) {
                 found = true;
-                locIsCooling = UtilityRoutines::SameString(coilType, DataHVACGlobals::cCoolingCoilTypes(loop));
-                locIsHeating = UtilityRoutines::SameString(coilType, DataHVACGlobals::cHeatingCoilTypes(loop));
+                locIsCooling = Util::SameString(coilType, DataHVACGlobals::cCoolingCoilTypes(loop));
+                locIsHeating = Util::SameString(coilType, DataHVACGlobals::cHeatingCoilTypes(loop));
                 break;
             }
         }
@@ -1951,15 +1951,15 @@ bool ReportCoilSelection::isCompTypeFan(std::string const &compType // string co
 )
 {
     // if compType name is one of the fan objects, then return true
-    if (UtilityRoutines::SameString(compType, "Fan:SystemModel")) {
+    if (Util::SameString(compType, "Fan:SystemModel")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:ComponentModel")) {
+    } else if (Util::SameString(compType, "Fan:ComponentModel")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:OnOff")) {
+    } else if (Util::SameString(compType, "Fan:OnOff")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:ConstantVolume")) {
+    } else if (Util::SameString(compType, "Fan:ConstantVolume")) {
         return true;
-    } else if (UtilityRoutines::SameString(compType, "Fan:VariableVolume")) {
+    } else if (Util::SameString(compType, "Fan:VariableVolume")) {
         return true;
     } else {
         return false;
@@ -1972,7 +1972,7 @@ bool ReportCoilSelection::isCompTypeCoil(std::string const &compType // string c
     // if compType name is one of the coil objects, then return true
     bool found(false);
     for (int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop) {
-        if (UtilityRoutines::SameString(compType, DataHVACGlobals::cAllCoilTypes(loop))) {
+        if (Util::SameString(compType, DataHVACGlobals::cAllCoilTypes(loop))) {
             found = true;
             break;
         }

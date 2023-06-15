@@ -1121,14 +1121,14 @@ namespace HeatBalanceIntRadExchange {
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
             std::string const thisSpaceOrSpaceListName =
-                UtilityRoutines::MakeUPPERCase(fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>());
+                Util::MakeUPPERCase(fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>());
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
             // Look for matching radiant enclosure name (solar enclosures have the same names)
             bool enclMatchFound = false;
             for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfRadiantEnclosures; ++enclosureNum) {
                 auto &thisEnclosure = state.dataViewFactor->EnclRadInfo(enclosureNum);
-                if (UtilityRoutines::SameString(thisSpaceOrSpaceListName, thisEnclosure.Name)) {
+                if (Util::SameString(thisSpaceOrSpaceListName, thisEnclosure.Name)) {
                     // View factor space name matches enclosure name
                     enclMatchFound = true;
                     break;
@@ -1136,7 +1136,7 @@ namespace HeatBalanceIntRadExchange {
             }
             if (enclMatchFound) continue; // We're done with this instance
             // Find matching SpaceList name
-            int spaceListNum = UtilityRoutines::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->spaceList);
+            int spaceListNum = Util::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->spaceList);
             int zoneListNum = 0;
             int inputZoneNum = 0;
             size_t listSize = 0;
@@ -1144,13 +1144,13 @@ namespace HeatBalanceIntRadExchange {
                 listSize = int(state.dataHeatBal->spaceList(spaceListNum).spaces.size());
             } else {
                 // Check Zone and ZoneList for backwards compatibility
-                zoneListNum = UtilityRoutines::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->ZoneList);
+                zoneListNum = Util::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->ZoneList);
                 if (zoneListNum > 0) {
                     for (int const zoneNum : state.dataHeatBal->ZoneList(zoneListNum).Zone) {
                         listSize += state.dataHeatBal->Zone(zoneNum).spaceIndexes.size();
                     }
                 } else {
-                    inputZoneNum = UtilityRoutines::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->Zone);
+                    inputZoneNum = Util::FindItemInList(thisSpaceOrSpaceListName, state.dataHeatBal->Zone);
                     if (inputZoneNum > 0) {
                         listSize = state.dataHeatBal->Zone(inputZoneNum).spaceIndexes.size();
                     }
@@ -1319,8 +1319,8 @@ namespace HeatBalanceIntRadExchange {
             }
 
             for (int index = 2; index <= NumAlphas; index += 2) {
-                int inx1 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
-                int inx2 = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
+                int inx1 = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(index), enclosureSurfaceNames, N);
+                int inx2 = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(index + 1), enclosureSurfaceNames, N);
                 if (inx1 == 0) {
                     ShowSevereError(state, format("GetInputViewFactors: {}=\"{}\", invalid surface name.", cCurrentModuleObject, EnclosureName));
                     ShowContinueError(state,
@@ -2001,7 +2001,7 @@ namespace HeatBalanceIntRadExchange {
         static constexpr std::string_view routineName("GetRadiantSystemSurface: "); // include trailing blank space
 
         // For radiant zone equipment, find the referenced surface and check if it is in the same zone or radiant enclosure
-        int const surfNum = UtilityRoutines::FindItemInList(SurfaceName, state.dataSurface->Surface);
+        int const surfNum = Util::FindItemInList(SurfaceName, state.dataSurface->Surface);
 
         // Trap for surfaces that do not exist
         if (surfNum == 0) {

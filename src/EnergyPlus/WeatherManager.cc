@@ -181,7 +181,7 @@ namespace Weather {
             auto &underwaterBoundary = state.dataWeather->underwaterBoundaries[i - 1];
             underwaterBoundary.Name = ipsc->cAlphaArgs(1);
             underwaterBoundary.distanceFromLeadingEdge = ipsc->rNumericArgs(1);
-            underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, state.dataSurface->OSCM);
+            underwaterBoundary.OSCMIndex = Util::FindItemInList(underwaterBoundary.Name, state.dataSurface->OSCM);
             if (underwaterBoundary.OSCMIndex <= 0) {
                 ShowSevereError(state, "Could not match underwater boundary condition object with an Other Side Conditions Model input object.");
                 errorsFound = true;
@@ -327,8 +327,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   August 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is called from the outer simulation manager and determines
@@ -882,7 +880,7 @@ namespace Weather {
                                                            "year included in start/end date.",
                                                            RoutineName));
                                     ShowContinueError(state, "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both, or");
-                                    ShowContinueError(state, R"(...set "Treat Weather as Actual" to "No".)");
+                                    ShowContinueError(state, "(...set \"Treat Weather as Actual\" to \"No\".)");
                                 }
                                 if (!General::BetweenDates(envCurr.StartDate, runStartJulian, runEndJulian))
                                     continue;
@@ -1299,8 +1297,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine resets the weekday for each month based on the current weekday
@@ -1493,8 +1489,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // With multiple year weather files (or repeating weather files that rollover day),
@@ -1592,8 +1586,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // With multiple year weather files (or repeating weather files that rollover day),
@@ -1982,8 +1974,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates all of the daily weather data in the local
@@ -2798,8 +2788,7 @@ namespace Weather {
                             TryAgain = true;
                             ShowWarningError(state, "ReadEPlusWeatherForDay: Feb29 data encountered but will not be processed.");
                             if (!state.dataWeather->WFAllowsLeapYears) {
-                                ShowContinueError(
-                                    state, "...WeatherFile does not allow Leap Years. HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\".");
+                                ShowContinueError(state, "...WeatherFile does not allow Leap Years. HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\".");
                             }
                             continue;
                         } else {
@@ -3373,7 +3362,7 @@ namespace Weather {
                 // Content is not empty
                 if (pos != 0) {
                     bool error = false;
-                    target = UtilityRoutines::ProcessNumber(current_line.substr(0, pos), error);
+                    target = Util::ProcessNumber(current_line.substr(0, pos), error);
                     if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
@@ -3388,7 +3377,7 @@ namespace Weather {
                     target = 999.0;
                 } else {
                     bool error = false;
-                    target = UtilityRoutines::ProcessNumber(current_line, error);
+                    target = Util::ProcessNumber(current_line, error);
                     if (error) {
                         ErrorInterpretWeatherDataLine(state, WYear, WMonth, WDay, WHour, WMinute, Line, current_line);
                     }
@@ -3954,8 +3943,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         C Barnaby
         //       DATE WRITTEN   Nov 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate relative air mass using Kasten and Young approximation
@@ -4001,8 +3988,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         C Barnaby
         //       DATE WRITTEN   Nov 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate clear-sky direct and diffuse irradiance using ASHRAE "tau" model
@@ -4044,8 +4029,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine allocates the weather data structures (Today, Tomorrow,
@@ -4272,7 +4255,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 1999
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine checks to see if a weather file and what kind of weather file
@@ -4354,8 +4336,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is currently the main interface between the old data
@@ -4429,8 +4409,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is checks to see whether the user specified location
@@ -4474,8 +4452,7 @@ namespace Weather {
                 Real64 const DiffCalc = std::abs(state.dataEnvrn->TimeZoneNumber - StdTimeMerid);
                 if (DiffCalc > 1.0 && DiffCalc < 24.0) {
                     if (DiffCalc < 3.0) {
-                        ShowWarningError(state,
-                                         format("Standard Time Meridian and Time Zone differ by more than 1, Difference=\"{:.1R}\"", DiffCalc));
+                        ShowWarningError(state, format("Standard Time Meridian and Time Zone differ by more than 1, Difference=\"{:.1R}\"", DiffCalc));
                         ShowContinueError(state, "Solar Positions may be incorrect");
                     } else {
                         ShowSevereError(state, format("Standard Time Meridian and Time Zone differ by more than 2, Difference=\"{:.1R}\"", DiffCalc));
@@ -4518,7 +4495,6 @@ namespace Weather {
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   February 1977
         //       MODIFIED       June 1997 (RKS)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine contains a portion of the legacy subroutine CKBLDE.
@@ -4545,7 +4521,6 @@ namespace Weather {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
         //       MODIFIED       December 2017; Jason DeGraw
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine prints out the necessary header information required
@@ -4614,8 +4589,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   June 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver of the weather reporting.  This
@@ -4683,8 +4656,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Liesen
         //       DATE WRITTEN   September 1997
-        //       MODIFIED
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver of the weather manager module.
@@ -4999,7 +4970,6 @@ namespace Weather {
         //       DATE WRITTEN   October 1997
         //       MODIFIED       February 1999, Add multiple run periods, Change name.
         //                      March 2012, LKL, Add features to object; New "actual weather" object;
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the run period info from User input and the
@@ -5314,7 +5284,7 @@ namespace Weather {
             BooleanSwitch b;
             if (ipsc->lAlphaFieldBlanks(3)) {
                 runPeriodInput.useHolidays = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useHolidays = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5329,7 +5299,7 @@ namespace Weather {
             // A4,  \field Use Weather File Daylight Saving Period
             if (ipsc->lAlphaFieldBlanks(4)) {
                 runPeriodInput.useDST = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useDST = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5344,7 +5314,7 @@ namespace Weather {
             // A5,  \field Apply Weekend Holiday Rule
             if (ipsc->lAlphaFieldBlanks(5)) { 
                 runPeriodInput.applyWeekendRule = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.applyWeekendRule = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5359,7 +5329,7 @@ namespace Weather {
             // A6,  \field Use Weather File Rain Indicators
             if (ipsc->lAlphaFieldBlanks(6)) {
                 runPeriodInput.useRain = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(6)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(6)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useRain = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5374,7 +5344,7 @@ namespace Weather {
             // A7,  \field Use Weather File Snow Indicators
             if (ipsc->lAlphaFieldBlanks(7)) {
                 runPeriodInput.useSnow = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5389,7 +5359,7 @@ namespace Weather {
             // A8,  \field Treat Weather as Actual
             if (ipsc->lAlphaFieldBlanks(8)) {
                 runPeriodInput.actualWeather = false;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.actualWeather = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5402,9 +5372,9 @@ namespace Weather {
             }
 
             // A9,  \field First Hour Interpolation Starting Values
-            if (ipsc->lAlphaFieldBlanks(9) || UtilityRoutines::SameString(ipsc->cAlphaArgs(8), "Hour24")) {
+            if (ipsc->lAlphaFieldBlanks(9) || Util::SameString(ipsc->cAlphaArgs(8), "Hour24")) {
                 runPeriodInput.firstHrInterpUsingHr1 = false;
-            } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(9), "Hour1")) {
+            } else if (Util::SameString(ipsc->cAlphaArgs(9), "Hour1")) {
                 runPeriodInput.firstHrInterpUsingHr1 = true;
             } else {
                 // fail-safe default
@@ -5573,7 +5543,7 @@ namespace Weather {
             BooleanSwitch b;
             if (ipsc->lAlphaFieldBlanks(3)) {
                 runPerDesInput.useDST = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useDST = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5587,7 +5557,7 @@ namespace Weather {
 
             if (ipsc->lAlphaFieldBlanks(4)) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereError(state,
@@ -5651,14 +5621,14 @@ namespace Weather {
 
             // Period Selection
             if (!ipsc->lAlphaFieldBlanks(2)) {
-                int WhichPeriod = UtilityRoutines::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue);
+                int WhichPeriod = Util::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue);
                 if (WhichPeriod == 0) {
-                    WhichPeriod = UtilityRoutines::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue1);
+                    WhichPeriod = Util::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue1);
                     if (WhichPeriod != 0) {
                     }
                 }
                 if (WhichPeriod == 0) {
-                    WhichPeriod = UtilityRoutines::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue2);
+                    WhichPeriod = Util::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue2);
                     if (WhichPeriod != 0) {
                         ShowWarningError(state, format("{}: object={} {}={} matched to {}",
                                                 ipsc->cCurrentModuleObject,
@@ -5702,7 +5672,7 @@ namespace Weather {
             BooleanSwitch b; 
             if (ipsc->lAlphaFieldBlanks(4)) {
                 runPerDesInput.useDST = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                  runPerDesInput.useDST = static_cast<bool>(b);
             } else {
                  ShowSevereError(state, format("{}: object={} {} invalid [{}]",
@@ -5712,7 +5682,7 @@ namespace Weather {
                         
             if (ipsc->lAlphaFieldBlanks(5)) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = true;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereError(state, format("{}: object={} {} invalid [{}]",
@@ -5737,8 +5707,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   June 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads any special day period data from the IDF and
@@ -6136,9 +6104,9 @@ namespace Weather {
             if (ipsc->lAlphaFieldBlanks(13)) {
                 designDayInput.suppressBegEnvReset = false;
             } else {
-                if (UtilityRoutines::SameString(ipsc->cAlphaArgs(13), "FullResetAtBeginEnvironment")) {
+                if (Util::SameString(ipsc->cAlphaArgs(13), "FullResetAtBeginEnvironment")) {
                     designDayInput.suppressBegEnvReset = false;
-                } else if (UtilityRoutines::SameString(ipsc->cAlphaArgs(13), "SuppressThermalResetAtBeginEnvironment")) {
+                } else if (Util::SameString(ipsc->cAlphaArgs(13), "SuppressThermalResetAtBeginEnvironment")) {
                     designDayInput.suppressBegEnvReset = true;
                 }
             }
@@ -6151,7 +6119,7 @@ namespace Weather {
 
             if (ipsc->lAlphaFieldBlanks(7)) {
                 designDayInput.RainInd = 0;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
                 designDayInput.RainInd = (int)b;
             } else {
                 ShowWarningError(state,
@@ -6167,7 +6135,7 @@ namespace Weather {
             //   A8,  \field Snow Indicator
             if (ipsc->lAlphaFieldBlanks(8)) {
                 designDayInput.SnowInd = 0;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
                 designDayInput.SnowInd = (int)b;
             } else {
                 ShowWarningError(state,
@@ -6185,7 +6153,7 @@ namespace Weather {
             if (ipsc->lAlphaFieldBlanks(3)) {
                 designDayInput.dryBulbRangeType = DesDayDryBulbRangeType::Default;
             } else if ((designDayInput.dryBulbRangeType =
-                        static_cast<DesDayDryBulbRangeType>(getEnumerationValue(DesDayDryBulbRangeTypeNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(3))))) != DesDayDryBulbRangeType::Invalid) {
+                        static_cast<DesDayDryBulbRangeType>(getEnumerationValue(DesDayDryBulbRangeTypeNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(3))))) != DesDayDryBulbRangeType::Invalid) {
             } else {
                 ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                 ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
@@ -6206,15 +6174,9 @@ namespace Weather {
 
             if (designDayInput.dryBulbRangeType != DesDayDryBulbRangeType::Profile && !MaxDryBulbEntered &&
                 ipsc->cAlphaArgs(3) != "invalid field") {
-                ShowSevereError(state,
-                                format("{}=\"{}\", invalid data.",
-                                       ipsc->cCurrentModuleObject,
-                                       designDayInput.Title));
+                ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                 ShowContinueError(state, format("..invalid blank field: {}", ipsc->cNumericFieldNames(3)));
-                ShowContinueError(state,
-                                  format("..this field is required when {}=\"{}\".",
-                                         ipsc->cAlphaFieldNames(3),
-                                         ipsc->cAlphaArgs(3)));
+                ShowContinueError(state, format("..this field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
 
@@ -6329,7 +6291,7 @@ namespace Weather {
             }
 
             //   A5,  \field Humidity Condition Type
-            designDayInput.HumIndType = static_cast<DesDayHumIndType>(getEnumerationValue(DesDayHumIndTypeNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(5))));
+            designDayInput.HumIndType = static_cast<DesDayHumIndType>(getEnumerationValue(DesDayHumIndTypeNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(5))));
             
             switch (designDayInput.HumIndType) {
             case DesDayHumIndType::WetBulb: {
@@ -6575,14 +6537,10 @@ namespace Weather {
                 designDayInput.HumIndType == DesDayHumIndType::WBProfDef ||
                 designDayInput.HumIndType == DesDayHumIndType::WBProfDif) {
                 if (designDayInput.HumIndValue > designDayInput.MaxDryBulb) {
-                    ShowWarningError(state,
-                                     format("{}=\"{}\", range check data.",
-                                            ipsc->cCurrentModuleObject,
-                                            designDayInput.Title));
-                    ShowContinueError(state,
-                                      format("..Humidity Indicator Temperature at Max Temperature={:.1R} > Max DryBulb={:.1R}",
-                                             designDayInput.HumIndValue,
-                                             designDayInput.MaxDryBulb));
+                    ShowWarningError(state, format("{}=\"{}\", range check data.", ipsc->cCurrentModuleObject, designDayInput.Title));
+                    ShowContinueError(state, format("..Humidity Indicator Temperature at Max Temperature={:.1R} > Max DryBulb={:.1R}",
+                                                    designDayInput.HumIndValue,
+                                                    designDayInput.MaxDryBulb));
                     ShowContinueError(state, format("..{}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ShowContinueError(state, "..Conditions for day will be set to Relative Humidity = 100%");
                     if (designDayInput.HumIndType == DesDayHumIndType::DewPoint) {
@@ -6597,7 +6555,7 @@ namespace Weather {
             //   A10, \field Solar Model Indicator
             if (ipsc->lAlphaFieldBlanks(10)) {
                 designDayInput.solarModel = DesDaySolarModel::ASHRAE_ClearSky;
-            } else if ((designDayInput.solarModel = static_cast<DesDaySolarModel>(getEnumerationValue(DesDaySolarModelNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(10))))) != DesDaySolarModel::Invalid) {
+            } else if ((designDayInput.solarModel = static_cast<DesDaySolarModel>(getEnumerationValue(DesDaySolarModelNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(10))))) != DesDaySolarModel::Invalid) {
             } else { 
                 ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
                 ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(10), ipsc->cAlphaArgs(10)));
@@ -6734,7 +6692,7 @@ namespace Weather {
             //   A9,  \field Daylight Saving Time Indicator
             if (ipsc->lAlphaFieldBlanks(9)) {
                 designDayInput.DSTIndicator = 0;
-            } else if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(9)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(9)))) != BooleanSwitch::Invalid) {
                 designDayInput.DSTIndicator = (int)b;
             } else {
                 ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, designDayInput.Title));
@@ -6831,8 +6789,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   July 2009
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Weather properties are an advanced concept for simulation.  Primarily, these properties are
@@ -6925,7 +6881,7 @@ namespace Weather {
                     continue;
                 }
             } else { // really a name
-                Found = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataWeather->Environment, &EnvironmentData::Title);
+                Found = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataWeather->Environment, &EnvironmentData::Title);
                 envFound = Found;
                 if (Found == 0) {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid Environment Name referenced.", RoutineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
@@ -6953,7 +6909,7 @@ namespace Weather {
             }
 
             if (!ipsc->lAlphaFieldBlanks(1)) {
-                UtilityRoutines::IsNameEmpty(state, ipsc->cAlphaArgs(1), ipsc->cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, ipsc->cAlphaArgs(1), ipsc->cCurrentModuleObject, ErrorsFound);
                 wpSkyTemp.Name = ipsc->cAlphaArgs(1); // Name
             } else {
                 wpSkyTemp.Name = "All RunPeriods";
@@ -7050,7 +7006,7 @@ namespace Weather {
 
             BooleanSwitch b;
             if (!wpSkyTemp.IsSchedule && !ipsc->lAlphaFieldBlanks(4)) {
-                if ((b = getYesNoValue(UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+                if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                     wpSkyTemp.UseWeatherFileHorizontalIR = static_cast<bool>(b);
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid {}.", RoutineName, ipsc->cCurrentModuleObject,ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(4)));
@@ -7103,8 +7059,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Ground Reflectances from the input file (optional) and
@@ -7159,8 +7113,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
@@ -7229,8 +7181,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the WATER MAINS TEMPERATURES object.
@@ -7306,7 +7256,6 @@ namespace Weather {
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
         //       MODIFIED       June 2018, B. Nigusse
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the daily water mains temperature based on input data from the WATER MAINS TEMPERATURES object.
@@ -7346,8 +7295,7 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2005
-        //       MODIFIED       na B Nigusse June 2018 (Refactored)
-        //       RE-ENGINEERED  na
+        //       MODIFIED       B Nigusse June 2018 (Refactored)
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the daily water mains temperature based on input data from the WATER MAINS TEMPERATURES object.
@@ -7389,8 +7337,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Peter Graham Ellis
         //       DATE WRITTEN   January 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the WEATHER STATION object.
@@ -7454,7 +7400,6 @@ namespace Weather {
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
         //       MODIFIED       Nov98 (FW); Nov 2000 (FW)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // CALCULATES EXTERIOR DAYLIGHT ILLUMINANCE AND LUMINOUS EFFICACY
@@ -7505,7 +7450,6 @@ namespace Weather {
         //       AUTHOR         Fred Winkelmann
         //       DATE WRITTEN   July 1997
         //       MODIFIED       August 2009, BG fixed upper bound for sky clearness bin 7
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Uses diffuse horizontal solar irradiance, direct normal solar
@@ -7631,8 +7575,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine processes each header line in the EPW weather file.
@@ -7694,7 +7636,7 @@ namespace Weather {
                 case 8:
                 case 9: {
                     bool errFlag;
-                    Real64 const Number = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                    Real64 const Number = Util::ProcessNumber(Line.substr(0, Pos), errFlag);
                     if (!errFlag) {
                         switch (i) {
                         case 6:
@@ -7738,7 +7680,7 @@ namespace Weather {
                 }
             }
             bool IOStatus;
-            state.dataWeather->NumEPWTypExtSets = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+            state.dataWeather->NumEPWTypExtSets = Util::ProcessNumber(Line.substr(0, Pos), IOStatus);
             Line.erase(0, Pos + 1);
             state.dataWeather->TypicalExtremePeriods.allocate(state.dataWeather->NumEPWTypExtSets);
             int TropExtremeCount = 0;
@@ -7758,7 +7700,7 @@ namespace Weather {
                 if (Pos != std::string::npos) {
                     state.dataWeather->TypicalExtremePeriods(i).TEType = Line.substr(0, Pos);
                     Line.erase(0, Pos + 1);
-                    if (UtilityRoutines::SameString(state.dataWeather->TypicalExtremePeriods(i).TEType, "EXTREME")) {
+                    if (Util::SameString(state.dataWeather->TypicalExtremePeriods(i).TEType, "EXTREME")) {
                         if (has_prefixi(state.dataWeather->TypicalExtremePeriods(i).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MAX")) {
                             state.dataWeather->TypicalExtremePeriods(i).ShortTitle = "NoDrySeasonMax";
                         } else if (has_prefixi(state.dataWeather->TypicalExtremePeriods(i).Title, "NO DRY SEASON - WEEK NEAR ANNUAL MIN")) {
@@ -7890,9 +7832,9 @@ namespace Weather {
             for (int i = 1; i <= state.dataWeather->NumEPWTypExtSets; ++i) {
                 auto &typicalExtPer = state.dataWeather->TypicalExtremePeriods(i);
                 // JulianDay (Month,Day,LeapYearValue)
-                std::string const ExtremePeriodTitle = UtilityRoutines::MakeUPPERCase(typicalExtPer.ShortTitle);
+                std::string const ExtremePeriodTitle = Util::MakeUPPERCase(typicalExtPer.ShortTitle);
                 if (ExtremePeriodTitle == "SUMMER") {
-                    if (UtilityRoutines::SameString(typicalExtPer.TEType, "EXTREME")) {
+                    if (Util::SameString(typicalExtPer.TEType, "EXTREME")) {
                         typicalExtPer.MatchValue = "SummerExtreme";
                         typicalExtPer.MatchValue1 = "TropicalHot";
                         typicalExtPer.MatchValue2 = "NoDrySeasonMax";
@@ -7901,7 +7843,7 @@ namespace Weather {
                     }
 
                 } else if (ExtremePeriodTitle == "WINTER") {
-                    if (UtilityRoutines::SameString(typicalExtPer.TEType, "EXTREME")) {
+                    if (Util::SameString(typicalExtPer.TEType, "EXTREME")) {
                         typicalExtPer.MatchValue = "WinterExtreme";
                         typicalExtPer.MatchValue1 = "TropicalCold";
                         typicalExtPer.MatchValue2 = "NoDrySeasonMin";
@@ -7955,12 +7897,9 @@ namespace Weather {
                 typicalExtPer.EndJDay = General::OrdinalDay(
                     typicalExtPer.EndMonth, typicalExtPer.EndDay, 0);
                 if (typicalExtPer.StartJDay <= typicalExtPer.EndJDay) {
-                    typicalExtPer.TotalDays =
-                        typicalExtPer.EndJDay - typicalExtPer.StartJDay + 1;
+                    typicalExtPer.TotalDays = typicalExtPer.EndJDay - typicalExtPer.StartJDay + 1;
                 } else {
-                    typicalExtPer.TotalDays =
-                        General::OrdinalDay(12, 31, state.dataWeather->LeapYearAdd) -
-                        typicalExtPer.StartJDay + 1 + typicalExtPer.EndJDay;
+                    typicalExtPer.TotalDays = General::OrdinalDay(12, 31, state.dataWeather->LeapYearAdd) - typicalExtPer.StartJDay + 1 + typicalExtPer.EndJDay;
                 }
             }
         } break;
@@ -7971,7 +7910,7 @@ namespace Weather {
             Pos = index(Line, ',');
             if (Pos != std::string::npos) {
                 bool errFlag;
-                int NumGrndTemps = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                int NumGrndTemps = Util::ProcessNumber(Line.substr(0, Pos), errFlag);
                 if (!errFlag && NumGrndTemps >= 1) {
                     Line.erase(0, Pos + 1);
                     // skip depth, soil conductivity, soil density, soil specific heat
@@ -7988,12 +7927,11 @@ namespace Weather {
                     for (int i = 1; i <= 12; ++i) { // take the first set of ground temperatures.
                         Pos = index(Line, ',');
                         if (Pos != std::string::npos) {
-                            state.dataWeather->GroundTempsFCFromEPWHeader(i) = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                            state.dataWeather->GroundTempsFCFromEPWHeader(i) = Util::ProcessNumber(Line.substr(0, Pos), errFlag);
                             ++actcount;
                         } else {
                             if (len(Line) > 0) {
-                                state.dataWeather->GroundTempsFCFromEPWHeader(i) =
-                                    UtilityRoutines::ProcessNumber(Line.substr(0, Pos), errFlag);
+                                state.dataWeather->GroundTempsFCFromEPWHeader(i) = Util::ProcessNumber(Line.substr(0, Pos), errFlag);
                                 ++actcount;
                             }
                             break;
@@ -8089,7 +8027,7 @@ namespace Weather {
                     }
 
                 } else if (i == 4) {
-                    int NumEPWHolidays = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                    int NumEPWHolidays = Util::ProcessNumber(Line.substr(0, Pos), IOStatus);
                     state.dataWeather->NumSpecialDays =
                         NumEPWHolidays + state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriodControl:SpecialDays");
                     state.dataWeather->SpecialDays.allocate(state.dataWeather->NumSpecialDays);
@@ -8190,7 +8128,7 @@ namespace Weather {
 
                 bool IOStatus;
                 if (i == 1) {
-                    state.dataWeather->NumDataPeriods = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                    state.dataWeather->NumDataPeriods = Util::ProcessNumber(Line.substr(0, Pos), IOStatus);
                     state.dataWeather->DataPeriods.allocate(state.dataWeather->NumDataPeriods);
                     NumHdArgs += 4 * state.dataWeather->NumDataPeriods;
                     if (state.dataWeather->NumDataPeriods > 0) {
@@ -8199,7 +8137,7 @@ namespace Weather {
                     }
 
                 } else if (i == 2) {
-                    state.dataWeather->NumIntervalsPerHour = UtilityRoutines::ProcessNumber(Line.substr(0, Pos), IOStatus);
+                    state.dataWeather->NumIntervalsPerHour = Util::ProcessNumber(Line.substr(0, Pos), IOStatus);
                 } else if (i >= 3) {
                     int const CurOne = mod(i - 3, 4);
                     int PMonth;
@@ -8309,8 +8247,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   August 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine skips the initial header records on the EnergyPlus Weather File (in.epw).
@@ -8369,7 +8305,7 @@ namespace Weather {
 
             if (i == 1) {
                 bool IOStatus;
-                int const NumPeriods = UtilityRoutines::ProcessNumber(Line.data.substr(0, Pos), IOStatus);
+                int const NumPeriods = Util::ProcessNumber(Line.data.substr(0, Pos), IOStatus);
                 NumHdArgs += 4 * NumPeriods;
             } else if ((i >= 3)) {
                 if (mod(i - 3, 4) == 0) ++CurCount;
@@ -8384,8 +8320,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports the counts of missing/out of range data
@@ -8456,8 +8390,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   November 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine creates the "interpolation" values / weights that are used for
@@ -8519,8 +8451,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   October 2010
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Make sure Environment derived type is set prior to getting
@@ -8674,8 +8604,6 @@ namespace Weather {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason DeGraw
         //       DATE WRITTEN   10/25/2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Split the former JGDate function in two. Convert a gregorian
@@ -8755,8 +8683,6 @@ namespace Weather {
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason DeGraw
         //       DATE WRITTEN   October 10, 2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // Compute the day of the year for leap and non-leap years.
@@ -8778,8 +8704,6 @@ namespace Weather {
         // FUNCTION INFORMATION:
         //       AUTHOR         Jason DeGraw
         //       DATE WRITTEN   October 31, 2017
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // Determine if a month/day+leapyear combination is valid.
@@ -8835,8 +8759,7 @@ namespace Weather {
             if (statFileExists) {
                 auto statFile = state.files.inStatFilePath.try_open();
                 if (!statFile.good()) {
-                    ShowSevereError(state,
-                                    format("CalcAnnualAndMonthlyDryBulbTemp: Could not open file {} for input (read).", statFile.filePath.string()));
+                    ShowSevereError(state, format("CalcAnnualAndMonthlyDryBulbTemp: Could not open file {} for input (read).", statFile.filePath.string()));
                     ShowContinueError(state, "Water Mains Temperature will be set to a fixed default value of 10.0 C.");
                     return;
                 }
@@ -8898,7 +8821,7 @@ namespace Weather {
                         std::string::size_type pos = index(epwLine.data, ',');
                         epwLine.data.erase(0, pos + 1);
                         pos = index(epwLine.data, ',');
-                        std::string LeapYear = UtilityRoutines::MakeUPPERCase(epwLine.data.substr(0, pos));
+                        std::string LeapYear = Util::MakeUPPERCase(epwLine.data.substr(0, pos));
                         if (LeapYear[0] == 'Y') {
                             epwHasLeapYear = true;
                         }

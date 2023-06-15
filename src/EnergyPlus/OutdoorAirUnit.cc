@@ -156,7 +156,7 @@ namespace OutdoorAirUnit {
         // Find the correct Outdoor Air Unit
 
         if (CompIndex == 0) {
-            OAUnitNum = UtilityRoutines::FindItemInList(CompName, state.dataOutdoorAirUnit->OutAirUnit);
+            OAUnitNum = Util::FindItemInList(CompName, state.dataOutdoorAirUnit->OutAirUnit);
             if (OAUnitNum == 0) {
                 ShowFatalError(state, format("ZoneHVAC:OutdoorAirUnit not found={}", CompName));
             }
@@ -315,7 +315,7 @@ namespace OutdoorAirUnit {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
             // A1
             thisOutAirUnit.Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -339,7 +339,7 @@ namespace OutdoorAirUnit {
 
             // A3
             thisOutAirUnit.ZoneName = state.dataIPShortCut->cAlphaArgs(3);
-            thisOutAirUnit.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            thisOutAirUnit.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
 
             if (thisOutAirUnit.ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
@@ -405,10 +405,10 @@ namespace OutdoorAirUnit {
                 }
             }
             // A6 :Fan Place
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "BlowThrough")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "BlowThrough")) {
                 thisOutAirUnit.FanPlace = BlowThru;
             }
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DrawThrough")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "DrawThrough")) {
                 thisOutAirUnit.FanPlace = DrawThru;
             }
             if (thisOutAirUnit.FanPlace == 0) {
@@ -664,7 +664,7 @@ namespace OutdoorAirUnit {
                         thisOutAirUnit.OAEquip(InListNum).ComponentName = AlphArray(InListNum * 2 + 1);
 
                         thisOutAirUnit.OAEquip(InListNum).Type =
-                            static_cast<CompType>(getEnumerationValue(CompTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(InListNum * 2))));
+                            static_cast<CompType>(getEnumerationValue(CompTypeNamesUC, Util::MakeUPPERCase(AlphArray(InListNum * 2))));
 
                         int const CompNum = InListNum;
 

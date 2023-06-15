@@ -313,11 +313,11 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                            state.dataIPShortCut->cAlphaArgs(6),
                                            "Chilled Water Nodes");
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "WaterCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "WaterCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::WaterCooled;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "AirCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "AirCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::AirCooled;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "EvaporativelyCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "EvaporativelyCooled")) {
             thisChiller.CondenserType = DataPlant::CondenserType::EvapCooled;
         } else {
             ShowSevereError(state, format("{}{}: {}", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));

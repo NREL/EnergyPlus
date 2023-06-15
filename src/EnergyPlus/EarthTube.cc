@@ -173,7 +173,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // First Alpha is Zone Name
-        thisEarthTube.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+        thisEarthTube.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
         if (thisEarthTube.ZonePtr == 0) {
             ShowSevereError(
                 state,

@@ -301,7 +301,7 @@ namespace SolarCollectors {
                     DataPlant::PlantEquipmentType::SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
+                int ParametersNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
                     ShowSevereError(state,
@@ -316,7 +316,7 @@ namespace SolarCollectors {
                 }
 
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -451,7 +451,7 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->Parameters(ParametersNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 // NOTE:  currently the only available choice is RectangularTank.  In the future progressive tube type will be
                 //        added
-                //                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "RectangularTank")) {
+                //                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "RectangularTank")) {
                 //                    state.dataSolarCollectors->Parameters(ParametersNum).ICSType_Num = TankTypeEnum::ICSRectangularTank;
                 //                } else {
                 //                    ShowSevereError(state, format("{}{} not found={}{} in {}{} ={}{}", //,
@@ -557,7 +557,7 @@ namespace SolarCollectors {
                 state.dataSolarCollectors->Collector(CollectorNum).InitICS = true;
 
                 // Get parameters object
-                int ParametersNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
+                int ParametersNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSolarCollectors->Parameters);
 
                 if (ParametersNum == 0) {
                     ShowSevereError(state,
@@ -588,7 +588,7 @@ namespace SolarCollectors {
                         state.dataSolarCollectors->Collector(CollectorNum).SideArea / state.dataSolarCollectors->Collector(CollectorNum).Area;
                 }
                 // Get surface object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -654,12 +654,12 @@ namespace SolarCollectors {
                 }
 
                 state.dataSolarCollectors->Collector(CollectorNum).BCType = state.dataIPShortCut->cAlphaArgs(4);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "AmbientAir")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "AmbientAir")) {
                     state.dataSolarCollectors->Collector(CollectorNum).OSCMName = "";
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "OtherSideConditionsModel")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "OtherSideConditionsModel")) {
                     state.dataSolarCollectors->Collector(CollectorNum).OSCMName = state.dataIPShortCut->cAlphaArgs(5);
                     state.dataSolarCollectors->Collector(CollectorNum).OSCM_ON = true;
-                    int Found = UtilityRoutines::FindItemInList(state.dataSolarCollectors->Collector(CollectorNum).OSCMName, state.dataSurface->OSCM);
+                    int Found = Util::FindItemInList(state.dataSolarCollectors->Collector(CollectorNum).OSCMName, state.dataSurface->OSCM);
                     if (Found == 0) {
                         ShowSevereError(state,
                                         format("{} not found={} in {} ={}",

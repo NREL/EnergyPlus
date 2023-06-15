@@ -918,7 +918,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     state->dataEMSMgr->FinishProcessingUserInput = false;
     ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
         *state,
-        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack))
+        state->dataRuntimeLang->ErlStack(Util::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack))
             .Instruction(1)
             .Argument2,
         seriousErrorFound); // we just check the logic and don't throw the fatal errors.
@@ -930,7 +930,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     seriousErrorFound = false;
     ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
         *state,
-        state->dataRuntimeLang->ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack))
+        state->dataRuntimeLang->ErlStack(Util::FindItemInList("SETNODESETPOINTTEST", state->dataRuntimeLang->ErlStack))
             .Instruction(1)
             .Argument2,
         seriousErrorFound);
@@ -2205,8 +2205,8 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
 
     SimulationManager::ManageSimulation(*state);
 
-    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
+    int winSurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int wallSurfNum = Util::FindItemInList("WALL", state->dataSurface->Surface);
     bool anyRan;
 
     // Test 1 - Set day of year to 121

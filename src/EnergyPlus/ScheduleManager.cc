@@ -600,7 +600,7 @@ namespace ScheduleManager {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             state.dataScheduleMgr->ScheduleType(LoopIndex).Name = Alphas(1);
             if (lNumericBlanks(1) || lNumericBlanks(2)) {
@@ -696,7 +696,7 @@ namespace ScheduleManager {
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
                 CheckIndex =
-                    UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -784,7 +784,7 @@ namespace ScheduleManager {
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
                 CheckIndex =
-                    UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -904,7 +904,7 @@ namespace ScheduleManager {
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
                 CheckIndex =
-                    UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -928,11 +928,11 @@ namespace ScheduleManager {
             }
 
             // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
-            if (UtilityRoutines::SameString(Alphas(3), "NO")) {
+            if (Util::SameString(Alphas(3), "NO")) {
                 state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::No;
-            } else if (UtilityRoutines::SameString(Alphas(3), "AVERAGE")) {
+            } else if (Util::SameString(Alphas(3), "AVERAGE")) {
                 state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Average;
-            } else if (UtilityRoutines::SameString(Alphas(3), "LINEAR")) {
+            } else if (Util::SameString(Alphas(3), "LINEAR")) {
                 state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated = ScheduleInterpolation::Linear;
             } else {
                 ShowSevereError(
@@ -1074,7 +1074,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->WeekSchedule(LoopIndex).Name = Alphas(1);
             // Rest of Alphas are processed into Pointers
             for (InLoopIndex = 1; InLoopIndex <= maxDayTypes; ++InLoopIndex) {
-                DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
+                DayIndex = Util::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}\", {} \"{}\" not Found",
@@ -1116,7 +1116,7 @@ namespace ScheduleManager {
             AllDays = false;
             // Rest of Alphas are processed into Pointers
             for (InLoopIndex = 2; InLoopIndex <= NumAlphas; InLoopIndex += 2) {
-                DayIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
+                DayIndex = Util::FindItemInList(Alphas(InLoopIndex + 1), state.dataScheduleMgr->DaySchedule({1, NumRegDaySchedules}));
                 if (DayIndex == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}\", {} \"{}\" not Found",
@@ -1177,7 +1177,7 @@ namespace ScheduleManager {
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
                 CheckIndex =
-                    UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -1203,7 +1203,7 @@ namespace ScheduleManager {
             DaysInYear = 0;
             // Rest of Alphas (Weekschedules) are processed into Pointers
             for (InLoopIndex = 3; InLoopIndex <= NumAlphas; ++InLoopIndex) {
-                WeekIndex = UtilityRoutines::FindItemInList(Alphas(InLoopIndex), state.dataScheduleMgr->WeekSchedule({1, NumRegWeekSchedules}));
+                WeekIndex = Util::FindItemInList(Alphas(InLoopIndex), state.dataScheduleMgr->WeekSchedule({1, NumRegWeekSchedules}));
                 if (WeekIndex == 0) {
                     ShowSevereError(state,
                                     format("{}{}=\"{}\", {}=\"{}\" not found.",
@@ -1321,7 +1321,7 @@ namespace ScheduleManager {
             state.dataScheduleMgr->Schedule(SchNum).SchType = SchedType::ScheduleInput_compact;
             // Validate ScheduleType
             CheckIndex =
-                UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -1496,7 +1496,7 @@ namespace ScheduleManager {
                             ++NumField;
                             ++xxcount;
                             ++NumNumbers;
-                            Numbers(NumNumbers) = UtilityRoutines::ProcessNumber(Alphas(NumField), ErrorHere);
+                            Numbers(NumNumbers) = Util::ProcessNumber(Alphas(NumField), ErrorHere);
                             if (ErrorHere) {
                                 ShowSevereError(state, format("{}=\"{}\"", CurrentModuleObject, Alphas(1)));
                                 ShowContinueError(state,
@@ -1690,7 +1690,7 @@ namespace ScheduleManager {
                 CheckIndex = 0;
                 if (!lAlphaBlanks(2))
                     CheckIndex =
-                        UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                        Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -1723,14 +1723,14 @@ namespace ScheduleManager {
                 continue;
             }
 
-            if (lAlphaBlanks(4) || UtilityRoutines::SameString(Alphas(4), "comma")) {
+            if (lAlphaBlanks(4) || Util::SameString(Alphas(4), "comma")) {
                 ColumnSep = CharComma;
                 Alphas(4) = "comma";
-            } else if (UtilityRoutines::SameString(Alphas(4), "semicolon")) {
+            } else if (Util::SameString(Alphas(4), "semicolon")) {
                 ColumnSep = CharSemicolon;
-            } else if (UtilityRoutines::SameString(Alphas(4), "tab")) {
+            } else if (Util::SameString(Alphas(4), "tab")) {
                 ColumnSep = CharTab;
-            } else if (UtilityRoutines::SameString(Alphas(4), "space")) {
+            } else if (Util::SameString(Alphas(4), "space")) {
                 ColumnSep = CharSpace;
             } else {
                 ShowSevereError(
@@ -2012,7 +2012,7 @@ namespace ScheduleManager {
             // Validate ScheduleType
             if (state.dataScheduleMgr->NumScheduleTypes > 0) {
                 CheckIndex =
-                    UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                    Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
                 if (CheckIndex == 0) {
                     if (!lAlphaBlanks(2)) {
                         ShowWarningError(state,
@@ -2084,7 +2084,7 @@ namespace ScheduleManager {
 
             // Validate ScheduleType
             CheckIndex =
-                UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -2162,7 +2162,7 @@ namespace ScheduleManager {
 
             // Validate ScheduleType
             CheckIndex =
-                UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -2241,7 +2241,7 @@ namespace ScheduleManager {
 
             // Validate ScheduleType
             CheckIndex =
-                UtilityRoutines::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
+                Util::FindItemInList(Alphas(2), state.dataScheduleMgr->ScheduleType({1, state.dataScheduleMgr->NumScheduleTypes}));
             if (CheckIndex == 0) {
                 if (!lAlphaBlanks(2)) {
                     ShowWarningError(state,
@@ -2862,7 +2862,7 @@ namespace ScheduleManager {
 
         if (state.dataScheduleMgr->NumSchedules > 0) {
             GetScheduleIndex =
-                UtilityRoutines::FindItemInList(ScheduleName, state.dataScheduleMgr->Schedule({1, state.dataScheduleMgr->NumSchedules}));
+                Util::FindItemInList(ScheduleName, state.dataScheduleMgr->Schedule({1, state.dataScheduleMgr->NumSchedules}));
             if (GetScheduleIndex > 0) {
                 if (!state.dataScheduleMgr->Schedule(GetScheduleIndex).Used) {
                     state.dataScheduleMgr->Schedule(GetScheduleIndex).Used = true;
@@ -2964,7 +2964,7 @@ namespace ScheduleManager {
 
         if (state.dataScheduleMgr->NumDaySchedules > 0) {
             GetDayScheduleIndex =
-                UtilityRoutines::FindItemInList(ScheduleName, state.dataScheduleMgr->DaySchedule({1, state.dataScheduleMgr->NumDaySchedules}));
+                Util::FindItemInList(ScheduleName, state.dataScheduleMgr->DaySchedule({1, state.dataScheduleMgr->NumDaySchedules}));
             if (GetDayScheduleIndex > 0) {
                 state.dataScheduleMgr->DaySchedule(GetDayScheduleIndex).Used = true;
             }
@@ -3416,7 +3416,7 @@ namespace ScheduleManager {
             RetHH = 0;
         } else {
             bool error = false;
-            rRetHH = UtilityRoutines::ProcessNumber(String.substr(0, Pos), error);
+            rRetHH = Util::ProcessNumber(String.substr(0, Pos), error);
             RetHH = int(rRetHH);
             if (double(RetHH) != rRetHH || error || rRetHH < 0.0) {
                 if (double(RetHH) != rRetHH && rRetHH >= 0.0) {
@@ -3439,7 +3439,7 @@ namespace ScheduleManager {
 
         String.erase(0, Pos + 1);
         bool error = false;
-        rRetMM = UtilityRoutines::ProcessNumber(String, error);
+        rRetMM = Util::ProcessNumber(String, error);
         RetMM = int(rRetMM);
         if (double(RetMM) != rRetMM || error || rRetMM < 0.0) {
             if (double(RetMM) != rRetMM && rRetMM >= 0.0) {

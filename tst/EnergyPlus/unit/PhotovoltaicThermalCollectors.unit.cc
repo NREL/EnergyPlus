@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, BIPVT_calculateBIPVTMaxHeatGain)
     Real64 tCollector = 0.0;
 
     // Set up conditions
-    int InletNode = UtilityRoutines::FindItemInList("ZN_1_FLR_1_SEC_1:SYS_OAINLET NODE",
+    int InletNode = Util::FindItemInList("ZN_1_FLR_1_SEC_1:SYS_OAINLET NODE",
                                                     state->dataLoopNodes->NodeID,
                                                     state->dataLoopNodes->NumOfNodes); // HVAC node associated with inlet of BIPVT
     state->dataLoopNodes->Node(InletNode).HumRat = 0.001;                              // inlet air humidity ratio (kgda/kg)

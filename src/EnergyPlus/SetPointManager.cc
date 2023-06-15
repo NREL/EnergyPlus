@@ -620,28 +620,28 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
         // setup program flow control integers
-        if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxTemp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinTemp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "HumidityRatio")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "HumidityRatio")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::HumRat;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumHumidityRatio")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumHumidityRatio")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxHumRat;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumHumidityRatio")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumHumidityRatio")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinHumRat;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MassFlowRate")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MassFlowRate")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MassFlow;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumMassFlowRate")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumMassFlowRate")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxMassFlow;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumMassFlowRate")) {
+        } else if (Util::SameString(state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumMassFlowRate")) {
             state.dataSetPointManager->SchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinMassFlow;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -728,11 +728,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->DualSchSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->DualSchSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->DualSchSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->DualSchSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->DualSchSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -830,17 +830,17 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         auto &thisOASetPtMgr = state.dataSetPointManager->OutAirSetPtMgr(SetPtMgrNum);
 
         thisOASetPtMgr.Name = cAlphaArgs(1);
         thisOASetPtMgr.ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(thisOASetPtMgr.ctrlVarType, "Temperature")) {
+        if (Util::SameString(thisOASetPtMgr.ctrlVarType, "Temperature")) {
             thisOASetPtMgr.CtrlTypeMode = CtrlVarType::Temp;
-        } else if (UtilityRoutines::SameString(thisOASetPtMgr.ctrlVarType, "MaximumTemperature")) {
+        } else if (Util::SameString(thisOASetPtMgr.ctrlVarType, "MaximumTemperature")) {
             thisOASetPtMgr.CtrlTypeMode = CtrlVarType::MaxTemp;
-        } else if (UtilityRoutines::SameString(thisOASetPtMgr.ctrlVarType, "MinimumTemperature")) {
+        } else if (Util::SameString(thisOASetPtMgr.ctrlVarType, "MinimumTemperature")) {
             thisOASetPtMgr.CtrlTypeMode = CtrlVarType::MinTemp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -961,11 +961,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -1036,7 +1036,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // get the actual zone number of the control zone
         state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
+            Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -1080,11 +1080,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -1155,7 +1155,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // get the actual zone number of the control zone
         state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
+            Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -1198,11 +1198,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -1273,7 +1273,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // get the actual zone number of the control zone
         state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
+            Util::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -1316,7 +1316,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ctrlVarType = "MinimumHumidityRatio";
@@ -1418,7 +1418,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ctrlVarType = "MaximumHumidityRatio";
@@ -1522,11 +1522,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -1671,14 +1671,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
 
         // setup program flow control integers.
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(getEnumerationValue(
-            controlTypeNameUC, UtilityRoutines::MakeUPPERCase(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
+            controlTypeNameUC, Util::MakeUPPERCase(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
         if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -1845,11 +1845,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -1872,7 +1872,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MaxTemp)]) {
+        if (Util::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MaxTemp)]) {
             state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MaxTemp;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -1945,11 +1945,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -1972,7 +1972,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MinTemp)]) {
+        if (Util::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MinTemp)]) {
             state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MinTemp;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -2046,11 +2046,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -2084,7 +2084,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy =
-            static_cast<ControlStrategy>(getEnumerationValue(strategyNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+            static_cast<ControlStrategy>(getEnumerationValue(strategyNamesUC, Util::MakeUPPERCase(cAlphaArgs(4))));
         if (state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy == ControlStrategy::Invalid) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(4), cAlphaArgs(4)));
@@ -2160,14 +2160,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
         state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).NumCtrlNodes = 1;
         NumNodesCtrld = 1;
 
-        if (UtilityRoutines::SameString(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).ctrlVarType, "Flow")) {
+        if (Util::SameString(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).ctrlVarType, "Flow")) {
             state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MassFlow;
         } else {
             // should not come here if idd type choice and key list is working
@@ -2231,7 +2231,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName = cAlphaArgs(2);
@@ -2320,7 +2320,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName = cAlphaArgs(2);
@@ -2410,7 +2410,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName = cAlphaArgs(2);
@@ -2500,7 +2500,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName = cAlphaArgs(2);
@@ -2591,7 +2591,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName = cAlphaArgs(2);
@@ -2678,7 +2678,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName = cAlphaArgs(2);
@@ -2767,15 +2767,15 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
             state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxTemp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
             state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinTemp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -2785,9 +2785,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         }
         state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(3);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).RefTempType, "OutdoorAirWetBulb")) {
+        if (Util::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).RefTempType, "OutdoorAirWetBulb")) {
             state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::WetBulb;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).RefTempType, "OutdoorAirDryBulb")) {
+        } else if (Util::SameString(state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).RefTempType, "OutdoorAirDryBulb")) {
             state.dataSetPointManager->FollowOATempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::DryBulb;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -2880,15 +2880,15 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxTemp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinTemp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -2908,9 +2908,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                               NodeInputManager::CompFluidStream::Primary,
                               ObjectIsNotParent);
         state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType = cAlphaArgs(4);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeWetBulb")) {
+        if (Util::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeWetBulb")) {
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::WetBulb;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeDryBulb")) {
+        } else if (Util::SameString(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTempType, "NodeDryBulb")) {
             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::DryBulb;
         } else {
             // should not come here if idd type choice and key list is working
@@ -3006,15 +3006,15 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MaximumTemperature")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MaxTemp;
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
+        } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).ctrlVarType, "MinimumTemperature")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::MinTemp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -3024,7 +3024,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             ErrorsFound = true;
         }
         state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType = cAlphaArgs(3);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
+        if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
                                         "Site:GroundTemperature:BuildingSurface")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::BuildingSurface;
             if (state.dataSetPointManager->NoSurfaceGroundTempObjWarning) {
@@ -3038,7 +3038,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
                 state.dataSetPointManager->NoSurfaceGroundTempObjWarning = false;
             }
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
+        } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
                                                "Site:GroundTemperature:Shallow")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Shallow;
             if (state.dataSetPointManager->NoShallowGroundTempObjWarning) {
@@ -3053,7 +3053,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
                 state.dataSetPointManager->NoShallowGroundTempObjWarning = false;
             }
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
+        } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
                                                "Site:GroundTemperature:Deep")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::Deep;
             if (state.dataSetPointManager->NoDeepGroundTempObjWarning) {
@@ -3068,7 +3068,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
                 state.dataSetPointManager->NoDeepGroundTempObjWarning = false;
             }
-        } else if (UtilityRoutines::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
+        } else if (Util::SameString(state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefGroundTempObjType,
                                                "Site:GroundTemperature:FCfactorMethod")) {
             state.dataSetPointManager->GroundTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceGroundTempObjectType::FCFactorMethod;
             if (state.dataSetPointManager->NoFCGroundTempObjWarning) {
@@ -3194,11 +3194,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             // should not come here if idd type choice and key list is working
@@ -3298,11 +3298,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
-        if (UtilityRoutines::SameString(state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
+        if (Util::SameString(state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).ctrlVarType, "Temperature")) {
             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CtrlTypeMode = CtrlVarType::Temp;
         } else {
             ShowSevereError(state, format(" found invalid control type of {} in {} = {}", cAlphaArgs(2), cCurrentModuleObject, cAlphaArgs(1)));
@@ -3382,7 +3382,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ctrlVarType = "Temperature";
@@ -3405,7 +3405,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
         // get the actual zone number of the control zone
         state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(2), cAlphaArgs(2)));
@@ -3494,7 +3494,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ctrlVarType = "Temperature";
@@ -3517,7 +3517,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
         // get the actual zone number of the control zone
         state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum =
-            UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            Util::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
         if (state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(2), cAlphaArgs(2)));
@@ -3608,7 +3608,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->ReturnWaterResetChWSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
 
@@ -3643,7 +3643,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // process the return temperature type/value
         std::string returnType(cAlphaArgs(4));
-        if (UtilityRoutines::SameString(returnType, "SCHEDULED")) {
+        if (Util::SameString(returnType, "SCHEDULED")) {
             state.dataSetPointManager->ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex =
                 GetScheduleIndex(state, cAlphaArgs(5));
             if (state.dataSetPointManager->ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex == 0) {
@@ -3651,9 +3651,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(5), cAlphaArgs(5)));
                 ErrorsFound = true;
             }
-        } else if (UtilityRoutines::SameString(returnType, "CONSTANT")) {
+        } else if (Util::SameString(returnType, "CONSTANT")) {
             state.dataSetPointManager->ReturnWaterResetChWSetPtMgr(SetPtMgrNum).returnTemperatureConstantTarget = rNumericArgs(3);
-        } else if (UtilityRoutines::SameString(returnType, "RETURNTEMPERATURESETPOINT")) {
+        } else if (Util::SameString(returnType, "RETURNTEMPERATURESETPOINT")) {
             state.dataSetPointManager->ReturnWaterResetChWSetPtMgr(SetPtMgrNum).useReturnTempSetpoint = true;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -3705,7 +3705,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).Name = cAlphaArgs(1);
 
@@ -3740,7 +3740,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         // process the return temperature type/value
         std::string returnType(cAlphaArgs(4));
-        if (UtilityRoutines::SameString(returnType, "SCHEDULED")) {
+        if (Util::SameString(returnType, "SCHEDULED")) {
             state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex =
                 GetScheduleIndex(state, cAlphaArgs(5));
             if (state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnTemperatureScheduleIndex == 0) {
@@ -3748,9 +3748,9 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(5), cAlphaArgs(5)));
                 ErrorsFound = true;
             }
-        } else if (UtilityRoutines::SameString(returnType, "CONSTANT")) {
+        } else if (Util::SameString(returnType, "CONSTANT")) {
             state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).returnTemperatureConstantTarget = rNumericArgs(3);
-        } else if (UtilityRoutines::SameString(returnType, "RETURNTEMPERATURESETPOINT")) {
+        } else if (Util::SameString(returnType, "RETURNTEMPERATURESETPOINT")) {
             state.dataSetPointManager->ReturnWaterResetHWSetPtMgr(SetPtMgrNum).useReturnTempSetpoint = true;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -3806,7 +3806,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         auto &setpointManager = state.dataSetPointManager->SystemNodeResetSetPtMgr(SetPtMgrNum);
 
@@ -3926,7 +3926,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  lAlphaFieldBlanks,
                                                                  cAlphaFieldNames,
                                                                  cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
         int SetPtRstMgrNum = SetPtMgrNum + state.dataSetPointManager->NumSystemNodeResetTempSetPtMgrs;
 
@@ -4566,10 +4566,10 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     LookForFan = true;
                                 }
                                 if (LookForFan) {
-                                    if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
-                                        UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
-                                        UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
-                                        UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
+                                    if (Util::SameString(CompType, "Fan:ConstantVolume") ||
+                                        Util::SameString(CompType, "Fan:VariableVolume") ||
+                                        Util::SameString(CompType, "Fan:OnOff") ||
+                                        Util::SameString(CompType, "Fan:ComponentModel")) {
                                         FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                                         FanNodeOut =
                                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
@@ -4583,10 +4583,10 @@ void InitSetPointManagers(EnergyPlusData &state)
                             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents;
                                  ++CompNum) {
                                 CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                                if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
-                                    UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
-                                    UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
-                                    UtilityRoutines::SameString(CompType, "Fan:ComponentModel")) {
+                                if (Util::SameString(CompType, "Fan:ConstantVolume") ||
+                                    Util::SameString(CompType, "Fan:VariableVolume") ||
+                                    Util::SameString(CompType, "Fan:OnOff") ||
+                                    Util::SameString(CompType, "Fan:ComponentModel")) {
                                     FanNodeIn = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                                     FanNodeOut = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).NodeNumOut;
                                 }
@@ -4611,7 +4611,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::Warmest)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -4649,7 +4649,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::Coldest)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumColdestSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -4689,7 +4689,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::WarmestTempFlow)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -4729,7 +4729,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::RAB)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     state.dataSetPointManager->AllSetPtMgr(state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).AirLoopNum =
@@ -4784,7 +4784,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::MZCoolingAverage)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -4823,7 +4823,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::MZHeatingAverage)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -4858,7 +4858,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::MZMinHumAverage)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -4913,7 +4913,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::MZMaxHumAverage)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -4968,7 +4968,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::MZMinHum)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {
@@ -5022,7 +5022,7 @@ void InitSetPointManagers(EnergyPlusData &state)
             cSetPointManagerType = managerTypeName[static_cast<int>(SetPointManagerType::MZMaxHum)];
             for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                 if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                    AirLoopNum = UtilityRoutines::FindItemInList(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName,
+                    AirLoopNum = Util::FindItemInList(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo,
                                                                  &AirLoopZoneEquipConnectData::AirLoopName);
                     if (AirLoopNum == 0) {

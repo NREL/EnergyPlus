@@ -147,7 +147,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
             SurfList(Item).Name = Alphas(1);
             SurfList(Item).NumOfSurfaces = NumAlphas - 1;
 
-            NameConflict = UtilityRoutines::FindItemInList(SurfList(Item).Name, state.dataSurface->Surface);
+            NameConflict = Util::FindItemInList(SurfList(Item).Name, state.dataSurface->Surface);
             if (NameConflict > 0) { // A surface list has the same name as a surface--not allowed
                 ShowSevereError(
                     state,
@@ -169,7 +169,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
             int ZoneForSurface = 0; // Zone number that first surface is attached to
             for (int SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
                 SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
-                SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), state.dataSurface->Surface);
+                SurfList(Item).SurfPtr(SurfNum) = Util::FindItemInList(Alphas(SurfNum + 1), state.dataSurface->Surface);
                 if (SurfList(Item).SurfPtr(SurfNum) == 0) {
                     ShowSevereError(
                         state,
@@ -254,7 +254,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
             SlabList(Item).Name = Alphas(1);
             SlabList(Item).NumOfSurfaces = ((NumAlphas - 1) / 4);
 
-            NameConflict = UtilityRoutines::FindItemInList(SlabList(Item).Name, state.dataSurface->Surface);
+            NameConflict = Util::FindItemInList(SlabList(Item).Name, state.dataSurface->Surface);
             if (NameConflict > 0) { // A surface list has the same name as a surface--not allowed
                 ShowSevereError(
                     state, format("{}{}", CurrentModuleObject2, " = " + SlabList(Item).Name + " has the same name as a slab; this is not allowed."));
@@ -280,7 +280,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
             int NumArray = 1;
             for (int SurfNum = 1; SurfNum <= SlabList(Item).NumOfSurfaces; ++SurfNum) {
                 SlabList(Item).ZoneName(SurfNum) = Alphas(AlphaArray);
-                SlabList(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(AlphaArray), state.dataHeatBal->Zone);
+                SlabList(Item).ZonePtr = Util::FindItemInList(Alphas(AlphaArray), state.dataHeatBal->Zone);
                 if (SlabList(Item).ZonePtr(SurfNum) == 0) {
                     ShowSevereError(
                         state,
@@ -290,7 +290,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                 }
 
                 SlabList(Item).SurfName(SurfNum) = Alphas(AlphaArray + 1);
-                SlabList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(AlphaArray + 1), state.dataSurface->Surface);
+                SlabList(Item).SurfPtr(SurfNum) = Util::FindItemInList(Alphas(AlphaArray + 1), state.dataSurface->Surface);
                 if (SlabList(Item).SurfPtr(SurfNum) == 0) {
                     ShowSevereError(state,
                                     fmt::format("{} in {} statement not found = {}",
@@ -300,7 +300,7 @@ void GetSurfaceListsInputs(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
                 for (int SrfList = 1; SrfList <= NumOfSurfaceLists; ++SrfList) {
-                    NameConflict = UtilityRoutines::FindItemInList(
+                    NameConflict = Util::FindItemInList(
                         SlabList(Item).SurfName(SurfNum), SurfList(SrfList).SurfName, SurfList(SrfList).NumOfSurfaces);
                     if (NameConflict > 0) { // A slab list includes a surface on a surface list--not allowed
                         ShowSevereError(state, format("{}{}", CurrentModuleObject2, "=\"" + SlabList(Item).Name + "\", invalid surface specified."));

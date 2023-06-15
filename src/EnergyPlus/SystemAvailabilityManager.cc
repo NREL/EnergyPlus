@@ -606,20 +606,20 @@ namespace SystemAvailabilityManager {
                 }
 
                 nightCycleMgr.nightCycleControlType = static_cast<NightCycleControlType>(
-                    getEnumerationValue(NightCycleControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+                    getEnumerationValue(NightCycleControlTypeNamesUC, Util::MakeUPPERCase(cAlphaArgs(4))));
 
                 assert(nightCycleMgr.nightCycleControlType != NightCycleControlType::Invalid);
 
                 // Cycling Run Time Control Type
                 nightCycleMgr.cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(
-                    getEnumerationValue(CyclingRunTimeControlNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(5))));
+                    getEnumerationValue(CyclingRunTimeControlNamesUC, Util::MakeUPPERCase(cAlphaArgs(5))));
 
                 assert(nightCycleMgr.cyclingRunTimeControl != CyclingRunTimeControl::Invalid);
 
                 // Control zone or zonelist
                 if (!lAlphaFieldBlanks(6)) {
                     nightCycleMgr.CtrlZoneListName = cAlphaArgs(6);
-                    int ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), state.dataHeatBal->Zone);
+                    int ZoneNum = Util::FindItemInList(cAlphaArgs(6), state.dataHeatBal->Zone);
                     if (ZoneNum > 0) {
                         nightCycleMgr.NumOfCtrlZones = 1;
                         nightCycleMgr.CtrlZonePtrs.allocate(1);
@@ -627,7 +627,7 @@ namespace SystemAvailabilityManager {
                     } else {
                         int zoneListNum = 0;
                         if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
+                            zoneListNum = Util::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfCtrlZones = NumZones;
@@ -661,7 +661,7 @@ namespace SystemAvailabilityManager {
                 // Cooling zone or zonelist
                 if (!lAlphaFieldBlanks(7)) {
                     nightCycleMgr.CoolingZoneListName = cAlphaArgs(7);
-                    int ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), state.dataHeatBal->Zone);
+                    int ZoneNum = Util::FindItemInList(cAlphaArgs(7), state.dataHeatBal->Zone);
                     if (ZoneNum > 0) {
                         nightCycleMgr.NumOfCoolingZones = 1;
                         nightCycleMgr.CoolingZonePtrs.allocate(1);
@@ -669,7 +669,7 @@ namespace SystemAvailabilityManager {
                     } else {
                         int zoneListNum = 0;
                         if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), state.dataHeatBal->ZoneList);
+                            zoneListNum = Util::FindItemInList(cAlphaArgs(7), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfCoolingZones = NumZones;
@@ -693,7 +693,7 @@ namespace SystemAvailabilityManager {
                 // Heating zone or zonelist
                 if (!lAlphaFieldBlanks(8)) {
                     nightCycleMgr.HeatingZoneListName = cAlphaArgs(8);
-                    int ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(8), state.dataHeatBal->Zone);
+                    int ZoneNum = Util::FindItemInList(cAlphaArgs(8), state.dataHeatBal->Zone);
                     if (ZoneNum > 0) {
                         nightCycleMgr.NumOfHeatingZones = 1;
                         nightCycleMgr.HeatingZonePtrs.allocate(1);
@@ -701,7 +701,7 @@ namespace SystemAvailabilityManager {
                     } else {
                         int zoneListNum = 0;
                         if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(8), state.dataHeatBal->ZoneList);
+                            zoneListNum = Util::FindItemInList(cAlphaArgs(8), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfHeatingZones = NumZones;
@@ -725,7 +725,7 @@ namespace SystemAvailabilityManager {
                 // HeatZnFan zone or zonelist
                 if (!lAlphaFieldBlanks(9)) {
                     nightCycleMgr.HeatZnFanZoneListName = cAlphaArgs(9);
-                    int ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(9), state.dataHeatBal->Zone);
+                    int ZoneNum = Util::FindItemInList(cAlphaArgs(9), state.dataHeatBal->Zone);
                     if (ZoneNum > 0) {
                         nightCycleMgr.NumOfHeatZnFanZones = 1;
                         nightCycleMgr.HeatZnFanZonePtrs.allocate(1);
@@ -733,7 +733,7 @@ namespace SystemAvailabilityManager {
                     } else {
                         int zoneListNum = 0;
                         if (state.dataHeatBal->NumOfZoneLists > 0)
-                            zoneListNum = UtilityRoutines::FindItemInList(cAlphaArgs(9), state.dataHeatBal->ZoneList);
+                            zoneListNum = Util::FindItemInList(cAlphaArgs(9), state.dataHeatBal->ZoneList);
                         if (zoneListNum > 0) {
                             int NumZones = state.dataHeatBal->ZoneList(zoneListNum).NumOfZones;
                             nightCycleMgr.NumOfHeatZnFanZones = NumZones;
@@ -809,7 +809,7 @@ namespace SystemAvailabilityManager {
                 optimumStartMgr.MaxOptStartTime = rNumericArgs(1);
 
                 optimumStartMgr.optimumStartControlType = static_cast<OptimumStartControlType>(
-                    getEnumerationValue(OptimumStartControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+                    getEnumerationValue(OptimumStartControlTypeNamesUC, Util::MakeUPPERCase(cAlphaArgs(4))));
 
                 if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::Invalid) {
                     optimumStartMgr.optimumStartControlType = OptimumStartControlType::ControlZone;
@@ -820,7 +820,7 @@ namespace SystemAvailabilityManager {
 
                 if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::ControlZone) {
                     optimumStartMgr.CtrlZoneName = cAlphaArgs(5);
-                    optimumStartMgr.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                    optimumStartMgr.ZoneNum = Util::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
                     if (optimumStartMgr.ZoneNum == 0) {
                         ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                         ShowSevereError(state, format("not found: {}=\"{}\".", cAlphaFieldNames(5), cAlphaArgs(5)));
@@ -839,7 +839,7 @@ namespace SystemAvailabilityManager {
                             }
                         }
                     }
-                    optimumStartMgr.NumOfZones = UtilityRoutines::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
+                    optimumStartMgr.NumOfZones = Util::FindItemInList(cAlphaArgs(6), state.dataHeatBal->ZoneList);
                     if (optimumStartMgr.NumOfZones == 0) {
                         ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                         ShowSevereError(state, format("not found: {}=\"{}\".", cAlphaFieldNames(6), cAlphaArgs(6)));
@@ -848,7 +848,7 @@ namespace SystemAvailabilityManager {
                 }
 
                 optimumStartMgr.controlAlgorithm =
-                    static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(7))));
+                    static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, Util::MakeUPPERCase(cAlphaArgs(7))));
 
                 assert(optimumStartMgr.controlAlgorithm != ControlAlgorithm::Invalid);
 
@@ -1254,7 +1254,7 @@ namespace SystemAvailabilityManager {
                 nightVentMgr.VentTempLowLim = rNumericArgs(2);
                 nightVentMgr.VentFlowFrac = rNumericArgs(3);
                 nightVentMgr.CtrlZoneName = cAlphaArgs(5);
-                nightVentMgr.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
+                nightVentMgr.ZoneNum = Util::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
                 if (nightVentMgr.ZoneNum == 0) {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, format("not found: {}=\"{}\".", cAlphaFieldNames(5), cAlphaArgs(5)));
@@ -1319,7 +1319,7 @@ namespace SystemAvailabilityManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
                 auto const &objectFields = instance.value();
-                std::string const thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = Util::MakeUPPERCase(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 auto &mgrList = state.dataSystemAvailabilityManager->ListData(Item);
                 mgrList.Name = thisObjectName;
@@ -1345,7 +1345,7 @@ namespace SystemAvailabilityManager {
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
                         mgrList.AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
-                            getEnumerationValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::MakeUPPERCase(availManagerObjType)));
+                            getEnumerationValue(SystemAvailabilityTypeNamesUC, Util::MakeUPPERCase(availManagerObjType)));
                         if (mgrList.AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
                             mgrList.AvailManagerType(listItem) = DataPlant::SystemAvailabilityType::Invalid;
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
@@ -1394,7 +1394,7 @@ namespace SystemAvailabilityManager {
 
         Found = 0;
         if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0)
-            Found = UtilityRoutines::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->ListData);
+            Found = Util::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->ListData);
 
         if (Found != 0) {
             state.dataPlnt->PlantAvailMgr(Loop).NumAvailManagers = state.dataSystemAvailabilityManager->ListData(Found).NumItems;
@@ -1491,7 +1491,7 @@ namespace SystemAvailabilityManager {
 
         Found = 0;
         if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0)
-            Found = UtilityRoutines::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->ListData);
+            Found = Util::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->ListData);
 
         if (Found != 0) {
             state.dataAirLoop->PriAirSysAvailMgr(Loop).NumAvailManagers = state.dataSystemAvailabilityManager->ListData(Found).NumItems;
@@ -1585,7 +1585,7 @@ namespace SystemAvailabilityManager {
             AvailabilityListName = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).AvailManagerListName;
             Found = 0;
             if (state.dataSystemAvailabilityManager->NumAvailManagerLists > 0)
-                Found = UtilityRoutines::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->ListData);
+                Found = Util::FindItemInList(AvailabilityListName, state.dataSystemAvailabilityManager->ListData);
             if (Found != 0) {
                 ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers = state.dataSystemAvailabilityManager->ListData(Found).NumItems;
                 CompNumAvailManagers = ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).NumAvailManagers;
@@ -1661,7 +1661,7 @@ namespace SystemAvailabilityManager {
                 auto &optimumStartMgr = state.dataSystemAvailabilityManager->OptimumStartData(SysAvailNum);
                 if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::MaximumOfZoneList) {
                     // a zone list
-                    ZoneListNum = UtilityRoutines::FindItemInList(optimumStartMgr.ZoneListName, state.dataHeatBal->ZoneList);
+                    ZoneListNum = Util::FindItemInList(optimumStartMgr.ZoneListName, state.dataHeatBal->ZoneList);
                     if (ZoneListNum > 0) {
                         optimumStartMgr.NumOfZones = state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
                         if (!allocated(optimumStartMgr.ZonePtrs)) {
@@ -1753,7 +1753,7 @@ namespace SystemAvailabilityManager {
         switch (SysAvailType) {
         case DataPlant::SystemAvailabilityType::Scheduled: { // 'AvailabilityManager:Scheduled'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedData);
             }
             if (SysAvailNum > 0) {
                 CalcSchedSysAvailMgr(state, SysAvailNum, AvailStatus);
@@ -1764,7 +1764,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::ScheduledOn: { // 'AvailabilityManager:ScheduledOn'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOnData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOnData);
             }
             if (SysAvailNum > 0) {
                 CalcSchedOnSysAvailMgr(state, SysAvailNum, AvailStatus);
@@ -1775,7 +1775,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::ScheduledOff: { // 'AvailabilityManager:ScheduledOff'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOffData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->SchedOffData);
             }
             if (SysAvailNum > 0) {
                 CalcSchedOffSysAvailMgr(state, SysAvailNum, AvailStatus);
@@ -1786,7 +1786,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::NightCycle: { // 'AvailabilityManager:NightCycle'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightCycleData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightCycleData);
             }
             if (SysAvailNum > 0) {
                 CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
@@ -1797,7 +1797,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::OptimumStart: { // 'AvailabilityManager:OptimumStart'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->OptimumStartData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->OptimumStartData);
             }
             if (SysAvailNum > 0) {
                 CalcOptStartSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
@@ -1808,7 +1808,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::NightVent: { // 'AvailabilityManager:NightVentilation'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightVentData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightVentData);
             }
             if (SysAvailNum > 0) {
                 CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, present(ZoneEquipType));
@@ -1819,7 +1819,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::DiffThermo: { // 'AvailabilityManager:DifferentialThermostat'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->DiffThermoData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->DiffThermoData);
             }
             if (SysAvailNum > 0) {
                 CalcDiffTSysAvailMgr(state, SysAvailNum, PreviousStatus, AvailStatus);
@@ -1829,7 +1829,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::HiTempTOff: { // 'AvailabilityManager:HighTemperatureTurnOff'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOffData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOffData);
             }
             if (SysAvailNum > 0) {
                 CalcHiTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
@@ -1839,7 +1839,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::HiTempTOn: { // 'AvailabilityManager:HighTemperatureTurnOn'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOnData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->HiTurnOnData);
             }
             if (SysAvailNum > 0) {
                 CalcHiTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
@@ -1849,7 +1849,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::LoTempTOff: { // 'AvailabilityManager:LowTemperatureTurnOff'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOffData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOffData);
             }
             if (SysAvailNum > 0) {
                 CalcLoTurnOffSysAvailMgr(state, SysAvailNum, AvailStatus);
@@ -1860,7 +1860,7 @@ namespace SystemAvailabilityManager {
         } break;
         case DataPlant::SystemAvailabilityType::LoTempTOn: { // 'AvailabilityManager:LowTemperatureTurnOn'
             if (SysAvailNum == 0) {
-                SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOnData);
+                SysAvailNum = Util::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->LoTurnOnData);
             }
             if (SysAvailNum > 0) {
                 CalcLoTurnOnSysAvailMgr(state, SysAvailNum, AvailStatus);
@@ -3848,7 +3848,7 @@ namespace SystemAvailabilityManager {
             }
             hybridVentMgr.ControlZoneName = state.dataIPShortCut->cAlphaArgs(3);
             // Check zone number
-            hybridVentMgr.ControlledZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            hybridVentMgr.ControlledZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (hybridVentMgr.ControlledZoneNum == 0) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state,
@@ -3904,9 +3904,9 @@ namespace SystemAvailabilityManager {
                 ErrorsFound = true;
             }
             // Read use weather rain indicator
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "YES")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "YES")) {
                 hybridVentMgr.UseRainIndicator = true;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "NO")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "NO")) {
                 hybridVentMgr.UseRainIndicator = false;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -4184,7 +4184,7 @@ namespace SystemAvailabilityManager {
                 hybridVentMgr.VentilationName = state.dataIPShortCut->cAlphaArgs(10);
                 if (state.dataHeatBal->TotVentilation > 0) {
                     hybridVentMgr.VentilationPtr =
-                        UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Ventilation);
+                        Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(10), state.dataHeatBal->Ventilation);
                     HybridVentSysAvailMaster(SysAvailNum) = hybridVentMgr.VentilationPtr;
                     SchedMax = GetScheduleMaxValue(state, hybridVentMgr.SimpleControlTypeSchedPtr);
                     if (hybridVentMgr.VentilationPtr <= 0 && int(SchedMax) == 1) {
@@ -4426,7 +4426,7 @@ namespace SystemAvailabilityManager {
             for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
                 auto &hybridVentMgr = state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum);
                 if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && state.dataHeatBal->TotVentilation > 0 && hybridVentMgr.VentilationPtr == 0) {
-                    hybridVentMgr.VentilationPtr = UtilityRoutines::FindItemInList(hybridVentMgr.VentilationName, state.dataHeatBal->Ventilation);
+                    hybridVentMgr.VentilationPtr = Util::FindItemInList(hybridVentMgr.VentilationName, state.dataHeatBal->Ventilation);
                     HybridVentSysAvailMaster(SysAvailNum) = hybridVentMgr.VentilationPtr;
                     SchedMax = GetScheduleMaxValue(state, hybridVentMgr.SimpleControlTypeSchedPtr);
                     if (hybridVentMgr.VentilationPtr <= 0 && int(SchedMax) == 1) {
@@ -4438,7 +4438,7 @@ namespace SystemAvailabilityManager {
                 }
                 // Check air loop number
                 for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
-                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, hybridVentMgr.AirLoopName)) {
+                    if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name, hybridVentMgr.AirLoopName)) {
                         hybridVentMgr.AirLoopNum = AirLoopNum;
                     }
                 }
@@ -4528,7 +4528,7 @@ namespace SystemAvailabilityManager {
             for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) { // loop over the primary air systems
                 AirLoopCount = 0;
                 for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
-                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name,
+                    if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name,
                                                     state.dataSystemAvailabilityManager->HybridVentData(SysAvailNum).AirLoopName)) {
                         ++AirLoopCount;
                         if (AirLoopCount > 1) SysAvailIndex = SysAvailNum;

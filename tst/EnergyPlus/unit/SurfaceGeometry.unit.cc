@@ -514,31 +514,31 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     //	enum surfaceShape:Triangle = 1
     //	"Surface 1 - Triangle"
-    int surfNum = UtilityRoutines::FindItemInList("SURFACE 1 - TRIANGLE", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("SURFACE 1 - TRIANGLE", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_TRUE(compare_enums(SurfaceShape::Triangle, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:Quadrilateral = 2
     //	"Surface 2 - Quadrilateral"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 2 - QUADRILATERAL", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 2 - QUADRILATERAL", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_TRUE(compare_enums(SurfaceShape::Quadrilateral, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:Rectangle = 3
     //	"Surface 3 - Rectangle"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 3 - RECTANGLE", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 3 - RECTANGLE", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_TRUE(compare_enums(SurfaceShape::Rectangle, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:RectangularDoorWindow = 4
     //	"Surface 4 - RectangularDoorWindow"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 4 - RECTANGULARDOORWINDOW", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_TRUE(compare_enums(SurfaceShape::RectangularDoorWindow, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:RectangularOverhang = 5
     //	"Surface 5 - RectangularOverhang"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 5 - RECTANGULAROVERHANG", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(compare_enums(SurfaceShape::RectangularOverhang,
                                state->dataSurface->Surface(surfNum).Shape,
@@ -546,7 +546,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     //	enum surfaceShape:RectangularLeftFin = 6
     //	"Surface 6 - RectangularLeftFin"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 6 - RECTANGULARLEFTFIN Left", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(compare_enums(SurfaceShape::RectangularLeftFin,
                                state->dataSurface->Surface(surfNum).Shape,
@@ -554,7 +554,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     //	enum surfaceShape:RectangularRightFin = 7
     //	"Surface 7 - RectangularRightFin"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 7 - RECTANGULARRIGHTFIN Right", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(compare_enums(SurfaceShape::RectangularRightFin,
                                state->dataSurface->Surface(surfNum).Shape,
@@ -562,19 +562,19 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     //	enum surfaceShape:TriangularWindow = 8
     //	"Surface 8 - TriangularWindow"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 8 - TRIANGULARWINDOW", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_TRUE(compare_enums(SurfaceShape::TriangularWindow, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:TriangularDoor = 9
     //	"Surface 9 - TriangularDoor"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 9 - TRIANGULARDOOR", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 9 - TRIANGULARDOOR", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_TRUE(compare_enums(SurfaceShape::TriangularDoor, state->dataSurface->Surface(surfNum).Shape));
 
     //	enum surfaceShape:Polygonal = 10
     //	"Surface 10 - Polygonal"
-    surfNum = UtilityRoutines::FindItemInList("SURFACE 10 - POLYGONAL", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE 10 - POLYGONAL", state->dataSurface->Surface);
     ProcessSurfaceVertices(*state, surfNum, ErrorsFound);
     EXPECT_TRUE(compare_enums(SurfaceShape::Polygonal, state->dataSurface->Surface(surfNum).Shape));
 }
@@ -968,19 +968,19 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
 
     // For each surface Run the test then Check the result
     // (1) rectangle window
-    int surfNum = UtilityRoutines::FindItemInList("SURFACE-1-RECTANGLE", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("SURFACE-1-RECTANGLE", state->dataSurface->Surface);
     MakeEquivalentRectangle(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_NEAR(7.60, state->dataSurface->Surface(surfNum).Width, 0.01);
     EXPECT_NEAR(1.20, state->dataSurface->Surface(surfNum).Height, 0.01);
     // (2) trapzoid window
-    surfNum = UtilityRoutines::FindItemInList("SURFACE-2-TRAPZOID", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE-2-TRAPZOID", state->dataSurface->Surface);
     MakeEquivalentRectangle(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_NEAR(7.80, state->dataSurface->Surface(surfNum).Width, 0.01);
     EXPECT_NEAR(1.17, state->dataSurface->Surface(surfNum).Height, 0.01);
     // (3) parallelogram window
-    surfNum = UtilityRoutines::FindItemInList("SURFACE-3-PARALLELOGRAM", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("SURFACE-3-PARALLELOGRAM", state->dataSurface->Surface);
     MakeEquivalentRectangle(*state, surfNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_NEAR(8.08, state->dataSurface->Surface(surfNum).Width, 0.01);
@@ -4043,19 +4043,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);           // expect no errors
 
-    int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("DATATELCOM_CEILING_1_0_0", state->dataSurface->Surface);
     EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
 
-    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZONE1_FLOOR_4_0_10000", state->dataSurface->Surface);
     EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::CondFD, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
 
-    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZONE1_FLOOR_4_0_20000", state->dataSurface->Surface);
     EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::HAMT, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
 
-    surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZONE1_FLOOR_4_0_30000", state->dataSurface->Surface);
     EXPECT_TRUE(compare_enums(DataSurfaces::HeatTransferModel::CTF, state->dataSurface->Surface(surfNum).HeatTransferAlgorithm));
     EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
@@ -4081,11 +4081,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     EXPECT_EQ(state->dataSurface->AllHTSurfaceList.size(), 4u);
     EXPECT_EQ(state->dataSurface->AllIZSurfaceList.size(), 2u);
 
-    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", state->dataHeatBal->Zone);
+    int zoneNum = Util::FindItemInList("DATATELCOM", state->dataHeatBal->Zone);
     EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
     EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 
-    zoneNum = UtilityRoutines::FindItemInList("ZONE1", state->dataHeatBal->Zone);
+    zoneNum = Util::FindItemInList("ZONE1", state->dataHeatBal->Zone);
     EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
     EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 }
@@ -5307,23 +5307,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).Name, "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).spaceNames[0], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(3).Name, "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(3).spaceNames[0], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 3);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).Name, "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).spaceNames[0], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(3).Name, "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(3).spaceNames[0], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 3);
@@ -5510,19 +5510,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
@@ -5720,33 +5720,33 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // For this test case, Zones 1 and 3 share radiant and solar enclosures
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
     EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
     EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
 
     // Check surface order
-    int Zone1Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface1"), state->dataSurface->Surface);
-    int Zone1Surface2 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface2"), state->dataSurface->Surface);
-    int Zone2Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Surface1"), state->dataSurface->Surface);
-    int Zone3Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Surface1"), state->dataSurface->Surface);
-    int Zone1Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Floor"), state->dataSurface->Surface);
-    int Zone2Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Floor"), state->dataSurface->Surface);
-    int Zone3Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Floor"), state->dataSurface->Surface);
+    int Zone1Surface1 = Util::FindItemInList(Util::MakeUPPERCase("Zone1-Surface1"), state->dataSurface->Surface);
+    int Zone1Surface2 = Util::FindItemInList(Util::MakeUPPERCase("Zone1-Surface2"), state->dataSurface->Surface);
+    int Zone2Surface1 = Util::FindItemInList(Util::MakeUPPERCase("Zone2-Surface1"), state->dataSurface->Surface);
+    int Zone3Surface1 = Util::FindItemInList(Util::MakeUPPERCase("Zone3-Surface1"), state->dataSurface->Surface);
+    int Zone1Floor = Util::FindItemInList(Util::MakeUPPERCase("Zone1-Floor"), state->dataSurface->Surface);
+    int Zone2Floor = Util::FindItemInList(Util::MakeUPPERCase("Zone2-Floor"), state->dataSurface->Surface);
+    int Zone3Floor = Util::FindItemInList(Util::MakeUPPERCase("Zone3-Floor"), state->dataSurface->Surface);
 
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst, Zone1Surface2);     // air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
@@ -6102,12 +6102,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // This should trigger the enclosure merging and all five zones should share a radiant and solar enclosure
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[3], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[4], "Space 4"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[2], "Space 5"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[3], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[4], "Space 4"));
     EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
@@ -6115,12 +6115,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(state->dataHeatBal->space(5).radiantEnclosureNum, 1);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 1);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 5"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[3], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[4], "Space 4"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[2], "Space 5"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[3], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[4], "Space 4"));
     EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
@@ -6650,38 +6650,38 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // That proved difficult to reproduce, however the root cause of the crash is space enclosure nums that are not consistent
     // with the enclosures that hold them. This test demostrates that failure.
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 5"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 5"));
 
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Radiant Enclosure 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 6"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[1], "Space 7"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[2], "Space 10"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[3], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[4], "Space 4"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[5], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[6], "Space 9"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Radiant Enclosure 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 6"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[1], "Space 7"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[2], "Space 10"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[3], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[4], "Space 4"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[5], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[6], "Space 9"));
 
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).Name, "Zone 8"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(3).spaceNames[0], "Space 8"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(3).Name, "Zone 8"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(3).spaceNames[0], "Space 8"));
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 3);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 3"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 5"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 5"));
 
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Solar Enclosure 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 6"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[1], "Space 7"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[2], "Space 10"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[3], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[4], "Space 4"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[5], "Space 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[6], "Space 9"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Solar Enclosure 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 6"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[1], "Space 7"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[2], "Space 10"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[3], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[4], "Space 4"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[5], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[6], "Space 9"));
 
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).Name, "Zone 8"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(3).spaceNames[0], "Space 8"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(3).Name, "Zone 8"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(3).spaceNames[0], "Space 8"));
 
     // Loop through all spaces on all enclosures and check that space radiantEnlosureNum matches the enclosure number
     // Before the fix, Space 3 and Space 5 have incorrect radiantEnclosureNum = 2 (should be 1)
@@ -6941,24 +6941,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     EXPECT_EQ(state->dataViewFactor->NumOfRadiantEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).Name, "Radiant Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
     Real64 enclArea = state->dataHeatBal->space(1).floorArea + state->dataHeatBal->space(3).floorArea;
     EXPECT_EQ(state->dataViewFactor->EnclRadInfo(1).FloorArea, enclArea);
 
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
     EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
     enclArea = state->dataHeatBal->space(2).floorArea;
     EXPECT_EQ(state->dataViewFactor->EnclRadInfo(2).FloorArea, enclArea);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).Name, "Solar Enclosure 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[0], "Space 1"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
     enclArea = state->dataHeatBal->space(1).floorArea + state->dataHeatBal->space(3).floorArea;
@@ -6967,8 +6967,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     Real64 enclTotSurfArea = state->dataHeatBal->space(1).totalSurfArea + state->dataHeatBal->space(3).totalSurfArea;
     EXPECT_EQ(state->dataViewFactor->EnclSolInfo(1).TotalSurfArea, enclTotSurfArea);
 
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Zone 2"));
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Zone 2"));
+    EXPECT_TRUE(Util::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
     EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
     enclArea = state->dataHeatBal->space(2).floorArea;
     EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).FloorArea, enclArea);
@@ -8644,17 +8644,17 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     // Simulation Order (1-based):
     //  SHADING SURFACES:
     int siteShadeShadeFlatShadeSurface =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int mirSiteShadeFlatShadeSurface =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList("Mir-" + Util::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int buildingShadeTiltedShadeSurface =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int mirBuildingShadeTiltedShadeSurface =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList("Mir-" + Util::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int zoneShadeLivingSouthShade001 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     int mirZoneShadeLivingSouthShade001 =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
+        Util::FindItemInList("Mir-" + Util::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     EXPECT_EQ(siteShadeShadeFlatShadeSurface, 1);
     EXPECT_EQ(mirSiteShadeFlatShadeSurface, 2);
     EXPECT_EQ(buildingShadeTiltedShadeSurface, 3);
@@ -8663,20 +8663,20 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(mirZoneShadeLivingSouthShade001, 6);
 
     //  LIVING ZONE:
-    int wallLivingNorth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:North"), state->dataSurface->Surface);
-    int wallLivingEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:East"), state->dataSurface->Surface);
-    int wallLivingSouth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:South"), state->dataSurface->Surface);
-    int wallLivingWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:West"), state->dataSurface->Surface);
-    int wallLivingInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Interior"), state->dataSurface->Surface);
-    int floorLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Floor"), state->dataSurface->Surface);
-    int ceilingLivingCeiling = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Ceiling"), state->dataSurface->Surface);
-    int doorWestDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestDoor"), state->dataSurface->Surface);
+    int wallLivingNorth = Util::FindItemInList(Util::MakeUPPERCase("Living:North"), state->dataSurface->Surface);
+    int wallLivingEast = Util::FindItemInList(Util::MakeUPPERCase("Living:East"), state->dataSurface->Surface);
+    int wallLivingSouth = Util::FindItemInList(Util::MakeUPPERCase("Living:South"), state->dataSurface->Surface);
+    int wallLivingWest = Util::FindItemInList(Util::MakeUPPERCase("Living:West"), state->dataSurface->Surface);
+    int wallLivingInterior = Util::FindItemInList(Util::MakeUPPERCase("Living:Interior"), state->dataSurface->Surface);
+    int floorLivingFloor = Util::FindItemInList(Util::MakeUPPERCase("Living:Floor"), state->dataSurface->Surface);
+    int ceilingLivingCeiling = Util::FindItemInList(Util::MakeUPPERCase("Living:Ceiling"), state->dataSurface->Surface);
+    int doorWestDoor = Util::FindItemInList(Util::MakeUPPERCase("WestDoor"), state->dataSurface->Surface);
     int windowTubularDaylightingDiffuser1 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
-    int windowNorthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthWindow"), state->dataSurface->Surface);
-    int windowEastWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastWindow"), state->dataSurface->Surface);
-    int windowSouthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthWindow"), state->dataSurface->Surface);
-    int windowWestWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestWindow"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::MakeUPPERCase("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
+    int windowNorthWindow = Util::FindItemInList(Util::MakeUPPERCase("NorthWindow"), state->dataSurface->Surface);
+    int windowEastWindow = Util::FindItemInList(Util::MakeUPPERCase("EastWindow"), state->dataSurface->Surface);
+    int windowSouthWindow = Util::FindItemInList(Util::MakeUPPERCase("SouthWindow"), state->dataSurface->Surface);
+    int windowWestWindow = Util::FindItemInList(Util::MakeUPPERCase("WestWindow"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallLivingNorth, 7);
     EXPECT_EQ(wallLivingEast, 8);
@@ -8699,13 +8699,13 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(state->dataHeatBal->space(1).WindowSurfaceLast, 19);
 
     //  GARAGE ZONE:
-    int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Interior"), state->dataSurface->Surface);
-    int wallGarageEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:EastWall"), state->dataSurface->Surface);
-    int wallGarageWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:WestWall"), state->dataSurface->Surface);
-    int wallGarageFrontDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:FrontDoor"), state->dataSurface->Surface);
-    int floorGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Floor"), state->dataSurface->Surface);
-    int ceilingGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Ceiling"), state->dataSurface->Surface);
-    int intmassEVChargingStation = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EVChargingStation"), state->dataSurface->Surface);
+    int wallGarageInterior = Util::FindItemInList(Util::MakeUPPERCase("Garage:Interior"), state->dataSurface->Surface);
+    int wallGarageEast = Util::FindItemInList(Util::MakeUPPERCase("Garage:EastWall"), state->dataSurface->Surface);
+    int wallGarageWest = Util::FindItemInList(Util::MakeUPPERCase("Garage:WestWall"), state->dataSurface->Surface);
+    int wallGarageFrontDoor = Util::FindItemInList(Util::MakeUPPERCase("Garage:FrontDoor"), state->dataSurface->Surface);
+    int floorGarageFloor = Util::FindItemInList(Util::MakeUPPERCase("Garage:Floor"), state->dataSurface->Surface);
+    int ceilingGarageInterior = Util::FindItemInList(Util::MakeUPPERCase("Garage:Ceiling"), state->dataSurface->Surface);
+    int intmassEVChargingStation = Util::FindItemInList(Util::MakeUPPERCase("EVChargingStation"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallGarageInterior, 20);
     EXPECT_EQ(wallGarageEast, 21);
@@ -8722,21 +8722,21 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(state->dataHeatBal->space(2).WindowSurfaceLast, -1);
 
     //  ATTIC ZONE:
-    int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastGable"), state->dataSurface->Surface);
-    int wallWestGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestGable"), state->dataSurface->Surface);
-    int wallNorthGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthGable"), state->dataSurface->Surface);
-    int floorAtticLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:LivingFloor"), state->dataSurface->Surface);
-    int floorAtticGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:GarageFloor"), state->dataSurface->Surface);
-    int roofNorthRoof1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof1"), state->dataSurface->Surface);
-    int roofSouthRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthRoof"), state->dataSurface->Surface);
-    int roofNorthRoof2 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof2"), state->dataSurface->Surface);
-    int roofNorthRoof3 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof3"), state->dataSurface->Surface);
-    int roofNorthRoof4 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof4"), state->dataSurface->Surface);
-    int roofEastRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastRoof"), state->dataSurface->Surface);
-    int roofWestRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestRoof"), state->dataSurface->Surface);
+    int wallEastGable = Util::FindItemInList(Util::MakeUPPERCase("EastGable"), state->dataSurface->Surface);
+    int wallWestGable = Util::FindItemInList(Util::MakeUPPERCase("WestGable"), state->dataSurface->Surface);
+    int wallNorthGable = Util::FindItemInList(Util::MakeUPPERCase("NorthGable"), state->dataSurface->Surface);
+    int floorAtticLivingFloor = Util::FindItemInList(Util::MakeUPPERCase("Attic:LivingFloor"), state->dataSurface->Surface);
+    int floorAtticGarageFloor = Util::FindItemInList(Util::MakeUPPERCase("Attic:GarageFloor"), state->dataSurface->Surface);
+    int roofNorthRoof1 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof1"), state->dataSurface->Surface);
+    int roofSouthRoof = Util::FindItemInList(Util::MakeUPPERCase("SouthRoof"), state->dataSurface->Surface);
+    int roofNorthRoof2 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof2"), state->dataSurface->Surface);
+    int roofNorthRoof3 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof3"), state->dataSurface->Surface);
+    int roofNorthRoof4 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof4"), state->dataSurface->Surface);
+    int roofEastRoof = Util::FindItemInList(Util::MakeUPPERCase("EastRoof"), state->dataSurface->Surface);
+    int roofWestRoof = Util::FindItemInList(Util::MakeUPPERCase("WestRoof"), state->dataSurface->Surface);
     int nonwindowTubularDaylightingDome1 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDome1"), state->dataSurface->Surface);
-    int windowAtticSkylight = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("AtticSkylight"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::MakeUPPERCase("TubularDaylightingDome1"), state->dataSurface->Surface);
+    int windowAtticSkylight = Util::FindItemInList(Util::MakeUPPERCase("AtticSkylight"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallEastGable, 27);
     EXPECT_EQ(wallWestGable, 28);
@@ -10045,12 +10045,12 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property object inputs
-    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    int SrdSurfsNum = Util::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
-    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    int GndSurfsNum = Util::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
     // set local derived data vars
-    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
@@ -11074,7 +11074,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleChecks)
     static constexpr std::array<bool, 8> isTransparent{false, true, false, false, false, true, false, false};
 
     for (int surf = 0; surf < 8; ++surf) {
-        int surfNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(surfacenames[surf]), state->dataSurface->Surface);
+        int surfNum = Util::FindItemInList(Util::MakeUPPERCase(surfacenames[surf]), state->dataSurface->Surface);
         EXPECT_EQ(state->dataSurface->Surface(surfNum).IsTransparent, isTransparent[surf]);
     }
     EXPECT_TRUE(state->dataSolarShading->anyScheduledShadingSurface);

@@ -245,7 +245,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &objectFields = instance.value();
-            std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+            std::string const &thisObjectName = Util::MakeUPPERCase(instance.key());
             ip->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
             std::string materialName = thisObjectName;
 
@@ -269,7 +269,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
             std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
             thisMaterial->Roughness =
-                static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(roughness)));
+                static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, Util::MakeUPPERCase(roughness)));
 
             thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
             thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
@@ -347,7 +347,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Name = MaterialNames(1);
 
         thisMaterial->Roughness =
-            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, Util::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Resistance = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -521,7 +521,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Roughness = SurfaceRoughness::VerySmooth;
         thisMaterial->ROnly = true;
         thisMaterial->Thickness = MaterialProps(1);
-        if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
+        if (!Util::SameString(MaterialNames(2), "SpectralAndAngle")) {
             thisMaterial->Trans = MaterialProps(2);
             thisMaterial->ReflectSolBeamFront = MaterialProps(3);
             thisMaterial->ReflectSolBeamBack = MaterialProps(4);
@@ -549,14 +549,14 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->GlassSpectralDataPtr = 0;
         if (state.dataHeatBal->TotSpectralData > 0 && !state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            thisMaterial->GlassSpectralDataPtr = UtilityRoutines::FindItemInList(MaterialNames(3), state.dataHeatBal->SpectralData);
+            thisMaterial->GlassSpectralDataPtr = Util::FindItemInList(MaterialNames(3), state.dataHeatBal->SpectralData);
         }
-        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) thisMaterial->GlassSpectralDataPtr = 0;
+        if (Util::SameString(MaterialNames(2), "SpectralAverage")) thisMaterial->GlassSpectralDataPtr = 0;
         // No need for spectral data for BSDF either
-        if (UtilityRoutines::SameString(MaterialNames(2), "BSDF")) thisMaterial->GlassSpectralDataPtr = 0;
-        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) thisMaterial->GlassSpectralAndAngle = true;
+        if (Util::SameString(MaterialNames(2), "BSDF")) thisMaterial->GlassSpectralDataPtr = 0;
+        if (Util::SameString(MaterialNames(2), "SpectralAndAngle")) thisMaterial->GlassSpectralAndAngle = true;
 
-        if (thisMaterial->GlassSpectralDataPtr == 0 && UtilityRoutines::SameString(MaterialNames(2), "Spectral")) {
+        if (thisMaterial->GlassSpectralDataPtr == 0 && Util::SameString(MaterialNames(2), "Spectral")) {
             ErrorsFound = true;
             ShowSevereError(state,
                             format("{}=\"{}\" has {} = Spectral but has no matching MaterialProperty:GlazingSpectralData set",
@@ -573,8 +573,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             }
         }
 
-        if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage") && !UtilityRoutines::SameString(MaterialNames(2), "Spectral") &&
-            !UtilityRoutines::SameString(MaterialNames(2), "BSDF") && !UtilityRoutines::SameString(MaterialNames(2), "SpectralAndAngle")) {
+        if (!Util::SameString(MaterialNames(2), "SpectralAverage") && !Util::SameString(MaterialNames(2), "Spectral") &&
+            !Util::SameString(MaterialNames(2), "BSDF") && !Util::SameString(MaterialNames(2), "SpectralAndAngle")) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", invalid specification.", state.dataHeatBalMgr->CurrentModuleObject, thisMaterial->Name));
             ShowContinueError(state,
@@ -585,7 +585,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         // TH 8/24/2011, allow glazing properties MaterialProps(2 to 10) to equal 0 or 1: 0.0 =< Prop <= 1.0
         // Fixed CR 8413 - modeling spandrel panels as glazing systems
-        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) {
+        if (Util::SameString(MaterialNames(2), "SpectralAverage")) {
 
             if (MaterialProps(2) + MaterialProps(3) > 1.0) {
                 ErrorsFound = true;
@@ -1111,9 +1111,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->AbsorpThermalBack = thisMaterial->EmissThermalBack;
         thisMaterial->TransThermal = thisMaterial->TausThermal;
 
-        if (UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) thisMaterial->GlassSpectralDataPtr = 0;
+        if (Util::SameString(MaterialNames(2), "SpectralAverage")) thisMaterial->GlassSpectralDataPtr = 0;
 
-        // IF(dataMaterial.Material(MaterNum)%GlassSpectralDataPtr == 0 .AND. UtilityRoutines::SameString(MaterialNames(2),'Spectral')) THEN
+        // IF(dataMaterial.Material(MaterNum)%GlassSpectralDataPtr == 0 .AND. Util::SameString(MaterialNames(2),'Spectral')) THEN
         //  ErrorsFound = .TRUE.
         //  CALL ShowSevereError(state, TRIM(state.dataHeatBalMgr->CurrentModuleObject)//'="'//Trim(dataMaterial.Material(MaterNum)%Name)// &
         //        '" has '//TRIM(cAlphaFieldNames(2))//' = Spectral but has no matching MaterialProperty:GlazingSpectralData set')
@@ -1125,7 +1125,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         //  END IF
         // END IF
 
-        if (!UtilityRoutines::SameString(MaterialNames(2), "SpectralAverage")) {
+        if (!Util::SameString(MaterialNames(2), "SpectralAverage")) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + thisMaterial->Name + "\", invalid specification.");
             ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + " must be SpectralAverage, value=" + MaterialNames(2));
@@ -1173,7 +1173,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, Util::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Roughness = SurfaceRoughness::MediumRough;
 
@@ -1280,7 +1280,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, Util::MakeUPPERCase(MaterialNames(2))));
 
         thisMaterial->Roughness = SurfaceRoughness::MediumRough;
 
@@ -1301,7 +1301,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             // Get gap vent type
             thisMaterial->gapVentType =
-                static_cast<GapVentType>(getEnumerationValue(GapVentTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+                static_cast<GapVentType>(getEnumerationValue(GapVentTypeUC, Util::MakeUPPERCase(MaterialNames(3))));
         }
 
         if (gasType == GasType::Custom) {
@@ -1385,7 +1385,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->NumberOfGasesInMixture = NumGases;
         for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
             thisMaterial->gasTypes(NumGas) =
-                static_cast<GasType>(getEnumerationValue(GasTypeUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
+                static_cast<GasType>(getEnumerationValue(GasTypeUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
         }
 
         thisMaterial->Roughness = SurfaceRoughness::MediumRough; // Unused
@@ -1721,8 +1721,8 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->ReflectanceModeling = MaterialNames(2);
-        if (!(UtilityRoutines::SameString(MaterialNames(2), "DoNotModel") || UtilityRoutines::SameString(MaterialNames(2), "ModelAsDirectBeam") ||
-              UtilityRoutines::SameString(MaterialNames(2), "ModelAsDiffuse"))) {
+        if (!(Util::SameString(MaterialNames(2), "DoNotModel") || Util::SameString(MaterialNames(2), "ModelAsDirectBeam") ||
+              Util::SameString(MaterialNames(2), "ModelAsDiffuse"))) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
             ShowContinueError(state,
@@ -2053,9 +2053,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->ROnly = true;
 
         state.dataMaterial->Blind(Loop).MaterialNumber = MaterNum;
-        if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
+        if (Util::SameString(MaterialNames(2), "Horizontal")) {
             state.dataMaterial->Blind(Loop).SlatOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
-        } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
+        } else if (Util::SameString(MaterialNames(2), "Vertical")) {
             state.dataMaterial->Blind(Loop).SlatOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
         }
         state.dataMaterial->Blind(Loop).SlatWidth = MaterialProps(1);
@@ -2102,7 +2102,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ShowContinueError(state, "This will allow direct beam to be transmitted when Slat angle = 0.");
         }
 
-        if (!UtilityRoutines::SameString(MaterialNames(2), "Horizontal") && !UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
+        if (!Util::SameString(MaterialNames(2), "Horizontal") && !Util::SameString(MaterialNames(2), "Vertical")) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value");
             ShowContinueError(state, state.dataIPShortCut->cAlphaFieldNames(2) + "=\"" + MaterialNames(2) + "\", must be Horizontal or Vertical.");
@@ -2341,9 +2341,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Roughness = SurfaceRoughness::Rough;
         thisMaterial->ROnly = true;
 
-        if (UtilityRoutines::SameString(MaterialNames(2), "Horizontal")) {
+        if (Util::SameString(MaterialNames(2), "Horizontal")) {
             thisMaterial->SlatOrientation = DataWindowEquivalentLayer::Orientation::Horizontal;
-        } else if (UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
+        } else if (Util::SameString(MaterialNames(2), "Vertical")) {
             thisMaterial->SlatOrientation = DataWindowEquivalentLayer::Orientation::Vertical;
         }
         thisMaterial->SlatWidth = MaterialProps(1);
@@ -2395,7 +2395,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->slatAngleType = SlatAngleType::FixedSlatAngle;
         if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             thisMaterial->slatAngleType =
-                static_cast<SlatAngleType>(getEnumerationValue(SlatAngleTypeUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
+                static_cast<SlatAngleType>(getEnumerationValue(SlatAngleTypeUC, Util::MakeUPPERCase(MaterialNames(3))));
         }
         if (thisMaterial->SlatWidth < thisMaterial->SlatSeparation) {
             ShowWarningError(state, format("{}=\"{}\", Slat Seperation/Width", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
@@ -2444,7 +2444,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             thisMaterial->SlatAngle = 0.0;
         }
 
-        if (!UtilityRoutines::SameString(MaterialNames(2), "Horizontal") && !UtilityRoutines::SameString(MaterialNames(2), "Vertical")) {
+        if (!Util::SameString(MaterialNames(2), "Horizontal") && !Util::SameString(MaterialNames(2), "Vertical")) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", Illegal value", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
             ShowContinueError(state,
@@ -2525,10 +2525,10 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // need to treat the A2 with is just the name of the soil(it is
         // not important)
         thisMaterial->Roughness =
-            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, UtilityRoutines::MakeUPPERCase(MaterialNames(3))));
-        if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
+            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, Util::MakeUPPERCase(MaterialNames(3))));
+        if (Util::SameString(MaterialNames(4), "Simple")) {
             thisMaterial->EcoRoofCalculationMethod = 1;
-        } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+        } else if (Util::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
             thisMaterial->EcoRoofCalculationMethod = 2;
         } else {
             ShowSevereError(state, format("{}=\"{}\", Illegal value", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
@@ -2599,7 +2599,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
+            if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBalMgr->CurrentModuleObject, ErrorsFound)) {
                 ShowContinueError(state, "...All Thermochromic Glazing names must be unique regardless of subtype.");
                 continue;
             }
@@ -2632,7 +2632,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 state.dataHeatBal->TCGlazings(Loop).LayerName(iTC) = state.dataIPShortCut->cAlphaArgs(1 + iTC);
 
                 // Find this glazing material in the material list
-                iMat = UtilityRoutines::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(1 + iTC), state.dataMaterial->Material);
+                iMat = Util::FindItemInPtrList(state.dataIPShortCut->cAlphaArgs(1 + iTC), state.dataMaterial->Material);
                 if (iMat != 0) {
                     // TC glazing
                     auto *thisMaterial = dynamic_cast<MaterialChild *>(state.dataMaterial->Material(iMat));
@@ -2818,7 +2818,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // Load the material derived type from the input data.
-        int MaterNum = UtilityRoutines::FindItemInPtrList(alphas(2), state.dataMaterial->Material);
+        int MaterNum = Util::FindItemInPtrList(alphas(2), state.dataMaterial->Material);
         if (MaterNum == 0) {
             ShowSevereError(state,
                             format("{}: invalid {} entered={}, must match to a valid Material name.",
@@ -2844,7 +2844,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 
         thisMaterial->absorpVarCtrlSignal = VariableAbsCtrlSignal::SurfaceTemperature; // default value
         thisMaterial->absorpVarCtrlSignal =
-            static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, UtilityRoutines::MakeUPPERCase(alphas(3))));
+            static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, Util::MakeUPPERCase(alphas(3))));
         //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
         thisMaterial->absorpThermalVarFuncIdx = Curve::GetCurveIndex(state, alphas(4));
         thisMaterial->absorpThermalVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));

@@ -105,7 +105,7 @@ namespace SplitterComponent {
 
         // Find the correct SplitterNumber
         if (CompIndex == 0) {
-            SplitterNum = UtilityRoutines::FindItemInList(CompName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
+            SplitterNum = Util::FindItemInList(CompName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
             if (SplitterNum == 0) {
                 ShowFatalError(state, format("SimAirLoopSplitter: Splitter not found={}", CompName));
             }
@@ -219,7 +219,7 @@ namespace SplitterComponent {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName = AlphArray(1);
             state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode =
@@ -614,7 +614,7 @@ namespace SplitterComponent {
 
         if (SplitterNum == 0) {
             WhichSplitter =
-                UtilityRoutines::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
+                Util::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
         } else {
             WhichSplitter = SplitterNum;
         }
@@ -665,7 +665,7 @@ namespace SplitterComponent {
 
         if (SplitterNum == 0) {
             WhichSplitter =
-                UtilityRoutines::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
+                Util::FindItemInList(SplitterName, state.dataSplitterComponent->SplitterCond, &SplitterConditions::SplitterName);
         } else {
             WhichSplitter = SplitterNum;
         }

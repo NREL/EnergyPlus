@@ -2771,7 +2771,7 @@ TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::UserCurve));
     curve = state->dataConvectionCoefficient->intAdaptiveConvAlgo
                 .intConvClassUserCurveNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
-    expected_curve = UtilityRoutines::FindItemInList("ASHRAE VERT DUPLICATE", state->dataConvectionCoefficient->hcIntUserCurve);
+    expected_curve = Util::FindItemInList("ASHRAE VERT DUPLICATE", state->dataConvectionCoefficient->hcIntUserCurve);
     ASSERT_EQ(curve, expected_curve);
 
     Convect::HcExt algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
@@ -2779,7 +2779,7 @@ TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::UserCurve));
     curve = state->dataConvectionCoefficient->extAdaptiveConvAlgo
                 .extConvClass2UserCurveNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
-    expected_curve = UtilityRoutines::FindItemInList("NUSSELTJURGESDUPCURVE", state->dataConvectionCoefficient->hcExtUserCurve);
+    expected_curve = Util::FindItemInList("NUSSELTJURGESDUPCURVE", state->dataConvectionCoefficient->hcExtUserCurve);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestCalcWindSurfaceTheta)

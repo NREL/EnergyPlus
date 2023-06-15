@@ -173,12 +173,12 @@ void GetExternalInterfaceInput(EnergyPlusData &state)
                                                                  _,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) { // The BCVTB interface is activated.
             ++state.dataExternalInterface->NumExternalInterfacesBCVTB;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1),
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1),
                                                "FunctionalMockupUnitImport")) { // The functional mock up unit import interface is activated.
             ++state.dataExternalInterface->NumExternalInterfacesFMUImport;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1),
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1),
                                                "FunctionalMockupUnitExport")) { // The functional mock up unit export interface is activated.
             ++state.dataExternalInterface->NumExternalInterfacesFMUExport;
         }
@@ -363,7 +363,7 @@ void ParseString(std::string const &str, // The string, with all elements separa
         } else { // Use rest of string
             iEnd = lenStr;
         }
-        ele(i) = UtilityRoutines::MakeUPPERCase(str.substr(iSta, iEnd - iSta - 1));
+        ele(i) = Util::MakeUPPERCase(str.substr(iSta, iEnd - iSta - 1));
     }
 }
 
@@ -1039,9 +1039,9 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
         // So this check that if I entered two different things and get the same end filename, then it's wrong?
         for (int j = 1; j <= state.dataExternalInterface->NumFMUObjects; ++j) {
             for (int k = 2; k <= state.dataExternalInterface->NumFMUObjects; ++k) {
-                if (!UtilityRoutines::SameString(strippedFileName(j), strippedFileName(k))) continue;
+                if (!Util::SameString(strippedFileName(j), strippedFileName(k))) continue;
                 // base file names are the same
-                if (UtilityRoutines::SameString(fullFileName(j), fullFileName(k))) continue;
+                if (Util::SameString(fullFileName(j), fullFileName(k))) continue;
                 ShowSevereError(state, "ExternalInterface/InitExternalInterfaceFMUImport:");
                 ShowContinueError(state, "duplicate file names (but not same file) entered.");
                 ShowContinueError(state, format("...entered file name=\"{}\"", state.dataExternalInterface->FMU(j).Name));
@@ -1083,10 +1083,10 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          _,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
                     std::string Name_NEW = state.dataIPShortCut->cAlphaArgs(4);
-                    if (!UtilityRoutines::SameString(Name_OLD, Name_NEW)) {
-                        int FOUND = UtilityRoutines::FindItem(Name_NEW, state.dataExternalInterface->checkInstanceName);
+                    if (!Util::SameString(Name_OLD, Name_NEW)) {
+                        int FOUND = Util::FindItem(Name_NEW, state.dataExternalInterface->checkInstanceName);
                         if (FOUND == 0) {
                             state.dataExternalInterface->checkInstanceName(l).Name = Name_NEW;
                             state.dataExternalInterface->FMU(i).NumInstances = j;
@@ -1289,8 +1289,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              _,
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
-                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
-                        UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                    if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
+                        Util::SameString(state.dataIPShortCut->cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
                         state.dataExternalInterface->FMU(i).Instance(j).fmuInputVariable(k).Name = state.dataIPShortCut->cAlphaArgs(5);
                         state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).VarKey = state.dataIPShortCut->cAlphaArgs(1);
                         state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).Name = state.dataIPShortCut->cAlphaArgs(2);
@@ -1301,7 +1301,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                  cCurrentModuleObject,
                                                                  state.dataExternalInterface->FMU(i).Instance(j).Name,
                                                                  state.dataExternalInterface->ErrorsFound);
-                        //                            UtilityRoutines::VerifyName( state.dataExternalInterface->FMU( i ).Instance( j
+                        //                            Util::VerifyName( state.dataExternalInterface->FMU( i ).Instance( j
                         //                            ).fmuInputVariable(
                         // k
                         //).Name,  state.dataExternalInterface->FMU(
@@ -1443,7 +1443,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          _,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name)) {
                     state.dataExternalInterface->FMU(i).TotNumOutputVariablesSchedule = j;
                     ++j;
                 }
@@ -1468,8 +1468,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              _,
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
-                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
-                        UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                    if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Name) &&
+                        Util::SameString(state.dataIPShortCut->cAlphaArgs(4), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableSchedule(k).Name = state.dataIPShortCut->cAlphaArgs(5);
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule(k).Name = state.dataIPShortCut->cAlphaArgs(1);
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableSchedule(k).InitialValue =
@@ -1559,7 +1559,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          _,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name)) {
                     state.dataExternalInterface->FMU(i).TotNumOutputVariablesVariable = j;
                     ++j;
                 }
@@ -1584,8 +1584,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              _,
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
-                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name) &&
-                        UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                    if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), state.dataExternalInterface->FMU(i).Name) &&
+                        Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableVariable(k).Name = state.dataIPShortCut->cAlphaArgs(4);
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableVariable(k).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -1672,7 +1672,7 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                          _,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name)) {
                     state.dataExternalInterface->FMU(i).TotNumOutputVariablesActuator = j;
                     ++j;
                 }
@@ -1697,8 +1697,8 @@ void InitExternalInterfaceFMUImport(EnergyPlusData &state)
                                                                              _,
                                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                                              state.dataIPShortCut->cNumericFieldNames);
-                    if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name) &&
-                        UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
+                    if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), state.dataExternalInterface->FMU(i).Name) &&
+                        Util::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataExternalInterface->FMU(i).Instance(j).Name)) {
                         state.dataExternalInterface->FMU(i).Instance(j).fmuOutputVariableActuator(k).Name = state.dataIPShortCut->cAlphaArgs(7);
                         state.dataExternalInterface->FMU(i).Instance(j).eplusInputVariableActuator(k).Name = state.dataIPShortCut->cAlphaArgs(1);
 
@@ -2483,9 +2483,9 @@ void VerifyExternalInterfaceObject(EnergyPlusData &state)
                                                              _,
                                                              state.dataIPShortCut->cAlphaFieldNames,
                                                              state.dataIPShortCut->cNumericFieldNames);
-    if ((!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) &&
-        (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "FunctionalMockupUnitImport")) &&
-        (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), "FunctionalMockupUnitExport"))) {
+    if ((!Util::SameString(state.dataIPShortCut->cAlphaArgs(1), "PtolemyServer")) &&
+        (!Util::SameString(state.dataIPShortCut->cAlphaArgs(1), "FunctionalMockupUnitImport")) &&
+        (!Util::SameString(state.dataIPShortCut->cAlphaArgs(1), "FunctionalMockupUnitExport"))) {
         ShowSevereError(state,
                         format("VerifyExternalInterfaceObject: {}, invalid {}=\"{}\".",
                                cCurrentModuleObject,

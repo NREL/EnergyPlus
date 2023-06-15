@@ -206,9 +206,9 @@ namespace ExteriorEnergyUse {
             }
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "ScheduleNameOnly")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::ScheduleOnly;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "AstronomicalClock")) {
                 state.dataExteriorEnergyUse->ExteriorLights(Item).ControlMode = ExteriorEnergyUse::LightControlType::AstroClockOverride;
             } else {
                 ShowSevereError(state,
@@ -597,46 +597,46 @@ namespace ExteriorEnergyUse {
         FuelTypeString = "";
 
         // Select the correct Number for the associated ascii name for the fuel type
-        if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity")) {
+        if (Util::SameString(FuelTypeAlpha, "Electricity")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::ElecUse;
             FuelTypeString = "Electricity";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "NaturalGas")) {
+        } else if (Util::SameString(FuelTypeAlpha, "NaturalGas")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::GasUse;
             FuelTypeString = "NaturalGas";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Coal")) {
+        } else if (Util::SameString(FuelTypeAlpha, "Coal")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::CoalUse;
             FuelTypeString = "Coal";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo1")) {
+        } else if (Util::SameString(FuelTypeAlpha, "FuelOilNo1")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::FuelOil1Use;
             FuelTypeString = "FuelOilNo1";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
+        } else if (Util::SameString(FuelTypeAlpha, "Propane")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse;
             FuelTypeString = "Propane";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Gasoline")) {
+        } else if (Util::SameString(FuelTypeAlpha, "Gasoline")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::GasolineUse;
             FuelTypeString = "Gasoline";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Diesel")) {
+        } else if (Util::SameString(FuelTypeAlpha, "Diesel")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DieselUse;
             FuelTypeString = "Diesel";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo2")) {
+        } else if (Util::SameString(FuelTypeAlpha, "FuelOilNo2")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use;
             FuelTypeString = "FuelOilNo2";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {
+        } else if (Util::SameString(FuelTypeAlpha, "OtherFuel1")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use;
             FuelTypeString = "OtherFuel1";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel2")) {
+        } else if (Util::SameString(FuelTypeAlpha, "OtherFuel2")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use;
             FuelTypeString = "OtherFuel2";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Water")) {
+        } else if (Util::SameString(FuelTypeAlpha, "Water")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::WaterUse;
             FuelTypeString = "Water";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Steam")) {
+        } else if (Util::SameString(FuelTypeAlpha, "Steam")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::SteamUse;
             FuelTypeString = "Steam";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictCooling")) {
+        } else if (Util::SameString(FuelTypeAlpha, "DistrictCooling")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictCoolUse;
             FuelTypeString = "DistrictCooling";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeating")) {
+        } else if (Util::SameString(FuelTypeAlpha, "DistrictHeating")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatUse;
             FuelTypeString = "DistrictHeating";
         } else {

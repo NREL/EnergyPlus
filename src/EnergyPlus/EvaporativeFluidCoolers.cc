@@ -277,7 +277,7 @@ namespace EvaporativeFluidCoolers {
                 thisEFC.capacityControl = CapacityControl::FanCycling; // FanCycling
             } else {
                 thisEFC.capacityControl =
-                    static_cast<CapacityControl>(getEnumerationValue(controlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+                    static_cast<CapacityControl>(getEnumerationValue(controlNamesUC, Util::MakeUPPERCase(AlphArray(6))));
                 if (thisEFC.capacityControl == CapacityControl::Invalid) {
                     thisEFC.capacityControl = CapacityControl::FanCycling;
                     ShowWarningError(state,
@@ -293,7 +293,7 @@ namespace EvaporativeFluidCoolers {
             if (AlphArray(7).empty()) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, Util::MakeUPPERCase(AlphArray(7))));
                 if (thisEFC.EvapLossMode == EvapLoss::Invalid) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
                     ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -328,7 +328,7 @@ namespace EvaporativeFluidCoolers {
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(8))));
+                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, Util::MakeUPPERCase(AlphArray(8))));
                 if (thisEFC.BlowdownMode == Blowdown::Invalid) {
                     ShowSevereError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
                     ShowContinueError(state, format("Entered in {} ={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -387,7 +387,7 @@ namespace EvaporativeFluidCoolers {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
+            if (Util::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
                 if (thisEFC.HighSpeedEvapFluidCoolerUA <= 0.0 && thisEFC.HighSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
                     ShowSevereError(state,
@@ -409,7 +409,7 @@ namespace EvaporativeFluidCoolers {
                                            AlphArray(4)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
+            } else if (Util::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (thisEFC.HighSpeedStandardDesignCapacity <= 0.0) {
                     ShowSevereError(state,
@@ -421,7 +421,7 @@ namespace EvaporativeFluidCoolers {
                                            AlphArray(4)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
+            } else if (Util::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UserSpecifiedDesignCapacity;
                 if (thisEFC.DesignWaterFlowRate <= 0.0 && thisEFC.DesignWaterFlowRate != DataSizing::AutoSize) {
                     ShowSevereError(state,
@@ -634,7 +634,7 @@ namespace EvaporativeFluidCoolers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(6)) {
                 thisEFC.EvapLossMode = EvapLoss::ByMoistTheory;
             } else {
-                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+                thisEFC.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(evapLossNamesUC, Util::MakeUPPERCase(AlphArray(6))));
                 if (thisEFC.EvapLossMode == EvapLoss::Invalid) {
                     ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(6), AlphArray(6)));
                     ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -668,7 +668,7 @@ namespace EvaporativeFluidCoolers {
                     thisEFC.ConcentrationRatio = 3.0;
                 }
             } else {
-                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+                thisEFC.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(blowDownNamesUC, Util::MakeUPPERCase(AlphArray(7))));
                 if (thisEFC.BlowdownMode == Blowdown::Invalid) {
                     ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(7), AlphArray(7)));
                     ShowContinueError(state, format("Entered in {} = {}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -761,7 +761,7 @@ namespace EvaporativeFluidCoolers {
                 ErrorsFound = true;
             }
 
-            if (UtilityRoutines::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
+            if (Util::SameString(AlphArray(4), "UFACTORTIMESAREAANDDESIGNWATERFLOWRATE")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UFactor;
                 if (thisEFC.HighSpeedEvapFluidCoolerUA <= 0.0 && thisEFC.HighSpeedEvapFluidCoolerUA != DataSizing::AutoSize) {
                     ShowSevereError(state,
@@ -802,7 +802,7 @@ namespace EvaporativeFluidCoolers {
                                            AlphArray(4)));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
+            } else if (Util::SameString(AlphArray(4), "STANDARDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (thisEFC.HighSpeedStandardDesignCapacity <= 0.0) {
                     ShowSevereError(state,
@@ -832,7 +832,7 @@ namespace EvaporativeFluidCoolers {
                                thisEFC.Name));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
+            } else if (Util::SameString(AlphArray(4), "USERSPECIFIEDDESIGNCAPACITY")) {
                 thisEFC.PerformanceInputMethod_Num = PIM::UserSpecifiedDesignCapacity;
                 if (thisEFC.DesignWaterFlowRate <= 0.0 && thisEFC.DesignWaterFlowRate != DataSizing::AutoSize) {
                     ShowSevereError(state,
@@ -2777,7 +2777,7 @@ namespace EvaporativeFluidCoolers {
             this->FluidIndex = state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).FluidIndex;
             std::string FluidName = FluidProperties::GetGlycolNameByIndex(state, this->FluidIndex);
 
-            if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
+            if (Util::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
                 this->PerformanceInputMethod_Num = PIM::StandardDesignCapacity;
                 if (FluidName != "WATER") {
                     ShowSevereError(state,

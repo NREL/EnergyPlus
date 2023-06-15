@@ -1542,13 +1542,13 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    int zoneNodeNum = UtilityRoutines::FindItemInList("ZSF1 NODE", state->dataLoopNodes->NodeID);
+    int zoneNodeNum = Util::FindItemInList("ZSF1 NODE", state->dataLoopNodes->NodeID);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = zoneNodeNum;
-    int inletNodeNum = UtilityRoutines::FindItemInList("ZSF1 INLET NODE", state->dataLoopNodes->NodeID);
+    int inletNodeNum = Util::FindItemInList("ZSF1 INLET NODE", state->dataLoopNodes->NodeID);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = inletNodeNum;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    int coolSPNodeNum = UtilityRoutines::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", state->dataLoopNodes->NodeID);
-    int heatSPNodeNum = UtilityRoutines::FindItemInList("AIR LOOP 1 OUTLET NODE", state->dataLoopNodes->NodeID);
+    int coolSPNodeNum = Util::FindItemInList("ZONE EQUIPMENT 1 INLET NODE", state->dataLoopNodes->NodeID);
+    int heatSPNodeNum = Util::FindItemInList("AIR LOOP 1 OUTLET NODE", state->dataLoopNodes->NodeID);
 
     auto &zoneNode(state->dataLoopNodes->Node(zoneNodeNum));
     auto &inletNode(state->dataLoopNodes->Node(inletNodeNum));

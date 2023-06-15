@@ -275,7 +275,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
                 if (!foundInFromGridTransformer) {
                     foundInFromGridTransformer = true;
                     facilityPowerInTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
@@ -293,7 +293,7 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                                       "Only one transformer with Usage PowerInFromGrid can be used, first one in input file will be used and the "
                                       "simulation continues...");
                 }
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerOutToGrid")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerOutToGrid")) {
                 if (powerOutTransformerObj_ == nullptr) {
                     ++numPowerOutTransformers_;
                     powerOutTransformerName_ = state.dataIPShortCut->cAlphaArgs(1);
@@ -734,19 +734,19 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             // Load the Generator Control Operation Scheme
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Baseload")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "Baseload")) {
                 genOperationScheme_ = GeneratorOpScheme::BaseLoad;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "DemandLimit")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "DemandLimit")) {
                 genOperationScheme_ = GeneratorOpScheme::DemandLimit;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackElectrical")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackElectrical")) {
                 genOperationScheme_ = GeneratorOpScheme::TrackElectrical;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackSchedule")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackSchedule")) {
                 genOperationScheme_ = GeneratorOpScheme::TrackSchedule;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackMeter")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "TrackMeter")) {
                 genOperationScheme_ = GeneratorOpScheme::TrackMeter;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FollowThermal")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "FollowThermal")) {
                 genOperationScheme_ = GeneratorOpScheme::ThermalFollow;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FollowThermalLimitElectrical")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "FollowThermalLimitElectrical")) {
                 genOperationScheme_ = GeneratorOpScheme::ThermalFollowLimitElectrical;
             } else {
                 ShowSevereError(
@@ -779,26 +779,26 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             errorsFound = true;
         }
 
-        demandMeterName_ = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5));
+        demandMeterName_ = Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5));
         // meters may not be "loaded" yet, defered check to later subroutine
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrent")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrent")) {
             bussType = ElectricBussType::ACBuss;
             state.dataIPShortCut->cAlphaArgs(6) = "AlternatingCurrent";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverter")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverter")) {
             bussType = ElectricBussType::DCBussInverter;
             inverterPresent = true;
             state.dataIPShortCut->cAlphaArgs(6) = "DirectCurrentWithInverter";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrentWithStorage")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrentWithStorage")) {
             bussType = ElectricBussType::ACBussStorage;
             storagePresent_ = true;
             state.dataIPShortCut->cAlphaArgs(6) = "AlternatingCurrentWithStorage";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverterDCStorage")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverterDCStorage")) {
             bussType = ElectricBussType::DCBussInverterDCStorage;
             inverterPresent = true;
             storagePresent_ = true;
             state.dataIPShortCut->cAlphaArgs(6) = "DirectCurrentWithInverterDCStorage";
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverterACStorage")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "DirectCurrentWithInverterACStorage")) {
             bussType = ElectricBussType::DCBussInverterACStorage;
             inverterPresent = true;
             storagePresent_ = true;
@@ -851,13 +851,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
         // Begin new content for grid supply and more control over storage
         // user selected storage operation scheme
         if (!state.dataIPShortCut->lAlphaFieldBlanks(10)) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackFacilityElectricDemandStoreExcessOnSite")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackFacilityElectricDemandStoreExcessOnSite")) {
                 storageScheme_ = StorageOpScheme::FacilityDemandStoreExcessOnSite;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackMeterDemandStoreExcessOnSite")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackMeterDemandStoreExcessOnSite")) {
                 storageScheme_ = StorageOpScheme::MeterDemandStoreExcessOnSite;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackChargeDischargeSchedules")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "TrackChargeDischargeSchedules")) {
                 storageScheme_ = StorageOpScheme::ChargeDischargeSchedules;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(10), "FacilityDemandLeveling")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(10), "FacilityDemandLeveling")) {
                 storageScheme_ = StorageOpScheme::FacilityDemandLeveling;
             } else {
                 ShowSevereError(
@@ -1106,7 +1106,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3),
                                             "LoadCenterPowerConditioning")) { // this is the right kind of transformer
                 transformerObj = std::make_unique<ElectricTransformer>(state, transformerName_);
             } else {
@@ -2182,7 +2182,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     name = objectName;
 
-    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypeNamesUC, UtilityRoutines::MakeUPPERCase(objectType)));
+    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypeNamesUC, Util::MakeUPPERCase(objectType)));
     switch (generatorType) {
     case GeneratorType::ICEngine: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
@@ -2208,7 +2208,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
         int ObjNum =
-            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(objectName));
+            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", Util::MakeUPPERCase(objectName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
             ShowFatalError(state, format("Cannot find Generator:PVWatts {}", objectName));
@@ -2264,14 +2264,14 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                 // Note: you can't use state.dataIPShortCut->cAlphaArgs etc or it'll override what will still need to be processed in
                 // ElectPowerLoadCenter::ElectPowerLoadCenter after this function is called
                 int PVNum =
-                    state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::MakeUPPERCase(objectName));
+                    state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, Util::MakeUPPERCase(objectName));
                 int NumAlphas; // Number of PV Array parameter alpha names being passed
                 int NumNums;   // Number of PV Array numeric parameters are being passed
                 int IOStat;
                 Array1D_string Alphas(5);   // Alpha items for object
                 Array1D<Real64> Numbers(2); // Numeric items for object
                 state.dataInputProcessing->inputProcessor->getObjectItem(state, objectType, PVNum, Alphas, NumAlphas, Numbers, NumNums, IOStat);
-                if (UtilityRoutines::SameString(Alphas(3), "PhotovoltaicPerformance:Simple")) {
+                if (Util::SameString(Alphas(3), "PhotovoltaicPerformance:Simple")) {
                     ShowWarningError(state,
                                      format("{}{}, Availability Schedule for Generator:Photovoltaics '{}' of Type PhotovoltaicPerformance:Simple "
                                             "will be be ignored (runs all the time).",
@@ -2551,7 +2551,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                 }
             }
 
-            zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            zoneNum_ = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::ZoneGains;
             if (zoneNum_ == 0) {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -3024,9 +3024,9 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
             }
         }
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "SimpleFixed")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "SimpleFixed")) {
             modelType_ = ConverterModelType::SimpleConstantEff;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "FunctionOfPower")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "FunctionOfPower")) {
             modelType_ = ConverterModelType::CurveFuncOfPower;
         } else {
             ShowSevereError(
@@ -3066,7 +3066,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 
         standbyPower_ = state.dataIPShortCut->rNumericArgs(3);
 
-        zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
+        zoneNum_ = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::ZoneGains;
         if (zoneNum_ == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
@@ -3369,7 +3369,7 @@ ElectricStorage::ElectricStorage( // main constructor
             }
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+        zoneNum_ = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::ZoneGains;
         if (zoneNum_ == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -3456,9 +3456,9 @@ ElectricStorage::ElectricStorage( // main constructor
                                                      state.dataIPShortCut->cAlphaFieldNames(5)); // Field Name
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "Yes")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "Yes")) {
                 lifeCalculation_ = BatteryDegradationModelType::LifeCalculationYes;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "No")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "No")) {
                 lifeCalculation_ = BatteryDegradationModelType::LifeCalculationNo;
             } else {
                 ShowWarningError(
@@ -3529,7 +3529,7 @@ ElectricStorage::ElectricStorage( // main constructor
             break;
         }
         case StorageModelType::LiIonNmcBattery: {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(4), "KandlerSmith") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(4), "KandlerSmith") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
                 lifeCalculation_ = BatteryDegradationModelType::LifeCalculationYes;
             } else {
                 lifeCalculation_ = BatteryDegradationModelType::LifeCalculationNo;
@@ -3816,7 +3816,7 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
     Real64 constexpr minDischargeEfficiency = 0.001;
 
     // Fix for Defect #8867.  Do not allow either efficiency to be zero as it will lead to a divide by zero (NaN).
-    if (UtilityRoutines::SameString(whichType, "CHARGING")) {
+    if (Util::SameString(whichType, "CHARGING")) {
         if (userInputValue < minChargeEfficiency) {
             ShowSevereError(state,
                             format("ElectricStorage charge efficiency was too low.  This occurred for electric storage unit named {}", deviceName));
@@ -3826,7 +3826,7 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
         } else {
             return userInputValue;
         }
-    } else if (UtilityRoutines::SameString(whichType, "DISCHARGING")) {
+    } else if (Util::SameString(whichType, "DISCHARGING")) {
         if (userInputValue < minDischargeEfficiency) {
             ShowSevereError(
                 state, format("ElectricStorage discharge efficiency was too low.  This occurred for electric storage unit named {}", deviceName));
@@ -4691,11 +4691,11 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
 
         if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
             usageMode_ = TransformerUse::PowerInFromGrid; // default
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerInFromGrid")) {
             usageMode_ = TransformerUse::PowerInFromGrid;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerOutToGrid")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "PowerOutToGrid")) {
             usageMode_ = TransformerUse::PowerOutFromBldgToGrid;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "LoadCenterPowerConditioning")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "LoadCenterPowerConditioning")) {
             usageMode_ = TransformerUse::PowerBetweenLoadCenterAndBldg;
 
         } else {
@@ -4706,7 +4706,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             errorsFound = true;
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->Zone);
+        zoneNum_ = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::ZoneGains;
         if (zoneNum_ == 0) {
             if (state.dataIPShortCut->lAlphaFieldBlanks(4)) {
@@ -4726,9 +4726,9 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         ratedCapacity_ = state.dataIPShortCut->rNumericArgs(2);
         phase_ = state.dataIPShortCut->rNumericArgs(3);
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Copper")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "Copper")) {
             factorTempCoeff_ = 234.5;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Aluminum")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "Aluminum")) {
             factorTempCoeff_ = 225.0;
         } else {
             ShowSevereError(
@@ -4740,9 +4740,9 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
         tempRise_ = state.dataIPShortCut->rNumericArgs(4);
         eddyFrac_ = state.dataIPShortCut->rNumericArgs(5);
 
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "RatedLosses")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "RatedLosses")) {
             performanceInputMode_ = TransformerPerformanceInput::LossesMethod;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "NominalEfficiency")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "NominalEfficiency")) {
             performanceInputMode_ = TransformerPerformanceInput::EfficiencyMethod;
         } else {
             ShowSevereError(
@@ -4782,9 +4782,9 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                 errorsFound = true;
             }
         }
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
             considerLosses_ = true;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
             considerLosses_ = false;
         } else {
             if (usageMode_ == TransformerUse::PowerInFromGrid) {
@@ -4814,10 +4814,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
 
             // Meter check deferred because they may have not been "loaded" yet,
             for (int loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
-                wiredMeterNames_[loopCount] = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
+                wiredMeterNames_[loopCount] = Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
                 // Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
-                if (UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:Facility") ||
-                    UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:HVAC")) {
+                if (Util::SameString(wiredMeterNames_[loopCount], "Electricity:Facility") ||
+                    Util::SameString(wiredMeterNames_[loopCount], "Electricity:HVAC")) {
                     specialMeter_[loopCount] = true;
                 } else {
                     specialMeter_[loopCount] = false;

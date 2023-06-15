@@ -7105,11 +7105,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     // default surface view factors
-    int SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
     auto &Surface_Living_North = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
     auto &Surface_Living_East = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
     auto &Surface_Living_South = state->dataSurface->Surface(SurfNum);
 
     // check exterior default surfaces sky and ground view factors
@@ -7385,12 +7385,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property object inputs
-    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    int SrdSurfsNum = Util::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
-    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    int GndSurfsNum = Util::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
     // set local derived data vars
-    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
@@ -7706,12 +7706,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageRefl)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
     // test surface property object inputs
-    int SrdSurfsNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    int SrdSurfsNum = Util::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(SrdSurfsNum).SurroundingSurfsPtr);
-    int GndSurfsNum = UtilityRoutines::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
+    int GndSurfsNum = Util::FindItemInList("GNDSURFS:FENESSURFACE", state->dataSurface->GroundSurfsProperty);
     EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(GndSurfsNum).GroundSurfsPtr);
     // set local derived data vars
-    int SurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
@@ -8348,11 +8348,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     state->dataSurface->SurfTAirRef(3) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
 
     // check default surface view factors
-    int SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    int SurfNum = Util::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
     auto &Surface_Living_North = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
     auto &Surface_Living_East = state->dataSurface->Surface(SurfNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
     auto &Surface_Living_South = state->dataSurface->Surface(SurfNum);
     // check exterior default surfaces sky and ground view factors
     EXPECT_DOUBLE_EQ(0.5, Surface_Living_North.ViewFactorSkyIR);
@@ -8363,17 +8363,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyViewFactorsR
     EXPECT_DOUBLE_EQ(0.5, Surface_Living_South.ViewFactorGroundIR);
 
     // set local derived data vars
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:NORTH", state->dataSurface->Surface);
     int SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty_1 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     int GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
     auto &GndSurfsProperty_1 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:EAST", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty_2 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;
     auto &GndSurfsProperty_2 = state->dataSurface->GroundSurfsProperty(GndSurfsNum);
-    SurfNum = UtilityRoutines::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
+    SurfNum = Util::FindItemInList("LIVING:SOUTH", state->dataSurface->Surface);
     SrdSurfsNum = state->dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
     auto &SrdSurfsProperty_3 = state->dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
     GndSurfsNum = state->dataSurface->Surface(SurfNum).SurfPropertyGndSurfIndex;

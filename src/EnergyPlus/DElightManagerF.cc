@@ -274,7 +274,7 @@ namespace DElightManagerF {
 
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
             if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
-                int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
+                int const izone = Util::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 
                     rLightLevel = GetDesignLightingLevelForZone(state, izone);
@@ -742,7 +742,7 @@ namespace DElightManagerF {
             cfs.Name = state.dataIPShortCut->cAlphaArgs(1);
             cfs.ComplexFeneType = state.dataIPShortCut->cAlphaArgs(2);
             cfs.surfName = state.dataIPShortCut->cAlphaArgs(3);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+            if (Util::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state,
                                 format("{}{}",
                                        cCurrentModuleObject,
@@ -750,7 +750,7 @@ namespace DElightManagerF {
                 ErrorsFound = true;
             }
             cfs.wndwName = state.dataIPShortCut->cAlphaArgs(4);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
+            if (Util::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state,
                                 format("{}{}",
                                        cCurrentModuleObject,
@@ -836,7 +836,7 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
+        //       MODIFIED       From Util::MakeUPPERCase( function by Linda K. Lawrie
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:

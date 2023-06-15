@@ -885,10 +885,10 @@ namespace SimulationManager {
         if (NumDebugOut > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state, CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
             if (NumAlpha >= 1) {
-                state.dataReportFlag->DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
+                state.dataReportFlag->DebugOutput = Util::SameString(Alphas(1), "Yes");
             }
             if (NumAlpha >= 2) {
-                state.dataReportFlag->EvenDuringWarmup = UtilityRoutines::SameString(Alphas(2), "Yes");
+                state.dataReportFlag->EvenDuringWarmup = Util::SameString(Alphas(2), "Yes");
             }
         }
 
@@ -923,47 +923,47 @@ namespace SimulationManager {
                             }
                             std::string diagnosticName = it->get<std::string>();
 
-                            if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
+                            if (Util::SameString(diagnosticName, "DisplayExtraWarnings")) {
                                 state.dataGlobal->DisplayExtraWarnings = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
+                            } else if (Util::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
                                 state.dataGlobal->DisplayAdvancedReportVariables = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAllWarnings")) {
+                            } else if (Util::SameString(diagnosticName, "DisplayAllWarnings")) {
                                 state.dataGlobal->DisplayAllWarnings = true;
                                 state.dataGlobal->DisplayExtraWarnings = true;
                                 state.dataGlobal->DisplayUnusedObjects = true;
                                 state.dataGlobal->DisplayUnusedSchedules = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedObjects")) {
+                            } else if (Util::SameString(diagnosticName, "DisplayUnusedObjects")) {
                                 state.dataGlobal->DisplayUnusedObjects = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedSchedules")) {
+                            } else if (Util::SameString(diagnosticName, "DisplayUnusedSchedules")) {
                                 state.dataGlobal->DisplayUnusedSchedules = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
+                            } else if (Util::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
                                 state.dataGlobal->DisplayZoneAirHeatBalanceOffBalance = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
+                            } else if (Util::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
                                 state.dataReportFlag->MakeMirroredDetachedShading = false;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
+                            } else if (Util::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
                                 state.dataReportFlag->MakeMirroredAttachedShading = false;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
+                            } else if (Util::SameString(diagnosticName, "ReportDuringWarmup")) {
                                 state.dataSysVars->ReportDuringWarmup = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
+                            } else if (Util::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
                                 state.dataEnvrn->DisplayWeatherMissingDataWarnings = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
+                            } else if (Util::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
                                 state.dataEnvrn->IgnoreSolarRadiation = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
+                            } else if (Util::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
                                 state.dataEnvrn->IgnoreBeamRadiation = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
+                            } else if (Util::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
                                 state.dataEnvrn->IgnoreDiffuseRadiation = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
+                            } else if (Util::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
                                 state.dataSysVars->DeveloperFlag = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
+                            } else if (Util::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
                                 state.dataSysVars->TimingFlag = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDetailedWarmupConvergence")) {
+                            } else if (Util::SameString(diagnosticName, "ReportDetailedWarmupConvergence")) {
                                 state.dataSysVars->ReportDetailedWarmupConvergence = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringHVACSizingSimulation")) {
+                            } else if (Util::SameString(diagnosticName, "ReportDuringHVACSizingSimulation")) {
                                 state.dataSysVars->ReportDuringHVACSizingSimulation = true;
-                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateMinimalSurfaceVariables")) { // TODO: Not a valid key choice
+                            } else if (Util::SameString(diagnosticName, "CreateMinimalSurfaceVariables")) { // TODO: Not a valid key choice
                                 continue;
                                 //        CreateMinimalSurfaceVariables=.TRUE.
-                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateNormalSurfaceVariables")) { // TODO: Not a valid key choice
+                            } else if (Util::SameString(diagnosticName, "CreateNormalSurfaceVariables")) { // TODO: Not a valid key choice
                                 continue;
                                 //        IF (CreateMinimalSurfaceVariables) THEN
                                 //          CALL ShowWarningError(state, 'GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
@@ -1075,15 +1075,15 @@ namespace SimulationManager {
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     state.dataGlobal->DoCoilDirectSolutions =
-                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
+                        Util::MakeUPPERCase(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
+                        Util::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
                 }
                 if (fields.find("use_representative_surfaces_for_calculations") != fields.end()) {
                     state.dataSurface->UseRepresentativeSurfaceCalculations =
-                        UtilityRoutines::MakeUPPERCase(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
+                        Util::MakeUPPERCase(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
@@ -1095,7 +1095,7 @@ namespace SimulationManager {
                 bool overridePsychTsatFnPb(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
-                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode").get<std::string>());
+                    overrideModeValue = Util::MakeUPPERCase(fields.at("override_mode").get<std::string>());
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     } else if (overrideModeValue == "MODE01") {
@@ -1380,22 +1380,22 @@ namespace SimulationManager {
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
-        UtilityRoutines::appendPerfLog(state,
+        Util::appendPerfLog(state,
                                        "Program, Version, TimeStamp",
                                        state.dataStrGlobals->VerStringVar); // this string already includes three portions and has commas
-        UtilityRoutines::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
+        Util::appendPerfLog(state, "Use Coil Direct Solution", bool_to_string(state.dataGlobal->DoCoilDirectSolutions));
         if (state.dataHeatBalIntRadExchg->CarrollMethod) {
-            UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");
+            Util::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
-            UtilityRoutines::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "ScriptF");
+            Util::appendPerfLog(state, "Zone Radiant Exchange Algorithm", "ScriptF");
         }
-        UtilityRoutines::appendPerfLog(state, "Override Mode", currentOverrideModeValue);
-        UtilityRoutines::appendPerfLog(state, "Number of Timesteps per Hour", fmt::to_string(state.dataGlobal->NumOfTimeStepInHour));
-        UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(state.dataHeatBal->MinNumberOfWarmupDays));
-        UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(state.dataEnvrn->forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0));
-        UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", state.dataConvergeParams->MaxZoneTempDiff));
-        UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", state.dataHeatBal->MaxAllowedDelTemp));
+        Util::appendPerfLog(state, "Override Mode", currentOverrideModeValue);
+        Util::appendPerfLog(state, "Number of Timesteps per Hour", fmt::to_string(state.dataGlobal->NumOfTimeStepInHour));
+        Util::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(state.dataHeatBal->MinNumberOfWarmupDays));
+        Util::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(state.dataEnvrn->forceBeginEnvResetSuppress));
+        Util::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0));
+        Util::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", state.dataConvergeParams->MaxZoneTempDiff));
+        Util::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", state.dataHeatBal->MaxAllowedDelTemp));
     }
 
     std::string bool_to_string(bool logical)

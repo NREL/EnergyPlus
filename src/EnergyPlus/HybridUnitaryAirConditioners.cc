@@ -97,7 +97,7 @@ void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     }
 
     if (CompIndex == 0) {
-        CompNum = UtilityRoutines::FindItemInList(CompName, state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner);
+        CompNum = Util::FindItemInList(CompName, state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner);
         if (CompNum == 0) {
             ShowFatalError(state, "SimZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC not found.");
         }
@@ -506,7 +506,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
 
             IsNotOK = false;
             IsBlank = false;
-            UtilityRoutines::VerifyName(state,
+            Util::VerifyName(state,
                                         Alphas(1),
                                         state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
                                         UnitLoop - 1,
@@ -629,9 +629,9 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // A13, \field Fan Heat Included in Lookup Tables
             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = false;
             if (!lAlphaBlanks(13)) {
-                if (UtilityRoutines::SameString(Alphas(13), "Yes")) {
+                if (Util::SameString(Alphas(13), "Yes")) {
                     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = false;
-                } else if (UtilityRoutines::SameString(Alphas(13), "No")) {
+                } else if (Util::SameString(Alphas(13), "No")) {
                     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).FanHeatGain = true;
                 } else {
                     ShowSevereError(
@@ -672,7 +672,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // A19, \ OA requirement pointer
             if (!lAlphaBlanks(19)) {
                 state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr =
-                    UtilityRoutines::FindItemInList(Alphas(19), state.dataSize->OARequirements);
+                    Util::FindItemInList(Alphas(19), state.dataSize->OARequirements);
                 if (state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
                     ShowSevereError(state, format("{}{} = {} invalid data", RoutineName, cCurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("Invalid-not found {}=\"{}\".", cAlphaFields(19), Alphas(19)));

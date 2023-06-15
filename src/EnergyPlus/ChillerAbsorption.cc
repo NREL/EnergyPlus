@@ -342,10 +342,10 @@ void GetBLASTAbsorberInput(EnergyPlusData &state)
                                            "Condenser (not tested) Nodes");
 
         if (NumAlphas > 8) {
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater") ||
-                UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater") ||
+                Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "HotWater")) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) ||
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), fluidNameSteam) ||
                        state.dataIPShortCut->cAlphaArgs(9).empty()) {
                 thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             } else {

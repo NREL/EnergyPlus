@@ -144,7 +144,7 @@ void SimEvapCooler(EnergyPlusData &state, std::string_view CompName, int &CompIn
 
     // Find the correct EvapCoolNumber
     if (CompIndex == 0) {
-        EvapCoolNum = UtilityRoutines::FindItemInList(CompName, EvapCond, &EvapConditions::Name);
+        EvapCoolNum = Util::FindItemInList(CompName, EvapCond, &EvapConditions::Name);
         if (EvapCoolNum == 0) {
             ShowFatalError(state, format("SimEvapCooler: Unit not found={}", CompName));
         }
@@ -1228,7 +1228,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
             for (int BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                  ++BranchComp) {
 
-                if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                if (Util::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
                                                 thisEvapCond.Name)) {
                     CoolerOnMainAirLoop = true;
                 }
@@ -1540,7 +1540,7 @@ void SizeEvapCooler(EnergyPlusData &state, int const EvapCoolNum)
                 for (int BranchComp = 1;
                      BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents;
                      ++BranchComp) {
-                    if (UtilityRoutines::SameString(
+                    if (Util::SameString(
                             state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
                             thisEvapCond.Name)) {
                         CoolerOnMainAirLoop = true;
@@ -3325,7 +3325,7 @@ void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     // Find the correct Equipment
     if (CompIndex == 0) {
-        CompNum = UtilityRoutines::FindItemInList(CompName, ZoneEvapUnit);
+        CompNum = Util::FindItemInList(CompName, ZoneEvapUnit);
         if (CompNum == 0) {
             ShowFatalError(state, "SimZoneEvaporativeCoolerUnit: Zone evaporative cooler unit not found.");
         }
@@ -3481,7 +3481,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             thisZoneEvapUnit.FanObjectClassName = Alphas(7);
             thisZoneEvapUnit.FanName = Alphas(8);
             bool errFlag = false;
-            if (!UtilityRoutines::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
+            if (!Util::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
                 Fans::GetFanType(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanType_Num, errFlag, CurrentModuleObject, thisZoneEvapUnit.Name);
                 Fans::GetFanIndex(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanIndex, errFlag, CurrentModuleObject);
                 thisZoneEvapUnit.FanInletNodeNum =
@@ -3497,7 +3497,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                     ShowContinueError(state, format("...specified in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
+            } else if (Util::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
 
                 thisZoneEvapUnit.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisZoneEvapUnit.FanName)); // call constructor
@@ -3561,7 +3561,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             }
 
             thisZoneEvapUnit.EvapCooler_1_Name = Alphas(12);
-            thisZoneEvapUnit.EvapCooler_1_Index = UtilityRoutines::FindItemInList(Alphas(12), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
+            thisZoneEvapUnit.EvapCooler_1_Index = Util::FindItemInList(Alphas(12), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
             if (thisZoneEvapUnit.EvapCooler_1_Index == 0) {
                 ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                 ShowContinueError(state, format("invalid, not found {}=\"{}\".", cAlphaFields(12), Alphas(12)));
@@ -3581,7 +3581,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                 if (!lAlphaBlanks(14)) {
                     thisZoneEvapUnit.EvapCooler_2_Name = Alphas(14);
                     thisZoneEvapUnit.EvapCooler_2_Index =
-                        UtilityRoutines::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
+                        Util::FindItemInList(Alphas(14), state.dataEvapCoolers->EvapCond, &EvapConditions::Name);
                     if (thisZoneEvapUnit.EvapCooler_2_Index == 0) {
                         ShowSevereError(state, format("{}=\"{}\" invalid data.", CurrentModuleObject, thisZoneEvapUnit.Name));
                         ShowContinueError(state, format("invalid, not found {}=\"{}\".", cAlphaFields(14), Alphas(14)));
@@ -3596,7 +3596,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             thisZoneEvapUnit.HVACSizingIndex = 0;
             if (!lAlphaBlanks(15)) {
-                thisZoneEvapUnit.HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(15), state.dataSize->ZoneHVACSizing);
+                thisZoneEvapUnit.HVACSizingIndex = Util::FindItemInList(Alphas(15), state.dataSize->ZoneHVACSizing);
                 if (thisZoneEvapUnit.HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(15), Alphas(15)));
                     ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
@@ -4490,7 +4490,7 @@ int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool
     }
 
     int WhichEvapCond =
-        UtilityRoutines::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
+        Util::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
     if (WhichEvapCond != 0) {
         return state.dataEvapCoolers->EvapCond(WhichEvapCond).InletNode;
     } else {
@@ -4515,7 +4515,7 @@ int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, boo
         state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
     }
     int WhichEvapCond =
-        UtilityRoutines::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
+        Util::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::Name, state.dataEvapCoolers->NumEvapCool);
     if (WhichEvapCond != 0) {
         return state.dataEvapCoolers->EvapCond(WhichEvapCond).OutletNode;
     } else {

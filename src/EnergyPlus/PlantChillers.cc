@@ -150,7 +150,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetElectricInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ElectricChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -204,7 +204,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -218,7 +218,7 @@ namespace PlantChillers {
             thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_Electric;
 
             thisChiller.CondenserType = static_cast<DataPlant::CondenserType>(
-                getEnumerationValue(DataPlant::CondenserTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+                getEnumerationValue(DataPlant::CondenserTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
             switch (thisChiller.CondenserType) {
             case DataPlant::CondenserType::AirCooled:
             case DataPlant::CondenserType::WaterCooled:
@@ -2072,7 +2072,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetEngineDrivenInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->EngineDrivenChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -2161,7 +2161,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -4075,7 +4075,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetGasTurbineInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->GTChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -4165,7 +4165,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,
@@ -6002,7 +6002,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetConstCOPInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ConstCOPChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (Util::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -6084,7 +6084,7 @@ namespace PlantChillers {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueChillerName(state,

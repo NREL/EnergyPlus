@@ -121,7 +121,7 @@ void SimulateFanComponents(EnergyPlusData &state,
     }
 
     if (CompIndex == 0) {
-        FanNum = UtilityRoutines::FindItemInList(CompName, state.dataFans->Fan, &FanEquipConditions::FanName);
+        FanNum = Util::FindItemInList(CompName, state.dataFans->Fan, &FanEquipConditions::FanName);
         if (FanNum == 0) {
             ShowFatalError(state, format("SimulateFanComponents: Fan not found={}", CompName));
         }
@@ -406,9 +406,9 @@ void GetFanInput(EnergyPlusData &state)
                                     thisFan.FanName));
         }
         thisFan.MaxAirFlowRateIsAutosizable = true;
-        if (UtilityRoutines::SameString(cAlphaArgs(3), "Fraction")) {
+        if (Util::SameString(cAlphaArgs(3), "Fraction")) {
             thisFan.FanMinAirFracMethod = DataHVACGlobals::MinFrac;
-        } else if (UtilityRoutines::SameString(cAlphaArgs(3), "FixedFlowRate")) {
+        } else if (Util::SameString(cAlphaArgs(3), "FixedFlowRate")) {
             thisFan.FanMinAirFracMethod = DataHVACGlobals::FixedMin;
         }
         thisFan.FanMinFrac = rNumericArgs(4);
@@ -1069,7 +1069,7 @@ void InitFan(EnergyPlusData &state,
     if (!state.dataFans->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
         state.dataFans->ZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
-            if (!UtilityRoutines::SameString(state.dataFans->Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
+            if (!Util::SameString(state.dataFans->Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
             if (DataZoneEquipment::CheckZoneEquipmentList(state, state.dataFans->Fan(Loop).FanType, state.dataFans->Fan(Loop).FanName)) continue;
             ShowSevereError(state,
                             format("InitFans: Fan=[{},{}] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
@@ -2336,7 +2336,7 @@ void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanInde
         state.dataFans->GetFanInputFlag = false;
     }
 
-    FanIndex = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+    FanIndex = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (FanIndex == 0) {
         if (!ThisObjectType.empty()) {
             ShowSevereError(state, fmt::format("{}, GetFanIndex: Fan not found={}", ThisObjectType, FanName));
@@ -2406,7 +2406,7 @@ void GetFanType(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    int FanIndex = UtilityRoutines::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
+    int FanIndex = Util::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
     if (FanIndex == 0) {
         if ((!ThisObjectType.empty()) && (!ThisObjectName.empty())) {
             ShowSevereError(state, fmt::format("GetFanType: {}=\"{}\", invalid Fan specified=\"{}\".", ThisObjectType, ThisObjectName, FanName));
@@ -2449,7 +2449,7 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
     if (present(FanIndex)) {
         return state.dataFans->Fan(FanIndex).MaxAirFlowRate;
     } else {
-        int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+        int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
         if (WhichFan != 0) {
             return state.dataFans->Fan(WhichFan).MaxAirFlowRate;
         } else {
@@ -2483,7 +2483,7 @@ int GetFanInletNode(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+    int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (WhichFan != 0) {
         return state.dataFans->Fan(WhichFan).InletNodeNum;
     } else {
@@ -2515,7 +2515,7 @@ int GetFanOutletNode(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+    int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (WhichFan != 0) {
         return state.dataFans->Fan(WhichFan).OutletNodeNum;
     } else {
@@ -2547,7 +2547,7 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
         state.dataFans->GetFanInputFlag = false;
     }
 
-    int WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+    int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     if (WhichFan != 0) {
         return state.dataFans->Fan(WhichFan).AvailSchedPtrNum;
     } else {
@@ -2588,11 +2588,11 @@ int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
             FanType = state.dataFans->Fan(WhichFan).FanType;
             FanName = state.dataFans->Fan(WhichFan).FanName;
         } else {
-            WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+            WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
             IndexIn = WhichFan;
         }
     } else {
-        WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+        WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     }
 
     if (WhichFan != 0) {
@@ -2631,7 +2631,7 @@ void SetFanData(EnergyPlusData &state,
     }
 
     if (FanNum == 0) {
-        WhichFan = UtilityRoutines::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
+        WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
     } else {
         WhichFan = FanNum;
     }

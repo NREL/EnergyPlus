@@ -407,7 +407,7 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         if (thisChiller.EvapVolFlowRate == DataSizing::AutoSize) {
             thisChiller.EvapVolFlowRateWasAutoSized = true;
         }
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
             thisChiller.CondVolFlowRate = 0.0011; // Condenser flow rate not used for this cond type
         } else {
             thisChiller.CondVolFlowRate = state.dataIPShortCut->rNumericArgs(13);
@@ -432,9 +432,9 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                            format("Errors found in processing curve input for {}={}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             Get_ErrorsFound = false;
         }
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "LeavingCondenser")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "LeavingCondenser")) {
             thisChiller.isEnterCondensTemp = false;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(15), "EnteringCondenser")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(15), "EnteringCondenser")) {
             thisChiller.isEnterCondensTemp = true;
         } else {
             thisChiller.isEnterCondensTemp = true;
@@ -443,9 +443,9 @@ void GetGasAbsorberInput(EnergyPlusData &state)
             ShowContinueError(state, "resetting to EnteringCondenser, simulation continues");
         }
         // Assign Other Parameters
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "AirCooled")) {
             thisChiller.isWaterCooled = false;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(16), "WaterCooled")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(16), "WaterCooled")) {
             thisChiller.isWaterCooled = true;
         } else {
             thisChiller.isWaterCooled = true;

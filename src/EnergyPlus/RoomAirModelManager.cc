@@ -254,7 +254,7 @@ namespace RoomAirModelManager {
         int NumPairs; // number of zeta/deltaTai pairs
         int ObjNum;   // loop indexer of input objects if the same type
         int ZoneNum;  // zone number in heat balance domain
-        int found;    // test for UtilityRoutines::FindItemInList(
+        int found;    // test for Util::FindItemInList(
 
         // access input file and setup
         state.dataRoomAirMod->numTempDistContrldZones =
@@ -300,7 +300,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
             // first get zone ID
-            ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
+            ZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneNum == 0) { // throw error
                 ShowSevereError(state, format("{}{}=\"{}\", invalid data.", RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(
@@ -433,19 +433,19 @@ namespace RoomAirModelManager {
             state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.LowGradient = state.dataIPShortCut->rNumericArgs(5);
             state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.HiGradient = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "OutdoorDryBulbTemperature")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "OutdoorDryBulbTemperature")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulb;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneDryBulbTemperature")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneDryBulbTemperature")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::ZoneAirTemp;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneAndOutdoorTemperatureDifference")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "ZoneAndOutdoorTemperatureDifference")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleCoolingLoad")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleCoolingLoad")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::SensibleCooling;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleHeatingLoad")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "SensibleHeatingLoad")) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).TwoGradPatrn.InterpolationMode =
                     DataRoomAirModel::UserDefinedPatternMode::SensibleHeating;
             } else {
@@ -584,7 +584,7 @@ namespace RoomAirModelManager {
             for (i = 1; i <= NumPairs; ++i) {
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).MapPatrn.SurfName(i) = state.dataIPShortCut->cAlphaArgs(i + 1);
                 state.dataRoomAirMod->RoomAirPattern(thisPattern).MapPatrn.DeltaTai(i) = state.dataIPShortCut->rNumericArgs(i + 4);
-                found = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(i + 1), state.dataSurface->Surface);
+                found = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(i + 1), state.dataSurface->Surface);
                 if (found != 0) {
                     state.dataRoomAirMod->RoomAirPattern(thisPattern).MapPatrn.SurfID(i) = found;
                 } else {
@@ -620,7 +620,7 @@ namespace RoomAirModelManager {
         for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             if (state.dataRoomAirMod->AirPatternZoneInfo(i).IsUsed) {
                 // first get return and exhaust air node index
-                found = UtilityRoutines::FindItemInList(
+                found = Util::FindItemInList(
                     state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
                 if (found != 0) {
 
@@ -706,13 +706,13 @@ namespace RoomAirModelManager {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
             state.dataRoomAirMod->AirNode(AirNodeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName = state.dataIPShortCut->cAlphaArgs(3); // Zone name
             state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataRoomAirMod->AirNode(AirNodeNum).ZoneName, state.dataHeatBal->Zone);
             if (state.dataRoomAirMod->AirNode(AirNodeNum).ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -929,7 +929,7 @@ namespace RoomAirModelManager {
                                                                      _,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+            ZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (ZoneNum == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1000,7 +1000,7 @@ namespace RoomAirModelManager {
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDDV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (state.dataRoomAirMod->ZoneUCSDDV(Loop).ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1084,7 +1084,7 @@ namespace RoomAirModelManager {
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDCV(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             if (state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1111,9 +1111,9 @@ namespace RoomAirModelManager {
             }
 
             // Third Alpha is a string: JET or RECIRCULATION
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Jet")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "Jet")) {
                 state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Jet;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), "Recirculation")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), "Recirculation")) {
                 state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Recirculation;
             } else {
                 state.dataRoomAirMod->ZoneUCSDCV(Loop).VforComfort = Comfort::Invalid;
@@ -1151,7 +1151,7 @@ namespace RoomAirModelManager {
 
             // Following depend on valid zone
 
-            Loop2 = UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr).Name,
+            Loop2 = Util::FindItemInList(state.dataHeatBal->Zone(state.dataRoomAirMod->ZoneUCSDCV(Loop).ZonePtr).Name,
                                                     state.afn->MultizoneZoneData,
                                                     &AirflowNetwork::MultizoneZoneProp::ZoneName);
             if (Loop2 == 0) {
@@ -1245,7 +1245,7 @@ namespace RoomAirModelManager {
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDUI(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDUI(Loop).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirMod->ZoneUCSDUI(Loop).ZonePtr) = Loop;
             if (state.dataRoomAirMod->ZoneUCSDUI(Loop).ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
@@ -1256,15 +1256,15 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->IsZoneUI(state.dataRoomAirMod->ZoneUCSDUI(Loop).ZonePtr) = true;
             }
             // 2nd alpha is diffuser type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Swirl")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Swirl")) {
                 state.dataRoomAirMod->ZoneUCSDUI(Loop).DiffuserType = Diffuser::Swirl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "VariableArea")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "VariableArea")) {
                 state.dataRoomAirMod->ZoneUCSDUI(Loop).DiffuserType = Diffuser::VarArea;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "HorizontalSwirl")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "HorizontalSwirl")) {
                 state.dataRoomAirMod->ZoneUCSDUI(Loop).DiffuserType = Diffuser::DisplVent;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Custom")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Custom")) {
                 state.dataRoomAirMod->ZoneUCSDUI(Loop).DiffuserType = Diffuser::Custom;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "LinearBarGrille")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "LinearBarGrille")) {
                 state.dataRoomAirMod->ZoneUCSDUI(Loop).DiffuserType = Diffuser::LinBarGrille;
             } else {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -1316,7 +1316,7 @@ namespace RoomAirModelManager {
             // First is Zone Name
             state.dataRoomAirMod->ZoneUCSDUE(Loop).ZoneName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->ZoneUCSDUE(Loop).ZonePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
             state.dataRoomAirMod->ZoneUFPtr(state.dataRoomAirMod->ZoneUCSDUE(Loop).ZonePtr) = Loop;
             if (state.dataRoomAirMod->ZoneUCSDUE(Loop).ZonePtr == 0) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
@@ -1327,15 +1327,15 @@ namespace RoomAirModelManager {
                 state.dataRoomAirMod->IsZoneUI(state.dataRoomAirMod->ZoneUCSDUE(Loop).ZonePtr) = true;
             }
             // 2nd alpha is diffuser type
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Swirl")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Swirl")) {
                 state.dataRoomAirMod->ZoneUCSDUE(Loop).DiffuserType = Diffuser::Swirl;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "VariableArea")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "VariableArea")) {
                 state.dataRoomAirMod->ZoneUCSDUE(Loop).DiffuserType = Diffuser::VarArea;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "HorizontalSwirl")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "HorizontalSwirl")) {
                 state.dataRoomAirMod->ZoneUCSDUE(Loop).DiffuserType = Diffuser::DisplVent;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Custom")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Custom")) {
                 state.dataRoomAirMod->ZoneUCSDUE(Loop).DiffuserType = Diffuser::Custom;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "LinearBarGrille")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "LinearBarGrille")) {
                 state.dataRoomAirMod->ZoneUCSDUE(Loop).DiffuserType = Diffuser::LinBarGrille;
             } else {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -1445,7 +1445,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+            ZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state,
                                 format("GetRoomAirflowNetworkData: Invalid {} = {}",
@@ -1490,7 +1490,7 @@ namespace RoomAirModelManager {
                     state.dataIPShortCut->cAlphaArgs(AlphaArgNum);
             }
             // control point node
-            AirCntrlNodeNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3),
+            AirCntrlNodeNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3),
                                                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node,
                                                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
             if (AirCntrlNodeNum == 0) {
@@ -1527,7 +1527,7 @@ namespace RoomAirModelManager {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+            ZoneNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (ZoneNum == 0) {
                 ShowSevereError(state,
                                 format("GetRoomAirflowNetworkData: Invalid {} = {}",
@@ -1539,7 +1539,7 @@ namespace RoomAirModelManager {
                 continue;
             }
 
-            RAFNNodeNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
+            RAFNNodeNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
                                                           state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node,
                                                           state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
             if (RAFNNodeNum == 0) {
@@ -1592,7 +1592,7 @@ namespace RoomAirModelManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // find surface list
                 if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
-                    RAFNNodeNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
+                    RAFNNodeNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
                                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node,
                                                                   &RoomAirflowNetworkAirNodeNestedStruct::NodeSurfListName,
                                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
@@ -1692,7 +1692,7 @@ namespace RoomAirModelManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // find surface list
                 if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
-                    RAFNNodeNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
+                    RAFNNodeNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
                                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node,
                                                                   &RoomAirflowNetworkAirNodeNestedStruct::NodeIntGainsListName,
                                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
@@ -1721,7 +1721,7 @@ namespace RoomAirModelManager {
                         int numGainsFound = 0;
                         for (gainsLoop = 1; gainsLoop <= numInputGains; ++gainsLoop) {
                             TypeNum = getEnumerationValue(DataHeatBalance::IntGainTypeNamesUC,
-                                                          UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(gainsLoop * 2)));
+                                                          Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(gainsLoop * 2)));
                             if (TypeNum >= 0) {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).IntGain(gainsLoop).Type =
                                     static_cast<DataHeatBalance::IntGainType>(TypeNum);
@@ -1802,7 +1802,7 @@ namespace RoomAirModelManager {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 // find surface list
                 if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes > 0) {
-                    RAFNNodeNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
+                    RAFNNodeNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1),
                                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node,
                                                                   &RoomAirflowNetworkAirNodeNestedStruct::NodeHVACListName,
                                                                   state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes);
@@ -1825,7 +1825,7 @@ namespace RoomAirModelManager {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC.allocate(numEquip);
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HasHVACAssigned = true;
                         for (EquipLoop = 1; EquipLoop <= numEquip; ++EquipLoop) {
-                            TypeNum = UtilityRoutines::FindItemInList(
+                            TypeNum = Util::FindItemInList(
                                 state.dataIPShortCut->cAlphaArgs(2 + (EquipLoop - 1) * 2), ZoneHVACTerminalTypes, NumZoneHVACTerminalTypes);
                             if (TypeNum > 0) {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).TypeOfNum = TypeNum;
@@ -1919,7 +1919,7 @@ namespace RoomAirModelManager {
                                 if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).FractionCheck) continue;
                                 if (TypeNum == static_cast<int>(
                                                    state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).Type) &&
-                                    UtilityRoutines::SameString(
+                                    Util::SameString(
                                         Name, state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).Name)) {
                                     SumFraction += state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGainsFractions(GainNum);
                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNum).IntGain(GainNum).FractionCheck = true;
@@ -3031,7 +3031,7 @@ namespace RoomAirModelManager {
         RAFNNodeNum = 0;
         for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
             if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(I).NumOfAirNodes > 0) {
-                RAFNNodeNum = UtilityRoutines::FindItemInList(RAFNNodeName,
+                RAFNNodeNum = Util::FindItemInList(RAFNNodeName,
                                                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(I).Node,
                                                               state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(I).NumOfAirNodes);
                 if (RAFNNodeNum > 0) {
@@ -3116,7 +3116,7 @@ namespace RoomAirModelManager {
 
         for (I = 1; I <= TotNumEquip; ++I) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state, EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status);
-            if (UtilityRoutines::SameString(Alphas(1), EquipName)) {
+            if (Util::SameString(Alphas(1), EquipName)) {
                 EquipFind = true;
                 break;
             }

@@ -170,7 +170,7 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
 
     // Find the correct WaterCoilNumber with the Coil Name
     if (CompIndex == 0) {
-        CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
+        CoilNum = Util::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
         if (CoilNum == 0) {
             ShowFatalError(state, format("SimulateWaterCoilComponents: Coil not found={}", CompName));
         }
@@ -337,7 +337,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
         VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
@@ -516,7 +516,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
         VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
@@ -755,7 +755,7 @@ void GetWaterCoilInput(EnergyPlusData &state)
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames.allocate(MaxNums);
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = "";
         state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames = cNumericFields;
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
         VerifyUniqueCoilName(state, CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
@@ -5887,7 +5887,7 @@ void CheckWaterCoilSchedule(EnergyPlusData &state, std::string_view CompName, Re
 
     // Find the correct Coil number
     if (CompIndex == 0) {
-        CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
+        CoilNum = Util::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
         if (CoilNum == 0) {
             ShowFatalError(state, format("CheckWaterCoilSchedule: Coil not found={}", CompName));
         }
@@ -5944,9 +5944,9 @@ Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
     }
 
     WhichCoil = 0;
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:Water") || Util::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
+        Util::SameString(CoilType, "Coil:Cooling:Water")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             // coil does not specify MaxWaterFlowRate
             MaxWaterFlowRate = state.dataWaterCoils->WaterCoil(WhichCoil).MaxWaterVolFlowRate;
@@ -5997,9 +5997,9 @@ int GetCoilInletNode(EnergyPlusData &state,
 
     NodeNumber = 0;
     WhichCoil = 0;
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:Water") || Util::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
+        Util::SameString(CoilType, "Coil:Cooling:Water")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             NodeNumber = state.dataWaterCoils->WaterCoil(WhichCoil).AirInletNodeNum;
         }
@@ -6048,9 +6048,9 @@ int GetCoilOutletNode(EnergyPlusData &state,
 
     WhichCoil = 0;
     NodeNumber = 0;
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:Water") || Util::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
+        Util::SameString(CoilType, "Coil:Cooling:Water")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             NodeNumber = state.dataWaterCoils->WaterCoil(WhichCoil).AirOutletNodeNum;
         }
@@ -6101,9 +6101,9 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
 
     NodeNumber = 0;
     WhichCoil = 0;
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:Water") || Util::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
+        Util::SameString(CoilType, "Coil:Cooling:Water")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             NodeNumber = state.dataWaterCoils->WaterCoil(WhichCoil).WaterInletNodeNum;
         }
@@ -6152,9 +6152,9 @@ int GetCoilWaterOutletNode(EnergyPlusData &state,
 
     NodeNumber = 0;
     WhichCoil = 0;
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:Water") || Util::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
+        Util::SameString(CoilType, "Coil:Cooling:Water")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             NodeNumber = state.dataWaterCoils->WaterCoil(WhichCoil).WaterOutletNodeNum;
         }
@@ -6198,9 +6198,9 @@ void SetCoilDesFlow(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:Water") || Util::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
+        Util::SameString(CoilType, "Coil:Cooling:Water")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             if (state.dataWaterCoils->WaterCoil(WhichCoil).DesAirVolFlowRate <= 0.0) {
                 state.dataWaterCoils->WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
@@ -6243,8 +6243,8 @@ Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Cooling:Water")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             CoilDesAirFlow = state.dataWaterCoils->WaterCoil(WhichCoil).DesAirVolFlowRate;
         } else {
@@ -6593,11 +6593,11 @@ int GetWaterCoilIndex(EnergyPlusData &state,
 
     IndexNum = 0;
     if (CoilType == "COIL:HEATING:WATER") {
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
+        IndexNum = Util::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
     } else if (CoilType == "COIL:COOLING:WATER") {
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
+        IndexNum = Util::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
     } else if (CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
+        IndexNum = Util::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
     } else {
         IndexNum = 0;
     }
@@ -6619,7 +6619,7 @@ int GetCompIndex(EnergyPlusData &state, CoilModel compType, std::string_view con
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    int index = UtilityRoutines::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
+    int index = Util::FindItemInList(coilName, state.dataWaterCoils->WaterCoil);
 
     if (index == 0) { // may not find coil name
         ShowSevereError(state,
@@ -6661,13 +6661,13 @@ Real64 GetWaterCoilCapacity(EnergyPlusData &state,
     Capacity = -1.0;
 
     if (CoilType == "COIL:HEATING:WATER") {
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
+        IndexNum = Util::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
         Capacity = state.dataWaterCoils->WaterCoil(IndexNum).DesWaterHeatingCoilRate;
     } else if (CoilType == "COIL:COOLING:WATER") {
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
+        IndexNum = Util::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
         Capacity = state.dataWaterCoils->WaterCoil(IndexNum).DesWaterCoolingCoilRate;
     } else if (CoilType == "COIL:COOLING:WATER:DETAILEDGEOMETRY") {
-        IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
+        IndexNum = Util::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
         Capacity = state.dataWaterCoils->WaterCoil(IndexNum).DesWaterCoolingCoilRate;
     } else {
         IndexNum = 0;
@@ -6714,7 +6714,7 @@ void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state,
 
     // Find the correct water coil
     if (CompIndex == 0) {
-        CoilNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
+        CoilNum = Util::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
         if (CoilNum == 0) {
             ShowFatalError(state, format("UpdateWaterToAirCoilPlantConnection: Specified Coil not one of Valid water coils={}", CoilName));
         }
@@ -6816,9 +6816,9 @@ int GetWaterCoilAvailScheduleIndex(EnergyPlusData &state,
     WhichCoil = 0;
     AvailSchIndex = 0;
 
-    if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
-        UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry")) {
-        WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
+    if (Util::SameString(CoilType, "Coil:Heating:Water") || Util::SameString(CoilType, "Coil:Cooling:Water") ||
+        Util::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry")) {
+        WhichCoil = Util::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
         if (WhichCoil != 0) {
             AvailSchIndex = state.dataWaterCoils->WaterCoil(WhichCoil).SchedPtr;
         }

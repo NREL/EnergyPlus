@@ -333,7 +333,7 @@ namespace CondenserLoopTowers {
             }
             tower.TowerFreeConvNomCapSizingFactor = NumArray(12);
             if (NumAlphas >= 4) {
-                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, Util::MakeUPPERCase(AlphArray(4))));
                 if (tower.PerformanceInputMethod_Num == PIM::Invalid) {
                     ShowSevereError(state, format("{}={}", cCurrentModuleObject, AlphArray(1)));
                     ShowContinueError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
@@ -404,7 +404,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, Util::MakeUPPERCase(AlphArray(6))));
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
@@ -412,7 +412,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(25);                    //  N17  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, Util::MakeUPPERCase(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
@@ -458,7 +458,7 @@ namespace CondenserLoopTowers {
                 tower.CapacityControl = CapacityCtrl::FanCycling; // FanCycling
             } else {
                 tower.CapacityControl =
-                    static_cast<CapacityCtrl>(getEnumerationValue(CapacityCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+                    static_cast<CapacityCtrl>(getEnumerationValue(CapacityCtrlNamesUC, Util::MakeUPPERCase(AlphArray(11))));
                 if (tower.CapacityControl == CapacityCtrl::Invalid) {
                     tower.CapacityControl = CapacityCtrl::FanCycling;
                     ShowWarningError(state,
@@ -487,7 +487,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for single speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(12))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, Util::MakeUPPERCase(AlphArray(12))));
             }
 
             //   High speed air flow rate must be greater than free convection air flow rate.
@@ -646,7 +646,7 @@ namespace CondenserLoopTowers {
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (NumAlphas >= 4) {
-                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, Util::MakeUPPERCase(AlphArray(4))));
             } else {
                 // Since Performance Input Method has been omitted then assume it to be UA and DESIGN WATER FLOW RATE
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
@@ -766,7 +766,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, Util::MakeUPPERCase(AlphArray(6))));
 
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
@@ -774,7 +774,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(33);                    //  N21  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, Util::MakeUPPERCase(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
@@ -801,7 +801,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for two speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, Util::MakeUPPERCase(AlphArray(11))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
@@ -1043,8 +1043,8 @@ namespace CondenserLoopTowers {
                                                                            DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
-            if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined") ||
-                 UtilityRoutines::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
+            if ((Util::SameString(AlphArray(4), "CoolToolsUserDefined") ||
+                 Util::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
                 state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowSevereError(state,
                                 format("{}, \"{}\" a {} must be specified when {} is specified as CoolToolsUserDefined or YorkCalcUserDefined",
@@ -1053,7 +1053,7 @@ namespace CondenserLoopTowers {
                                        state.dataIPShortCut->cAlphaFieldNames(5),
                                        state.dataIPShortCut->cAlphaFieldNames(4)));
                 ErrorsFound = true;
-            } else if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow") || UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) &&
+            } else if ((Util::SameString(AlphArray(4), "CoolToolsCrossFlow") || Util::SameString(AlphArray(4), "YorkCalc")) &&
                        !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowWarningError(state,
                                  format("{}, \"{}\" a Tower Model Coefficient Name is specified and the Tower Model Type is not specified as "
@@ -1081,7 +1081,7 @@ namespace CondenserLoopTowers {
 
             auto &vstower = state.dataCondenserLoopTowers->towers(tower.VSTower);
 
-            if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
+            if (Util::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 tower.TowerModelType = ModelType::CoolToolsXFModel;
                 //     set cross-flow model coefficients
                 //       Outputs approach in C
@@ -1131,7 +1131,7 @@ namespace CondenserLoopTowers {
                 vstower.MinWaterFlowRatio = 0.75;
                 vstower.MaxWaterFlowRatio = 1.25;
 
-            } else if (UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) {
+            } else if (Util::SameString(AlphArray(4), "YorkCalc")) {
                 tower.TowerModelType = ModelType::YorkCalcModel;
                 //     set counter-flow model coefficients
                 //       Outputs approach in C
@@ -1174,13 +1174,13 @@ namespace CondenserLoopTowers {
                 vstower.MaxWaterFlowRatio = 1.25;
                 vstower.MaxLiquidToGasRatio = 8.0;
 
-            } else if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined")) {
+            } else if (Util::SameString(AlphArray(4), "CoolToolsUserDefined")) {
                 tower.TowerModelType = ModelType::CoolToolsUserDefined;
                 // Nested Get-input routines below.  Should pull out of here and read in beforehand.
                 for (VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSCoolToolsModelCoeffs; ++VSModelCoeffNum) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
-                    if (!UtilityRoutines::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
+                    if (!Util::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
                     vstower.FoundModelCoeff = true;
                     // verify the correct number of coefficients for the CoolTools model
                     if (NumNums2 != 43) {
@@ -1215,13 +1215,13 @@ namespace CondenserLoopTowers {
                                            tower.ModelCoeffObjectName));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(4), "YorkCalcUserDefined")) {
+            } else if (Util::SameString(AlphArray(4), "YorkCalcUserDefined")) {
                 tower.TowerModelType = ModelType::YorkCalcUserDefined;
                 // Nested Get-input routines below.  Should pull out of here and read in beforehand.
                 for (VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSYorkCalcModelCoeffs; ++VSModelCoeffNum) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
-                    if (!UtilityRoutines::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
+                    if (!Util::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
                     vstower.FoundModelCoeff = true;
                     // verify the correct number of coefficients for the YorkCalc model
                     if (NumNums2 != 36) {
@@ -1435,7 +1435,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(8))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, Util::MakeUPPERCase(AlphArray(8))));
 
             tower.UserEvapLossFactor = NumArray(11);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(12) / 100.0; //  N12, \field Drift Loss Percent
@@ -1443,7 +1443,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(17);                    //  N14  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(9))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, Util::MakeUPPERCase(AlphArray(9))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(10));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
@@ -1470,7 +1470,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for variable speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(13))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, Util::MakeUPPERCase(AlphArray(13))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
@@ -1552,9 +1552,9 @@ namespace CondenserLoopTowers {
                                                                            DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
-            if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
+            if (Util::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
+            } else if (Util::SameString(AlphArray(4), "NominalCapacity")) {
                 tower.PerformanceInputMethod_Num = PIM::NominalCapacity;
             } else {
                 ShowSevereError(state, format("{}={}", cCurrentModuleObject, AlphArray(1)));
@@ -1695,7 +1695,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, Util::MakeUPPERCase(AlphArray(10))));
 
             tower.UserEvapLossFactor = NumArray(23);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(24) / 100.0; //  N24, \field Drift Loss Percent
@@ -1703,7 +1703,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(29);                    //  N29  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, Util::MakeUPPERCase(AlphArray(11))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(12));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(12), AlphArray(12)));
@@ -1730,7 +1730,7 @@ namespace CondenserLoopTowers {
             tower.TowerMassFlowRateMultiplier = tower.MaxFracFlowRate;
             //   cell control for variable speed Merkel tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(15))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, Util::MakeUPPERCase(AlphArray(15))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
@@ -2557,7 +2557,7 @@ namespace CondenserLoopTowers {
             // Design water flow rate is assumed to be 3 gpm per ton (SI equivalent 5.382E-8 m3/s per watt)
             this->DesignWaterFlowRate = 5.382e-8 * this->TowerNominalCapacity;
             tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
-            if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:SingleSpeed")) {
+            if (Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:SingleSpeed")) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)],
@@ -2572,7 +2572,7 @@ namespace CondenserLoopTowers {
                                                  "Initial Design Water Flow Rate based on tower nominal capacity [m3/s]",
                                                  this->DesignWaterFlowRate);
                 }
-            } else if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
+            } else if (Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)],
@@ -3097,7 +3097,7 @@ namespace CondenserLoopTowers {
         }
 
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity &&
-            UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
+            Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
             if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->TowerLowSpeedNomCap > 0.0) {
 
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now is a
@@ -3278,7 +3278,7 @@ namespace CondenserLoopTowers {
 
         // calibrate variable speed tower model based on user input by finding calibration water flow rate ratio that
         // yields an approach temperature that matches user input
-        if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
+        if (Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
 
             //   check range for water flow rate ratio (make sure RegulaFalsi converges)
             Real64 MaxWaterFlowRateRatio = 0.5; // maximum water flow rate ratio which yields desired approach temp

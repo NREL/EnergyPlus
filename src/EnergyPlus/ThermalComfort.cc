@@ -1956,7 +1956,7 @@ namespace ThermalComfort {
             for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
                 thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 2);
                 thisAngFacList.SurfacePtr(SurfNum) =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
                 thisAngFacList.AngleFactor(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum);
                 // Error trap for surfaces that do not exist or surfaces not in the zone
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
@@ -2015,7 +2015,7 @@ namespace ThermalComfort {
             auto &thisPeople = state.dataHeatBal->People(Item);
             if (thisPeople.MRTCalcType != DataHeatBalance::CalcMRT::AngleFactor) continue;
             thisPeople.AngleFactorListPtr =
-                UtilityRoutines::FindItemInList(thisPeople.AngleFactorListName, state.dataThermalComforts->AngleFactorList);
+                Util::FindItemInList(thisPeople.AngleFactorListName, state.dataThermalComforts->AngleFactorList);
             int WhichAFList = thisPeople.AngleFactorListPtr;
             if (WhichAFList == 0 && (thisPeople.Fanger || thisPeople.Pierce || thisPeople.KSU)) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", routineName, cCurrentModuleObject, thisPeople.AngleFactorListName));

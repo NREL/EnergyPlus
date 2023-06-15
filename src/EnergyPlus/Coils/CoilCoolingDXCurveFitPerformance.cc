@@ -76,9 +76,9 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     this->crankcaseHeaterCap = input_data.crankcase_heater_capacity;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.base_operating_mode_name);
     this->normalMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
-    if (UtilityRoutines::SameString(input_data.capacity_control, "CONTINUOUS")) {
+    if (Util::SameString(input_data.capacity_control, "CONTINUOUS")) {
         this->capControlMethod = CapControlMethod::CONTINUOUS;
-    } else if (UtilityRoutines::SameString(input_data.capacity_control, "DISCRETE")) {
+    } else if (Util::SameString(input_data.capacity_control, "DISCRETE")) {
         this->capControlMethod = CapControlMethod::DISCRETE;
     } else {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
@@ -107,7 +107,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     }
     // Validate fuel type input
     this->compressorFuelType =
-        static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, UtilityRoutines::MakeUPPERCase(input_data.compressor_fuel_type)));
+        static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Util::MakeUPPERCase(input_data.compressor_fuel_type)));
     if (this->compressorFuelType == Constant::eFuel::Invalid) {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");
@@ -150,7 +150,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
                                                                  IOStatus,
                                                                  _,
                                                                  state.dataIPShortCut->lAlphaFieldBlanks);
-        if (!UtilityRoutines::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
+        if (!Util::SameString(name_to_find, state.dataIPShortCut->cAlphaArgs(1))) {
             continue;
         }
         found_it = true;

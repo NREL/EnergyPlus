@@ -392,7 +392,7 @@ namespace RoomAirModelAirflowNetwork {
                                         }
                                     }
                                 } else {
-                                    if (UtilityRoutines::SameString(
+                                    if (Util::SameString(
                                             state.dataZoneEquip->ZoneEquipList(LoopZone).EquipName(I),
                                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).Name)) {
                                         if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
@@ -416,7 +416,7 @@ namespace RoomAirModelAirflowNetwork {
                                 }
                             }
                             for (IdNode = 1; IdNode <= state.dataLoopNodes->NumOfNodes; ++IdNode) { // loop over all nodes to find supply node ID
-                                if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(IdNode),
+                                if (Util::SameString(state.dataLoopNodes->NodeID(IdNode),
                                                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
                                                                     .Node(LoopAirNode)
                                                                     .HVAC(EquipLoop)
@@ -438,7 +438,7 @@ namespace RoomAirModelAirflowNetwork {
                             }
 
                             if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).SupNodeNum > 0 &&
-                                UtilityRoutines::SameString(
+                                Util::SameString(
                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).ReturnNodeName,
                                     "")) {
                                 // Find matching return node
@@ -454,7 +454,7 @@ namespace RoomAirModelAirflowNetwork {
 
                             if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).Node(LoopAirNode).HVAC(EquipLoop).RetNodeNum == 0) {
                                 for (IdNode = 1; IdNode <= state.dataLoopNodes->NumOfNodes; ++IdNode) { // loop over all nodes to find return node ID
-                                    if (UtilityRoutines::SameString(state.dataLoopNodes->NodeID(IdNode),
+                                    if (Util::SameString(state.dataLoopNodes->NodeID(IdNode),
                                                                     state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone)
                                                                         .Node(LoopAirNode)
                                                                         .HVAC(EquipLoop)

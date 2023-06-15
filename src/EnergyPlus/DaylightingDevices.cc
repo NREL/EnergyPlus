@@ -462,7 +462,7 @@ namespace DaylightingDevices {
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Get TDD:DOME object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -541,7 +541,7 @@ namespace DaylightingDevices {
                 }
 
                 // Get TDD:DIFFUSER object
-                SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -655,7 +655,7 @@ namespace DaylightingDevices {
 
                 // Construction
                 state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct);
+                    Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataConstruction->Construct);
 
                 if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).Construction == 0) {
                     ShowSevereError(state,
@@ -749,7 +749,7 @@ namespace DaylightingDevices {
                     for (int TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
                         std::string const TZoneName = state.dataIPShortCut->cAlphaArgs(TZoneNum + 4);
                         state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) =
-                            UtilityRoutines::FindItemInList(TZoneName, state.dataHeatBal->Zone);
+                            Util::FindItemInList(TZoneName, state.dataHeatBal->Zone);
                         if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) == 0) {
                             ShowSevereError(
                                 state,
@@ -829,7 +829,7 @@ namespace DaylightingDevices {
                 state.dataDaylightingDevicesData->Shelf(ShelfNum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 // Get window object
-                int SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                int SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
 
                 if (SurfNum == 0) {
                     ShowSevereError(state,
@@ -898,7 +898,7 @@ namespace DaylightingDevices {
 
                 // Get inside shelf heat transfer surface (optional)
                 if (state.dataIPShortCut->cAlphaArgs(3) != "") {
-                    SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
+                    SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataSurface->Surface);
 
                     if (SurfNum == 0) {
                         ShowSevereError(state,
@@ -934,7 +934,7 @@ namespace DaylightingDevices {
 
                 // Get outside shelf attached shading surface (optional)
                 if (state.dataIPShortCut->cAlphaArgs(4) != "") {
-                    SurfNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->Surface);
+                    SurfNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(4), state.dataSurface->Surface);
 
                     if (SurfNum == 0) {
                         ShowSevereError(state,
@@ -976,7 +976,7 @@ namespace DaylightingDevices {
                         int ConstrNum = 0;
                         // Get outside shelf construction (required if outside shelf is specified)
                         if (state.dataIPShortCut->cAlphaArgs(5) != "") {
-                            ConstrNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataConstruction->Construct);
+                            ConstrNum = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(5), state.dataConstruction->Construct);
 
                             if (ConstrNum == 0) {
                                 ShowSevereError(state,

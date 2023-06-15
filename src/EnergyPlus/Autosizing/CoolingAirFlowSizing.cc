@@ -73,7 +73,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
         if (this->curZoneEqNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
                 this->autoSizedValue = _originalValue;
-                if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                if (Util::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
                     this->originalValue /= (1.0 - this->dataBypassFrac);  // back out bypass fraction applied in GetInput
                 }
@@ -278,7 +278,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
         } else if (this->curSysNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
                 this->autoSizedValue = _originalValue;
-                if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                if (Util::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
                     this->originalValue /= (1.0 - this->dataBypassFrac);  // back out bypass fraction applied in GetInput
                 }
@@ -334,7 +334,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
 
         // override sizing string
         if (this->overrideSizeString) {
-            if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
+            if (Util::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
                 this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
                 if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
             } else if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {

@@ -2196,7 +2196,7 @@ namespace Curve {
                                                              ErrorsFound);
 
                     // Ensure the CP array name should be the same as the name of AirflowNetwork:MultiZone:WindPressureCoefficientArray
-                    if (!UtilityRoutines::SameString(Alphas(2), wpcName)) {
+                    if (!Util::SameString(Alphas(2), wpcName)) {
                         ShowSevereError(state,
                                         format("GetCurveInput: Invalid {} = {} in {} = ",
                                                state.dataIPShortCut->cAlphaFieldNames(2),
@@ -2269,7 +2269,7 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
-                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName), fields);
+                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(Util::MakeUPPERCase(thisObjectName), fields);
             }
         }
 
@@ -2285,13 +2285,13 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
-                std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                std::string varListName = Util::MakeUPPERCase(thisObjectName);
 
                 std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto &indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
+                    std::string indVarName = Util::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
@@ -2404,7 +2404,7 @@ namespace Curve {
                     }
                 }
                 // Add grid to btwxtManager
-                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
+                state.dataCurveManager->btwxtManager.addGrid(Util::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
 
@@ -2419,10 +2419,10 @@ namespace Curve {
                 ++CurveNum;
                 Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-                thisCurve->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisCurve->Name = Util::MakeUPPERCase(thisObjectName);
                 thisCurve->interpolationType = InterpType::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
+                std::string indVarListName = Util::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = format("Table:Lookup \"{}\"", thisCurve->Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2491,9 +2491,9 @@ namespace Curve {
                 };
                 NormalizationMethod normalizeMethod = NM_NONE;
                 if (fields.count("normalization_method")) {
-                    if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "DIVISORONLY")) {
+                    if (Util::SameString(fields.at("normalization_method").get<std::string>(), "DIVISORONLY")) {
                         normalizeMethod = NM_DIVISOR_ONLY;
-                    } else if (UtilityRoutines::SameString(fields.at("normalization_method").get<std::string>(), "AUTOMATICWITHDIVISOR")) {
+                    } else if (Util::SameString(fields.at("normalization_method").get<std::string>(), "AUTOMATICWITHDIVISOR")) {
                         normalizeMethod = NM_AUTO_WITH_DIVISOR;
                     }
                 }
@@ -2963,7 +2963,7 @@ namespace Curve {
         if (InInputType.empty()) {
             return true; // if not used it is valid
         }
-        CurveInputType found = static_cast<CurveInputType>(getEnumerationValue(inputTypes, UtilityRoutines::MakeUPPERCase(InInputType)));
+        CurveInputType found = static_cast<CurveInputType>(getEnumerationValue(inputTypes, Util::MakeUPPERCase(InInputType)));
         return found != CurveInputType::Invalid;
     }
 
@@ -2991,7 +2991,7 @@ namespace Curve {
         };
         constexpr std::array<std::string_view, static_cast<int>(CurveOutputType::Num)> outputTypes = {
             "DIMENSIONLESS", "PRESSURE", "TEMPERATURE", "CAPACITY", "POWER"};
-        CurveOutputType found = static_cast<CurveOutputType>(getEnumerationValue(outputTypes, UtilityRoutines::MakeUPPERCase(InOutputType)));
+        CurveOutputType found = static_cast<CurveOutputType>(getEnumerationValue(outputTypes, Util::MakeUPPERCase(InOutputType)));
         return found != CurveOutputType::Invalid;
     }
 
@@ -3057,7 +3057,7 @@ namespace Curve {
         // Given a curve name, returns the curve index
 
         // METHODOLOGY EMPLOYED:
-        // uses UtilityRoutines::FindItemInList( to search the curve array for the curve name
+        // uses Util::FindItemInList( to search the curve array for the curve name
 
         // First time GetCurveIndex is called, get the input for all the performance curves
         if (state.dataCurveManager->GetCurvesInputFlag) {
@@ -3473,7 +3473,7 @@ namespace Curve {
         // Then try to retrieve a pressure curve object
         if (allocated(state.dataBranchAirLoopPlant->PressureCurve)) {
             if (size(state.dataBranchAirLoopPlant->PressureCurve) > 0) {
-                TempCurveIndex = UtilityRoutines::FindItemInList(PressureCurveName, state.dataBranchAirLoopPlant->PressureCurve);
+                TempCurveIndex = Util::FindItemInList(PressureCurveName, state.dataBranchAirLoopPlant->PressureCurve);
             } else {
                 TempCurveIndex = 0;
             }

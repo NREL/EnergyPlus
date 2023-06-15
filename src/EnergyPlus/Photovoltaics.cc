@@ -141,7 +141,7 @@ namespace Photovoltaics {
         }
 
         if (GeneratorIndex == 0) {
-            PVnum = UtilityRoutines::FindItemInList(GeneratorName, state.dataPhotovoltaic->PVarray);
+            PVnum = Util::FindItemInList(GeneratorName, state.dataPhotovoltaic->PVarray);
             if (PVnum == 0) {
                 ShowFatalError(state, format("SimPhotovoltaicGenerator: Specified PV not one of valid Photovoltaic Generators {}", GeneratorName));
             }
@@ -299,12 +299,12 @@ namespace Photovoltaics {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
             state.dataPhotovoltaic->PVarray(PVnum).Name = state.dataIPShortCut->cAlphaArgs(1);
 
             state.dataPhotovoltaic->PVarray(PVnum).SurfaceName = state.dataIPShortCut->cAlphaArgs(2);
             state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr =
-                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+                Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
             // required-surface
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
@@ -343,11 +343,11 @@ namespace Photovoltaics {
             }
 
             state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Invalid;
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVSimplePerfObjectName)) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVSimplePerfObjectName)) {
                 state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Simple;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVEquiv1DiodePerfObjectName)) {
                 state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::TRNSYS;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVSandiaPerfObjectName)) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(3), state.dataPhotovoltaic->cPVSandiaPerfObjectName)) {
                 state.dataPhotovoltaic->PVarray(PVnum).PVModelType = PVModel::Sandia;
             } else { // throw error, did not find module performance type
                 if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
@@ -365,17 +365,17 @@ namespace Photovoltaics {
             state.dataPhotovoltaic->PVarray(PVnum).PerfObjName = state.dataIPShortCut->cAlphaArgs(4); // check later once perf objects are loaded
 
             state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Invalid;
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "Decoupled")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "Decoupled")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::Decoupled;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "DecoupledUllebergDynamic")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "DecoupledUllebergDynamic")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::DecoupledUllebergDynamic;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "IntegratedSurfaceOutsideFace")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "IntegratedSurfaceOutsideFace")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::SurfaceOutsideFace;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "IntegratedTranspiredCollector")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "IntegratedTranspiredCollector")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::TranspiredCollector;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "IntegratedExteriorVentedCavity")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "IntegratedExteriorVentedCavity")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::ExteriorVentedCavity;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(5), "PhotovoltaicThermalSolarCollector")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(5), "PhotovoltaicThermalSolarCollector")) {
                 state.dataPhotovoltaic->PVarray(PVnum).CellIntegrationMode = CellIntegration::PVTSolarCollector;
             } else {
                 if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
@@ -402,7 +402,7 @@ namespace Photovoltaics {
             case CellIntegration::SurfaceOutsideFace:
             case CellIntegration::TranspiredCollector:
             case CellIntegration::ExteriorVentedCavity: {
-                dupPtr = UtilityRoutines::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).SurfaceName,
+                dupPtr = Util::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).SurfaceName,
                                                          state.dataPhotovoltaic->PVarray({PVnum + 1, state.dataPhotovoltaic->NumPVs}),
                                                          &PVArrayStruct::SurfaceName);
                 if (dupPtr != 0) dupPtr += PVnum; // to correct for shortened array in find item
@@ -469,15 +469,15 @@ namespace Photovoltaics {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
                 tmpSimpleModuleParams(ModNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 tmpSimpleModuleParams(ModNum).ActiveFraction = state.dataIPShortCut->rNumericArgs(1);
 
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Fixed")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Fixed")) {
                     tmpSimpleModuleParams(ModNum).EfficencyInputMode = Efficiency::Fixed;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Scheduled")) {
                     tmpSimpleModuleParams(ModNum).EfficencyInputMode = Efficiency::Scheduled;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
@@ -522,13 +522,13 @@ namespace Photovoltaics {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
                 tmpTNRSYSModuleParams(ModNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "CrystallineSilicon")) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "CrystallineSilicon")) {
                     tmpTNRSYSModuleParams(ModNum).CellType = SiPVCells::Crystalline;
-                } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "AmorphousSilicon")) {
+                } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "AmorphousSilicon")) {
                     tmpTNRSYSModuleParams(ModNum).CellType = SiPVCells::Amorphous;
                 } else {
                     if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
@@ -584,7 +584,7 @@ namespace Photovoltaics {
                                                                          state.dataIPShortCut->lAlphaFieldBlanks,
                                                                          state.dataIPShortCut->cAlphaFieldNames,
                                                                          state.dataIPShortCut->cNumericFieldNames);
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
+                if (Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
                     continue;
                 }
 
@@ -636,7 +636,7 @@ namespace Photovoltaics {
 
             switch (state.dataPhotovoltaic->PVarray(PVnum).PVModelType) {
             case PVModel::Simple: {
-                ThisParamObj = UtilityRoutines::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).PerfObjName, tmpSimpleModuleParams);
+                ThisParamObj = Util::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).PerfObjName, tmpSimpleModuleParams);
                 if (ThisParamObj > 0) {
                     state.dataPhotovoltaic->PVarray(PVnum).SimplePVModule = tmpSimpleModuleParams(ThisParamObj); // entire structure assignment
 
@@ -653,7 +653,7 @@ namespace Photovoltaics {
                 }
             } break;
             case PVModel::TRNSYS: {
-                ThisParamObj = UtilityRoutines::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).PerfObjName, tmpTNRSYSModuleParams);
+                ThisParamObj = Util::FindItemInList(state.dataPhotovoltaic->PVarray(PVnum).PerfObjName, tmpTNRSYSModuleParams);
                 if (ThisParamObj > 0) {
                     state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule = tmpTNRSYSModuleParams(ThisParamObj); // entire structure assignment
                 } else {
@@ -665,7 +665,7 @@ namespace Photovoltaics {
                 }
             } break;
             case PVModel::Sandia: {
-                ThisParamObj = UtilityRoutines::FindItemInList(
+                ThisParamObj = Util::FindItemInList(
                     state.dataPhotovoltaic->PVarray(PVnum).PerfObjName, tmpSNLModuleParams, &SNLModuleParamsStuct::name);
                 if (ThisParamObj > 0) {
                     state.dataPhotovoltaic->PVarray(PVnum).SNLPVModule = tmpSNLModuleParams(ThisParamObj); // entire structure assignment
@@ -786,7 +786,7 @@ namespace Photovoltaics {
         if (SurfNum > 0) {
             GetPVZone = state.dataSurface->Surface(SurfNum).Zone;
             if (GetPVZone == 0) { // might need to get the zone number from the name
-                GetPVZone = UtilityRoutines::FindItemInList(
+                GetPVZone = Util::FindItemInList(
                     state.dataSurface->Surface(SurfNum).ZoneName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             }
         }

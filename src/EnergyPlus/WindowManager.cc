@@ -7937,7 +7937,7 @@ namespace WindowManager {
                     state.dataMaterial->Screens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(thisMaterial->Trans);
 
                     state.dataMaterial->Screens(ScreenNum).screenBeamReflectanceModel = static_cast<Material::ScreenBeamReflectanceModel>(
-                        getEnumerationValue(ScreenBeamReflectanceModelNamesUC, UtilityRoutines::MakeUPPERCase(thisMaterial->ReflectanceModeling)));
+                        getEnumerationValue(ScreenBeamReflectanceModelNamesUC, Util::MakeUPPERCase(thisMaterial->ReflectanceModeling)));
 
                     // Reflectance of screen material only
                     state.dataMaterial->Screens(ScreenNum).ReflectCylinder = thisMaterial->ReflectShade / (1 - thisMaterial->Trans);
@@ -9143,7 +9143,7 @@ namespace WindowManager {
                                                                      IOStatus);
 
             // use default spectrum data, done!
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2), "Default")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(2), "Default")) {
                 state.dataWindowManager->RunMeOnceFlag = true;
                 return;
             }
@@ -9178,7 +9178,7 @@ namespace WindowManager {
                                                                          state.dataIPShortCut->rNumericArgs,
                                                                          NumNumbers,
                                                                          IOStatus);
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cSolarSpectrum)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), cSolarSpectrum)) {
                     iSolarSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->nume) {
@@ -9199,7 +9199,7 @@ namespace WindowManager {
                         }
                     }
                 }
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(1), cVisibleSpectrum)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(1), cVisibleSpectrum)) {
                     iVisibleSpectrum = Loop;
                     // overwrite the default solar spectrum
                     if (NumNumbers > 2 * state.dataWindowManager->numt3) {

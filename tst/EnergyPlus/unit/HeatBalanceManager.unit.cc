@@ -1591,8 +1591,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);
     // Find the fenestration surface
-    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
-    int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", state->dataConstruction->Construct);
+    int winSurfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int win1ConstNum = Util::FindItemInList("WINDOWCONSTRUCTION1", state->dataConstruction->Construct);
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win1ConstNum);
     Real64 transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
@@ -1607,7 +1607,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     HeatBalanceManager::ManageHeatBalance(*state);
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);
-    int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", state->dataConstruction->Construct);
+    int win2ConstNum = Util::FindItemInList("WINDOWCONSTRUCTION2", state->dataConstruction->Construct);
     EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win2ConstNum);
     transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
@@ -1814,8 +1814,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
 
-    int constrNum = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Grouped Air Boundary"), state->dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
+    int constrNum = Util::FindItemInList(Util::MakeUPPERCase("Grouped Air Boundary"), state->dataConstruction->Construct);
+    EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1825,8 +1825,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(state->dataHeatBal->NominalRforNominalUCalculation(constrNum), 0.0);
 
     constrNum =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
+        Util::FindItemInList(Util::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
+    EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1876,8 +1876,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     EXPECT_EQ(state->dataHeatBal->TotConstructs, 1);
 
     int constrNum =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
-    EXPECT_TRUE(UtilityRoutines::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
+        Util::FindItemInList(Util::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
+    EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -2176,7 +2176,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
 
     SimulationManager::ManageSimulation(*state);
 
-    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     EXPECT_EQ(state->dataSurface->Surface(surfNum).Construction, state->dataSurface->SurfEMSConstructionOverrideValue(surfNum));
     EXPECT_TRUE(state->dataSurface->SurfEMSConstructionOverrideON(surfNum));
 }
