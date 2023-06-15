@@ -3369,9 +3369,9 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     state->dataLowTempRadSys->CflowRadiantSysDesign.allocate(1);
     auto &thisRadSysDesign(state->dataLowTempRadSys->CflowRadiantSysDesign(1));
     state->dataGlobal->NumOfTimeStepInHour = 1;
-    state->dataWeather->today.allocate(state->dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
+    state->dataWeather->wvarsHrTsToday.allocate(state->dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
     for (int hourNumber = 1; hourNumber <= Constant::HoursInDay; ++hourNumber) {
-        state->dataWeather->today(state->dataGlobal->NumOfTimeStepInHour, hourNumber).OutDryBulbTemp = double(hourNumber);
+        state->dataWeather->wvarsHrTsToday(state->dataGlobal->NumOfTimeStepInHour, hourNumber).OutDryBulbTemp = double(hourNumber);
     }
 
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature

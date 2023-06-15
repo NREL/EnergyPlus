@@ -625,16 +625,16 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
 
         // Checks for missing value
         if (DryBulb >= 99.9) {
-            DryBulb = state.dataWeather->Missing.DryBulb;
+            DryBulb = state.dataWeather->wvarsMissing.OutDryBulbTemp;
         }
         if (DewPoint >= 99.9) {
-            DewPoint = state.dataWeather->Missing.DewPoint;
+            DewPoint = state.dataWeather->wvarsMissing.OutDewPointTemp;
         }
         if (WindSpeed >= 999.0) {
-            WindSpeed = state.dataWeather->Missing.WindSpd;
+            WindSpeed = state.dataWeather->wvarsMissing.WindSpeed;
         }
         if (OpaqueSkyCover >= 99.0) {
-            OpaqueSkyCover = state.dataWeather->Missing.OpaqSkyCvr;
+            OpaqueSkyCover = state.dataWeather->wvarsMissing.OpaqueSkyCover;
         }
 
         kivaWeather.dryBulb.push_back(DryBulb);

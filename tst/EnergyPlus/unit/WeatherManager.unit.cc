@@ -214,7 +214,7 @@ TEST_F(EnergyPlusFixture, JGDate_Test)
     // used http://aa.usno.navy.mil/data/docs/JulianDate.php
     //
     int julianDate;
-    Weather::GregorianDate gregorianDate(2016, 5, 25); // when test was made
+    Weather::GregorianDate gregorianDate = {2016, 5, 25}; // when test was made
 
     julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2457534, julianDate);
@@ -722,7 +722,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 TauB = state->dataWeather->DesDayInput(EnvrnNum).TauB;
     Real64 TauD = state->dataWeather->DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_TRUE(compare_enums(Weather::DesignDaySolarModel::ASHRAE_Tau2017, state->dataWeather->DesDayInput(EnvrnNum).SolarModel));
+    EXPECT_TRUE(compare_enums(Weather::DesDaySolarModel::ASHRAE_Tau2017, state->dataWeather->DesDayInput(EnvrnNum).solarModel));
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -733,7 +733,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 expectedIDifH = ETR * std::exp(-TauD * std::pow(M, AD));
     Real64 expectedIGlbH = expectedIDirN * CosZenith + expectedIDifH;
     // calc TauModel
-    ASHRAETauModel(*state, state->dataWeather->DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    ASHRAETauModel(*state, state->dataWeather->DesDayInput(EnvrnNum).solarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
     // check the coefficients are correctly applied
     EXPECT_EQ(expectedIDirN, BeamRad);
     EXPECT_EQ(expectedIDifH, DiffRad);
@@ -759,7 +759,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     DiffRad = 0.0;
     GloHorzRad = 0.0;
     // calc TauModel
-    ASHRAETauModel(*state, state->dataWeather->DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    ASHRAETauModel(*state, state->dataWeather->DesDayInput(EnvrnNum).solarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
     // check the coefficients are correctly applied
     EXPECT_EQ(expectedIDirN, BeamRad);
     EXPECT_EQ(expectedIDifH, DiffRad);
@@ -899,15 +899,15 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     ASSERT_FALSE(ErrorsFound);
 
     Weather::SetUpDesignDay(*state, 1);
-    EXPECT_TRUE(compare_enums(state->dataWeather->DesDayInput(1).HumIndType, Weather::DDHumIndType::Enthalpy));
+    EXPECT_TRUE(compare_enums(state->dataWeather->DesDayInput(1).HumIndType, Weather::DesDayHumIndType::Enthalpy));
     EXPECT_EQ(state->dataWeather->DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;
     for (int Hour = 1; Hour <= 24; ++Hour) {
         for (int TS = 1; TS <= state->dataGlobal->NumOfTimeStepInHour; ++TS) {
-            EXPECT_GE(state->dataWeather->tomorrow(TS, Hour).OutRelHum, 0.);
-            EXPECT_LE(state->dataWeather->tomorrow(TS, Hour).OutRelHum, 100.);
-            if (state->dataWeather->tomorrow(TS, Hour).OutRelHum < 100.) {
+            EXPECT_GE(state->dataWeather->wvarsHrTsTomorrow(TS, Hour).OutRelHum, 0.);
+            EXPECT_LE(state->dataWeather->wvarsHrTsTomorrow(TS, Hour).OutRelHum, 100.);
+            if (state->dataWeather->wvarsHrTsTomorrow(TS, Hour).OutRelHum < 100.) {
                 ++n_RH_not100;
             }
         }
@@ -1178,7 +1178,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz)
     Weather::ReadWeatherForDay(*state, 0, 1, false);
 
     Real64 expected_IRHorizSky = 345.73838855245953;
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).HorizIRSky, expected_IRHorizSky, 0.001);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).HorizIRSky, expected_IRHorizSky, 0.001);
 }
 
 // Test for Issue 7957: add new sky cover weather output values;
@@ -1275,7 +1275,7 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
 
     // Test the feature of interpolating some weather inputs to calc sky temp
     Real64 expected_SkyTemp = -22.8763495;
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 2).SkyTemp, expected_SkyTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 2).SkyTemp, expected_SkyTemp, 1e-6);
 }
 
 // Test for fixing the first sub-hour weather data interpolation
@@ -1358,60 +1358,60 @@ TEST_F(EnergyPlusFixture, Fix_first_hour_weather_data_interpolation_OutputTest)
 
     // Test interpolating values of some weather data during the first hour
     Real64 expected_DryBulbTemp = -12.2;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).OutDryBulbTemp, expected_DryBulbTemp, 1e-6);
 
     Real64 expected_DewPointTemp = -16.1;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).OutDewPointTemp, expected_DewPointTemp, 1e-6);
 
     Real64 expected_BaroPress = 99500;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).OutBaroPress, expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).OutBaroPress, expected_BaroPress, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).OutBaroPress, expected_BaroPress, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).OutBaroPress, expected_BaroPress, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).OutBaroPress, expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).OutBaroPress, expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).OutBaroPress, expected_BaroPress, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).OutBaroPress, expected_BaroPress, 1e-6);
 
     Real64 expected_RelHum = 73;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).OutRelHum, expected_RelHum, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).OutRelHum, expected_RelHum, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).OutRelHum, expected_RelHum, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).OutRelHum, expected_RelHum, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).OutRelHum, expected_RelHum, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).OutRelHum, expected_RelHum, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).OutRelHum, expected_RelHum, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).OutRelHum, expected_RelHum, 1e-6);
 
     Real64 expected_WindSpeed = 2.6;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).WindSpeed, expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).WindSpeed, expected_WindSpeed, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).WindSpeed, expected_WindSpeed, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).WindSpeed, expected_WindSpeed, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).WindSpeed, expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).WindSpeed, expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).WindSpeed, expected_WindSpeed, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).WindSpeed, expected_WindSpeed, 1e-6);
 
     Real64 expected_WindDir = 270;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).WindDir, expected_WindDir, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).WindDir, expected_WindDir, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).WindDir, expected_WindDir, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).WindDir, expected_WindDir, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).WindDir, expected_WindDir, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).WindDir, expected_WindDir, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).WindDir, expected_WindDir, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).WindDir, expected_WindDir, 1e-6);
 
     Real64 expected_TotalSkyCover = 9;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).TotalSkyCover, expected_TotalSkyCover, 1e-6);
 
     Real64 expected_OpaqueSkyCover = 9;
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 1).OpaqueSkyCover, expected_OpaqueSkyCover, 1e-6);
 }
 
 // Test for Issue 8760: fix opaque sky cover weather values;
@@ -1495,32 +1495,32 @@ TEST_F(EnergyPlusFixture, Fix_OpaqueSkyCover_Test)
 
     // Test additional set of weather data on sky temp calc
     Real64 expected_SkyTemp = -1.7901122977770569;
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 1).SkyTemp, expected_SkyTemp, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 1).SkyTemp, expected_SkyTemp, 1e-6);
 
     // Test Total Sky Cover and Opaque Sky Cover
     Real64 expected_TSC = 9;
     Real64 expected_OSC = 8;
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 3).TotalSkyCover, expected_TSC, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 3).OpaqueSkyCover, expected_OSC, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 3).TotalSkyCover, 9.25, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 3).OpaqueSkyCover, 8.25, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 3).TotalSkyCover, 9.5, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 3).OpaqueSkyCover, 8.5, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 3).TotalSkyCover, 9.75, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 3).OpaqueSkyCover, 8.75, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 3).TotalSkyCover, expected_TSC, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 3).OpaqueSkyCover, expected_OSC, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 3).TotalSkyCover, 9.25, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 3).OpaqueSkyCover, 8.25, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 3).TotalSkyCover, 9.5, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 3).OpaqueSkyCover, 8.5, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 3).TotalSkyCover, 9.75, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 3).OpaqueSkyCover, 8.75, 1e-6);
 
     expected_TSC = 8;
     expected_OSC = 8;
 
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 4).TotalSkyCover, expected_TSC, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(4, 4).OpaqueSkyCover, expected_OSC, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 4).TotalSkyCover, 8.25, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(3, 4).OpaqueSkyCover, 8.00, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 4).TotalSkyCover, 8.50, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(2, 4).OpaqueSkyCover, 8.00, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 4).TotalSkyCover, 8.75, 1e-6);
-    EXPECT_NEAR(state->dataWeather->tomorrow(1, 4).OpaqueSkyCover, 8.00, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 4).TotalSkyCover, expected_TSC, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(4, 4).OpaqueSkyCover, expected_OSC, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 4).TotalSkyCover, 8.25, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(3, 4).OpaqueSkyCover, 8.00, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 4).TotalSkyCover, 8.50, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(2, 4).OpaqueSkyCover, 8.00, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 4).TotalSkyCover, 8.75, 1e-6);
+    EXPECT_NEAR(state->dataWeather->wvarsHrTsTomorrow(1, 4).OpaqueSkyCover, 8.00, 1e-6);
 }
 
 TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
@@ -1624,22 +1624,22 @@ TEST_F(EnergyPlusFixture, WeatherManager_SetRainFlag)
     // Need to instantiate some stuff to avoid a crash
     // Weather::ReadUserWeatherInput(*state);
 
-    state->dataWeather->today.allocate(state->dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
-    state->dataWeather->today(1, 24).IsRain = false;
+    state->dataWeather->wvarsHrTsToday.allocate(state->dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
+    state->dataWeather->wvarsHrTsToday(1, 24).IsRain = false;
     state->dataEnvrn->RunPeriodEnvironment = true;
     Weather::SetCurrentWeather(*state);
     // when TodayIsRain is false, IsRain is still true as site:precipitation has non-zero rain fall
     ASSERT_TRUE(state->dataEnvrn->IsRain);
 
     state->dataWaterData->RainFall.ModeID = DataWater::RainfallMode::EPWPrecipitation;
-    state->dataWeather->today(1, 24).IsRain = false;
+    state->dataWeather->wvarsHrTsToday(1, 24).IsRain = false;
     state->dataEnvrn->RunPeriodEnvironment = true;
     Weather::SetCurrentWeather(*state);
     ASSERT_FALSE(state->dataEnvrn->IsRain);
 
     // site:precipitation overwritten of rain flag does not take effect during sizing period
     state->dataGlobal->NumOfTimeStepInHour = 4;
-    state->dataWeather->today(1, 24).IsRain = false;
+    state->dataWeather->wvarsHrTsToday(1, 24).IsRain = false;
     state->dataEnvrn->RunPeriodEnvironment = false;
     Weather::SetCurrentWeather(*state);
     ASSERT_FALSE(state->dataEnvrn->IsRain);
@@ -2150,7 +2150,7 @@ TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
 
         EXPECT_FALSE(ErrorFound);
         EXPECT_EQ(0, PresWeathObs);
-        EXPECT_EQ(0, state->dataWeather->Missed.WeathCodes);
+        EXPECT_EQ(0, state->dataWeather->wvarsMissedCounts.WeathCodes);
         EXPECT_EQ(9, PresWeathConds(1));
         EXPECT_EQ(0, PresWeathConds(2));
         EXPECT_EQ(9, PresWeathConds(3));
@@ -2274,7 +2274,7 @@ TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
 
         EXPECT_FALSE(ErrorFound);
         EXPECT_EQ(9, PresWeathObs);
-        EXPECT_EQ(0, state->dataWeather->Missed.WeathCodes);
+        EXPECT_EQ(0, state->dataWeather->wvarsMissedCounts.WeathCodes);
         EXPECT_EQ(9, PresWeathConds(1));
         EXPECT_EQ(9, PresWeathConds(2));
         EXPECT_EQ(9, PresWeathConds(3));
@@ -2399,7 +2399,7 @@ TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
 
         EXPECT_FALSE(ErrorFound);
         EXPECT_EQ(0, PresWeathObs);
-        EXPECT_EQ(0, state->dataWeather->Missed.WeathCodes);
+        EXPECT_EQ(0, state->dataWeather->wvarsMissedCounts.WeathCodes);
         EXPECT_EQ(9, PresWeathConds(1));
         EXPECT_EQ(0, PresWeathConds(2));
         EXPECT_EQ(9, PresWeathConds(3));

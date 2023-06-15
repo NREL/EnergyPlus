@@ -2520,7 +2520,7 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
                 int iHour = (Operand(1).Number + 1); // Operand 1 is hour from 0:23
                 int iTimeStep = Operand(2).Number;
                 if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
-                    auto const &today = state.dataWeather->today(iTimeStep, iHour);
+                    auto const &today = state.dataWeather->wvarsHrTsToday(iTimeStep, iHour);
                     ReturnValue.initialized = true;
                     ReturnValue.Type = Value::Number;
                     switch (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator) {
@@ -2565,8 +2565,8 @@ ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, 
             case ErlFunc::TomorrowLiquidPrecip: {
                 int iHour = (Operand(1).Number + 1); // Operand 1 is hour from 0:23
                 int iTimeStep = Operand(2).Number;
-                if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
-                    auto const &tomorrow = state.dataWeather->tomorrow(iTimeStep, iHour);
+                if ((iHour > 0) && (iHour <= Constant::HoursInDay) && (iTimeStep > 0) && (iTimeStep <= state.dataGlobal->NumOfTimeStepInHour)) {
+                    auto const &tomorrow = state.dataWeather->wvarsHrTsTomorrow(iTimeStep, iHour);
                     ReturnValue.initialized = true;
                     ReturnValue.Type = Value::Number;
                     switch (state.dataRuntimeLang->ErlExpression(ExpressionNum).Operator) {

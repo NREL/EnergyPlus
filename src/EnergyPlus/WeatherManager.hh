@@ -107,7 +107,7 @@ namespace Weather {
         Num
     };
 
-    enum class DesignDaySolarModel
+    enum class DesDaySolarModel
     {
         Invalid = -1,
         ASHRAE_ClearSky,     // Design Day solar model ASHRAE ClearSky (default)
@@ -118,11 +118,14 @@ namespace Weather {
         Num
     };
 
-    static constexpr std::array<std::string_view, (int)DesignDaySolarModel::Num> DesDaySolarModelNamesUC = {
+    static constexpr std::array<std::string_view, (int)DesDaySolarModel::Num> DesDaySolarModelNames = {
+        "ASHRAEClearSky", "ZhangHuang", "Schedule", "ASHRAETau", "ASHRAETau2017" };
+
+    static constexpr std::array<std::string_view, (int)DesDaySolarModel::Num> DesDaySolarModelNamesUC = {
         "ASHRAECLEARSKY", "ZHANGHUANG", "SCHEDULE", "ASHRAETAU", "ASHRAETAU2017" };
                                                                                                              
     // Design Day Humidity Indicating Type
-    enum class DDHumIndType
+    enum class DesDayHumIndType
     {
         Invalid = -1,
         WetBulb,   // Wetbulb (default)
@@ -136,12 +139,12 @@ namespace Weather {
         Num
     };
 
-    static constexpr std::array<std::string_view, (int)DDHumIndType::Num> DesDayHumIndTypeNamesUC = {
+    static constexpr std::array<std::string_view, (int)DesDayHumIndType::Num> DesDayHumIndTypeNamesUC = {
         "WETBULB", "DEWPOINT", "ENTHALPY", "HUMIDITYRATIO", "RELATIVEHUMIDITYSCHEDULE",
         "WETBULBPROFILEDEFAULTMULTIPLIERS", "WETBULBPROFILEDIFFERENCESCHEDULE", "WETBULBPROFILEMULTIPLIERSCHEDULE"};
                 
     // Design Day DryBulb Range Type
-    enum class DDDBRangeType
+    enum class DesDayDryBulbRangeType
     {
         Invalid = -1,
         Default,    // Default Multipliers
@@ -151,7 +154,7 @@ namespace Weather {
         Num
     };
 
-    static constexpr std::array<std::string_view, (int)DDDBRangeType::Num> DDDBRangeTypeNamesUC = {
+    static constexpr std::array<std::string_view, (int)DesDayDryBulbRangeType::Num> DesDayDryBulbRangeTypeNamesUC = {
         "DEFAULTMULTIPLIERS", "MULTIPLIERSCHEDULE", "DIFFERENCESCHEDULE", "TEMPERATUREPROFILESCHEDULE"};
 
     enum class SkyTempModel
@@ -223,7 +226,7 @@ namespace Weather {
         Real64 MaxDryBulb = 0.0;              // Maximum Dry-Bulb Temperature (C)
         Real64 DailyDBRange = 0.0;            // Daily Temperature Range (deltaC)
         Real64 HumIndValue = 0.0;             // Humidity Indicating Value at Max Dry-bulb Temperature
-        DDHumIndType HumIndType = DDHumIndType::WetBulb;        // Humidity Indicating type  (see Parameters)
+        DesDayHumIndType HumIndType = DesDayHumIndType::WetBulb;        // Humidity Indicating type  (see Parameters)
         Real64 PressBarom = 0.0;              // Atmospheric/Barometric Pressure (Pascals)
         Real64 WindSpeed = 0.0;               // Wind Speed (m/s)
         Real64 WindDir = 0.0;                 // Wind Direction (degrees clockwise from North, N=0, E=90, S=180, W=270)
@@ -234,8 +237,8 @@ namespace Weather {
         int Month = 0;                      // Month of Year ( 1 - 12 )
         int DayType = 0;                    // Day Type Sunday = 1 - Saturday = 7
         int DSTIndicator = 0;               // Daylight Saving Time Period Indicator (1=yes, 0=no) for this DesignDay
-        DesignDaySolarModel SolarModel = DesignDaySolarModel::ASHRAE_ClearSky; // Solar Model for creating solar values for design day.
-        DDDBRangeType DBTempRangeType = DDDBRangeType::Default;  // Drybulb Range Type (see Parameters)
+        DesDaySolarModel solarModel = DesDaySolarModel::ASHRAE_ClearSky; // Solar Model for creating solar values for design day.
+        DesDayDryBulbRangeType dryBulbRangeType = DesDayDryBulbRangeType::Default;  // Drybulb Range Type (see Parameters)
         int TempRangeSchPtr = 0;            // Schedule pointer to a day schedule for dry-bulb temperature range multipliers
         int HumIndSchPtr = 0;               // Schedule pointer to a day schedule that specifies
         //    relative humidity (%) or wet-bulb range multipliers per HumIndType
@@ -350,7 +353,7 @@ namespace Weather {
         bool HasYearData = false;
     };
 
-    struct DaylightSavingPeriodData
+    struct DSTPeriod
     {
         // Members
         DateType StDateType = DateType::Invalid; // Start Date type as from EPW or IDF
@@ -363,70 +366,31 @@ namespace Weather {
         int EnWeekDay = 0;       // For DateTypes=NthDayOfMonth or LastDayOfMonth
     };
 
-    // This struct carries the default missing data for those data elements that would be best replaced with the previous hour's data for missing
-    // data.
-    struct MissingData
-    {
-        // Members
-        Real64 DryBulb = 0.0;      // Dry Bulb Temperature (C)
-        Real64 DewPoint = 0.0;     // Dew Point Temperature (C)
-        int RelHumid = 0;        // Relative Humidity (%) // Why is this an int?
-        Real64 StnPres = 0.0;      // Atmospheric Pressure (Pa)
-        int WindDir = 0;         // Wind Direction (deg) // Why are these things ints?
-        Real64 WindSpd = 0.0;      // Wind Speed/Velocity (m/s)
-        int TotSkyCvr = 0;       // Total Sky Cover (tenths)
-        int OpaqSkyCvr = 0;      // Opaque Sky Cover (tenths)
-        Real64 Visibility = 0.0;   // Visibility (km)
-        int Ceiling = 0.0;         // Ceiling Height (m)
-        int PrecipWater = 0.0;     // Precipitable Water (mm)
-        Real64 AerOptDepth = 0.0;  // Aerosol Optical Depth
-        int SnowDepth = 0.0;       // Snow Depth (cm)
-        int DaysLastSnow = 0;    // Number of Days since last snow
-        Real64 Albedo = 0.0;       // Albedo
-        Real64 LiquidPrecip = 0.0; // Rain/Liquid Precipitation (mm)
-    };
-
     // This Derived type carries the counts of missing data items in the weather reading process. It will count only items that are on the source file
     // -- not those that are derived from data on the source file.
-    struct MissingDataCounts
+    struct WeatherVarCounts
     {
         // Members
         // Comments below illustrate the data that is being counted:
-        int DryBulb = 0;      // Dry Bulb Temperature (C)
-        int DewPoint = 0;     // Dew Point Temperature (C)
-        int RelHumid = 0;     // Relative Humidity (%)
-        int StnPres = 0;      // Atmospheric Pressure (Pa)
+        int OutDryBulbTemp = 0;      // Dry Bulb Temperature (C)
+        int OutDewPointTemp = 0;     // Dew Point Temperature (C)
+        int OutRelHum = 0;     // Relative Humidity (%)
+        int OutBaroPress = 0;      // Atmospheric Pressure (Pa)
         int WindDir = 0;      // Wind Direction (deg)
-        int WindSpd = 0;      // Wind Speed/Velocity (m/s)
-        int DirectRad = 0;    // Direct Radiation (wh/m2)
-        int DiffuseRad = 0;   // Diffuse Radiation (wh/m2)
-        int TotSkyCvr = 0;    // Total Sky Cover (tenths)
-        int OpaqSkyCvr = 0;   // Opaque Sky Cover (tenths)
+        int WindSpeed = 0;      // Wind Speed/Velocity (m/s)
+        int BeamSolarRad = 0;    // Direct Radiation (wh/m2)
+        int DifSolarRad = 0;   // Diffuse Radiation (wh/m2)
+        int TotalSkyCover = 0;    // Total Sky Cover (tenths)
+        int OpaqueSkyCover = 0;   // Opaque Sky Cover (tenths)
         int Visibility = 0;   // Visibility (km)
         int Ceiling = 0;      // Ceiling Height (m)
-        int PrecipWater = 0;  // Precipitable Water (mm)
+        int LiquidPrecip = 0;  // Precipitable Water (mm)
+        int WaterPrecip = 0;  // Precipitable Water (mm)
         int AerOptDepth = 0;  // Aerosol Optical Depth
         int SnowDepth = 0;    // Snow Depth (cm)
         int DaysLastSnow = 0; // Number of Days since last snow
         int WeathCodes = 0;   // Weather codes invalid
         int Albedo = 0;       // Albedo
-        int LiquidPrecip = 0; // Liquid Precip Depth
-    };
-
-    // This Derived type carries the counts of out of range items in the weather reading process. It will count only items that are on the source file
-    // -- not those that are derived from data on the source file.
-    struct RangeDataCounts
-    {
-        // Members
-        // Comments below illustrate the data that is being counted:
-        int DryBulb = 0;    // Dry Bulb Temperature (C)
-        int DewPoint = 0;   // Dew Point Temperature (C)
-        int RelHumid = 0;   // Relative Humidity (%)
-        int StnPres = 0;    // Atmospheric Pressure (Pa)
-        int WindDir = 0;    // Wind Direction (deg)
-        int WindSpd = 0;    // Wind Speed/Velocity (m/s)
-        int DirectRad = 0;  // Direct Radiation (wh/m2)
-        int DiffuseRad = 0; // Diffuse Radiation (wh/m2)
     };
 
     struct TypicalExtremeData
@@ -584,7 +548,7 @@ namespace Weather {
     Real64 CalcSkyEmissivity(EnergyPlusData &state, SkyTempModel skyTempModel, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
     void ASHRAETauModel([[maybe_unused]] EnergyPlusData &state,
-                        DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+                        DesDaySolarModel TauModel, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 ETR,                       // extraterrestrial normal irradiance, W/m2
                         Real64 CosZen,                    // COS( solar zenith angle), 0 - 1
                         Real64 TauB,                      // beam tau factor
@@ -710,18 +674,14 @@ namespace Weather {
 
     struct GregorianDate
     {
-        int year;
-        int month;
-        int day;
-
-        GregorianDate(int year, int month, int day) : year(year), month(month), day(day)
-        {
-        }
+        int year = 0;
+        int month = 0;
+        int day = 0;
     };
 
     int computeJulianDate(int gyyyy, int gmm, int gdd);
 
-    int computeJulianDate(GregorianDate gdate);
+    int computeJulianDate(GregorianDate const &gdate);
 
     GregorianDate computeGregorianDate(int jdate);
 
@@ -735,17 +695,11 @@ namespace Weather {
     struct AnnualMonthlyDryBulbWeatherData
     {
         // Members
-        bool OADryBulbWeatherDataProcessed;             // if false stat or weather file OA Dry-bulb temp is not processed yet
-        Real64 AnnualAvgOADryBulbTemp;                  // annual average outdoor air temperature (C)
-        Real64 MonthlyAvgOADryBulbTempMaxDiff;          // monthly daily average OA drybulb temperature maximum difference (deltaC)
-        Array1D<Real64> MonthlyDailyAverageDryBulbTemp; // monthly-daily average outdoor air temperatures (C)
+        bool OADryBulbWeatherDataProcessed = false;             // if false stat or weather file OA Dry-bulb temp is not processed yet
+        Real64 AnnualAvgOADryBulbTemp = 0.0;                  // annual average outdoor air temperature (C)
+        Real64 MonthlyAvgOADryBulbTempMaxDiff = 0.0;          // monthly daily average OA drybulb temperature maximum difference (deltaC)
+        Array1D<Real64> MonthlyDailyAverageDryBulbTemp = Array1D<Real64>(12, 0.0); // monthly-daily average outdoor air temperatures (C)
 
-        // Default Constructor
-        AnnualMonthlyDryBulbWeatherData()
-            : OADryBulbWeatherDataProcessed(false), AnnualAvgOADryBulbTemp(0.0), MonthlyAvgOADryBulbTempMaxDiff(0.0),
-              MonthlyDailyAverageDryBulbTemp(12, 0.0)
-        {
-        }
         void CalcAnnualAndMonthlyDryBulbTemp(EnergyPlusData &state); // true if this is CorrelationFromWeatherFile
     };
 
@@ -776,6 +730,18 @@ namespace Weather {
         Real64 LiquidPrecip;
         Real64 TotalSkyCover;
         Real64 OpaqueSkyCover;
+    };
+
+    // This struct carries the default missing data for those data elements that would be best replaced with the previous hour's data for missing
+    // data.
+    struct ExtWeatherVars : public WeatherVars
+    {
+        // Members
+        Real64 Visibility = 0.0;   // Visibility (km)
+        Real64 Ceiling = 0.0;         // Ceiling Height (m)
+        Real64 AerOptDepth = 0.0;  // Aerosol Optical Depth
+        Real64 SnowDepth = 0.0;       // Snow Depth (cm)
+        int DaysLastSnow = 0;    // Number of Days since last snow
     };
 
     // Here's a fun little function
@@ -851,44 +817,9 @@ struct WeatherManagerData : BaseGlobalStruct
     int NumEPWTypExtSets;           // Number of Typical/Extreme on weather file.
     int NumWPSkyTemperatures;       // Number of WeatherProperty:SkyTemperature items in input file
     
-    Array2D<Weather::WeatherVars> today;
-    Array2D<Weather::WeatherVars> tomorrow;
+    Array2D<Weather::WeatherVars> wvarsHrTsToday;
+    Array2D<Weather::WeatherVars> wvarsHrTsTomorrow;
 
-#ifdef GET_OUT        
-    Array2D_bool TodayIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
-    Array2D_bool TodayIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayWindDir;         // Wind direction of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodaySkyTemp;         // Sky temperature NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayHorizIRSky;      // Horizontal IR from Sky NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayBeamSolarRad;    // Direct normal solar irradiance NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayAlbedo;          // Albedo NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm) NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayTotalSkyCover;   // Total Sky Cover(cert-err58-cpp)
-    Array2D<Real64> TodayOpaqueSkyCover;  // Opaque Sky Cover(cert-err58-cpp)
-
-    Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
-    Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowOutRelHum;       // Relative Humidity of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowWindSpeed;       // Wind speed of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowWindDir;         // Wind direction of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowSkyTemp;         // Sky temperature NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowHorizIRSky;      // Horizontal IR from Sky NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowBeamSolarRad;    // Direct normal solar irradiance NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowAlbedo;          // Albedo NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover {tenth of sky}(cert-err58-cpp)
-    Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover {tenth of sky}(cert-err58-cpp)
-#endif //
     Array3D<Real64> DDDBRngModifier;      // Design Day Dry-bulb Temperature Range Modifier NOLINT(cert-err58-cpp)
     Array3D<Real64> DDHumIndModifier;     // Design Day relative humidity values or wet-bulb modifiers (per HumIndType) NOLINT(cert-err58-cpp)
     Array3D<Real64> DDBeamSolarValues;    // Design Day Beam Solar Values NOLINT(cert-err58-cpp)
@@ -941,12 +872,12 @@ struct WeatherManagerData : BaseGlobalStruct
     // NOLINTNEXTLINE(cert-err58-cpp)
     EPVector<Weather::DayWeatherVariables> DesignDay; // Design day environments
     // NOLINTNEXTLINE(cert-err58-cpp)
-    Weather::MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) |
+    Weather::ExtWeatherVars wvarsMissing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) |
                                          // Wind Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) |
                                          // Visibility (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) |
                                          // Number of Days since last snow | Albedo | Rain/Liquid Precipitation (mm)
-    Weather::MissingDataCounts Missed;              // NOLINT(cert-err58-cpp)
-    Weather::RangeDataCounts OutOfRange;            // NOLINT(cert-err58-cpp)
+    Weather::WeatherVarCounts wvarsMissedCounts;              // NOLINT(cert-err58-cpp)
+    Weather::WeatherVarCounts wvarsOutOfRangeCounts;            // NOLINT(cert-err58-cpp)
     EPVector<Weather::DesignDayData> DesDayInput;   // Design day Input Data NOLINT(cert-err58-cpp)
     Array1D<Weather::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
     Array1D<Weather::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
@@ -959,9 +890,9 @@ struct WeatherManagerData : BaseGlobalStruct
     Array1D<Weather::ReportPeriodData> VisualReportPeriodInput;
     std::unordered_map<std::string, std::string> ReportPeriodInputUniqueNames;
     EPVector<Weather::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
-    Weather::DaylightSavingPeriodData EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
-    Weather::DaylightSavingPeriodData IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
-    Weather::DaylightSavingPeriodData DST;                       // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
+    Weather::DSTPeriod EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
+    Weather::DSTPeriod IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
+    Weather::DSTPeriod DST;                       // Daylight Saving Period Data, if active NOLINT(cert-err58-cpp)
     EPVector<Weather::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
     EPVector<Weather::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
     EPVector<Weather::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
@@ -981,23 +912,10 @@ struct WeatherManagerData : BaseGlobalStruct
     int CurDayOfWeek;
     Real64 ReadEPlusWeatherCurTime;
     bool LastHourSet;
-    Real64 LastHrOutDryBulbTemp;
-    Real64 LastHrOutDewPointTemp;
-    Real64 LastHrOutBaroPress;
-    Real64 LastHrOutRelHum;
-    Real64 LastHrWindSpeed;
-    Real64 LastHrWindDir;
-    Real64 LastHrSkyTemp;
-    Real64 LastHrHorizIRSky;
-    Real64 LastHrBeamSolarRad;
-    Real64 LastHrDifSolarRad;
-    Real64 LastHrAlbedo;
-    Real64 LastHrLiquidPrecip;
-    Real64 LastHrTotalSkyCover;
-    Real64 LastHrOpaqueSkyCover;
-    Real64 NextHrBeamSolarRad;
-    Real64 NextHrDifSolarRad;
-    Real64 NextHrLiquidPrecip;
+
+    Weather::WeatherVars wvarsLastHr;
+    Weather::WeatherVars wvarsNextHr;
+
     Real64 IsRainThreshold; // precipitation threshold (m) for a rainy day
 
     // ProcessEPWHeader static vars
@@ -1061,42 +979,8 @@ struct WeatherManagerData : BaseGlobalStruct
         this->NumOfEnvrn = 0;                       // Number of environments to be simulated
         this->NumEPWTypExtSets = 0;                 // Number of Typical/Extreme on weather file.
         this->NumWPSkyTemperatures = 0;             // Number of WeatherProperty:SkyTemperature items in input file
-        this->today.deallocate();
-        this->tomorrow.deallocate();
-#ifdef GET_OUT        
-        this->TodayIsRain.deallocate();             // Rain indicator, true=rain
-        this->TodayIsSnow.deallocate();             // Snow indicator, true=snow
-        this->TodayOutDryBulbTemp.deallocate();     // Dry bulb temperature of outside air
-        this->TodayOutDewPointTemp.deallocate();    // Dew Point Temperature of outside air
-        this->TodayOutBaroPress.deallocate();       // Barometric pressure of outside air
-        this->TodayOutRelHum.deallocate();          // Relative Humidity of outside air
-        this->TodayWindSpeed.deallocate();          // Wind speed of outside air
-        this->TodayWindDir.deallocate();            // Wind direction of outside air
-        this->TodaySkyTemp.deallocate();            // Sky temperature
-        this->TodayHorizIRSky.deallocate();         // Horizontal IR from Sky
-        this->TodayBeamSolarRad.deallocate();       // Direct normal solar irradiance
-        this->TodayDifSolarRad.deallocate();        // Sky diffuse horizontal solar irradiance
-        this->TodayAlbedo.deallocate();             // Albedo
-        this->TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
-        this->TodayTotalSkyCover.deallocate();      // Total Sky Cover
-        this->TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
-        this->TomorrowIsRain.deallocate();          // Rain indicator, true=rain
-        this->TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
-        this->TomorrowOutDryBulbTemp.deallocate();  // Dry bulb temperature of outside air
-        this->TomorrowOutDewPointTemp.deallocate(); // Dew Point Temperature of outside air
-        this->TomorrowOutBaroPress.deallocate();    // Barometric pressure of outside air
-        this->TomorrowOutRelHum.deallocate();       // Relative Humidity of outside air
-        this->TomorrowWindSpeed.deallocate();       // Wind speed of outside air
-        this->TomorrowWindDir.deallocate();         // Wind direction of outside air
-        this->TomorrowSkyTemp.deallocate();         // Sky temperature
-        this->TomorrowHorizIRSky.deallocate();      // Horizontal IR from Sky
-        this->TomorrowBeamSolarRad.deallocate();    // Direct normal solar irradiance
-        this->TomorrowDifSolarRad.deallocate();     // Sky diffuse horizontal solar irradiance
-        this->TomorrowAlbedo.deallocate();          // Albedo
-        this->TomorrowLiquidPrecip.deallocate();    // Liquid Precipitation Depth
-        this->TomorrowTotalSkyCover.deallocate();   // Total Sky Cover {tenth of sky}
-        this->TomorrowOpaqueSkyCover.deallocate();  // Opaque Sky Cover {tenth of sky}
-#endif        
+        this->wvarsHrTsToday.deallocate();
+        this->wvarsHrTsTomorrow.deallocate();
         this->DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
         this->DDHumIndModifier.deallocate();        // Design Day relative humidity values
         this->DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
@@ -1129,9 +1013,9 @@ struct WeatherManagerData : BaseGlobalStruct
         this->TodayVariables = Weather::DayWeatherVariables();
         this->TomorrowVariables = Weather::DayWeatherVariables();
         this->DesignDay.deallocate();
-        this->Missing = Weather::MissingData();
-        this->Missed = Weather::MissingDataCounts();
-        this->OutOfRange = Weather::RangeDataCounts();
+        this->wvarsMissing = Weather::ExtWeatherVars();
+        this->wvarsMissedCounts = Weather::WeatherVarCounts();
+        this->wvarsOutOfRangeCounts = Weather::WeatherVarCounts();
         this->DesDayInput.deallocate(); // Design day Input Data
         this->Environment.deallocate(); // Environment data
         this->RunPeriodInput.deallocate();
@@ -1145,32 +1029,10 @@ struct WeatherManagerData : BaseGlobalStruct
         this->ReportPeriodInputUniqueNames.clear();
         this->TypicalExtremePeriods.deallocate();
 
-        this->EPWDST.StDateType = Weather::DateType::Invalid;
-        this->EPWDST.StWeekDay = 0;
-        this->EPWDST.StMon = 0;
-        this->EPWDST.StDay = 0;
-        this->EPWDST.EnDateType = Weather::DateType::Invalid;
-        this->EPWDST.EnMon = 0;
-        this->EPWDST.EnDay = 0;
-        this->EPWDST.EnWeekDay = 0;
+        this->EPWDST = Weather::DSTPeriod();
+        this->IDFDST = Weather::DSTPeriod();
+        this->DST = Weather::DSTPeriod();
 
-        this->IDFDST.StDateType = Weather::DateType::Invalid;
-        this->IDFDST.StWeekDay = 0;
-        this->IDFDST.StMon = 0;
-        this->IDFDST.StDay = 0;
-        this->IDFDST.EnDateType = Weather::DateType::Invalid;
-        this->IDFDST.EnMon = 0;
-        this->IDFDST.EnDay = 0;
-        this->IDFDST.EnWeekDay = 0;
-
-        this->DST.StDateType = Weather::DateType::Invalid;
-        this->DST.StWeekDay = 0;
-        this->DST.StMon = 0;
-        this->DST.StDay = 0;
-        this->DST.EnDateType = Weather::DateType::Invalid;
-        this->DST.EnMon = 0;
-        this->DST.EnDay = 0;
-        this->DST.EnWeekDay = 0;
         this->WPSkyTemperature.deallocate();
         this->SpecialDays.deallocate();
         this->DataPeriods.deallocate();
@@ -1195,23 +1057,8 @@ struct WeatherManagerData : BaseGlobalStruct
         // SetUpDesignDay static vars
         this->PrintDDHeader = true;
 
-        this->LastHrOutDryBulbTemp = 0.0;
-        this->LastHrOutDewPointTemp = 0.0;
-        this->LastHrOutBaroPress = 0.0;
-        this->LastHrOutRelHum = 0.0;
-        this->LastHrWindSpeed = 0.0;
-        this->LastHrWindDir = 0.0;
-        this->LastHrSkyTemp = 0.0;
-        this->LastHrHorizIRSky = 0.0;
-        this->LastHrBeamSolarRad = 0.0;
-        this->LastHrDifSolarRad = 0.0;
-        this->LastHrAlbedo = 0.0;
-        this->LastHrLiquidPrecip = 0.0;
-        this->LastHrTotalSkyCover = 0.0;
-        this->LastHrOpaqueSkyCover = 0.0;
-        this->NextHrBeamSolarRad = 0.0;
-        this->NextHrDifSolarRad = 0.0;
-        this->NextHrLiquidPrecip = 0.0;
+        this->wvarsLastHr = Weather::WeatherVars();
+        this->wvarsNextHr = Weather::WeatherVars();
 
         // ProcessEPWHeader static vars
         this->EPWHeaderTitle = "";
