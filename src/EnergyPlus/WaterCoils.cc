@@ -2320,10 +2320,9 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 rho;
-    int FieldNum = 2;                      // IDD numeric field number where input field description is found
+    //int FieldNum = 2;                      // IDD numeric field number where input field description is found
     std::string CompType;                  // component type
     std::string SizingString;              // input field sizing description (e.g., Nominal Capacity)
-    bool bPRINT = true;                    // TRUE if sizing is reported to output (eio)
     Real64 TempSize;                       // autosized value
     Real64 DesCoilWaterInTempSaved;        // coil water inlet temp used for error checking UA sizing
     Real64 DesCoilInletWaterTempUsed(0.0); // coil design inlet water temp for UA sizing only
@@ -2336,7 +2335,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     Real64 DesCoilAirFlow = 0.0;
     Real64 DesCoilExitTemp = 0.0;
     Real64 CpAirStd = PsyCpAirFnW(0.0);
-    std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
 
     // cooling coils
     if (((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
@@ -2364,6 +2362,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
         if (PltSizCoolNum > 0) {
 
+            //int FieldNum = 0;
             state.dataSize->DataPltSizCoolNum = PltSizCoolNum;
             state.dataSize->DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum;
 
@@ -2373,8 +2372,8 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 CompType = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
             }
 
-            bPRINT = false; // do not print this sizing request since the autosized value is needed and this input may not be autosized (we should
-                            // print this!)
+            bool bPRINT = false; // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
+                                 // should print this!)
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate == state.dataSize->DataFlowUsedForSizing) {
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate; // represents parent object has hard-sized airflow
             } else {
@@ -2383,7 +2382,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             ErrorsFound = false;
             CoolingAirFlowSizer sizingCoolingAirFlow;
-            CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
+            std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
             sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             Real64 autoSizedValue = sizingCoolingAirFlow.size(state, TempSize, ErrorsFound);
             state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate =
@@ -2455,7 +2454,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                                      // should print this!)
                 TempSize = AutoSize; // not an input for this model
             } else {
-                FieldNum = 4; //  N4 , \field Design Inlet Air Temperature
+                //FieldNum = 4; //  N4 , \field Design Inlet Air Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp; // preserve input if entered
             }
@@ -2469,7 +2468,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 bPRINT = false;      // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize; // coil report
             } else {
-                FieldNum = 3; //  N3 , \field Design Inlet Water Temperature
+                //FieldNum = 3; //  N3 , \field Design Inlet Water Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp; // preserve input if entered
             }
@@ -2504,7 +2503,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 bPRINT = false;      // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize; // coil report
             } else {
-                FieldNum = 5; //  N5 , \field Design Outlet Air Temperature
+                //FieldNum = 5; //  N5 , \field Design Outlet Air Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp; // preserve input if entered
             }
@@ -2589,7 +2588,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel == CoilModel::CoolingDetailed) {
 
-                FieldNum = 16; //  N16, \field Number of Tubes per Row
+                int FieldNum = 16; //  N16, \field Number of Tubes per Row
                 bPRINT = true;
                 SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum);
                 // Auto size detailed cooling coil number of tubes per row = int( 13750.0 * WaterCoil( CoilNum ).MaxWaterVolFlowRate ) + 1
@@ -2748,6 +2747,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
         if (PltSizHeatNum > 0) {
 
+            int FieldNum = 0;
             bool NomCapUserInp = false; // flag for whether user has onput a nominal heating capacity
 
             state.dataSize->DataPltSizHeatNum = PltSizHeatNum;
@@ -2774,11 +2774,11 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             } else {
                 NomCapUserInp = false;
             }
-            bPRINT = false;                              // do not print this sizing request
+            bool bPRINT = false;                         // do not print this sizing request
             TempSize = AutoSize;                         // get the autosized air volume flow rate for use in other calculations
             SizingString.clear();                        // doesn't matter
             CompType = cAllCoilTypes(Coil_HeatingWater); // "Coil:Heating:Water"
-            CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
+            std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
             if (state.dataWaterCoils->WaterCoil(CoilNum).DesiccantRegenerationCoil) {
                 state.dataSize->DataDesicRegCoil = true;
                 state.dataSize->DataDesicDehumNum = state.dataWaterCoils->WaterCoil(CoilNum).DesiccantDehumNum;
@@ -2820,7 +2820,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 TempSize = AutoSize;
             }
             if (state.dataSize->CurSysNum > 0) {
-                int SizingType = HeatingCapacitySizing;
                 FieldNum = 3; //  N3 , \field Rated Capacity
                 SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
                 ErrorsFound = false;
@@ -3123,12 +3122,10 @@ void CalcSimpleHeatingCoil(EnergyPlusData &state,
     Real64 E2;
     Real64 Effec;
     Real64 Cp;
-    int Control;
 
     UA = state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable;
     TempAirIn = state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp;
     Win = state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat;
-    Control = state.dataWaterCoils->WaterCoil(CoilNum).Control;
     TempWaterIn = state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp;
 
     // adjust mass flow rates for cycling fan cycling coil operation
@@ -5053,15 +5050,9 @@ void UpdateWaterCoil(EnergyPlusData &state, int const CoilNum)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirInletNode;
-    int WaterInletNode;
-    int AirOutletNode;
-    int WaterOutletNode;
-
-    AirInletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum;
-    WaterInletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
-    AirOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum;
-    WaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
+    int const AirInletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum;
+    int const AirOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum;
+    int const WaterOutletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum;
 
     // Set the outlet air nodes of the WaterCoil
     state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataWaterCoils->WaterCoil(CoilNum).OutletAirMassFlowRate;
