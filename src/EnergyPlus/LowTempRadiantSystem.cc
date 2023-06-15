@@ -1943,7 +1943,6 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
         int RadNum;                 // Number of the radiant system (DO loop counter)
-        int RadSurfNum;             // Number of the radiant system surface (DO loop counter)
         int SurfNum;                // Intermediate variable for keeping track of the surface number
         Real64 TotalEffic;          // Intermediate calculation variable for total pump efficiency
         int ZoneNum;                // Intermediate variable for keeping track of the zone number
@@ -5945,8 +5944,11 @@ namespace LowTempRadiantSystem {
         // If there are no radiant systems in this input file, just RETURN
         if (state.dataLowTempRadSys->TotalNumOfRadSystems == 0) return;
 
-        // If it was allocated, then we have to check to see if this was running at all...
-        for (int numRadSys = 1; numRadSys <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++numRadSys) {
+        // Now check to see if anything is running and transfer information from the "average" variables to
+        // the array that will be used within the heat balance.
+        state.dataHeatBalFanSys->QRadSysSource = 0.0 // Zero this out first
+            for (int numRadSys = 1; numRadSys <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++numRadSys)
+        {
             auto &thisLTR = state.dataLowTempRadSys->HydrRadSys(numRadSys);
             for (int numRadSurf = 1; numRadSurf <= thisLTR.NumOfSurfaces; ++numRadSurf) {
                 if (thisLTR.QRadSysSrcAvg(numRadSurf) != 0.0) LowTempRadSysOn = true;

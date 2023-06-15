@@ -1515,7 +1515,6 @@ namespace VentilatedSlab {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadNum;         // Number of the radiant system (DO loop counter)
-        int RadSurfNum;     // Number of the radiant system surface (DO loop counter)
         int SurfNum;        // Intermediate variable for keeping track of the surface number
         int ZoneNum;        // Intermediate variable for keeping track of the zone number
         int AirRelNode;     // relief air node number in Ventilated Slab loop
