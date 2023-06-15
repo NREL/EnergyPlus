@@ -1050,7 +1050,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
     Real64 EnthCorrFrac(0.0); // enthalpy correction factor
     Real64 TempCorrFrac(0.0); // temperature correction factor
 
-    auto &Node = state.dataLoopNodes->Node;
+    /*auto &Node = state.dataLoopNodes->Node;*/
 
     if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
         // initialize the environment and sizing flags
@@ -1168,33 +1168,35 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
 
         if ((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
             (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) { // 'Cooling'
-            Node(WaterInletNode).Temp = 5.0;
+            auto &waterInletNode = state.dataLoopNodes->Node(WaterInletNode);
+            waterInletNode.Temp = 5.0;
 
             Cp = GetSpecificHeatGlycol(state,
                                        state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum).FluidName,
-                                       Node(WaterInletNode).Temp,
+                                       waterInletNode.Temp,
                                        state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
-            Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
-            Node(WaterInletNode).Quality = 0.0;
-            Node(WaterInletNode).Press = 0.0;
-            Node(WaterInletNode).HumRat = 0.0;
+            waterInletNode.Enthalpy = Cp * waterInletNode.Temp;
+            waterInletNode.Quality = 0.0;
+            waterInletNode.Press = 0.0;
+            waterInletNode.HumRat = 0.0;
         }
 
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) { // 'Heating'
-            Node(WaterInletNode).Temp = 60.0;
+            auto &waterInletNode = state.dataLoopNodes->Node(WaterInletNode);
+            waterInletNode.Temp = 60.0;
 
             Cp = GetSpecificHeatGlycol(state,
                                        state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum).FluidName,
-                                       Node(WaterInletNode).Temp,
+                                       waterInletNode.Temp,
                                        state.dataPlnt->PlantLoop(state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum).FluidIndex,
                                        RoutineName);
 
-            Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
-            Node(WaterInletNode).Quality = 0.0;
-            Node(WaterInletNode).Press = 0.0;
-            Node(WaterInletNode).HumRat = 0.0;
+            waterInletNode.Enthalpy = Cp * waterInletNode.Temp;
+            waterInletNode.Quality = 0.0;
+            waterInletNode.Press = 0.0;
+            waterInletNode.HumRat = 0.0;
             state.dataWaterCoils->MyUAAndFlowCalcFlag(CoilNum) = false;
             // fill values for variable UA
             CpAirStd = PsyCpAirFnW(0.0);
@@ -2071,14 +2073,16 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
     // First set the conditions for the air into the coil model
     AirInletNode = state.dataWaterCoils->WaterCoil(CoilNum).AirInletNodeNum;
     WaterInletNode = state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;
-    state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
-    state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = Node(AirInletNode).Temp;
-    state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = Node(AirInletNode).HumRat;
-    state.dataWaterCoils->WaterCoil(CoilNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
+    auto const &airInletNode = state.dataLoopNodes->Node(AirInletNode);
+    state.dataWaterCoils->WaterCoil(CoilNum).InletAirMassFlowRate = airInletNode.MassFlowRate;
+    state.dataWaterCoils->WaterCoil(CoilNum).InletAirTemp = airInletNode.Temp;
+    state.dataWaterCoils->WaterCoil(CoilNum).InletAirHumRat = airInletNode.HumRat;
+    state.dataWaterCoils->WaterCoil(CoilNum).InletAirEnthalpy = airInletNode.Enthalpy;
 
-    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = Node(WaterInletNode).MassFlowRate;
-    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = Node(WaterInletNode).Temp;
-    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy = Node(WaterInletNode).Enthalpy;
+    auto const &waterInletNode = state.dataLoopNodes->Node(WaterInletNode);
+    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = waterInletNode.MassFlowRate;
+    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = waterInletNode.Temp;
+    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterEnthalpy = waterInletNode.Enthalpy;
 
     state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable = state.dataWaterCoils->WaterCoil(CoilNum).UACoil;
 
@@ -2334,9 +2338,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
     Real64 CpAirStd = PsyCpAirFnW(0.0);
     std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
 
-    auto &ZoneEqSizing = state.dataSize->ZoneEqSizing;
-    // auto &OASysEqSizing = state.dataSize->OASysEqSizing;
-
     // cooling coils
     if (((state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) ||
          (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling)) &&
@@ -2390,10 +2391,11 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             // Check if the air volume flow rate is defined in parent HVAC equipment and set water coil design air volume flow rate accordingly
             if (state.dataSize->CurZoneEqNum > 0) {
-                if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent &&
+                auto const &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+                if (ZoneEqSizing.DesignSizeFromParent &&
                     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate == autoSizedValue) {
-                    state.dataSize->DataAirFlowUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
-                    state.dataSize->DataFlowUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataAirFlowUsedForSizing = ZoneEqSizing.AirVolFlow;
+                    state.dataSize->DataFlowUsedForSizing = ZoneEqSizing.AirVolFlow;
                     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize; // represents water coil being autosized
                 } else {
                     state.dataSize->DataAirFlowUsedForSizing =
@@ -2437,8 +2439,9 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             Real64 autoSizedCWFlow = sizerCWWaterflow.size(state, TempSize, ErrorsFound);
             // Check if the water flow rate is defined in parent HVAC equipment and set water coil design water flow rate accordingly
             if (state.dataSize->CurZoneEqNum > 0) {
-                if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
-                    state.dataSize->DataWaterFlowUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).MaxCWVolFlow;
+                auto const &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+                if (ZoneEqSizing.DesignSizeFromParent){
+                    state.dataSize->DataWaterFlowUsedForSizing = ZoneEqSizing.MaxCWVolFlow;
                 } else {
                     state.dataSize->DataWaterFlowUsedForSizing = autoSizedCWFlow;
                 }
@@ -2790,10 +2793,9 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 state.dataSize->DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                 if (state.dataSize->CurOASysNum > 0) {
-                    auto &OASysEqSizing = state.dataSize->OASysEqSizing;
-                    OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
-                    OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow =
-                        state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                    auto &OASysEqSizing = state.dataSize->OASysEqSizing(state.dataSize->CurOASysNum);
+                    OASysEqSizing.AirFlow = true;
+                    OASysEqSizing.AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                 }
                 TempSize = AutoSize; // reset back
             }
@@ -2870,9 +2872,10 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             Real64 sizedMaxWaterVolFlowRate = sizerHWWaterflow.size(state, TempSize, ErrorsFound);
             // Check if the water flow rate is defined in parent HVAC equipment and set water coil design water flow rate accordingly
             if (state.dataSize->CurZoneEqNum > 0) {
-                if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
-                    state.dataSize->DataWaterFlowUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).MaxHWVolFlow;
-                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = ZoneEqSizing(state.dataSize->CurZoneEqNum).MaxHWVolFlow;
+                auto const &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+                if (ZoneEqSizing.DesignSizeFromParent) {
+                    state.dataSize->DataWaterFlowUsedForSizing = ZoneEqSizing.MaxHWVolFlow;
+                    state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = ZoneEqSizing.MaxHWVolFlow;
                 } else {
                     state.dataSize->DataWaterFlowUsedForSizing = sizedMaxWaterVolFlowRate;
                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = sizedMaxWaterVolFlowRate;
