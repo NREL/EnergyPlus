@@ -1416,8 +1416,8 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
 
                         // If on soil boundary, load up local variables and perform calculations
                         NodePast = this->T(WidthIndex, DepthIndex, LengthIndex, TimeIndex::Previous);
-                        PastNodeTempAbs = NodePast + Constant::KelvinConv;
-                        SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::KelvinConv;
+                        PastNodeTempAbs = NodePast + Constant::Kelvin;
+                        SkyTempAbs = state.dataEnvrn->SkyTemp + Constant::Kelvin;
                         TopRoughness = this->SoilRoughness;
                         TopThermAbs = this->SoilThermAbs;
                         TopSolarAbs = this->SoilSolarAbs;

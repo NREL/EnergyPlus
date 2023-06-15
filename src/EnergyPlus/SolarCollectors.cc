@@ -1814,8 +1814,8 @@ namespace SolarCollectors {
 
         if (NumCovers == 1) {
             // calc linearized radiation coefficient
-            tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
-                      (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
+            tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::Kelvin) + (TempOuterCover + Constant::Kelvin)) *
+                      (pow_2(TempAbsPlate + Constant::Kelvin) + pow_2(TempOuterCover + Constant::Kelvin));
             tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
             hRadCoefA2C = tempnom / tempdenom;
             hRadCoefC2C = 0.0;
@@ -1827,8 +1827,8 @@ namespace SolarCollectors {
             for (int CoverNum = 1; CoverNum <= NumCovers; ++CoverNum) {
                 if (CoverNum == 1) {
                     // calc linearized radiation coefficient
-                    tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::KelvinConv) + (TempInnerCover + Constant::KelvinConv)) *
-                              (pow_2(TempAbsPlate + Constant::KelvinConv) + pow_2(TempInnerCover + Constant::KelvinConv));
+                    tempnom = Constant::StefanBoltzmann * ((TempAbsPlate + Constant::Kelvin) + (TempInnerCover + Constant::Kelvin)) *
+                              (pow_2(TempAbsPlate + Constant::Kelvin) + pow_2(TempInnerCover + Constant::Kelvin));
                     tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                     hRadCoefA2C = tempnom / tempdenom;
                     // Calc convection heat transfer coefficient:
@@ -1836,8 +1836,8 @@ namespace SolarCollectors {
                         TempAbsPlate, TempOuterCover, AirGapDepth, this->CosTilt, this->SinTilt);
                 } else {
                     // calculate the linearized radiation coeff.
-                    tempnom = Constant::StefanBoltzmann * ((TempInnerCover + Constant::KelvinConv) + (TempOuterCover + Constant::KelvinConv)) *
-                              (pow_2(TempInnerCover + Constant::KelvinConv) + pow_2(TempOuterCover + Constant::KelvinConv));
+                    tempnom = Constant::StefanBoltzmann * ((TempInnerCover + Constant::Kelvin) + (TempOuterCover + Constant::Kelvin)) *
+                              (pow_2(TempInnerCover + Constant::Kelvin) + pow_2(TempOuterCover + Constant::Kelvin));
                     tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                     hRadCoefC2C = tempnom / tempdenom;
                     // Calc convection heat transfer coefficient:
@@ -1852,8 +1852,8 @@ namespace SolarCollectors {
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * Constant::StefanBoltzmann *
-                  ((TempOuterCover + Constant::KelvinConv) + state.dataEnvrn->SkyTempKelvin) *
-                  (pow_2(TempOuterCover + Constant::KelvinConv) + pow_2(state.dataEnvrn->SkyTempKelvin));
+                  ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->SkyTempKelvin) *
+                  (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->SkyTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -1866,8 +1866,8 @@ namespace SolarCollectors {
         }
 
         tempnom = state.dataSurface->Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * Constant::StefanBoltzmann *
-                  ((TempOuterCover + Constant::KelvinConv) + state.dataEnvrn->GroundTempKelvin) *
-                  (pow_2(TempOuterCover + Constant::KelvinConv) + pow_2(state.dataEnvrn->GroundTempKelvin));
+                  ((TempOuterCover + Constant::Kelvin) + state.dataEnvrn->GroundTempKelvin) *
+                  (pow_2(TempOuterCover + Constant::Kelvin) + pow_2(state.dataEnvrn->GroundTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -2001,7 +2001,7 @@ namespace SolarCollectors {
             DensOfAir = Density[Index - 1] + InterpFrac * (Density[Index] - Density[Index - 1]);
         }
 
-        VolExpAir = 1.0 / (Tref + Constant::KelvinConv);
+        VolExpAir = 1.0 / (Tref + Constant::Kelvin);
 
         // Rayleigh number
         Real64 RaNum = gravity * pow_2(DensOfAir) * VolExpAir * PrOfAir * DeltaT * pow_3(AirGap) / pow_2(VisDOfAir);

@@ -2490,20 +2490,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_DOUBLE_EQ(0.25, state->dataSurface->Surface(3).ViewFactorGroundIR);
     // Test if sky and grd view factor and temperature correctly overwritten
     EXPECT_DOUBLE_EQ(
-        (Constant::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + Constant::KelvinConv) - pow_4(15.0 + Constant::KelvinConv)) / (20.0 - 15.0)),
+        (Constant::StefanBoltzmann * 0.9 * 0.3 * (pow_4(20.0 + Constant::Kelvin) - pow_4(15.0 + Constant::Kelvin)) / (20.0 - 15.0)),
         state->dataHeatBalSurf->SurfHSkyExt(1));
     EXPECT_DOUBLE_EQ(
-        (Constant::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + Constant::KelvinConv) - pow_4(22.0 + Constant::KelvinConv)) / (20.0 - 22.0)),
+        (Constant::StefanBoltzmann * 0.9 * 0.1 * (pow_4(20.0 + Constant::Kelvin) - pow_4(22.0 + Constant::Kelvin)) / (20.0 - 22.0)),
         state->dataHeatBalSurf->SurfHGrdExt(1));
 
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
+    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.6 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin)),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(1));
     EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 *
-                         (0.3 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)) +
-                          0.3 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv))),
+                         (0.3 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin)) +
+                          0.3 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin))),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(2));
-    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + Constant::KelvinConv) - pow_4(20.0 + Constant::KelvinConv)),
+    EXPECT_DOUBLE_EQ(Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(25.0 + Constant::Kelvin) - pow_4(20.0 + Constant::Kelvin)),
                      state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(3));
     EXPECT_DOUBLE_EQ(0.0, state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs(4));
 }
@@ -7152,8 +7152,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     Real64 result_LWRExchangeCoeff_surf2 = 0.0;
     Real64 result_LWRExchangeCoeff_surf3 = 0.0;
     // set exterior surface and ground surface temperatures
-    Real64 surf_TK = 20.0 + Constant::KelvinConv;
-    Real64 grnd_TK = 22.0 + Constant::KelvinConv;
+    Real64 surf_TK = 20.0 + Constant::Kelvin;
+    Real64 grnd_TK = 22.0 + Constant::Kelvin;
     // calculate LWR exchange coefficent from exterior surface to ground
     result_LWRExchangeCoeff_surf1 = Constant::StefanBoltzmann * 0.9 * 0.5 * (pow_4(surf_TK) - pow_4(grnd_TK)) / (surf_TK - grnd_TK);
     result_LWRExchangeCoeff_surf2 = Constant::StefanBoltzmann * 0.9 * 0.2 * (pow_4(surf_TK) - pow_4(grnd_TK)) / (surf_TK - grnd_TK);
@@ -7421,7 +7421,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestGroundSurfsAverageTemp)
     // test 1: surface viewing grass, parking and lake areas
     // calculate ground surfaces average temperature
     GetGroundSurfacesTemperatureAverage(*state);
-    Real64 dTK = Constant::KelvinConv;
+    Real64 dTK = Constant::Kelvin;
     Real64 results_gndSurfsAvgTemp = 0.0;
     results_gndSurfsAvgTemp = root_4((0.2 * pow_4(25.0 + dTK) + 0.1 * pow_4(28.0 + dTK) + 0.1 * pow_4(22.0 + dTK)) / (0.2 + 0.1 + 0.1)) - dTK;
     // check ground surfaces average temperature

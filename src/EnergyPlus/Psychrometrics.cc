@@ -742,7 +742,7 @@ namespace Psychrometrics {
 #endif
 
         // Convert temperature from Centigrade to Kelvin.
-        Real64 const Tkel(T + Constant::KelvinConv); // Dry-bulb in REAL(r64) for function passing
+        Real64 const Tkel(T + Constant::Kelvin); // Dry-bulb in REAL(r64) for function passing
 
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
         if (Tkel < 173.15) {

@@ -324,7 +324,7 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     if (ExtBoundCond > 0) {
         value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(ExtBoundCond);
     } else {
-        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::KelvinConv;
+        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::Kelvin;
         value = state.dataWindowManager->sigma * pow_4(tout);
         value = ViewFactorSkyIR *
                     (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +

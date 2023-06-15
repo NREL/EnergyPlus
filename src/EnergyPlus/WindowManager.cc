@@ -2521,7 +2521,7 @@ namespace WindowManager {
                         for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
                             SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
-                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::KelvinConv;
+                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::Kelvin;
                             OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
@@ -2687,7 +2687,7 @@ namespace WindowManager {
                     SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs = GetCurrentScheduleValue(
                                          state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                     Constant::KelvinConv;
+                                     Constant::Kelvin;
                     rad_out_lw_srd_per_area += -emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
                 }
             }
@@ -3658,8 +3658,8 @@ namespace WindowManager {
                 }
                 CalcISO15099WindowIntConvCoeff(state,
                                                SurfNum,
-                                               state.dataWindowManager->thetas[InsideFaceIndex - 1] - Constant::KelvinConv,
-                                               state.dataWindowManager->tin - Constant::KelvinConv);
+                                               state.dataWindowManager->thetas[InsideFaceIndex - 1] - Constant::Kelvin,
+                                               state.dataWindowManager->tin - Constant::Kelvin);
                 state.dataWindowManager->hcin = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
             }
 
@@ -3920,8 +3920,8 @@ namespace WindowManager {
                     ShowContinueError(state,
                                       format("Glazing face index = {} ; new temperature ={:.4R}C  ; previous temperature = {:.4R}C",
                                              i,
-                                             state.dataWindowManager->thetas[i - 1] - Constant::KelvinConv,
-                                             state.dataWindowManager->thetasPrev[i - 1] - Constant::KelvinConv));
+                                             state.dataWindowManager->thetas[i - 1] - Constant::Kelvin,
+                                             state.dataWindowManager->thetasPrev[i - 1] - Constant::Kelvin));
                 }
             }
 

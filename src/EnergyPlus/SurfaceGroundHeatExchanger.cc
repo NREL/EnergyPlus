@@ -1244,8 +1244,8 @@ namespace SurfaceGroundHeatExchanger {
         // set previous surface temp
         OldSurfTemp = this->TtopHistory[1];
         // absolute temperatures
-        SurfTempAbs = OldSurfTemp + Constant::KelvinConv;
-        SkyTempAbs = ThisSkyTemp + Constant::KelvinConv;
+        SurfTempAbs = OldSurfTemp + Constant::Kelvin;
+        SkyTempAbs = ThisSkyTemp + Constant::Kelvin;
 
         // ASHRAE simple convection coefficient model for external surfaces.
         ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(this->TopRoughness, ThisWindSpeed);
@@ -1296,8 +1296,8 @@ namespace SurfaceGroundHeatExchanger {
             // make a surface heat balance and solve for temperature
             OldSurfTemp = this->TbtmHistory[1];
             // absolute temperatures
-            SurfTempAbs = OldSurfTemp + Constant::KelvinConv;
-            ExtTempAbs = ThisDryBulb + Constant::KelvinConv;
+            SurfTempAbs = OldSurfTemp + Constant::Kelvin;
+            ExtTempAbs = ThisDryBulb + Constant::Kelvin;
 
             // ASHRAE simple convection coefficient model for external surfaces.
             ConvCoef = Convect::CalcASHRAESimpExtConvCoeff(this->TopRoughness, ThisWindSpeed);

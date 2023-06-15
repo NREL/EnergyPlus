@@ -2057,11 +2057,10 @@ namespace Weather {
 
         ScheduleManager::UpdateScheduleValues(state);
 
-        state.dataEnvrn->CurMnDyHr = fmt::format(
+        state.dataEnvrn->CurMnDyHr = format(
             "{:02d}/{:02d} {:02d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, (unsigned short)(state.dataGlobal->HourOfDay - 1));
-        state.dataEnvrn->CurMnDy = fmt::format("{:02d}/{:02d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
-        state.dataEnvrn->CurMnDyYr =
-            fmt::format("{:02d}/{:02d}/{:04d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->CalendarYear);
+        state.dataEnvrn->CurMnDy = format("{:02d}/{:02d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+        state.dataEnvrn->CurMnDyYr = format("{:02d}/{:02d}/{:04d}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, state.dataGlobal->CalendarYear);
 
         state.dataGlobal->WeightNow = state.dataWeather->Interpolation(state.dataGlobal->TimeStep);
         state.dataGlobal->WeightPreviousHour = 1.0 - state.dataGlobal->WeightNow;
@@ -2070,15 +2069,11 @@ namespace Weather {
         state.dataGlobal->SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour +
                                          (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
-        state.dataEnvrn->GroundTemp =
-            state.dataWeather->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
-        state.dataEnvrn->GroundTempKelvin = state.dataEnvrn->GroundTemp + Constant::KelvinConv;
-        state.dataEnvrn->GroundTempFC =
-            state.dataWeather->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
-        state.dataEnvrn->GroundTemp_Surface =
-            state.dataWeather->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
-        state.dataEnvrn->GroundTemp_Deep =
-            state.dataWeather->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTemp = state.dataWeather->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTempKelvin = state.dataEnvrn->GroundTemp + Constant::Kelvin;
+        state.dataEnvrn->GroundTempFC = state.dataWeather->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTemp_Surface = state.dataWeather->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTemp_Deep = state.dataWeather->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
         state.dataEnvrn->GndReflectance = state.dataWeather->GroundReflectances(state.dataEnvrn->Month);
         state.dataEnvrn->GndReflectanceForDayltg = state.dataEnvrn->GndReflectance;
 
@@ -2167,7 +2162,7 @@ namespace Weather {
         if (state.dataEnvrn->EMSWindDirOverrideOn) state.dataEnvrn->WindDir = state.dataEnvrn->EMSWindDirOverrideValue;
         state.dataWeather->HorizIRSky = today.HorizIRSky;
         state.dataEnvrn->SkyTemp = today.SkyTemp;
-        state.dataEnvrn->SkyTempKelvin = state.dataEnvrn->SkyTemp + Constant::KelvinConv;
+        state.dataEnvrn->SkyTempKelvin = state.dataEnvrn->SkyTemp + Constant::Kelvin;
         state.dataEnvrn->DifSolarRad = today.DifSolarRad;
         if (state.dataEnvrn->EMSDifSolarRadOverrideOn) state.dataEnvrn->DifSolarRad = state.dataEnvrn->EMSDifSolarRadOverrideValue;
         state.dataEnvrn->BeamSolarRad = today.BeamSolarRad;
@@ -3161,12 +3156,12 @@ namespace Weather {
             ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
         } else if (ESkyCalcType == SkyTempModel::Idso) {
             double const PartialPress = RelHum * Psychrometrics::PsyPsatFnTemp(state, DryBulb) * 0.01;
-            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + Constant::KelvinConv));
+            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + Constant::Kelvin));
         } else if (ESkyCalcType == SkyTempModel::BerdahlMartin) {
             double const TDewC = min(DryBulb, DewPoint);
             ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
         } else {
-            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + Constant::KelvinConv) / Constant::KelvinConv);
+            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + Constant::Kelvin) / Constant::Kelvin);
         }
         return ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
     }
@@ -3764,14 +3759,14 @@ namespace Weather {
                 double DryBulb = tomorrowTs.OutDryBulbTemp;
                 double RelHum = tomorrowTs.OutRelHum * 0.01;
                 Real64 ESky = CalcSkyEmissivity(state, envCurr.skyTempModel, OSky, DryBulb, tomorrowTs.OutDewPointTemp, RelHum); // Emissivitity of Sky
-                tomorrowTs.HorizIRSky = ESky * Constant::StefanBoltzmann * pow_4(DryBulb + Constant::KelvinConv);
+                tomorrowTs.HorizIRSky = ESky * Constant::StefanBoltzmann * pow_4(DryBulb + Constant::Kelvin);
 
                 if (envCurr.skyTempModel == SkyTempModel::Brunt ||
                     envCurr.skyTempModel == SkyTempModel::Idso ||
                     envCurr.skyTempModel == SkyTempModel::BerdahlMartin ||
                     envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
                     // Design day not scheduled
-                    tomorrowTs.SkyTemp = (DryBulb + Constant::KelvinConv) * root_4(ESky) - Constant::KelvinConv;
+                    tomorrowTs.SkyTemp = (DryBulb + Constant::Kelvin) * root_4(ESky) - Constant::Kelvin;
                 }
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
@@ -8967,10 +8962,10 @@ namespace Weather {
         if (!envCurr.UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
             Real64 ESky = CalcSkyEmissivity(state, envCurr.skyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
-            HorizIRSky = ESky * Constant::StefanBoltzmann * pow_4(DryBulb + Constant::KelvinConv);
+            HorizIRSky = ESky * Constant::StefanBoltzmann * pow_4(DryBulb + Constant::Kelvin);
             if (envCurr.skyTempModel == SkyTempModel::Brunt || envCurr.skyTempModel == SkyTempModel::Idso ||
                 envCurr.skyTempModel == SkyTempModel::BerdahlMartin || envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
-                SkyTemp = (DryBulb + Constant::KelvinConv) * root_4(ESky) - Constant::KelvinConv;
+                SkyTemp = (DryBulb + Constant::Kelvin) * root_4(ESky) - Constant::Kelvin;
             } else {
                 SkyTemp = 0.0; // dealt with later
             }
@@ -8979,7 +8974,7 @@ namespace Weather {
             HorizIRSky = IRHoriz;
             if (envCurr.skyTempModel == SkyTempModel::Brunt || envCurr.skyTempModel == SkyTempModel::Idso ||
                 envCurr.skyTempModel == SkyTempModel::BerdahlMartin || envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
-                    SkyTemp = root_4(IRHoriz / Constant::StefanBoltzmann) - Constant::KelvinConv;
+                    SkyTemp = root_4(IRHoriz / Constant::StefanBoltzmann) - Constant::Kelvin;
             } else {
                 SkyTemp = 0.0; // dealt with later
             }

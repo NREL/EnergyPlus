@@ -2059,7 +2059,7 @@ namespace ThermalComfort {
         auto &thisAngFacList(state.dataThermalComforts->AngleFactorList(AngleFacNum));
 
         for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-            Real64 SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(thisAngFacList.SurfacePtr(SurfNum)) + Constant::KelvinConv;
+            Real64 SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(thisAngFacList.SurfacePtr(SurfNum)) + Constant::Kelvin;
             Real64 SurfEAF =
                 state.dataConstruction->Construct(state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal *
                 thisAngFacList.AngleFactor(SurfNum);
@@ -2067,7 +2067,7 @@ namespace ThermalComfort {
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
 
-        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - Constant::KelvinConv;
+        CalcAngleFactorMRT = root_4(SurfTempEmissAngleFacSummed / SumSurfaceEmissAngleFactor) - Constant::Kelvin;
 
         return CalcAngleFactorMRT;
     }
@@ -2258,11 +2258,11 @@ namespace ThermalComfort {
             state.dataHeatBalFanSys->ZoneQSteamBaseboardToPerson(state.dataThermalComforts->ZoneNum) +
             state.dataHeatBalFanSys->ZoneQElecBaseboardToPerson(state.dataThermalComforts->ZoneNum);
         if (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) > 0.0) {
-            state.dataThermalComforts->RadTemp += Constant::KelvinConv; // Convert to Kelvin
+            state.dataThermalComforts->RadTemp += Constant::Kelvin; // Convert to Kelvin
             state.dataThermalComforts->RadTemp =
                 root_4(pow_4(state.dataThermalComforts->RadTemp) +
                        (state.dataHeatBalFanSys->ZoneQdotRadHVACToPerson(state.dataThermalComforts->ZoneNum) / AreaEff / StefanBoltzmannConst));
-            state.dataThermalComforts->RadTemp -= Constant::KelvinConv; // Convert back to Celsius
+            state.dataThermalComforts->RadTemp -= Constant::Kelvin; // Convert back to Celsius
         }
 
         CalcRadTemp = state.dataThermalComforts->RadTemp;

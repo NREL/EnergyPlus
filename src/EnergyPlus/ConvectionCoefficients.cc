@@ -429,8 +429,8 @@ void InitExtConvCoeff(EnergyPlusData &state,
         state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
     }
 
-    Real64 TAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::KelvinConv;
-    Real64 TSurf = TempExt + Constant::KelvinConv;
+    Real64 TAir = state.dataSurface->SurfOutDryBulbTemp(SurfNum) + Constant::Kelvin;
+    Real64 TSurf = TempExt + Constant::Kelvin;
     Real64 TSky = state.dataEnvrn->SkyTempKelvin;
     Real64 TGround = TAir;
 
@@ -438,12 +438,12 @@ void InitExtConvCoeff(EnergyPlusData &state,
         int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
         if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
             TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
-                   Constant::KelvinConv;
+                   Constant::Kelvin;
         }
     }
     if (surface.UseSurfPropertyGndSurfTemp) {
         int gndSurfsNum = surface.SurfPropertyGndSurfIndex;
-        TGround = state.dataSurface->GroundSurfsProperty(gndSurfsNum).SurfsTempAvg + Constant::KelvinConv;
+        TGround = state.dataSurface->GroundSurfsProperty(gndSurfsNum).SurfsTempAvg + Constant::Kelvin;
     }
 
     int BaseSurf = surface.BaseSurf; // If this is a base surface, BaseSurf = SurfNum
@@ -2488,11 +2488,11 @@ void CalcTrombeWallIntConvCoeff(EnergyPlusData &state,
         // make sure inside surface is hot, outside is cold
         // NOTE: this is not ideal.  could have circumstances that reverse this?
         if (SurfaceTemperatures(Surf1) > SurfaceTemperatures(Surf2)) {
-            Tsi = SurfaceTemperatures(Surf1) + Constant::KelvinConv;
-            Tso = SurfaceTemperatures(Surf2) + Constant::KelvinConv;
+            Tsi = SurfaceTemperatures(Surf1) + Constant::Kelvin;
+            Tso = SurfaceTemperatures(Surf2) + Constant::Kelvin;
         } else {
-            Tso = SurfaceTemperatures(Surf1) + Constant::KelvinConv;
-            Tsi = SurfaceTemperatures(Surf2) + Constant::KelvinConv;
+            Tso = SurfaceTemperatures(Surf1) + Constant::Kelvin;
+            Tsi = SurfaceTemperatures(Surf2) + Constant::Kelvin;
         }
 
         beta = 2.0 / (Tso + Tsi);
@@ -3637,7 +3637,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
             HnFn = [=](double Tsurf, double Tamb, double, double, double) -> double {
                 return CalcFohannoPolidoriVerticalWall(Tsurf - Tamb,
                                                        WallHeight,
-                                                       Tsurf - Constant::KelvinConv, // Kiva already uses Kelvin, but algorithm expects C
+                                                       Tsurf - Constant::Kelvin, // Kiva already uses Kelvin, but algorithm expects C
                                                        QdotConvection);
             };
         } else {
@@ -4464,7 +4464,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
             }
         }
         GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) /
-              ((state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + Constant::KelvinConv) * pow_2(v));
+              ((state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT + Constant::Kelvin) * pow_2(v));
 
         // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
         if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
@@ -6173,7 +6173,7 @@ Real64 CalcFohannoPolidoriVerticalWall(Real64 const DeltaTemp, // [C] temperatur
     Real64 RaH(0.0);
     Real64 BetaFilm(0.0);
 
-    BetaFilm = 1.0 / (Constant::KelvinConv + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
+    BetaFilm = 1.0 / (Constant::Kelvin + SurfTemp + 0.5 * DeltaTemp); // TODO check sign on DeltaTemp
     RaH = (g * BetaFilm * QdotConv * pow_4(Height) * Pr) / (k * pow_2(v));
 
     if (RaH <= 6.3e09) {
@@ -6944,7 +6944,7 @@ Real64 CalcClearRoof(EnergyPlusData &state,
         Ln = std::sqrt(RoofArea);
     }
     DeltaTemp = SurfTemp - AirTemp;
-    BetaFilm = 1.0 / (Constant::KelvinConv + SurfTemp + 0.5 * DeltaTemp);
+    BetaFilm = 1.0 / (Constant::Kelvin + SurfTemp + 0.5 * DeltaTemp);
     AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, AirTemp, state.dataEnvrn->OutHumRat);
 
     GrLn = g * pow_2(AirDensity) * pow_3(Ln) * std::abs(DeltaTemp) * BetaFilm / pow_2(v);

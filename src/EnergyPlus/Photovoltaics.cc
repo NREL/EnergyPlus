@@ -553,14 +553,14 @@ namespace Photovoltaics {
                 tmpTNRSYSModuleParams(ModNum).ShuntResistance = state.dataIPShortCut->rNumericArgs(5);
                 tmpTNRSYSModuleParams(ModNum).RefIsc = state.dataIPShortCut->rNumericArgs(6);
                 tmpTNRSYSModuleParams(ModNum).RefVoc = state.dataIPShortCut->rNumericArgs(7);
-                tmpTNRSYSModuleParams(ModNum).RefTemperature = state.dataIPShortCut->rNumericArgs(8) + Constant::KelvinConv;
+                tmpTNRSYSModuleParams(ModNum).RefTemperature = state.dataIPShortCut->rNumericArgs(8) + Constant::Kelvin;
                 tmpTNRSYSModuleParams(ModNum).RefInsolation = state.dataIPShortCut->rNumericArgs(9);
                 tmpTNRSYSModuleParams(ModNum).Imp = state.dataIPShortCut->rNumericArgs(10);
                 tmpTNRSYSModuleParams(ModNum).Vmp = state.dataIPShortCut->rNumericArgs(11);
                 tmpTNRSYSModuleParams(ModNum).TempCoefIsc = state.dataIPShortCut->rNumericArgs(12);
                 tmpTNRSYSModuleParams(ModNum).TempCoefVoc = state.dataIPShortCut->rNumericArgs(13);
-                tmpTNRSYSModuleParams(ModNum).NOCTAmbTemp = state.dataIPShortCut->rNumericArgs(14) + Constant::KelvinConv;
-                tmpTNRSYSModuleParams(ModNum).NOCTCellTemp = state.dataIPShortCut->rNumericArgs(15) + Constant::KelvinConv;
+                tmpTNRSYSModuleParams(ModNum).NOCTAmbTemp = state.dataIPShortCut->rNumericArgs(14) + Constant::Kelvin;
+                tmpTNRSYSModuleParams(ModNum).NOCTCellTemp = state.dataIPShortCut->rNumericArgs(15) + Constant::Kelvin;
                 tmpTNRSYSModuleParams(ModNum).NOCTInsolation = state.dataIPShortCut->rNumericArgs(16);
                 tmpTNRSYSModuleParams(ModNum).HeatLossCoef = state.dataIPShortCut->rNumericArgs(17);
                 tmpTNRSYSModuleParams(ModNum).HeatCapacity = state.dataIPShortCut->rNumericArgs(18);
@@ -1187,9 +1187,9 @@ namespace Photovoltaics {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && state.dataPhotovoltaicState->MyEnvrnFlag(PVnum)) {
             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.CellTempK =
-                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::KelvinConv;
+                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::Kelvin;
             state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVcalc.LastCellTempK =
-                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::KelvinConv;
+                state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::Kelvin;
             state.dataPhotovoltaicState->MyEnvrnFlag(PVnum) = false;
         }
 
@@ -1283,7 +1283,7 @@ namespace Photovoltaics {
         state.dataPhotovoltaic->ShuntResistance = state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
 
         // convert ambient temperature from C to K
-        Tambient = state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::KelvinConv;
+        Tambient = state.dataSurface->SurfOutDryBulbTemp(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::Kelvin;
 
         auto &thisPVarray = state.dataPhotovoltaic->PVarray;
 
@@ -1325,19 +1325,19 @@ namespace Photovoltaics {
                                       state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * state.dataPhotovoltaicState->PVTimeStep));
                 } break;
                 case CellIntegration::SurfaceOutsideFace: {
-                    CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::KelvinConv;
+                    CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::Kelvin;
                 } break;
                 case CellIntegration::TranspiredCollector: {
                     GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
-                    CellTemp += Constant::KelvinConv;
+                    CellTemp += Constant::Kelvin;
                 } break;
                 case CellIntegration::ExteriorVentedCavity: {
                     GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                    CellTemp += Constant::KelvinConv;
+                    CellTemp += Constant::Kelvin;
                 } break;
                 case CellIntegration::PVTSolarCollector: {
                     GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, CellTemp);
-                    CellTemp += Constant::KelvinConv;
+                    CellTemp += Constant::Kelvin;
                 } break;
                 default:
                     break;
@@ -1415,19 +1415,19 @@ namespace Photovoltaics {
                                         state.dataPhotovoltaic->PVarray(PVnum).TRNSYSPVModule.HeatCapacity * state.dataPhotovoltaicState->PVTimeStep);
             } break;
             case CellIntegration::SurfaceOutsideFace: {
-                CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::KelvinConv;
+                CellTemp = state.dataHeatBalSurf->SurfTempOut(state.dataPhotovoltaic->PVarray(PVnum).SurfacePtr) + Constant::Kelvin;
             } break;
             case CellIntegration::TranspiredCollector: {
                 GetUTSCTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).UTSCPtr, CellTemp);
-                CellTemp += Constant::KelvinConv;
+                CellTemp += Constant::Kelvin;
             } break;
             case CellIntegration::ExteriorVentedCavity: {
                 GetExtVentedCavityTsColl(state, state.dataPhotovoltaic->PVarray(PVnum).ExtVentCavPtr, CellTemp);
-                CellTemp += Constant::KelvinConv;
+                CellTemp += Constant::Kelvin;
             } break;
             case CellIntegration::PVTSolarCollector: {
                 GetPVTTsColl(state, thisPVarray(PVnum).PVTPtr, CellTemp);
-                CellTemp += Constant::KelvinConv;
+                CellTemp += Constant::Kelvin;
             } break;
             default: {
                 assert(false);
@@ -1444,7 +1444,7 @@ namespace Photovoltaics {
         }
 
         // convert cell temperature back to C
-        CellTempC = CellTemp - Constant::KelvinConv;
+        CellTempC = CellTemp - Constant::Kelvin;
 
         // calculate array based outputs (so far, the outputs are module based
         IA = state.dataPhotovoltaic->PVarray(PVnum).NumSeriesNParall * IM;
@@ -2175,7 +2175,7 @@ namespace Photovoltaics {
 
         if (Ee > 0.0) {
             // following is equation 8 in King et al. nov. 2003
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + Constant::KelvinConv)) / 1.60218e-19);
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + Constant::Kelvin)) / 1.60218e-19);
 
             BVmpEe = BVmp0 + mBVmp * (1.0 - Ee);
 
@@ -2214,7 +2214,7 @@ namespace Photovoltaics {
         Real64 BVocEe; // working variable
 
         if (Ee > 0.0) {
-            dTc = DiodeFactor * ((1.38066e-23 * (Tc + Constant::KelvinConv)) / 1.60218e-19);
+            dTc = DiodeFactor * ((1.38066e-23 * (Tc + Constant::Kelvin)) / 1.60218e-19);
             BVocEe = BVoc0 + mBVoc * (1.0 - Ee);
 
             SandiaVoc = Voc0 + NcellSer * dTc * std::log(Ee) + BVocEe * (Tc - 25.0);

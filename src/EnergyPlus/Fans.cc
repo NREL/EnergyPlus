@@ -1226,7 +1226,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
         //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
         // From PsychRoutines:
         //   w=MAX(dw,1.0d-5)
-        //   rhoair = pb/(287.d0*(tdb+Constant::KelvinConv())*(1.0d0+1.6077687d0*w))
+        //   rhoair = pb/(287.d0*(tdb+Constant::Kelvin())*(1.0d0+1.6077687d0*w))
         Real64 RhoAir = state.dataEnvrn->StdRhoAir;
 
         // Adjust max fan volumetric airflow using fan sizing factor
@@ -2089,7 +2089,7 @@ void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     //   StdRhoAir=PsyRhoAirFnPbTdbW(StdBaroPress,20,0)
     // From PsychRoutines:
     //   w=MAX(dw,1.0d-5)
-    //   rhoair = pb/(287.d0*(tdb+Constant::KelvinConv())*(1.0d0+1.6077687d0*w))
+    //   rhoair = pb/(287.d0*(tdb+Constant::Kelvin())*(1.0d0+1.6077687d0*w))
     Real64 RhoAir = fan.RhoAirStdInit;
     Real64 MassFlow = min(fan.InletAirMassFlowRate, fan.MaxAirMassFlowRate);
 

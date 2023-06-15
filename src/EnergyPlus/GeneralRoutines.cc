@@ -911,8 +911,8 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         Real64 AbsThermSurf =
             dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
                 ->AbsorpThermal;
-        Real64 TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::KelvinConv;
-        Real64 TsBaffK = TmpTsBaf + Constant::KelvinConv;
+        Real64 TsoK = state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfPtr) + Constant::Kelvin;
+        Real64 TsBaffK = TmpTsBaf + Constant::Kelvin;
         if (TsBaffK == TsoK) {        // avoid divide by zero
             HPlenARR(ThisSurf) = 0.0; // no net heat transfer if same temperature
         } else {
@@ -972,7 +972,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 Isc =
         sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) / A;
     // average of surface temps , for Beta in Grashoff no.
-    Real64 TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::KelvinConv;
+    Real64 TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::Kelvin;
     // Grasshof number for natural convection calc
     Real64 Gr = g * pow_3(GapThick) * std::abs(Tso - TmpTsBaf) * pow_2(RhoAir) / (TmeanK * pow_2(nu));
 
@@ -983,14 +983,14 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 VdotWind = Cv * (VentArea / 2.0) * Vwind; // volume flow rate of nat. vent due to wind
 
     if (TaGap > Tamb) {
-        VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + Constant::KelvinConv));
+        VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (TaGap - Tamb) / (TaGap + Constant::Kelvin));
     } else if (TaGap == Tamb) {
         VdotThermal = 0.0;
     } else {
         if ((std::abs(Tilt) < 5.0) || (std::abs(Tilt - 180.0) < 5.0)) {
             VdotThermal = 0.0; // stable buoyancy situation
         } else {
-            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + Constant::KelvinConv));
+            VdotThermal = Cd * (VentArea / 2.0) * std::sqrt(2.0 * g * HdeltaNPL * (Tamb - TaGap) / (Tamb + Constant::Kelvin));
         }
     }
 

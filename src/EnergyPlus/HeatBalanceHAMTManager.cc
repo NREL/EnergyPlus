@@ -1496,7 +1496,7 @@ namespace HeatBalanceHAMTManager {
 
         SurfTempInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
 
-        state.dataMstBal->RhoVaporSurfIn(sid) = SurfTempInP / (461.52 * (thisZoneHB.MAT + Constant::KelvinConv));
+        state.dataMstBal->RhoVaporSurfIn(sid) = SurfTempInP / (461.52 * (thisZoneHB.MAT + Constant::Kelvin));
     }
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)
@@ -1651,7 +1651,7 @@ namespace HeatBalanceHAMTManager {
         // Return value
         Real64 WVDC;
 
-        WVDC = (2.e-7 * std::pow(Temperature + Constant::KelvinConv, 0.81)) / ambp;
+        WVDC = (2.e-7 * std::pow(Temperature + Constant::Kelvin, 0.81)) / ambp;
 
         return WVDC;
     }

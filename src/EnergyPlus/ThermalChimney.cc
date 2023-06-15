@@ -744,7 +744,7 @@ namespace ThermalChimney {
                         if (state.dataHeatBalSurf->SurfTempIn(SurfNum) > TemporaryWallSurfTemp) {
                             TemporaryWallSurfTemp = state.dataHeatBalSurf->SurfTempIn(SurfNum);
                             ConvTransCoeffWallFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
-                            SurfTempAbsorberWall = state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv;
+                            SurfTempAbsorberWall = state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::Kelvin;
                         }
                     }
                 }
@@ -754,7 +754,7 @@ namespace ThermalChimney {
                         if (state.dataSurface->Surface(SurfNum).Width > TempmajorW) {
                             TempmajorW = state.dataSurface->Surface(SurfNum).Width;
                             ConvTransCoeffGlassFluid = state.dataHeatBalSurf->SurfHConvInt(SurfNum);
-                            SurfTempGlassCover = state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::KelvinConv;
+                            SurfTempGlassCover = state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::Kelvin;
                         }
                     }
                 }
@@ -781,7 +781,7 @@ namespace ThermalChimney {
                 RoomAirTemp += state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) *
                                state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT;
             }
-            RoomAirTemp += Constant::KelvinConv;
+            RoomAirTemp += Constant::Kelvin;
 
             Process1 = 0.0;
             Process2 = 0.0;
@@ -919,7 +919,7 @@ namespace ThermalChimney {
                 state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCMassFlow =
                     state.dataThermalChimneys->ThermalChimneyReport(Loop).OverallTCVolumeFlow * AirDensityThermalChim;
             }
-            state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - Constant::KelvinConv;
+            state.dataThermalChimneys->ThermalChimneyReport(Loop).OutletAirTempThermalChim = ThermChimSubTemp(NTC) - Constant::Kelvin;
 
             if (GetCurrentScheduleValue(state, state.dataThermalChimneys->ThermalChimneySys(Loop).SchedPtr) <= 0.0) {
                 for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {

@@ -1172,7 +1172,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
             SumSysM += MassFlowRate;
         }
         if (TotSysFlow > 0.0) {
-            TSupK = TSupK / SumSysM + Constant::KelvinConv;
+            TSupK = TSupK / SumSysM + Constant::Kelvin;
         } else {
             TSupK = 0.0;
         }
@@ -1202,7 +1202,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
         NumberOfPlumes = 1.0;
         NumDiffusersPerPlume = 1.0;
     }
-    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
+    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::Kelvin) > thisZoneHB.MAT) {
         // The system will mix
         HeightFrac = 0.0;
     } else {
@@ -1478,8 +1478,8 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     if (MIXFLAG) {
         state.dataRoomAirMod->Phi(ZoneNum) = 1.0;
     } else {
-        state.dataRoomAirMod->Phi(ZoneNum) = (state.dataRoomAirMod->ZTOC(ZoneNum) - (TSupK - Constant::KelvinConv)) /
-                                             (state.dataRoomAirMod->ZTMX(ZoneNum) - (TSupK - Constant::KelvinConv));
+        state.dataRoomAirMod->Phi(ZoneNum) = (state.dataRoomAirMod->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) /
+                                             (state.dataRoomAirMod->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
     }
 
     // Mixed for reporting purposes
@@ -1678,7 +1678,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
             SumSysM += MassFlowRate;
         }
         if (TotSysFlow > 0.0) {
-            TSupK = TSupK / SumSysM + Constant::KelvinConv;
+            TSupK = TSupK / SumSysM + Constant::Kelvin;
         } else {
             TSupK = 0.0;
         }
@@ -1713,7 +1713,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
         NumberOfPlumes = 1.0;
         NumDiffusersPerPlume = 1.0;
     }
-    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
+    if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::Kelvin) > thisZoneHB.MAT) {
         // The system will mix
         HeightFrac = 0.0;
     } else {
@@ -2021,8 +2021,8 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     if (MIXFLAG) {
         state.dataRoomAirMod->Phi(ZoneNum) = 1.0;
     } else {
-        state.dataRoomAirMod->Phi(ZoneNum) = (state.dataRoomAirMod->ZTOC(ZoneNum) - (TSupK - Constant::KelvinConv)) /
-                                             (state.dataRoomAirMod->ZTMX(ZoneNum) - (TSupK - Constant::KelvinConv));
+        state.dataRoomAirMod->Phi(ZoneNum) = (state.dataRoomAirMod->ZTOC(ZoneNum) - (TSupK - Constant::Kelvin)) /
+                                             (state.dataRoomAirMod->ZTMX(ZoneNum) - (TSupK - Constant::Kelvin));
     }
 
     // Mixed for reporting purposes

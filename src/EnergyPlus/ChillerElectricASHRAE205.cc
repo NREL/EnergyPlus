@@ -885,9 +885,9 @@ void ASHRAE205ChillerSpecs::size([[maybe_unused]] EnergyPlusData &state)
     // TODO: Determine actual rated flow rates instead of design flow rates
     this->RefCap = this->Representation->performance.performance_map_cooling
                        .calculate_performance(this->EvapVolFlowRate,
-                                              this->TempRefEvapOut + Constant::KelvinConv,
+                                              this->TempRefEvapOut + Constant::Kelvin,
                                               this->CondVolFlowRate,
-                                              this->TempRefCondIn + Constant::KelvinConv,
+                                              this->TempRefCondIn + Constant::Kelvin,
                                               this->MaxSequenceNumber,
                                               this->InterpolationType)
                        .net_evaporator_capacity;
@@ -1424,17 +1424,17 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     // Available chiller capacity is capacity at the highest sequence number; i.e. max chiller capacity
     const Real64 maximumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
-                                                                this->EvapOutletTemp + Constant::KelvinConv,
+                                                                this->EvapOutletTemp + Constant::Kelvin,
                                                                 this->CondVolFlowRate,
-                                                                this->CondInletTemp + Constant::KelvinConv,
+                                                                this->CondInletTemp + Constant::Kelvin,
                                                                 this->MaxSequenceNumber,
                                                                 this->InterpolationType)
                                          .net_evaporator_capacity;
     const Real64 minimumChillerCap = this->Representation->performance.performance_map_cooling
                                          .calculate_performance(this->EvapVolFlowRate,
-                                                                this->EvapOutletTemp + Constant::KelvinConv,
+                                                                this->EvapOutletTemp + Constant::Kelvin,
                                                                 this->CondVolFlowRate,
-                                                                this->CondInletTemp + Constant::KelvinConv,
+                                                                this->CondInletTemp + Constant::Kelvin,
                                                                 this->MinSequenceNumber,
                                                                 this->InterpolationType)
                                          .net_evaporator_capacity;
@@ -1458,9 +1458,9 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
         auto f = [MyLoad, this](Real64 partLoadSeqNum) {
             this->QEvaporator = this->Representation->performance.performance_map_cooling
                                     .calculate_performance(this->EvapVolFlowRate,
-                                                           this->EvapOutletTemp + Constant::KelvinConv,
+                                                           this->EvapOutletTemp + Constant::Kelvin,
                                                            this->CondVolFlowRate,
-                                                           this->CondInletTemp + Constant::KelvinConv,
+                                                           this->CondInletTemp + Constant::Kelvin,
                                                            partLoadSeqNum,
                                                            this->InterpolationType)
                                     .net_evaporator_capacity;
@@ -1482,9 +1482,9 @@ void ASHRAE205ChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, boo
     // Use performance map to get the rest of results at new sequence number
     auto lookupVariablesCooling = // This is a struct returned by value, relying on RVO (THIS_AUTO_OK)
         this->Representation->performance.performance_map_cooling.calculate_performance(this->EvapVolFlowRate,
-                                                                                        this->EvapOutletTemp + Constant::KelvinConv,
+                                                                                        this->EvapOutletTemp + Constant::Kelvin,
                                                                                         this->CondVolFlowRate,
-                                                                                        this->CondInletTemp + Constant::KelvinConv,
+                                                                                        this->CondInletTemp + Constant::Kelvin,
                                                                                         partLoadSeqNum,
                                                                                         this->InterpolationType);
     this->QEvaporator = lookupVariablesCooling.net_evaporator_capacity * this->ChillerCyclingRatio;
@@ -1662,9 +1662,9 @@ void ASHRAE205ChillerSpecs::getDesignCapacities(
     if (calledFromLocation.loopNum == this->CWPlantLoc.loopNum) {
         MinLoad = this->Representation->performance.performance_map_cooling
                       .calculate_performance(this->EvapVolFlowRate,
-                                             this->TempRefEvapOut + Constant::KelvinConv,
+                                             this->TempRefEvapOut + Constant::Kelvin,
                                              this->CondVolFlowRate,
-                                             this->TempRefCondIn + Constant::KelvinConv,
+                                             this->TempRefCondIn + Constant::Kelvin,
                                              this->MinSequenceNumber,
                                              this->InterpolationType)
                       .net_evaporator_capacity;
