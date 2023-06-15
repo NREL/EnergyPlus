@@ -20940,8 +20940,6 @@ Coil:Heating:Gas:MultiStage,
 TEST_F(EnergyPlusFixture, SetEconomizerStagingOperationSpeedTest)
 {
     // initialization
-    bool zoneEquipment = false;
-    bool ErrorsFound = false;
     bool firstHVACIteration = true;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataHVACGlobal->TurnFansOn = true;
