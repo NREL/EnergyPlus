@@ -1050,8 +1050,6 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
     Real64 EnthCorrFrac(0.0); // enthalpy correction factor
     Real64 TempCorrFrac(0.0); // temperature correction factor
 
-    /*auto &Node = state.dataLoopNodes->Node;*/
-
     if (state.dataWaterCoils->InitWaterCoilOneTimeFlag) {
         // initialize the environment and sizing flags
         state.dataWaterCoils->MyEnvrnFlag.allocate(state.dataWaterCoils->NumWaterCoils);
