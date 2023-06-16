@@ -5566,7 +5566,6 @@ void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, A
     Real64 S2;
 
     auto &OrdPairSum = state.dataWaterCoils->OrdPairSum;
-    auto &OrdPairSumMatrix = state.dataWaterCoils->OrdPairSumMatrix;
 
     OrdPairSum = 0.0;
     OrdPairSum(1, 1) = WaterCoils::MaxOrderedPairs;
@@ -5582,44 +5581,46 @@ void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, A
     while (!Converged) {
         for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
             for (J = 1; J <= PolynomOrder + 1; ++J) {
-                OrdPairSumMatrix(J, CurrentOrder) = OrdPairSum(J - 1 + CurrentOrder, 1);
+                state.dataWaterCoils->OrdPairSumMatrix(J, CurrentOrder) = OrdPairSum(J - 1 + CurrentOrder, 1);
             } // End of J loop
-            OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder) = OrdPairSum(CurrentOrder, 2);
+            state.dataWaterCoils->OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder) = OrdPairSum(CurrentOrder, 2);
         } // End of CurrentOrder loop
 
         for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
-            OrdPairSumMatrix(CurrentOrder, PolynomOrder + 2) = -1.0;
+            state.dataWaterCoils->OrdPairSumMatrix(CurrentOrder, PolynomOrder + 2) = -1.0;
             for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
-                OrdPairSumMatrix(J, PolynomOrder + 2) = 0.0;
+                state.dataWaterCoils->OrdPairSumMatrix(J, PolynomOrder + 2) = 0.0;
             } // End of J loop
 
             for (II = 2; II <= PolynomOrder + 2; ++II) {
                 for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
-                    OrdPairSumMatrix(J, II) -= OrdPairSumMatrix(J, 1) * OrdPairSumMatrix(CurrentOrder, II) / OrdPairSumMatrix(CurrentOrder, 1);
+                    state.dataWaterCoils->OrdPairSumMatrix(J, II) -= state.dataWaterCoils->OrdPairSumMatrix(J, 1) *
+                                                                     state.dataWaterCoils->OrdPairSumMatrix(CurrentOrder, II) /
+                                                                     state.dataWaterCoils->OrdPairSumMatrix(CurrentOrder, 1);
                 } // End of J loop
             }     // End of II loop
             for (II = 1; II <= PolynomOrder + 1; ++II) {
                 for (J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J) {
-                    OrdPairSumMatrix(J, II) = OrdPairSumMatrix(J, II + 1);
+                    state.dataWaterCoils->OrdPairSumMatrix(J, II) = state.dataWaterCoils->OrdPairSumMatrix(J, II + 1);
                 } // End of J loop
             }     // End of II loop
         }         // End of CurrentOrder loop
 
         S2 = 0.0;
         for (CurrentOrdPair = 1; CurrentOrdPair <= WaterCoils::MaxOrderedPairs; ++CurrentOrdPair) {
-            S1 = OrdPairSumMatrix(PolynomOrder + 2, 1);
+            S1 = state.dataWaterCoils->OrdPairSumMatrix(PolynomOrder + 2, 1);
             auto const OrderedPair1C = OrderedPair(CurrentOrdPair, 1); // (AUTO_OK_OBJ)
             Real64 OrderedPair1C_pow = 1.0;
             for (CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder) {
                 OrderedPair1C_pow *= OrderedPair1C;
-                S1 += OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder + 1) * OrderedPair1C_pow;
+                S1 += state.dataWaterCoils->OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder + 1) * OrderedPair1C_pow;
             } // End of CurrentOrder loop
             S2 += (S1 - OrderedPair(CurrentOrdPair, 2)) * (S1 - OrderedPair(CurrentOrdPair, 2));
         } // End of CurrentOrdPair loop
         B = WaterCoils::MaxOrderedPairs - (PolynomOrder + 1);
         if (S2 > 0.0001) S2 = std::sqrt(S2 / B);
         for (CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder) {
-            PolynomCoef(CurrentOrder) = OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder);
+            PolynomCoef(CurrentOrder) = state.dataWaterCoils->OrdPairSumMatrix(PolynomOrder + 2, CurrentOrder);
         } // End of CurrentOrder loop
 
         if ((PolynomOrder - WaterCoils::MaxPolynomOrder < 0) && (S2 - WaterCoils::PolyConvgTol > 0.0)) {
