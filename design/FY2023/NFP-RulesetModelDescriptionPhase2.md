@@ -4,6 +4,7 @@ Ruleset Model Description Phase 2
 **Jason Glazer, GARD Analytics**
 
  - May 31, 2023
+ - June 16, 2023 updates based on feedback
 
 ## Justification for New Feature ##
 
@@ -56,7 +57,122 @@ https://github.com/open229/ruleset-model-description-schema/blob/main/schema-sou
 
 ## E-mail and  Conference Call Conclusions ##
 
-None so far.
+Feedback received is shown below:
+
+----
+
+Concern about reporting equipment performance metric values that don't match manufacturers reported values
+
+----
+
+From Standard 229 and RCT development perspective, I think the highest priority is to implement RMD generation for components 
+planned for inclusion in the 229 RMD tests. As you know, these tests are based on the modified medium office prototype model. 
+Examples of modifications include the following:
+- support for all (or most) of Appendix G baseline HVAC system types 
+- support several commonly used system types (such as WSHP) and designs (such as DOAS + space conditioning system; space conditioning system + HW baseboard). 
+- detailed window specification 
+- handling of plenums (schema WG deemed that they should be aggregated with the parent space in the RMD file).
+
+-----
+
+I would suggest adding Output data, or at least portion of the Output since some HVAC rules checking the peak cooling load and unmet hours.
+
+-----
+
+I just completed the review for Section 21 and 22 rules and attached is a list of keys required in addition to system type test jsons 
+
+https://github.com/pnnl/ruleset-checking-tool/tree/develop/rct229/ruletest_engine/ruletest_jsons/ashrae9012019/system_types
+
+boilers
+- draft_type
+- rated_capacity
+- operation_lower_limit
+- operation_upper_limit
+- efficiency
+-	efficiency_metric
+
+Chiller
+- condensing_loop
+- rated_capacity
+- compressor_type
+- full_load_efficiency
+- is_chilled_water_pump_interlocked
+- is_condenser_water_pump_interlocked
+- part_load_efficiency
+- part_load_efficiency_metric
+
+FluidLoop
+- heating_design_and_control	
+    - design_supply_temperature
+    - design_return_temperature
+    - flow_control
+    - operation
+    - minimum_flow_fraction
+- pump_power_per_flow_rate	
+- cooling_or_condensing_design_and_control	
+    - design_supply_temperature
+    - design_return_temperature
+    - temperature_reset_type
+    - outdoor_high_for_loop_supply_reset_temperature
+    - outdoor_low_for_loop_supply_reset_temperature
+    - loop_supply_temperature_at_outdoor_high
+    - loop_supply_temperature_at_outdoor_low
+    - minimum_flow_fraction
+    - is_sized_using_coincident_load
+    - flow_control
+
+HeatRejection
+- loop
+- range
+- design_wetbult_temperature
+- approach
+- leaving_water_setpoint_temperature
+
+Output
+- output_instance
+    - unmet_load_hours_heating
+    - unmet_occupied_load_hours_heating
+    - unmet_load_hours_cooling
+    - unmet_occupied_load_hours_cooling
+    - building_peak_cooling_load
+    - unmet_load_hours
+
+FanSystem
+- temperature_control	
+- reset_differential_temperature	
+
+Terminals
+- primary_airflow
+- minimum_outdoor_airflow
+- minimum_airflow
+- design_thermostat_heating_setpoint
+
+(Later additions covering part of Section 19)
+
+HeatingSystem
+- heating_coil_setpoint
+
+FanSystem
+- operation_during_occupied
+- demand_control_ventilation_control
+- operation_during_unoccupied
+- temperature_control
+- reset_differential_temperature
+
+-----
+
+Adding more outputs to the database tables is generally not problematic, but I would suggest we get OpenStudio to do some 
+testing prior to anything merging into E+ develop branch.  Their testing on tabular outputs is above and beyond our own, 
+and they have a tendency to find issues after we've closed for IO freeze if we don't engage them early.
+
+-------
+
+Add chillers, boilers and cooling towers to equipment summary report as separate tables.
+
+-------
+
+Based on this feedback, the NFP was updated. 
+
 
 ## Overview ##
 
@@ -110,6 +226,7 @@ In addition, some fixes of the createRMD Python script will be incorporated from
 - Fix grouping of HVAC related datagroups and use Construction:FfactorGroundFloor (issue #8)
 - Ground Surfaces cannot be identified (issue #12)
 - Add method to merge compliance parameters (issue #14)
+- Add support for unmet load hours and peak building cooling load (issue #15)
 
 To understand how when data elements can be populated by either EnergyPlus input or 
 EnergyPlus output as the source of the RMD data elements, a specially tagged version of the 
@@ -141,44 +258,9 @@ such as specific new columns and data elements that are most important.
 
 ### Enhance Existing EnergyPlus Tabular Output Reports ###
 
-#### Equipment Summary - Central Plant ####
-
-The current columns are:
-- Type
-- Reference Capacity [W]
-- Reference Efficiency [W/W]
-- Rated Capacity [W]
-- Rated Efficiency [W/W]
-- IPLV in SI Units [W/W]
-- IPLV in IP Units [Btu/W-h]
-
-The new columns would be:
-- Plantloop name
-- Plantloop branch name
-- Minimum part load ratio 
-- Fuel type
-- Parasitic electric load
-- Rated entering condenser temperature
-- Rated leaving evaporator temperature
-- Reference entering condenser temperature
-- Reference leaving evaporator temperature
-- Design water flow rate
-- Chiller condenser design flow rate
-- Heat recovery Plantloop name
-- Heat recovery Plantloop branch name
-- Recovery Relative Capacity Fraction
-- Fluid type
-- Range
-- Approach
-- Design Fan Power
-- Design inlet air wet-bulb temperature
-- Leaving water setpoint temperature
-- Chiller Condenser type
-
-We may also want to consider breaking up the "Central Plant" table into separate tables for chillers, boilers, and heat 
-rejection since more columns are unique to just one of those.
-
 #### Equipment Summary - Heating Coils ####
+
+This is a predefined table.
 
 The current columns are:
 - Type
@@ -196,6 +278,8 @@ The new columns would be:
 
 #### Equipment Summary - DX Heating Coils ####
 
+This is a predefined table.
+
 The current columns are:
 - DX Heating Coil Type
 - High Temperature Heating (net) Rating Capacity [W]
@@ -209,6 +293,8 @@ The new columns would be:
 - Airloop branch name
 
 #### Equipment Summary - Fans ####
+
+This is a predefined table.
 
 The current columns are:
 - Type
@@ -237,6 +323,8 @@ The new columns would be:
 
 #### Equipment Summary - Pumps ####
 
+This is a predefined table.
+
 The current columns are:
 - Type
 - Control
@@ -253,6 +341,8 @@ The new columns would be:
 - Plantloop branch name
 
 #### System Summary - Demand Controlled Ventilation using Controller:MechanicalVentilation ####
+
+This is a predefined table.
 
 The current columns are:
 - Controller:MechanicalVentilation Name 
@@ -309,6 +399,8 @@ Additionally, the BND file may also be reviewed for what can easily be added to 
 
 #### Coil Sizing Details - Coil Connections ####
 
+This is an addition to an exisiting report using predefined tables.
+
 A new table under the current Coil Sizing Details report called "Coil Connections". Each row would be a coil:
 
 - Coil Name
@@ -353,7 +445,77 @@ available within the data structure that would be useful to report. Include spec
 
 
 
+
+
+#### Equipment Summary - Chiller ####
+
+This is an addition to an exisiting report using predefined tables.
+
+A new report for Chillers.
+ - Type
+ - Reference Capacity [W]
+ - Reference Efficiency [W/W]
+ - Rated Capacity [W]
+ - Rated Efficiency [W/W]
+ - IPLV in SI Units [W/W]
+ - IPLV in IP Units [Btu/W-h]
+ - Plantloop name
+ - Plantloop branch name
+ - Condenser loop name
+ - Condenser loop branch name
+ - Minimum part load ratio 
+ - Fuel type
+ - Rated entering condenser temperature
+ - Rated leaving evaporator temperature
+ - Reference entering condenser temperature
+ - Reference leaving evaporator temperature
+ - Design Size Reference Chilled Water Flow Rate
+ - Design Size Reference Condenser Fluid Flow Rate
+ - Heat recovery Plantloop name
+ - Heat recovery Plantloop branch name
+ - Recovery Relative Capacity Fraction
+
+
+We may also want to consider breaking up the "Central Plant" table into separate tables for chillers, boilers, and heat 
+rejection since more columns are unique to just one of those.
+
+#### Equipment Summary - Boiler ####
+
+This is an addition to an exisiting report using predefined tables.
+
+A new report for Boilers.
+ - Type
+ - Reference Capacity [W]
+ - Reference Efficiency [W/W]
+ - Rated Capacity [W]
+ - Rated Efficiency [W/W]
+ - Plantloop name
+ - Plantloop branch name
+ - Minimum part load ratio 
+ - Fuel type
+ - Parasitic electric load
+
+
+#### Equipment Summary - cooling towers and fluid coolers ####
+
+This is an addition to an exisiting report using predefined tables.
+
+A new report for cooling towers and fluid coolers.
+ - Type
+ - Condenser loop name
+ - Condenser loop branch name
+ - Fluid type
+ - Range
+ - Approach
+ - Design Fan Power
+ - Design inlet air wet-bulb temperature
+ - Design Water Flow Rate
+ - Leaving water setpoint temperature
+
+
 #### Equipment Summary - PlantLoop or CondenserLoop ####
+
+This is an addition to an exisiting report using predefined tables.
 
 A new report for PlantLoop objects. One row for each Plant or CondenserLoop
 - name
@@ -366,6 +528,8 @@ A new report for PlantLoop objects. One row for each Plant or CondenserLoop
 - Branch name
 
 #### Equipment Summary - AirTerminals ####
+
+This is an addition to an exisiting report using predefined tables.
 
 A new report for AirTerminals.
 - name
@@ -393,6 +557,8 @@ A new report for AirTerminals.
 - Cooling capacity
 
 #### Equipment Summary - Air Heat Recovery ####
+
+This is an addition to an exisiting report using predefined tables.
 
 A new report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:AirToAir:FlatPlate:
 - name
@@ -435,7 +601,24 @@ None required.
 
 ## Design Document ##
 
-Not yet developed
+In general to try to maximize the number of new data elements implemented during this phase, items should be added based
+on complexity. 
+
+For EnergyPlus changes, add new columns in the following order based on difficulty:
+1. Existing predefined tables where new output is simple echo of input or already computed and in data structure
+2. New predefined tables where new output is simple echo of input or already computed and in data structure
+3. New or existing predefined tables where new output is easy to determine
+4. Adding columns to existing not-predefined tables
+5. More complicated outputs
+
+All brand new tables can be added as predefined. For changes to existing tables shown earlier an indication was added indicating 
+if it was predefined. Echos of input are indicated in the eptags schema file.
+
+Provide draft updated output from EnergyPlus for OpenStudio team to test prior to release.
+
+For the createRulesetModelDecription Python script, will continue being developed using the same approach 
+as the 2022 work and will continue to include unit tests.
+
 
 ## References ##
 
