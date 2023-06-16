@@ -2289,6 +2289,8 @@ namespace Weather {
         int PresWeathObs;
         Array1D_int PresWeathConds(9);
 
+        constexpr std::string_view routineName = "ReadEPlusWeatherForDay";
+        
         Array1D<WeatherVars> wvarsHr = Array1D<WeatherVars>(Constant::HoursInDay);
 
         auto &thisEnviron = state.dataWeather->Environment(Environ);
@@ -2428,98 +2430,53 @@ namespace Weather {
                     }
                     // Do the range checks on the first set of fields -- no others.
                     bool ErrorsFound = false;
-                    if (DryBulb >= 99.9)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "DryBulb Temperature",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">= -90",
-                                                                              (DryBulb >= -90.0),
-                                                                              "<= 70",
-                                                                              (DryBulb <= 70.0),
-                                                                              format("{:.2R}", DryBulb),
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
-                    if (DewPoint < 99.9)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "DewPoint Temperature",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">= -90",
-                                                                              (DewPoint >= -90.0),
-                                                                              "<= 70",
-                                                                              (DewPoint <= 70.0),
-                                                                              format("{:.2R}", DewPoint),
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
-                    if (RelHum < 999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Relative Humidity",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              "> 0",
-                                                                              (RelHum >= 0.0),
-                                                                              "<= 110",
-                                                                              (RelHum <= 110.0),
-                                                                              format("{:.0R}", RelHum),
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
-                    if (AtmPress < 999999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Atmospheric Pressure",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              "> 31000",
-                                                                              (AtmPress > 31000.0),
-                                                                              "<=120000",
-                                                                              (AtmPress <= 120000.0),
-                                                                              format("{:.0R}", AtmPress),
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
-                    if (DirectRad < 9999.0)
-                        state.dataInputProcessing->inputProcessor->lowerRangeCheck(state,
-                                                                                   ErrorsFound,
-                                                                                   "Direct Radiation",
-                                                                                   "WeatherFile",
-                                                                                   "Severe",
-                                                                                   ">= 0",
-                                                                                   (DirectRad >= 0.0),
-                                                                                   {},
-                                                                                   state.dataEnvrn->WeatherFileLocationTitle);
-                    if (DiffuseRad < 9999.0)
-                        state.dataInputProcessing->inputProcessor->lowerRangeCheck(state,
-                                                                                   ErrorsFound,
-                                                                                   "Diffuse Radiation",
-                                                                                   "WeatherFile",
-                                                                                   "Severe",
-                                                                                   ">= 0",
-                                                                                   (DiffuseRad >= 0.0),
-                                                                                   {},
-                                                                                   state.dataEnvrn->WeatherFileLocationTitle);
-                    if (WindDir < 999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Wind Direction",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">=0",
-                                                                              (WindDir >= 0.0),
-                                                                              "<=360",
-                                                                              (WindDir <= 360.0),
-                                                                              format("{:.0R}", WindDir),
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
-                    if (WindSpeed < 999.0)
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              ErrorsFound,
-                                                                              "Wind Speed",
-                                                                              "WeatherFile",
-                                                                              "Severe",
-                                                                              ">=0",
-                                                                              (WindSpeed >= 0.0),
-                                                                              "<=40",
-                                                                              (WindSpeed <= 40.0),
-                                                                              format("{:.2R}", WindSpeed),
-                                                                              state.dataEnvrn->WeatherFileLocationTitle);
+                    if (DryBulb < 99.9 && (DryBulb < -90.0 || DryBulb > 70.0)) {
+                            ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("DryBulb Temperature ({:.2R}) is out of range [-90.0, 70.0]", DryBulb));
+                        ErrorsFound = true;
+                    }
+                            
+                    if (DewPoint < 99.9 && (DewPoint < -90.0 || DewPoint > 70.0)) {
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("DewPoint Temperature ({:.2R}) is out of range [-90.0, 70.0]", DewPoint));
+                        ErrorsFound = true;
+                    }
+
+                    if (RelHum < 999.0 &&  (RelHum < 0.0 || RelHum > 110.0)) {
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("Relative Humidity ({:.2R}) is out of range [0.0, 100.0]", RelHum));
+                        ErrorsFound = true;
+                    }
+                                   
+                    if (AtmPress < 999999.0 &&  (AtmPress <= 31000.0 || AtmPress > 120000.0)) {
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("Atmospheric Pressure ({:.0R}) is out of range [31000, 120000]", AtmPress));
+                        ErrorsFound = true;
+                    }
+
+                    if (DirectRad < 9999.0 && DirectRad < 0.0) {
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("Direct Radiation ({:.2R}) is out of range [0.0, -]", DirectRad));
+                        ErrorsFound = true;
+                    }                            
+
+                    if (DiffuseRad < 9999.0 && DiffuseRad < 0.0) {
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("Diffuse Radiation ({:.2R}) is out of range [0.0, -]", DiffuseRad));
+                        ErrorsFound = true;
+                    }                            
+
+                    if (WindDir < 999.0 && (WindDir < 0.0 || WindDir > 360.0)) {
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("Wind Direction ({:.2R}) is out of range [0.0, 360.0]", WindDir));
+                        ErrorsFound = true;
+                    }
+
+                    if (WindSpeed < 999.0 && (WindSpeed < 0.0 || WindSpeed > 40.0))
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(state, format("Wind Speed ({:.2R}) is out of range [0.0, 40.0]", WindSpeed));
+                        ErrorsFound = true;
+
                     if (ErrorsFound) {
                         ShowSevereError(state, "Out of Range errors found with initial day of WeatherFile");
                     }
@@ -5981,6 +5938,9 @@ namespace Weather {
         static constexpr std::array<Real64, 24> DefaultTempRangeMult = {0.88, 0.92, 0.95, 0.98, 1.0,  0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13,
                                                                         0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82};
 
+
+        static constexpr std::string_view routineName = "GetDesignDayData";
+        
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string units;
         OutputProcessor::Unit unitType;
@@ -6155,19 +6115,9 @@ namespace Weather {
             if (desDayInput.dryBulbRangeType != DesDayDryBulbRangeType::Difference &&
                 desDayInput.dryBulbRangeType != DesDayDryBulbRangeType::Profile) {
                 Real64 testval = desDayInput.MaxDryBulb - desDayInput.DailyDBRange;
-                bool errFlag = false;
-                state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                      errFlag,
-                                                                      ipsc->cAlphaFieldNames(3),
-                                                                      ipsc->cCurrentModuleObject,
-                                                                      "Severe",
-                                                                      ">= -90",
-                                                                      (testval >= -90.0),
-                                                                      "<= 70",
-                                                                      (testval <= 70.0),
-                                                                      {},
-                                                                      desDayInput.Title);
-                if (errFlag) {
+                if (testval < -90.0 || testval > 70.0) {
+                    ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
+                    ShowContinueError(state, format("{} ({.2R}) is out of range [-90.0, 70.0]", ipsc->cAlphaFieldNames(3), testval));
                     ErrorsFound = true;
                 }
             }
@@ -6237,19 +6187,10 @@ namespace Weather {
                         }
 
                         testval = desDayInput.MaxDryBulb - testval;
-                        bool errFlag = false;
-                        state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                              errFlag,
-                                                                              ipsc->cAlphaFieldNames(4),
-                                                                              ipsc->cCurrentModuleObject,
-                                                                              "Severe",
-                                                                              ">= -90",
-                                                                              (testval >= -90.0),
-                                                                              "<= 70",
-                                                                              (testval <= 70.0),
-                                                                              {},
-                                                                              desDayInput.Title);
-                        if (errFlag) {
+                        if (testval < 90.0 || testval > 70.0) {
+                            ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
+                            // should this be cNumericFieldNames?
+                            ShowContinueError(state, format("{} = ({.2R}) is out of range [-90.0, 70.0]", ipsc->cAlphaFieldNames(4), testval));
                             ErrorsFound = true;
                         }
                     }
@@ -6286,22 +6227,14 @@ namespace Weather {
                     ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-                bool errFlag = false;
 
-                state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                      errFlag,
-                                                                      ipsc->cAlphaFieldNames(5) + " - Wet-Bulb",
-                                                                      ipsc->cCurrentModuleObject,
-                                                                      "Severe",
-                                                                      ">= -90",
-                                                                      (desDayInput.HumIndValue >= -90.0),
-                                                                      "<= 70",
-                                                                      (desDayInput.HumIndValue <= 70.0),
-                                                                      {},
-                                                                      desDayInput.Title);
-                if (errFlag) {
+                if (desDayInput.HumIndValue < -90.0 || desDayInput.HumIndValue > 70.0) {
+                    ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
+                    ShowContinueError(state, format("{} = {.2R} is out of range [-90.0, 70.0]",
+                                                    ipsc->cAlphaFieldNames(5) + " - WetBulb", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
+                
             } break;
 
             case DesDayHumIndType::DewPoint: {
@@ -6313,21 +6246,14 @@ namespace Weather {
                     ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-                bool errFlag = false;
-                state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                      errFlag,
-                                                                      ipsc->cAlphaFieldNames(5) + " - Dew-Point",
-                                                                      ipsc->cCurrentModuleObject,
-                                                                      "Severe",
-                                                                      ">= -90",
-                                                                      (desDayInput.HumIndValue >= -90.0),
-                                                                      "<= 70",
-                                                                      (desDayInput.HumIndValue <= 70.0),
-                                                                      {},
-                                                                      desDayInput.Title);
-                if (errFlag) {
+
+                if (desDayInput.HumIndValue < -90.0 || desDayInput.HumIndValue > 70.0) {
+                    ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
+                    ShowContinueError(state, format("{} = {.2R} is out of range [-90.0, 70.0]",
+                                                    ipsc->cAlphaFieldNames(5) + " - DewPoint", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
+
             } break;
 
             case DesDayHumIndType::HumRatio: {
@@ -6340,22 +6266,14 @@ namespace Weather {
                     ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-                bool errFlag = false;
-                
-                state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                      errFlag,
-                                                                      ipsc->cAlphaFieldNames(5) + " - Humidity-Ratio",
-                                                                      ipsc->cCurrentModuleObject,
-                                                                      "Severe",
-                                                                      ">= 0",
-                                                                      (desDayInput.HumIndValue >= 0.0),
-                                                                      "<= .03",
-                                                                      (desDayInput.HumIndValue <= 0.03),
-                                                                      {},
-                                                                      desDayInput.Title);
-                if (errFlag) {
+
+                if (desDayInput.HumIndValue < 0.0 || desDayInput.HumIndValue > 0.03) {
+                    ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
+                    ShowContinueError(state, format("{} = {.2R} is out of range [0.0, 0.03]",
+                                                    ipsc->cAlphaFieldNames(5) + " - Humidity-Ratio", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
+
             } break;
 
             case DesDayHumIndType::Enthalpy: {
@@ -6368,22 +6286,15 @@ namespace Weather {
                     ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
                     ErrorsFound = true;
                 }
-                bool errFlag = false;
+
                 desDayInput.HumIndType = DesDayHumIndType::Enthalpy;
-                state.dataInputProcessing->inputProcessor->rangeCheck(state,
-                                                                      errFlag,
-                                                                      ipsc->cAlphaFieldNames(5) + " - Enthalpy",
-                                                                      "SizingPeriod:DesignDay",
-                                                                      "Severe",
-                                                                      ">= 0.0",
-                                                                      (desDayInput.HumIndValue >= 0.0),
-                                                                      "<= 130000",
-                                                                      (desDayInput.HumIndValue <= 130000.0),
-                                                                      {},
-                                                                      desDayInput.Title);
-                if (errFlag) {
+                if (desDayInput.HumIndValue < 0.0 || desDayInput.HumIndValue > 130000.0) {
+                    ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
+                    ShowContinueError(state, format("{} = {.0R} is out of range [0.0, 130000.0]",
+                                                    ipsc->cAlphaFieldNames(5) + " - Enthalpy", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
+                        
             } break;
                     
             case DesDayHumIndType::RelHumSch: {
@@ -8955,6 +8866,7 @@ namespace Weather {
                 f(iHr, iTS);
     }
             
+
 } // namespace Weather
 
 } // namespace EnergyPlus
