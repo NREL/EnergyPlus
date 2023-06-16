@@ -5965,10 +5965,8 @@ int GetCoilInletNode(EnergyPlusData &state,
     // as zero.
 
     // Return value
-    int NodeNumber; // returned node number of matched coil
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -5976,8 +5974,8 @@ int GetCoilInletNode(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    NodeNumber = 0;
-    WhichCoil = 0;
+    int NodeNumber = 0;
+    int WhichCoil = 0;
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
         WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
@@ -6015,9 +6013,6 @@ int GetCoilOutletNode(EnergyPlusData &state,
     // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
     // as zero.
 
-    // Return value
-    int NodeNumber; // returned node number of matched coil
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
     // Obtains and Allocates DXCoils
@@ -6027,7 +6022,7 @@ int GetCoilOutletNode(EnergyPlusData &state,
     }
 
     int WhichCoil = 0;
-    NodeNumber = 0;
+    int NodeNumber = 0; // returned node number of matched coil
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
         WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
@@ -6067,9 +6062,6 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
     // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
     // as zero.
 
-    // Return value
-    int NodeNumber; // returned node number of matched coil
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
     // Obtains and Allocates DXCoils
@@ -6078,7 +6070,7 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    NodeNumber = 0;
+    int NodeNumber = 0; // returned node number of matched coil
     int WhichCoil = 0;
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
@@ -6117,20 +6109,14 @@ int GetCoilWaterOutletNode(EnergyPlusData &state,
     // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
     // as zero.
 
-    // Return value
-    int NodeNumber; // returned node number of matched coil
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
-
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
         GetWaterCoilInput(state);
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    NodeNumber = 0;
-    WhichCoil = 0;
+    int NodeNumber = 0; // returned node number of matched coil
+    int WhichCoil = 0;
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
         WhichCoil = UtilityRoutines::FindItem(CoilName, state.dataWaterCoils->WaterCoil);
