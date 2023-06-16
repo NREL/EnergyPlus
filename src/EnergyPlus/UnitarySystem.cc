@@ -10638,7 +10638,7 @@ namespace UnitarySystems {
                     state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;
                     state.dataUnitarySystems->OACompOnMassFlow = this->m_NoCoolHeatOutAirMassFlow;
-                } else if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation; set system flow rate to economizer flow rate
+                } else if (this->m_EconoSpeedNum > 0) { // multi-stage economizer operation; set system flow rate to economizer flow rate
                     state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
                     state.dataUnitarySystems->OACompOnMassFlow = this->m_CoolOutAirMassFlow;
@@ -10654,7 +10654,7 @@ namespace UnitarySystems {
                         state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_NoLoadAirFlowRateRatio;
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_NoCoolHeatOutAirMassFlow;
-                    } else if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation
+                    } else if (this->m_EconoSpeedNum > 0) { // multi-stage economizer operation
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
@@ -10667,15 +10667,15 @@ namespace UnitarySystems {
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum - 1];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                     }
-                } else {                              // cycling fan mode
-                    if (this->m_EconoSpeedNum <= 1) { // multi-stage economizer operation
+                } else {                                                   // cycling fan mode
+                    if (this->m_EconoSpeedNum == 0 && CoolSpeedNum == 0) { // multi-stage economizer operation
                         state.dataUnitarySystems->CompOffMassFlow = 0.0;
                         state.dataUnitarySystems->CompOffFlowRatio = 0.0;
-                    } else if (this->m_EconoSpeedNum > 1) { // multi-stage economizer operation
+                    } else if (this->m_EconoSpeedNum > 0) { // multi-stage economizer operation
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum - 1];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum - 1];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
-                    } else if (CoolSpeedNum <= 1) {
+                    } else if (CoolSpeedNum == 0) {
                         state.dataUnitarySystems->CompOffMassFlow = 0.0; // #5518
                         state.dataUnitarySystems->CompOffFlowRatio = 0.0;
                     } else {
@@ -11127,7 +11127,7 @@ namespace UnitarySystems {
         DataHVACGlobals::CompressorOperation CoolingCompOn = DataHVACGlobals::CompressorOperation::Off;
         if (CoolPLR > 0) {
             CoolingCompOn = CompressorOn;
-        } else if (CoolPLR == 0 && this->m_EconoSpeedNum > 1) { // turn compressor off for economizer calculations
+        } else if (CoolPLR == 0 && this->m_EconoSpeedNum > 0) { // turn compressor off for economizer calculations
             CoolingCompOn = DataHVACGlobals::CompressorOperation::Off;
         } else if (this->m_CoolingSpeedNum > 1) { // for multispeed coils, comp is on IF speed > 1
             CoolingCompOn = DataHVACGlobals::CompressorOperation::On;

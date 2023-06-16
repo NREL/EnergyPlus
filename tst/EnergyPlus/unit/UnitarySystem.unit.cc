@@ -848,7 +848,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     Real64 fanDT = thisSys->getFanDeltaTemp(*state, true, 1, 1.0);
     EXPECT_NEAR(fanDT, 0.7070, 0.0001);
     fanDT = thisSys->getFanDeltaTemp(*state, true, 0.5, 0.5);
-    EXPECT_NEAR(fanDT, 0.3068, 0.0001);
+    EXPECT_NEAR(fanDT, 0.7070, 0.0001);
 }
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 {
