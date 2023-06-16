@@ -335,7 +335,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     Real64 capacityModifierFuncTemp = 1.0;
     Real64 availableCapacity = this->referenceCapacity;
     Real64 partLoadRatio = 0.0;
-    bool minWaterTempExceeded = false;
+    bool waterTempExceeded = false;
 
     // evaluate capacity modifier curve and determine load side heat transfer
     // any adjustment to outlet water temp set point requires some form of iteration
@@ -352,7 +352,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 availableCapacity *= dryCorrectionFactor;
             } else {
                 // interpolation of heating capacity between wet and dry is based on outdoor relative humidity over 60%-90% range
-                Real64 semiDryFactor = dryCorrectionFactor + (1.0 - dryCorrectionFactor) * ((RH90 - state.dataEnvrn->OutRelHum) / rangeRH);
+                Real64 semiDryFactor = dryCorrectionFactor + (1.0 - dryCorrectionFactor) * (1.0 - ((RH90 - state.dataEnvrn->OutRelHum) / rangeRH));
                 availableCapacity *= semiDryFactor;
             }
         }
@@ -365,17 +365,17 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
             Real64 minWaterTemp = Curve::CurveValue(state, this->minSupplyWaterTempCurveIndex, state.dataEnvrn->OutDryBulbTemp);
             if (loadSideOutletSetpointTemp < minWaterTemp) {
                 loadSideOutletSetpointTemp = originalLoadSideOutletSPTemp + (1.0 - partLoadRatio) * (minWaterTemp - originalLoadSideOutletSPTemp);
-                minWaterTempExceeded = true;
+                waterTempExceeded = true;
             }
         }
         if (this->maxSupplyWaterTempCurveIndex > 0) {
             Real64 maxWaterTemp = Curve::CurveValue(state, this->maxSupplyWaterTempCurveIndex, state.dataEnvrn->OutDryBulbTemp);
             if (loadSideOutletSetpointTemp > maxWaterTemp) {
                 loadSideOutletSetpointTemp = maxWaterTemp + (1.0 - partLoadRatio) * (originalLoadSideOutletSPTemp - maxWaterTemp);
-            } else if (!minWaterTempExceeded) {
+            } else if (!waterTempExceeded) {
                 break;
             }
-        } else if (!minWaterTempExceeded) {
+        } else if (!waterTempExceeded) {
             break;
         }
     }
@@ -1369,11 +1369,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 constexpr std::array<std::string_view, static_cast<int>(DefrostControl::Num)> PLHPDefrostTypeNamesUC = {
-                    "TIMED", "ONDEMAND", "TIMEDEMPIRICAL"};
+                    "NONE", "TIMED", "ONDEMAND", "TIMEDEMPIRICAL"};
                 auto const defrostControlStrategy = fields.find("heat_pump_defrost_control");
                 if (defrostControlStrategy != fields.end()) {
                     thisPLHP.defrostStrategy = static_cast<DefrostControl>(getEnumerationValue(
                         PLHPDefrostTypeNamesUC, UtilityRoutines::MakeUPPERCase(defrostControlStrategy.value().get<std::string>())));
+                } else {
+                    thisPLHP.defrostStrategy == DefrostControl::None;
                 }
 
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating &&
@@ -1488,7 +1490,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 }
 
                 if (thisPLHP.airSource && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating &&
-                    thisPLHP.defrostStrategy != DefrostControl::Invalid) {
+                    thisPLHP.defrostStrategy != DefrostControl::None) {
                     thisPLHP.defrostAvailable = true;
                 }
                 // store the worker functions that generalized the heating/cooling sides

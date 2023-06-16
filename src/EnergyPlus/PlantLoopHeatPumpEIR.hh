@@ -88,6 +88,7 @@ namespace EIRPlantLoopHeatPumps {
     enum class DefrostControl
     {
         Invalid = -1,
+        None,
         Timed,          // uses fixed time reverse cycle defrost strategy
         OnDemand,       // uses outdoor humidity defrost timing
         TimedEmpirical, // uses outdoor temperature defrost timing
