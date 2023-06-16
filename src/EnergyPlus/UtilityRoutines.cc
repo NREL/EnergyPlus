@@ -637,6 +637,10 @@ int AbortEnergyPlus(EnergyPlusData &state)
         state.files.flushAll();
     }
 
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
+
     return EXIT_FAILURE;
 }
 
@@ -772,9 +776,20 @@ int EndEnergyPlus(EnergyPlusData &state)
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
 
+    if (state.dataGlobal->fProgressPtr) {
+        state.dataGlobal->fProgressPtr(100);
+    }
+    if (state.dataGlobal->progressCallback) {
+        state.dataGlobal->progressCallback(100);
+    }
+
     if (state.dataGlobal->eplusRunningViaAPI) {
         state.files.flushAll();
     }
+
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
 
     return EXIT_SUCCESS;
 }
