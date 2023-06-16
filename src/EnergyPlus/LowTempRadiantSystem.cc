@@ -5947,8 +5947,7 @@ namespace LowTempRadiantSystem {
         // Now check to see if anything is running and transfer information from the "average" variables to
         // the array that will be used within the heat balance.
         state.dataHeatBalFanSys->QRadSysSource = 0.0; // Zero this out first
-            for (int numRadSys = 1; numRadSys <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++numRadSys)
-        {
+        for (int numRadSys = 1; numRadSys <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++numRadSys) {
             auto &thisLTR = state.dataLowTempRadSys->HydrRadSys(numRadSys);
             for (int numRadSurf = 1; numRadSurf <= thisLTR.NumOfSurfaces; ++numRadSurf) {
                 if (thisLTR.QRadSysSrcAvg(numRadSurf) != 0.0) LowTempRadSysOn = true;
