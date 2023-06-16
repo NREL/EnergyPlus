@@ -220,6 +220,16 @@ void SummarizeErrors(EnergyPlusData &state);
 
 void ShowRecurringErrors(EnergyPlusData &state);
 
+struct ErrorObjectHeader
+{
+    std::string_view routineName;
+    std::string_view objectType;
+    std::string_view objectName;
+};
+
+void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+
 namespace UtilityRoutines {
 
     static constexpr std::array<std::string_view, 12> MonthNamesCC{
