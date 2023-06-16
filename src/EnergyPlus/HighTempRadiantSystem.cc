@@ -368,8 +368,8 @@ namespace HighTempRadiantSystem {
                 }
             }
 
-            highTempRadSys.HeaterType = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+            highTempRadSys.HeaterType =
+                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
 
             if (highTempRadSys.HeaterType == Constant::eResource::NaturalGas) {
                 highTempRadSys.CombustionEffic = state.dataIPShortCut->rNumericArgs(4);
