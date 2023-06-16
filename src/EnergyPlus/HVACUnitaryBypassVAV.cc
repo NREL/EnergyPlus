@@ -439,7 +439,7 @@ namespace HVACUnitaryBypassVAV {
 
             thisCBVAV.OutAirSchPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3)); // convert schedule name to pointer (index number)
             if (thisCBVAV.OutAirSchPtr != 0) {
-                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.OutAirSchPtr, "<", 0.0, ">", 1.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.OutAirSchPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("The schedule values in {} must be 0 to 1.", cAlphaFields(3)));
                     ErrorsFound = true;
@@ -786,7 +786,7 @@ namespace HVACUnitaryBypassVAV {
 
             thisCBVAV.FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(13)); // convert schedule name to pointer (index number)
             if (thisCBVAV.FanOpModeSchedPtr != 0) {
-                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.FanOpModeSchedPtr, "<", 0.0, ">", 1.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.FanOpModeSchedPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("The schedule values in {} must be 0 to 1.", cAlphaFields(13)));
                     ShowContinueError(state, "A value of 0 represents cycling fan mode, any other value up to 1 represents constant fan mode.");
