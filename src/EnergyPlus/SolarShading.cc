@@ -77,11 +77,13 @@
 #include <EnergyPlus/DaylightingDevices.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarReflectionManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -192,6 +194,7 @@ void InitSolarCalculations(EnergyPlusData &state)
         }
 
         if (state.dataSolarShading->GetInputFlag) {
+            checkShadingSurfaceSchedules(state);
             GetShadowingInput(state);
             state.dataSolarShading->GetInputFlag = false;
             state.dataSolarShading->MaxHCV =
@@ -363,6 +366,36 @@ void InitSolarCalculations(EnergyPlusData &state)
     state.dataSolarShading->firstTime = false;
 }
 
+void checkShadingSurfaceSchedules(EnergyPlusData &state)
+{
+    // Shading surfaces with a transmittance schedule that is always 1.0 are marked IsTransparent during shading surface input processing
+    // Now that EMS (and other types) actuators are set up, check to see if the schedule has an actuator and reset if needed
+    for (int surfNum = state.dataSurface->ShadingSurfaceFirst; surfNum <= state.dataSurface->ShadingSurfaceLast; ++surfNum) {
+        auto &thisSurface = state.dataSurface->Surface(surfNum);
+        if (!thisSurface.IsTransparent) continue;
+        // creating some dummy bools here on purpose -- we need to do some renaming and/or consolidate these into a meaningful new global sometime
+        // for now I want the logic to be as readable as possible, so creating shorthand variables makes it very clear
+        bool const anyPlugins = size(state.dataPluginManager->plugins) > 0;
+        bool const runningByAPI = state.dataGlobal->eplusRunningViaAPI;
+        bool const anyEMS = state.dataGlobal->AnyEnergyManagementSystemInModel;
+        if ((anyEMS && EMSManager::isScheduleManaged(state, thisSurface.SchedShadowSurfIndex)) || runningByAPI || anyPlugins) {
+            // Transmittance schedule definitely has an actuator or may have one via python plugin or API
+            // Set not transparent so it won't be skipped during shading calcs
+            thisSurface.IsTransparent = false;
+            // Also set global flags
+            state.dataSolarShading->anyScheduledShadingSurface = true;
+            state.dataSurface->ShadingTransmittanceVaries = true;
+        } else if (!thisSurface.MirroredSurf) {
+            // Warning moved here from shading surface input processing (skip warning for mirrored surfaces)
+            ShowWarningError(state,
+                             format(R"(Shading Surface="{}", Transmittance Schedule Name="{}", is always transparent.)",
+                                    thisSurface.Name,
+                                    state.dataScheduleMgr->Schedule(thisSurface.SchedShadowSurfIndex).Name));
+            ShowContinueError(state, "This shading surface will be ignored.");
+        }
+    }
+}
+
 void GetShadowingInput(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
@@ -491,7 +524,7 @@ void GetShadowingInput(EnergyPlusData &state)
         ShowSevereError(state, "The Shading Calculation Method of choice is \"PixelCounting\"; ");
         ShowContinueError(state, "and there is at least one shading surface of type ");
         ShowContinueError(state, "Shading:Site:Detailed, Shading:Building:Detailed, or Shading:Zone:Detailed, ");
-        ShowContinueError(state, "that has an active transmittance schedule value greater than zero.");
+        ShowContinueError(state, "that has an active transmittance schedule value greater than zero or may vary.");
         ShowContinueError(state, "With \"PixelCounting\" Shading Calculation Method, the shading surfaces will be treated as ");
         ShowContinueError(state, "completely opaque (transmittance = 0) during the shading calculation, ");
         ShowContinueError(state, "which may result in inaccurate or unexpected results.");
@@ -715,17 +748,23 @@ void GetShadowingInput(EnergyPlusData &state)
         }
     }
 
+    if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSurface->ShadingTransmittanceVaries &&
+        state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
+
+        ShowWarningError(state, "GetShadowingInput: The shading transmittance for shading devices may change throughout the year.");
+        ShowContinueError(state,
+                          format("Choose Shading Calculation Update Frequency Method = Timestep in the {} object to capture all shading impacts.",
+                                 cCurrentModuleObject));
+    }
     if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm && state.dataSurface->ShadingTransmittanceVaries &&
         state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) {
 
-        ShowWarningError(state,
-                         format("GetShadowingInput: The shading transmittance for shading devices changes throughout the year. Choose "
-                                "DetailedSkyDiffuseModeling in the {} object to remove this warning.",
-                                cCurrentModuleObject));
+        ShowWarningError(state, "GetShadowingInput: The shading transmittance for shading devices may change throughout the year.");
         ShowContinueError(state, "Simulation has been reset to use DetailedSkyDiffuseModeling. Simulation continues.");
+        ShowContinueError(state, format("Choose DetailedSkyDiffuseModeling in the {} object to remove this warning.", cCurrentModuleObject));
         state.dataSysVars->DetailedSkyDiffuseAlgorithm = true;
         state.dataIPShortCut->cAlphaArgs(2) = "DetailedSkyDiffuseModeling";
-        if (state.dataSolarShading->ShadowingCalcFrequency > 1) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration && state.dataSolarShading->ShadowingCalcFrequency > 1) {
             ShowContinueError(state,
                               format("Better accuracy may be gained by setting the {} to 1 in the {} object.",
                                      state.dataIPShortCut->cNumericFieldNames(1),
@@ -4598,8 +4637,6 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Legacy Code
-    //       DATE WRITTEN
-    //       MODIFIED       na
     //       RE-ENGINEERED  Lawrie, Oct 2000
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -4628,20 +4665,11 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
     // REFERENCES:
     // BLAST/IBLAST code, original author George Walton
 
-    // Using/Aliasing
-
-    int N;    // Loop index
-    int NV1;  // Number of vertices of figure NS1
-    int NV2;  // Number of vertices of figure NS2
-    int NV3;  // Number of vertices of figure NS3 (the overlap of NS1 and NS2)
-    int NIN1; // Number of vertices of NS1 within NS2
-    int NIN2; // Number of vertices of NS2 within NS1
-
-    // Check for exceeding array limits.
 #ifdef EP_Count_Calls
     ++state.dataTimingsData->NumDetPolyOverlap_Calls;
 #endif
 
+    // Check for exceeding array limits.
     if (NS3 > state.dataSolarShading->MaxHCS) {
 
         state.dataSolarShading->OverlapStatus = TooManyFigures;
@@ -4666,9 +4694,11 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
     }
 
     state.dataSolarShading->OverlapStatus = PartialOverlap;
-    NV1 = state.dataSolarShading->HCNV(NS1);
-    NV2 = state.dataSolarShading->HCNV(NS2);
-    NV3 = 0;
+    int NV1 = state.dataSolarShading->HCNV(NS1); // Number of vertices of figure NS1
+    int NV2 = state.dataSolarShading->HCNV(NS2); // Number of vertices of figure NS2
+    int NV3 = 0;                                 // Number of vertices of figure NS3 (the overlap of NS1 and NS2)
+    int NIN1 = 0;                                // Number of vertices of NS1 within NS2
+    int NIN2 = 0;                                // Number of vertices of NS2 within NS1
 
     if (!state.dataSysVars->SutherlandHodgman) {
         INCLOS(state, NS1, NV1, NS2, NV2, NV3, NIN1); // Find vertices of NS1 within NS2.
@@ -4701,14 +4731,14 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
         CLIPPOLY(state, NS1, NS2, NV1, NV2, NV3);
     }
 
-    if (NV3 < state.dataSolarShading->MaxHCV && NS3 <= state.dataSolarShading->MaxHCS) {
+    if (NV3 < state.dataSolarShading->MaxHCV) {
 
         if (!state.dataSysVars->SutherlandHodgman) {
             ORDER(state, NV3, NS3); // Put vertices in clockwise order.
         } else {
             assert(equal_dimensions(state.dataSolarShading->HCX, state.dataSolarShading->HCY));
             int l = state.dataSolarShading->HCX.index(NS3, 1);
-            for (N = 1; N <= NV3; ++N, ++l) {
+            for (int N = 1; N <= NV3; ++N, ++l) {
                 state.dataSolarShading->HCX[l] = nint64(state.dataSolarShading->XTEMP(N)); // [ l ] == ( N, NS3 )
                 state.dataSolarShading->HCY[l] = nint64(state.dataSolarShading->YTEMP(N));
             }
@@ -4720,20 +4750,23 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
         if (std::abs(state.dataSolarShading->HCAREA(NS3)) * HCMULT < std::abs(state.dataSolarShading->HCAREA(NS1))) {
             state.dataSolarShading->OverlapStatus = NoOverlap;
         } else {
-            if (state.dataSolarShading->HCAREA(NS1) * state.dataSolarShading->HCAREA(NS2) > 0.0)
+            if (state.dataSolarShading->HCAREA(NS1) * state.dataSolarShading->HCAREA(NS2) > 0.0) {
                 state.dataSolarShading->HCAREA(NS3) = -state.dataSolarShading->HCAREA(NS3); // Determine sign of area of overlap
-            Real64 const HCT_1(state.dataSolarShading->HCT(NS1));
-            Real64 const HCT_2(state.dataSolarShading->HCT(NS2));
-            Real64 HCT_3(HCT_2 * HCT_1); // Determine transmission of overlap
-            if (HCT_2 >= 0.5 && HCT_1 >= 0.5) {
-                if (HCT_2 != 1.0 && HCT_1 != 1.0) {
-                    HCT_3 = 1.0 - HCT_3;
-                }
             }
-            state.dataSolarShading->HCT(NS3) = HCT_3;
+            Real64 const HCT_1 = state.dataSolarShading->HCT(NS1);
+            Real64 const HCT_2 = state.dataSolarShading->HCT(NS2);
+            if (HCT_2 == 1.0 || HCT_1 == 1.0) {
+                state.dataSolarShading->HCT(NS3) = HCT_1 * HCT_2;
+            } else {
+                // Determine transmission of overlap which corrects for prior shadows
+                // The resulting transmission of overlapping shadows is HCT_1 * HCT_2
+                // Shadows with HCT_1 and HCT_2 have already been applied in the overlapping area
+                // so the correction is the difference between (HCT_1+HCT_2) and (HCT_1*HCT_2)
+                state.dataSolarShading->HCT(NS3) = (HCT_1 + HCT_2) - HCT_1 * HCT_2;
+            }
         }
 
-    } else if (NV3 > state.dataSolarShading->MaxHCV) {
+    } else {
 
         state.dataSolarShading->OverlapStatus = TooManyVertices;
 
@@ -4750,26 +4783,6 @@ void DeterminePolygonOverlap(EnergyPlusData &state,
             state.dataSolarShading->TrackTooManyVertices(state.dataSolarShading->NumTooManyVertices).SurfIndex1 =
                 state.dataSolarShading->CurrentShadowingSurface;
             state.dataSolarShading->TrackTooManyVertices(state.dataSolarShading->NumTooManyVertices).SurfIndex2 =
-                state.dataSolarShading->CurrentSurfaceBeingShadowed;
-        }
-
-    } else if (NS3 > state.dataSolarShading->MaxHCS) {
-
-        state.dataSolarShading->OverlapStatus = TooManyFigures;
-
-        if (!state.dataSolarShading->TooManyFiguresMessage && !state.dataGlobal->DisplayExtraWarnings) {
-            ShowWarningError(state,
-                             format("DeterminePolygonOverlap: Too many figures [>{}]  detected in an overlap calculation. Use "
-                                    "Output:Diagnostics,DisplayExtraWarnings; for more details.",
-                                    state.dataSolarShading->MaxHCS));
-            state.dataSolarShading->TooManyFiguresMessage = true;
-        }
-
-        if (state.dataGlobal->DisplayExtraWarnings) {
-            state.dataSolarShading->TrackTooManyFigures.redimension(++state.dataSolarShading->NumTooManyFigures);
-            state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex1 =
-                state.dataSolarShading->CurrentShadowingSurface;
-            state.dataSolarShading->TrackTooManyFigures(state.dataSolarShading->NumTooManyFigures).SurfIndex2 =
                 state.dataSolarShading->CurrentSurfaceBeingShadowed;
         }
     }

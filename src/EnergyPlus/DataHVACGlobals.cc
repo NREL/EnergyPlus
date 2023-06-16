@@ -59,6 +59,7 @@ namespace DataHVACGlobals {
     // This data-only module is a repository for HVAC variables which are considered
     // to be "global" in nature in EnergyPlus.
 
+    // fan types
     Array1D_string const
         cFanTypes(NumAllFanTypes,
                   {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});

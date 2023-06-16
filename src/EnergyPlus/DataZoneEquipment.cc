@@ -815,7 +815,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->SupplyAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -885,7 +884,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->ReturnAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -944,31 +942,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     lAlphaBlanks.deallocate();
     lNumericBlanks.deallocate();
 
-    // setup zone equipment info for convection correlations
-    SetupZoneEquipmentForConvectionFlowRegime(state);
-
     if (state.dataZoneEquip->GetZoneEquipmentDataErrorsFound) {
         ShowFatalError(state, format("{}Errors found in getting Zone Equipment input.", RoutineName));
-    }
-}
-
-void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Decide a few one-time things for later
-    // determination of flow regime for convection
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;
-
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
     }
 }
 

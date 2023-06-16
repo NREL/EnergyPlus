@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,23.1;
+  Version,23.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -11031,6 +11031,8 @@
     AirLoop DataCenter Basement Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter Basement,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -11051,6 +11053,8 @@
     AirLoop DataCenter bot Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter bot,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -11071,6 +11075,8 @@
     AirLoop DataCenter mid Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter mid,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -11091,6 +11097,8 @@
     AirLoop DataCenter top Supply Fan Outlet,  !- Air Inlet Node Name
     Cooling Coil Air Outlet Node AirLoop DataCenter top,  !- Air Outlet Node Name
     autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     autosize,                !- Rated Water Flow Rate {m3/s}
     autosize,                !- Gross Rated Total Cooling Capacity {W}
     autosize,                !- Gross Rated Sensible Cooling Capacity {W}

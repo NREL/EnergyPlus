@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2659,6 +2659,8 @@
     SPACE1-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE1-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2679,6 +2681,8 @@
     SPACE2-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE2-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2699,6 +2703,8 @@
     SPACE3-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE3-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2719,6 +2725,8 @@
     SPACE4-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE4-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2739,6 +2747,8 @@
     SPACE5-1 Zone Unit Fan Outlet,  !- Air Inlet Node Name
     SPACE5-1 Cooling Coil Outlet,  !- Air Outlet Node Name
     Autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Autosize,                !- Rated Water Flow Rate {m3/s}
     Autosize,                !- Gross Rated Total Cooling Capacity {W}
     Autosize,                !- Gross Rated Sensible Cooling Capacity {W}
