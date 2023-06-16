@@ -149,13 +149,9 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   February 1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine manages WaterCoil component simulation.
-
-    // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CoilNum;         // The WaterCoil that you are currently loading input into
@@ -3579,8 +3575,6 @@ void CoolingCoil(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   Mar 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // The subroutine has the coil logic. Three types of Cooling Coils exist:
@@ -3599,20 +3593,6 @@ void CoolingCoil(EnergyPlusData &state,
     // Madison, pp. 4.6.8-1 - 4.6.8-12.
     // Threlkeld, J.L.  1970.  Thermal Environmental Engineering, 2nd Edition,
     // Englewood Cliffs: Prentice-Hall,Inc. pp. 254-270.
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
-    // FUNCTION PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 AirInletCoilSurfTemp; // Coil surface temperature at air entrance(C)
@@ -3813,8 +3793,6 @@ void CoilCompletelyDry(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   March 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate the performance of a sensible air-liquid heat exchanger.  Calculated
@@ -3828,22 +3806,8 @@ void CoilCompletelyDry(EnergyPlusData &state,
     // Kays, W.M. and A.L. London.  1964,Compact Heat Exchangers, 2nd Edition,
     // New York: McGraw-Hill.
 
-    // USE STATEMENTS:
-    // na
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CoilCompletelyDry");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 CapacitanceAir;   // Air-side capacity rate(W/C)
@@ -3912,8 +3876,6 @@ void CoilCompletelyWet(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   Mar 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate the performance of a cooling coil when the external fin surface is
@@ -3937,13 +3899,6 @@ void CoilCompletelyWet(EnergyPlusData &state,
     // Elmahdy, A.H. and Mitalas, G.P.  1977."A Simple Model for Cooling and
     // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
     // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
-
-    // USE STATEMENTS:
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CoilCompletelyWet");
@@ -4072,8 +4027,6 @@ void CoilPartWetPartDry(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   March 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate the performance of a cooling  coil when the external fin surface is
@@ -4093,20 +4046,9 @@ void CoilPartWetPartDry(EnergyPlusData &state,
     // Threlkeld, J.L.  1970.  Thermal Environmental Engineering, 2nd Edition,
     // Englewood Cliffs: Prentice-Hall,Inc. pp. 254-270.
 
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
     int constexpr itmax(60);
     Real64 constexpr smalltempdiff(1.0e-9);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 DryCoilHeatTranfer;             // Heat transfer rate for dry coil(W)
@@ -4314,8 +4256,6 @@ Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   March 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate the UA of a heat exchanger using the effectiveness-NTU relationships
@@ -4330,18 +4270,9 @@ Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state,
     // Return value
     Real64 CalcCoilUAbyEffectNTU; // Overall heat transfer coefficient(W/C)
 
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
     Real64 constexpr SmallNo(1.e-9);
     int constexpr itmax(12);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 MaxHeatTransfer;       // Maximum heat transfer from inlet conditions (W)
@@ -4438,36 +4369,17 @@ void CoilOutletStreamCondition(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   March 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate the outlet states of a simple heat exchanger using the effectiveness-Ntu
     // method of analysis.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Kays, W.M. and A.L. London.  1964.Compact Heat Exchangers, 2nd Ed.McGraw-Hill:New York.
-
-    // USE STATEMENTS:
-    // na
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
     Real64 constexpr LargeNo(1.e10);  // value used in place of infinity
     Real64 constexpr SmallNo(1.e-15); // value used in place of zero
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 MinimumCapacityStream; // Minimum capacity rate of the streams(W/C)
@@ -4570,8 +4482,6 @@ void WetCoilOutletCondition(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   Mar 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculate the leaving air temperature,the leaving air humidity ratio and the
@@ -4585,21 +4495,8 @@ void WetCoilOutletCondition(EnergyPlusData &state,
     // Dehumidifying Coils for Use In Calculating Energy Requirements for Buildings,"
     // ASHRAE Transactions,Vol.83 Part 2, pp. 103-117.
 
-    // USE STATEMENTS:
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
     Real64 constexpr SmallNo(1.e-9); // SmallNo value used in place of zero
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 CapacitanceAir;        // Air capacity rate(W/C)
@@ -4730,32 +4627,9 @@ void ReportWaterCoil(EnergyPlusData &state, int const CoilNum)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   1998
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variable for the coils.
-
-    // METHODOLOGY EMPLOYED:
-    // NA
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     auto &waterCoil = state.dataWaterCoils->WaterCoil(CoilNum);
     if (waterCoil.reportCoilFinalSizes) {
@@ -5305,8 +5179,6 @@ void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
     // FUNCTION INFORMATION:
     // AUTHOR         Rahul Chillar
     // DATE WRITTEN   June 2004
-    // MODIFIED       na
-    // RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Iterately solves for the value of SurfAreaWetFraction for the Cooling Coil.
@@ -5319,24 +5191,10 @@ void CoilAreaFracIter(Real64 &NewSurfAreaWetFrac,       // Out Value of variable
     // REFERENCES:
     // ME 423 Design of Thermal Systems Class Notes.UIUC. W.F.Stoecker
 
-    // USE STATEMENTS:
-    // na
-
-    // Enforce explicit typing of all variables in this routine
-
-    // Locals
-    // FUNCTION ARGUMENT DEFINITIONS:
-
     // FUNCTION PARAMETER DEFINITIONS:
     Real64 constexpr Tolerance(1.e-5);         // Relative error tolerance
     Real64 constexpr PerturbSurfAreaFrac(0.1); // Perturbation applied to Surf Fraction to initialize iteration
     Real64 constexpr SmallNum(1.e-9);          // Small Number
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     Real64 check;             // Validity Check for moving to Quad Solution
@@ -5490,16 +5348,6 @@ void CheckWaterCoilSchedule(EnergyPlusData &state, std::string_view CompName, Re
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   October 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // <description>
-
-    // Using/Aliasing
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int CoilNum;
 
     // Obtains and Allocates WaterCoil related parameters from input file
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
@@ -5507,6 +5355,7 @@ void CheckWaterCoilSchedule(EnergyPlusData &state, std::string_view CompName, Re
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
+    int CoilNum = 0;
     // Find the correct Coil number
     if (CompIndex == 0) {
         CoilNum = UtilityRoutines::FindItemInList(CompName, state.dataWaterCoils->WaterCoil);
@@ -5546,8 +5395,6 @@ Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   November 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the max water flow rate for the given coil and returns it.  If
@@ -5597,17 +5444,11 @@ int GetCoilInletNode(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         R. Raustad
     //       DATE WRITTEN   March 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given coil and returns the inlet node number.  If
     // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
     // as zero.
-
-    // Return value
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -5646,15 +5487,11 @@ int GetCoilOutletNode(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         R. Raustad
     //       DATE WRITTEN   March 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given coil and returns the inlet node number.  If
     // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
     // as zero.
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -5695,15 +5532,11 @@ int GetCoilWaterInletNode(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         R. Raustad
     //       DATE WRITTEN   July 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given coil and returns the inlet water control node number.  If
     // incorrect coil type or name is given, ErrorsFound is returned as true and node number is returned
     // as zero.
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -5742,8 +5575,6 @@ int GetCoilWaterOutletNode(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         R. Raustad
     //       DATE WRITTEN   July 2007
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given coil and returns the outlet water node number.  If
@@ -5788,15 +5619,11 @@ void SetCoilDesFlow(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine is designed to set the design air volume flow rate in the
     // water coil data structure. Some of the coil types do not have this datum as
     // an input parameter and it is needed for calculating capacity for output reporting.
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
         GetWaterCoilInput(state);
@@ -5829,18 +5656,13 @@ Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine is designed to set the design air volume flow rate in the
     // water coil data structure. Some of the coil types do not have this datum as
     // an input parameter and it is needed for calculating capacity for output reporting.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 CoilDesAirFlow;
-
-    CoilDesAirFlow = 0.0;
+    Real64 CoilDesAirFlow = 0.0;
 
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) { // First time subroutine has been entered
         GetWaterCoilInput(state);
@@ -5873,14 +5695,10 @@ void CheckActuatorNode(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   January 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This subroutine checks that the input actuator node number is matched by
     // the water inlet node number of some water coil
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -5910,8 +5728,6 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Bereket Nigusse
     //       DATE WRITTEN   March 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine checks that the sensor node number matches the air outlet node number
@@ -5919,8 +5735,6 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CheckForSensorAndSetpointNode: ");
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Obtains and Allocates DXCoils
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -6027,18 +5841,10 @@ Real64 TdbFnHRhPb(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   April 1, 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Given the specific enthalpy, relative humidity, and the
     // barometric pressure, the function returns the dry bulb temperature.
-
-    // METHODOLOGY EMPLOYED:
-    // Inverts PsyHFnTdbRhPb
-
-    // REFERENCES:
-    // none
 
     // Return value
     Real64 T; // result=> humidity ratio
@@ -6093,8 +5899,6 @@ Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum) // coil 
     // FUNCTION INFORMATION:
     //       AUTHOR         Bereket A Nigusse, FSEC
     //       DATE WRITTEN   July 2010
-    //       MODIFIED
-    //       RE-ENGINEERED
 
     // PURPOSE OF THIS FUNCTION:
     // Splits the UA value of a simple coil:cooling:water heat exchanger model into
@@ -6112,15 +5916,6 @@ Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum) // coil 
     //         of 58.0 [W/m2C] and 82.0 [W/m2C] sensible convection equivalent of the mass
     //         transfer coefficient converted using the approximate relation:
     //         hequivalent = hmasstransfer/CpAir.
-
-    // REFERENCES:
-
-    // USE STATEMENTS:
-
-    // Return value
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
     constexpr Real64 OverallFinEfficiency(0.92); // Assumes aluminum fins, 12 fins per inch, fins
@@ -6144,12 +5939,6 @@ Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum) // coil 
         1.0 / (hWaterTubeInside * AreaRatio) +
         1.0 / (hAirTubeOutside * OverallFinEfficiency)); // Inverse of overall heat transfer coefficient for coil [W/m2C]
 
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     auto &waterCoil = state.dataWaterCoils->WaterCoil(CoilNum);
     waterCoil.UACoilTotal = 1.0 / (1.0 / waterCoil.UACoilExternal + 1.0 / waterCoil.UACoilInternal);
@@ -6168,8 +5957,6 @@ int GetWaterCoilIndex(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         B. Nigusse, FSEC
     //       DATE WRITTEN   Feb 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the index for the given coil and returns it.  If incorrect coil
@@ -6232,19 +6019,11 @@ Real64 GetWaterCoilCapacity(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         R. Raustad, FSEC
     //       DATE WRITTEN   Sep 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the capacity for the given coil and returns it.  If incorrect coil
     // type or name is given, ErrorsFound is returned as true and capacity is returned
     // as zero.
-
-    // Return value
-    Real64 Capacity; // returned coil capacity if matched coil
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int IndexNum; // index to water coil
 
     // Obtains and allocates WaterCoil related parameters from input file
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
@@ -6252,7 +6031,8 @@ Real64 GetWaterCoilCapacity(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    Capacity = -1.0;
+    int IndexNum;           // index to water coil
+    Real64 Capacity = -1.0; // returned coil capacity if matched coil
 
     if (CoilType == "COIL:HEATING:WATER") {
         IndexNum = UtilityRoutines::FindItemInList(CoilName, state.dataWaterCoils->WaterCoil);
@@ -6382,19 +6162,11 @@ int GetWaterCoilAvailScheduleIndex(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Chandan Sharma, FSEC
     //       DATE WRITTEN   February 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up the given coil and returns the availability schedule index.  If
     // incorrect coil type or name is given, ErrorsFound is returned as true and index is returned
     // as zero.
-
-    // Return value
-    int AvailSchIndex; // returned availability schedule of matched coil
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichCoil;
 
     // Obtains and Allocates HeatingCoil related parameters from input file
     // Obtains and Allocates DXCoils
@@ -6403,8 +6175,8 @@ int GetWaterCoilAvailScheduleIndex(EnergyPlusData &state,
         state.dataWaterCoils->GetWaterCoilsInputFlag = false;
     }
 
-    WhichCoil = 0;
-    AvailSchIndex = 0;
+    int WhichCoil = 0;
+    int AvailSchIndex = 0;
 
     if (UtilityRoutines::SameString(CoilType, "Coil:Heating:Water") || UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") ||
         UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water:DetailedGeometry")) {
@@ -6436,13 +6208,9 @@ void SetWaterCoilData(EnergyPlusData &state,
     // FUNCTION INFORMATION:
     //       AUTHOR         Bereket Nigusse
     //       DATE WRITTEN   February 2016
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function sets data to water Heating Coil using the coil index and arguments passed
-
-    // Using/Aliasing
 
     if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
         GetWaterCoilInput(state);
@@ -6490,23 +6258,9 @@ void EstimateCoilInletWaterTemp(EnergyPlusData &state,
     // applies energy balance around the water coil and estimates coil water inlet temperature
     // assuming coil effectiveness of 0.8
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("EstimateCoilInletWaterTemp");
     constexpr Real64 EffectivenessMaxAssumed(0.80);
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 WaterMassFlowRate;
