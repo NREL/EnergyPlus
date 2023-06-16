@@ -627,7 +627,7 @@ namespace Weather {
     void GetDSTData(EnergyPlusData &state, bool &ErrorsFound); // will be set to true if severe errors are found in inputs
 
     void GetDesignDayData(EnergyPlusData &state,
-                          int &TotDesDays, // Total number of Design days to Setup
+                          int TotDesDays, // Total number of Design days to Setup
                           bool &ErrorsFound);
 
     void GetLocationInfo(EnergyPlusData &state, bool &ErrorsFound);
@@ -744,6 +744,22 @@ namespace Weather {
         int DaysLastSnow = 0;    // Number of Days since last snow
     };
 
+   struct DesDayMods {
+       Real64 OutDryBulbTemp;
+       Real64 OutRelHum;
+       Real64 BeamSolarRad;
+       Real64 DifSolarRad;
+       Real64 SkyTemp;
+    };
+
+    struct SPSiteSchedules {
+        Real64 OutDryBulbTemp = -999.0;
+        Real64 OutRelHum = -999.0;
+        Real64 BeamSolarRad = -999.0;
+        Real64 DifSolarRad = -999.0;
+        Real64 SkyTemp = -999.0;
+    };
+        
     // Here's a fun little function
     void ForAllHrTs(EnergyPlusData &state, std::function<void(int, int)> f); 
 } // namespace Weather
@@ -820,13 +836,15 @@ struct WeatherManagerData : BaseGlobalStruct
     Array2D<Weather::WeatherVars> wvarsHrTsToday;
     Array2D<Weather::WeatherVars> wvarsHrTsTomorrow;
 
+    EPVector<Array2D<Weather::DesDayMods>> desDayMods;
+#ifdef GET_OUT        
     Array3D<Real64> DDDBRngModifier;      // Design Day Dry-bulb Temperature Range Modifier NOLINT(cert-err58-cpp)
     Array3D<Real64> DDHumIndModifier;     // Design Day relative humidity values or wet-bulb modifiers (per HumIndType) NOLINT(cert-err58-cpp)
     Array3D<Real64> DDBeamSolarValues;    // Design Day Beam Solar Values NOLINT(cert-err58-cpp)
     Array3D<Real64> DDDiffuseSolarValues; // Design Day Relative Humidity Values NOLINT(cert-err58-cpp)
 
     Array3D<Real64> DDSkyTempScheduleValues; // Sky temperature - DesignDay input NOLINT(cert-err58-cpp)
-
+#endif // 
     int RptIsRain;  // Rain Report Value
     int RptIsSnow;  // Snow Report Value
     int RptDayType; // DayType Report Value
@@ -836,13 +854,18 @@ struct WeatherManagerData : BaseGlobalStruct
     Real64 SolarAzimuthAngle;                             // Angle of Solar Azimuth (degrees)
     Real64 HorizIRSky;                                    // Horizontal Infrared Radiation Intensity (W/m2)
     Real64 TimeStepFraction;                              // Fraction of hour each time step represents
-    Array1D<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value NOLINT(cert-err58-cpp)
+
+    EPVector<Weather::SPSiteSchedules> spSiteSchedules;
+    std::vector<int> spSiteSchedNums;
+#ifdef GET_OUT        
+        Array1D<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value NOLINT(cert-err58-cpp)
     Array1D<Real64> SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value NOLINT(cert-err58-cpp)
     Array1D<Real64> SPSiteBeamSolarScheduleValue;         // reporting Beam Solar Schedule Value NOLINT(cert-err58-cpp)
     Array1D<Real64> SPSiteDiffuseSolarScheduleValue;      // reporting Diffuse Solar Schedule Value NOLINT(cert-err58-cpp)
     Array1D<Real64> SPSiteSkyTemperatureScheduleValue;    // reporting SkyTemperature Modifier Schedule Value NOLINT(cert-err58-cpp)
     Array1D_int SPSiteScheduleNamePtr;                    // SP Site Schedule Name Ptrs NOLINT(cert-err58-cpp)
     Array1D_string SPSiteScheduleUnits;                   // SP Site Schedule Units NOLINT(cert-err58-cpp)
+#endif // 
     int NumSPSiteScheduleNamePtrs;                        // Number of SP Site Schedules (DesignDay only)
     // Number of hours of missing data
     Array1D<Real64> Interpolation;      // Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
@@ -981,11 +1004,14 @@ struct WeatherManagerData : BaseGlobalStruct
         this->NumWPSkyTemperatures = 0;             // Number of WeatherProperty:SkyTemperature items in input file
         this->wvarsHrTsToday.deallocate();
         this->wvarsHrTsTomorrow.deallocate();
+        this->desDayMods.deallocate();
+#ifdef GET_OUT
         this->DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
         this->DDHumIndModifier.deallocate();        // Design Day relative humidity values
         this->DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
         this->DDDiffuseSolarValues.deallocate();    // Design Day Relative Humidity Values
         this->DDSkyTempScheduleValues.deallocate(); // Sky temperature - DesignDay input
+#endif // GET_OUT        
         this->RptIsRain = 0;                        // Rain Report Value
         this->RptIsSnow = 0;                        // Snow Report Value
         this->RptDayType = 0;                       // DayType Report Value
@@ -995,6 +1021,9 @@ struct WeatherManagerData : BaseGlobalStruct
         this->SolarAzimuthAngle = 0.0;                           // Angle of Solar Azimuth (degrees)
         this->HorizIRSky = 0.0;                                  // Horizontal Infrared Radiation Intensity (W/m2)
         this->TimeStepFraction = 0.0;                            // Fraction of hour each time step represents
+        this->spSiteSchedules.deallocate();
+        this->spSiteSchedNums.clear();
+#ifdef GET_OUT        
         this->SPSiteDryBulbRangeModScheduleValue.deallocate();   // reporting Drybulb Temperature Range Modifier Schedule Value
         this->SPSiteHumidityConditionScheduleValue.deallocate(); // reporting Humidity Condition Schedule Value
         this->SPSiteBeamSolarScheduleValue.deallocate();         // reporting Beam Solar Schedule Value
@@ -1002,6 +1031,7 @@ struct WeatherManagerData : BaseGlobalStruct
         this->SPSiteSkyTemperatureScheduleValue.deallocate();    // reporting SkyTemperature Modifier Schedule Value
         this->SPSiteScheduleNamePtr.deallocate();                // SP Site Schedule Name Ptrs
         this->SPSiteScheduleUnits.deallocate();                  // SP Site Schedule Units
+#endif //        
         this->NumSPSiteScheduleNamePtrs = 0;                     // Number of SP Site Schedules (DesignDay only)
         this->Interpolation.deallocate();                        // Interpolation values based on Number of Time Steps in Hour
         this->SolarInterpolation.deallocate();                   // Solar Interpolation values based on
