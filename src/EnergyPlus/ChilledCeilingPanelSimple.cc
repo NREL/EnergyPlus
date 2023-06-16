@@ -640,7 +640,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
                 thisCP.TotSurfToDistrib = MinFraction;
             }
             if (thisCP.SurfacePtr(SurfNum) != 0) {
-                state.dataSurface->SurfIntConvSurfGetsRadiantHeat(thisCP.SurfacePtr(SurfNum)) = true;
+                state.dataSurface->surfIntConv(thisCP.SurfacePtr(SurfNum)).getsRadiantHeat = true;
             }
 
             AllFracsSummed += thisCP.FracDistribToSurf(SurfNum);

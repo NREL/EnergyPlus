@@ -512,7 +512,7 @@ namespace HighTempRadiantSystem {
                 }
 
                 if (highTempRadSys.SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(highTempRadSys.SurfacePtr(SurfNum)) = true;
+                    state.dataSurface->surfIntConv(highTempRadSys.SurfacePtr(SurfNum)).getsRadiantHeat = true;
                 }
 
                 AllFracsSummed += highTempRadSys.FracDistribToSurf(SurfNum);
