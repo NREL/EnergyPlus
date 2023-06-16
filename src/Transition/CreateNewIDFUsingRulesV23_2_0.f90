@@ -408,99 +408,175 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(23:CurArgs+4)=InArgs(19:CurArgs)
                 CurArgs = CurArgs + 4
 
+              CASE('COIL:COOLING:DX:CURVEFIT:PERFORMANCE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:2)=InArgs(1:2)
+                OutArgs(3) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(4:CurArgs+1)=InArgs(3:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:COOLING:DX:SINGLESPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:26)=InArgs(1:26)
+                OutArgs(27) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(28:CurArgs+1)=InArgs(27:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:COOLING:DX:MULTISPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:12)=InArgs(1:12)
+                OutArgs(13) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(14:CurArgs+1)=InArgs(13:CurArgs)
+                CurArgs = CurArgs + 1
+
               CASE('COIL:COOLING:DX:VARIABLESPEED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 ! manipulate all the speeds regardless of CurArgs count
-                OutArgs(1:25)=InArgs(1:25)
-                OutArgs(26) = ''  ! new speed 1 2017 rated field
-                OutArgs(27) = ''  ! new speed 1 2023 rated field
-                OutArgs(28:37)=InArgs(26:35)
-                OutArgs(38)='' ! new speed 2 2017 rated field
-                OutArgs(39)='' ! new speed 2 2023 rated field
-                OutArgs(40:49)=InArgs(36:45)
-                OutArgs(50)='' ! new speed 3 2017 rated field
-                OutArgs(51)='' ! new speed 3 2023 rated field
-                OutArgs(52:61)=InArgs(46:55)
-                OutArgs(62)='' ! new speed 4 2017 rated field
-                OutArgs(63)='' ! new speed 4 2023 rated field
-                OutArgs(64:73)=InArgs(56:65)
-                OutArgs(74)='' ! new speed 5 2017 rated field
-                OutArgs(75)='' ! new speed 5 2023 rated field
-                OutArgs(76:85)=InArgs(66:75)
-                OutArgs(86)='' ! new speed 6 2017 rated field
-                OutArgs(87)='' ! new speed 6 2023 rated field
-                OutArgs(88:97)=InArgs(76:85)
-                OutArgs(98)='' ! new speed 7 2017 rated field
-                OutArgs(99)='' ! new speed 7 2023 rated field
-                OutArgs(100:109)=InArgs(86:95)
-                OutArgs(110)='' ! new speed 8 2017 rated field
-                OutArgs(111)='' ! new speed 8 2023 rated field
-                OutArgs(112:121)=InArgs(96:105)
-                OutArgs(122)='' ! new speed 9 2017 rated field
-                OutArgs(123)='' ! new speed 9 2023 rated field
-                OutArgs(124:133)=InArgs(106:115)
-                OutArgs(134)='' ! new speed 10 2017 rated field
-                OutArgs(135)='' ! new speed 10 2023 rated field
-                OutArgs(136:CurArgs+20)=InArgs(116:CurArgs)
+                OutArgs(1:14)=InArgs(1:14)
+                OutArgs(15) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(16:26)=InArgs(15:25)
+                OutArgs(27) = ''  ! new speed 1 2017 rated field
+                OutArgs(28) = ''  ! new speed 1 2023 rated field
+                OutArgs(29:38)=InArgs(26:35)
+                OutArgs(39)='' ! new speed 2 2017 rated field
+                OutArgs(40)='' ! new speed 2 2023 rated field
+                OutArgs(41:50)=InArgs(36:45)
+                OutArgs(51)='' ! new speed 3 2017 rated field
+                OutArgs(52)='' ! new speed 3 2023 rated field
+                OutArgs(53:62)=InArgs(46:55)
+                OutArgs(63)='' ! new speed 4 2017 rated field
+                OutArgs(64)='' ! new speed 4 2023 rated field
+                OutArgs(65:74)=InArgs(56:65)
+                OutArgs(75)='' ! new speed 5 2017 rated field
+                OutArgs(76)='' ! new speed 5 2023 rated field
+                OutArgs(77:86)=InArgs(66:75)
+                OutArgs(87)='' ! new speed 6 2017 rated field
+                OutArgs(88)='' ! new speed 6 2023 rated field
+                OutArgs(89:98)=InArgs(76:85)
+                OutArgs(99)='' ! new speed 7 2017 rated field
+                OutArgs(100)='' ! new speed 7 2023 rated field
+                OutArgs(101:110)=InArgs(86:95)
+                OutArgs(111)='' ! new speed 8 2017 rated field
+                OutArgs(112)='' ! new speed 8 2023 rated field
+                OutArgs(113:122)=InArgs(96:105)
+                OutArgs(123)='' ! new speed 9 2017 rated field
+                OutArgs(124)='' ! new speed 9 2023 rated field
+                OutArgs(125:134)=InArgs(106:115)
+                OutArgs(135)='' ! new speed 10 2017 rated field
+                OutArgs(136)='' ! new speed 10 2023 rated field
+                OutArgs(137:CurArgs+21)=InArgs(116:CurArgs)
                 ! But then only modify CurArgs based on the number of fields
-                IF (CurArgs .GE. 25) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
-                IF (CurArgs .GE. 35) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 45) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 55) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 65) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 75) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 85) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 95) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 105) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 115) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 26) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
+                IF (CurArgs .GE. 36) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 46) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 56) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 66) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 76) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 86) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 96) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 106) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 116) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+
+              CASE('COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:5)=InArgs(1:5)
+                OutArgs(6) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:HEATING:DX:SINGLESPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:19)=InArgs(1:19)
+                OutArgs(20) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(21:CurArgs+1)=InArgs(20:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:HEATING:DX:MULTISPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:7)=InArgs(1:7)
+                OutArgs(8) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
+                CurArgs = CurArgs + 1
 
               CASE('COIL:HEATING:DX:VARIABLESPEED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 ! manipulate all the speeds regardless of CurArgs count
-                OutArgs(1:21)=InArgs(1:21)
-                OutArgs(22) = ''  ! new speed 1 2017 rated field
-                OutArgs(23) = ''  ! new speed 1 2023 rated field
-                OutArgs(24:30)=InArgs(22:28)
-                OutArgs(31)='' ! new speed 2 2017 rated field
-                OutArgs(32)='' ! new speed 2 2023 rated field
-                OutArgs(33:39)=InArgs(29:35)
-                OutArgs(40)='' ! new speed 3 2017 rated field
-                OutArgs(41)='' ! new speed 3 2023 rated field
-                OutArgs(42:48)=InArgs(36:42)
-                OutArgs(49)='' ! new speed 4 2017 rated field
-                OutArgs(50)='' ! new speed 4 2023 rated field
-                OutArgs(51:57)=InArgs(43:49)
-                OutArgs(58)='' ! new speed 5 2017 rated field
-                OutArgs(59)='' ! new speed 5 2023 rated field
-                OutArgs(60:66)=InArgs(50:56)
-                OutArgs(67)='' ! new speed 6 2017 rated field
-                OutArgs(68)='' ! new speed 6 2023 rated field
-                OutArgs(69:75)=InArgs(57:63)
-                OutArgs(76)='' ! new speed 7 2017 rated field
-                OutArgs(77)='' ! new speed 7 2023 rated field
-                OutArgs(78:84)=InArgs(64:70)
-                OutArgs(85)='' ! new speed 8 2017 rated field
-                OutArgs(86)='' ! new speed 8 2023 rated field
-                OutArgs(87:93)=InArgs(71:77)
-                OutArgs(94)='' ! new speed 9 2017 rated field
-                OutArgs(95)='' ! new speed 9 2023 rated field
-                OutArgs(96:102)=InArgs(78:84)
-                OutArgs(103)='' ! new speed 10 2017 rated field
-                OutArgs(104)='' ! new speed 10 2023 rated field
-                OutArgs(105:CurArgs+20)=InArgs(85:CurArgs)
+                OutArgs(1:13)=InArgs(1:13)
+                OutArgs(14) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(15:22)=InArgs(14:21)
+                OutArgs(23) = ''  ! new speed 1 2017 rated field
+                OutArgs(24) = ''  ! new speed 1 2023 rated field
+                OutArgs(25:31)=InArgs(22:28)
+                OutArgs(32)='' ! new speed 2 2017 rated field
+                OutArgs(33)='' ! new speed 2 2023 rated field
+                OutArgs(34:40)=InArgs(29:35)
+                OutArgs(41)='' ! new speed 3 2017 rated field
+                OutArgs(42)='' ! new speed 3 2023 rated field
+                OutArgs(43:49)=InArgs(36:42)
+                OutArgs(50)='' ! new speed 4 2017 rated field
+                OutArgs(51)='' ! new speed 4 2023 rated field
+                OutArgs(52:58)=InArgs(43:49)
+                OutArgs(59)='' ! new speed 5 2017 rated field
+                OutArgs(60)='' ! new speed 5 2023 rated field
+                OutArgs(61:67)=InArgs(50:56)
+                OutArgs(68)='' ! new speed 6 2017 rated field
+                OutArgs(69)='' ! new speed 6 2023 rated field
+                OutArgs(70:76)=InArgs(57:63)
+                OutArgs(77)='' ! new speed 7 2017 rated field
+                OutArgs(78)='' ! new speed 7 2023 rated field
+                OutArgs(79:85)=InArgs(64:70)
+                OutArgs(86)='' ! new speed 8 2017 rated field
+                OutArgs(87)='' ! new speed 8 2023 rated field
+                OutArgs(88:94)=InArgs(71:77)
+                OutArgs(95)='' ! new speed 9 2017 rated field
+                OutArgs(96)='' ! new speed 9 2023 rated field
+                OutArgs(97:103)=InArgs(78:84)
+                OutArgs(104)='' ! new speed 10 2017 rated field
+                OutArgs(105)='' ! new speed 10 2023 rated field
+                OutArgs(106:CurArgs+21)=InArgs(85:CurArgs)
                 ! But then only modify CurArgs based on the number of fields
-                IF (CurArgs .GE. 21) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
-                IF (CurArgs .GE. 38) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 35) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 42) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 49) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 56) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 63) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 70) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 77) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs .GE. 84) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 22) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
+                IF (CurArgs .GE. 39) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 36) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 43) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 50) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 57) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 64) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 71) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 78) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs .GE. 85) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+
+              CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP:PUMPED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:19)=InArgs(1:19)
+                OutArgs(20) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(21:CurArgs+1)=InArgs(20:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP:WRAPPED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:12)=InArgs(1:12)
+                OutArgs(13) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(14:CurArgs+1)=InArgs(13:CurArgs)
+                CurArgs = CurArgs + 1
+
+              CASE('COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:18)=InArgs(1:18)
+                OutArgs(19) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(20:CurArgs+1)=InArgs(19:CurArgs)
+                CurArgs = CurArgs + 1
 
               CASE('COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
