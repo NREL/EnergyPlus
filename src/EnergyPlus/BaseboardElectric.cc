@@ -446,13 +446,13 @@ namespace BaseboardElectric {
             auto &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
             auto &baseboard = state.dataBaseboardElectric->baseboards(BaseboardNum);
 
-            std::string CompType = baseboard.EquipType;
-            std::string CompName = baseboard.EquipName;
+            std::string_view const CompType = baseboard.EquipType;
+            std::string_view const CompName = baseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = baseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 1;
-            std::string SizingString = baseboard.FieldNames(FieldNum) + " [W]";
+            std::string const SizingString = format("{} [W]", baseboard.FieldNames(FieldNum));
             int CapSizingMethod = baseboard.HeatingCapMethod;
             ZoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||

@@ -2378,7 +2378,7 @@ namespace Weather {
                     // Do the range checks on the first set of fields -- no others.
                     bool ErrorsFound = false;
                     if (DryBulb < 99.9 && (DryBulb < -90.0 || DryBulb > 70.0)) {
-                            ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
                         ShowContinueError(state, format("DryBulb Temperature ({:.2R}) is out of range [-90.0, 70.0]", DryBulb));
                         ErrorsFound = true;
                     }

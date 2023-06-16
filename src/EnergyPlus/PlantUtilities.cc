@@ -1908,8 +1908,8 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 }
 
 int MyPlantSizingIndex(EnergyPlusData &state,
-                       std::string const &CompType,           // component description
-                       std::string_view CompName,             // user name of component
+                       std::string_view const CompType,       // component description
+                       std::string_view const CompName,       // user name of component
                        int const NodeNumIn,                   // component water inlet node
                        [[maybe_unused]] int const NodeNumOut, // component water outlet node
                        bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
