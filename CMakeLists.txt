@@ -298,15 +298,6 @@ endif()
 # E+ required libraries
 add_subdirectory(idd)
 
-execute_process(
-  COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
-  TIMEOUT 30
-  RESULT_VARIABLE generate_epJSON_schema_result)
-if(${generate_epJSON_schema_result} MATCHES ".*timeout.*")
-  message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
-endif()
-configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd")
-configure_file(idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
 configure_file(idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd")
 configure_file(idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd")
 
@@ -322,7 +313,6 @@ configure_file("workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/work
 # of course E+ itself
 add_subdirectory(src/EnergyPlus)
 set_target_properties(airflownetworklib PROPERTIES FOLDER "Internal")
-set_target_properties(GenerateEmbeddedEpJSONSchema PROPERTIES FOLDER "Internal")
 set_target_properties(energyplusparser PROPERTIES FOLDER "Internal")
 
 if(BUILD_TESTING)
