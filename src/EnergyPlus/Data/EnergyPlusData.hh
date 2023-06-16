@@ -347,7 +347,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<CondenserLoopTowersData> dataCondenserLoopTowers;
     std::unique_ptr<ConstructionData> dataConstruction;
     std::unique_ptr<ContaminantBalanceData> dataContaminantBalance;
-    std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficient;
+    std::unique_ptr<ConvectionCoefficientsData> dataConvect;
     std::unique_ptr<ConvergParamsData> dataConvergeParams;
     std::unique_ptr<CoolTowerData> dataCoolTower;
     std::unique_ptr<CostEstimateManagerData> dataCostEstimateManager;
