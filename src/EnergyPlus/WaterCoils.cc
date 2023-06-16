@@ -2318,7 +2318,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 rho;
-    //int FieldNum = 2;                      // IDD numeric field number where input field description is found
     std::string CompType;                  // component type
     std::string SizingString;              // input field sizing description (e.g., Nominal Capacity)
     Real64 TempSize;                       // autosized value
@@ -2360,7 +2359,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
         if (PltSizCoolNum > 0) {
 
-            //int FieldNum = 0;
+            // int FieldNum = 0;
             state.dataSize->DataPltSizCoolNum = PltSizCoolNum;
             state.dataSize->DataWaterLoopNum = state.dataWaterCoils->WaterCoil(CoilNum).WaterPlantLoc.loopNum;
 
@@ -2389,8 +2388,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             // Check if the air volume flow rate is defined in parent HVAC equipment and set water coil design air volume flow rate accordingly
             if (state.dataSize->CurZoneEqNum > 0) {
                 auto const &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
-                if (ZoneEqSizing.DesignSizeFromParent &&
-                    state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate == autoSizedValue) {
+                if (ZoneEqSizing.DesignSizeFromParent && state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate == autoSizedValue) {
                     state.dataSize->DataAirFlowUsedForSizing = ZoneEqSizing.AirVolFlow;
                     state.dataSize->DataFlowUsedForSizing = ZoneEqSizing.AirVolFlow;
                     state.dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize; // represents water coil being autosized
@@ -2437,7 +2435,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             // Check if the water flow rate is defined in parent HVAC equipment and set water coil design water flow rate accordingly
             if (state.dataSize->CurZoneEqNum > 0) {
                 auto const &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
-                if (ZoneEqSizing.DesignSizeFromParent){
+                if (ZoneEqSizing.DesignSizeFromParent) {
                     state.dataSize->DataWaterFlowUsedForSizing = ZoneEqSizing.MaxCWVolFlow;
                 } else {
                     state.dataSize->DataWaterFlowUsedForSizing = autoSizedCWFlow;
@@ -2452,7 +2450,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                                      // should print this!)
                 TempSize = AutoSize; // not an input for this model
             } else {
-                //FieldNum = 4; //  N4 , \field Design Inlet Air Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp; // preserve input if entered
             }
@@ -2466,7 +2463,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 bPRINT = false;      // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize; // coil report
             } else {
-                //FieldNum = 3; //  N3 , \field Design Inlet Water Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesInletWaterTemp; // preserve input if entered
             }
@@ -2501,7 +2497,6 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
                 bPRINT = false;      // no field for detailed water coil, should print to eio anyway
                 TempSize = AutoSize; // coil report
             } else {
-                //FieldNum = 5; //  N5 , \field Design Outlet Air Temperature
                 bPRINT = true;
                 TempSize = state.dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp; // preserve input if entered
             }
