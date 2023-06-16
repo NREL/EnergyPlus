@@ -1718,7 +1718,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_CopyReportPeriodObject)
                                           state->dataWeather->ReportPeriodInput(2).endMonth,
                                           state->dataWeather->ReportPeriodInput(2).endDay);
 
-    CopyReportPeriodObject(state->dataWeather->ReportPeriodInput, 1, state->dataWeather->ReportPeriodInput, 2);
+    state->dataWeather->ReportPeriodInput(2) = state->dataWeather->ReportPeriodInput(1);
 
     EXPECT_EQ(state->dataWeather->ReportPeriodInput(2).title, state->dataWeather->ReportPeriodInput(1).title);
     EXPECT_EQ(state->dataWeather->ReportPeriodInput(2).reportName, state->dataWeather->ReportPeriodInput(1).reportName);

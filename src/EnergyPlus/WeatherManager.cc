@@ -112,16 +112,16 @@ namespace Weather {
     static constexpr std::array<std::string_view, (int)WaterMainsTempCalcMethod::Num> waterMainsCalcMethodNamesUC{
         "SCHEDULE", "CORRELATION", "CORRELATIONFROMWEATHERFILE", "FIXEDDEFAULT"};
 
-    static constexpr std::array<std::string_view, (int)SkyTempModel::Num> SkyTempModelInputNamesUC{
+    static constexpr std::array<std::string_view, (int)SkyTempModel::Num> SkyTempModelNamesUC{
         "CLARKALLEN", "SCHEDULEVALUE", "DIFFERENCESCHEDULEDRYBULBVALUE", "DIFFERENCESCHEDULEDEWPOINTVALUE", "BRUNT", "IDSO", "BERDAHLMARTIN"};
 
     static constexpr std::array<std::string_view, (int)SkyTempModel::Num> SkyTempModelNames{"Clark and Allen",
-                                                                                                            "Schedule Value",
-                                                                                                            "DryBulb Difference Schedule Value",
-                                                                                                            "Dewpoint Difference Schedule Value",
-                                                                                                            "Brunt",
-                                                                                                            "Idso",
-                                                                                                            "Berdahl and Martin"};
+                    "Schedule Value",
+                    "DryBulb Difference Schedule Value",
+                    "Dewpoint Difference Schedule Value",
+                    "Brunt",
+                    "Idso",
+                    "Berdahl and Martin"};
 
     void ManageWeather(EnergyPlusData &state)
     {
@@ -746,8 +746,7 @@ namespace Weather {
             for (int i = 1; i <= state.dataWeather->NumOfEnvrn; ++i) {
                 state.dataEnvrn->TotalOverallSimDays += state.dataWeather->Environment(i).TotalDays;
                 if (state.dataWeather->Environment(i).KindOfEnvrn == Constant::KindOfSim::RunPeriodWeather) {
-                    state.dataEnvrn->MaxNumberSimYears =
-                        max(state.dataEnvrn->MaxNumberSimYears, state.dataWeather->Environment(i).NumSimYears);
+                    state.dataEnvrn->MaxNumberSimYears = max(state.dataEnvrn->MaxNumberSimYears, state.dataWeather->Environment(i).NumSimYears);
                 }
             }
             DisplaySimDaysProgress(state, state.dataEnvrn->CurrentOverallSimDay, state.dataEnvrn->TotalOverallSimDays);
@@ -768,32 +767,32 @@ namespace Weather {
             state.dataGlobal->CalendarYear = envCurr.StartYear;
             state.dataGlobal->CalendarYearChr = fmt::to_string(state.dataGlobal->CalendarYear);
             state.dataEnvrn->Month = envCurr.StartMonth;
-            state.dataGlobal->NumOfDayInEnvrn =
-                envCurr.TotalDays; // Set day loop maximum from DataGlobals
-            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
-                if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
-                    if (state.dataGlobal->KindOfSim == Constant::KindOfSim::DesignDay) {
-                        if (state.dataGlobal->DoDesDaySim) {
-                            ShowWarningError(state, format("{}Adaptive Comfort being reported during design day.", RoutineName));
-                            Real64 GrossApproxAvgDryBulb = (state.dataWeather->DesDayInput(state.dataWeather->Envrn).MaxDryBulb +
-                                                            (state.dataWeather->DesDayInput(state.dataWeather->Envrn).MaxDryBulb -
-                                                             state.dataWeather->DesDayInput(state.dataWeather->Envrn).DailyDBRange)) /
-                                                           2.0;
-                            if (state.dataHeatBal->AdaptiveComfortRequested_ASH55)
-                                ThermalComfort::CalcThermalComfortAdaptiveASH55(state, true, false, GrossApproxAvgDryBulb);
-                            if (state.dataHeatBal->AdaptiveComfortRequested_CEN15251)
-                                ThermalComfort::CalcThermalComfortAdaptiveCEN15251(state, true, false, GrossApproxAvgDryBulb);
-                        }
-                    } else {
-                        if (state.dataGlobal->DoWeathSim || state.dataGlobal->DoDesDaySim) {
-                            if (state.dataHeatBal->AdaptiveComfortRequested_ASH55)
-                                ThermalComfort::CalcThermalComfortAdaptiveASH55(state, true, true, 0.0);
-                            if (state.dataHeatBal->AdaptiveComfortRequested_CEN15251)
-                                ThermalComfort::CalcThermalComfortAdaptiveCEN15251(state, true, true, 0.0);
-                        }
+            state.dataGlobal->NumOfDayInEnvrn = envCurr.TotalDays; // Set day loop maximum from DataGlobals
+
+            if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
+                (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251)) {
+                if (state.dataGlobal->KindOfSim == Constant::KindOfSim::DesignDay) {
+                    if (state.dataGlobal->DoDesDaySim) {
+                        ShowWarningError(state, format("{}Adaptive Comfort being reported during design day.", RoutineName));
+                        Real64 GrossApproxAvgDryBulb = (state.dataWeather->DesDayInput(state.dataWeather->Envrn).MaxDryBulb +
+                                                        (state.dataWeather->DesDayInput(state.dataWeather->Envrn).MaxDryBulb -
+                                                         state.dataWeather->DesDayInput(state.dataWeather->Envrn).DailyDBRange)) /
+                                2.0;
+                        if (state.dataHeatBal->AdaptiveComfortRequested_ASH55)
+                            ThermalComfort::CalcThermalComfortAdaptiveASH55(state, true, false, GrossApproxAvgDryBulb);
+                        if (state.dataHeatBal->AdaptiveComfortRequested_CEN15251)
+                            ThermalComfort::CalcThermalComfortAdaptiveCEN15251(state, true, false, GrossApproxAvgDryBulb);
+                    }
+                } else {
+                    if (state.dataGlobal->DoWeathSim || state.dataGlobal->DoDesDaySim) {
+                        if (state.dataHeatBal->AdaptiveComfortRequested_ASH55)
+                            ThermalComfort::CalcThermalComfortAdaptiveASH55(state, true, true, 0.0);
+                        if (state.dataHeatBal->AdaptiveComfortRequested_CEN15251)
+                            ThermalComfort::CalcThermalComfortAdaptiveCEN15251(state, true, true, 0.0);
                     }
                 }
             }
+
             if (state.dataWeather->Envrn > state.dataEnvrn->TotDesDays && state.dataWeather->WeatherFileExists) {
                 OpenEPlusWeatherFile(state, ErrorsFound, false);
             }
@@ -840,11 +839,8 @@ namespace Weather {
                         Array1D_int ActEndDayOfMonth(12);
                         ActEndDayOfMonth = state.dataWeather->EndDayOfMonth;
                         state.dataEnvrn->CurrentYearIsLeapYear = envCurr.IsLeapYear;
-                        if (state.dataEnvrn->CurrentYearIsLeapYear && state.dataWeather->WFAllowsLeapYears) {
-                            state.dataWeather->LeapYearAdd = 1;
-                        } else {
-                            state.dataWeather->LeapYearAdd = 0;
-                        }
+
+                        state.dataWeather->LeapYearAdd = (int)(state.dataEnvrn->CurrentYearIsLeapYear && state.dataWeather->WFAllowsLeapYears);
                         if (state.dataEnvrn->CurrentYearIsLeapYear) {
                             ActEndDayOfMonth(2) = state.dataWeather->EndDayOfMonth(2) + state.dataWeather->LeapYearAdd;
                         }
@@ -995,51 +991,47 @@ namespace Weather {
                                   SkyTempModelNames[(int)envCurr.skyTempModel]);
                         }
 
-                        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
-                            if ((state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather && state.dataGlobal->DoWeathSim)) {
-                                if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
-                                    if (state.dataWeather->WFAllowsLeapYears) {
-                                        ShowSevereError(
-                                            state,
-                                            format("{}AdaptiveComfort Reporting does not work correctly with leap years in weather files.",
-                                                   RoutineName));
-                                        ErrorsFound = true;
-                                    }
-                                    if (state.dataWeather->NumDataPeriods != 1) {
-                                        ShowSevereError(
-                                            state,
-                                            format("{}AdaptiveComfort Reporting does not work correctly with multiple dataperiods in weather files.",
-                                                   RoutineName));
-                                        ErrorsFound = true;
-                                    }
-                                    auto const &dataPeriod1 = state.dataWeather->DataPeriods(1);
-                                    if (dataPeriod1.StMon == 1 && dataPeriod1.StDay == 1) {
-                                        int RunStJDay = General::OrdinalDay(dataPeriod1.StMon, dataPeriod1.StDay, state.dataWeather->LeapYearAdd);
-                                        int RunEnJDay = General::OrdinalDay(dataPeriod1.EnMon, dataPeriod1.EnDay, state.dataWeather->LeapYearAdd);
-                                        if (RunEnJDay - RunStJDay + 1 != 365) {
-                                            ShowSevereError(state,
-                                                            format("{}AdaptiveComfort Reporting does not work correctly with weather files that do "
-                                                                   "not contain 365 days.",
-                                                                   RoutineName));
-                                            ErrorsFound = true;
-                                        }
-                                    } else {
-                                        ShowSevereError(state,
-                                                        format("{}AdaptiveComfort Reporting does not work correctly with weather files that do not "
-                                                               "start on 1 January.",
-                                                               RoutineName));
-                                        ErrorsFound = true;
-                                    }
-                                    if (state.dataWeather->NumIntervalsPerHour != 1) {
-                                        ShowSevereError(state,
-                                                        format("{}AdaptiveComfort Reporting does not work correctly with weather files that have "
-                                                               "multiple interval records per hour.",
-                                                               RoutineName));
-                                        ErrorsFound = true;
-                                    }
-                                }
+                        if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation &&
+                            (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather && state.dataGlobal->DoWeathSim) &&
+                            (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251)) {
+                            if (state.dataWeather->WFAllowsLeapYears) {
+                                ShowSevereError(state,
+                                                format("{}AdaptiveComfort Reporting does not work correctly with leap years in weather files.",
+                                                       RoutineName));
+                                ErrorsFound = true;
                             }
-                        }
+                            if (state.dataWeather->NumDataPeriods != 1) {
+                                ShowSevereError(
+                                                state,
+                                                format("{}AdaptiveComfort Reporting does not work correctly with multiple dataperiods in weather files.",
+                                                       RoutineName));
+                                ErrorsFound = true;
+                            }
+                            auto const &dataPeriod1 = state.dataWeather->DataPeriods(1);
+                            if (dataPeriod1.StMon == 1 && dataPeriod1.StDay == 1) {
+                                int RunStJDay = General::OrdinalDay(dataPeriod1.StMon, dataPeriod1.StDay, state.dataWeather->LeapYearAdd);
+                                int RunEnJDay = General::OrdinalDay(dataPeriod1.EnMon, dataPeriod1.EnDay, state.dataWeather->LeapYearAdd);
+                                if (RunEnJDay - RunStJDay + 1 != 365) {
+                                    ShowSevereError(state,
+                                                    format("{}AdaptiveComfort Reporting does not work correctly with weather files that do "
+                                                           "not contain 365 days.", RoutineName));
+                                    ErrorsFound = true;
+                                }
+                            } else {
+                                ShowSevereError(state,
+                                                format("{}AdaptiveComfort Reporting does not work correctly with weather files that do not "
+                                                       "start on 1 January.",
+                                                       RoutineName));
+                                ErrorsFound = true;
+                            }
+                            if (state.dataWeather->NumIntervalsPerHour != 1) {
+                                ShowSevereError(state,
+                                                format("{}AdaptiveComfort Reporting does not work correctly with weather files that have "
+                                                       "multiple interval records per hour.",
+                                                       RoutineName));
+                                ErrorsFound = true;
+                            }
+                        } // if
 
                         // Only need to set Week days for Run Days
                         state.dataEnvrn->RunPeriodStartDayOfWeek = TWeekDay;
@@ -1049,27 +1041,19 @@ namespace Weather {
 
                         state.dataWeather->curSimDayForEndOfRunPeriod = envCurr.TotalDays;
 
-                        {
-                            int i = JDay5Start;
-                            while (true) {
-                                state.dataWeather->WeekDayTypes(i) = TWeekDay;
-                                TWeekDay = mod(TWeekDay, 7) + 1;
-                                ++i;
-                                if (i > 366) i = 1;
-                                if (i == JDay5End) break;
-                            }
+                        int i = JDay5Start;
+                        while (true) {
+                            state.dataWeather->WeekDayTypes(i) = TWeekDay;
+                            TWeekDay = mod(TWeekDay, 7) + 1;
+                            ++i;
+                            if (i > 366) i = 1;
+                            if (i == JDay5End) break;
                         }
 
-                        if (state.dataWeather->UseDaylightSaving) {
-                            if (state.dataWeather->EPWDaylightSaving) {
-                                state.dataWeather->DaylightSavingIsActive = true;
-                            }
-                        } else {
-                            state.dataWeather->DaylightSavingIsActive = false;
-                        }
-                        if (state.dataWeather->IDFDaylightSaving) {
-                            state.dataWeather->DaylightSavingIsActive = true;
-                        }
+
+                        state.dataWeather->DaylightSavingIsActive =
+                            (state.dataWeather->UseDaylightSaving && state.dataWeather->EPWDaylightSaving) || state.dataWeather->IDFDaylightSaving;
+
                         envCurr.SetWeekDays = false;
 
                         if (state.dataWeather->DaylightSavingIsActive) {
@@ -1714,34 +1698,11 @@ namespace Weather {
             state.dataWeather->wvarsMissing.Albedo = 0.0;                            // Initial "missing" value
             state.dataWeather->wvarsMissing.LiquidPrecip = 0.0;                      // Initial "missing" value
             // Counts set to 0 for each environment
-            state.dataWeather->wvarsMissedCounts.OutBaroPress = 0;
-            state.dataWeather->wvarsMissedCounts.OutDryBulbTemp = 0;
-            state.dataWeather->wvarsMissedCounts.OutDewPointTemp = 0;
-            state.dataWeather->wvarsMissedCounts.OutRelHum = 0;
-            state.dataWeather->wvarsMissedCounts.WindSpeed = 0;
-            state.dataWeather->wvarsMissedCounts.WindDir = 0;
-            state.dataWeather->wvarsMissedCounts.TotalSkyCover = 0;
-            state.dataWeather->wvarsMissedCounts.OpaqueSkyCover = 0;
-            state.dataWeather->wvarsMissedCounts.Visibility = 0;
-            state.dataWeather->wvarsMissedCounts.Ceiling = 0;
-            state.dataWeather->wvarsMissedCounts.WaterPrecip = 0;
-            state.dataWeather->wvarsMissedCounts.AerOptDepth = 0;
-            state.dataWeather->wvarsMissedCounts.SnowDepth = 0;
-            state.dataWeather->wvarsMissedCounts.DaysLastSnow = 0;
-            state.dataWeather->wvarsMissedCounts.Albedo = 0;
-            state.dataWeather->wvarsMissedCounts.LiquidPrecip = 0;
-            state.dataWeather->wvarsMissedCounts.WeathCodes = 0;
-            state.dataWeather->wvarsMissedCounts.BeamSolarRad = 0;
-            state.dataWeather->wvarsMissedCounts.DifSolarRad = 0;
+            state.dataWeather->wvarsMissedCounts = Weather::WeatherVarCounts();
+
             // Counts set to 0 for each environment
-            state.dataWeather->wvarsOutOfRangeCounts.OutBaroPress = 0;
-            state.dataWeather->wvarsOutOfRangeCounts.OutDryBulbTemp = 0;
-            state.dataWeather->wvarsOutOfRangeCounts.OutDewPointTemp = 0;
-            state.dataWeather->wvarsOutOfRangeCounts.OutRelHum = 0;
-            state.dataWeather->wvarsOutOfRangeCounts.WindSpeed = 0;
-            state.dataWeather->wvarsOutOfRangeCounts.WindDir = 0;
-            state.dataWeather->wvarsOutOfRangeCounts.BeamSolarRad = 0;
-            state.dataWeather->wvarsOutOfRangeCounts.DifSolarRad = 0;
+            state.dataWeather->wvarsOutOfRangeCounts = Weather::WeatherVarCounts();
+
             state.dataWeather->IsRainThreshold = 0.8 / double(state.dataGlobal->NumOfTimeStepInHour); // [mm]
 
             if (!state.dataWeather->RPReadAllWeatherData) {
@@ -1823,15 +1784,8 @@ namespace Weather {
                             ++envCurr.CurrentYear;
                             envCurr.IsLeapYear = isLeapYear(envCurr.CurrentYear);
                             state.dataEnvrn->CurrentYearIsLeapYear = envCurr.IsLeapYear;
-                            if (state.dataEnvrn->CurrentYearIsLeapYear) {
-                                if (state.dataWeather->WFAllowsLeapYears) {
-                                    state.dataWeather->LeapYearAdd = 1;
-                                } else {
-                                    state.dataWeather->LeapYearAdd = 0;
-                                }
-                            } else {
-                                state.dataWeather->LeapYearAdd = 0;
-                            }
+                            state.dataWeather->LeapYearAdd = (int)(state.dataEnvrn->CurrentYearIsLeapYear && state.dataWeather->WFAllowsLeapYears);
+
                             // need to reset MonWeekDay and WeekDayTypes
                             int JDay5Start = General::OrdinalDay(envCurr.StartMonth, envCurr.StartDay, state.dataWeather->LeapYearAdd);
                             int JDay5End = General::OrdinalDay(envCurr.EndMonth, envCurr.EndDay, state.dataWeather->LeapYearAdd);
@@ -1876,15 +1830,8 @@ namespace Weather {
                             state.dataEnvrn->CurrentYearIsLeapYear)
                             ++state.dataWeather->curSimDayForEndOfRunPeriod;
                     }
-                    if (state.dataEnvrn->CurrentYearIsLeapYear) {
-                        if (state.dataWeather->WFAllowsLeapYears) {
-                            state.dataWeather->LeapYearAdd = 1;
-                        } else {
-                            state.dataWeather->LeapYearAdd = 0;
-                        }
-                    } else {
-                        state.dataWeather->LeapYearAdd = 0;
-                    }
+
+                    state.dataWeather->LeapYearAdd = (int)(state.dataEnvrn->CurrentYearIsLeapYear && state.dataWeather->WFAllowsLeapYears);
 
                     if (state.dataGlobal->DayOfSim < state.dataWeather->curSimDayForEndOfRunPeriod) {
                         ResetWeekDaysByMonth(state,
@@ -4725,11 +4672,11 @@ namespace Weather {
     }
 
     void GetReportPeriodData(EnergyPlusData &state,
-                             int &nReportPeriods, // Total number of Report Periods requested
+                             int nReportPeriods, // Total number of Report Periods requested
                              bool &ErrorsFound)
     {
+        constexpr std::string_view routineName = "GetReportPeriodData";
         state.dataWeather->ReportPeriodInput.allocate(nReportPeriods);
-        state.dataWeather->ReportPeriodInputUniqueNames.reserve(static_cast<unsigned>(nReportPeriods));
 
         auto const &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "Output:Table:ReportPeriod";
@@ -4751,23 +4698,23 @@ namespace Weather {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
+            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
             // A1, \field Name
-            if (!ipsc->lAlphaFieldBlanks(1)) {
-                GlobalNames::VerifyUniqueInterObjectName(state,
-                                                         state.dataWeather->ReportPeriodInputUniqueNames,
-                                                         ipsc->cAlphaArgs(1),
-                                                         ipsc->cCurrentModuleObject,
-                                                         ipsc->cAlphaFieldNames(1),
-                                                         ErrorsFound);
+            if (std::find_if(state.dataWeather->ReportPeriodInput.begin(), state.dataWeather->ReportPeriodInput.end(),
+                             [&newName](ReportPeriodData const &rpd) { return newName == rpd.title; }) != state.dataWeather->ReportPeriodInput.end()) {
+                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ErrorsFound = true;
             }
-
+                    
             ++Count;
+
+            auto &reportPeriodInput = state.dataWeather->ReportPeriodInput(i);
             // Loop = RP + Ptr;
             // Note JM 2018-11-20: IDD allows blank name, but input processor will create a name such as "ReportPeriod 1" anyways
             // which is fine for our reporting below
-            state.dataWeather->ReportPeriodInput(i).title = ipsc->cAlphaArgs(1);
+            reportPeriodInput.title = newName;
             // A2, \field Report Name
-            state.dataWeather->ReportPeriodInput(i).reportName = ipsc->cAlphaArgs(2);
+            reportPeriodInput.reportName = ipsc->cAlphaArgs(2);
 
             // set the start and end day of month from user input
             // N1, \field Begin Year
@@ -4778,91 +4725,55 @@ namespace Weather {
             // N6, \field End Month
             // N7, \field End Day of Month
             // N8; \field End Hour of Day
-            state.dataWeather->ReportPeriodInput(i).startYear = int(ipsc->rNumericArgs(1));
-            state.dataWeather->ReportPeriodInput(i).startMonth = int(ipsc->rNumericArgs(2));
-            state.dataWeather->ReportPeriodInput(i).startDay = int(ipsc->rNumericArgs(3));
-            state.dataWeather->ReportPeriodInput(i).startHour = int(ipsc->rNumericArgs(4));
-            state.dataWeather->ReportPeriodInput(i).endYear = int(ipsc->rNumericArgs(5));
-            state.dataWeather->ReportPeriodInput(i).endMonth = int(ipsc->rNumericArgs(6));
-            state.dataWeather->ReportPeriodInput(i).endDay = int(ipsc->rNumericArgs(7));
-            state.dataWeather->ReportPeriodInput(i).endHour = int(ipsc->rNumericArgs(8));
+            reportPeriodInput.startYear = int(ipsc->rNumericArgs(1));
+            reportPeriodInput.startMonth = int(ipsc->rNumericArgs(2));
+            reportPeriodInput.startDay = int(ipsc->rNumericArgs(3));
+            reportPeriodInput.startHour = int(ipsc->rNumericArgs(4));
+            reportPeriodInput.endYear = int(ipsc->rNumericArgs(5));
+            reportPeriodInput.endMonth = int(ipsc->rNumericArgs(6));
+            reportPeriodInput.endDay = int(ipsc->rNumericArgs(7));
+            reportPeriodInput.endHour = int(ipsc->rNumericArgs(8));
 
             // Validate year inputs
-            if (state.dataWeather->ReportPeriodInput(i).startYear == 0) {
-                if (state.dataWeather->ReportPeriodInput(i).endYear != 0) { // Have to have an input start year to input an end year
-                    ShowSevereError(state,
-                                    format("{}: object={}, end year cannot be specified if the start year is not.",
-                                           ipsc->cCurrentModuleObject,
-                                           state.dataWeather->ReportPeriodInput(i).title));
+            if (reportPeriodInput.startYear == 0) {
+                if (reportPeriodInput.endYear != 0) { // Have to have an input start year to input an end year
+                    ShowSevereError(state, format("{}: object={}, end year cannot be specified if the start year is not.",
+                                           ipsc->cCurrentModuleObject, reportPeriodInput.title));
                     ErrorsFound = true;
                 }
-            } else if (state.dataWeather->ReportPeriodInput(i).startYear < 1583) { // Bail on the proleptic Gregorian calendar
-                ShowSevereError(state,
-                                format("{}: object={}, start year ({}) is too early, please choose a date after 1582.",
-                                       ipsc->cCurrentModuleObject,
-                                       state.dataWeather->ReportPeriodInput(i).title,
-                                       state.dataWeather->ReportPeriodInput(i).startYear));
+            } else if (reportPeriodInput.startYear < 1583) { // Bail on the proleptic Gregorian calendar
+                ShowSevereError(state, format("{}: object={}, start year ({}) is too early, please choose a date after 1582.",
+                                       ipsc->cCurrentModuleObject, reportPeriodInput.title, reportPeriodInput.startYear));
                 ErrorsFound = true;
             }
 
-            if (state.dataWeather->ReportPeriodInput(i).endYear != 0 &&
-                state.dataWeather->ReportPeriodInput(i).startYear > state.dataWeather->ReportPeriodInput(i).endYear) {
-                ShowSevereError(state,
-                                format("{}: object={}, start year ({}) is after the end year ({}).",
-                                       ipsc->cCurrentModuleObject,
-                                       state.dataWeather->ReportPeriodInput(i).title,
-                                       state.dataWeather->ReportPeriodInput(i).startYear,
-                                       state.dataWeather->ReportPeriodInput(i).endYear));
+            if (reportPeriodInput.endYear != 0 && reportPeriodInput.startYear > reportPeriodInput.endYear) {
+                ShowSevereError(state, format("{}: object={}, start year ({}) is after the end year ({}).",
+                                       ipsc->cCurrentModuleObject, reportPeriodInput.title, reportPeriodInput.startYear, reportPeriodInput.endYear));
                 ErrorsFound = true;
             }
 
-            state.dataWeather->ReportPeriodInput(i).startJulianDate =
-                computeJulianDate(state.dataWeather->ReportPeriodInput(i).startYear,
-                                  state.dataWeather->ReportPeriodInput(i).startMonth,
-                                  state.dataWeather->ReportPeriodInput(i).startDay);
-            state.dataWeather->ReportPeriodInput(i).endJulianDate = computeJulianDate(state.dataWeather->ReportPeriodInput(i).endYear,
-                                                                                             state.dataWeather->ReportPeriodInput(i).endMonth,
-                                                                                             state.dataWeather->ReportPeriodInput(i).endDay);
+            reportPeriodInput.startJulianDate = computeJulianDate(reportPeriodInput.startYear, reportPeriodInput.startMonth, reportPeriodInput.startDay);
+            reportPeriodInput.endJulianDate = computeJulianDate(reportPeriodInput.endYear, reportPeriodInput.endMonth, reportPeriodInput.endDay);
         }
-    }
-
-    void CopyReportPeriodObject(const Array1D<Weather::ReportPeriodData> &source,
-                                const int sourceIdx,
-                                Array1D<Weather::ReportPeriodData> &target,
-                                const int targetIdx)
-    // copy the content of one reporting period object to another.
-    // The aim is to transfer data of each reporting period object to its corresonding
-    // report time so the indexing works out
-    {
-        target(targetIdx).title = source(sourceIdx).title;
-        target(targetIdx).reportName = source(sourceIdx).reportName;
-        target(targetIdx).startYear = source(sourceIdx).startYear;
-        target(targetIdx).startMonth = source(sourceIdx).startMonth;
-        target(targetIdx).startDay = source(sourceIdx).startDay;
-        target(targetIdx).startHour = source(sourceIdx).startHour;
-        target(targetIdx).startJulianDate = source(sourceIdx).startJulianDate;
-        target(targetIdx).endYear = source(sourceIdx).endYear;
-        target(targetIdx).endMonth = source(sourceIdx).endMonth;
-        target(targetIdx).endDay = source(sourceIdx).endDay;
-        target(targetIdx).endHour = source(sourceIdx).endHour;
-        target(targetIdx).endJulianDate = source(sourceIdx).endJulianDate;
     }
 
     void GroupReportPeriodByType(EnergyPlusData &state, const int nReportPeriods)
     {
         // transfer data from the reporting period object to the corresponding report period type arrays
         // ThermalResilienceSummary, CO2ResilienceSummary, VisualResilienceSummary, and AllResilienceSummaries
-        for (int i = 1; i <= nReportPeriods; ++i) {
-            if (state.dataWeather->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
-                state.dataWeather->TotThermalReportPers += 1;
-            } else if (state.dataWeather->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
-                state.dataWeather->TotCO2ReportPers += 1;
-            } else if (state.dataWeather->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
-                state.dataWeather->TotVisualReportPers += 1;
-            } else if (state.dataWeather->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
-                state.dataWeather->TotThermalReportPers += 1;
-                state.dataWeather->TotCO2ReportPers += 1;
-                state.dataWeather->TotVisualReportPers += 1;
+        for (auto const &reportPeriodInput : state.dataWeather->ReportPeriodInput) {
+
+            if (reportPeriodInput.reportName == "THERMALRESILIENCESUMMARY") {
+                ++state.dataWeather->TotThermalReportPers;
+            } else if (reportPeriodInput.reportName == "CO2RESILIENCESUMMARY") {
+                ++state.dataWeather->TotCO2ReportPers;
+            } else if (reportPeriodInput.reportName == "VISUALRESILIENCESUMMARY") {
+                ++state.dataWeather->TotVisualReportPers;
+            } else if (reportPeriodInput.reportName == "ALLRESILIENCESUMMARIES") {
+                ++state.dataWeather->TotThermalReportPers;
+                ++state.dataWeather->TotCO2ReportPers;
+                ++state.dataWeather->TotVisualReportPers;
             }
         }
 
@@ -4870,38 +4781,30 @@ namespace Weather {
         state.dataWeather->CO2ReportPeriodInput.allocate(state.dataWeather->TotCO2ReportPers);
         state.dataWeather->VisualReportPeriodInput.allocate(state.dataWeather->TotVisualReportPers);
 
-        int ThermalReportPeriodsIdx = 1;
-        int CO2ReportPeriodsIdx = 1;
-        int VisualReportPeriodsIdx = 1;
-        for (int i = 1; i <= nReportPeriods; ++i) {
-            if (state.dataWeather->ReportPeriodInput(i).reportName == "THERMALRESILIENCESUMMARY") {
-                CopyReportPeriodObject(
-                    state.dataWeather->ReportPeriodInput, i, state.dataWeather->ThermalReportPeriodInput, ThermalReportPeriodsIdx);
-                ThermalReportPeriodsIdx += 1;
-            } else if (state.dataWeather->ReportPeriodInput(i).reportName == "CO2RESILIENCESUMMARY") {
-                CopyReportPeriodObject(
-                    state.dataWeather->ReportPeriodInput, i, state.dataWeather->CO2ReportPeriodInput, CO2ReportPeriodsIdx);
-                CO2ReportPeriodsIdx += 1;
-            } else if (state.dataWeather->ReportPeriodInput(i).reportName == "VISUALRESILIENCESUMMARY") {
-                CopyReportPeriodObject(
-                    state.dataWeather->ReportPeriodInput, i, state.dataWeather->VisualReportPeriodInput, VisualReportPeriodsIdx);
-                VisualReportPeriodsIdx += 1;
-            } else if (state.dataWeather->ReportPeriodInput(i).reportName == "ALLRESILIENCESUMMARIES") {
-                CopyReportPeriodObject(
-                    state.dataWeather->ReportPeriodInput, i, state.dataWeather->ThermalReportPeriodInput, ThermalReportPeriodsIdx);
-                ThermalReportPeriodsIdx += 1;
-                CopyReportPeriodObject(
-                    state.dataWeather->ReportPeriodInput, i, state.dataWeather->CO2ReportPeriodInput, CO2ReportPeriodsIdx);
-                CO2ReportPeriodsIdx += 1;
-                CopyReportPeriodObject(
-                    state.dataWeather->ReportPeriodInput, i, state.dataWeather->VisualReportPeriodInput, VisualReportPeriodsIdx);
-                VisualReportPeriodsIdx += 1;
+        for (int i = 1, iThermal = 1, iVisual = 1, iCO2 = 1; i <= nReportPeriods; ++i) {
+            auto const &reportPeriodInput = state.dataWeather->ReportPeriodInput(i);
+            if (reportPeriodInput.reportName == "THERMALRESILIENCESUMMARY") {
+                state.dataWeather->ThermalReportPeriodInput(iThermal) = reportPeriodInput;
+                ++iThermal;
+            } else if (reportPeriodInput.reportName == "CO2RESILIENCESUMMARY") {
+                state.dataWeather->CO2ReportPeriodInput(iCO2) = reportPeriodInput;
+                ++iCO2;
+            } else if (reportPeriodInput.reportName == "VISUALRESILIENCESUMMARY") {
+                state.dataWeather->VisualReportPeriodInput(iVisual) = reportPeriodInput;
+                ++iVisual;
+            } else if (reportPeriodInput.reportName == "ALLRESILIENCESUMMARIES") {
+                state.dataWeather->ThermalReportPeriodInput(iThermal) = reportPeriodInput;
+                ++iThermal;
+                state.dataWeather->CO2ReportPeriodInput(iCO2) = reportPeriodInput;
+                ++iCO2;
+                state.dataWeather->VisualReportPeriodInput(iVisual) = reportPeriodInput;
+                ++iVisual;
             }
         }
     }
 
     void GetRunPeriodData(EnergyPlusData &state,
-                          int &nRunPeriods, // Total number of Run Periods requested
+                          int nRunPeriods, // Total number of Run Periods requested
                           bool &ErrorsFound)
     {
 
@@ -4915,9 +4818,9 @@ namespace Weather {
         // This subroutine gets the run period info from User input and the
         //  simulation dates
 
+        constexpr std::string_view routineName = "GetRunPeriodData";
         // Call Input Get routine to retrieve annual run data
         state.dataWeather->RunPeriodInput.allocate(nRunPeriods);
-        state.dataWeather->RunPeriodInputUniqueNames.reserve(static_cast<unsigned>(nRunPeriods));
 
         auto const &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "RunPeriod";
@@ -4940,13 +4843,11 @@ namespace Weather {
                                                                      ipsc->cNumericFieldNames);
 
             // A1, \field Name
-            if (!ipsc->lAlphaFieldBlanks(1)) {
-                GlobalNames::VerifyUniqueInterObjectName(state,
-                                                         state.dataWeather->RunPeriodInputUniqueNames,
-                                                         ipsc->cAlphaArgs(1),
-                                                         ipsc->cCurrentModuleObject,
-                                                         ipsc->cAlphaFieldNames(1),
-                                                         ErrorsFound);
+            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            if (std::find_if(state.dataWeather->RunPeriodInput.begin(), state.dataWeather->RunPeriodInput.end(),
+                             [&newName](RunPeriodData const &rpd) { return rpd.title == newName; }) != state.dataWeather->RunPeriodInput.end()) {
+                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ErrorsFound = true;
             }
 
             ++Count;
@@ -5361,13 +5262,13 @@ namespace Weather {
         // This subroutine gets the run period design info from User input and the
         //  simulation dates
 
+        constexpr std::string_view routineName = "GetRunPeriodDesignData";
         // Call Input Get routine to retrieve annual run data
         int RPD1 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays");
         int RPD2 = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
         state.dataWeather->TotRunDesPers = RPD1 + RPD2;
 
         state.dataWeather->RunPeriodDesignInput.allocate(RPD1 + RPD2);
-        state.dataWeather->RunPeriodDesignInputUniqueNames.reserve(static_cast<unsigned>(RPD1 + RPD2));
 
         int Count = 0;
         auto const &ipsc = state.dataIPShortCut;
@@ -5388,17 +5289,18 @@ namespace Weather {
                                                                      ipsc->lAlphaFieldBlanks,
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataWeather->RunPeriodDesignInputUniqueNames,
-                                                     ipsc->cAlphaArgs(1),
-                                                     ipsc->cCurrentModuleObject,
-                                                     ipsc->cAlphaFieldNames(1),
-                                                     ErrorsFound);
+
+            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            if (std::find_if(state.dataWeather->RunPeriodDesignInput.begin(), state.dataWeather->RunPeriodDesignInput.end(),
+                             [&newName](RunPeriodData const &rpd) { return newName == rpd.title; } ) != state.dataWeather->RunPeriodDesignInput.end()) { 
+                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ErrorsFound = true;
+            }
 
             ++Count;
 
             auto &runPerDesInput = state.dataWeather->RunPeriodDesignInput(Count);
-            runPerDesInput.title = ipsc->cAlphaArgs(1);
+            runPerDesInput.title = newName;
             runPerDesInput.periodType = "User Selected WeatherFile RunPeriod (Design)";
 
             // set the start and end day of month from user input
@@ -5408,62 +5310,33 @@ namespace Weather {
             runPerDesInput.endDay = int(ipsc->rNumericArgs(4));
 
             switch (runPerDesInput.startMonth) {
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12:
+            case 1: case 3: case 5: case 7: case 8: case 10: case 12: {
                 if (runPerDesInput.startDay > 31) {
-                    ShowSevereError(state,
-                                    format("{}: object={} {}",
-                                           ipsc->cCurrentModuleObject,
-                                           runPerDesInput.title,
-                                           format("{} invalid (Day of Month) [{}]",
-                                                  ipsc->cNumericFieldNames(2),
-                                                  runPerDesInput.startDay)));
+                    ShowSevereError(state, format("{}: object={} {} invalid (Day of Month) [{}]", ipsc->cCurrentModuleObject, runPerDesInput.title,
+                                                  ipsc->cNumericFieldNames(2), runPerDesInput.startDay));
                     ErrorsFound = true;
                 }
-                break;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
+            } break;
+            case 4: case 6: case 9: case 11: {
                 if (runPerDesInput.startDay > 30) {
-                    ShowSevereError(state,
-                                    format("{}: object={} {}",
-                                           ipsc->cCurrentModuleObject,
-                                           runPerDesInput.title,
-                                           format("{} invalid (Day of Month) [{}]",
-                                                  ipsc->cNumericFieldNames(2),
-                                                  runPerDesInput.startDay)));
+                    ShowSevereError(state, format("{}: object={} {} invalid (Day of Month) [{}]",
+                                           ipsc->cCurrentModuleObject, runPerDesInput.title, ipsc->cNumericFieldNames(2), runPerDesInput.startDay));
                     ErrorsFound = true;
                 }
-                break;
-            case 2:
+            } break;
+            case 2: {
                 if (runPerDesInput.startDay > 28 + state.dataWeather->LeapYearAdd) {
-                    ShowSevereError(state,
-                                    format("{}: object={} {}",
-                                           ipsc->cCurrentModuleObject,
-                                           runPerDesInput.title,
-                                           format("{} invalid (Day of Month) [{}]",
-                                                  ipsc->cNumericFieldNames(2),
-                                                  runPerDesInput.startDay)));
+                    ShowSevereError(state, format("{}: object={} {} invalid (Day of Month) [{}]",
+                                                  ipsc->cCurrentModuleObject,runPerDesInput.title, ipsc->cNumericFieldNames(2), runPerDesInput.startDay));
                     ErrorsFound = true;
                 }
-                break;
-            default:
-                ShowSevereError(state,
-                                format("{}: object={} {}",
-                                       ipsc->cCurrentModuleObject,
-                                       runPerDesInput.title,
-                                       format("{} invalid (Month) [{}]",
-                                              ipsc->cNumericFieldNames(1),
-                                              runPerDesInput.startMonth)));
+            } break;
+            default: {
+                ShowSevereError(state, format("{}: object={} {} invalid (Month) [{}]",
+                                              ipsc->cCurrentModuleObject, runPerDesInput.title, ipsc->cNumericFieldNames(1), runPerDesInput.startMonth));
                 ErrorsFound = true;
-                break;
-            }
+            } break;
+            } // switch
 
             if (ipsc->lAlphaFieldBlanks(2)) {
                 runPerDesInput.dayOfWeek = (int)ScheduleManager::DayType::Monday; // Defaults to Monday
@@ -5472,10 +5345,7 @@ namespace Weather {
                 if (runPerDesInput.dayOfWeek < 1 || runPerDesInput.dayOfWeek == 8) {
                     ShowWarningError(state,
                                      format("{}: object={} {} invalid (Day of Week) [{} for Start is not Valid, Monday will be Used.",
-                                            ipsc->cCurrentModuleObject,
-                                            runPerDesInput.title,
-                                            ipsc->cAlphaFieldNames(1),
-                                            ipsc->cAlphaArgs(1)));
+                                            ipsc->cCurrentModuleObject, runPerDesInput.title, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1)));
                     runPerDesInput.dayOfWeek = (int)ScheduleManager::DayType::Monday; // Defaults to Monday
                 }
             }
@@ -5546,12 +5416,12 @@ namespace Weather {
                                                                      ipsc->lAlphaFieldBlanks,
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
-            GlobalNames::VerifyUniqueInterObjectName(state,
-                                                     state.dataWeather->RunPeriodDesignInputUniqueNames,
-                                                     ipsc->cAlphaArgs(1),
-                                                     ipsc->cCurrentModuleObject,
-                                                     ipsc->cAlphaFieldNames(1),
-                                                     ErrorsFound);
+            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            if (std::find_if(state.dataWeather->RunPeriodDesignInput.begin(), state.dataWeather->RunPeriodDesignInput.end(),
+                             [&newName](RunPeriodData const &rpd) { return newName == rpd.title; }) != state.dataWeather->RunPeriodDesignInput.end()) {
+                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ErrorsFound = true;
+            }
 
             ++Count;
             auto &runPerDesInput = state.dataWeather->RunPeriodDesignInput(Count);
@@ -6807,7 +6677,7 @@ namespace Weather {
             // Validate Calculation Type.
             std::string units;
             OutputProcessor::Unit unitType;
-            wpSkyTemp.skyTempModel = static_cast<SkyTempModel>(getEnumerationValue(Weather::SkyTempModelInputNamesUC, ipsc->cAlphaArgs(2)));
+            wpSkyTemp.skyTempModel = static_cast<SkyTempModel>(getEnumerationValue(Weather::SkyTempModelNamesUC, ipsc->cAlphaArgs(2)));
 
             switch (wpSkyTemp.skyTempModel) {
             case SkyTempModel::ScheduleValue: {
@@ -8396,16 +8266,10 @@ namespace Weather {
                 envCurr.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
                 if (envCurr.StartYear == envCurr.EndYear) {
                     // Short-circuit all the calculations, we're in a single year
-                    int LocalLeapYearAdd = 0;
-                    if (isLeapYear(envCurr.StartYear)) {
-                        // If a leap year is supported by the weather file, do it.
-                        if (state.dataWeather->WFAllowsLeapYears) {
-                            envCurr.IsLeapYear = true; // explicit set, this might be unwise
-                            LocalLeapYearAdd = 1;
-                        } else {
-                            envCurr.IsLeapYear = false; // explicit set, this might be unwise
-                        }
-                    }
+
+                    envCurr.IsLeapYear = isLeapYear(envCurr.StartYear) && state.dataWeather->WFAllowsLeapYears;
+                    int LocalLeapYearAdd = (int)envCurr.IsLeapYear;
+
                     envCurr.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, LocalLeapYearAdd);
                     envCurr.EndJDay = General::OrdinalDay(runPer.endMonth, runPer.endDay, LocalLeapYearAdd);
                     envCurr.RawSimDays = (envCurr.EndJDay - envCurr.StartJDay + 1);
@@ -8413,9 +8277,9 @@ namespace Weather {
                 } else {
                     // Environment crosses year boundaries
                     envCurr.RollDayTypeOnRepeat = runPer.RollDayTypeOnRepeat;
-                    envCurr.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, runPer.isLeapYear ? 1 : 0);
+                    envCurr.StartJDay = General::OrdinalDay(runPer.startMonth, runPer.startDay, (int)runPer.isLeapYear);
                     envCurr.EndJDay = General::OrdinalDay(
-                        runPer.endMonth, runPer.endDay, isLeapYear(runPer.endYear) && state.dataWeather->WFAllowsLeapYears ? 1 : 0);
+                                                          runPer.endMonth, runPer.endDay, (int)(isLeapYear(runPer.endYear) && state.dataWeather->WFAllowsLeapYears));
                     envCurr.TotalDays = 366 - envCurr.StartJDay + envCurr.EndJDay + 365 * std::max(envCurr.NumSimYears - 2, 0);
                     if (state.dataWeather->WFAllowsLeapYears) {
                         // First year
@@ -8853,7 +8717,7 @@ namespace Weather {
             HorizIRSky = IRHoriz;
             if (envCurr.skyTempModel == SkyTempModel::Brunt || envCurr.skyTempModel == SkyTempModel::Idso ||
                 envCurr.skyTempModel == SkyTempModel::BerdahlMartin || envCurr.skyTempModel == SkyTempModel::ClarkAllen) {
-                    SkyTemp = root_4(IRHoriz / Constant::StefanBoltzmann) - Constant::Kelvin;
+                SkyTemp = root_4(IRHoriz / Constant::StefanBoltzmann) - Constant::Kelvin;
             } else {
                 SkyTemp = 0.0; // dealt with later
             }

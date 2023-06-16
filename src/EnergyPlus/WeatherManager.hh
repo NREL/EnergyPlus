@@ -49,7 +49,6 @@
 #define WeatherManager_hh_INCLUDED
 
 // C++ Headers
-#include <unordered_map>
 #include <vector>
 
 // ObjexxFCL Headers
@@ -602,20 +601,14 @@ namespace Weather {
 
     void ReadUserWeatherInput(EnergyPlusData &state);
 
-    //    copy report period data from source to target
-    void CopyReportPeriodObject(const Array1D<Weather::ReportPeriodData> &source,
-                                const int sourceIdx,
-                                Array1D<Weather::ReportPeriodData> &target,
-                                const int targetIdx);
-
     void GroupReportPeriodByType(EnergyPlusData &state, const int nReportPeriods);
 
     void GetReportPeriodData(EnergyPlusData &state,
-                             int &nReportPeriods, // Total number of Report Periods requested
+                             int nReportPeriods, // Total number of Report Periods requested
                              bool &ErrorsFound);
 
     void GetRunPeriodData(EnergyPlusData &state,
-                          int &nRunPeriods, // Total number of Run Periods requested
+                          int nRunPeriods, // Total number of Run Periods requested
                           bool &ErrorsFound);
 
     void GetRunPeriodDesignData(EnergyPlusData &state, bool &ErrorsFound);
@@ -837,14 +830,7 @@ struct WeatherManagerData : BaseGlobalStruct
     Array2D<Weather::WeatherVars> wvarsHrTsTomorrow;
 
     EPVector<Array2D<Weather::DesDayMods>> desDayMods;
-#ifdef GET_OUT        
-    Array3D<Real64> DDDBRngModifier;      // Design Day Dry-bulb Temperature Range Modifier NOLINT(cert-err58-cpp)
-    Array3D<Real64> DDHumIndModifier;     // Design Day relative humidity values or wet-bulb modifiers (per HumIndType) NOLINT(cert-err58-cpp)
-    Array3D<Real64> DDBeamSolarValues;    // Design Day Beam Solar Values NOLINT(cert-err58-cpp)
-    Array3D<Real64> DDDiffuseSolarValues; // Design Day Relative Humidity Values NOLINT(cert-err58-cpp)
 
-    Array3D<Real64> DDSkyTempScheduleValues; // Sky temperature - DesignDay input NOLINT(cert-err58-cpp)
-#endif // 
     int RptIsRain;  // Rain Report Value
     int RptIsSnow;  // Snow Report Value
     int RptDayType; // DayType Report Value
@@ -857,16 +843,7 @@ struct WeatherManagerData : BaseGlobalStruct
 
     EPVector<Weather::SPSiteSchedules> spSiteSchedules;
     std::vector<int> spSiteSchedNums;
-#ifdef GET_OUT        
-        Array1D<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value NOLINT(cert-err58-cpp)
-    Array1D<Real64> SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value NOLINT(cert-err58-cpp)
-    Array1D<Real64> SPSiteBeamSolarScheduleValue;         // reporting Beam Solar Schedule Value NOLINT(cert-err58-cpp)
-    Array1D<Real64> SPSiteDiffuseSolarScheduleValue;      // reporting Diffuse Solar Schedule Value NOLINT(cert-err58-cpp)
-    Array1D<Real64> SPSiteSkyTemperatureScheduleValue;    // reporting SkyTemperature Modifier Schedule Value NOLINT(cert-err58-cpp)
-    Array1D_int SPSiteScheduleNamePtr;                    // SP Site Schedule Name Ptrs NOLINT(cert-err58-cpp)
-    Array1D_string SPSiteScheduleUnits;                   // SP Site Schedule Units NOLINT(cert-err58-cpp)
-#endif // 
-    int NumSPSiteScheduleNamePtrs;                        // Number of SP Site Schedules (DesignDay only)
+
     // Number of hours of missing data
     Array1D<Real64> Interpolation;      // Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
     Array1D<Real64> SolarInterpolation; // Solar Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
@@ -904,14 +881,11 @@ struct WeatherManagerData : BaseGlobalStruct
     EPVector<Weather::DesignDayData> DesDayInput;   // Design day Input Data NOLINT(cert-err58-cpp)
     Array1D<Weather::EnvironmentData> Environment;  // Environment data NOLINT(cert-err58-cpp)
     Array1D<Weather::RunPeriodData> RunPeriodInput; // NOLINT(cert-err58-cpp)
-    std::unordered_map<std::string, std::string> RunPeriodInputUniqueNames;
     EPVector<Weather::RunPeriodData> RunPeriodDesignInput; // NOLINT(cert-err58-cpp)
-    std::unordered_map<std::string, std::string> RunPeriodDesignInputUniqueNames;
     Array1D<Weather::ReportPeriodData> ReportPeriodInput;
     Array1D<Weather::ReportPeriodData> ThermalReportPeriodInput;
     Array1D<Weather::ReportPeriodData> CO2ReportPeriodInput;
     Array1D<Weather::ReportPeriodData> VisualReportPeriodInput;
-    std::unordered_map<std::string, std::string> ReportPeriodInputUniqueNames;
     EPVector<Weather::TypicalExtremeData> TypicalExtremePeriods; // NOLINT(cert-err58-cpp)
     Weather::DSTPeriod EPWDST;                    // Daylight Saving Period Data from EPW file NOLINT(cert-err58-cpp)
     Weather::DSTPeriod IDFDST;                    // Daylight Saving Period Data from IDF file NOLINT(cert-err58-cpp)
@@ -1023,16 +997,7 @@ struct WeatherManagerData : BaseGlobalStruct
         this->TimeStepFraction = 0.0;                            // Fraction of hour each time step represents
         this->spSiteSchedules.deallocate();
         this->spSiteSchedNums.clear();
-#ifdef GET_OUT        
-        this->SPSiteDryBulbRangeModScheduleValue.deallocate();   // reporting Drybulb Temperature Range Modifier Schedule Value
-        this->SPSiteHumidityConditionScheduleValue.deallocate(); // reporting Humidity Condition Schedule Value
-        this->SPSiteBeamSolarScheduleValue.deallocate();         // reporting Beam Solar Schedule Value
-        this->SPSiteDiffuseSolarScheduleValue.deallocate();      // reporting Diffuse Solar Schedule Value
-        this->SPSiteSkyTemperatureScheduleValue.deallocate();    // reporting SkyTemperature Modifier Schedule Value
-        this->SPSiteScheduleNamePtr.deallocate();                // SP Site Schedule Name Ptrs
-        this->SPSiteScheduleUnits.deallocate();                  // SP Site Schedule Units
-#endif //        
-        this->NumSPSiteScheduleNamePtrs = 0;                     // Number of SP Site Schedules (DesignDay only)
+
         this->Interpolation.deallocate();                        // Interpolation values based on Number of Time Steps in Hour
         this->SolarInterpolation.deallocate();                   // Solar Interpolation values based on
 
@@ -1049,14 +1014,11 @@ struct WeatherManagerData : BaseGlobalStruct
         this->DesDayInput.deallocate(); // Design day Input Data
         this->Environment.deallocate(); // Environment data
         this->RunPeriodInput.deallocate();
-        this->RunPeriodInputUniqueNames.clear();
         this->RunPeriodDesignInput.deallocate();
-        this->RunPeriodDesignInputUniqueNames.clear();
         this->ReportPeriodInput.deallocate();
         this->ThermalReportPeriodInput.deallocate();
         this->CO2ReportPeriodInput.deallocate();
         this->VisualReportPeriodInput.deallocate();
-        this->ReportPeriodInputUniqueNames.clear();
         this->TypicalExtremePeriods.deallocate();
 
         this->EPWDST = Weather::DSTPeriod();
@@ -1107,7 +1069,7 @@ struct WeatherManagerData : BaseGlobalStruct
           UseSpecialDays(true), UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false),
           DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0),
           NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0),
-          HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}),
+          HorizIRSky(0.0), TimeStepFraction(0.0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}),
           LeapYearAdd(0), DatesShouldBeReset(false), StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
     {
     }
