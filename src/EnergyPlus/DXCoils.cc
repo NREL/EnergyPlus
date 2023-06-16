@@ -8052,7 +8052,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             CompName = thisDXCoil.Name;
             CompType = thisDXCoil.DXCoilType;
             if (Mode == thisDXCoil.NumOfSpeeds) {
-                FieldNum = 10 + (Mode - 1) * 13;
+                FieldNum = 10 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = thisDXCoil.MSRatedAirVolFlowRate(Mode);
                 state.dataSize->DataEMSOverrideON = thisDXCoil.RatedAirVolFlowRateEMSOverrideON(Mode);
@@ -8077,7 +8077,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     MSRatedAirVolFlowRateDes = TempSize;
                 }
             } else {
-                FieldNum = 10 + (Mode - 1) * 13;
+                FieldNum = 10 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
@@ -8132,7 +8132,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 PrintFlag = true;
                 state.dataSize->DataFlowUsedForSizing = thisDXCoil.MSRatedAirVolFlowRate(Mode);
                 SizingMethod = CoolingCapacitySizing;
-                FieldNum = 7 + (Mode - 1) * 13;
+                FieldNum = 7 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 state.dataSize->DataEMSOverrideON = thisDXCoil.RatedTotCapEMSOverrideOn(Mode);
                 state.dataSize->DataEMSOverride = thisDXCoil.RatedTotCapEMSOverrideValue(Mode);
@@ -8166,7 +8166,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 // cooling capacity at lower speeds
                 PrintFlag = true;
                 SizingMethod = CoolingCapacitySizing;
-                FieldNum = 7 + (Mode - 1) * 13;
+                FieldNum = 7 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
