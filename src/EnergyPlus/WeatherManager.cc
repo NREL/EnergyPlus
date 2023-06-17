@@ -161,6 +161,8 @@ namespace Weather {
         bool errorsFound = false;
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
 
+        constexpr std::string_view routineName = "CheckIfAnyUnderwaterBoundaries";
+        
         auto const &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "SurfaceProperty:Underwater";
         int Num = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
@@ -180,28 +182,27 @@ namespace Weather {
             state.dataWeather->underwaterBoundaries.emplace_back();
             auto &underwaterBoundary = state.dataWeather->underwaterBoundaries[i - 1];
             underwaterBoundary.Name = ipsc->cAlphaArgs(1);
+
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, underwaterBoundary.Name};
+            
             underwaterBoundary.distanceFromLeadingEdge = ipsc->rNumericArgs(1);
             underwaterBoundary.OSCMIndex = Util::FindItemInList(underwaterBoundary.Name, state.dataSurface->OSCM);
             if (underwaterBoundary.OSCMIndex <= 0) {
-                ShowSevereError(state, "Could not match underwater boundary condition object with an Other Side Conditions Model input object.");
+                ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 errorsFound = true;
             }
             underwaterBoundary.WaterTempScheduleIndex = ScheduleManager::GetScheduleIndex(state, ipsc->cAlphaArgs(2));
             if (underwaterBoundary.WaterTempScheduleIndex == 0) {
-                ShowSevereError(
-                    state, format("(Water temperature schedule for \"SurfaceProperty:Underwater\" named {} not found)", underwaterBoundary.Name));
+                ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 errorsFound = true;
             }
+
             if (ipsc->lAlphaFieldBlanks(3)) {
                 // that's OK, we can have a blank schedule, the water will just have no free stream velocity
                 underwaterBoundary.VelocityScheduleIndex = 0;
-            } else {
-                underwaterBoundary.VelocityScheduleIndex = ScheduleManager::GetScheduleIndex(state, ipsc->cAlphaArgs(3));
-                if (underwaterBoundary.WaterTempScheduleIndex == 0) {
-                    ShowSevereError(state,
-                        format("(Free stream velocity schedule for \"SurfaceProperty:Underwater\" named {} not found)", underwaterBoundary.Name));
-                    errorsFound = true;
-                }
+            } else  if ((underwaterBoundary.VelocityScheduleIndex = ScheduleManager::GetScheduleIndex(state, ipsc->cAlphaArgs(3))) == 0) {
+                ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
+                errorsFound = true;
             }
             if (errorsFound) break;
         }
@@ -4699,10 +4700,11 @@ namespace Weather {
                                                                      ipsc->cNumericFieldNames);
 
             std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
             // A1, \field Name
             if (std::find_if(state.dataWeather->ReportPeriodInput.begin(), state.dataWeather->ReportPeriodInput.end(),
                              [&newName](ReportPeriodData const &rpd) { return newName == rpd.title; }) != state.dataWeather->ReportPeriodInput.end()) {
-                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
             }
                     
@@ -4844,9 +4846,11 @@ namespace Weather {
 
             // A1, \field Name
             std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
+            
             if (std::find_if(state.dataWeather->RunPeriodInput.begin(), state.dataWeather->RunPeriodInput.end(),
                              [&newName](RunPeriodData const &rpd) { return rpd.title == newName; }) != state.dataWeather->RunPeriodInput.end()) {
-                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
             }
 
@@ -4910,22 +4914,14 @@ namespace Weather {
 
             // A2 , \field Day of Week for Start Day
             bool inputWeekday = false;
-            if (!ipsc->lAlphaFieldBlanks(2)) { // Have input
-                int dayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
-                if (dayType < 1) {
-                    ShowWarningError(state,
-                                     format("{}: object={}{} invalid (Day of Week) [{}] for Start is not valid, Sunday will be used.",
-                                            ipsc->cCurrentModuleObject,
-                                            runPeriodInput.title,
-                                            ipsc->cAlphaFieldNames(2),
-                                            ipsc->cAlphaArgs(2)));
-                    runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
-                } else {
-                    runPeriodInput.startWeekDay = static_cast<ScheduleManager::DayType>(dayType);
-                    inputWeekday = true;
-                }
-            } else { // No input, set the default as Sunday. This may get overriden below
+            if (ipsc->lAlphaFieldBlanks(2)) {
                 runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
+
+            } else if ((runPeriodInput.startWeekDay = static_cast<ScheduleManager::DayType>(getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2)))) == ScheduleManager::DayType::Invalid) {
+                ShowWarningInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2), "Sunday");
+                runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
+            } else {
+                inputWeekday = true;
             }
 
             // Validate the dates now that the weekday field has been looked at
@@ -5118,8 +5114,7 @@ namespace Weather {
                                                                                               runPeriodInput.endDay);
             }
 
-            runPeriodInput.numSimYears =
-                runPeriodInput.endYear - runPeriodInput.startYear + 1;
+            runPeriodInput.numSimYears = runPeriodInput.endYear - runPeriodInput.startYear + 1;
 
             // A3,  \field Use Weather File Holidays and Special Days
             BooleanSwitch b;
@@ -5128,12 +5123,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useHolidays = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={}{} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPeriodInput.title,
-                                       ipsc->cAlphaFieldNames(3),
-                                       ipsc->cAlphaArgs(3)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
@@ -5143,12 +5133,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useDST = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={}{} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPeriodInput.title,
-                                       ipsc->cAlphaFieldNames(4),
-                                       ipsc->cAlphaArgs(4)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
                 ErrorsFound = true;
             }
 
@@ -5158,12 +5143,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.applyWeekendRule = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={}{} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPeriodInput.title,
-                                       ipsc->cAlphaFieldNames(5),
-                                       ipsc->cAlphaArgs(5)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                 ErrorsFound = true;
             }
 
@@ -5173,12 +5153,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(6)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useRain = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={}{} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPeriodInput.title,
-                                       ipsc->cAlphaFieldNames(6),
-                                       ipsc->cAlphaArgs(6)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6));
                 ErrorsFound = true;
             }
 
@@ -5188,12 +5163,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useSnow = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={}{} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPeriodInput.title,
-                                       ipsc->cAlphaFieldNames(7),
-                                       ipsc->cAlphaArgs(7)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7));
                 ErrorsFound = true;
             }
 
@@ -5203,12 +5173,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.actualWeather = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={}{} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPeriodInput.title,
-                                       ipsc->cAlphaFieldNames(8),
-                                       ipsc->cAlphaArgs(8)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8));
                 ErrorsFound = true;
             }
 
@@ -5290,10 +5255,12 @@ namespace Weather {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
+
             std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
             if (std::find_if(state.dataWeather->RunPeriodDesignInput.begin(), state.dataWeather->RunPeriodDesignInput.end(),
                              [&newName](RunPeriodData const &rpd) { return newName == rpd.title; } ) != state.dataWeather->RunPeriodDesignInput.end()) { 
-                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
             }
 
@@ -5356,12 +5323,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useDST = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={} {} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPerDesInput.title,
-                                       ipsc->cAlphaFieldNames(3),
-                                       ipsc->cAlphaArgs(3)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
@@ -5370,12 +5332,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = static_cast<bool>(b);
             } else {
-                ShowSevereError(state,
-                                format("{}: object={} {} invalid [{}]",
-                                       ipsc->cCurrentModuleObject,
-                                       runPerDesInput.title,
-                                       ipsc->cAlphaFieldNames(4),
-                                       ipsc->cAlphaArgs(4)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
                 ErrorsFound = true;
             }
 
@@ -5417,9 +5374,11 @@ namespace Weather {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
             std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
             if (std::find_if(state.dataWeather->RunPeriodDesignInput.begin(), state.dataWeather->RunPeriodDesignInput.end(),
                              [&newName](RunPeriodData const &rpd) { return newName == rpd.title; }) != state.dataWeather->RunPeriodDesignInput.end()) {
-                ShowSevereError(state, format("{}: {} = {}, duplicate object name", routineName, ipsc->cCurrentModuleObject, newName));
+                ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
             }
 
@@ -5430,7 +5389,10 @@ namespace Weather {
                 "User Selected WeatherFile Typical/Extreme Period (Design)=" + ipsc->cAlphaArgs(2);
 
             // Period Selection
-            if (!ipsc->lAlphaFieldBlanks(2)) {
+            if (ipsc->lAlphaFieldBlanks(2)) {
+                ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(2));
+                ErrorsFound = true;
+            } else {
                 int WhichPeriod = Util::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue);
                 if (WhichPeriod == 0) {
                     WhichPeriod = Util::FindItem(ipsc->cAlphaArgs(2), state.dataWeather->TypicalExtremePeriods, &TypicalExtremeData::MatchValue1);
@@ -5462,11 +5424,8 @@ namespace Weather {
                     runPerDesInput.endJulianDate = typicalExtPer.EndJDay;
                     runPerDesInput.totalDays = typicalExtPer.TotalDays;
                 }
-            } else {
-                ShowSevereError(state, format("{}: object={} {} invalid (blank).", ipsc->cCurrentModuleObject, runPerDesInput.title, ipsc->cAlphaFieldNames(2)));
-                ErrorsFound = true;
             }
-
+            
             if (ipsc->lAlphaFieldBlanks(3)) {
                 runPerDesInput.dayOfWeek = (int)ScheduleManager::DayType::Monday; // Defaults to Monday
             } else {
@@ -5485,8 +5444,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                  runPerDesInput.useDST = static_cast<bool>(b);
             } else {
-                 ShowSevereError(state, format("{}: object={} {} invalid [{}]",
-                                               ipsc->cCurrentModuleObject, runPerDesInput.title, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
+                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
                  ErrorsFound = true;
             }
                         
@@ -5495,8 +5453,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = static_cast<bool>(b);
             } else {
-                ShowSevereError(state, format("{}: object={} {} invalid [{}]",
-                                       ipsc->cCurrentModuleObject, runPerDesInput.title, ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                 ErrorsFound = true;
             }
             auto &runPeriodDesignInput1 = state.dataWeather->RunPeriodDesignInput(1);
@@ -5551,6 +5508,8 @@ namespace Weather {
         //        \key CustomDay1
         //        \key CustomDay2
 
+        constexpr std::string_view routineName = "GetSpecialDayPeriodData";
+            
         auto const &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "RunPeriodControl:SpecialDays";
         int NumSpecDays = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
@@ -5577,6 +5536,7 @@ namespace Weather {
             auto &specialDay = state.dataWeather->SpecialDays(Count);
             
             specialDay.Name = AlphArray(1);
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, specialDay.Name};
 
             int PMonth;
             int PDay;
@@ -5598,7 +5558,7 @@ namespace Weather {
                 specialDay.CompDate = 0;
                 specialDay.WthrFile = false;
             } else if (dateType == DateType::Invalid) {
-                ShowSevereError(state, format("{}: {} Invalid {}={}", ipsc->cCurrentModuleObject, AlphArray(1), ipsc->cAlphaFieldNames(2), AlphArray(2)));
+                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), AlphArray(2));
                 ErrorsFound = true;
             }
 
@@ -5611,7 +5571,7 @@ namespace Weather {
 
             int DayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, AlphArray(3));
             if (DayType == 0) {
-                ShowSevereError(state, format("{}: {} Invalid {}={}",ipsc->cCurrentModuleObject, AlphArray(1), ipsc->cAlphaFieldNames(3), AlphArray(3)));
+                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(3), AlphArray(3));
                 ErrorsFound = true;
             } else {
                 specialDay.DayType = DayType;
@@ -5690,6 +5650,8 @@ namespace Weather {
         //      \memo <Weekday> can be Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
         //      \memo <Nth> can be 1 or 1st, 2 or 2nd, etc. up to 5(?)
 
+        constexpr std::string_view routineName = "GetDSTData";
+            
         auto const &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "RunPeriodControl:DaylightSavingTime";
         int NumFound = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
@@ -5710,6 +5672,9 @@ namespace Weather {
                                                                      ipsc->lAlphaFieldBlanks,
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
+
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
+            
             if (NumAlphas != 2) {
                 ShowSevereError(state, format("{}: Insufficient fields, must have Start AND End Dates", ipsc->cCurrentModuleObject));
                 ErrorsFound = true;
@@ -5722,11 +5687,7 @@ namespace Weather {
                                            state.dataWeather->IDFDST.StDateType,
                                            ErrorsFound);
                 if (state.dataWeather->IDFDST.StDateType == DateType::Invalid) {
-                    ShowSevereError(state,
-                                    format("{}: Invalid {}={}",
-                                           ipsc->cCurrentModuleObject,
-                                           ipsc->cAlphaFieldNames(1),
-                                           ipsc->cAlphaArgs(1)));
+                    ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                     ErrorsFound = true;
                 }
                 General::ProcessDateString(state,
@@ -5737,11 +5698,7 @@ namespace Weather {
                                            state.dataWeather->IDFDST.EnDateType,
                                            ErrorsFound);
                 if (state.dataWeather->IDFDST.EnDateType == DateType::Invalid) {
-                    ShowSevereError(state,
-                                    format("{}: Invalid {}={}",
-                                           ipsc->cCurrentModuleObject,
-                                           ipsc->cAlphaFieldNames(2),
-                                           ipsc->cAlphaArgs(2)));
+                    ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                     ErrorsFound = true;
                 }
                 state.dataWeather->IDFDaylightSaving = true;
@@ -5866,16 +5823,18 @@ namespace Weather {
             desDayInput.Title = ipsc->cAlphaArgs(1); // Environment name
             envCurr.Title = desDayInput.Title;
 
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, desDayInput.Title};
+            
             //   N3,  \field Maximum Dry-Bulb Temperature
             //   N4,  \field Daily Dry-Bulb Temperature Range
             //   N9,  \field Barometric Pressure
             //   N10, \field Wind Speed
             //   N11, \field Wind Direction
             desDayInput.MaxDryBulb = ipsc->rNumericArgs(3); // Maximum Dry-Bulb Temperature (C)
-            if (!ipsc->lNumericFieldBlanks(3)) MaxDryBulbEntered = true;
+            MaxDryBulbEntered = !ipsc->lNumericFieldBlanks(3);
             desDayInput.DailyDBRange = ipsc->rNumericArgs(4); // Daily dry-bulb temperature range (deltaC)
             desDayInput.PressBarom = ipsc->rNumericArgs(9); // Atmospheric/Barometric Pressure (Pascals)
-            if (!ipsc->lNumericFieldBlanks(9)) PressureEntered = true;
+            PressureEntered = !ipsc->lNumericFieldBlanks(9);
             desDayInput.PressureEntered = PressureEntered;
             desDayInput.WindSpeed = ipsc->rNumericArgs(10);           // Wind Speed (m/s)
             desDayInput.WindDir = mod(ipsc->rNumericArgs(11), 360.0); // Wind Direction
@@ -5923,13 +5882,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
                 desDayInput.RainInd = (int)b;
             } else {
-                ShowWarningError(state,
-                                 format("{}=\"{}\", invalid field: {}=\"{}\".",
-                                        ipsc->cCurrentModuleObject,
-                                        desDayInput.Title,
-                                        ipsc->cAlphaFieldNames(8),
-                                        ipsc->cAlphaArgs(8)));
-                ShowContinueError(state, "\"No\" will be used.");
+                ShowWarningInvalidBool(state, eoh, ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7), "No");
                 desDayInput.RainInd = 0;
             }
 
@@ -5939,13 +5892,7 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
                 desDayInput.SnowInd = (int)b;
             } else {
-                ShowWarningError(state,
-                                 format("{}=\"{}\", invalid field: {}=\"{}\".",
-                                        ipsc->cCurrentModuleObject,
-                                        desDayInput.Title,
-                                        ipsc->cAlphaFieldNames(8),
-                                        ipsc->cAlphaArgs(8)));
-                ShowContinueError(state, "\"No\" will be used.");
+                ShowWarningInvalidBool(state, eoh, ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8), "No");
                 desDayInput.SnowInd = 0;
             }
 
@@ -5956,8 +5903,7 @@ namespace Weather {
             } else if ((desDayInput.dryBulbRangeType =
                         static_cast<DesDayDryBulbRangeType>(getEnumerationValue(DesDayDryBulbRangeTypeNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(3))))) != DesDayDryBulbRangeType::Invalid) {
             } else {
-                ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
+                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
                 desDayInput.dryBulbRangeType = DesDayDryBulbRangeType::Default;
             }
@@ -5975,9 +5921,7 @@ namespace Weather {
 
             if (desDayInput.dryBulbRangeType != DesDayDryBulbRangeType::Profile && !MaxDryBulbEntered &&
                 ipsc->cAlphaArgs(3) != "invalid field") {
-                ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                ShowContinueError(state, format("..invalid blank field: {}", ipsc->cNumericFieldNames(3)));
-                ShowContinueError(state, format("..this field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
+                ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(3), ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
@@ -5993,84 +5937,7 @@ namespace Weather {
             }
 
             //   A4,  \field Dry-Bulb Temperature Range Modifier Day Schedule Name
-            if (desDayInput.dryBulbRangeType != DesDayDryBulbRangeType::Default) {
-                if (!ipsc->lAlphaFieldBlanks(4)) {
-                    desDayInput.TempRangeSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(4));
-                    if (desDayInput.TempRangeSchPtr == 0) {
-                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
-                        ErrorsFound = true;
-                    } else {
-                        Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
-                        ScheduleManager::GetSingleDayScheduleValues(state, desDayInput.TempRangeSchPtr, tmp);
-                        auto &desDayModEnvrn = state.dataWeather->desDayMods(EnvrnNum);
-                        for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-                            for (int iTS = 1; iTS < state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
-                                desDayModEnvrn(iTS, iHr).OutDryBulbTemp = tmp(iTS, iHr);
-                            }
-                        }
-
-                        if (std::find(state.dataWeather->spSiteSchedNums.begin(), state.dataWeather->spSiteSchedNums.end(),
-                                      desDayInput.TempRangeSchPtr) == state.dataWeather->spSiteSchedNums.end()) {
-                            state.dataWeather->spSiteSchedNums.emplace_back(desDayInput.TempRangeSchPtr);
-                            SetupOutputVariable(state,
-                                                "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value",
-                                                unitType,
-                                                state.dataWeather->spSiteSchedules(EnvrnNum).OutDryBulbTemp,
-                                                OutputProcessor::SOVTimeStepType::Zone,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                ipsc->cAlphaArgs(4));
-                        }
-
-                        if (desDayInput.dryBulbRangeType == DesDayDryBulbRangeType::Multiplier) {
-                            if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.TempRangeSchPtr, 0.0, false, 1.0, false)) {
-                                ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
-                                ShowContinueError(state, "..Specified [Schedule] Dry-bulb Range Multiplier Values are not within [0.0, 1.0]");
-                                ErrorsFound = true;
-                            }
-                        } else if (desDayInput.dryBulbRangeType == DesDayDryBulbRangeType::Difference) { // delta, must be > 0.0
-                            if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.TempRangeSchPtr, 0.0, false)) {
-                                ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
-                                ShowSevereError(state, "Some [Schedule] Dry-bulb Range Difference Values are < 0.0 [would make max larger].");
-                                ErrorsFound = true;
-                            }
-                        }
-
-                        auto const &desDayModsEnvrn = state.dataWeather->desDayMods(EnvrnNum);
-                        Real64 testval = std::numeric_limits<Real64>::min();
-                        for (int iHr = 1; i <= Constant::HoursInDay; ++iHr) {
-                            for (int iTS = 1; i <= state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
-                                if (desDayModsEnvrn(iTS, iHr).OutDryBulbTemp > testval) testval = desDayModsEnvrn(iTS, iHr).OutDryBulbTemp;
-                            }
-                        }
-
-                        if (desDayInput.dryBulbRangeType == DesDayDryBulbRangeType::Profile) {
-                            if (MaxDryBulbEntered) {
-                                ShowWarningError(state, format("{}=\"{}\", data override.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                                ShowContinueError(state, format("..{}=[{:.2R}] will be overwritten.", ipsc->cNumericFieldNames(3), desDayInput.MaxDryBulb));
-                                ShowContinueError(state, format("..{}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
-                                ShowContinueError(state, format("..with max value=[{:.2R}].", testval));
-                            }
-                            desDayInput.MaxDryBulb = testval;
-                        }
-
-                        testval = desDayInput.MaxDryBulb - testval;
-                        if (testval < 90.0 || testval > 70.0) {
-                            ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
-                            // should this be cNumericFieldNames?
-                            ShowContinueError(state, format("{} = ({.2R}) is out of range [-90.0, 70.0]", ipsc->cAlphaFieldNames(4), testval));
-                            ErrorsFound = true;
-                        }
-                    }
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cAlphaFieldNames(4)));
-                    ShowContinueError(state, format("..required when {} indicates \"SCHEDULE\".", ipsc->cAlphaFieldNames(3)));
-                    ErrorsFound = true;
-                }
-            } else {
+            if (desDayInput.dryBulbRangeType == DesDayDryBulbRangeType::Default) {
                 // Default dry-bulb temperature Range
                 Real64 LastHrValue = DefaultTempRangeMult[23];
                 for (int hour = 1; hour <= Constant::HoursInDay; ++hour) {
@@ -6081,21 +5948,91 @@ namespace Weather {
                     }
                     LastHrValue = DefaultTempRangeMult[hour - 1];
                 }
-            }
 
+            } else if (ipsc->lAlphaFieldBlanks(4)) {
+                ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaFieldNames(3), "SCHEDULE"); 
+                ErrorsFound = true;
+
+            } else if ((desDayInput.TempRangeSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(4))) == 0) {
+                ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
+                ErrorsFound = true;
+
+            } else {
+                Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
+                ScheduleManager::GetSingleDayScheduleValues(state, desDayInput.TempRangeSchPtr, tmp);
+                auto &desDayModEnvrn = state.dataWeather->desDayMods(EnvrnNum);
+                for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+                    for (int iTS = 1; iTS < state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
+                        desDayModEnvrn(iTS, iHr).OutDryBulbTemp = tmp(iTS, iHr);
+                    }
+                }
+
+                if (std::find(state.dataWeather->spSiteSchedNums.begin(), state.dataWeather->spSiteSchedNums.end(),
+                              desDayInput.TempRangeSchPtr) == state.dataWeather->spSiteSchedNums.end()) {
+                    state.dataWeather->spSiteSchedNums.emplace_back(desDayInput.TempRangeSchPtr);
+                    SetupOutputVariable(state,
+                                        "Sizing Period Site Drybulb Temperature Range Modifier Schedule Value",
+                                        unitType,
+                                        state.dataWeather->spSiteSchedules(EnvrnNum).OutDryBulbTemp,
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        ipsc->cAlphaArgs(4));
+                }
+
+                if (desDayInput.dryBulbRangeType == DesDayDryBulbRangeType::Multiplier) {
+                    if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.TempRangeSchPtr, 0.0, false, 1.0, false)) {
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
+                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
+                        ShowContinueError(state, "..Specified [Schedule] Dry-bulb Range Multiplier Values are not within [0.0, 1.0]");
+                        ErrorsFound = true;
+                    }
+                } else if (desDayInput.dryBulbRangeType == DesDayDryBulbRangeType::Difference) { // delta, must be > 0.0
+                    if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.TempRangeSchPtr, 0.0, false)) {
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
+                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
+                        ShowSevereError(state, "Some [Schedule] Dry-bulb Range Difference Values are < 0.0 [would make max larger].");
+                        ErrorsFound = true;
+                    }
+                }
+
+                auto const &desDayModsEnvrn = state.dataWeather->desDayMods(EnvrnNum);
+                Real64 testval = std::numeric_limits<Real64>::min();
+                for (int iHr = 1; i <= Constant::HoursInDay; ++iHr) {
+                    for (int iTS = 1; i <= state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
+                        if (desDayModsEnvrn(iTS, iHr).OutDryBulbTemp > testval) testval = desDayModsEnvrn(iTS, iHr).OutDryBulbTemp;
+                    }
+                }
+
+                if (desDayInput.dryBulbRangeType == DesDayDryBulbRangeType::Profile) {
+                    if (MaxDryBulbEntered) {
+                        ShowWarningError(state, format("{}=\"{}\", data override.", ipsc->cCurrentModuleObject, desDayInput.Title));
+                        ShowContinueError(state, format("..{}=[{:.2R}] will be overwritten.", ipsc->cNumericFieldNames(3), desDayInput.MaxDryBulb));
+                        ShowContinueError(state, format("..{}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
+                        ShowContinueError(state, format("..with max value=[{:.2R}].", testval));
+                    }
+                    desDayInput.MaxDryBulb = testval;
+                }
+
+                testval = desDayInput.MaxDryBulb - testval;
+                if (testval < 90.0 || testval > 70.0) {
+                    ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
+                    // should this be cNumericFieldNames?
+                    ShowContinueError(state, format("{} = ({.2R}) is out of range [-90.0, 70.0]", ipsc->cAlphaFieldNames(4), testval));
+                    ErrorsFound = true;
+                }
+            } 
+            
             //   A5,  \field Humidity Condition Type
             desDayInput.HumIndType = static_cast<DesDayHumIndType>(getEnumerationValue(DesDayHumIndTypeNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(5))));
             
             switch (desDayInput.HumIndType) {
             case DesDayHumIndType::WetBulb: {
                 //   N5,  \field Wetbulb or DewPoint at Maximum Dry-Bulb
-                if (!ipsc->lNumericFieldBlanks(5)) {
-                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                if (ipsc->lNumericFieldBlanks(5)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(5), ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                     ErrorsFound = true;
+                } else {
+                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 }
 
                 if (desDayInput.HumIndValue < -90.0 || desDayInput.HumIndValue > 70.0) {
@@ -6104,17 +6041,14 @@ namespace Weather {
                                                     ipsc->cAlphaFieldNames(5) + " - WetBulb", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
-                
             } break;
 
             case DesDayHumIndType::DewPoint: {
-                if (!ipsc->lNumericFieldBlanks(5)) {
-                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                if (ipsc->lNumericFieldBlanks(5)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(5), ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                     ErrorsFound = true;
+                } else {
+                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 }
 
                 if (desDayInput.HumIndValue < -90.0 || desDayInput.HumIndValue > 70.0) {
@@ -6123,18 +6057,15 @@ namespace Weather {
                                                     ipsc->cAlphaFieldNames(5) + " - DewPoint", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
-
             } break;
 
             case DesDayHumIndType::HumRatio: {
                 //   N6,  \field Humidity Ratio at Maximum Dry-Bulb
-                if (!ipsc->lNumericFieldBlanks(6)) {
-                    desDayInput.HumIndValue = ipsc->rNumericArgs(6); // Humidity Indicating Conditions at Max Dry-Bulb
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(6)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                if (ipsc->lNumericFieldBlanks(6)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(6), ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                     ErrorsFound = true;
+                } else {
+                    desDayInput.HumIndValue = ipsc->rNumericArgs(6); // Humidity Indicating Conditions at Max Dry-Bulb
                 }
 
                 if (desDayInput.HumIndValue < 0.0 || desDayInput.HumIndValue > 0.03) {
@@ -6143,18 +6074,15 @@ namespace Weather {
                                                     ipsc->cAlphaFieldNames(5) + " - Humidity-Ratio", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
-
             } break;
 
             case DesDayHumIndType::Enthalpy: {
                 //   N7,  \field Enthalpy at Maximum Dry-Bulb {J/kg}.
-                if (!ipsc->lNumericFieldBlanks(7)) {
-                    desDayInput.HumIndValue = ipsc->rNumericArgs(7); // Humidity Indicating Conditions at Max Dry-Bulb
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(7)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                if (ipsc->lNumericFieldBlanks(7)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(7), ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                     ErrorsFound = true;
+                } else {
+                    desDayInput.HumIndValue = ipsc->rNumericArgs(7); // Humidity Indicating Conditions at Max Dry-Bulb
                 }
 
                 desDayInput.HumIndType = DesDayHumIndType::Enthalpy;
@@ -6164,7 +6092,6 @@ namespace Weather {
                                                     ipsc->cAlphaFieldNames(5) + " - Enthalpy", desDayInput.HumIndValue));
                     ErrorsFound = true;
                 }
-                        
             } break;
                     
             case DesDayHumIndType::RelHumSch: {
@@ -6175,37 +6102,31 @@ namespace Weather {
             case DesDayHumIndType::WBProfMul: {
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
-                if (!ipsc->lNumericFieldBlanks(5)) {
-                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                if (ipsc->lNumericFieldBlanks(5)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(5), ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                     ErrorsFound = true;
+                } else {
+                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 }
             } break;
                     
             case DesDayHumIndType::WBProfDif: {
                 units = "[]";
                 unitType = OutputProcessor::Unit::None;
-                if (!ipsc->lNumericFieldBlanks(5)) {
-                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                if (ipsc->lNumericFieldBlanks(5)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(5), ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                     ErrorsFound = true;
+                } else {
+                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 }
             } break;
 
             case DesDayHumIndType::WBProfDef: {
-                if (!ipsc->lNumericFieldBlanks(5)) {
-                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
-                } else {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5)));
+                if (ipsc->lNumericFieldBlanks(5)) {
+                    ShowSevereEmptyField(state, eoh, ipsc->cNumericFieldNames(5), ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
                     ErrorsFound = true;
+                } else {
+                    desDayInput.HumIndValue = ipsc->rNumericArgs(5); // Humidity Indicating Conditions at Max Dry-Bulb
                 }
             } break;
 
@@ -6223,14 +6144,11 @@ namespace Weather {
             if (desDayInput.HumIndType == DesDayHumIndType::RelHumSch || desDayInput.HumIndType == DesDayHumIndType::WBProfMul ||
                 desDayInput.HumIndType == DesDayHumIndType::WBProfDif) {
                 if (ipsc->lAlphaFieldBlanks(6)) {
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cAlphaFieldNames(6)));
-                    ShowContinueError(state, format("..field is required when {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
+                    ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(6), ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                     ErrorsFound = true;
                 } else if ((desDayInput.HumIndSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(6))) == 0) {
-                    ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6)));
-                    ShowContinueError(state, "Default Humidity will be used (constant for day using Humidity Indicator Temp).");
+                    ShowWarningItemNotFound(state, eoh, ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6),
+                                            "Default Humidity (constant for day using Humidity Indicator Temp).");
                     // reset HumIndType ?
                 } else {
                     Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
@@ -6322,106 +6240,93 @@ namespace Weather {
             //   A10, \field Solar Model Indicator
             if (ipsc->lAlphaFieldBlanks(10)) {
                 desDayInput.solarModel = DesDaySolarModel::ASHRAE_ClearSky;
-            } else if ((desDayInput.solarModel = static_cast<DesDaySolarModel>(getEnumerationValue(DesDaySolarModelNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(10))))) != DesDaySolarModel::Invalid) {
+            } else if ((desDayInput.solarModel = static_cast<DesDaySolarModel>(getEnumerationValue(DesDaySolarModelNamesUC,
+                                                                                                   Util::MakeUPPERCase(ipsc->cAlphaArgs(10))))) != DesDaySolarModel::Invalid) {
             } else { 
-                ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(10), ipsc->cAlphaArgs(10)));
-                ShowContinueError(state, "Model used will be ASHRAE ClearSky");
+                ShowWarningInvalidKey(state, eoh, ipsc->cAlphaFieldNames(10), ipsc->cAlphaArgs(10), "ASHRAE ClearSky");
                 desDayInput.solarModel = DesDaySolarModel::ASHRAE_ClearSky;
             }
 
             if (desDayInput.solarModel == DesDaySolarModel::SolarModel_Schedule) {
                 //   A11, \field Beam Solar Day Schedule Name
-                if (!ipsc->lAlphaFieldBlanks(11)) {
-                    desDayInput.BeamSolarSchPtr =
-                        ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(11));
-                    if (desDayInput.BeamSolarSchPtr == 0) {
-                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(11), ipsc->cAlphaArgs(11)));
-                        ShowContinueError(state, format("..Required when {} indicates \"Schedule\".", ipsc->cAlphaFieldNames(10)));
-                        ErrorsFound = true;
-                    } else {
-                        Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
-                        ScheduleManager::GetSingleDayScheduleValues(state, desDayInput.BeamSolarSchPtr, tmp);
-                        auto &desDayModsEnvrn = state.dataWeather->desDayMods(EnvrnNum);
-                        for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr)
-                            for (int iTS = 1; iTS <= state.dataGlobal->NumOfTimeStepInHour; ++iTS)
-                                desDayModsEnvrn(iTS, iHr).BeamSolarRad = tmp(iTS, iHr);
-                                        
-                        unitType = OutputProcessor::Unit::W_m2;
-                        units = "[W/m2]";
-                        if (std::find(state.dataWeather->spSiteSchedNums.begin(), state.dataWeather->spSiteSchedNums.end(),
-                                      desDayInput.BeamSolarSchPtr) ==
-                            state.dataWeather->spSiteSchedNums.end()) {
-                            state.dataWeather->spSiteSchedNums.emplace_back(desDayInput.BeamSolarSchPtr);
-                            SetupOutputVariable(state,
-                                                "Sizing Period Site Beam Solar Schedule Value",
-                                                unitType,
-                                                state.dataWeather->spSiteSchedules(EnvrnNum).BeamSolarRad,
-                                                OutputProcessor::SOVTimeStepType::Zone,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                ipsc->cAlphaArgs(11));
-                        }
-                        if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.BeamSolarSchPtr, 0.0, false)) {
-                            ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                            ShowContinueError(state,format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(11), ipsc->cAlphaArgs(11)));
-                            ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
-                            ErrorsFound = true;
-                        }
-                    }
-                } else { // should have entered beam schedule
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cAlphaFieldNames(11)));
+                if (ipsc->lAlphaFieldBlanks(11)) {
+                    // should have entered beam schedule
+                    ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(11), "", "");
                     ErrorsFound = true;
+                } else if ((desDayInput.BeamSolarSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(11))) == 0) {
+                    ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(11), ipsc->cAlphaArgs(11));
+                    ErrorsFound = true;
+                } else {
+                    Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
+                    ScheduleManager::GetSingleDayScheduleValues(state, desDayInput.BeamSolarSchPtr, tmp);
+                    auto &desDayModsEnvrn = state.dataWeather->desDayMods(EnvrnNum);
+                    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr)
+                        for (int iTS = 1; iTS <= state.dataGlobal->NumOfTimeStepInHour; ++iTS)
+                            desDayModsEnvrn(iTS, iHr).BeamSolarRad = tmp(iTS, iHr);
+                    
+                    unitType = OutputProcessor::Unit::W_m2;
+                    units = "[W/m2]";
+                    if (std::find(state.dataWeather->spSiteSchedNums.begin(), state.dataWeather->spSiteSchedNums.end(),
+                                  desDayInput.BeamSolarSchPtr) == state.dataWeather->spSiteSchedNums.end()) {
+                        state.dataWeather->spSiteSchedNums.emplace_back(desDayInput.BeamSolarSchPtr);
+                        SetupOutputVariable(state,
+                                            "Sizing Period Site Beam Solar Schedule Value",
+                                            unitType,
+                                            state.dataWeather->spSiteSchedules(EnvrnNum).BeamSolarRad,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            ipsc->cAlphaArgs(11));
+                    }
+
+                    if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.BeamSolarSchPtr, 0.0, false)) {
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
+                        ShowContinueError(state,format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(11), ipsc->cAlphaArgs(11)));
+                        ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
+                        ErrorsFound = true;
+                    }
                 }
+
                 //   A12, \field Diffuse Solar Day Schedule Name
-                if (!ipsc->lAlphaFieldBlanks(12)) {
-                    desDayInput.DiffuseSolarSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(12));
-                    if (desDayInput.DiffuseSolarSchPtr == 0) {
-                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(12), ipsc->cAlphaArgs(12)));
-                        ShowContinueError(state, format("..Required when {} indicates \"Schedule\".", ipsc->cAlphaFieldNames(10)));
-                        ErrorsFound = true;
-                    } else {
-                        Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
-                        ScheduleManager::GetSingleDayScheduleValues(state, desDayInput.DiffuseSolarSchPtr, tmp);
-                        auto &desDayModsEnvrn = state.dataWeather->desDayMods(EnvrnNum);
-                        for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr)
-                                for (int iTS = 1; iTS <= state.dataGlobal->NumOfTimeStepInHour; ++iTS)
-                                        desDayModsEnvrn(iTS, iHr).DifSolarRad = tmp(iTS, iHr); 
-
-                        units = "[W/m2]";
-                        unitType = OutputProcessor::Unit::W_m2;
-                        if (std::find(state.dataWeather->spSiteSchedNums.begin(), state.dataWeather->spSiteSchedNums.end(),
-                                      desDayInput.DiffuseSolarSchPtr) == state.dataWeather->spSiteSchedNums.end()) {
-                            state.dataWeather->spSiteSchedNums.emplace_back(desDayInput.DiffuseSolarSchPtr);
-                            SetupOutputVariable(state,
-                                                "Sizing Period Site Diffuse Solar Schedule Value",
-                                                unitType,
-                                                state.dataWeather->spSiteSchedules(EnvrnNum).DifSolarRad,
-                                                OutputProcessor::SOVTimeStepType::Zone,
-                                                OutputProcessor::SOVStoreType::Average,
-                                                ipsc->cAlphaArgs(12));
-                        }
-                        if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.DiffuseSolarSchPtr, 0.0, false)) {
-                            ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                            ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(12),ipsc->cAlphaArgs(12)));
-                            ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
-                            ErrorsFound = true;
-                        }
-                    }
-                } else { // should have entered diffuse schedule
-                    ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cAlphaFieldNames(12)));
+                if (ipsc->lAlphaFieldBlanks(12)) {
+                    // should have entered diffuse schedule
+                    ShowSevereEmptyField(state, eoh, ipsc->cAlphaFieldNames(12), "", "");
                     ErrorsFound = true;
-                }
-            }
+                } else if ((desDayInput.DiffuseSolarSchPtr = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(12))) == 0) {
+                    ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(12), ipsc->cAlphaArgs(12));
+                    ErrorsFound = true;
+                } else {
+                    Array2D<Real64> tmp = Array2D<Real64>(state.dataGlobal->NumOfTimeStepInHour, Constant::HoursInDay);
+                    ScheduleManager::GetSingleDayScheduleValues(state, desDayInput.DiffuseSolarSchPtr, tmp);
+                    auto &desDayModsEnvrn = state.dataWeather->desDayMods(EnvrnNum);
+                    for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr)
+                        for (int iTS = 1; iTS <= state.dataGlobal->NumOfTimeStepInHour; ++iTS)
+                            desDayModsEnvrn(iTS, iHr).DifSolarRad = tmp(iTS, iHr); 
 
-            if (desDayInput.solarModel == DesDaySolarModel::ASHRAE_ClearSky) {
+                    units = "[W/m2]";
+                    unitType = OutputProcessor::Unit::W_m2;
+                    if (std::find(state.dataWeather->spSiteSchedNums.begin(), state.dataWeather->spSiteSchedNums.end(),
+                                  desDayInput.DiffuseSolarSchPtr) == state.dataWeather->spSiteSchedNums.end()) {
+                        state.dataWeather->spSiteSchedNums.emplace_back(desDayInput.DiffuseSolarSchPtr);
+                        SetupOutputVariable(state,
+                                            "Sizing Period Site Diffuse Solar Schedule Value",
+                                            unitType,
+                                            state.dataWeather->spSiteSchedules(EnvrnNum).DifSolarRad,
+                                            OutputProcessor::SOVTimeStepType::Zone,
+                                            OutputProcessor::SOVStoreType::Average,
+                                            ipsc->cAlphaArgs(12));
+                    }
+                    if (!ScheduleManager::CheckDayScheduleValueMinMax(state, desDayInput.DiffuseSolarSchPtr, 0.0, false)) {
+                        ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
+                        ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(12),ipsc->cAlphaArgs(12)));
+                        ShowContinueError(state, "..Specified [Schedule] Values are not >= 0.0");
+                        ErrorsFound = true;
+                    }
+                }
+
+            } else if (desDayInput.solarModel == DesDaySolarModel::ASHRAE_ClearSky) {
                 if (ipsc->lNumericFieldBlanks(14)) {
-                    ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                    ShowContinueError(state, format("..invalid field: {} is blank.", ipsc->cNumericFieldNames(14)));
-                    ShowContinueError(state, "..Zero clear sky (no solar) will be used.");
+                    ShowWarningEmptyField(state, eoh, ipsc->cNumericFieldNames(14),
+                                          ipsc->cAlphaFieldNames(10), ipsc->cAlphaArgs(10), "Zero clear sky (no solar)");
                 }
             }
 
@@ -6462,20 +6367,14 @@ namespace Weather {
             } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(9)))) != BooleanSwitch::Invalid) {
                 desDayInput.DSTIndicator = (int)b;
             } else {
-                ShowWarningError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                ShowContinueError(state, format("..invalid field: {}=\"{} (\"No\" will be used)", ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9)));
+                ShowWarningInvalidBool(state, eoh, ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9), "No");
                 desDayInput.DSTIndicator = 0;
             }
 
             //   A2,  \field Day Type
             desDayInput.DayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
             if (desDayInput.DayType <= 0) {
-                ShowSevereError(state, format("{}=\"{}\", invalid data.", ipsc->cCurrentModuleObject, desDayInput.Title));
-                ShowContinueError(state, format("..invalid field: {}=\"{}\".", ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2)));
-                ShowContinueError(state,
-                                  "Valid values are "
-                                  "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Holiday,SummerDesignDay,WinterDesignDay,CustomDay1,"
-                                  "CustomDay2.");
+                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
             }
 
@@ -6580,7 +6479,7 @@ namespace Weather {
         //        \object-list DayScheduleNames
         //        \object-list ScheduleNames
 
-        static constexpr std::string_view RoutineName("GetWeatherProperties:");
+        static constexpr std::string_view routineName = "GetWeatherProperties";
 
         int Found;
         int envFound;
@@ -6608,7 +6507,7 @@ namespace Weather {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             auto &wpSkyTemp = state.dataWeather->WPSkyTemperature(i);
             if (ipsc->cAlphaArgs(1).empty()) {
                 Found = 0;
@@ -6617,8 +6516,8 @@ namespace Weather {
                     if (environJ.KindOfEnvrn != Constant::KindOfSim::RunPeriodWeather) continue;
                     if (environJ.WP_Type1 != 0) {
                         ShowSevereError(state,
-                                        format("{}{}=\"{}\", indicated Environment Name already assigned.",
-                                               RoutineName,
+                                        format("{}: {}=\"{}\", indicated Environment Name already assigned.",
+                                               routineName,
                                                ipsc->cCurrentModuleObject,
                                                ipsc->cAlphaArgs(1)));
                         if (!environJ.Title.empty()) {
@@ -6650,30 +6549,25 @@ namespace Weather {
                 Found = Util::FindItemInList(ipsc->cAlphaArgs(1), state.dataWeather->Environment, &EnvironmentData::Title);
                 envFound = Found;
                 if (Found == 0) {
-                    ShowSevereError(state, format("{}{}=\"{}\", invalid Environment Name referenced.", RoutineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state, "...remainder of object not processed.");
+                    ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                     ErrorsFound = true;
                     continue;
+                } 
+
+                auto &envrnFound = state.dataWeather->Environment(Found);
+                if (envrnFound.WP_Type1 != 0) {
+                    ShowSevereError(state, format("{}:{}=\"{}\", indicated Environment Name already assigned.",
+                                                  routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                    ShowContinueError(state, format("...Environment=\"{}\", already using {}=\"{}\".",
+                                                    envrnFound.Title, ipsc->cCurrentModuleObject, state.dataWeather->WPSkyTemperature(envrnFound.WP_Type1).Name));
+                    ErrorsFound = true;
                 } else {
-                    auto &envrnFound = state.dataWeather->Environment(Found);
-                    if (envrnFound.WP_Type1 != 0) {
-                        ShowSevereError(state, format("{}{}=\"{}\", indicated Environment Name already assigned.",
-                                                      RoutineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                        ShowContinueError(state, format("...Environment=\"{}\", already using {}=\"{}\".",
-                                                        envrnFound.Title, ipsc->cCurrentModuleObject, state.dataWeather->WPSkyTemperature(envrnFound.WP_Type1).Name));
-                        ErrorsFound = true;
-                    } else {
-                        state.dataWeather->Environment(Found).WP_Type1 = i;
-                    }
+                    state.dataWeather->Environment(Found).WP_Type1 = i;
                 }
             }
 
-            if (!ipsc->lAlphaFieldBlanks(1)) {
-                Util::IsNameEmpty(state, ipsc->cAlphaArgs(1), ipsc->cCurrentModuleObject, ErrorsFound);
-                wpSkyTemp.Name = ipsc->cAlphaArgs(1); // Name
-            } else {
-                wpSkyTemp.Name = "All RunPeriods";
-            }
+            wpSkyTemp.Name = !ipsc->lAlphaFieldBlanks(1) ? ipsc->cAlphaArgs(1) : "All RunPeriods";
+
             // Validate Calculation Type.
             std::string units;
             OutputProcessor::Unit unitType;
@@ -6711,11 +6605,7 @@ namespace Weather {
                     // See if it's a schedule.
                     Found = ScheduleManager::GetScheduleIndex(state, ipsc->cAlphaArgs(3));
                     if (Found == 0) {
-                        ShowSevereError(state, format("{}{}=\"{}\", invalid {}.",
-                                               RoutineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(3)));
-                        ShowContinueError(state, format("...Entered name=\"{}\".", ipsc->cAlphaArgs(3)));
-                        ShowContinueError(state, "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
-                                          "\"Schedule:Constant\" objects.");
+                        ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                         ErrorsFound = true;
                     } else {
                         wpSkyTemp.IsSchedule = true;
@@ -6724,10 +6614,7 @@ namespace Weather {
                 } else { // See if it's a valid schedule.
                     Found = ScheduleManager::GetDayScheduleIndex(state, ipsc->cAlphaArgs(3));
                     if (Found == 0) {
-                        ShowSevereError(state, format("{}{}=\"{}\", invalid {}.",
-                                                      RoutineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(3)));
-                        ShowContinueError(state, format("...Entered name=\"{}\".", ipsc->cAlphaArgs(3)));
-                        ShowContinueError(state, R"(...Should be a single day schedule ("Schedule:Day:Hourly", "Schedule:Day:Interval", or "Schedule:Day:List".)");
+                        ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                         ErrorsFound = true;
                     } else {
                         if (envFound != 0) {
@@ -6754,8 +6641,7 @@ namespace Weather {
                 if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                     wpSkyTemp.UseWeatherFileHorizontalIR = static_cast<bool>(b);
                 } else {
-                    ShowSevereError(state, format("{}{}=\"{}\", invalid {}.", RoutineName, ipsc->cCurrentModuleObject,ipsc->cAlphaArgs(1), ipsc->cAlphaFieldNames(4)));
-                    ShowContinueError(state, format("...entered value=\"{}\", should be Yes or No.", ipsc->cAlphaArgs(4)));
+                    ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
                     ErrorsFound = true;
                 }
             } else {
@@ -6930,6 +6816,8 @@ namespace Weather {
         // PURPOSE OF THIS SUBROUTINE:
         // Reads the input data for the WATER MAINS TEMPERATURES object.
 
+        constexpr std::string_view routineName = "GetWaterMainsTemperatures";
+            
         auto const &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "Site:WaterMainsTemperature";
         int NumObjects = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
@@ -6953,24 +6841,23 @@ namespace Weather {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
+            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ""};
+            
             state.dataWeather->WaterMainsTempsMethod =
                 static_cast<Weather::WaterMainsTempCalcMethod>(getEnumerationValue(waterMainsCalcMethodNamesUC, AlphArray(1)));
-            if (state.dataWeather->WaterMainsTempsMethod == WaterMainsTempCalcMethod::Schedule) {
+
+            switch (state.dataWeather->WaterMainsTempsMethod) {
+            case WaterMainsTempCalcMethod::Schedule: {
                 state.dataWeather->WaterMainsTempsScheduleName = AlphArray(2);
                 state.dataWeather->WaterMainsTempsSchedule = ScheduleManager::GetScheduleIndex(state, AlphArray(2));
                 if (state.dataWeather->WaterMainsTempsSchedule == 0) {
-                    ShowSevereError(state,
-                                    format("{}: invalid {}={}",
-                                           ipsc->cCurrentModuleObject,
-                                           ipsc->cAlphaFieldNames(2),
-                                           AlphArray(2)));
+                    ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(2), AlphArray(2));
                     ErrorsFound = true;
                 }
-
-            } else if (state.dataWeather->WaterMainsTempsMethod == WaterMainsTempCalcMethod::Correlation) {
+            } break;
+            case WaterMainsTempCalcMethod::Correlation: {
                 if (NumNums == 0) {
-                    ShowSevereError(state,
-                                    format("{}: Missing Annual Average and Maximum Difference fields.", ipsc->cCurrentModuleObject));
+                    ShowSevereError(state, format("{}: Missing Annual Average and Maximum Difference fields.", ipsc->cCurrentModuleObject));
                     ErrorsFound = true;
                 } else if (NumNums == 1) {
                     ShowSevereError(state, format("{}: Missing Maximum Difference field.", ipsc->cCurrentModuleObject));
@@ -6979,14 +6866,15 @@ namespace Weather {
                     state.dataWeather->WaterMainsTempsAnnualAvgAirTemp = NumArray(1);
                     state.dataWeather->WaterMainsTempsMaxDiffAirTemp = NumArray(2);
                 }
-            } else if (state.dataWeather->WaterMainsTempsMethod == WaterMainsTempCalcMethod::CorrelationFromWeatherFile) {
+            } break;
+            case WaterMainsTempCalcMethod::CorrelationFromWeatherFile: {
                 // No action
-            } else {
-                ShowSevereError(
-                    state,
-                    format("{}: invalid {}={}", ipsc->cCurrentModuleObject, ipsc->cAlphaFieldNames(1), AlphArray(1)));
+            } break; 
+            default: {
+                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(1), AlphArray(1));
                 ErrorsFound = true;
-            }
+            } break;
+            } // switch
 
         } else if (NumObjects > 1) {
             ShowSevereError(state, format("{}: Too many objects entered. Only one allowed.", ipsc->cCurrentModuleObject));

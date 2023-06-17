@@ -707,22 +707,22 @@ namespace Weather {
                  Real64 IRHoriz);
 
     struct WeatherVars {
-        bool IsRain;
-        bool IsSnow;
-        Real64 OutDryBulbTemp;
-        Real64 OutDewPointTemp;
-        Real64 OutBaroPress;
-        Real64 OutRelHum;
-        Real64 WindSpeed;
-        Real64 WindDir;
-        Real64 SkyTemp;
-        Real64 HorizIRSky;
-        Real64 BeamSolarRad;
-        Real64 DifSolarRad;
-        Real64 Albedo;
-        Real64 LiquidPrecip;
-        Real64 TotalSkyCover;
-        Real64 OpaqueSkyCover;
+        bool IsRain = false;
+        bool IsSnow = false;
+        Real64 OutDryBulbTemp = 0.0;
+        Real64 OutDewPointTemp = 0.0;
+        Real64 OutBaroPress = 0.0;
+        Real64 OutRelHum = 0.0;
+        Real64 WindSpeed = 0.0;
+        Real64 WindDir = 0.0;
+        Real64 SkyTemp = 0.0;
+        Real64 HorizIRSky = 0.0;
+        Real64 BeamSolarRad = 0.0;
+        Real64 DifSolarRad = 0.0;
+        Real64 Albedo = 0.0;
+        Real64 LiquidPrecip = 0.0;
+        Real64 TotalSkyCover = 0.0;
+        Real64 OpaqueSkyCover = 0.0;
     };
 
     // This struct carries the default missing data for those data elements that would be best replaced with the previous hour's data for missing
@@ -738,11 +738,11 @@ namespace Weather {
     };
 
    struct DesDayMods {
-       Real64 OutDryBulbTemp;
-       Real64 OutRelHum;
-       Real64 BeamSolarRad;
-       Real64 DifSolarRad;
-       Real64 SkyTemp;
+       Real64 OutDryBulbTemp = 0.0;
+       Real64 OutRelHum = 0.0;
+       Real64 BeamSolarRad = 0.0;
+       Real64 DifSolarRad = 0.0;
+       Real64 SkyTemp = 0.0;
     };
 
     struct SPSiteSchedules {
