@@ -2420,11 +2420,12 @@ namespace Weather {
                         ErrorsFound = true;
                     }
 
-                    if (WindSpeed < 999.0 && (WindSpeed < 0.0 || WindSpeed > 40.0))
+                    if (WindSpeed < 999.0 && (WindSpeed < 0.0 || WindSpeed > 40.0)) {
                         ShowSevereError(state, format("{}: {}", routineName, state.dataEnvrn->WeatherFileLocationTitle));
                         ShowContinueError(state, format("Wind Speed ({:.2R}) is out of range [0.0, 40.0]", WindSpeed));
                         ErrorsFound = true;
-
+                    }
+                    
                     if (ErrorsFound) {
                         ShowSevereError(state, "Out of Range errors found with initial day of WeatherFile");
                     }
