@@ -519,6 +519,8 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 MSHPWasteHeat = 0.0;             // Waste heat
     Real64 PreviousTimeStep = 0.0;          // The time step length at the previous time step
     bool ShortenTimeStepSysRoomAir = false; // Logical flag that triggers shortening of system time step
+    // For multispeed unitary systems
+    Real64 MSUSEconoSpeedNum = 0; // Economizer speed
 
     Real64 deviationFromSetPtThresholdHtg = -0.2; // heating threshold for reporting setpoint deviation
     Real64 deviationFromSetPtThresholdClg = 0.2;  // cooling threshold for reporting setpoint deviation
