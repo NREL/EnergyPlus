@@ -2749,9 +2749,9 @@ Multipler_{heating,\; power} = {0.90 - 36.45 \times w_{defrost,\; coil}}
 \begin{equation}
 EIRFT_{defrost} = \frac{1}{COP_{ref}}
 \end{equation}
-If the Defrost Energy Input Ratio Function of Temperature Curve has been entered by the user this curve will update the value of $EIRFT_{defrost}$. This performance curve is a function of outdoor wet-bulb temperature and outdoor dry-bulb temperature. If either of these outdoor temperature are below 15.555 \degC, the minimum of 15.555 \degC is used.
+If the Defrost Energy Input Ratio Function of Temperature Curve has been entered by the user this curve will update the value of $EIRFT_{defrost}$. This performance curve is a function of outdoor wet-bulb temperature and outdoor dry-bulb temperature. If either of these outdoor temperatures are below 15.555 C, the minimum temperature of 15.555 C is used.
 \begin{equation}
-{EIRFT_{defrost} = f(T_{ambient,\; wetbulb}, T_{ambient})}, minimum temperature = 15.555.
+{EIRFT_{defrost} = f(T_{ambient,\; wetbulb}, T_{ambient})}
 \end{equation}
 \begin{equation}
 \dot{Q}_{defrost} = EIRFT_{defrost} \times \frac{Q_{ref}}{1.01667} \times Fraction_{defrost,\; time}
@@ -2782,11 +2782,11 @@ Multipler_{heating,\; power} = {0.954 \times (1 - Fraction_{defrost,\; time})}
 \dot{Q}_{load,\; defrost} = {0.01 \times Fraction_{defrost,\; time} \times (7.222 - T_{ambient}) \times (\frac{\dot{Q}_{ref}}{1.01667})}
 \end{equation}
 \begin{equation}
-EIRFT_{defrost} = 0}
+EIRFT_{defrost} = 0
 \end{equation}
-If the Defrost Energy Input Ratio Function of Temperature Curve has been entered by the user this curve will update $EIRFT_{defrost}$ as:
+If the Defrost Energy Input Ratio Function of Temperature Curve has been entered by the user this curve will update $EIRFT_{defrost}$.  If either of these outdoor temperatures are below 15.555 C, the minimum temperature of 15.555 C is used.
 \begin{equation}
-{EIRFT_{defrost} = f(T_{ambient,\; wetbulb}, T_{ambient})}, where\; 15.555 \le T_{ambient,\; wetbulb}\; and\; 15.555 \le T_{ambient}
+{EIRFT_{defrost} = f(T_{ambient,\; wetbulb}, T_{ambient})}
 \end{equation}
 \begin{equation}
 \dot{Q}_{defrost} = EIRFT_{defrost} \times \frac{\dot{Q}_{ref}}{1.01667} \times Fraction_{defrost,\; time}
@@ -2834,7 +2834,7 @@ The heat load per cycle of defrost is calculated based on a user provided perfor
 Heat_{load,\; defrost} = f(T_{ambient})
 \end{equation}
 \begin{equation}
-Heat_{load,\; defrost} = f(T_{ambient,\;wetbulb}
+Heat_{load,\; defrost} = f(T_{ambient,\;wetbulb})
 \end{equation}
 The heat load per cycle of defrost is applied to the available capacity and is proportional to the defrost cycle per hour as: 
 \begin{equation}
@@ -2860,7 +2860,7 @@ Multiplier_{heating,\; capacity} = {1 + (Heat_{load,\; defrost} \times Cycles_{d
 Multipler_{heating,\; power} = {(1 + Heat_{load,\; defrost})}
 \end{equation}
 \begin{equation}
-Fraction_{defrost, time} = user\; input, Heat\; Pump\; Defrost\; Time\; Period\; Fraction \times Cycles_{defrost
+Fraction_{defrost, time} = user\; input, Heat\; Pump\; Defrost\; Time\; Period\; Fraction \times Cycles_{defrost}
 \end{equation}
 
 These defrost method calculations, if used, will result in an adjustment to the available heating capacity as:
