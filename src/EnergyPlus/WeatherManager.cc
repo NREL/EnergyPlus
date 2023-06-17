@@ -3471,12 +3471,14 @@ namespace Weather {
 
             static constexpr std::array<std::string_view, (int)DesDayHumIndType::Num> DesDayHumIndTypeStrings = {
                 "Wetbulb,{:.2R},{{C}},", "Dewpoint,{:.2R},{{C}},", "Enthalpy,{:.2R},{{J/kgDryAir}},",
-                "HumidityRatio,{:.4R},{{kgWater/kgDryAir}},", "Schedule,<schedule values from 0.0 to 100.0>,{percent},",
+                "HumidityRatio,{:.4R},{{kgWater/kgDryAir}},", "Schedule,<schedule values from 0.0 to 100.0>,{{percent}},",
                 "WetBulbProfileDefaultMultipliers,{:.2R},{{C}},", "WetBulbProfileDifferenceSchedule,{:.2R},{{C}},",
                 "WetBulbProfileMultiplierSchedule,{:.2R},{{C}},"};
                     
             // Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units
-            if (desDayInput.HumIndType == DesDayHumIndType::WBProfDef) {
+            if (desDayInput.HumIndType == DesDayHumIndType::RelHumSch) {
+                print(state.files.eio, DesDayHumIndTypeStrings[(int)desDayInput.HumIndType]);
+            } else if (desDayInput.HumIndType == DesDayHumIndType::WBProfDef) {
                 print(state.files.eio, DesDayHumIndTypeStrings[(int)desDayInput.HumIndType],
                       state.dataWeather->DesDayInput(state.dataWeather->Envrn).HumIndValue);
             } else {
@@ -5785,19 +5787,17 @@ namespace Weather {
 
         auto const &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "SizingPeriod:DesignDay";
-        for (int i = 1; i <= TotDesDays; ++i) {
+        for (int iDesDay = 1; iDesDay <= TotDesDays; ++iDesDay) {
 
             int EnvrnNum;
-            if (state.dataSysVars->ReverseDD) {
-                if (i == 1 && TotDesDays > 1) {
-                    EnvrnNum = 2;
-                } else if (i == 2) {
-                    EnvrnNum = 1;
-                } else {
-                    EnvrnNum = i;
-                }
+            if (!state.dataSysVars->ReverseDD) {
+                EnvrnNum = iDesDay;
+            } else if (iDesDay == 1 && TotDesDays > 1) {
+                EnvrnNum = 2;
+            } else if (iDesDay == 2) {
+                EnvrnNum = 1;
             } else {
-                EnvrnNum = i;
+                EnvrnNum = iDesDay;
             }
 
             // Call Input Get routine to retrieve design day data
@@ -5808,7 +5808,7 @@ namespace Weather {
             int IOStat;      // IO Status when calling get input subroutine
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
-                                                                     i,
+                                                                     iDesDay,
                                                                      ipsc->cAlphaArgs,
                                                                      NumAlpha,
                                                                      ipsc->rNumericArgs,
@@ -5998,8 +5998,8 @@ namespace Weather {
 
                 auto const &desDayModsEnvrn = state.dataWeather->desDayMods(EnvrnNum);
                 Real64 testval = std::numeric_limits<Real64>::min();
-                for (int iHr = 1; i <= Constant::HoursInDay; ++iHr) {
-                    for (int iTS = 1; i <= state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
+                for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
+                    for (int iTS = 1; iTS <= state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
                         if (desDayModsEnvrn(iTS, iHr).OutDryBulbTemp > testval) testval = desDayModsEnvrn(iTS, iHr).OutDryBulbTemp;
                     }
                 }
@@ -6015,7 +6015,7 @@ namespace Weather {
                 }
 
                 testval = desDayInput.MaxDryBulb - testval;
-                if (testval < 90.0 || testval > 70.0) {
+                if (testval < -90.0 || testval > 70.0) {
                     ShowSevereError(state, format("{}: {} = {}", routineName, ipsc->cCurrentModuleObject, desDayInput.Title));
                     // should this be cNumericFieldNames?
                     ShowContinueError(state, format("{} = ({.2R}) is out of range [-90.0, 70.0]", ipsc->cAlphaFieldNames(4), testval));
