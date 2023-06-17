@@ -596,7 +596,7 @@ namespace HWBaseboardRadiator {
 
             // Remaining fraction is added to the zone as convective heat transfer
             AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
-            if (AllFracsSummed > MaxFraction) {
+            if (HWBaseboardDesignDataObject.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", Fraction Radiant was higher than the allowable maximum.",
                                         RoutineName,
@@ -605,7 +605,7 @@ namespace HWBaseboardRadiator {
                 HWBaseboardDesignDataObject.FracRadiant = MaxFraction;
                 thisHWBaseboard.FracConvect = 0.0;
             } else {
-                thisHWBaseboard.FracConvect = 1.0 - AllFracsSummed;
+                thisHWBaseboard.FracConvect = 1.0 - HWBaseboardDesignDataObject.FracRadiant;
             }
 
             thisHWBaseboard.TotSurfToDistrib = NumNumbers - 4;
