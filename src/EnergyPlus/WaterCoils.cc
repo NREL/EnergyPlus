@@ -3229,7 +3229,7 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
         //);             } // CoefPointer
         auto const &dry_fin_eff_coef = waterCoil.DryFinEfficncyCoef;
         Real64 DryFinEfficncy_pow = 1.0;
-        for (int CoefPointer = 1; CoefPointer <= dry_fin_eff_coef.length(); ++CoefPointer) {
+        for (int CoefPointer = 1; CoefPointer <= 5; ++CoefPointer) {
             DryCoilEfficiency += dry_fin_eff_coef(CoefPointer) * DryFinEfficncy_pow;
             DryFinEfficncy_pow *= DryFinEfficncy;
         } // CoefPointer
