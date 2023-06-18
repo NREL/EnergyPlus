@@ -2065,11 +2065,16 @@ namespace Weather {
         if ((state.dataGlobal->KindOfSim == Constant::KindOfSim::DesignDay) ||
             (state.dataGlobal->KindOfSim == Constant::KindOfSim::HVACSizeDesignDay)) {
 
+            for (int iDD = 1; iDD <= state.dataEnvrn->TotDesDays; ++iDD) {
+                state.dataWeather->spSiteSchedules(iDD) = {-999.0, -999.0, -999.0, -999.0, -999.0};
+            }
+            
             auto const &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
             int const envrnDayNum = envCurr.DesignDayNum;
             auto &desDayInput = state.dataWeather->DesDayInput(envrnDayNum);
             auto &spSiteSchedule = state.dataWeather->spSiteSchedules(envrnDayNum);
             auto &desDayMod = state.dataWeather->desDayMods(envrnDayNum)(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay);
+            
             if (desDayInput.dryBulbRangeType != DesDayDryBulbRangeType::Default) {
                 spSiteSchedule.OutDryBulbTemp = desDayMod.OutDryBulbTemp;
             }
@@ -2088,6 +2093,9 @@ namespace Weather {
                 spSiteSchedule.SkyTemp = desDayMod.SkyTemp;
             }
         } else if (state.dataEnvrn->TotDesDays > 0) {
+            for (int iDD = 1; iDD <= state.dataEnvrn->TotDesDays; ++iDD) {
+                state.dataWeather->spSiteSchedules(iDD) = {-999.0, -999.0, -999.0, -999.0, -999.0};
+            }
         }
 
         state.dataEnvrn->WindSpeed = today.WindSpeed;
@@ -5963,7 +5971,7 @@ namespace Weather {
                 ScheduleManager::GetSingleDayScheduleValues(state, desDayInput.TempRangeSchPtr, tmp);
                 auto &desDayModEnvrn = state.dataWeather->desDayMods(EnvrnNum);
                 for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
-                    for (int iTS = 1; iTS < state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
+                    for (int iTS = 1; iTS <= state.dataGlobal->NumOfTimeStepInHour; ++iTS) {
                         desDayModEnvrn(iTS, iHr).OutDryBulbTemp = tmp(iTS, iHr);
                     }
                 }

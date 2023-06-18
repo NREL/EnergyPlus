@@ -746,11 +746,11 @@ namespace Weather {
     };
 
     struct SPSiteSchedules {
-        Real64 OutDryBulbTemp = -999.0;
-        Real64 OutRelHum = -999.0;
-        Real64 BeamSolarRad = -999.0;
-        Real64 DifSolarRad = -999.0;
-        Real64 SkyTemp = -999.0;
+        Real64 OutDryBulbTemp = 0.0;
+        Real64 OutRelHum = 0.0;
+        Real64 BeamSolarRad = 0.0;
+        Real64 DifSolarRad = 0.0;
+        Real64 SkyTemp = 0.0;
     };
         
     // Here's a fun little function
