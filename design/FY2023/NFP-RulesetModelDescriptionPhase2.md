@@ -61,11 +61,11 @@ Feedback received is shown below:
 
 ----
 
-Concern about reporting equipment performance metric values that don't match manufacturers reported values
+Concern about reporting equipment performance metric values that don't match manufacturers' reported values
 
 ----
 
-From Standard 229 and RCT development perspective, I think the highest priority is to implement RMD generation for components 
+From Standard 229 and RCT development perspectives, I think the highest priority is to implement RMD generation for components 
 planned for inclusion in the 229 RMD tests. As you know, these tests are based on the modified medium office prototype model. 
 Examples of modifications include the following:
 - support for all (or most) of Appendix G baseline HVAC system types 
@@ -76,7 +76,7 @@ space conditioning system + HW baseboard).
 
 -----
 
-I would suggest adding Output data, or at least portion of the Output since some HVAC rules checking the peak cooling load and unmet hours.
+I would suggest adding Output data, or at least a portion of the Output since some HVAC rules checking the peak cooling load and unmet hours.
 
 -----
 
@@ -193,7 +193,7 @@ cooling_source*, cooling_from_loop, fan, fan_configuration*, is_supply_ducted*
 
 The key below is shown for indicators:
 - '*' indicates data elements that are not connective
-- '^' indicates data elements already complete
+- '^' indicates data elements are already complete
 - '~' indicates a new data element that can be implemented without EnergyPlus enhancement
 
 --------
@@ -450,7 +450,7 @@ Additionally, the BND file may also be reviewed for what can easily be added to 
 
 #### Coil Sizing Details - Coil Connections ####
 
-This is an addition to an exisiting report using predefined tables.
+This is an addition to an existing report using predefined tables.
 
 A new table under the current Coil Sizing Details report called "Coil Connections". Each row would be a coil:
 
@@ -496,7 +496,7 @@ available within the data structure that would be useful to report. Include spec
 
 #### Equipment Summary - Chiller ####
 
-This is an addition to an exisiting report using predefined tables.
+This is an addition to an existing report using predefined tables.
 
 A new report for Chillers.
  - Type
@@ -524,7 +524,7 @@ A new report for Chillers.
 
 #### Equipment Summary - Boiler ####
 
-This is an addition to an exisiting report using predefined tables.
+This is an addition to an existing report using predefined tables.
 
 A new report for Boilers.
  - Type
@@ -541,7 +541,7 @@ A new report for Boilers.
 
 #### Equipment Summary - cooling towers and fluid coolers ####
 
-This is an addition to an exisiting report using predefined tables.
+This is an addition to an existing report using predefined tables.
 
 A new report for cooling towers and fluid coolers.
  - Type
@@ -558,7 +558,7 @@ A new report for cooling towers and fluid coolers.
 
 #### Equipment Summary - PlantLoop or CondenserLoop ####
 
-This is an addition to an exisiting report using predefined tables.
+This is an addition to an existing report using predefined tables.
 
 A new report for PlantLoop objects. One row for each Plant or CondenserLoop
 - name
@@ -572,7 +572,7 @@ A new report for PlantLoop objects. One row for each Plant or CondenserLoop
 
 #### Equipment Summary - AirTerminals ####
 
-This is an addition to an exisiting report using predefined tables.
+This is an addition to an existing report using predefined tables.
 
 A new report for AirTerminals.
 - name
@@ -601,7 +601,7 @@ A new report for AirTerminals.
 
 #### Equipment Summary - Air Heat Recovery ####
 
-This is an addition to an exisiting report using predefined tables.
+This is an addition to an existing report using predefined tables.
 
 A new report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:AirToAir:FlatPlate:
 - name
@@ -644,7 +644,7 @@ None required.
 
 ## Design Document ##
 
-In general to try to maximize the number of new data elements implemented during this phase, items should be added based
+In general, to try to maximize the number of new data elements implemented during this phase, items should be added based
 on complexity. 
 
 For EnergyPlus changes, add new columns in the following order based on difficulty:
@@ -654,7 +654,7 @@ For EnergyPlus changes, add new columns in the following order based on difficul
 4. Adding columns to existing not-predefined tables
 5. More complicated outputs
 
-In general, the order recommended in the Prioritization section above will be followed.
+The order recommended in the Prioritization section above will be followed.
 
 All brand new tables can be added as predefined. For changes to existing tables shown earlier an indication was added indicating 
 if it was predefined. Echos of input are indicated in the eptags schema file.
@@ -664,7 +664,7 @@ Provide draft updated output from EnergyPlus for OpenStudio team to test prior t
 For the createRulesetModelDecription Python script, will continue being developed using the same approach 
 as the 2022 work and will continue to include unit tests. This includes:
 
- - The Python utility is separate from EnergyPlus and will  eventually be packaged with the EnergyPlus installer. It will 
+ - The Python utility is separate from EnergyPlus and will eventually be packaged with the EnergyPlus installer. It will 
  continue to be developed in its own repository but eventually this may be merged or linked from the  EnergyPlus repository.
 
  - The Python utility reads the JSON files that EnergyPlus produces when  the output:JSON input object is used as the primary
