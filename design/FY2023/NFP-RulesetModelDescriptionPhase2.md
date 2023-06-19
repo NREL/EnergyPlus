@@ -311,8 +311,6 @@ new output tables.
 
 #### Equipment Summary - Heating Coils ####
 
-This is a predefined table.
-
 The current columns are:
 - Type
 - Design Coil Load [W]
@@ -329,8 +327,6 @@ The new columns would be:
 
 #### Equipment Summary - DX Heating Coils ####
 
-This is a predefined table.
-
 The current columns are:
 - DX Heating Coil Type
 - High Temperature Heating (net) Rating Capacity [W]
@@ -344,8 +340,6 @@ The new columns would be:
 - Airloop branch name
 
 #### Equipment Summary - Fans ####
-
-This is a predefined table.
 
 The current columns are:
 - Type
@@ -374,8 +368,6 @@ The new columns would be:
 
 #### Equipment Summary - Pumps ####
 
-This is a predefined table.
-
 The current columns are:
 - Type
 - Control
@@ -392,8 +384,6 @@ The new columns would be:
 - Plantloop branch name
 
 #### System Summary - Demand Controlled Ventilation using Controller:MechanicalVentilation ####
-
-This is a predefined table.
 
 The current columns are:
 - Controller:MechanicalVentilation Name 
@@ -420,6 +410,8 @@ The new columns would be:
 - Design supply temperature
 - Design return temperature
 - Sizing option (Coincident/NonCoincident)
+
+Note: the component sizing summary uses a slightly different approach to defining the table entries.
 
 ### Add New EnergyPlus Tabular Reports and Tables ###
 
@@ -449,8 +441,6 @@ The table would list where controllers, setpoint managers, and other items that 
 Additionally, the BND file may also be reviewed for what can easily be added to the topology report with minimal effort.
 
 #### Coil Sizing Details - Coil Connections ####
-
-This is an addition to an existing report using predefined tables.
 
 A new table under the current Coil Sizing Details report called "Coil Connections". Each row would be a coil:
 
@@ -496,8 +486,6 @@ available within the data structure that would be useful to report. Include spec
 
 #### Equipment Summary - Chiller ####
 
-This is an addition to an existing report using predefined tables.
-
 A new report for Chillers.
  - Type
  - Reference Capacity [W]
@@ -524,8 +512,6 @@ A new report for Chillers.
 
 #### Equipment Summary - Boiler ####
 
-This is an addition to an existing report using predefined tables.
-
 A new report for Boilers.
  - Type
  - Reference Capacity [W]
@@ -540,8 +526,6 @@ A new report for Boilers.
 
 
 #### Equipment Summary - cooling towers and fluid coolers ####
-
-This is an addition to an existing report using predefined tables.
 
 A new report for cooling towers and fluid coolers.
  - Type
@@ -558,8 +542,6 @@ A new report for cooling towers and fluid coolers.
 
 #### Equipment Summary - PlantLoop or CondenserLoop ####
 
-This is an addition to an existing report using predefined tables.
-
 A new report for PlantLoop objects. One row for each Plant or CondenserLoop
 - name
 - type (PlantLoop or CondenserLoop)
@@ -571,8 +553,6 @@ A new report for PlantLoop objects. One row for each Plant or CondenserLoop
 - Branch name
 
 #### Equipment Summary - AirTerminals ####
-
-This is an addition to an existing report using predefined tables.
 
 A new report for AirTerminals.
 - name
@@ -600,8 +580,6 @@ A new report for AirTerminals.
 - Cooling capacity
 
 #### Equipment Summary - Air Heat Recovery ####
-
-This is an addition to an existing report using predefined tables.
 
 A new report for each HeatExchanger:AirToAir:SensibleAndLatent and HeatExchanger:AirToAir:FlatPlate:
 - name
@@ -648,16 +626,14 @@ In general, to try to maximize the number of new data elements implemented durin
 on complexity. 
 
 For EnergyPlus changes, add new columns in the following order based on difficulty:
-1. Existing predefined tables where new output is simple echo of input or already computed and in data structure
-2. New predefined tables where new output is simple echo of input or already computed and in data structure
-3. New or existing predefined tables where new output is easy to determine
-4. Adding columns to existing not-predefined tables
-5. More complicated outputs
+1. Existing tables where new output is simple echo of input or already computed and in data structure
+2. New tables where new output is simple echo of input or already computed and in data structure
+3. New or existing tables where new output is easy to determine
+4. More complicated outputs
 
 The order recommended in the Prioritization section above will be followed.
 
-All brand new tables can be added as predefined. For changes to existing tables shown earlier an indication was added indicating 
-if it was predefined. Echos of input are indicated in the eptags schema file.
+Echos of input are indicated in the eptags schema file.
 
 Provide draft updated output from EnergyPlus for OpenStudio team to test prior to release.
 
