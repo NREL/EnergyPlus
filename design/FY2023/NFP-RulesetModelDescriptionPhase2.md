@@ -4,7 +4,7 @@ Ruleset Model Description Phase 2
 **Jason Glazer, GARD Analytics**
 
  - May 31, 2023
- - June 16, 2023 updates based on feedback
+ - June 19, 2023 updates based on feedback and added design document
 
 ## Justification for New Feature ##
 
@@ -69,7 +69,8 @@ From Standard 229 and RCT development perspective, I think the highest priority 
 planned for inclusion in the 229 RMD tests. As you know, these tests are based on the modified medium office prototype model. 
 Examples of modifications include the following:
 - support for all (or most) of Appendix G baseline HVAC system types 
-- support several commonly used system types (such as WSHP) and designs (such as DOAS + space conditioning system; space conditioning system + HW baseboard). 
+- support several commonly used system types (such as WSHP) and designs (such as DOAS + space conditioning system; 
+space conditioning system + HW baseboard). 
 - detailed window specification 
 - handling of plenums (schema WG deemed that they should be aggregated with the parent space in the RMD file).
 
@@ -171,6 +172,33 @@ Add chillers, boilers and cooling towers to equipment summary report as separate
 
 -------
 
+Selecting the baseline system in 90.1 Appendix G is a high priority. The following data elements are needed for that: 
+
+- ASHRAE229: id^, ruleset_model_instances^  
+- RulesetModelInstance: id^, buildings^, fluid_loops~, pumps~, boilers~, chillers~  
+- Building: id^, building_segments^, building_open_schedule*  
+- BuildingSegment: id^, zones^, heating_ventilating_air_conditioning_systems~  
+- Zone: id^, thermostat_cooling_setpoint_schedule*^, thermostat_heating_setpoint_schedule*^, terminals  
+- HeatingVentilatingAirConditioningSystem: id~, fan_system~, heating_system~, cooling_system~, preheat_system  
+- HeatingSystem: id~, energy_source_type*, hot_water_loop  
+- CoolingSystem: id~, chilled_water_loop  
+- FanSystem: id~, supply_fans, return_fans, fan_control*  
+- Fan: id
+- Terminal: id, type*, served_by_heating_ventilating_air_conditioning_system, heating_source*, heating_from_loop, 
+cooling_source*, cooling_from_loop, fan, fan_configuration*, is_supply_ducted*  
+- FluidLoop: id~, type*, child_loops  
+- Pump: id~, loop_or_piping, speed_control*~  
+- Boiler: id~, loop, energy_source_type*  
+- Chiller: id~, cooling_loop  
+
+The key below is shown for indicators:
+- '*' indicates data elements that are not connective
+- '^' indicates data elements already complete
+- '~' indicates a new data element that can be implemented without EnergyPlus enhancement
+
+--------
+
+
 Based on this feedback, the NFP was updated. 
 
 
@@ -255,6 +283,29 @@ with the budget for this task, so some prioritization of what should be in this 
 will be needed. The prioritization will link the support of the enhanced tables to the support of data elements in 
 the RMD data elements. Feedback on the priorities is welcome, either overall (air side vs. water side) or detailed, 
 such as specific new columns and data elements that are most important.
+
+The feedback on prioritization was to first support the selection of baseline HVAC system in Appendix G which includes
+changes to or new EnergyPlus reports:
+
+- Equipment Summary – Fans
+- HVAC Topology
+- Equipment Summary - PlantLoop or CondenserLoop
+- Equipment Summary – AirTerminals
+
+After that supporting additional central plant reports in EnergyPlus enhancements:
+
+- Equipment Summary – Pumps
+- Component Sizing Summary – PlantLoop
+- Equipment Summary – Chiller
+- Equipment Summary – Boiler
+- Equipment Summary - cooling towers and fluid coolers
+
+While the EnergyPlus enhancements are underway, data elements that can be supported by current outputs should be 
+implemented.
+
+Based on shorter deadline for the IO freeze of EnergyPlus, changes to existing reports will be implemented sooner than brand
+new output tables.
+
 
 ### Enhance Existing EnergyPlus Tabular Output Reports ###
 
@@ -443,10 +494,6 @@ available within the data structure that would be useful to report. Include spec
 - Heat Recovery - Operation With Economizer
 - Heat Recovery - Supply Air Temperature Control
 
-
-
-
-
 #### Equipment Summary - Chiller ####
 
 This is an addition to an exisiting report using predefined tables.
@@ -474,10 +521,6 @@ A new report for Chillers.
  - Heat recovery Plantloop name
  - Heat recovery Plantloop branch name
  - Recovery Relative Capacity Fraction
-
-
-We may also want to consider breaking up the "Central Plant" table into separate tables for chillers, boilers, and heat 
-rejection since more columns are unique to just one of those.
 
 #### Equipment Summary - Boiler ####
 
@@ -611,14 +654,33 @@ For EnergyPlus changes, add new columns in the following order based on difficul
 4. Adding columns to existing not-predefined tables
 5. More complicated outputs
 
+In general, the order recommended in the Prioritization section above will be followed.
+
 All brand new tables can be added as predefined. For changes to existing tables shown earlier an indication was added indicating 
 if it was predefined. Echos of input are indicated in the eptags schema file.
 
 Provide draft updated output from EnergyPlus for OpenStudio team to test prior to release.
 
 For the createRulesetModelDecription Python script, will continue being developed using the same approach 
-as the 2022 work and will continue to include unit tests.
+as the 2022 work and will continue to include unit tests. This includes:
 
+ - The Python utility is separate from EnergyPlus and will  eventually be packaged with the EnergyPlus installer. It will 
+ continue to be developed in its own repository but eventually this may be merged or linked from the  EnergyPlus repository.
+
+ - The Python utility reads the JSON files that EnergyPlus produces when  the output:JSON input object is used as the primary
+ source of information. As a secondary source of information, the epJSON input is read.
+
+ - The Ruleset Model Description (RMD) format will be produced by the utility and is also a JSON format.
+
+ - Verification that the RMD output produced by the new utility is consistent with the RMD schema is performed by using 
+ the jsonschema Python library "validate" method.
+
+ - The PathLib library is used for accessing files.
+
+ - The unittest library is used for providing unit testing. The goal is to have tests for almost all of the methods.
+
+ - Only a subset of data groups from the RMD schema will be generated and only data elements that are most direct will be 
+ implemented. This is expected to be the first step in an ongoing effort to fully implement the RMD schema as an output format.
 
 ## References ##
 
