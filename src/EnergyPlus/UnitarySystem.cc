@@ -18132,7 +18132,7 @@ namespace UnitarySystems {
         Real64 cpAir = PsyCpAirFnW(state.dataLoopNodes->Node(outdoorAirController.InletNode).HumRat);
         Real64 outdoorAirTemp = state.dataLoopNodes->Node(outdoorAirController.InletNode).Temp;
         Real64 zoneTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode).Temp;
-        // iterate through the unitarys system's cooling speed to see at which
+        // iterate through the unitary system's cooling speed to see at which
         // air flow rate the load can be met at 100% outdoor air fraction
         for (int clgSpd = 1; clgSpd <= this->m_NumOfSpeedCooling; ++clgSpd) {
             // calculations for "high speed" refer to operation at the current
