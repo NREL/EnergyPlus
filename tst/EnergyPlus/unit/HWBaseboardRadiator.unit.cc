@@ -199,7 +199,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterInputTest)
 {
 
     bool errorFound = false;
-    const Real64 absTol = 0.00001;
+    Real64 absTol = 0.00001;
     std::string const idf_objects = delimited_string({
 
         "  ZoneHVAC:Baseboard:RadiantConvective:Water,",
