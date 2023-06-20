@@ -92,7 +92,7 @@ namespace CoolingPanelSimple {
     struct CoolingPanelParams
     {
         // Members
-        std::string EquipID;
+        std::string Name;
         DataPlant::PlantEquipmentType EquipType = DataPlant::PlantEquipmentType::Invalid;
         std::string Schedule;
         Array1D_string SurfaceName;
