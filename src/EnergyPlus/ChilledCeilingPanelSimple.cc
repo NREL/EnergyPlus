@@ -889,7 +889,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
-        int ZoneNum = ThisCP.ZonePtr;
+        int ZoneNum = thisCP.ZonePtr;
         thisCP.ZeroCPSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
         thisCP.CoolingPanelSrcAvg = 0.0;
         thisCP.LastCoolingPanelSrc = 0.0;

@@ -1098,7 +1098,7 @@ namespace HighTempRadiantSystem {
         if (state.dataHighTempRadSys->NumOfHighTempRadSys == 0) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
-        for (RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
+        for (int RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
             auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
             thisHTR.QHTRRadSource = thisHTR.QHTRRadSrcAvg;
             if (thisHTR.QHTRRadSrcAvg != 0.0) HighTempRadSysOn = true;
