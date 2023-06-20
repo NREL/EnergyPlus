@@ -68,14 +68,6 @@ namespace HWBaseboardRadiator {
 
     extern std::string const cCMO_BBRadiator_Water;
 
-    struct AccountingData
-    {
-        // Record keeping variables used to calculate QBBRadSrcAvg locally
-        Real64 LastQBBRadSrc = 0.0;      // Need to keep the last value in case we are still iterating
-        Real64 LastSysTimeElapsed = 0.0; // Need to keep the last value in case we are still iterating
-        Real64 LastTimeStepSys = 0.0;    // Need to keep the last value in case we are still iterating
-    };
-
     struct HWBaseboardParams
     {
         // Members
@@ -113,42 +105,28 @@ namespace HWBaseboardRadiator {
         Real64 AirOutletTempStd = 0.0;
         Real64 FracConvect = 0.0;
         Array1D<Real64> FracDistribToSurf;
-        Real64 TotPower;
-        Real64 Power;
-        Real64 ConvPower;
-        Real64 RadPower;
-        Real64 TotEnergy;
-        Real64 Energy;
-        Real64 ConvEnergy;
-        Real64 RadEnergy;
-        PlantLocation plantLoc;
-        int BBLoadReSimIndex;
-        int BBMassFlowReSimIndex;
-        int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod;          // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
-                                       // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity;  // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        Real64 ZeroBBSourceSumHATsurf; // used in baseboard energy balance
+        Real64 TotPower = 0.0;
+        Real64 Power = 0.0;
+        Real64 ConvPower = 0.0;
+        Real64 RadPower = 0.0;
+        Real64 TotEnergy = 0.0;
+        Real64 Energy = 0.0;
+        Real64 ConvEnergy = 0.0;
+        Real64 RadEnergy = 0.0;
+        PlantLocation plantLoc = {};
+        int BBLoadReSimIndex = 0;
+        int BBMassFlowReSimIndex = 0;
+        int BBInletTempFlowReSimIndex = 0;
+        int HeatingCapMethod = 0;            // - Method for heating capacity scaled sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+                                             // FracOfAutosizedHeatingCapacity)
+        Real64 ScaledHeatingCapacity = 0.0;  // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 ZeroBBSourceSumHATsurf = 0.0; // used in baseboard energy balance
         // Record keeping variables used to calculate QBBRadSrcAvg locally
-        Real64 QBBRadSource;       // Need to keep the last value in case we are still iterating
-        Real64 QBBRadSrcAvg;       // Need to keep the last value in case we are still iterating
-        Real64 LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-        Real64 LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-        Real64 LastQBBRadSrc;      // Need to keep the last value in case we are still iterating
-
-        // Default Constructor
-        HWBaseboardParams()
-            : EquipType(DataPlant::PlantEquipmentType::Invalid), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), WaterInletNode(0), WaterOutletNode(0),
-              TotSurfToDistrib(0), ControlCompTypeNum(0), CompErrIndex(0), AirMassFlowRate(0.0), AirMassFlowRateStd(0.0), WaterTempAvg(0.0),
-              RatedCapacity(0.0), UA(0.0), WaterMassFlowRate(0.0), WaterMassFlowRateMax(0.0), WaterMassFlowRateStd(0.0), WaterVolFlowRateMax(0.0),
-              WaterInletTempStd(0.0), WaterInletTemp(0.0), WaterInletEnthalpy(0.0), WaterOutletTempStd(0.0), WaterOutletTemp(0.0),
-              WaterOutletEnthalpy(0.0), AirInletTempStd(0.0), AirInletTemp(0.0), AirOutletTemp(0.0), AirInletHumRat(0.0), AirOutletTempStd(0.0),
-              FracConvect(0.0), TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0),
-              RadEnergy(0.0), plantLoc{}, BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0), HeatingCapMethod(0),
-              ScaledHeatingCapacity(0.0), ZeroBBSourceSumHATsurf(0.0), QBBRadSource(0.0), QBBRadSrcAvg(0.0), LastSysTimeElapsed(0.0),
-              LastTimeStepSys(0.0), LastQBBRadSrc(0.0)
-        {
-        }
+        Real64 QBBRadSource = 0.0;       // Need to keep the last value in case we are still iterating
+        Real64 QBBRadSrcAvg = 0.0;       // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed = 0.0; // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys = 0.0;    // Need to keep the last value in case we are still iterating
+        Real64 LastQBBRadSrc = 0.0;      // Need to keep the last value in case we are still iterating
     };
 
     struct HWBaseboardDesignData : HWBaseboardParams

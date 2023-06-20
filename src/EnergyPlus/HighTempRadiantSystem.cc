@@ -1139,7 +1139,6 @@ namespace HighTempRadiantSystem {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Using/Aliasing
-        auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
         auto &dataHBFS = state.dataHeatBalFanSys;
 
         // Initialize arrays
@@ -1150,6 +1149,7 @@ namespace HighTempRadiantSystem {
 
         for (int RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
 
+            auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
             int ZoneNum = thisHTR.ZonePtr;
 
             dataHBFS->ZoneQHTRadSysToPerson(ZoneNum) = thisHTR.QHTRRadSource * thisHTR.FracRadiant * thisHTR.FracDistribPerson;
