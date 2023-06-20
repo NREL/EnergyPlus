@@ -154,8 +154,8 @@ namespace LowTempRadiantSystem {
         Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
         // Record keeping variables used to calculate QRadSysSrcAvg locally
         Array1D<Real64> LastQRadSysSrc;                                                  // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastSysTimeElapsed;                                              // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastTimeStepSys;                                                 // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed;                                                       // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys;                                                          // Need to keep the last value in case we are still iterating
         LowTempRadiantControlTypes controlType = LowTempRadiantControlTypes::MATControl; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
                                                                                          // Surface Face Temp, Surface Interior Temp, Running Mean
                                                                                          // Temp for Constant Flow systems only)

@@ -278,9 +278,9 @@ namespace VentilatedSlab {
         Real64 ZeroVentSlabSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
         Array1D<Real64> QRadSysSrcAvg;       // Average source over the time step for a particular radiant surfaceD
         // Record keeping variables used to calculate QRadSysSrcAvg locally
-        Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-        Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
+        Array1D<Real64> LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+        Real64 LastSysTimeElapsed;      // Need to keep the last value in case we are still iterating
+        Real64 LastTimeStepSys;         // Need to keep the last value in case we are still iterating
 
         // Default Constructor
         VentilatedSlabData()

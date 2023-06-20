@@ -1975,22 +1975,22 @@ namespace LowTempRadiantSystem {
                 auto &thisLTR = state.dataLowTempRadSys->HydrRadSys(RadNum);
                 thisLTR.QRadSysSrcAvg.dimension(thisLTR.NumOfSurfaces, 0.0);
                 thisLTR.LastQRadSysSrc.dimension(thisLTR.NumOfSurfaces, 0.0);
-                thisLTR.LastSysTimeElapsed.dimension(thisLTR.NumOfSurfaces, 0.0);
-                thisLTR.LastTimeStepSys.dimension(thisLTR.NumOfSurfaces, 0.0);
+                thisLTR.LastSysTimeElapsed = 0.0;
+                thisLTR.LastTimeStepSys = 0.0;
             }
             for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++RadNum) {
                 auto &thisLTR = state.dataLowTempRadSys->CFloRadSys(RadNum);
                 thisLTR.QRadSysSrcAvg.dimension(thisLTR.NumOfSurfaces, 0.0);
                 thisLTR.LastQRadSysSrc.dimension(thisLTR.NumOfSurfaces, 0.0);
-                thisLTR.LastSysTimeElapsed.dimension(thisLTR.NumOfSurfaces, 0.0);
-                thisLTR.LastTimeStepSys.dimension(thisLTR.NumOfSurfaces, 0.0);
+                thisLTR.LastSysTimeElapsed = 0.0;
+                thisLTR.LastTimeStepSys = 0.0;
             }
             for (RadNum = 1; RadNum <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++RadNum) {
                 auto &thisLTR = state.dataLowTempRadSys->ElecRadSys(RadNum);
                 thisLTR.QRadSysSrcAvg.dimension(thisLTR.NumOfSurfaces, 0.0);
                 thisLTR.LastQRadSysSrc.dimension(thisLTR.NumOfSurfaces, 0.0);
-                thisLTR.LastSysTimeElapsed.dimension(thisLTR.NumOfSurfaces, 0.0);
-                thisLTR.LastTimeStepSys.dimension(thisLTR.NumOfSurfaces, 0.0);
+                thisLTR.LastSysTimeElapsed = 0.0;
+                thisLTR.LastTimeStepSys = 0.0;
             }
             state.dataLowTempRadSys->MySizeFlagHydr.allocate(state.dataLowTempRadSys->NumOfHydrLowTempRadSys);
             state.dataLowTempRadSys->MySizeFlagCFlo.allocate(state.dataLowTempRadSys->NumOfCFloLowTempRadSys);
@@ -5373,19 +5373,18 @@ namespace LowTempRadiantSystem {
 
             int surfNum = this->SurfacePtr(radSurfNum);
 
-            if (this->LastSysTimeElapsed(radSurfNum) == SysTimeElapsed) {
+            if (this->LastSysTimeElapsed == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
-                this->QRadSysSrcAvg(radSurfNum) -= this->LastQRadSysSrc(radSurfNum) * this->LastTimeStepSys(radSurfNum) / TimeStepZone;
+                this->QRadSysSrcAvg(radSurfNum) -= this->LastQRadSysSrc(radSurfNum) * this->LastTimeStepSys / TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
             this->QRadSysSrcAvg(radSurfNum) += state.dataHeatBalFanSys->QRadSysSource(surfNum) * TimeStepSys / TimeStepZone;
-
             this->LastQRadSysSrc(radSurfNum) = state.dataHeatBalFanSys->QRadSysSource(surfNum);
-            this->LastSysTimeElapsed(radSurfNum) = SysTimeElapsed;
-            this->LastTimeStepSys(radSurfNum) = TimeStepSys;
         }
+        this->LastSysTimeElapsed = SysTimeElapsed;
+        this->LastTimeStepSys = TimeStepSys;
     }
 
     void VariableFlowRadiantSystemData::updateLowTemperatureRadiantSystem(EnergyPlusData &state)

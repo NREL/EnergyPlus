@@ -1549,8 +1549,8 @@ namespace VentilatedSlab {
                 }
                 thisVentSlab.QRadSysSrcAvg.dimension(numRadSurfs, 0.0);
                 thisVentSlab.LastQRadSysSrc.dimension(numRadSurfs, 0.0);
-                thisVentSlab.LastSysTimeElapsed.dimension(numRadSurfs, 0.0);
-                thisVentSlab.LastTimeStepSys.dimension(numRadSurfs, 0.0);
+                thisVentSlab.LastSysTimeElapsed = 0.0;
+                thisVentSlab.LastTimeStepSys = 0.0;
             }
             state.dataVentilatedSlab->MyEnvrnFlag = true;
             state.dataVentilatedSlab->MySizeFlag = true;
@@ -4473,20 +4473,17 @@ namespace VentilatedSlab {
 
             SurfNum = ventSlab.SurfacePtr(RadSurfNum);
 
-            if (ventSlab.LastSysTimeElapsed(RadSurfNum) == SysTimeElapsed) {
-                // Still iterating or reducing system time step, so subtract old values which were
-                // not valid
-                ventSlab.QRadSysSrcAvg(RadSurfNum) -=
-                    ventSlab.LastQRadSysSrc(RadSurfNum) * ventSlab.LastTimeStepSys(RadSurfNum) / state.dataGlobal->TimeStepZone;
+            if (ventSlab.LastSysTimeElapsed == SysTimeElapsed) {
+                // Still iterating or reducing system time step, so subtract old values which were not valid
+                ventSlab.QRadSysSrcAvg(RadSurfNum) -= ventSlab.LastQRadSysSrc(RadSurfNum) * ventSlab.LastTimeStepSys / state.dataGlobal->TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
             ventSlab.QRadSysSrcAvg(RadSurfNum) += state.dataHeatBalFanSys->QRadSysSource(SurfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
-
             ventSlab.LastQRadSysSrc(RadSurfNum) = state.dataHeatBalFanSys->QRadSysSource(SurfNum);
-            ventSlab.LastSysTimeElapsed(RadSurfNum) = SysTimeElapsed;
-            ventSlab.LastTimeStepSys(RadSurfNum) = TimeStepSys;
         }
+        ventSlab.LastSysTimeElapsed = SysTimeElapsed;
+        ventSlab.LastTimeStepSys = TimeStepSys;
 
         // First sum up all of the heat sources/sinks associated with this system
         TotalHeatSource = 0.0;
