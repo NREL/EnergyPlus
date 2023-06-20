@@ -253,8 +253,7 @@ namespace HWBaseboardRadiator {
             2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AllFracsSummed; // Sum of the fractions radiant
-        int BaseboardNum;      // Baseboard number
+        int BaseboardNum; // Baseboard number
         int BaseboardDesignNum;
         int NumAlphas;  // Number of Alphas for each GetobjectItem call
         int NumNumbers; // Number of Numbers for each GetobjectItem call
@@ -595,7 +594,6 @@ namespace HWBaseboardRadiator {
             }
 
             // Remaining fraction is added to the zone as convective heat transfer
-            AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             if (HWBaseboardDesignDataObject.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", Fraction Radiant was higher than the allowable maximum.",
@@ -633,7 +631,7 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.ZonePtr =
                 DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWater, thisHWBaseboard.Name);
 
-            AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
+            Real64 AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= thisHWBaseboard.TotSurfToDistrib; ++SurfNum) {
                 thisHWBaseboard.SurfacePtr(SurfNum) =
                     HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
