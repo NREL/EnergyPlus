@@ -873,7 +873,6 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
         ThisInNode.Press = 0.0;
         ThisInNode.HumRat = 0.0;
 
-
         thisCP.ZeroCPSourceSumHATsurf = 0.0;
         thisCP.CoolingPanelSource = 0.0;
         thisCP.CoolingPanelSrcAvg = 0.0;
