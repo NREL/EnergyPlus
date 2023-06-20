@@ -1921,10 +1921,6 @@ void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
                         scheme.DedicatedHR_HWRetControl_Name = UtilityRoutines::MakeUPPERCase(dedicatedHWHPName.value().get<std::string>());
                         scheme.PlantOps.DedicatedHR_HWRetControl_Input = true;
                     }
-                    auto const dedicatedCapacityFactor = fields.find("dedicated_recovery_heat_pump_control_load_capacity_factor");
-                    if (dedicatedCapacityFactor != fields.end()) {
-                        scheme.PlantOps.DedicatedHR_CapacityControlFactor = dedicatedCapacityFactor.value().get<Real64>();
-                    }
                 }
             }
 

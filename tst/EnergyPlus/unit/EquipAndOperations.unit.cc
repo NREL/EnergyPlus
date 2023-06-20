@@ -363,8 +363,8 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     EXPECT_EQ(1, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // heating
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.BuildingPolledCoolingLoad);
     EXPECT_EQ(1000.0, chillerHeaterSupervisor.Report.BuildingPolledHeatingLoad);
-    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.AirSourcePlantCoolingLoad, 0.001);
-    EXPECT_NEAR(158.559, chillerHeaterSupervisor.Report.AirSourcePlantHeatingLoad, 0.001);
+    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.PrimaryPlantCoolingLoad, 0.001);
+    EXPECT_NEAR(158.559, chillerHeaterSupervisor.Report.PrimaryPlantHeatingLoad, 0.001);
 
     // check to see if correct plant equipment are active
     auto &eqcool = chillerHeaterSupervisor.CoolingOnlyEquipList(1).Comp(1);
@@ -378,8 +378,8 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     EXPECT_TRUE(thisHeatEq1);  // heating equipment active
     EXPECT_EQ(state->dataPlnt->PlantLoop(1).Name, "Cooling Plant");
     EXPECT_EQ(state->dataPlnt->PlantLoop(2).Name, "Heating Plant");
-    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.AirSourcePlantCoolingLoad, 0.001);
-    EXPECT_NEAR(158.559, chillerHeaterSupervisor.Report.AirSourcePlantHeatingLoad, 0.001);
+    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.PrimaryPlantCoolingLoad, 0.001);
+    EXPECT_NEAR(158.559, chillerHeaterSupervisor.Report.PrimaryPlantHeatingLoad, 0.001);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToHeatingSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 0.0;
@@ -398,8 +398,8 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     EXPECT_EQ(0, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // off
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.BuildingPolledCoolingLoad);
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.BuildingPolledHeatingLoad);
-    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.AirSourcePlantCoolingLoad, 0.001);
-    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.AirSourcePlantHeatingLoad, 0.001);
+    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.PrimaryPlantCoolingLoad, 0.001);
+    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.PrimaryPlantHeatingLoad, 0.001);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToCoolingSP = -100.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToCoolingSP = -200.0;
@@ -416,8 +416,8 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     bool thisHeatEq2 = state->dataPlnt->PlantLoop(2).LoopSide(eqheat.LoopSideNumPtr).Branch(eqheat.BranchNumPtr).Comp(eqheat.CompNumPtr).ON;
     EXPECT_FALSE(thisHeatEq2); // heating equipment is not active
     EXPECT_TRUE(thisCoolEq2);  // cooling equipment active
-    EXPECT_NEAR(-14.249, chillerHeaterSupervisor.Report.AirSourcePlantCoolingLoad, 0.001);
-    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.AirSourcePlantHeatingLoad, 0.001);
+    EXPECT_NEAR(-14.249, chillerHeaterSupervisor.Report.PrimaryPlantCoolingLoad, 0.001);
+    EXPECT_NEAR(0.0, chillerHeaterSupervisor.Report.PrimaryPlantHeatingLoad, 0.001);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(1)).OutputRequiredToHeatingSP = 100.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(chillerHeaterSupervisor.ZonePtrs(2)).OutputRequiredToHeatingSP = 200.0;
@@ -430,6 +430,6 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     EXPECT_EQ(3, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // simultaneous cooling and heating
     EXPECT_EQ(-1000.0, chillerHeaterSupervisor.Report.BuildingPolledCoolingLoad);
     EXPECT_EQ(1000.0, chillerHeaterSupervisor.Report.BuildingPolledHeatingLoad);
-    EXPECT_NEAR(-14.249, chillerHeaterSupervisor.Report.AirSourcePlantCoolingLoad, 0.001);
-    EXPECT_NEAR(158.559, chillerHeaterSupervisor.Report.AirSourcePlantHeatingLoad, 0.001);
+    EXPECT_NEAR(-14.249, chillerHeaterSupervisor.Report.PrimaryPlantCoolingLoad, 0.001);
+    EXPECT_NEAR(158.559, chillerHeaterSupervisor.Report.PrimaryPlantHeatingLoad, 0.001);
 }

@@ -51,6 +51,7 @@
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus::DataPlant {
@@ -91,6 +92,7 @@ struct EquipListCompData
     int BranchNumPtr;                           // pointer to the comp location in the data structure
     int CompNumPtr;                             // pointer to the comp location in the data structure
     Real64 SetPointFlowRate;                    // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
+    bool SetPointFlowRateWasAutosized;          // TRANE, true if comp setpoint control flow rate was autosize on input
     std::string DemandNodeName;                 // COMP SETPOINT CTRL ONLY--The name of each item in the list
     int DemandNodeNum;                          // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
     std::string SetPointNodeName;               // COMP SETPOINT CTRL ONLY--The name of each item in the list
@@ -101,7 +103,8 @@ struct EquipListCompData
     // Default Constructor
     EquipListCompData()
         : CtrlType(DataPlant::CtrlType::Invalid), LoopNumPtr(0), LoopSideNumPtr(DataPlant::LoopSideLocation::Invalid), BranchNumPtr(0), CompNumPtr(0),
-          SetPointFlowRate(0.0), DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0), EMSActuatorDispatchedLoadValue(0.0)
+          SetPointFlowRate(0.0), SetPointFlowRateWasAutosized(false), DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0),
+          EMSActuatorDispatchedLoadValue(0.0)
     {
     }
 };
@@ -156,12 +159,17 @@ struct PlantOpsData
     bool SimulHeatCoolCoolingOpInput = false;
     bool DedicatedHR_ChWRetControl_Input = false;
     bool DedicatedHR_HWRetControl_Input = false;
-    Real64 DedicatedHR_SecChW_DesignCapacity = 0.0;
-    Real64 DedicatedHR_SecHW_DesignCapacity = 0.0;
-    Real64 DedicatedHR_CapacityControlFactor = 0.0;
-    bool AirSourcePlantHeatingOnly = false;                   // operation mode, if true primary plant appears to only need heating
-    bool AirSourcePlantCoolingOnly = false;                   // operation mode, if true primary plant appears to only need cooling
-    bool AirSourcePlantSimultaneousHeatingAndCooling = false; // operation mode, if true primary plant appears to need both heating and cooling
+    bool DedicatedHR_Present = false;
+    Real64 DedicatedHR_SecChW_DesignCapacity = 0.0;             // design (sizing) capacity for cooling side of dedicated heat recovery WWHP, Watts
+    Real64 DedicatedHR_SecChW_CurrentCapacity = 0.0;            // current capacity for cooling side of dedicated heat recovery WWHP, Watts
+    Real64 DedicatedHR_SecHW_DesignCapacity = 0.0;              // design (sizing) capacity for heating side of dedicated heat recovery WWHP, Watts
+    Real64 DedicatedHR_SecHW_CurrentCapacity = 0.0;             // current capacity for heating side of dedicated heat recovery WWHP, Watts
+                                                                //   Real64 DedicatedHR_CapacityControlFactor = 0.0;
+    bool AirSourcePlantHeatingOnly = false;                     // operation mode, if true primary plant appears to only need heating
+    bool AirSourcePlantCoolingOnly = false;                     // operation mode, if true primary plant appears to only need cooling
+    bool AirSourcePlantSimultaneousHeatingAndCooling = false;   // operation mode, if true primary plant appears to need both heating and cooling
+    bool SimultaneousHeatingCoolingWithCoolingDominant = false; //
+    bool SimultaneousHeatingCoolingWithHeatingDominant = false;
     int PrimaryHWLoopIndex = 0;
     int PrimaryHWLoopSupInletNode = 0;
     int PrimaryChWLoopIndex = 0;
@@ -172,15 +180,17 @@ struct PlantOpsData
 
 struct ReportData
 {
-    int AirSourcePlant_OpMode = 0;          //  heating only = 1, cooling only = 2, simult heat cool = 3
+    int AirSourcePlant_OpMode = 0;          // heating only = 1, cooling only = 2, simult heat cool = 3
+    int DedicHR_OpMode = 0;                 // not dispatched = 0, heating led = 1, cooling led = 2
+    int BoilerAux_OpMode = 0;               // not Dispatched = 0, Boiler(s) On = 1
     Real64 BuildingPolledHeatingLoad = 0.0; // current  building heating loads from predicted sensible zone loads, air system ventilation loads, and
                                             // any plant load profile process laods
     Real64 BuildingPolledCoolingLoad = 0.0; //  current building Cooling loads from predicted sensible zone loads, air system ventilation loads, and
                                             //  any plant load profile process laods
-    Real64 AirSourcePlantHeatingLoad = 0.0; // current apparant plant load on hot water plant served by air source heatpumps
-    Real64 AirSourcePlantCoolingLoad = 0.0; // current apparant plant load on chilled water plant served by air source heatpumps
-    int DedicHR_OpMode = 0;                 //  heating led = 1, cooling led = 2, , not dispatched = 0
-    int BoilerAux_OpMode = 0; // Not Dispatched = 0, Secondary Boiler On = 1, Primary Boiler On = 3, Both Secondary and Primary Boiler On = 4
+    Real64 PrimaryPlantHeatingLoad = 0.0;   // current apparent plant load on primary hot water plant served by heatpumps
+    Real64 PrimaryPlantCoolingLoad = 0.0;   // current apparent plant load on primary chilled water plant served by heatpumps
+    Real64 SecondaryPlantHeatingLoad = 0.0; // current apparent plant load on secondary hot water plant served by heatpumps
+    Real64 SecondaryPlantCoolingLoad = 0.0; // current apparent plant load on secondary chilled water plant served by heatpumps
 };
 
 struct ChillerHeaterSupervisoryOperationData
@@ -208,10 +218,8 @@ struct ChillerHeaterSupervisoryOperationData
     Array1D<EquipOpList> CoolingOnlyEquipList;
     Array1D<EquipOpList> SimultHeatCoolHeatingEquipList;
     Array1D<EquipOpList> SimultHeatCoolCoolingEquipList;
-    EquipListCompData DedicatedHR_ChWRetControl_LoadSideComp;
-    EquipListCompData DedicatedHR_ChWRetControl_SourceSideComp;
-    EquipListCompData DedicatedHR_HWRetControl_LoadSideComp;
-    EquipListCompData DedicatedHR_HWRetControl_SourceSideComp;
+    EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump DedicatedHR_CoolingPLHP; // real pointer to the cooling side of dedicated heat recovery WWHP
+    EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump DedicatedHR_HeatingPLHP; // real pointer to the heating side of dedicated heat recory WWHP
     Array1D<int> PlantLoopIndicesBeingSupervised;          // if non zero then points to index of a plant loop that has this supervisory scheme as its
                                                            // operation scheme
     Array1D<int> SecondaryPlantLoopIndicesBeingSupervised; // if not zero then points to index of a plant loop that is treated as being a
@@ -229,6 +237,8 @@ struct ChillerHeaterSupervisoryOperationData
     void DetermineCurrentBuildingLoads(EnergyPlusData &state);
 
     void DetermineCurrentPlantLoads(EnergyPlusData &state);
+
+    void DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state);
 
     void ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state);
 
