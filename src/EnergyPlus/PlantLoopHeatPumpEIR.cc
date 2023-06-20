@@ -191,8 +191,8 @@ void EIRPlantLoopHeatPump::resetReportingVariables()
 void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool FirstHVACIteration)
 {
     if (!this->running) {
-        this->loadSideMassFlowRate = 0.0;
-        this->sourceSideMassFlowRate = 0.0;
+        this->loadSideMassFlowRate = (this->loadSideIsPlantInlet) ? state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate : 0.0;
+        this->sourceSideMassFlowRate = (this->sourceSideIsPlantOutlet) ? state.dataLoopNodes->Node(this->sourceSideNodes.inlet).MassFlowRate : 0.0;
         PlantUtilities::SetComponentFlowRate(
             state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
         PlantUtilities::SetComponentFlowRate(
@@ -207,21 +207,24 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool
     } else { // the heat pump must run
         // apply min/max operating limits based on source side entering fluid temperature
         if (this->minSourceTempLimit > this->sourceSideInletTemp || this->maxSourceTempLimit < this->sourceSideInletTemp) {
-            this->loadSideMassFlowRate = 0.0;
-            this->sourceSideMassFlowRate = 0.0;
+            this->loadSideMassFlowRate = (this->loadSideIsPlantInlet) ? state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate : 0.0;
+            this->sourceSideMassFlowRate =
+                (this->sourceSideIsPlantOutlet) ? state.dataLoopNodes->Node(this->sourceSideNodes.inlet).MassFlowRate : 0.0;
             this->running = false;
         } else {
-            this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
-            this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
+            this->loadSideMassFlowRate =
+                (this->loadSideIsPlantInlet) ? state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate : this->loadSideDesignMassFlowRate;
+            this->sourceSideMassFlowRate = (this->sourceSideIsPlantOutlet) ? state.dataLoopNodes->Node(this->sourceSideNodes.inlet).MassFlowRate
+                                                                           : this->sourceSideDesignMassFlowRate;
 
             if (!FirstHVACIteration && this->flowControl == DataPlant::FlowMode::VariableSpeedPump) {
-                if (this->loadVSBranchPump || this->loadVSLoopPump) {
+                if ((this->loadVSBranchPump || this->loadVSLoopPump) && !this->loadSideIsPlantInlet) {
                     this->loadSideMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
                     if (this->loadVSBranchPump) {
                         this->loadSideMassFlowRate = std::max(this->loadSideMassFlowRate, this->loadVSPumpMinLimitMassFlow);
                     }
                 }
-                if (this->sourceVSBranchPump || this->sourceVSLoopPump) {
+                if ((this->sourceVSBranchPump || this->sourceVSLoopPump) && !this->sourceSideMassFlowRate) {
                     this->sourceSideMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
                     if (this->sourceVSBranchPump) {
                         this->sourceSideMassFlowRate = std::max(this->sourceSideMassFlowRate, this->sourceVSPumpMinLimitMassFlow);
@@ -372,10 +375,24 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
             Real64 maxWaterTemp = Curve::CurveValue(state, this->maxSupplyWaterTempCurveIndex, state.dataEnvrn->OutDryBulbTemp);
             if (loadSideOutletSetpointTemp > maxWaterTemp) {
                 loadSideOutletSetpointTemp = maxWaterTemp + (1.0 - partLoadRatio) * (originalLoadSideOutletSPTemp - maxWaterTemp);
-            } else if (!waterTempExceeded) {
-                break;
+                waterTempExceeded = true;
             }
-        } else if (!waterTempExceeded) {
+        }
+        if (this->sourceSideIsPlantOutlet || this->loadSideIsPlantInlet) {
+            // check to see if souce side outlet temp exceeds limit and reduce PLR if necessary
+            auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
+            Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
+                state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLHPEIR::simulate()");
+            Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+            Real64 const tempSourceOutletTemp =
+                this->calcSourceOutletTemp(this->sourceSideInletTemp, (availableCapacity * partLoadRatio) / sourceMCp);
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating && tempSourceOutletTemp < this->minSourceTempLimit) {
+                partLoadRatio *= (this->sourceSideInletTemp - this->minSourceTempLimit) / (this->sourceSideInletTemp - tempSourceOutletTemp);
+            } else if (tempSourceOutletTemp > this->maxSourceTempLimit) {
+                partLoadRatio *= (this->maxSourceTempLimit - this->sourceSideInletTemp) / (tempSourceOutletTemp - this->sourceSideInletTemp);
+            }
+        }
+        if (!waterTempExceeded) {
             break;
         }
     }
@@ -1375,7 +1392,7 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     thisPLHP.defrostStrategy = static_cast<DefrostControl>(getEnumerationValue(
                         PLHPDefrostTypeNamesUC, UtilityRoutines::MakeUPPERCase(defrostControlStrategy.value().get<std::string>())));
                 } else {
-                    thisPLHP.defrostStrategy == DefrostControl::None;
+                    thisPLHP.defrostStrategy = DefrostControl::None;
                 }
 
                 if (thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating &&

@@ -1000,22 +1000,22 @@ namespace DataPlant {
         bool HeatingDominated(false);
         this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = false;
         bool SimultaneousHeatingAndCoolingRequested(false);
-        if (this->Report.BuildingPolledHeatingLoad < DataHVACGlobals::SmallLoad &&
-            this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+        if (this->Report.AirSourcePlantHeatingLoad < DataHVACGlobals::SmallLoad &&
+            this->Report.AirSourcePlantCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
             this->PlantOps.AirSourcePlantCoolingOnly = true;
-        } else if (this->Report.BuildingPolledCoolingLoad > DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad &&
-                   this->Report.BuildingPolledHeatingLoad > DataHVACGlobals::SmallLoad) {
+        } else if (this->Report.AirSourcePlantCoolingLoad > DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad &&
+                   this->Report.AirSourcePlantHeatingLoad > DataHVACGlobals::SmallLoad) {
             this->PlantOps.AirSourcePlantHeatingOnly = true;
 
             if (state.dataEnvrn->OutDryBulbTemp < this->TempReset.LowOutdoorTemp) { // too cold for airsource HPs
                 this->PlantOps.AirSourcePlantHeatingOnly = false;
             }
 
-        } else if ((this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) &&
-                   (this->Report.BuildingPolledHeatingLoad > DataHVACGlobals::SmallLoad)) {
+        } else if ((this->Report.AirSourcePlantCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) &&
+                   (this->Report.AirSourcePlantHeatingLoad > DataHVACGlobals::SmallLoad)) {
             SimultaneousHeatingAndCoolingRequested = true;
             this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = true;
-            if (this->Report.BuildingPolledHeatingLoad > abs(this->Report.BuildingPolledCoolingLoad)) {
+            if (this->Report.AirSourcePlantHeatingLoad > abs(this->Report.AirSourcePlantCoolingLoad)) {
                 HeatingDominated = true;
                 if (this->PlantOps.SimultHeatCoolOpAvailable) {
                     this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = true;
@@ -1023,7 +1023,7 @@ namespace DataPlant {
                     this->PlantOps.AirSourcePlantHeatingOnly = true;
                     this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = false;
                 }
-            } else if (abs(this->Report.BuildingPolledCoolingLoad) > this->Report.BuildingPolledHeatingLoad) {
+            } else if (abs(this->Report.AirSourcePlantCoolingLoad) > this->Report.AirSourcePlantHeatingLoad) {
                 CoolingDominated = true;
                 if (this->PlantOps.SimultHeatCoolOpAvailable) {
                     this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = true;
@@ -1379,18 +1379,18 @@ namespace DataPlant {
                                            .Branch(this->DedicatedHR_ChWRetControl_SourceSideComp.BranchNumPtr)
                                            .Comp(this->DedicatedHR_ChWRetControl_SourceSideComp.CompNumPtr)
                                            .NodeNumIn;
+            auto &CW_RetNode = state.dataLoopNodes->Node(inletChWReturnNodeNum);
+            auto &HW_RetNode = state.dataLoopNodes->Node(inletHWReturnNodeNum);
+            auto &CW_RetNodeID = state.dataLoopNodes->NodeID(inletChWReturnNodeNum);
+            auto &HW_RetNodeID = state.dataLoopNodes->NodeID(inletHWReturnNodeNum);
             Real64 CW_RetMdot = state.dataLoopNodes->Node(inletChWReturnNodeNum).MassFlowRate;
             Real64 HW_RetMdot = state.dataLoopNodes->Node(inletHWReturnNodeNum).MassFlowRate;
-            bool flowInEach = false;
-            // need flow in both returns.
-            if (CW_RetMdot <= 0.0 || HW_RetMdot <= 0.0) {
+            Real64 CW_RetTemp = state.dataLoopNodes->Node(inletChWReturnNodeNum).Temp;
+            Real64 HW_RetTemp = state.dataLoopNodes->Node(inletHWReturnNodeNum).Temp;
+            bool flowInEach = true;
+            // step 1. need flow in both returns.
+            if ((CW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow) || (HW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow)) {
                 flowInEach = false;
-            } else {
-                flowInEach = true;
-                if ((CW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow) || (HW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow)) {
-                    // step 1.b, make sure the flows are not too small.
-                    flowInEach = false;
-                }
             }
 
             // step 2. calculate the loads to adjust the
@@ -1415,9 +1415,9 @@ namespace DataPlant {
             // step 2 decide which leads based on there being flow in both and which one has the higher load to meet secondary setpoint
             bool CoolLedNeed = false;
             bool HeatLedNeed = false;
-            if (flowInEach && HW_Qdot > CW_Qdot) {
+            if (flowInEach && HW_Qdot > CW_Qdot && CW_RetTemp > this->Setpoint.PrimCW) {
                 HeatLedNeed = true;
-            } else if (flowInEach && HW_Qdot <= CW_Qdot) {
+            } else if (flowInEach && HW_Qdot <= CW_Qdot && HW_RetTemp < this->Setpoint.PrimHW_High) {
                 CoolLedNeed = true;
             }
 
@@ -1428,13 +1428,16 @@ namespace DataPlant {
                 HW_Qdot > (this->PlantOps.DedicatedHR_SecHW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor)) { // load is too high
                 HeatLedNeed = false;
                 if (CW_Qdot > 1.0 &&
-                    CW_Qdot < (this->PlantOps.DedicatedHR_SecChW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor)) {
+                    (CW_Qdot < (this->PlantOps.DedicatedHR_SecChW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor) &&
+                     HW_RetTemp < this->Setpoint.PrimHW_High)) {
                     CoolLedNeed = true;
                 }
             }
             if (CoolLedNeed && CW_Qdot > (this->PlantOps.DedicatedHR_SecChW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor)) {
                 CoolLedNeed = false;
-                if (HW_Qdot > 1.0 && HW_Qdot < (this->PlantOps.DedicatedHR_SecHW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor)) {
+                if (HW_Qdot > 1.0 &&
+                    (HW_Qdot < (this->PlantOps.DedicatedHR_SecHW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor) &&
+                     CW_RetTemp > this->Setpoint.PrimCW)) {
                     HeatLedNeed = true;
                 }
             }
@@ -1447,7 +1450,8 @@ namespace DataPlant {
                 if (CW_RetMdot / HW_RetMdot > FlowImbalanceRatioThreshold) { // insuficient flow in source side relative to load side
                     CoolLedNeed = false;
                     if (HW_Qdot > 1.0 &&
-                        HW_Qdot < (this->PlantOps.DedicatedHR_SecHW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor)) {
+                        (HW_Qdot < (this->PlantOps.DedicatedHR_SecHW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor) &&
+                         CW_RetTemp > this->Setpoint.PrimCW)) {
                         HeatLedNeed = true;
                     }
                 }
@@ -1456,7 +1460,8 @@ namespace DataPlant {
                 if (HW_RetMdot / CW_RetMdot > FlowImbalanceRatioThreshold) { // insuficient flow in source side relative to load side
                     HeatLedNeed = false;
                     if (CW_Qdot > 1.0 &&
-                        CW_Qdot < (this->PlantOps.DedicatedHR_SecChW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor)) {
+                        (CW_Qdot < (this->PlantOps.DedicatedHR_SecChW_DesignCapacity * this->PlantOps.DedicatedHR_CapacityControlFactor) &&
+                         HW_RetTemp < this->Setpoint.PrimHW_High)) {
                         CoolLedNeed = true;
                     }
                 }
