@@ -37,6 +37,8 @@ The AirloopHVAC:UnitarySystem object is intended to replace all other air loop e
 
 The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of a fan component (OnOff, ConstantVolume, VariableVolume, or ComponentModel), a cooling coil component, a heating coil component, and a reheat coil as shown in Figure~\ref{fig:schematic-of-the-energyplus-unitary-system}. When a draw through configuration is desired, the fan is placed directly after the heating coil. If dehumidification control is selected, a reheat coil component is also required. If the reheat coil is present and the dehumidification control type input is not specified as CoolReheat, the reheat coil will not be active. All of the fan and coil components are optional which allows the AirLoopHVAC:UnitarySystem object to be configured for fan-only, heating-only, cooling-only, or both heating and cooling. It may also be applied without a fan, controlling one or more coils, similar to the function of \hyperref[coilsystemcoolingdx]{CoilSystem:Cooling:DX}.
 
+When the AirloopHVAC:UnitarySystem object is modeled as an equipment on an air loop with an economizer, and when the system is using either a \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:Multispeed}, \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}, or a \hyperref[coilcoolingdx]{Coil:Cooling:DX} object, two types of economizer staging operation are available, see the \textbf{Economizer Operation Staging} input of the hyperref[controlleroutdoorair]{Controller:OutdoorAir} object.
+
 \begin{figure}[hbtp] % fig 1
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image294.png}

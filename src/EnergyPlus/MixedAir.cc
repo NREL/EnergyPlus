@@ -826,8 +826,9 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
                         state,
                         format(
                             "SimOAController: EconomizerFirst was selected in the \"{}\" Controller:OutdoorAir object but the air loop it belongs to "
-                            "doesn't include a AirLoopHVAC:UnitarySystem with a Load Control Type input and a Coil:Cooling:DX:MultiSpeed or "
-                            "Coil:Cooling:DX:VariableSpeed cooling coil. EconomizerFirst will not be enforced.",
+                            "does not include an AirLoopHVAC:UnitarySystem with a \"Load\" Control Type input and cooling coil of one of the "
+                            "following types: Coil:Cooling:DX:MultiSpeed,"
+                            " Coil:Cooling:DX:VariableSpeed, or Coil:Cooling:DX. EconomizerFirst will not be enforced.",
                             state.dataMixedAir->OAController(OAControllerNum).Name));
                 }
             }
