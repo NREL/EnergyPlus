@@ -56,11 +56,15 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataZoneEnergyDemands;
@@ -189,4 +193,124 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     EXPECT_EQ(HWBaseboard(1).AirInletTemp, HWBaseboard(1).AirOutletTemp);
     EXPECT_EQ(HWBaseboard(1).WaterInletTemp, HWBaseboard(1).WaterOutletTemp);
     EXPECT_EQ(0.0, HWBaseboard(1).AirMassFlowRate);
+}
+
+TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterInputTest)
+{
+
+    bool errorFound = false;
+    const Real64 absTol = 0.00001;
+    std::string const idf_objects = delimited_string({
+
+        "  ZoneHVAC:Baseboard:RadiantConvective:Water,",
+        "    ThisIsABaseboard,        !- Name",
+        "    Baseboard Design,        !- Design Object",
+        "    ,                        !- Availability Schedule Name",
+        "    Zone BB Water In Node,   !- Inlet Node Name",
+        "    Zone BB Water Out Node,  !- Outlet Node Name",
+        "    87.78,                   !- Rated Average Water Temperature {C}",
+        "    0.063,                   !- Rated Water Mass Flow Rate {kg/s}",
+        "    autosize,                !- Heating Design Capacity {W}",
+        "    autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "    TheFloor,                !- Surface 1 Name",
+        "    0.8;                     !- Fraction of Radiant Energy to Surface 1",
+        "  ZoneHVAC:Baseboard:RadiantConvective:Water:Design,",
+        "    Baseboard Design,        !- Name",
+        "    HeatingDesignCapacity,   !- Heating Design Capacity Method",
+        "    ,                        !- Heating Design Capacity Per Floor Area {W/m2}",
+        "    ,                        !- Fraction of Autosized Heating Design Capacity",
+        "    0.001,                   !- Convergence Tolerance",
+        "    0.4,                     !- Fraction Radiant",
+        "    0.2;                     !- Fraction of Radiant Energy Incident on People",
+        "  Zone,",
+        "    ThisIsAZone,  !- Name",
+        "    0,            !- Direction of Relative North {deg}",
+        "    0,            !- X Origin {m}",
+        "    0,            !- Y Origin {m}",
+        "    0,            !- Z Origin {m}",
+        "    1,            !- Type",
+        "    1,            !- Multiplier",
+        "    3.0,          !- Ceiling Height {m}",
+        "    200.0;        !- Volume {m3}",
+        "  BuildingSurface:Detailed,",
+        "    TheFloor,      !- Name",
+        "    FLOOR,         !- Surface Type",
+        "    MyCons,        !- Construction Name",
+        "    ThisIsAZone,   !- Zone Name",
+        "    ,              !- Space Name",
+        "    Ground,        !- Outside Boundary Condition",
+        "    C1-1,          !- Outside Boundary Condition Object",
+        "    NoSun,         !- Sun Exposure",
+        "    NoWind,        !- Wind Exposure",
+        "    0.0,           !- View Factor to Ground",
+        "    4,             !- Number of Vertices",
+        "    26.8,3.7,2.4,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    30.5,0.0,2.4,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.0,0.0,2.4,   !- X,Y,Z ==> Vertex 3 {m}",
+        "    3.7,3.7,2.4;   !- X,Y,Z ==> Vertex 4 {m}",
+        "  Construction,",
+        "    MyCons,        !- Name",
+        "    MyLayer;       !- Outside Layer",
+        "  Material,",
+        "    MyLayer,       !- Name",
+        "    MediumRough,   !- Roughness",
+        "    0.1,           !- Thickness {m}",
+        "    1.0,           !- Conductivity {W/m-K}",
+        "    1000.0,        !- Density {kg/m3}",
+        "    800.0,         !- Specific Heat {J/kg-K}",
+        "    0.9,           !- Thermal Absorptance",
+        "    0.65,          !- Solar Absorptance",
+        "    0.65;          !- Visible Absorptance",
+        "  ZoneHVAC:EquipmentList,",
+        "    MyZoneEquipmentList,     !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:Baseboard:RadiantConvective:Water,  !- Zone Equipment 1 Object Type",
+        "    ThisIsABaseboard,        !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+        "  ZoneHVAC:EquipmentConnections,",
+        "  ThisIsAZone,           !- Zone Name",
+        "  MyZoneEquipmentList,   !- Zone Conditioning Equipment List Name",
+        "  ThisIsAZone In Nodes,  !- Zone Air Inlet Node or NodeList Name",
+        "  ,                      !- Zone Air Exhaust Node or NodeList Name",
+        "  ThisIsAZone Node,      !- Zone Air Node Name",
+        "  ThisIsAZone Out Node;  !- Zone Return Air Node or NodeList Name",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    errorFound = false;
+    HeatBalanceManager::GetZoneData(*state, errorFound);
+    EXPECT_FALSE(errorFound);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
+
+    errorFound = false;
+    Material::GetMaterialData(*state, errorFound);
+    EXPECT_FALSE(errorFound);
+
+    errorFound = false;
+    HeatBalanceManager::GetConstructData(*state, errorFound);
+    EXPECT_FALSE(errorFound);
+
+    errorFound = false;
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, errorFound);
+    EXPECT_FALSE(errorFound);
+
+    ZoneEquipmentManager::GetZoneEquipment(*state);
+
+    GetHWBaseboardInput(*state);
+
+    ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboard(1).FracDistribToSurf(1), 0.8, absTol);
+    ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboardDesignObject(1).FracRadiant, 0.4, absTol);
+    ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboardDesignObject(1).FracDistribPerson, 0.2, absTol);
+    ASSERT_NEAR(state->dataHWBaseboardRad->HWBaseboard(1).FracConvect, 0.6, absTol);
 }
