@@ -729,7 +729,10 @@ add_custom_command(
         -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddable_epJSON_schema>"
         -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS generate_embeddable_epJSON_schema epjson_schema "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc"
+  DEPENDS
+    generate_embeddable_epJSON_schema
+    epjson_schema
+    "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc"
   VERBATIM)
 
 add_custom_target(embedded_epjson_source ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc")
