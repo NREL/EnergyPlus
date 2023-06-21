@@ -731,7 +731,8 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     generate_embeddable_epJSON_schema
-    epjson_schema
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" # File-level dependency
+    epjson_schema                                             # target-level dependency, to avoid race conditions
     "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc"
   VERBATIM)
 
