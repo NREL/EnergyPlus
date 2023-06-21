@@ -1312,15 +1312,15 @@ namespace DataPlant {
                 .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
                 .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
                 .ON = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
+            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
+                .LoopSide(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopSideNum)
+                .Branch(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.branchNum)
+                .Comp(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.compNum)
                 .Available = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
+            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
+                .LoopSide(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopSideNum)
+                .Branch(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.branchNum)
+                .Comp(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.compNum)
                 .ON = false;
         }
 
