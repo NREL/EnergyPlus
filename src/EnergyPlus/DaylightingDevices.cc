@@ -782,7 +782,7 @@ namespace Dayltg {
                     state.dataDaylightingManager->TDDFluxInc(hr, tddNum) = Illums();
                     state.dataDaylightingManager->TDDFluxTrans(hr, tddNum) = Illums();
                 } // for (tddNum)
-            } // for (hr)
+            }     // for (hr)
         }
     }
 
@@ -1334,8 +1334,8 @@ namespace Dayltg {
     }
 
     Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,                                  // TDD pipe object number
-                    Real64 const COSI,                                  // Cosine of the incident angle
+                    int const PipeNum,          // TDD pipe object number
+                    Real64 const COSI,          // Cosine of the incident angle
                     RadType const RadiationType // Radiation type flag
     )
     {

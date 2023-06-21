@@ -1439,11 +1439,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     int numExtWins = state->dataDaylightingData->enclDaylight(1).TotalExtWindows;
     int numRefPts = thisDaylgtCtrl.TotalDaylRefPoints;
     int numSlatAngs = state->dataSurface->actualMaxSlatAngs;
-    
+
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
-                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) { 
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
                     thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.2, 0.2, 0.2, 0.2};
                     thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.01, 0.01, 0.01, 0.01};
                     thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.9, 0.9, 0.9, 0.9};
@@ -1475,7 +1475,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_LuminanceShadin
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
-                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) { 
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
                     thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
                     thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
                     thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
@@ -1766,11 +1766,11 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     int numExtWins = state->dataDaylightingData->enclDaylight(1).TotalExtWindows;
     int numRefPts = thisDaylgtCtrl.TotalDaylRefPoints;
     int numSlatAngs = state->dataSurface->actualMaxSlatAngs;
-    
+
     for (int iHr = 1; iHr <= Constant::HoursInDay; ++iHr) {
         for (int iWin = 1; iWin <= numExtWins; ++iWin) {
             for (int iRefPt = 1; iRefPt <= numRefPts; ++iRefPt) {
-                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) { 
+                for (int iSlatAng = 1; iSlatAng <= numSlatAngs; ++iSlatAng) {
                     thisDaylgtCtrl.DaylIllFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
                     thisDaylgtCtrl.DaylBackFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};
                     thisDaylgtCtrl.DaylSourceFacSky(iHr, iWin, iRefPt, iSlatAng) = {0.0, 0.0, 0.0, 0.0};

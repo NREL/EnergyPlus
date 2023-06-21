@@ -67,7 +67,7 @@ namespace Dayltg {
     // Two kinds of reference points: used directly in daylighting, used to show illuminance map of zone
     constexpr int MaxMapRefPoints(2500); // Maximum number of Illuminance Map Ref Points
 
-    enum class SkyType 
+    enum class SkyType
     {
         Invalid = -1,
         Clear,
@@ -77,10 +77,11 @@ namespace Dayltg {
         Num
     };
 
-    struct Illums {
+    struct Illums
+    {
         std::array<Real64, (int)SkyType::Num> sky = {0.0, 0.0, 0.0, 0.0};
     };
-        
+
     enum class ExtWinType
     {
         Invalid = -1,
@@ -108,7 +109,7 @@ namespace Dayltg {
     };
 
     static constexpr std::array<std::string_view, (int)DaylightingMethod::Num> DaylightingMethodNamesUC = {"NONE", "SPLITFLUX", "DELIGHT"};
-                
+
     // Parameters for "Lighting Control Type" - these are the values expected by DElight
     enum class LtgCtrlType
     {
@@ -118,8 +119,6 @@ namespace Dayltg {
         ContinuousOff = 3,
         Num
     };
-
-        
 
     static constexpr std::array<std::string_view, 4> LtgCtrlTypeNamesUC = {"INVALID", "CONTINUOUS", "STEPPED", "CONTINUOUSOFF"};
 
@@ -163,8 +162,8 @@ namespace Dayltg {
         int spaceIndex = 0;   // Index to space where the daylighting:controls object is located (0 if specified for a zone)
         int enclIndex = 0;    // Index to enclosure where the daylighting:controls object is located
         Dayltg::DaylightingMethod DaylightMethod = DaylightingMethod::None; // Type of Daylighting (1=SplitFlux, 2=DElight)
-        int AvailSchedNum = 0;                                                       // pointer to availability schedule if present
-        int TotalDaylRefPoints = 0;                                                  // Number of daylighting reference points for this control
+        int AvailSchedNum = 0;                                              // pointer to availability schedule if present
+        int TotalDaylRefPoints = 0;                                         // Number of daylighting reference points for this control
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
         Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)

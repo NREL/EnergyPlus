@@ -80,8 +80,8 @@ namespace Dayltg {
     );
 
     Real64 TransTDD(EnergyPlusData &state,
-                    int const PipeNum,                                  // TDD pipe object number
-                    Real64 const COSI,                                  // Cosine of the incident angle
+                    int const PipeNum,                  // TDD pipe object number
+                    Real64 const COSI,                  // Cosine of the incident angle
                     Dayltg::RadType const RadiationType // Radiation type flag
     );
 
