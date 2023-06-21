@@ -5663,14 +5663,13 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     }
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
+        auto &availMgr = state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal).ZoneCompAvailMgrs(VRFTUNum);
         if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).AvailManagerListName =
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).ZoneNum = ZoneNum;
+            availMgr.AvailManagerListName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
+            availMgr.ZoneNum = ZoneNum;
             state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum) = false;
         }
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::VRFTerminalUnit).ZoneCompAvailMgrs(VRFTUNum).AvailStatus;
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus = availMgr.AvailStatus;
     }
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
@@ -5771,7 +5770,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 for (ELLoop = 1; ELLoop <= state.dataGlobal->NumOfZones; ++ELLoop) {        // NumOfZoneEquipLists
                     if (state.dataZoneEquip->ZoneEquipList(ELLoop).Name == "") continue;    // dimensioned by NumOfZones.  Only valid ones have names.
                     for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
-                        if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipType(ListLoop),
+                        if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipTypeName(ListLoop),
                                                          DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num)))
                             continue;
                         if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipName(ListLoop),
@@ -5920,7 +5919,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
             EquipList_exit:;
                 if (ctrlZoneNum > 0) {
                     int inletNodeADUNum = 0;
-                    DataZoneEquipment::ZoneEquip sysType_Num = DataZoneEquipment::ZoneEquip::Invalid;
+                    DataZoneEquipment::ZoneEquipType sysType_Num = DataZoneEquipment::ZoneEquipType::Invalid;
                     std::string sysName = "";
                     for (int inletNode = 1; inletNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; inletNode++) {
                         if (state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(inletNode) !=
@@ -5928,7 +5927,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             continue;
                         inletNodeADUNum = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeADUNum(inletNode);
                         if (inletNodeADUNum > 0 && inletNodeADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size()) {
-                            sysType_Num = DataZoneEquipment::ZoneEquip::AirDistUnit;
+                            sysType_Num = DataZoneEquipment::ZoneEquipType::AirDistributionUnit;
                             sysName = state.dataDefineEquipment->AirDistUnit(inletNodeADUNum).Name;
                             break;
                         }
@@ -5940,7 +5939,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                  state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex).NumOfEquipTypes;
                                  ++EquipNum) {
                                 if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
-                                         .EquipTypeEnum(EquipNum) != sysType_Num) ||
+                                         .EquipType(EquipNum) != sysType_Num) ||
                                     state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).EquipListIndex)
                                             .EquipName(EquipNum) != sysName)
                                     continue;

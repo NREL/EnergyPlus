@@ -1695,8 +1695,8 @@ namespace RoomAirModelManager {
                     int iEquipArg = 2 + (iEquip - 1) * 2;
                     auto &roomAFNNodeHVAC = roomAFNNode.HVAC(iEquip);
                     roomAFNNodeHVAC.zoneEquipType =
-                        static_cast<DataHVACGlobals::ZoneEquipType>(getEnumValue(DataHVACGlobals::zoneEquipTypeNamesUC, ipsc->cAlphaArgs(iEquipArg)));
-                    if (roomAFNNodeHVAC.zoneEquipType == DataHVACGlobals::ZoneEquipType::Invalid) {
+                        static_cast<DataZoneEquipment::ZoneEquipType>(getEnumValue(DataZoneEquipment::zoneEquipTypeNamesUC, ipsc->cAlphaArgs(iEquipArg)));
+                    if (roomAFNNodeHVAC.zoneEquipType == DataZoneEquipment::ZoneEquipType::Invalid) {
                         ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(iEquipArg), ipsc->cAlphaArgs(iEquipArg));
                         ErrorsFound = true;
                     }
@@ -1713,7 +1713,6 @@ namespace RoomAirModelManager {
                     
                     IntEquipError = CheckEquipName(
                                                    state,
-                                                   roomAFNNodeHVAC.ObjectTypeName,
                                                    roomAFNNodeHVAC.Name,
                                                    roomAFNNodeHVAC.SupplyNodeName,
                                                    roomAFNNodeHVAC.ReturnNodeName,
@@ -2881,12 +2880,11 @@ namespace RoomAirModelManager {
     }
 
     bool CheckEquipName(EnergyPlusData &state,
-                        std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
                         int TotNumEquip,              // how many of this equipment type
-                        DataHVACGlobals::ZoneEquipType zoneEquipType
+                        DataZoneEquipment::ZoneEquipType zoneEquipType
     )
     {
 
@@ -2923,9 +2921,9 @@ namespace RoomAirModelManager {
 
         SupplyNodeName = "";
 
-        if (zoneEquipType == DataHVACGlobals::ZoneEquipType::Invalid) return EquipFind;
+        if (zoneEquipType == DataZoneEquipment::ZoneEquipType::Invalid) return EquipFind;
 
-        std::string_view equipTypeName = DataHVACGlobals::zoneEquipTypeNamesUC[(int)zoneEquipType];
+        std::string_view equipTypeName = DataZoneEquipment::zoneEquipTypeNamesUC[(int)zoneEquipType];
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, equipTypeName, TotalArgs, NumAlphas, NumNumbers);
 
         MaxNums = max(MaxNums, NumNumbers);
@@ -2954,158 +2952,158 @@ namespace RoomAirModelManager {
         }
 
         switch (zoneEquipType) {
-        case DataHVACGlobals::ZoneEquipType::VariableRefrigerantFlow: { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
+        case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
             SupplyNodeName = Alphas(4);
             ReturnNodeName = "";                                                           // Zone return node
         } break;
-        case DataHVACGlobals::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
+        case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
             I = GetFanOutletNode(state, "Fan:OnOff", Alphas(4), errorfound);
             if (errorfound) {
             }
             SupplyNodeName = state.dataLoopNodes->NodeID(I);                      // ?????
             ReturnNodeName = "";                                                  // Zone exhaust node
         } break;
-        case DataHVACGlobals::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
+        case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
             SupplyNodeName = Alphas(6);
             ReturnNodeName = Alphas(5);
         } break;
-        case DataHVACGlobals::ZoneEquipType::OutdoorAirUnit: { // ZoneHVAC : OutdoorAirUnit
+        case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: { // ZoneHVAC : OutdoorAirUnit
             SupplyNodeName = Alphas(13);
             ReturnNodeName = Alphas(14);
         } break;
-        case DataHVACGlobals::ZoneEquipType::PackagedTerminalAirConditioner: { // ZoneHVAC : PackagedTerminalAirConditioner
+        case DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner: { // ZoneHVAC : PackagedTerminalAirConditioner
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
         } break;
-        case DataHVACGlobals::ZoneEquipType::PackagedTerminalHeatPump: { // ZoneHVAC : PackagedTerminalHeatPump
+        case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump: { // ZoneHVAC : PackagedTerminalHeatPump
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
         } break;
-        case DataHVACGlobals::ZoneEquipType::UnitHeater: { // ZoneHVAC : UnitHeater
+        case DataZoneEquipment::ZoneEquipType::UnitHeater: { // ZoneHVAC : UnitHeater
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
         } break;
-        case DataHVACGlobals::ZoneEquipType::UnitVentilator: { // ZoneHVAC : UnitVentilator
+        case DataZoneEquipment::ZoneEquipType::UnitVentilator: { // ZoneHVAC : UnitVentilator
             SupplyNodeName = Alphas(7);
             ReturnNodeName = Alphas(6);
         } break;
-        case DataHVACGlobals::ZoneEquipType::VentilatedSlab: { // ZoneHVAC : VentilatedSlab
+        case DataZoneEquipment::ZoneEquipType::VentilatedSlab: { // ZoneHVAC : VentilatedSlab
             SupplyNodeName = Alphas(20);
             ReturnNodeName = Alphas(18);
         } break;
-        case DataHVACGlobals::ZoneEquipType::WaterToAirHeatPump: { // ZoneHVAC : WaterToAirHeatPump
+        case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir: { // ZoneHVAC : WaterToAirHeatPump
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
         } break;
-        case DataHVACGlobals::ZoneEquipType::WindowAirConditioner: { // ZoneHVAC : WindowAirConditioner
+        case DataZoneEquipment::ZoneEquipType::WindowAirConditioner: { // ZoneHVAC : WindowAirConditioner
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
         } break;
-        case DataHVACGlobals::ZoneEquipType::BaseboardRadiantConvectiveElectric: { // ZoneHVAC : Baseboard : RadiantConvective : Electric
+        case DataZoneEquipment::ZoneEquipType::BaseboardElectric: { // ZoneHVAC : Baseboard : RadiantConvective : Electric
             SupplyNodeName = "";                                                          // convection only
         } break;
-        case DataHVACGlobals::ZoneEquipType::BaseboardRadiantConvectiveWater: { // ZoneHVAC : Baseboard : RadiantConvective : Water
+        case DataZoneEquipment::ZoneEquipType::BaseboardWater: { // ZoneHVAC : Baseboard : RadiantConvective : Water
             SupplyNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::BaseboardRadiantConvectiveSteam: { // ZoneHVAC : Baseboard : RadiantConvective : Steam
+        case DataZoneEquipment::ZoneEquipType::BaseboardSteam: { // ZoneHVAC : Baseboard : RadiantConvective : Steam
             SupplyNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::BaseboardConvectiveElectric: { // ZoneHVAC : Baseboard : Convective : Electric
+        case DataZoneEquipment::ZoneEquipType::BaseboardConvectiveElectric: { // ZoneHVAC : Baseboard : Convective : Electric
             SupplyNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::BaseboardConvectiveWater: { // ZoneHVAC : Baseboard : Convective : Water
+        case DataZoneEquipment::ZoneEquipType::BaseboardConvectiveWater: { // ZoneHVAC : Baseboard : Convective : Water
             SupplyNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::HighTemperatureRadiant: { // ZoneHVAC : HighTemperatureRadiant
+        case DataZoneEquipment::ZoneEquipType::HighTemperatureRadiant: { // ZoneHVAC : HighTemperatureRadiant
             SupplyNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::DehumidifierDX: { // ZoneHVAC : Dehumidifier : DX
+        case DataZoneEquipment::ZoneEquipType::DehumidifierDX: { // ZoneHVAC : Dehumidifier : DX
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
         } break;
-        case DataHVACGlobals::ZoneEquipType::IdealLoadsAirSystem: { // ZoneHVAC : IdealLoadsAirSystem
+        case DataZoneEquipment::ZoneEquipType::PurchasedAir: { // ZoneHVAC : IdealLoadsAirSystem
             SupplyNodeName = Alphas(3);
             ReturnNodeName = Alphas(4);
         } break;
-        case DataHVACGlobals::ZoneEquipType::RefrigerationChillerSet: { // ZoneHVAC : RefrigerationChillerSet
+        case DataZoneEquipment::ZoneEquipType::RefrigerationChillerSet: { // ZoneHVAC : RefrigerationChillerSet
             SupplyNodeName = Alphas(5);
             ReturnNodeName = Alphas(4);
         } break;
-        case DataHVACGlobals::ZoneEquipType::HybridUnitaryAirConditioners: { // ZoneHVAC : HybridUnitaryAirConditioners
+        case DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler: { // ZoneHVAC : HybridUnitaryAirConditioners
             SupplyNodeName = Alphas(11);
             ReturnNodeName = Alphas(9);
         } break;
-        case DataHVACGlobals::ZoneEquipType::FanZoneExhaust: {      // Fan : ZoneExhaust
+        case DataZoneEquipment::ZoneEquipType::ExhaustFan: {      // Fan : ZoneExhaust
             SupplyNodeName = "";                                                      // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
         } break;
-        case DataHVACGlobals::ZoneEquipType::WaterHeaterHeatPump: { // WaterHeater : HeatPump
+        case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater: { // WaterHeater : HeatPump
             SupplyNodeName = Alphas(8);
             ReturnNodeName = Alphas(7);
             // For AirTerminals, find matching return node later
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalDualDuctConstantVolume: { // AirTerminal : DualDuct : ConstantVolume
+        case DataZoneEquipment::ZoneEquipType::AirTerminalDualDuctConstantVolume: { // AirTerminal : DualDuct : ConstantVolume
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalDualDuctVAV: { // AirTerminal : DualDuct : VAV
+        case DataZoneEquipment::ZoneEquipType::AirTerminalDualDuctVAV: { // AirTerminal : DualDuct : VAV
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctConstantVolumeReheat: { // AirTerminal : SingleDuct : ConstantVolume : Reheat
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctConstantVolumeReheat: { // AirTerminal : SingleDuct : ConstantVolume : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctConstantVolumeNoReheat: { // AirTerminal : SingleDuct :
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctConstantVolumeNoReheat: { // AirTerminal : SingleDuct :
                                                                                                               // ConstantVolume : NoReheat
             SupplyNodeName = Alphas(4);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctVAVReheat: { // AirTerminal : SingleDuct : VAV : Reheat
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVReheat: { // AirTerminal : SingleDuct : VAV : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctVAVNoReheat: { // AirTerminal : SingleDuct : VAV : NoReheat
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVNoReheat: { // AirTerminal : SingleDuct : VAV : NoReheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctSeriesPIUReheat: { // AirTerminal : SingleDuct : SeriesPIU : Reheat
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctSeriesPIUReheat: { // AirTerminal : SingleDuct : SeriesPIU : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctParallelPIUReheat: { // AirTerminal : SingleDuct : ParallelPIU : Reheat
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctParallelPIUReheat: { // AirTerminal : SingleDuct : ParallelPIU : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctCAVFourPipeInduction: { // AirTerminal : SingleDuct :
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctCAVFourPipeInduction: { // AirTerminal : SingleDuct :
                                                                                                             // ConstantVolume : FourPipeInduction
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctVAVReheatVariableSpeedFan: { // AirTerminal : SingleDuct : VAV
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVReheatVariableSpeedFan: { // AirTerminal : SingleDuct : VAV
                                                                                                                  // : Reheat : VariableSpeedFan
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctVAVHeatAndCoolReheat: { // AirTerminal : SingleDuct : VAV :
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVHeatAndCoolReheat: { // AirTerminal : SingleDuct : VAV :
                                                                                                             // HeatAndCool : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctVAVHeatAndCoolNoReheat: { // AirTerminal : SingleDuct : VAV :
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctVAVHeatAndCoolNoReheat: { // AirTerminal : SingleDuct : VAV :
                                                                                                               // HeatAndCool : NoReheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalSingleDuctConstantVolumeCooledBeam: { // AirTerminal : SingleDuct :
+        case DataZoneEquipment::ZoneEquipType::AirTerminalSingleDuctConstantVolumeCooledBeam: { // AirTerminal : SingleDuct :
                                                                                                                 // ConstantVolume : CooledBeam
             SupplyNodeName = Alphas(5);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirTerminalDualDuctVAVOutdoorAir: { // AirTerminal : DualDuct : VAV : OutdoorAir
+        case DataZoneEquipment::ZoneEquipType::AirTerminalDualDuctVAVOutdoorAir: { // AirTerminal : DualDuct : VAV : OutdoorAir
             SupplyNodeName = Alphas(3);
             ReturnNodeName = "";
         } break;
-        case DataHVACGlobals::ZoneEquipType::AirLoopHVACReturnAir: { // AirLoopHVACReturnAir
+        case DataZoneEquipment::ZoneEquipType::AirLoopHVACReturnAir: { // AirLoopHVACReturnAir
             SupplyNodeName = Alphas(4);                                                //
             ReturnNodeName = "";                                                       //
         } break;

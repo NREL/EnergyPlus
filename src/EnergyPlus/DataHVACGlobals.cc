@@ -199,7 +199,7 @@ namespace DataHVACGlobals {
     Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
 
     Array1D_string const cVRFHeatingPerformanceOATTypes(NumVRFHeatingPerformanceOATTypes, {"WetBulbTemperature", "DryBulbTemperature"});
-
+#ifdef GET_OUT
     constexpr std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNamesUC = {
             "DUMMY",
             "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
@@ -281,7 +281,7 @@ namespace DataHVACGlobals {
             "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
             "AirTerminal:DualDuct:VAV:OutdoorAir",
             "AirLoopHVACReturnAir"};
-        
+#endif //        
 } // namespace DataHVACGlobals
 
 } // namespace EnergyPlus

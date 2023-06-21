@@ -3085,7 +3085,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 zoneEqSizing.DesignSizeFromParent = false;
             }
 
-            const int ZoneEquipTypeNum = state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipTypeEnum;
+            DataZoneEquipment::ZoneEquipType zoneEquipType = state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).equipType;
 
             auto &zoneEquipList = state.dataZoneEquip->ZoneEquipList(state.dataSize->CurZoneEqNum);
 
@@ -3093,25 +3093,25 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             bool ValidSAMComp = false;
 
-            if (ZoneEquipTypeNum <= NumValidSysAvailZoneComponents) ValidSAMComp = true;
+            if ((int)zoneEquipType <= NumValidSysAvailZoneComponents) ValidSAMComp = true;
 
             auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
             if (ZoneCompNum > 0 && ValidSAMComp) {
 
-                SystemAvailabilityManager::GetZoneEqAvailabilityManager(state, ZoneEquipTypeNum, ZoneCompNum, ErrorFlag);
+                SystemAvailabilityManager::GetZoneEqAvailabilityManager(state, zoneEquipType, ZoneCompNum, ErrorFlag);
 
-                if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::CycleOn) {
+                if (ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::CycleOn) {
                     state.dataHVACGlobal->TurnFansOn = true;
                     state.dataHVACGlobal->TurnFansOff = false;
-                } else if (ZoneComp(ZoneEquipTypeNum).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::ForceOff) {
+                } else if (ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == DataHVACGlobals::ForceOff) {
                     state.dataHVACGlobal->TurnFansOn = false;
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
             }
 
-            switch (ZoneEquipTypeNum) {
-            case ZoneEquip::AirDistUnit: { // 'ZoneHVAC:AirDistributionUnit'
+            switch (zoneEquipType) {
+            case ZoneEquipType::AirDistributionUnit: { // 'ZoneHVAC:AirDistributionUnit'
                 // Air loop system availability manager status only applies to PIU and exhaust fans
                 // Check to see if System Availability Managers are asking for fans to cycle on or shut off
                 // and set fan on/off flags accordingly.
@@ -3135,7 +3135,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 thisZoneHB.NonAirSystemResponse += NonAirSysOutput;
                 SysOutputProvided = NonAirSysOutput + AirSysOutput;
             } break;
-            case ZoneEquip::VRFTerminalUnit: { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                    
+            case ZoneEquipType::VariableRefrigerantFlowTerminal: { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
                 bool HeatingActive = false;
                 bool CoolingActive = false;
                 int constexpr OAUnitNum = 0;
@@ -3154,7 +3155,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                          SysOutputProvided,
                                                          LatOutputProvided);
             } break;
-            case ZoneEquip::WindowAC: { // 'ZoneHVAC:WindowAirConditioner'
+                    
+            case ZoneEquipType::WindowAirConditioner: { // 'ZoneHVAC:WindowAirConditioner'
                 WindowAC::SimWindowAC(state,
                                       state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                       ControlledZoneNum,
@@ -3163,10 +3165,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                       LatOutputProvided,
                                       zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::PkgTermHPAirToAir:   // 'ZoneHVAC:PackagedTerminalHeatPump'
-            case ZoneEquip::PkgTermACAirToAir:   // 'ZoneHVAC:PackagedTerminalAirConditioner'
-            case ZoneEquip::PkgTermHPWaterToAir: // 'ZoneHVAC:WaterToAirHeatPump'
-            case ZoneEquip::ZoneUnitarySys: {    // 'AirloopHVAC:UnitarySystem'
+
+            case ZoneEquipType::PackagedTerminalHeatPump:   // 'ZoneHVAC:PackagedTerminalHeatPump'
+            case ZoneEquipType::PackagedTerminalAirConditioner:   // 'ZoneHVAC:PackagedTerminalAirConditioner'
+            case ZoneEquipType::PackagedTerminalHeatPumpWaterToAir: // 'ZoneHVAC:WaterToAirHeatPump'
+            case ZoneEquipType::UnitarySystem: {    // 'AirloopHVAC:UnitarySystem'
                 int AirLoopNum = 0;
                 bool HeatingActive = false;
                 bool CoolingActive = false;
@@ -3186,7 +3189,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                               SysOutputProvided,
                                                               LatOutputProvided);
             } break;
-            case ZoneEquip::ZoneDXDehumidifier: { // 'ZoneHVAC:Dehumidifier:DX'
+            case ZoneEquipType::DehumidifierDX: { // 'ZoneHVAC:Dehumidifier:DX'
                 ZoneDehumidifier::SimZoneDehumidifier(state,
                                                       state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                       ControlledZoneNum,
@@ -3201,7 +3204,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                          // temperature) SysOutputProvided amount was already sent above to
                                          // next Predict-Correct series of calcs via SysDepZoneLoads
             } break;
-            case ZoneEquip::FanCoil4Pipe: { // 'ZoneHVAC:FourPipeFanCoil'
+                    
+            case ZoneEquipType::FourPipeFanCoil: { // 'ZoneHVAC:FourPipeFanCoil'
                 FanCoilUnits::SimFanCoilUnit(state,
                                              state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                              ControlledZoneNum,
@@ -3210,7 +3214,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                              LatOutputProvided,
                                              zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::UnitVentilator: { // 'ZoneHVAC:UnitVentilator'
+                    
+            case ZoneEquipType::UnitVentilator: { // 'ZoneHVAC:UnitVentilator'
                 UnitVentilator::SimUnitVentilator(state,
                                                   state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                   ControlledZoneNum,
@@ -3219,7 +3224,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                   LatOutputProvided,
                                                   zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::UnitHeater: { // 'ZoneHVAC:UnitHeater'
+                    
+            case ZoneEquipType::UnitHeater: { // 'ZoneHVAC:UnitHeater'
                 UnitHeater::SimUnitHeater(state,
                                           state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                           ControlledZoneNum,
@@ -3228,7 +3234,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                           LatOutputProvided,
                                           zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::PurchasedAir: { // 'ZoneHVAC:IdealLoadsAirSystem'
+
+            case ZoneEquipType::PurchasedAir: { // 'ZoneHVAC:IdealLoadsAirSystem'
                 PurchasedAirManager::SimPurchasedAir(state,
                                                      state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                      SysOutputProvided,
@@ -3237,7 +3244,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                      ControlledZoneNum,
                                                      zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::BBWater: { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
+
+            case ZoneEquipType::BaseboardWater: { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
                 HWBaseboardRadiator::SimHWBaseboard(state,
                                                     state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                     ControlledZoneNum,
@@ -3248,7 +3256,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 thisZoneHB.NonAirSystemResponse += SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
-            case ZoneEquip::BBSteam: { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
+                    
+            case ZoneEquipType::BaseboardSteam: { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
                 SteamBaseboardRadiator::SimSteamBaseboard(state,
                                                           state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                           ControlledZoneNum,
@@ -3259,7 +3268,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 thisZoneHB.NonAirSystemResponse += SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
-            case ZoneEquip::BBWaterConvective: { // 'ZoneHVAC:Baseboard:Convective:Water'
+                    
+            case ZoneEquipType::BaseboardConvectiveWater: { // 'ZoneHVAC:Baseboard:Convective:Water'
                 BaseboardRadiator::SimBaseboard(state,
                                                 state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                 ControlledZoneNum,
@@ -3270,7 +3280,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 thisZoneHB.NonAirSystemResponse += SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
-            case ZoneEquip::BBElectricConvective: { // 'ZoneHVAC:Baseboard:Convective:Electric'
+
+            case ZoneEquipType::BaseboardConvectiveElectric: { // 'ZoneHVAC:Baseboard:Convective:Electric'
                 BaseboardElectric::SimElectricBaseboard(state,
                                                         state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                         ControlledZoneNum,
@@ -3280,7 +3291,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 thisZoneHB.NonAirSystemResponse += SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
-            case ZoneEquip::CoolingPanel: { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
+                    
+            case ZoneEquipType::CoolingPanel: { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
                 CoolingPanelSimple::SimCoolingPanel(state,
                                                     state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                     ControlledZoneNum,
@@ -3291,7 +3303,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 thisZoneHB.NonAirSystemResponse += SysOutputProvided;
                 LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
             } break;
-            case ZoneEquip::HiTempRadiant: { // 'ZoneHVAC:HighTemperatureRadiant'
+                    
+            case ZoneEquipType::HighTemperatureRadiant: { // 'ZoneHVAC:HighTemperatureRadiant'
                 HighTempRadiantSystem::SimHighTempRadiantSystem(state,
                                                                 state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                                 FirstHVACIteration,
@@ -3300,7 +3313,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 LatOutputProvided = 0.0; // This baseboard currently sends its latent heat gain directly to predictor/corrector
                                          // via SumLatentHTRadSys... so setting LatOutputProvided = 0.0
             } break;
-            case ZoneEquip::LoTempRadiant: { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow',
+                    
+            case ZoneEquipType::LowTemperatureRadiant: { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow',
                                              // 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
                 // 'ZoneHVAC:LowTemperatureRadiant:Electric'
                 LowTempRadiantSystem::SimLowTempRadiantSystem(state,
@@ -3310,7 +3324,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                               zoneEquipList.EquipIndex(EquipPtr));
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
-            case ZoneEquip::ZoneExhaustFan: { // 'Fan:ZoneExhaust'
+                    
+            case ZoneEquipType::ExhaustFan: { // 'Fan:ZoneExhaust'
                 // Air loop system availability manager status only applies to PIU and exhaust fans
                 // Check to see if System Availability Managers are asking for fans to cycle on or shut off
                 // and set fan on/off flags accordingly.
@@ -3328,14 +3343,16 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                             zoneEquipList.EquipIndex(EquipPtr));
 
             } break;
-            case ZoneEquip::HeatXchngr: { // 'HeatExchanger:AirToAir:FlatPlate'
+                    
+            case ZoneEquipType::HeatExchanger: { // 'HeatExchanger:AirToAir:FlatPlate'
                 HeatRecovery::SimHeatRecovery(state,
                                               state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                               FirstHVACIteration,
                                               zoneEquipList.EquipIndex(EquipPtr),
                                               DataHVACGlobals::ContFanCycCoil);
             } break;
-            case ZoneEquip::ERVStandAlone: { // 'ZoneHVAC:EnergyRecoveryVentilator'
+                    
+            case ZoneEquipType::EnergyRecoveryVentilator: { // 'ZoneHVAC:EnergyRecoveryVentilator'
                 HVACStandAloneERV::SimStandAloneERV(state,
                                                     state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                     ControlledZoneNum,
@@ -3344,7 +3361,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                     LatOutputProvided,
                                                     zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::HPWaterHeater: { // 'WaterHeater:HeatPump:PumpedCondenser'
+                    
+            case ZoneEquipType::HeatPumpWaterHeater: { // 'WaterHeater:HeatPump:PumpedCondenser'
                 WaterThermalTanks::SimHeatPumpWaterHeater(state,
                                                           state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                           FirstHVACIteration,
@@ -3352,7 +3370,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                           LatOutputProvided,
                                                           state.dataZoneEquip->ZoneEquipList(ControlledZoneNum).EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::VentilatedSlab: { // 'ZoneHVAC:VentilatedSlab'
+                    
+            case ZoneEquipType::VentilatedSlab: { // 'ZoneHVAC:VentilatedSlab'
                 VentilatedSlab::SimVentilatedSlab(state,
                                                   state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                   ControlledZoneNum,
@@ -3361,7 +3380,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                   LatOutputProvided,
                                                   zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::OutdoorAirUnit: { // 'ZoneHVAC:OutdoorAirUnit'
+                    
+            case ZoneEquipType::OutdoorAirUnit: { // 'ZoneHVAC:OutdoorAirUnit'
                 OutdoorAirUnit::SimOutdoorAirUnit(state,
                                                   state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                   ControlledZoneNum,
@@ -3370,7 +3390,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                   LatOutputProvided,
                                                   zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::BBElectric: { // 'ZoneHVAC:Baseboard:RadiantConvective:Electric'
+                    
+            case ZoneEquipType::BaseboardElectric: { // 'ZoneHVAC:Baseboard:RadiantConvective:Electric'
                 ElectricBaseboardRadiator::SimElecBaseboard(state,
                                                             state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                             ControlledZoneNum,
@@ -3381,7 +3402,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 thisZoneHB.NonAirSystemResponse += SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
-            case ZoneEquip::RefrigerationAirChillerSet: { // 'ZoneHVAC:RefrigerationChillerSet'
+                    
+            case ZoneEquipType::RefrigerationChillerSet: { // 'ZoneHVAC:RefrigerationChillerSet'
                 RefrigeratedCase::SimAirChillerSet(state,
                                                    state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                    ControlledZoneNum,
@@ -3392,7 +3414,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
                 thisZoneHB.NonAirSystemResponse += SysOutputProvided;
             } break;
-            case ZoneEquip::UserDefinedZoneHVACForcedAir: {
+
+            case ZoneEquipType::UserDefinedHVACForcedAir: {
                 UserDefinedComponents::SimZoneAirUserDefined(state,
                                                              state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                              ControlledZoneNum,
@@ -3400,7 +3423,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                              LatOutputProvided,
                                                              zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::ZoneEvaporativeCoolerUnit: {
+                    
+            case ZoneEquipType::EvaporativeCooler: {
                 EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state,
                                                                  state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                                                  ControlledZoneNum,
@@ -3408,7 +3432,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                                  LatOutputProvided,
                                                                  zoneEquipList.EquipIndex(EquipPtr));
             } break;
-            case ZoneEquip::ZoneHybridEvaporativeCooler: {
+                    
+            case ZoneEquipType::HybridEvaporativeCooler: {
                 HybridUnitaryAirConditioners::SimZoneHybridUnitaryAirConditioners(
                     state,
                     state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
@@ -3417,6 +3442,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                     LatOutputProvided,
                     zoneEquipList.EquipIndex(EquipPtr));
             } break;
+                    
             default:
                 break;
             }
@@ -3527,9 +3553,9 @@ void SetZoneEquipSimOrder(EnergyPlusData &state, int const ControlledZoneNum)
     int const NumOfEquipTypes(zeq.NumOfEquipTypes);
     for (int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum) {
         auto &pso(state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum));
-        pso.EquipType = zeq.EquipType(EquipTypeNum);
+        pso.EquipTypeName = zeq.EquipTypeName(EquipTypeNum);
         pso.EquipName = zeq.EquipName(EquipTypeNum);
-        pso.EquipTypeEnum = zeq.EquipTypeEnum(EquipTypeNum);
+        pso.equipType = zeq.EquipType(EquipTypeNum);
         pso.CoolingPriority = zeq.CoolingPriority(EquipTypeNum);
         pso.HeatingPriority = zeq.HeatingPriority(EquipTypeNum);
         pso.EquipPtr = EquipTypeNum;
@@ -3538,9 +3564,9 @@ void SetZoneEquipSimOrder(EnergyPlusData &state, int const ControlledZoneNum)
          EquipTypeNum <= EquipTypeNum_end;
          ++EquipTypeNum) { // Reset unused upper array portion
         auto &pso(state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum));
-        pso.EquipType.clear();
+        pso.EquipTypeName.clear();
         pso.EquipName.clear();
-        pso.EquipTypeEnum = 0;
+        pso.equipType = DataZoneEquipment::ZoneEquipType::Invalid;
         pso.EquipPtr = 0;
     }
 
@@ -3559,10 +3585,10 @@ void SetZoneEquipSimOrder(EnergyPlusData &state, int const ControlledZoneNum)
                  state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputRequired >= 0.0)) {
 
                 // Tuned C++ string swap avoids copying
-                pso.EquipType.swap(psc.EquipType);
+                pso.EquipTypeName.swap(psc.EquipTypeName);
                 pso.EquipName.swap(psc.EquipName);
                 std::swap(pso.EquipPtr, psc.EquipPtr);
-                std::swap(pso.EquipTypeEnum, psc.EquipTypeEnum);
+                std::swap(pso.equipType, psc.equipType);
                 std::swap(pso.CoolingPriority, psc.CoolingPriority);
                 std::swap(pso.HeatingPriority, psc.HeatingPriority);
 
@@ -6141,7 +6167,7 @@ void GetStandAloneERVNodes(EnergyPlusData &state, DataHeatBalance::ZoneAirBalanc
         thisZoneAirBalance.OneTimeFlag = true;
         if (state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes > 0) {
             for (int I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
-                if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(I) == DataZoneEquipment::ZoneEquip::ERVStandAlone) {
+                if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipType(I) == DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator) {
                     ++thisZoneAirBalance.NumOfERVs;
                 }
             }
@@ -6150,7 +6176,7 @@ void GetStandAloneERVNodes(EnergyPlusData &state, DataHeatBalance::ZoneAirBalanc
                 thisZoneAirBalance.ERVExhaustNode.allocate(thisZoneAirBalance.NumOfERVs);
                 int j = 1;
                 for (int I = 1; I <= state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
-                    if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(I) == DataZoneEquipment::ZoneEquip::ERVStandAlone) {
+                    if (state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipType(I) == DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator) {
                         thisZoneAirBalance.ERVInletNode(j) =
                             HVACStandAloneERV::GetStandAloneERVOutAirNode(state, state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(I));
                         thisZoneAirBalance.ERVExhaustNode(j) =

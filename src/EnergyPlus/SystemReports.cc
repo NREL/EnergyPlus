@@ -2568,7 +2568,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
         // Set index of air loop serving zone
         for (CompNum = 1; CompNum <= state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).NumOfEquipTypes; ++CompNum) {
-            std::string &TypeOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipType(CompNum);
+            std::string &TypeOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipTypeName(CompNum);
             std::string &NameOfComp = state.dataZoneEquip->ZoneEquipList(CtrlZoneNum).EquipName(CompNum);
             DataLoopNode::ConnectionObjectType TypeOfCompNum = static_cast<DataLoopNode::ConnectionObjectType>(
                 EnergyPlus::getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, TypeOfComp));
@@ -4133,10 +4133,10 @@ void ReportVentilationLoads(EnergyPlusData &state)
         for (int thisZoneEquipNum = 1; thisZoneEquipNum <= thisZoneEquipList.NumOfEquipTypes; ++thisZoneEquipNum) {
             auto &thisEquipIndex = thisZoneEquipList.EquipIndex(thisZoneEquipNum);
 
-            switch (thisZoneEquipList.EquipTypeEnum(thisZoneEquipNum)) {
+            switch (thisZoneEquipList.EquipType(thisZoneEquipNum)) {
                 // case statement to cover all possible zone forced air units that could have outside air
 
-            case DataZoneEquipment::ZoneEquip::WindowAC: { // Window Air Conditioner
+            case DataZoneEquipment::ZoneEquipType::WindowAirConditioner: { // Window Air Conditioner
                 int OutAirNode = WindowAC::GetWindowACOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
@@ -4152,10 +4152,9 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
+            } break;
 
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::VRFTerminalUnit: {
+            case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: {
                 int OutAirNode = HVACVariableRefrigerantFlow::GetVRFTUOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
                 int ZoneInletAirNode = HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode(state, thisEquipIndex);
@@ -4170,12 +4169,11 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir:
-            case DataZoneEquipment::ZoneEquip::PkgTermACAirToAir:
-            case DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir: {
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump:
+            case DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner:
+            case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir: {
                 // loop index accesses correct pointer to equipment on this equipment list, DataZoneEquipment::GetZoneEquipmentData
                 // thisEquipIndex (EquipIndex) is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
                 int OutAirNode = thisZoneEquipList.compPointer[thisZoneEquipNum]->getMixerOANode();
@@ -4190,10 +4188,9 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     // Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::FanCoil4Pipe: {
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: {
                 int OutAirNode = FanCoilUnits::GetFanCoilOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
@@ -4209,10 +4206,9 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::UnitVentilator: {
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::UnitVentilator: {
                 int OutAirNode = UnitVentilator::GetUnitVentilatorOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
@@ -4228,10 +4224,9 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::PurchasedAir: {
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::PurchasedAir: {
                 ZFAUOutAirFlow += PurchasedAirManager::GetPurchasedAirOutAirMassFlow(state, thisEquipIndex);
                 int ZoneInletAirNode = PurchasedAirManager::GetPurchasedAirZoneInletAirNode(state, thisEquipIndex);
                 if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
@@ -4246,10 +4241,9 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::ERVStandAlone: {
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: {
                 int OutAirNode = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
@@ -4265,15 +4259,13 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::ZoneUnitarySys: {
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::UnitarySystem: {
                 // add accounting for OA when unitary system is used as zone equipment
+            } break;
 
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::OutdoorAirUnit: {
+            case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: {
                 int OutAirNode = OutdoorAirUnit::GetOutdoorAirUnitOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
@@ -4288,10 +4280,9 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::ZoneHybridEvaporativeCooler: {
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler: {
                 int OutAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
@@ -4308,36 +4299,33 @@ void ReportVentilationLoads(EnergyPlusData &state)
                 } else {
                     ZFAUZoneVentLoad += 0.0;
                 }
-
-                break;
-            }
-            case DataZoneEquipment::ZoneEquip::UnitHeater:
-            case DataZoneEquipment::ZoneEquip::VentilatedSlab:
+            } break;
+                    
+            case DataZoneEquipment::ZoneEquipType::UnitHeater:
+            case DataZoneEquipment::ZoneEquipType::VentilatedSlab:
                 //    ZoneHVAC:EvaporativeCoolerUnit ?????
-            case DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit:
-            case DataZoneEquipment::ZoneEquip::AirDistUnit:
-            case DataZoneEquipment::ZoneEquip::BBWaterConvective:
-            case DataZoneEquipment::ZoneEquip::BBElectricConvective:
-            case DataZoneEquipment::ZoneEquip::HiTempRadiant:
+            case DataZoneEquipment::ZoneEquipType::EvaporativeCooler:
+            case DataZoneEquipment::ZoneEquipType::AirDistributionUnit:
+            case DataZoneEquipment::ZoneEquipType::BaseboardConvectiveWater:
+            case DataZoneEquipment::ZoneEquipType::BaseboardConvectiveElectric:
+            case DataZoneEquipment::ZoneEquipType::HighTemperatureRadiant:
                 //    not sure how HeatExchanger:* could be used as zone equipment ?????
-            case DataZoneEquipment::ZoneEquip::LoTempRadiant:
-            case DataZoneEquipment::ZoneEquip::ZoneExhaustFan:
-            case DataZoneEquipment::ZoneEquip::HeatXchngr:
+            case DataZoneEquipment::ZoneEquipType::LowTemperatureRadiant:
+            case DataZoneEquipment::ZoneEquipType::ExhaustFan:
+            case DataZoneEquipment::ZoneEquipType::HeatExchanger:
                 // HPWaterHeater can be used as zone equipment
-            case DataZoneEquipment::ZoneEquip::HPWaterHeater:
-            case DataZoneEquipment::ZoneEquip::BBWater:
-            case DataZoneEquipment::ZoneEquip::ZoneDXDehumidifier:
-            case DataZoneEquipment::ZoneEquip::BBSteam:
-            case DataZoneEquipment::ZoneEquip::BBElectric:
-            case DataZoneEquipment::ZoneEquip::RefrigerationAirChillerSet:
-            case DataZoneEquipment::ZoneEquip::UserDefinedZoneHVACForcedAir:
-            case DataZoneEquipment::ZoneEquip::CoolingPanel: {
+            case DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater:
+            case DataZoneEquipment::ZoneEquipType::BaseboardWater:
+            case DataZoneEquipment::ZoneEquipType::DehumidifierDX:
+            case DataZoneEquipment::ZoneEquipType::BaseboardSteam:
+            case DataZoneEquipment::ZoneEquipType::BaseboardElectric:
+            case DataZoneEquipment::ZoneEquipType::RefrigerationChillerSet:
+            case DataZoneEquipment::ZoneEquipType::UserDefinedHVACForcedAir:
+            case DataZoneEquipment::ZoneEquipType::CoolingPanel: {
                 // do nothing, OA not included
-
-                break;
-            }
+            } break;
+                    
             default: {
-
                 ShowFatalError(state,
                                "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if "
                                "to do nothing");

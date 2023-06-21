@@ -376,7 +376,7 @@ namespace UnitVentilator {
             if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide || unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 unitVent.ATMixerExists = true;
             }
-            unitVent.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::UnitVentilator, unitVent.Name);
+            unitVent.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::UnitVentilator, unitVent.Name);
             if (unitVent.ZonePtr == 0) {
                 ErrorsFound = true;
             }
@@ -1103,13 +1103,13 @@ namespace UnitVentilator {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum);
             if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
-                    unitVent.AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
+                availMgr.AvailManagerListName = unitVent.AvailManagerListName;
+                availMgr.ZoneNum = ZoneNum;
                 state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
             }
-            unitVent.AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
+            unitVent.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {

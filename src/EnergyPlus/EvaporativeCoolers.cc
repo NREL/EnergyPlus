@@ -3775,13 +3775,13 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
         if (zoneEvapUnit.MyZoneEq) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
                 zoneEvapUnit.AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
             zoneEvapUnit.MyZoneEq = false;
         }
         zoneEvapUnit.FanAvailStatus =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::ZoneEvaporativeCoolerUnit).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;
     }
 
     if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {

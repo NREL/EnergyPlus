@@ -330,7 +330,7 @@ namespace BaseboardElectric {
                 }
 
                 thisBaseboard.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
-                    state, DataZoneEquipment::ZoneEquip::BBElectricConvective, thisBaseboard.EquipName);
+                    state, DataZoneEquipment::ZoneEquipType::BaseboardConvectiveElectric, thisBaseboard.EquipName);
             }
 
             if (ErrorsFound) {

@@ -86,12 +86,11 @@ namespace RoomAirModelManager {
                         bool &Errorfound); // find zone number and node number based on the node name
 
     bool CheckEquipName(EnergyPlusData &state,
-                        std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
                         int TotNumEquip,              // how many of this equipment type
-                        DataHVACGlobals::ZoneEquipType zeType);                 // equipment type number
+                        DataZoneEquipment::ZoneEquipType zoneEquipType);                 // equipment type number
 
 } // namespace RoomAirModelManager
 

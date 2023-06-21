@@ -601,7 +601,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         // search zone equipment list structure for zone index
         for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
             for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::CoolingPanel &&
+                if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquipType::CoolingPanel &&
                     state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == thisCP.Name) {
                     thisCP.ZonePtr = ctrlZone;
                 }

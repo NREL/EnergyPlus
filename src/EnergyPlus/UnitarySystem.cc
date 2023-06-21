@@ -378,16 +378,16 @@ namespace UnitarySystems {
             // need to move to better location and save thisObjectIndex and thisObjectType in struct
             // this->m_EquipCompNum is by parent type, not total UnitarySystems
             // e.g., PTAC = 1,2,3; PTHP = 1,2; PTWSHP = 1,2,3,4; UnitarySystems = 9 total
-            DataZoneEquipment::ZoneEquip thisObjectType = DataZoneEquipment::ZoneEquip::Invalid;
+            DataZoneEquipment::ZoneEquipType thisObjectType = DataZoneEquipment::ZoneEquipType::Invalid;
             switch (this->m_sysType) {
             case SysType::PackagedAC:
-                thisObjectType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
+                thisObjectType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
                 break;
             case SysType::PackagedHP:
-                thisObjectType = DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir;
+                thisObjectType = DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump;
                 break;
             case SysType::PackagedWSHP:
-                thisObjectType = DataZoneEquipment::ZoneEquip::PkgTermHPWaterToAir;
+                thisObjectType = DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir;
                 break;
             default:
                 break;
@@ -6986,7 +6986,7 @@ namespace UnitarySystems {
     {
         std::string cCurrentModuleObject = "ZoneHVAC:PackagedTerminalAirConditioner";
         SysType sysTypeNum = SysType::PackagedAC;
-        DataZoneEquipment::ZoneEquip zoneEqType = DataZoneEquipment::ZoneEquip::Invalid;
+        DataZoneEquipment::ZoneEquipType zoneEqType = DataZoneEquipment::ZoneEquipType::Invalid;
         int numPTAC = 0;
         int numPTHP = 0;
         int numPTWSHP = 0;
@@ -6994,11 +6994,11 @@ namespace UnitarySystems {
         for (int getPTUnitType = 1; getPTUnitType <= 3; ++getPTUnitType) {
             if (getPTUnitType == 2) {
                 sysTypeNum = SysType::PackagedHP;
-                zoneEqType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
+                zoneEqType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
                 cCurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
             } else if (getPTUnitType == 3) {
                 sysTypeNum = SysType::PackagedWSHP;
-                zoneEqType = DataZoneEquipment::ZoneEquip::PkgTermACAirToAir;
+                zoneEqType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
                 cCurrentModuleObject = "ZoneHVAC:WaterToAirHeatPump";
             }
             auto const instances = state.dataInputProcessing->inputProcessor->epJSON.find(cCurrentModuleObject);
@@ -7104,7 +7104,7 @@ namespace UnitarySystems {
 
                     thisSys.UnitType = cCurrentModuleObject;
                     thisSys.m_sysType = sysTypeNum;
-                    thisSys.ZoneEqType = zoneEqType;
+                    thisSys.zoneEquipType = zoneEqType;
 
                     // TODO: figure out another way to set this next variable
                     // Unitary System will not turn on unless this mode is set OR a different method is used to set air flow rate
@@ -7114,11 +7114,11 @@ namespace UnitarySystems {
                     if (sysNum == -1) {
                         // zone equipment require a 1-n index for access to zone availability managers
                         switch (getPTUnitType) {
-                        case 1:
+                        case 1: // Excuse me?
                             ++numPTAC;
                             thisSys.m_EquipCompNum = numPTAC;
                             break;
-                        case 2:
+                        case 2: // Baking powder?
                             ++numPTHP;
                             thisSys.m_EquipCompNum = numPTHP;
                             break;
@@ -17116,27 +17116,22 @@ namespace UnitarySystems {
 
     void UnitarySys::setSystemParams(EnergyPlusData &state, Real64 &TotalFloorAreaOnAirLoop, const std::string &thisObjectName)
     {
-        this->NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).ZoneNode;
+        auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum);
+        this->NodeNumOfControlledZone = zoneEquipConfig.ZoneNode;
         TotalFloorAreaOnAirLoop = state.dataHeatBal->Zone(this->ControlZoneNum).FloorArea;
         this->m_AirLoopEquipment = false;
-        if (state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex > 0) {
-            for (int EquipNum = 1;
-                 EquipNum <=
-                 state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex).NumOfEquipTypes;
-                 ++EquipNum) {
-                if ((state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                         .EquipTypeEnum(EquipNum) != DataZoneEquipment::ZoneEquip::ZoneUnitarySys) ||
-                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                            .EquipName(EquipNum) != thisObjectName)
-                    continue;
-                this->m_ZoneSequenceCoolingNum =
-                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                        .CoolingPriority(EquipNum);
-                this->m_ZoneSequenceHeatingNum =
-                    state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(this->ControlZoneNum).EquipListIndex)
-                        .HeatingPriority(EquipNum);
-                break;
+        if (zoneEquipConfig.EquipListIndex == 0)
+            return;
+
+        auto &zoneEquipList = state.dataZoneEquip->ZoneEquipList(zoneEquipConfig.EquipListIndex);
+        for (int EquipNum = 1; EquipNum <= zoneEquipList.NumOfEquipTypes; ++EquipNum) {
+            if ((zoneEquipList.EquipType(EquipNum) != DataZoneEquipment::ZoneEquipType::UnitarySystem) ||
+                zoneEquipList.EquipName(EquipNum) != thisObjectName) {
+                continue;
             }
+            this->m_ZoneSequenceCoolingNum = zoneEquipList.CoolingPriority(EquipNum);
+            this->m_ZoneSequenceHeatingNum = zoneEquipList.HeatingPriority(EquipNum);
+            break;
         }
     }
 

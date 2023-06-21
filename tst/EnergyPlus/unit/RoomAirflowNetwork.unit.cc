@@ -250,8 +250,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes = 1;
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName.allocate(1);
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName(1) = "ZoneHVAC";
-    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum.allocate(1);
-    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::PkgTermHPAirToAir;
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipType.allocate(1);
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipType(1) = DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump;
 
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode.allocate(1);
@@ -394,7 +394,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     ASSERT_TRUE(process_idf(idf_objects));
     state->afn->get_input();
 
-    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(1) = DataZoneEquipment::ZoneEquip::AirDistUnit;
+    state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipType(1) = DataZoneEquipment::ZoneEquipType::AirDistributionUnit;
     state->dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
     state->dataDefineEquipment->AirDistUnit.allocate(1);

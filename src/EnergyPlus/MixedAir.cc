@@ -1633,7 +1633,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                             for (int EquipListNum = 1; EquipListNum <= state.dataZoneEquip->NumOfZoneEquipLists; ++EquipListNum) {
                                 if (EquipListNum == EquipListIndex) {
                                     for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
-                                        if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipType(EquipNum),
+                                        if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipTypeName(EquipNum),
                                                                         "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
                                             for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                                                 if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipName(EquipNum),

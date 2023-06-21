@@ -1190,13 +1190,13 @@ namespace OutdoorAirUnit {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum);
             if (state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailManagerListName =
-                    thisOutAirUnit.AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).ZoneNum = ZoneNum;
+                    availMgr.AvailManagerListName = thisOutAirUnit.AvailManagerListName;
+                availMgr.ZoneNum = ZoneNum;
                 state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum) = false;
             }
-            thisOutAirUnit.AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum).AvailStatus;
+            thisOutAirUnit.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {

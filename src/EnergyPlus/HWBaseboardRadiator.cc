@@ -631,7 +631,7 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.FracDistribToSurf = 0.0;
 
             thisHWBaseboard.ZonePtr =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWater, thisHWBaseboard.Name);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardWater, thisHWBaseboard.Name);
 
             AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= thisHWBaseboard.TotSurfToDistrib; ++SurfNum) {

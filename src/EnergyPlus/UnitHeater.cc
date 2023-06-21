@@ -800,14 +800,13 @@ namespace UnitHeater {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum);
             if (state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
+                availMgr.AvailManagerListName = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
+                availMgr.ZoneNum = ZoneNum;
                 state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum) = false;
             }
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus =
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {

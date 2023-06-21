@@ -1561,12 +1561,13 @@ namespace VentilatedSlab {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::VentilatedSlab).ZoneCompAvailMgrs(Item);
             if (state.dataVentilatedSlab->MyZoneEqFlag(Item)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).AvailManagerListName = ventSlab.AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).ZoneNum = VentSlabZoneNum;
+                availMgr.AvailManagerListName = ventSlab.AvailManagerListName;
+                availMgr.ZoneNum = VentSlabZoneNum;
                 state.dataVentilatedSlab->MyZoneEqFlag(Item) = false;
             }
-            ventSlab.AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).AvailStatus;
+            ventSlab.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataVentilatedSlab->MyPlantScanFlag(Item) && allocated(state.dataPlnt->PlantLoop)) {

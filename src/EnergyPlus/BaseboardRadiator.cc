@@ -417,7 +417,7 @@ namespace BaseboardRadiator {
                 }
 
                 thisBaseboard.ZonePtr =
-                    DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWaterConvective, thisBaseboard.EquipID);
+                    DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardConvectiveWater, thisBaseboard.EquipID);
             }
 
             if (ErrorsFound) {

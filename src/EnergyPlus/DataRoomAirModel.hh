@@ -55,8 +55,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -424,7 +424,7 @@ namespace DataRoomAirModel {
         std::string ObjectTypeName = ""; // HVAC object type name
         std::string SupplyNodeName = ""; // HVAC system supply node name
         std::string ReturnNodeName = ""; // HVAC system return node name
-        DataHVACGlobals::ZoneEquipType zoneEquipType = DataHVACGlobals::ZoneEquipType::Invalid;              // HVAC type num
+        DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::Invalid;              // HVAC type num
         Real64 SupplyFraction = 0.0;      // Supply flow fraction
         Real64 ReturnFraction = 0.0;      // Return flow fraction
         int EquipConfigIndex = 0;       // HVAC equipment configuration index

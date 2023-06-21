@@ -11214,7 +11214,7 @@ namespace AirflowNetwork {
             for (int j = 1; j <= m_state.dataGlobal->NumOfZones; ++j) {
                 if (!m_state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
                 for (int EquipTypeNum = 1; EquipTypeNum <= m_state.dataZoneEquip->ZoneEquipList(j).NumOfEquipTypes; ++EquipTypeNum) {
-                    if (m_state.dataZoneEquip->ZoneEquipList(j).EquipTypeEnum(EquipTypeNum) == DataZoneEquipment::ZoneEquip::ZoneExhaustFan) {
+                    if (m_state.dataZoneEquip->ZoneEquipList(j).EquipType(EquipTypeNum) == DataZoneEquipment::ZoneEquipType::ExhaustFan) {
                         bool found = false;
                         for (int k = 1; k <= m_state.dataZoneEquip->ZoneEquipConfig(j).NumExhaustNodes; ++k) {
                             for (int i = 1; i <= AirflowNetworkNumOfExhFan; ++i) {
@@ -12090,7 +12090,7 @@ namespace AirflowNetwork {
             if (!m_state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
             NumOfCtrlZones++;
             for (int EquipTypeNum = 1; EquipTypeNum <= m_state.dataZoneEquip->ZoneEquipList(ZoneNum).NumOfEquipTypes; ++EquipTypeNum) {
-                if (m_state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipTypeEnum(EquipTypeNum) == DataZoneEquipment::ZoneEquip::AirDistUnit) {
+                if (m_state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipType(EquipTypeNum) == DataZoneEquipment::ZoneEquipType::AirDistributionUnit) {
                     int AirDistUnitNum = m_state.dataZoneEquip->ZoneEquipList(ZoneNum).EquipIndex(EquipTypeNum);
                     MdotBranch = m_state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).MassFlowRateTU;
                     break;

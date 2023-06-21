@@ -372,7 +372,7 @@ namespace DataHVACGlobals {
 
     // Parameters for HVACSystemRootFindingAlgorithm
     int constexpr Bisection(2);
-
+#ifdef GET_OUT
     enum class ZoneEquipType {
         Invalid = -1,
         DUMMY, // There is some back and forth with AFN enumerations here that I just don't want to mess with
@@ -427,7 +427,7 @@ namespace DataHVACGlobals {
     // ZoneUnitarySys
     extern const std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNames;
     extern const std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNamesUC;
-
+#endif //
     int constexpr MaxSpeedLevels = 10;
 
     extern Array1D_string const cFanTypes;

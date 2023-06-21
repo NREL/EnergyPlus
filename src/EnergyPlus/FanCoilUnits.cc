@@ -630,7 +630,7 @@ namespace FanCoilUnits {
                                    state.dataFanCoilUnits->ATMixerOutNode,
                                    fanCoil.AirOutNode);
             fanCoil.ControlZoneNum =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::FanCoil4Pipe, fanCoil.Name);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::FourPipeFanCoil, fanCoil.Name);
             if (fanCoil.ControlZoneNum == 0) {
                 ErrorsFound = true;
             }
@@ -1032,14 +1032,13 @@ namespace FanCoilUnits {
         }
 
         if (allocated(state.dataHVACGlobal->ZoneComp)) {
+            auto &availMgr = state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::FourPipeFanCoil).ZoneCompAvailMgrs(FanCoilNum);
             if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
-                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName =
-                    fanCoil.AvailManagerListName;
-                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ControlledZoneNum;
+                availMgr.AvailManagerListName = fanCoil.AvailManagerListName;
+                availMgr.ZoneNum = ControlledZoneNum;
                 state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
             }
-            fanCoil.AvailStatus =
-                state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquip::FanCoil4Pipe).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
+            fanCoil.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
