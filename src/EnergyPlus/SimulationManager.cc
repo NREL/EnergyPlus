@@ -1076,15 +1076,15 @@ namespace SimulationManager {
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     state.dataGlobal->DoCoilDirectSolutions =
-                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
+                        UtilityRoutines::makeUPPER(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
+                        UtilityRoutines::makeUPPER(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
                 }
                 if (fields.find("use_representative_surfaces_for_calculations") != fields.end()) {
                     state.dataSurface->UseRepresentativeSurfaceCalculations =
-                        UtilityRoutines::MakeUPPERCase(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
+                        UtilityRoutines::makeUPPER(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
@@ -1096,7 +1096,7 @@ namespace SimulationManager {
                 bool overridePsychTsatFnPb(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
-                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode").get<std::string>());
+                    overrideModeValue = UtilityRoutines::makeUPPER(fields.at("override_mode").get<std::string>());
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     } else if (overrideModeValue == "MODE01") {

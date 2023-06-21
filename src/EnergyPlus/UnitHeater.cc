@@ -469,7 +469,7 @@ namespace UnitHeater {
             // Heating coil information:
             {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type =
-                    static_cast<HCoilType>(getEnumerationValue(HCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(7))));
+                    static_cast<HCoilType>(getEnumValue(HCoilTypeNamesUC, UtilityRoutines::makeUPPER(Alphas(7))));
                 switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
                 case HCoilType::WaterHeatingCoil:
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;

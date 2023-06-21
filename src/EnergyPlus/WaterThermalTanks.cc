@@ -1334,7 +1334,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Inlet Air Configuration
         HPWH.InletAirConfiguration =
-            static_cast<WTTAmbientTemp>(getEnumerationValue(HPWHAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[6 + nAlphaOffset])));
+            static_cast<WTTAmbientTemp>(getEnumValue(HPWHAmbientTempNamesUC, UtilityRoutines::makeUPPER(hpwhAlpha[6 + nAlphaOffset])));
         switch (HPWH.InletAirConfiguration) {
         case WTTAmbientTemp::Schedule: {
 
@@ -1560,7 +1560,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Compressor Location
         HPWH.CrankcaseTempIndicator = static_cast<CrankcaseHeaterControlTemp>(
-            getEnumerationValue(CrankcaseHeaterControlTempNamesUC, UtilityRoutines::MakeUPPERCase(hpwhAlpha[20 + nAlphaOffset])));
+            getEnumValue(CrankcaseHeaterControlTempNamesUC, UtilityRoutines::makeUPPER(hpwhAlpha[20 + nAlphaOffset])));
         switch (HPWH.CrankcaseTempIndicator) {
         case CrankcaseHeaterControlTemp::Schedule: {
             if (!hpwhAlphaBlank[21 + nAlphaOffset]) {
@@ -2404,7 +2404,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         // Validate Heater Control Type
         Tank.ControlType = static_cast<HeaterControlMode>(
-            getEnumerationValue(HeaterControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+            getEnumValue(HeaterControlModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.ControlType) {
         case HeaterControlMode::Cycle: {
             Tank.MinCapacity = Tank.MaxCapacity;
@@ -2434,7 +2434,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.IgnitionDelay = state.dataIPShortCut->rNumericArgs(7); // Not yet implemented
 
         // Validate Heater Fuel Type
-        Tank.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+        Tank.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
         switch (Tank.FuelType) {
         case Constant::eFuel::Invalid: {
             ShowSevereError(state,
@@ -2496,7 +2496,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OffCycParaLoad = state.dataIPShortCut->rNumericArgs(9);
 
         // Validate Off-Cycle Parasitic Fuel Type
-        Tank.OffCycParaFuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
+        Tank.OffCycParaFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
         switch (Tank.OffCycParaFuelType) {
         case Constant::eFuel::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(6).empty()) { // If blank, default to Fuel Type for heater
@@ -2521,7 +2521,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(11);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
+        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
         switch (Tank.OnCycParaFuelType) {
         case Constant::eFuel::Invalid:
             if (state.dataIPShortCut->cAlphaArgs(7).empty()) { // If blank, default to Fuel Type for heater
@@ -2544,7 +2544,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
         Tank.OnCycParaFracToTank = state.dataIPShortCut->rNumericArgs(12);
 
         Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+            getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
         switch (Tank.AmbientTempIndicator) {
         case WTTAmbientTemp::Schedule: {
             Tank.AmbientTempSchedule = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(9));
@@ -2772,7 +2772,7 @@ bool getWaterHeaterMixedInputs(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
             Tank.SourceSideControlMode = static_cast<SourceSideControl>(
-                getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(18))));
+                getEnumValue(SourceSideControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(18))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 format("{} = {}:  Invalid Control Mode entered={}",
@@ -2863,7 +2863,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         }
 
         Tank.Shape =
-            static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+            static_cast<TankShape>(getEnumValue(TankShapeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
         case TankShape::VertCylinder: {
@@ -2903,7 +2903,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Heater Priority Control
         Tank.StratifiedControlMode = static_cast<PriorityControlMode>(
-            getEnumerationValue(PriorityControlModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+            getEnumValue(PriorityControlModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (Tank.StratifiedControlMode == PriorityControlMode::Invalid) {
             ShowSevereError(state,
                             format("{} = {}:  Invalid Heater Priority Control entered={}",
@@ -3003,7 +3003,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Heater Fuel Type
         Tank.FuelType = static_cast<Constant::eFuel>(
-            getEnumerationValue(Constant::eFuelNamesUC,
+            getEnumValue(Constant::eFuelNamesUC,
                                 state.dataIPShortCut->cAlphaArgs(
                                     7))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.FuelType == Constant::eFuel::Invalid) {
@@ -3031,7 +3031,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate Off-Cycle Parasitic Fuel Type
         Tank.OffCycParaFuelType = static_cast<Constant::eFuel>(
-            getEnumerationValue(Constant::eFuelNamesUC,
+            getEnumValue(Constant::eFuelNamesUC,
                                 state.dataIPShortCut->cAlphaArgs(
                                     8))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported
         if (Tank.OffCycParaFuelType == Constant::eFuel::Invalid) {
@@ -3055,7 +3055,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaLoad = state.dataIPShortCut->rNumericArgs(15);
 
         // Validate On-Cycle Parasitic Fuel Type
-        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(getEnumerationValue(
+        Tank.OnCycParaFuelType = static_cast<Constant::eFuel>(getEnumValue(
             Constant::eFuelNamesUC,
             state.dataIPShortCut->cAlphaArgs(
                 9))); // returns all kinds of fuels including district heat and cool + steam, returns unassigned if unsupported/empty
@@ -3078,7 +3078,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaHeight = state.dataIPShortCut->rNumericArgs(17);
 
         Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+            getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(10))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -3372,7 +3372,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         // Validate inlet mode
         Tank.InletMode = static_cast<InletPositionMode>(
-            getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(20))));
+            getEnumValue(InletPositionModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(20))));
 
         Tank.Nodes = state.dataIPShortCut->rNumericArgs(32);
         int specifiedNodes = 0;
@@ -3407,7 +3407,7 @@ bool getWaterHeaterStratifiedInput(EnergyPlusData &state)
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(21)) {
             Tank.SourceSideControlMode = static_cast<SourceSideControl>(
-                getEnumerationValue(SourceSideControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(21))));
+                getEnumValue(SourceSideControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(21))));
             if (Tank.SourceSideControlMode == SourceSideControl::Invalid) {
                 ShowSevereError(state,
                                 format("{} = {}:  Invalid Control Mode entered={}",
@@ -3531,7 +3531,7 @@ bool getWaterTankMixedInput(EnergyPlusData &state)
         Tank.OnCycParaFracToTank = 0.0;
 
         Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+            getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -3794,7 +3794,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         }
 
         Tank.Shape =
-            static_cast<TankShape>(getEnumerationValue(TankShapeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            static_cast<TankShape>(getEnumValue(TankShapeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
         switch (Tank.Shape) {
         case TankShape::HorizCylinder:
         case TankShape::VertCylinder: {
@@ -3868,7 +3868,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
         Tank.OnCycParaHeight = 0.0;
 
         Tank.AmbientTempIndicator = static_cast<WTTAmbientTemp>(
-            getEnumerationValue(TankAmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+            getEnumValue(TankAmbientTempNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         switch (Tank.AmbientTempIndicator) {
 
         case WTTAmbientTemp::Schedule: {
@@ -4113,7 +4113,7 @@ bool getWaterTankStratifiedInput(EnergyPlusData &state)
 
         // Validate inlet mode
         Tank.InletMode = static_cast<InletPositionMode>(
-            getEnumerationValue(InletPositionModeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(14))));
+            getEnumValue(InletPositionModeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(14))));
 
         Tank.Nodes = state.dataIPShortCut->rNumericArgs(18);
         Tank.AdditionalCond = state.dataIPShortCut->rNumericArgs(19);
@@ -4405,7 +4405,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                         } else {
 
                             DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
-                                getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(Tank.Type)));
+                                getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::makeUPPER(Tank.Type)));
 
                             Tank.SourceInletNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                        HPWH.OutletNodeName1,

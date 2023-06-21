@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+    state->dataRoomAirMod->AirModel(1).AirModel = DataRoomAirModel::RoomAirModel::Mixing;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
@@ -926,7 +926,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+    state->dataRoomAirMod->AirModel(1).AirModel = DataRoomAirModel::RoomAirModel::Mixing;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);

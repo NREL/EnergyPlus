@@ -2539,7 +2539,7 @@ namespace ThermalComfort {
             testCooling = (state.dataHeatBalFanSys->TempControlType(iZone) != DataHVACGlobals::ThermostatType::SingleHeating);
 
             if (testHeating && (SensibleLoadPredictedNoAdj > 0)) { // heating
-                if (state.dataRoomAirMod->AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
+                if (state.dataRoomAirMod->AirModel(iZone).AirModel != DataRoomAirModel::RoomAirModel::Mixing) {
                     deltaT = state.dataHeatBalFanSys->TempTstatAir(iZone) - state.dataHeatBalFanSys->ZoneThermostatSetPointLo(iZone);
                 } else {
                     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {
@@ -2565,7 +2565,7 @@ namespace ThermalComfort {
                     }
                 }
             } else if (testCooling && (SensibleLoadPredictedNoAdj < 0)) { // cooling
-                if (state.dataRoomAirMod->AirModel(iZone).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
+                if (state.dataRoomAirMod->AirModel(iZone).AirModel != DataRoomAirModel::RoomAirModel::Mixing) {
                     deltaT = state.dataHeatBalFanSys->TempTstatAir(iZone) - state.dataHeatBalFanSys->ZoneThermostatSetPointHi(iZone);
                 } else {
                     if (state.dataZoneTempPredictorCorrector->NumOnOffCtrZone > 0) {

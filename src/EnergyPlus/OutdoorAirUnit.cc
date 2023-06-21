@@ -511,7 +511,7 @@ namespace OutdoorAirUnit {
                 constexpr std::array<std::string_view, static_cast<int>(OAUnitCtrlType::Num)> ctrlTypeNamesUC = {
                     "NEUTRALCONTROL", "INVALID-UNCONDITIONED", "TEMPERATURECONTROL"};
                 OAUnitCtrlType const tmpCtrlType =
-                    static_cast<OAUnitCtrlType>(getEnumerationValue(ctrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+                    static_cast<OAUnitCtrlType>(getEnumValue(ctrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
                 switch (tmpCtrlType) {
                 case OAUnitCtrlType::Neutral:
                 case OAUnitCtrlType::Temperature:
@@ -664,7 +664,7 @@ namespace OutdoorAirUnit {
                         thisOutAirUnit.OAEquip(InListNum).ComponentName = AlphArray(InListNum * 2 + 1);
 
                         thisOutAirUnit.OAEquip(InListNum).Type =
-                            static_cast<CompType>(getEnumerationValue(CompTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(InListNum * 2))));
+                            static_cast<CompType>(getEnumValue(CompTypeNamesUC, UtilityRoutines::makeUPPER(AlphArray(InListNum * 2))));
 
                         int const CompNum = InListNum;
 

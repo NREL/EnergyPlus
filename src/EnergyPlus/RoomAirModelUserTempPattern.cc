@@ -236,7 +236,7 @@ void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number
 
         CurntPatternKey = GetCurrentScheduleValue(state, state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).PatternSchedID);
 
-        CurPatrnID = FindNumberInList(CurntPatternKey, state.dataRoomAirMod->RoomAirPattern, &TemperaturePatternStruct::PatrnID);
+        CurPatrnID = FindNumberInList(CurntPatternKey, state.dataRoomAirMod->RoomAirPattern, &TemperaturePattern::PatrnID);
 
         if (CurPatrnID == 0) {
             // throw error here ? way to test schedules before getting to this point?

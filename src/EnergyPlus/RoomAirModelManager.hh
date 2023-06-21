@@ -91,7 +91,7 @@ namespace RoomAirModelManager {
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
                         int TotNumEquip,              // how many of this equipment type
-                        int TypeNum);                 // equipment type number
+                        DataHVACGlobals::ZoneEquipType zeType);                 // equipment type number
 
 } // namespace RoomAirModelManager
 

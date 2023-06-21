@@ -1774,7 +1774,7 @@ namespace PlantPipingSystemsManager {
 
             // Read in the flow direction
             thisSegment.FlowDirection =
-                static_cast<SegmentFlow>(getEnumerationValue(flowDirectionNamesUC, stripped(state.dataIPShortCut->cAlphaArgs(2))));
+                static_cast<SegmentFlow>(getEnumValue(flowDirectionNamesUC, stripped(state.dataIPShortCut->cAlphaArgs(2))));
             if (thisSegment.FlowDirection == SegmentFlow::Invalid) {
                 CurIndex = 2;
                 IssueSevereInputFieldError(state,

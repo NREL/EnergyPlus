@@ -364,7 +364,7 @@ namespace WaterToAirHeatPump {
             heatPump.LossFactor = NumArray(11);
 
             heatPump.compressorType =
-                static_cast<CompressorType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
+                static_cast<CompressorType>(getEnumValue(CompressTypeNamesUC, UtilityRoutines::makeUPPER(AlphArray(2))));
 
             switch (heatPump.compressorType) {
             case CompressorType::Reciprocating: {
@@ -548,7 +548,7 @@ namespace WaterToAirHeatPump {
             heatPump.LossFactor = NumArray(8);
 
             heatPump.compressorType =
-                static_cast<CompressorType>(getEnumerationValue(CompressTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(2))));
+                static_cast<CompressorType>(getEnumValue(CompressTypeNamesUC, UtilityRoutines::makeUPPER(AlphArray(2))));
             switch (heatPump.compressorType) {
             case CompressorType::Reciprocating: {
                 heatPump.CompPistonDisp = NumArray(9);

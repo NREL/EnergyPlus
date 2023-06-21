@@ -4849,7 +4849,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.AvailSchedNum = ScheduleManager::ScheduleAlwaysOn;
         }
 
-        int typeNum = getEnumerationValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5)));
+        int typeNum = getEnumValue(DataDaylighting::LtgCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)));
         daylightControl.LightControlType = static_cast<DataDaylighting::LtgCtrlType>(typeNum);
         if (daylightControl.LightControlType == DataDaylighting::LtgCtrlType::Invalid) {
             ShowWarningError(state,

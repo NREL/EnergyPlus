@@ -724,7 +724,7 @@ namespace CrossVentMgr {
                 if (thisSurface.Zone == ZoneNum) {
                     if (state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
-                    } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModelType ==
+                    } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModel ==
                                DataRoomAirModel::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
                             state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum);
@@ -737,7 +737,7 @@ namespace CrossVentMgr {
 
                     if (state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
-                    } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModelType ==
+                    } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModel ==
                                DataRoomAirModel::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
                             state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum);
@@ -747,11 +747,11 @@ namespace CrossVentMgr {
                     }
                 }
             } else if ((thisSurface.Zone == ZoneNum) &&
-                       (state.dataRoomAirMod->AirModel(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).AirModelType ==
+                       (state.dataRoomAirMod->AirModel(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).AirModel ==
                         DataRoomAirModel::RoomAirModel::UCSDCV)) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone);
             } else if ((thisSurface.Zone != ZoneNum) &&
-                       (state.dataRoomAirMod->AirModel(thisSurface.Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV)) {
+                       (state.dataRoomAirMod->AirModel(thisSurface.Zone).AirModel == DataRoomAirModel::RoomAirModel::UCSDCV)) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(surfNum);
             } else {
                 if (thisSurface.Zone == ZoneNum) {

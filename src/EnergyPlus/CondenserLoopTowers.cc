@@ -333,7 +333,7 @@ namespace CondenserLoopTowers {
             }
             tower.TowerFreeConvNomCapSizingFactor = NumArray(12);
             if (NumAlphas >= 4) {
-                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumValue(PIMNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
                 if (tower.PerformanceInputMethod_Num == PIM::Invalid) {
                     ShowSevereError(state, format("{}={}", cCurrentModuleObject, AlphArray(1)));
                     ShowContinueError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
@@ -404,7 +404,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
@@ -412,7 +412,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(25);                    //  N17  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
@@ -458,7 +458,7 @@ namespace CondenserLoopTowers {
                 tower.CapacityControl = CapacityCtrl::FanCycling; // FanCycling
             } else {
                 tower.CapacityControl =
-                    static_cast<CapacityCtrl>(getEnumerationValue(CapacityCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+                    static_cast<CapacityCtrl>(getEnumValue(CapacityCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
                 if (tower.CapacityControl == CapacityCtrl::Invalid) {
                     tower.CapacityControl = CapacityCtrl::FanCycling;
                     ShowWarningError(state,
@@ -487,7 +487,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for single speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(12))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(12))));
             }
 
             //   High speed air flow rate must be greater than free convection air flow rate.
@@ -646,7 +646,7 @@ namespace CondenserLoopTowers {
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (NumAlphas >= 4) {
-                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumerationValue(PIMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumValue(PIMNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
             } else {
                 // Since Performance Input Method has been omitted then assume it to be UA and DESIGN WATER FLOW RATE
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
@@ -766,7 +766,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(6))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
 
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
@@ -774,7 +774,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(33);                    //  N21  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(7))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
@@ -801,7 +801,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for two speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
@@ -1435,7 +1435,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(8))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(8))));
 
             tower.UserEvapLossFactor = NumArray(11);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(12) / 100.0; //  N12, \field Drift Loss Percent
@@ -1443,7 +1443,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(17);                    //  N14  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(9))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(9))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(10));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
@@ -1470,7 +1470,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for variable speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(13))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(13))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
@@ -1695,7 +1695,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumerationValue(EvapLossNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(10))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(10))));
 
             tower.UserEvapLossFactor = NumArray(23);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(24) / 100.0; //  N24, \field Drift Loss Percent
@@ -1703,7 +1703,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(29);                    //  N29  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumerationValue(BlowDownNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(11))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(12));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(12), AlphArray(12)));
@@ -1730,7 +1730,7 @@ namespace CondenserLoopTowers {
             tower.TowerMassFlowRateMultiplier = tower.MaxFracFlowRate;
             //   cell control for variable speed Merkel tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumerationValue(CellCtrlNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(15))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(15))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {

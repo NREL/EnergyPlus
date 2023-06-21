@@ -486,7 +486,7 @@ namespace VentilatedSlab {
             ventSlab.OutAirVolFlow = state.dataIPShortCut->rNumericArgs(3);
 
             ventSlab.outsideAirControlType = static_cast<OutsideAirControlType>(
-                getEnumerationValue(OutsideAirControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+                getEnumValue(OutsideAirControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
             switch (ventSlab.outsideAirControlType) {
             case OutsideAirControlType::VariablePercent: {
@@ -564,7 +564,7 @@ namespace VentilatedSlab {
 
             // System Configuration:
             ventSlab.SysConfg = static_cast<VentilatedSlabConfig>(
-                getEnumerationValue(VentilatedSlabConfigNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+                getEnumValue(VentilatedSlabConfigNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
 
             if (ventSlab.SysConfg == VentilatedSlabConfig::Invalid) {
                 ShowSevereError(
@@ -611,7 +611,7 @@ namespace VentilatedSlab {
 
             // Process the temperature control type
             ventSlab.controlType = static_cast<ControlType>(
-                getEnumerationValue(ControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+                getEnumValue(ControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
 
             if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(
@@ -987,7 +987,7 @@ namespace VentilatedSlab {
             // Coil options assign
 
             ventSlab.coilOption =
-                static_cast<CoilType>(getEnumerationValue(CoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(26))));
+                static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(26))));
 
             if (ventSlab.coilOption == CoilType::Invalid) {
                 ShowSevereError(
@@ -1016,7 +1016,7 @@ namespace VentilatedSlab {
                     errFlag = false;
 
                     ventSlab.hCoilType = static_cast<HeatingCoilType>(
-                        getEnumerationValue(HeatingCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(27))));
+                        getEnumValue(HeatingCoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(27))));
 
                     switch (ventSlab.hCoilType) {
 
@@ -1132,7 +1132,7 @@ namespace VentilatedSlab {
                     errFlag = false;
 
                     ventSlab.cCoilType = static_cast<CoolingCoilType>(
-                        getEnumerationValue(CoolingCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(30))));
+                        getEnumValue(CoolingCoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(30))));
 
                     switch (ventSlab.cCoilType) {
                     case CoolingCoilType::WaterCooling: {

@@ -288,7 +288,7 @@ namespace FanCoilUnits {
                                                                                              "MULTISPEEDFAN",
                                                                                              "ASHRAE90VARIABLEFAN"};
             std::string capCtrlMeth = Alphas(3);
-            fanCoil.CapCtrlMeth_Num = static_cast<CCM>(getEnumerationValue(CapCtrlMethUC, capCtrlMeth));
+            fanCoil.CapCtrlMeth_Num = static_cast<CCM>(getEnumValue(CapCtrlMethUC, capCtrlMeth));
             if (fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) {
                 fanCoil.DesZoneCoolingLoad = DataSizing::AutoSize;
                 fanCoil.DesZoneHeatingLoad = DataSizing::AutoSize;

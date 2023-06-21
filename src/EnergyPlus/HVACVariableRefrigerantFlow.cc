@@ -2036,7 +2036,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         thisVrfSys.MasterZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(24), state.dataHeatBal->Zone);
 
-        thisVrfSys.ThermostatPriority = static_cast<ThermostatCtrlType>(getEnumerationValue(ThermostatCtrlTypeUC, cAlphaArgs(25)));
+        thisVrfSys.ThermostatPriority = static_cast<ThermostatCtrlType>(getEnumValue(ThermostatCtrlTypeUC, cAlphaArgs(25)));
 
         if (thisVrfSys.ThermostatPriority == ThermostatCtrlType::MasterThermostatPriority) {
             if (thisVrfSys.MasterZonePtr == 0) {
@@ -2117,7 +2117,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(31)) {
             thisVrfSys.DefrostStrategy =
-                static_cast<StandardRatings::DefrostStrat>(getEnumerationValue(StandardRatings::DefrostStratUC, cAlphaArgs(31)));
+                static_cast<StandardRatings::DefrostStrat>(getEnumValue(StandardRatings::DefrostStratUC, cAlphaArgs(31)));
             if (thisVrfSys.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(state,
                                 format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(31), cAlphaArgs(31)));
@@ -2129,7 +2129,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(32)) {
             thisVrfSys.DefrostControl =
-                static_cast<StandardRatings::HPdefrostControl>(getEnumerationValue(StandardRatings::HPdefrostControlUC, cAlphaArgs(32)));
+                static_cast<StandardRatings::HPdefrostControl>(getEnumValue(StandardRatings::HPdefrostControlUC, cAlphaArgs(32)));
 
             if (thisVrfSys.DefrostControl == StandardRatings::HPdefrostControl::Invalid) {
                 ShowSevereError(state,
@@ -2322,7 +2322,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
         if (!lAlphaFieldBlanks(39)) {
             // A39; \field Fuel type, Validate fuel type input
-            thisVrfSys.fuel = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, cAlphaArgs(39)));
+            thisVrfSys.fuel = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, cAlphaArgs(39)));
             if (thisVrfSys.fuel == Constant::eFuel::Invalid) {
                 ShowSevereError(
                     state,

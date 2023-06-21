@@ -598,7 +598,7 @@ void GetPlantLoopData(EnergyPlusData &state)
             MatchedPressureString = false;
 
             this_loop.PressureSimType = static_cast<DataPlant::PressSimType>(
-                getEnumerationValue(PressureSimTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alpha(PressSimAlphaIndex))));
+                getEnumValue(PressureSimTypeNamesUC, UtilityRoutines::makeUPPER(Alpha(PressSimAlphaIndex))));
             switch (this_loop.PressureSimType) {
                 // Check all types
             case DataPlant::PressSimType::NoPressure:
@@ -876,7 +876,7 @@ void GetPlantInput(EnergyPlusData &state)
                     this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
                     this_comp.Type =
-                        static_cast<PlantEquipmentType>(getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_comp_type)));
+                        static_cast<PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_comp_type)));
 
                     switch (this_comp.Type) {
                     case PlantEquipmentType::Pipe: {

@@ -150,7 +150,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetElectricInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ElectricChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -218,7 +218,7 @@ namespace PlantChillers {
             thisChiller.ChillerType = DataPlant::PlantEquipmentType::Chiller_Electric;
 
             thisChiller.CondenserType = static_cast<DataPlant::CondenserType>(
-                getEnumerationValue(DataPlant::CondenserTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+                getEnumValue(DataPlant::CondenserTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             switch (thisChiller.CondenserType) {
             case DataPlant::CondenserType::AirCooled:
             case DataPlant::CondenserType::WaterCooled:
@@ -433,7 +433,7 @@ namespace PlantChillers {
             if (thisChiller.SizFac <= 0.0) thisChiller.SizFac = 1.0;
 
             thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
+                static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -2072,7 +2072,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetEngineDrivenInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->EngineDrivenChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -2430,7 +2430,7 @@ namespace PlantChillers {
             thisChiller.DesignMinExitGasTemp = state.dataIPShortCut->rNumericArgs(24);
 
             // Validate fuel type input
-            thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(12)));
+            thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(12)));
 
             thisChiller.FuelHeatingValue = state.dataIPShortCut->rNumericArgs(25);
 
@@ -2515,7 +2515,7 @@ namespace PlantChillers {
             }
 
             thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(15)));
+                static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(15)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -4075,7 +4075,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetGasTurbineInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->GTChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -4472,7 +4472,7 @@ namespace PlantChillers {
             }
 
             thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+                static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -4483,7 +4483,7 @@ namespace PlantChillers {
             }
 
             // Fuel Type Case Statement
-            thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+            thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
             if (thisChiller.FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -6002,7 +6002,7 @@ namespace PlantChillers {
             state.dataPlantChillers->GetConstCOPInput = false;
         }
         for (auto &thisChiller : state.dataPlantChillers->ConstCOPChiller) {
-            if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
+            if (UtilityRoutines::makeUPPER(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }
         }
@@ -6293,7 +6293,7 @@ namespace PlantChillers {
             }
 
             thisChiller.FlowMode =
-                static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
+                static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(7)));
             if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));

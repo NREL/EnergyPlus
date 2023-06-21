@@ -485,8 +485,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
         {
             thisZoneAirBalance.BalanceMethod = static_cast<DataHeatBalance::AirBalance>(
-                getEnumerationValue(DataHeatBalance::AirBalanceTypeNamesUC,
-                                    UtilityRoutines::MakeUPPERCase(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
+                getEnumValue(DataHeatBalance::AirBalanceTypeNamesUC,
+                                    UtilityRoutines::makeUPPER(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
             if (thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Invalid) {
                 thisZoneAirBalance.BalanceMethod = DataHeatBalance::AirBalance::None;
                 ShowWarningError(state,
@@ -747,7 +747,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 // Set space flow fractions
                 // Infiltration equipment design level calculation method.
                 AirflowSpecAlt flow =
-                    static_cast<AirflowSpecAlt>(getEnumerationValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                    static_cast<AirflowSpecAlt>(getEnumValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
                 case AirflowSpecAlt::Flow:
                 case AirflowSpecAlt::FlowPerZone:
@@ -1399,7 +1399,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Ventilation equipment design level calculation method
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
                 case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
@@ -1530,7 +1530,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                     thisVentilation.FanType = DataHeatBalance::VentilationType::Natural;
                 } else {
                     thisVentilation.FanType =
-                        static_cast<DataHeatBalance::VentilationType>(getEnumerationValue(ventilationTypeNamesUC, cAlphaArgs(5)));
+                        static_cast<DataHeatBalance::VentilationType>(getEnumValue(ventilationTypeNamesUC, cAlphaArgs(5)));
                     if (thisVentilation.FanType == DataHeatBalance::VentilationType::Invalid) {
                         ShowSevereError(state,
                                         format(R"({}{}="{}". invalid {}="{}".)",
@@ -2579,7 +2579,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Mixing equipment design level calculation method
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
                 case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
@@ -3198,7 +3198,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 }
 
                 // Mixing equipment design level calculation method.
-                AirflowSpec flow = static_cast<AirflowSpec>(getEnumerationValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpec flow = static_cast<AirflowSpec>(getEnumValue(airflowNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
                 case AirflowSpec::Flow:
                 case AirflowSpec::FlowPerZone:
@@ -4595,7 +4595,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                                                                  state.dataIPShortCut->cNumericFieldNames);
         ZoneNum = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
         if (ZoneNum != 0) {
-            if (!state.dataRoomAirMod->AirModel(ZoneNum).AirModelName.empty()) {
+            if (!state.dataRoomAirMod->AirModel(ZoneNum).Name.empty()) {
                 ShowSevereError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, "Duplicate zone name, only one type of roomair model is allowed per zone");
@@ -4603,19 +4603,19 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                                   format("Zone {} was already assigned a roomair model by {} = {}",
                                          state.dataIPShortCut->cAlphaArgs(2),
                                          cCurrentModuleObject,
-                                         state.dataRoomAirMod->AirModel(ZoneNum).AirModelName));
+                                         roomAirModelNamesUC[(int)state.dataRoomAirMod->AirModel(ZoneNum).AirModel]));
                 ShowContinueError(state,
                                   format("Air Model Type for zone already set to {}",
-                                         DataRoomAirModel::ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
+                                         roomAirModelNamesUC[(int)state.dataRoomAirMod->AirModel(ZoneNum).AirModel]));
                 ShowContinueError(state, format("Trying to overwrite with model type = {}", state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
-            state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
 
-            state.dataRoomAirMod->AirModel(ZoneNum).AirModelType =
-                static_cast<DataRoomAirModel::RoomAirModel>(getEnumerationValue(roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
-            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType) {
+            // state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
+            state.dataRoomAirMod->AirModel(ZoneNum).AirModel =
+                    static_cast<DataRoomAirModel::RoomAirModel>(getEnumValue(roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3))); // is this arg1 or arg3?
+            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModel) {
             case DataRoomAirModel::RoomAirModel::Mixing:
                 // nothing to do here actually
                 break;
@@ -4723,11 +4723,11 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 ShowWarningError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("The mixing air model will be used for Zone ={}", state.dataIPShortCut->cAlphaArgs(2)));
-                state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+                state.dataRoomAirMod->AirModel(ZoneNum).AirModel = DataRoomAirModel::RoomAirModel::Mixing;
             }
 
             state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme =
-                static_cast<DataRoomAirModel::CouplingScheme>(getEnumerationValue(couplingSchemeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+                static_cast<DataRoomAirModel::CouplingScheme>(getEnumValue(couplingSchemeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
             if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == DataRoomAirModel::CouplingScheme::Invalid) {
                 ShowWarningError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -4744,10 +4744,10 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         // this used to be an if (NumOfAirModels == 0) block, but both the IF and the ELSE had the same content, these two lines:
-        state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + state.dataHeatBal->Zone(ZoneNum).Name;
+        state.dataRoomAirMod->AirModel(ZoneNum).Name = "MIXING AIR MODEL FOR " + state.dataHeatBal->Zone(ZoneNum).Name;
         state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
         // set global flag for non-mixing model
-        if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType != DataRoomAirModel::RoomAirModel::Mixing) {
+        if (state.dataRoomAirMod->AirModel(ZoneNum).AirModel != DataRoomAirModel::RoomAirModel::Mixing) {
             state.dataRoomAirMod->anyNonMixingRoomAirModel = true;
         }
     }
@@ -4766,7 +4766,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         {
             static constexpr std::string_view RoomAirZoneFmt("RoomAir Model,{},{}\n");
 
-            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType) {
+            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModel) {
             case DataRoomAirModel::RoomAirModel::Mixing: {
                 print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "Mixing/Well-Stirred");
             } break;

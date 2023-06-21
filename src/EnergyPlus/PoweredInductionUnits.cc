@@ -318,7 +318,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
 
         thisPIU.HCoilType =
-            static_cast<HtgCoilType>(getEnumerationValue(HCoilNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+            static_cast<HtgCoilType>(getEnumValue(HCoilNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
         switch (thisPIU.HCoilType) {
         case HtgCoilType::SimpleHeating: {
             thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;

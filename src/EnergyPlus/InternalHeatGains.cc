@@ -878,7 +878,7 @@ namespace InternalHeatGains {
                             }
 
                             if (!IHGAlphaFieldBlanks(10) || !IHGAlphas(10).empty()) {
-                                thisPeople.clothingType = static_cast<ClothingType>(getEnumerationValue(clothingTypeNamesUC, IHGAlphas(10)));
+                                thisPeople.clothingType = static_cast<ClothingType>(getEnumValue(clothingTypeNamesUC, IHGAlphas(10)));
                                 if (thisPeople.clothingType == ClothingType::Invalid) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  ={}",
@@ -3197,12 +3197,12 @@ namespace InternalHeatGains {
 
                         // Environmental class
                         thisZoneITEq.Class =
-                            static_cast<ITEClass>(getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(10))));
+                            static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(10))));
                         ErrorsFound = ErrorsFound || (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
                         thisZoneITEq.AirConnectionType = static_cast<ITEInletConnection>(
-                            getEnumerationValue(ITEInletConnectionNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(11))));
+                            getEnumValue(ITEInletConnectionNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(11))));
                         if (thisZoneITEq.AirConnectionType == ITEInletConnection::RoomAirModel) {
                             // ZoneITEq(Loop).AirConnectionType = ITEInletConnection::RoomAirModel;
                             ShowWarningError(state,
@@ -4161,7 +4161,7 @@ namespace InternalHeatGains {
             int counter = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
-                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(objectType, instance.key());
 
                 // For incoming idf, maintain object order

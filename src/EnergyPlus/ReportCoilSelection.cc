@@ -606,6 +606,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
             c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeEnum(1);
             c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(1);
         } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
+#ifdef GET_OUT_FOR_NOW            
             bool foundOne(false);
             for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
                 // go with the first ZoneHVAC device in the list
@@ -638,8 +639,10 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
                         c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
                         c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                     }
+                
                 }
             }
+#endif //                
         }
     }
 }
@@ -661,6 +664,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                 c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
                 c->coilLocation = "Zone Equipment";
             } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
+#ifdef GET_OUT_FOR_NOW
                 bool foundOne(false);
                 for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
                     // go with the first ZoneHVAC device in the list
@@ -697,7 +701,8 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                             c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                         }
                     }
-                }
+                } // for (loop)
+#endif //                
             }
         }
 

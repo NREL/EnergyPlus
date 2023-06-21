@@ -8063,7 +8063,7 @@ namespace SurfaceGeometry {
             constexpr std::array<std::string_view, static_cast<int>(CalculationMethod::Num)> CalculationMethodUC = {
                 "TOTALEXPOSEDPERIMETER", "EXPOSEDPERIMETERFRACTION", "BYSEGMENT"};
             CalculationMethod calculationMethod =
-                static_cast<CalculationMethod>(getEnumerationValue(CalculationMethodUC, state.dataIPShortCut->cAlphaArgs(alpF)));
+                static_cast<CalculationMethod>(getEnumValue(CalculationMethodUC, state.dataIPShortCut->cAlphaArgs(alpF)));
             if (calculationMethod != CalculationMethod::TotalExposedPerimeter && calculationMethod != CalculationMethod::ExposedPerimeterFraction &&
                 calculationMethod != CalculationMethod::Bysegment) {
                 ShowSevereError(state,
@@ -8532,7 +8532,7 @@ namespace SurfaceGeometry {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 GroundSurfacesProperty thisGndSurfsObj;
-                thisGndSurfsObj.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisGndSurfsObj.Name = UtilityRoutines::makeUPPER(thisObjectName);
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
                 auto groundSurfaces = fields.find("ground_surfaces");
                 if (groundSurfaces != fields.end()) {
@@ -8544,7 +8544,7 @@ namespace SurfaceGeometry {
                         if (GndSurfName != groundSurface.end()) {
                             std::string ground_surf_name = GndSurfName.value().get<std::string>();
                             if (!ground_surf_name.empty()) {
-                                thisGndSurf.Name = UtilityRoutines::MakeUPPERCase(ground_surf_name);
+                                thisGndSurf.Name = UtilityRoutines::makeUPPER(ground_surf_name);
                             }
                         }
                         auto groundSurfViewFactor = groundSurface.find("ground_surface_view_factor");
@@ -8557,7 +8557,7 @@ namespace SurfaceGeometry {
                             std::string gnd_surf_TempSchName = TempSchName.value().get<std::string>();
                             if (!gnd_surf_TempSchName.empty()) {
                                 thisGndSurf.TempSchPtr =
-                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(gnd_surf_TempSchName));
+                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::makeUPPER(gnd_surf_TempSchName));
                             }
                         }
                         auto ReflSchName = groundSurface.find("ground_surface_reflectance_schedule_name");
@@ -8565,7 +8565,7 @@ namespace SurfaceGeometry {
                             std::string gnd_surf_ReflSchName = ReflSchName.value().get<std::string>();
                             if (!gnd_surf_ReflSchName.empty()) {
                                 thisGndSurf.ReflSchPtr =
-                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(gnd_surf_ReflSchName));
+                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::makeUPPER(gnd_surf_ReflSchName));
                             }
                         }
                         thisGndSurfsObj.GndSurfs.push_back(thisGndSurf);
@@ -10018,7 +10018,7 @@ namespace SurfaceGeometry {
             windowShadingControl.DaylightingControlName = state.dataIPShortCut->cAlphaArgs(12);
 
             windowShadingControl.multiSurfaceControl = static_cast<MultiSurfaceControl>(
-                getEnumerationValue(MultiSurfaceControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(13))));
+                getEnumValue(MultiSurfaceControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(13))));
 
             if (windowShadingControl.multiSurfaceControl == MultiSurfaceControl::Invalid) {
                 windowShadingControl.multiSurfaceControl = MultiSurfaceControl::Sequential;
@@ -10045,7 +10045,7 @@ namespace SurfaceGeometry {
             }
 
             windowShadingControl.shadingControlType = static_cast<WindowShadingControlType>(
-                getEnumerationValue(WindowShadingControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+                getEnumValue(WindowShadingControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
             if (windowShadingControl.ShadingDevice > 0) {
                 if (state.dataMaterial->Material(windowShadingControl.ShadingDevice)->group == Material::Group::Screen &&
@@ -10138,7 +10138,7 @@ namespace SurfaceGeometry {
                                        state.dataIPShortCut->cAlphaFieldNames(5)));
             }
             windowShadingControl.slatAngleControl = static_cast<SlatAngleControl>(
-                getEnumerationValue(SlatAngleNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(10))));
+                getEnumValue(SlatAngleNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(10))));
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE
@@ -10955,10 +10955,10 @@ namespace SurfaceGeometry {
             if (SurfNum > 0) {
                 state.dataSurface->AirflowWindows = true;
                 state.dataSurface->SurfWinAirflowSource(SurfNum) =
-                    static_cast<WindowAirFlowSource>(getEnumerationValue(WindowAirFlowSourceNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
+                    static_cast<WindowAirFlowSource>(getEnumValue(WindowAirFlowSourceNamesUC, state.dataIPShortCut->cAlphaArgs(2)));
 
                 state.dataSurface->SurfWinAirflowDestination(SurfNum) =
-                    static_cast<WindowAirFlowDestination>(getEnumerationValue(WindowAirFlowDestinationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+                    static_cast<WindowAirFlowDestination>(getEnumValue(WindowAirFlowDestinationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
 
                 if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == WindowAirFlowDestination::Return) {
                     int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, state.dataSurface->Surface(SurfNum).ZoneName);
@@ -12176,7 +12176,7 @@ namespace SurfaceGeometry {
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
             InsulationType insulationType =
-                static_cast<InsulationType>(getEnumerationValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
+                static_cast<InsulationType>(getEnumValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
             if (insulationType == InsulationType::Invalid) {
                 ShowSevereError(state,
                                 format("{}, {}=\"{}\", invalid data.",

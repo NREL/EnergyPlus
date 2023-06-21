@@ -761,7 +761,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
         intConvUserCurve.Name = ipsc->cAlphaArgs(1);
 
         ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, intConvUserCurve.Name};
-        intConvUserCurve.refTempType = static_cast<RefTemp>(getEnumerationValue(RefTempNamesUC, ipsc->cAlphaArgs(2)));
+        intConvUserCurve.refTempType = static_cast<RefTemp>(getEnumValue(RefTempNamesUC, ipsc->cAlphaArgs(2)));
         if (intConvUserCurve.refTempType == RefTemp::Invalid) {
             ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
             ErrorsFound = true;
@@ -856,7 +856,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
 
         ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, extConvUserCurve.Name};
         extConvUserCurve.windSpeedType =
-            static_cast<RefWind>(getEnumerationValue(RefWindNamesUC, UtilityRoutines::MakeUPPERCase(ipsc->cAlphaArgs(2))));
+            static_cast<RefWind>(getEnumValue(RefWindNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
         if (extConvUserCurve.windSpeedType == RefWind::Invalid) {
             ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
             ErrorsFound = true;
@@ -1039,7 +1039,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     ErrorsFound = true;
                 }
 
-                HcExt hcExt = static_cast<HcExt>(getEnumerationValue(HcExtNamesUC, Alphas(Ptr + 1)));
+                HcExt hcExt = static_cast<HcExt>(getEnumValue(HcExtNamesUC, Alphas(Ptr + 1)));
 
                 switch (hcExt) {
 
@@ -1160,7 +1160,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                     continue;
                 }
 
-                HcInt hcInt = static_cast<HcInt>(getEnumerationValue(HcIntNamesUC, Alphas(Ptr + 1)));
+                HcInt hcInt = static_cast<HcInt>(getEnumValue(HcIntNamesUC, Alphas(Ptr + 1)));
 
                 switch (hcInt) {
                 // Are these not used anymore? They can be deleted then
@@ -1295,7 +1295,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                                                                  ipsc->cNumericFieldNames);
         // Check Field 1 for validity
         ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, ""};
-        SurfaceFilter surfaceFilter = static_cast<SurfaceFilter>(getEnumerationValue(SurfaceFilterNamesUC, Alphas(1)));
+        SurfaceFilter surfaceFilter = static_cast<SurfaceFilter>(getEnumValue(SurfaceFilterNamesUC, Alphas(1)));
 
         for (int Pass = 1, Ptr = 2, FieldNo = 2, NumField = 1; Pass <= 2; ++Pass, Ptr += 4, FieldNo += 4, ++NumField) {
 
@@ -1303,7 +1303,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
 
             if (Alphas(Ptr) == "OUTSIDE") {
 
-                HcExt hcExt = static_cast<HcExt>(getEnumerationValue(HcExtNamesUC, Alphas(Ptr + 1)));
+                HcExt hcExt = static_cast<HcExt>(getEnumValue(HcExtNamesUC, Alphas(Ptr + 1)));
 
                 switch (hcExt) {
 
@@ -1411,7 +1411,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
                 } // switch (hcExt)
 
             } else if (Alphas(Ptr) == "INSIDE") {
-                HcInt hcInt = static_cast<HcInt>(getEnumerationValue(HcIntNamesUC, Alphas(Ptr + 1)));
+                HcInt hcInt = static_cast<HcInt>(getEnumValue(HcIntNamesUC, Alphas(Ptr + 1)));
 
                 switch (hcInt) {
 
@@ -1590,7 +1590,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
         auto &intAlgo = state.dataConvect->intAdaptiveConvAlgo;
         for (int iInConvClass = 0, i = 2; iInConvClass < (int)IntConvClass::Num && i <= NumAlphas; ++iInConvClass, i += 2) {
 
-            intAlgo.intConvClassEqNums[iInConvClass] = static_cast<HcInt>(getEnumerationValue(HcIntNamesUC, ipsc->cAlphaArgs(i)));
+            intAlgo.intConvClassEqNums[iInConvClass] = static_cast<HcInt>(getEnumValue(HcIntNamesUC, ipsc->cAlphaArgs(i)));
 
             if (intAlgo.intConvClassEqNums[iInConvClass] == HcInt::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(i), ipsc->cAlphaArgs(i));
@@ -1628,7 +1628,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
 
         for (int iOutConvClass = 0, i = 2; i < (int)ExtConvClass::Num && i <= NumAlphas; ++iOutConvClass, i += 2) {
 
-            extAlgo.extConvClass2EqNums[iOutConvClass] = static_cast<HcExt>(getEnumerationValue(HcExtNamesUC, ipsc->cAlphaArgs(i)));
+            extAlgo.extConvClass2EqNums[iOutConvClass] = static_cast<HcExt>(getEnumValue(HcExtNamesUC, ipsc->cAlphaArgs(i)));
 
             if (extAlgo.extConvClass2EqNums[iOutConvClass] == HcExt::Invalid) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(i), ipsc->cAlphaArgs(i));
@@ -1981,9 +1981,9 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
         }
 
         assert(state.dataRoomAirMod->AirModel.allocated());
-        if (state.dataRoomAirMod->AirModel(surface.Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
-            state.dataRoomAirMod->AirModel(surface.Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
-            state.dataRoomAirMod->AirModel(surface.Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+        if (state.dataRoomAirMod->AirModel(surface.Zone).AirModel == DataRoomAirModel::RoomAirModel::UCSDDV ||
+            state.dataRoomAirMod->AirModel(surface.Zone).AirModel == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+            state.dataRoomAirMod->AirModel(surface.Zone).AirModel == DataRoomAirModel::RoomAirModel::UCSDUFE) {
 
             // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
             if (state.dataSurface->surfIntConv(SurfNum).userModelNum != 0) {
@@ -1996,7 +1996,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
                                                       -surface.CosTilt); // negative CosTilt because CosTilt is relative to exterior
             }
 
-        } else if (state.dataRoomAirMod->AirModel(surface.Zone).AirModelType == DataRoomAirModel::RoomAirModel::UCSDCV) {
+        } else if (state.dataRoomAirMod->AirModel(surface.Zone).AirModel == DataRoomAirModel::RoomAirModel::UCSDCV) {
 
             Hf = 4.3 * Vhc()(surface.Zone);
 

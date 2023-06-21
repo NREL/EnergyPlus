@@ -509,7 +509,7 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
 
                     if (!TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum).empty()) {
                         DataHVACGlobals::ThermostatType ctrlType = static_cast<DataHVACGlobals::ThermostatType>(
-                            getEnumerationValue(ValidControlTypesUC, TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum)));
+                            getEnumValue(ValidControlTypesUC, TempControlledZone(TempControlledZoneNum).ControlType(ControlTypeNum)));
                         TempControlledZone(TempControlledZoneNum).ControlTypeEnum(ControlTypeNum) = ctrlType;
                         if (ctrlType == DataHVACGlobals::ThermostatType::Invalid) {
                             ShowSevereError(state,
@@ -1259,9 +1259,9 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                     ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum - 1 + 5));
                     ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ControlTypeNum) = cAlphaArgs(nint(2.0 * ControlTypeNum + 5));
                     if (ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum) != "") {
-                        CTIndex = getEnumerationValue(
+                        CTIndex = getEnumValue(
                             ValidComfortControlTypesUC,
-                            UtilityRoutines::MakeUPPERCase(ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum)));
+                            UtilityRoutines::makeUPPER(ComfortControlledZone(ComfortControlledZoneNum).ControlType(ControlTypeNum)));
                         if (CTIndex == 0) {
                             ShowSevereError(state,
                                             format("{}=\"{}\" invalid {}=\"{}\"",
@@ -3586,7 +3586,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
     this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
     if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-        if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+        if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             // RoomAirflowNetworkModel - make dynamic term independent of TimeStepSys
             auto &thisRoomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
             if (thisRoomAirflowNetworkZoneInfo.IsUsed) {
@@ -3618,7 +3618,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
             if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
                 this->ZoneT1 = this->ZoneTM2;
                 this->ZoneW1 = this->ZoneWM2;
-                if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+                if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     auto &thisRoomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
                     for (int LoopNode = 1; LoopNode <= thisRoomAirflowNetworkZoneInfo.NumOfAirNodes; ++LoopNode) {
                         thisRoomAirflowNetworkZoneInfo.Node(LoopNode).AirTempT1 = thisRoomAirflowNetworkZoneInfo.Node(LoopNode).AirTempTM2;
@@ -3628,7 +3628,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
             } else {
                 this->ZoneT1 = this->ZoneTMX;
                 this->ZoneW1 = this->ZoneWMX;
-                if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+                if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     auto &thisRoomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
                     for (int LoopNode = 1; LoopNode <= thisRoomAirflowNetworkZoneInfo.NumOfAirNodes; ++LoopNode) {
                         thisRoomAirflowNetworkZoneInfo.Node(LoopNode).AirTempT1 = thisRoomAirflowNetworkZoneInfo.Node(LoopNode).AirTempTMX;
@@ -3640,7 +3640,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
         } else {
             this->ZoneT1 = this->ZT;
             this->ZoneW1 = this->ZoneAirHumRat;
-            if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 auto &thisRoomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
                 for (int LoopNode = 1; LoopNode <= thisRoomAirflowNetworkZoneInfo.NumOfAirNodes; ++LoopNode) {
                     thisRoomAirflowNetworkZoneInfo.Node(LoopNode).AirTempT1 = thisRoomAirflowNetworkZoneInfo.Node(LoopNode).AirTemp;
@@ -4119,7 +4119,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         }
         C = RhoAir * volume * thisZone.ZoneVolCapMultpMoist / TimeStepSysSec;
 
-        if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+        if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             auto &roomAFNInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum);
             int RoomAirNode = roomAFNInfo.ControlAirNodeID;
             H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(roomAFNInfo.Node(RoomAirNode).HumRat, roomAFNInfo.Node(RoomAirNode).AirTemp);
@@ -4356,7 +4356,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
             state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum) = 1.0;
         } else {
             auto &thisAirModel = state.dataRoomAirMod->AirModel(zoneNum);
-            if ((thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::Mixing) || (!thisAirModel.SimAirModel)) {
+            if ((thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::Mixing) || (!thisAirModel.SimAirModel)) {
                 // Fully mixed
                 thisSystemNode.Temp = this->ZT;
                 // SpaceHB TODO: What to do here if this is for space
@@ -4382,8 +4382,8 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
                     // Negligible flow, assume mixed - reasonable lagged starting value for first step time with significant flow
                     state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum) = 1.0;
                 }
-            } else if (thisAirModel.SimAirModel && ((thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::UserDefined) ||
-                                                    (thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::Mundt))) {
+            } else if (thisAirModel.SimAirModel && ((thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::UserDefined) ||
+                                                    (thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::Mundt))) {
                 if (this->SumSysMCp > DataHVACGlobals::SmallMassFlow) {
                     Real64 TempSupplyAir = this->SumSysMCpT / this->SumSysMCp; // Non-negligible flow, calculate supply air temperature
                     if (std::abs(TempSupplyAir - this->ZT) > state.dataHeatBal->TempConvergTol) {
@@ -4399,7 +4399,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
                     // Negligible flow, assume mixed - reasonable lagged starting value for first step time with significant flow
                     state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum) = 1.0;
                 }
-            } else if (thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            } else if (thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 // Zone node used in the RoomAirflowNetwork model
                 this->ZT = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum)
                                .Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).ControlAirNodeID)
@@ -4462,7 +4462,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
 
         // SpaceHB TODO: For now, room air model is only for zones
         if (spaceNum == 0 && state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-            if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 this->ZT = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum)
                                .Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).ControlAirNodeID)
                                .AirTemp;
@@ -4601,9 +4601,9 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0) {
-        if (thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
-            thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
-            thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+        if (thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::UCSDDV ||
+            thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+            thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::UCSDUFE) {
             state.dataRoomAirMod->XM4TFloor(zoneNum) = state.dataRoomAirMod->XM3TFloor(zoneNum);
             state.dataRoomAirMod->XM3TFloor(zoneNum) = state.dataRoomAirMod->XM2TFloor(zoneNum);
             state.dataRoomAirMod->XM2TFloor(zoneNum) = state.dataRoomAirMod->XMATFloor(zoneNum);
@@ -4624,7 +4624,7 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
         }
 
         // for RoomAirflowNetwork model
-        if (thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+        if (thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
                 auto &roomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode);
                 roomAirflowNetworkZoneInfo.AirTempX4 = roomAirflowNetworkZoneInfo.AirTempX3;
@@ -4647,9 +4647,9 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
         this->ZoneWMX = this->ZoneAirHumRatAvg; // using average for whole zone time step.
         // SpaceHB TODO: For now, room air model is only for zones
         if (spaceNum == 0) {
-            if (thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
-                thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
-                thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+            if (thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::UCSDDV ||
+                thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                 state.dataRoomAirMod->ZoneM2Floor(zoneNum) = state.dataRoomAirMod->ZoneMXFloor(zoneNum);
                 state.dataRoomAirMod->ZoneMXFloor(zoneNum) = state.dataRoomAirMod->ZTFloor(zoneNum); // using average for whole zone time step.
                 state.dataRoomAirMod->ZoneM2OC(zoneNum) = state.dataRoomAirMod->ZoneMXOC(zoneNum);
@@ -4658,7 +4658,7 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
                 state.dataRoomAirMod->ZoneMXMX(zoneNum) = state.dataRoomAirMod->ZTMX(zoneNum); // using average for whole zone time step.
             }
 
-            if (thisAirModel.AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            if (thisAirModel.AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
                     auto &roomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode);
                     roomAirflowNetworkZoneInfo.AirTempTM2 = roomAirflowNetworkZoneInfo.AirTempTMX;
@@ -4720,7 +4720,7 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
             state.dataRoomAirMod->DSXM2TMX(zoneNum) = state.dataRoomAirMod->DSXMATMX(zoneNum);
             state.dataRoomAirMod->DSXMATMX(zoneNum) = state.dataRoomAirMod->MATMX(zoneNum);
         }
-        if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+        if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
                 auto &roomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode);
                 roomAirflowNetworkZoneInfo.AirTempDSX4 = roomAirflowNetworkZoneInfo.AirTempDSX3;
@@ -4744,9 +4744,9 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
 
         // SpaceHB TODO: For now, room air model is only for zones
         if (spaceNum == 0) {
-            if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
-                state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
-                state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+            if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::UCSDDV ||
+                state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+                state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                 state.dataRoomAirMod->ZoneM2Floor(zoneNum) = state.dataRoomAirMod->ZoneMXFloor(zoneNum);
                 state.dataRoomAirMod->ZoneMXFloor(zoneNum) = state.dataRoomAirMod->ZTFloor(zoneNum); // using average for whole zone time step.
                 state.dataRoomAirMod->ZoneM2OC(zoneNum) = state.dataRoomAirMod->ZoneMXOC(zoneNum);
@@ -4754,7 +4754,7 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
                 state.dataRoomAirMod->ZoneM2MX(zoneNum) = state.dataRoomAirMod->ZoneMXMX(zoneNum);
                 state.dataRoomAirMod->ZoneMXMX(zoneNum) = state.dataRoomAirMod->ZTMX(zoneNum); // using average for whole zone time step.
             }
-            if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+            if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                 for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
                     auto &roomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode);
                     roomAirflowNetworkZoneInfo.AirTempTM2 = roomAirflowNetworkZoneInfo.AirTempTMX;
@@ -4798,9 +4798,9 @@ void ZoneSpaceHeatBalanceData::revertZoneTimestepHistory(EnergyPlusData &state, 
 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0) {
-        if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV ||
-            state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
-            state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+        if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::UCSDDV ||
+            state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::UCSDUFI ||
+            state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::UCSDUFE) {
 
             state.dataRoomAirMod->XMATFloor(zoneNum) = state.dataRoomAirMod->XM2TFloor(zoneNum);
             state.dataRoomAirMod->XM2TFloor(zoneNum) = state.dataRoomAirMod->XM3TFloor(zoneNum);
@@ -4815,7 +4815,7 @@ void ZoneSpaceHeatBalanceData::revertZoneTimestepHistory(EnergyPlusData &state, 
             state.dataRoomAirMod->XM3TMX(zoneNum) = state.dataRoomAirMod->XM4TMX(zoneNum);
         }
 
-        if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+        if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
             for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
                 auto &roomAirflowNetworkZoneInfo = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode);
                 roomAirflowNetworkZoneInfo.AirTempX1 = roomAirflowNetworkZoneInfo.AirTempX2;
@@ -4955,7 +4955,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
 
     if (this->ZoneAirHumRatTemp > WZSat) this->ZoneAirHumRatTemp = WZSat;
 
-    if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+    if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
         this->ZoneAirHumRatTemp = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum)
                                       .Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).ControlAirNodeID)
                                       .HumRat;
@@ -7163,7 +7163,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
                                                   state.dataRoomAirMod->DSXM3TMX(zoneNum),
                                                   state.dataRoomAirMod->DSXM4TMX(zoneNum));
                 }
-                if (state.dataRoomAirMod->AirModel(zoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
+                if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
                         auto &ThisRAFNNode(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(zoneNum).Node(LoopNode));
                         DownInterpolate4HistoryValues(PriorTimeStep,

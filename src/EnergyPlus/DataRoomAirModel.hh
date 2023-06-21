@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -82,8 +83,9 @@ namespace DataRoomAirModel {
         AirflowNetwork, // RoomAirModel_AirflowNetwork interior zone model
         Num
     };
-    constexpr const char *ChAirModel[] = {
-        "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork"};
+
+    extern const std::array<std::string_view, (int)RoomAirModel::Num> roomAirModelNames;
+    extern const std::array<std::string_view, (int)RoomAirModel::Num> roomAirModelNamesUC; 
 
     // Parameters to indicate air temperature coupling scheme
     enum class CouplingScheme
@@ -98,18 +100,20 @@ namespace DataRoomAirModel {
     enum class AirNodeType
     {
         Invalid = -1,
-        InletAir,              // air node at inlet (for Mundt and Rees&Haves Models)
-        FloorAir,              // air node at floor (for Mundt and Rees&Haves Models)
-        ControlAir,            // air node at control point (for Mundt Model)
-        CeilingAir,            // air node at ceiling (for Mundt Model)
-        MundtRoomAir,          // air node for vertical walls (for Mundt Model)
-        ReturnAir,             // air node for return (for Mundt and Rees&Haves Models)
-        AirflowNetworkRoomAir, // air node for airflow network based room air model
-        PlumeAir,              // air node for plume load (for Rees&Haves Model)
-        RoomAir,               // air node for vertical walls (for Rees&Haves Model)
+        Inlet,              // air node at inlet (for Mundt and Rees&Haves Models)
+        Floor,              // air node at floor (for Mundt and Rees&Haves Models)
+        Control,            // air node at control point (for Mundt Model)
+        Ceiling,            // air node at ceiling (for Mundt Model)
+        Mundt,          // air node for vertical walls (for Mundt Model)
+        Return,             // air node for return (for Mundt and Rees&Haves Models)
+        AFN, // air node for airflow network based room air model
+        Plume,              // air node for plume load (for Rees&Haves Model)
+        Rees,               // air node for vertical walls (for Rees&Haves Model)
         Num
     };
 
+    extern const std::array<std::string_view, (int)AirNodeType::Num> airNodeTypeNamesUC;
+        
     // user-defined pattern two gradient interpolation modes
     enum class UserDefinedPatternMode
     {
@@ -122,6 +126,8 @@ namespace DataRoomAirModel {
         Num
     };
 
+    extern const std::array<std::string_view, (int)UserDefinedPatternMode::Num> userDefinedPatternModeNamesUC;
+
     // user defined temperature pattern types
     enum class UserDefinedPatternType
     {
@@ -132,6 +138,8 @@ namespace DataRoomAirModel {
         SurfMapTemp,    // arbitrary surface mappings
         Num
     };
+
+    extern const std::array<std::string_view, (int)UserDefinedPatternType::Num> userDefinedPatternNamesUC;
 
     // parameters to indicate diffuser type
     enum class Diffuser
@@ -145,6 +153,8 @@ namespace DataRoomAirModel {
         Num
     };
 
+    extern const std::array<std::string_view, (int)Diffuser::Num> diffuserNamesUC;
+
     enum class Comfort
     {
         Invalid = -1,
@@ -153,185 +163,140 @@ namespace DataRoomAirModel {
         Num
     };
 
+    extern const std::array<std::string_view, (int)Comfort::Num> comfortNamesUC;
+        
     struct AirModelData
     {
         // Members
-        std::string AirModelName;
-        std::string ZoneName;
-        int ZonePtr;               // Pointer to the zone number for this statement
-        RoomAirModel AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
+        std::string Name = "";
+        std::string ZoneName = "";
+        int ZonePtr = 0;               // Pointer to the zone number for this statement
+        RoomAirModel AirModel = RoomAirModel::Mixing; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
         // 4 = UCSDDV, 5 = UCSDCV, -1 = user defined
         // 6 = UCSDUFI, 7 = UCSDUFE, 8 = AirflowNetwork
-        CouplingScheme TempCoupleScheme; // 1 = absolute (direct),
+        CouplingScheme TempCoupleScheme = CouplingScheme::Direct; // 1 = absolute (direct),
         // 2 = relative air model temperature passing scheme (indirect)
-        bool SimAirModel; // FALSE if Mixing air model is currently used and
+        bool SimAirModel = false; // FALSE if Mixing air model is currently used and
         // TRUE if other air models are currently used
-
-        // Default Constructor
-        AirModelData() : ZonePtr(0), AirModelType(RoomAirModel::Mixing), TempCoupleScheme(CouplingScheme::Direct), SimAirModel(false)
-        {
-        }
     };
 
     struct AirNodeData
     {
         // Members
-        std::string Name; // name
-        std::string ZoneName;
-        int ZonePtr;               // Pointer to the zone number for this statement
-        AirNodeType ClassType;     // depending on type of model
-        Real64 Height;             // height
-        Real64 ZoneVolumeFraction; // portion of zone air volume associated with this node
+        std::string Name = ""; // name
+        std::string ZoneName = "";
+        int ZonePtr = 0;               // Pointer to the zone number for this statement
+        AirNodeType ClassType = AirNodeType::Invalid;     // depending on type of model
+        Real64 Height = 0.0;             // height
+        Real64 ZoneVolumeFraction = 0.0; // portion of zone air volume associated with this node
         Array1D_bool SurfMask;     // limit of 60 surfaces at current sizing
-        bool IsZone;               // TRUE if this node is zone node
-
-        // Default Constructor
-        AirNodeData() : ZonePtr(0), ClassType(AirNodeType::Invalid), Height(0.0), ZoneVolumeFraction(0), IsZone(false)
-        {
-        }
+        bool IsZone = false;               // TRUE if this node is zone node
     };
 
     struct DVData
     {
         // Members
-        std::string ZoneName;       // Name of zone
-        int ZonePtr;                // Pointer to the zone number for this statement
-        int SchedGainsPtr;          // Schedule for internal gain fraction to occupied zone
-        std::string SchedGainsName; // Gains Schedule name
-        Real64 NumPlumesPerOcc;     // Effective number of plumes per occupant
-        Real64 ThermostatHeight;    // Height of thermostat/ temperature control sensor
-        Real64 ComfortHeight;       // Height at which air temperature is measured for comfort purposes
-        Real64 TempTrigger;         // Minimum temperature difference between TOC TMX for stratification
-
-        // Default Constructor
-        DVData() : ZonePtr(0), SchedGainsPtr(-1), NumPlumesPerOcc(1.0), ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0)
-        {
-        }
+        std::string ZoneName = "";       // Name of zone
+        int ZonePtr = 0;                // Pointer to the zone number for this statement
+        int SchedGainsPtr = -1;          // Schedule for internal gain fraction to occupied zone
+        std::string SchedGainsName = ""; // Gains Schedule name
+        Real64 NumPlumesPerOcc = 0.0;     // Effective number of plumes per occupant
+        Real64 ThermostatHeight = 0.0;    // Height of thermostat/ temperature control sensor
+        Real64 ComfortHeight = 0.0;       // Height at which air temperature is measured for comfort purposes
+        Real64 TempTrigger = 0.0;         // Minimum temperature difference between TOC TMX for stratification
     };
 
     struct CVData
     {
         // Members
-        std::string ZoneName;       // Name of zone
-        int ZonePtr;                // Pointer to the zone number for this statement
-        int SchedGainsPtr;          // Schedule for internal gain fraction to occupied zone
-        std::string SchedGainsName; // Gains Schedule name
-        Comfort VforComfort;        // Use Recirculation or Jet velocity and temperatures
+        std::string ZoneName = "";       // Name of zone
+        int ZonePtr = 0;                // Pointer to the zone number for this statement
+        int SchedGainsPtr = 0;          // Schedule for internal gain fraction to occupied zone
+        std::string SchedGainsName = ""; // Gains Schedule name
+        Comfort VforComfort = Comfort::Invalid;        // Use Recirculation or Jet velocity and temperatures
         // for comfort models
-
-        // Default Constructor
-        CVData() : ZonePtr(-1), SchedGainsPtr(-1), VforComfort(Comfort::Invalid)
-        {
-        }
     };
 
     struct CVFlow
     {
         // Members
-        int FlowFlag; // Equal to 1 if the opening has inflow, else equal to 0.
-        Real64 Width; // Width of the opening [m]
-        Real64 Area;  // Area of the opening [m2]
-        Real64 Fin;   // Inflow volume flux through the opening [m3/s]
-        Real64 Uin;   // Inflow air velocity through the opening [m/s]
-        Real64 Vjet;  // Average maximum jet velocity for the opening [m/s]
-        Real64 Yjet;  // Y in "Y = aX + b" formula
-        Real64 Ujet;  // Volume average jet region velocity [m/s]
-        Real64 Yrec;  // Y in "Y = aX + b" formula
-        Real64 Urec;  // Area-averaged velocity in the y-z plane with maximum flow [m/s]
-        Real64 YQrec; // Y in "Y = aX + b" formula
-        Real64 Qrec;  // Total flow rate for the recirculation regions in the plane of maximum flow [m3/s]
-
-        // Default Constructor
-        CVFlow()
-            : FlowFlag(0), Width(0.0), Area(0.0), Fin(0.0), Uin(0.0), Vjet(0.0), Yjet(0.0), Ujet(0.0), Yrec(0.0), Urec(0.0), YQrec(0.0), Qrec(0.0)
-        {
-        }
+        int FlowFlag = 0; // Equal to 1 if the opening has inflow, else equal to 0.
+        Real64 Width = 0.0; // Width of the opening [m]
+        Real64 Area = 0.0;  // Area of the opening [m2]
+        Real64 Fin = 0.0;   // Inflow volume flux through the opening [m3/s]
+        Real64 Uin = 0.0;   // Inflow air velocity through the opening [m/s]
+        Real64 Vjet = 0.0;  // Average maximum jet velocity for the opening [m/s]
+        Real64 Yjet = 0.0;  // Y in "Y = aX + b" formula
+        Real64 Ujet = 0.0;  // Volume average jet region velocity [m/s]
+        Real64 Yrec = 0.0;  // Y in "Y = aX + b" formula
+        Real64 Urec = 0.0;  // Area-averaged velocity in the y-z plane with maximum flow [m/s]
+        Real64 YQrec = 0.0; // Y in "Y = aX + b" formula
+        Real64 Qrec = 0.0;  // Total flow rate for the recirculation regions in the plane of maximum flow [m3/s]
     };
 
     struct CVDVParameters
     {
         // Members
-        Real64 Width;
-        Real64 Height;
-        int Shadow;
-        Real64 Zmin;
-        Real64 Zmax;
-
-        // Default Constructor
-        CVDVParameters() : Width(0.0), Height(0.0), Shadow(0), Zmin(0.0), Zmax(0.0)
-        {
-        }
+        Real64 Width = 0.0;
+        Real64 Height = 0.0;
+        int Shadow = 0;
+        Real64 Zmin = 0.0;
+        Real64 Zmax = 0.0;
     };
 
     struct UFIData
     {
         // Members
-        std::string ZoneName;    // Name of zone
-        int ZonePtr;             // Pointer to the zone number for this statement
-        int ZoneEquipPtr;        // Pointer to zone equip for this UFAD zone
-        Real64 DiffusersPerZone; // Number of diffusers in this zone
-        Real64 PowerPerPlume;    // Power in each plume [W]
-        Real64 DiffArea;         // Effective area of a diffuser [m2]
-        Real64 DiffAngle;        // angle between diffuser slots and vertical (degrees)
-        Real64 HeatSrcHeight;    // height of heat source above floor [m]
-        Real64 ThermostatHeight; // Height of thermostat/ temperature control sensor [m]
-        Real64 ComfortHeight;    // Height at which air temperature is measured for
+        std::string ZoneName = "";    // Name of zone
+        int ZonePtr = 0;             // Pointer to the zone number for this statement
+        int ZoneEquipPtr = 0;        // Pointer to zone equip for this UFAD zone
+        Real64 DiffusersPerZone = 0.0; // Number of diffusers in this zone
+        Real64 PowerPerPlume = 0.0;    // Power in each plume [W]
+        Real64 DiffArea = 0.0;         // Effective area of a diffuser [m2]
+        Real64 DiffAngle = 0.0;        // angle between diffuser slots and vertical (degrees)
+        Real64 HeatSrcHeight = 0.0;    // height of heat source above floor [m]
+        Real64 ThermostatHeight = 0.0; // Height of thermostat/ temperature control sensor [m]
+        Real64 ComfortHeight = 0.0;    // Height at which air temperature is measured for
         // comfort purposes [m]
-        Real64 TempTrigger; // Minimum temperature difference between TOC TMX
+        Real64 TempTrigger = 0.0; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        Diffuser DiffuserType; // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
-        Real64 TransHeight;    // user specified transition height [m]
+        Diffuser DiffuserType = Diffuser::Invalid; // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Real64 TransHeight = 0.0;    // user specified transition height [m]
         bool CalcTransHeight;  // flag to calc trans height or use user specified input
-        Real64 A_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 B_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 C_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 D_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 E_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-
-        // Default Constructor
-        UFIData()
-            : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
-              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0)
-        {
-        }
+        Real64 A_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 B_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 C_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 D_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 E_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
     };
 
     struct UFEData
     {
         // Members
-        std::string ZoneName;    // Name of zone
-        int ZonePtr;             // Pointer to the zone number for this statement
-        int ZoneEquipPtr;        // Pointer to zone equip for this UFAD zone
-        Real64 DiffusersPerZone; // Number of diffusers in this zone
-        Real64 PowerPerPlume;    // Power in each plume [W]
-        Real64 DiffArea;         // Effective area of a diffuser [m2]
-        Real64 DiffAngle;        // angle between diffuser slots and vertical (degrees)
-        Real64 HeatSrcHeight;    // height of heat source above floor [m]
-        Real64 ThermostatHeight; // Height of thermostat/ temperature control sensor [m]
-        Real64 ComfortHeight;    // Height at which air temperature is measured for
+        std::string ZoneName = "";    // Name of zone
+        int ZonePtr = 0;             // Pointer to the zone number for this statement
+        int ZoneEquipPtr = 0;        // Pointer to zone equip for this UFAD zone
+        Real64 DiffusersPerZone = 0.0; // Number of diffusers in this zone
+        Real64 PowerPerPlume = 0.0;    // Power in each plume [W]
+        Real64 DiffArea = 0.0;         // Effective area of a diffuser [m2]
+        Real64 DiffAngle = 0.0;        // angle between diffuser slots and vertical (degrees)
+        Real64 HeatSrcHeight = 0.0;    // height of heat source above floor [m]
+        Real64 ThermostatHeight = 0.0; // Height of thermostat/ temperature control sensor [m]
+        Real64 ComfortHeight = 0.0;    // Height at which air temperature is measured for
         // comfort purposes [m]
-        Real64 TempTrigger; // Minimum temperature difference between TOC TMX
+        Real64 TempTrigger = 0.0; // Minimum temperature difference between TOC TMX
         // for stratification [deltaC]
-        Diffuser DiffuserType; // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
-        Real64 TransHeight;    // user specified transition height [m]
-        bool CalcTransHeight;  // flag to calc trans height or use user specified input
-        Real64 A_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 B_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 C_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 D_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 E_Kc;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 WinWidth;       // sum of widths of exterior windows in zone
-        Real64 NumExtWin;      // number of exterior windows in the zone
-        bool ShadeDown;        // signals shade up or down
-
-        // Default Constructor
-        UFEData()
-            : ZonePtr(0), ZoneEquipPtr(0), DiffusersPerZone(0.0), PowerPerPlume(0.0), DiffArea(0.0), DiffAngle(0.0), HeatSrcHeight(0.0),
-              ThermostatHeight(0.0), ComfortHeight(0.0), TempTrigger(0.0), DiffuserType(Diffuser::Invalid), TransHeight(0.0), CalcTransHeight(false),
-              A_Kc(0.0), B_Kc(0.0), C_Kc(0.0), D_Kc(0.0), E_Kc(0.0), WinWidth(0.0), NumExtWin(0.0), ShadeDown(true)
-        {
-        }
+        Diffuser DiffuserType = Diffuser::Invalid; // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
+        Real64 TransHeight = 0.0;    // user specified transition height [m]
+        bool CalcTransHeight = false;  // flag to calc trans height or use user specified input
+        Real64 A_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 B_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 C_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 D_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 E_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
+        Real64 WinWidth = 0.0;       // sum of widths of exterior windows in zone
+        Real64 NumExtWin = 0.0;      // number of exterior windows in the zone
+        bool ShadeDown = false;        // signals shade up or down
     };
 
     struct SurfMapPattern // nested structure in RoomAirPattern
@@ -340,52 +305,34 @@ namespace DataRoomAirModel {
         // user variables
         Array1D_string SurfName;  // user defined name
         Array1D<Real64> DeltaTai; // (Tai - MAT ) offset from mean air temp
-        int NumSurfs;             // number of surfaces in this pattern
+        int NumSurfs = 0;             // number of surfaces in this pattern
         // calculated and from elsewhere
         Array1D_int SurfID; // index in HB surface structure array
-
-        // Default Constructor
-        SurfMapPattern() : NumSurfs(0)
-        {
-        }
     };
 
     struct ConstGradPattern // nested structure in RoomAirPattern
     {
         // Members
         // user variables
-        std::string Name; // name
-        Real64 Gradient;  // value of vertical gradient [C/m]
-
-        // Default Constructor
-        ConstGradPattern() : Gradient(0.0)
-        {
-        }
+        std::string Name = ""; // name
+        Real64 Gradient = 0.0;  // value of vertical gradient [C/m]
     };
 
     struct TwoVertGradInterpolPattern // nested structure in RoomAirPattern
     {
         // Members
         // user variables
-        std::string Name;                                           // name
-        Real64 TstatHeight;                                         // Height of thermostat/ temperature control sensor
-        Real64 TleavingHeight;                                      // height of return air node where leaving zone
-        Real64 TexhaustHeight;                                      // height of exhaust air node where leaving zone
-        Real64 LowGradient;                                         // lower value of vertical gradient [C/m]
-        Real64 HiGradient;                                          // upper value of vertical gradient [C/m]
-        DataRoomAirModel::UserDefinedPatternMode InterpolationMode; // control for interpolation mode
-        Real64 UpperBoundTempScale;                                 // temperature value for HiGradient
-        Real64 LowerBoundTempScale;                                 // temperature value for LowGradient
-        Real64 UpperBoundHeatRateScale;                             // load value for HiGradient
-        Real64 LowerBoundHeatRateScale;                             // load value for lowGradient
-
-        // Default Constructor
-        TwoVertGradInterpolPattern()
-            : TstatHeight(0.0), TleavingHeight(0.0), TexhaustHeight(0.0), LowGradient(0.0), HiGradient(0.0),
-              InterpolationMode(DataRoomAirModel::UserDefinedPatternMode::Invalid), UpperBoundTempScale(0.0), LowerBoundTempScale(0.0),
-              UpperBoundHeatRateScale(0.0), LowerBoundHeatRateScale(0.0)
-        {
-        }
+        std::string Name = "";                                           // name
+        Real64 TstatHeight = 0.0;                                         // Height of thermostat/ temperature control sensor
+        Real64 TleavingHeight = 0.0;                                      // height of return air node where leaving zone
+        Real64 TexhaustHeight = 0.0;                                      // height of exhaust air node where leaving zone
+        Real64 LowGradient = 0.0;                                         // lower value of vertical gradient [C/m]
+        Real64 HiGradient = 0.0;                                          // upper value of vertical gradient [C/m]
+        UserDefinedPatternMode InterpolationMode = UserDefinedPatternMode::Invalid; // control for interpolation mode
+        Real64 UpperBoundTempScale = 0.0;                                 // temperature value for HiGradient
+        Real64 LowerBoundTempScale = 0.0;                                 // temperature value for LowGradient
+        Real64 UpperBoundHeatRateScale = 0.0;                             // load value for HiGradient
+        Real64 LowerBoundHeatRateScale = 0.0;                             // load value for lowGradient
     };
 
     struct TempVsHeightPattern // to be used as nested structure in RoomAirPattern
@@ -393,312 +340,201 @@ namespace DataRoomAirModel {
         // Members
         Array1D<Real64> ZetaPatrn;     // non dimensional height from floor,
         Array1D<Real64> DeltaTaiPatrn; // Tai- MAT (TODO, check sign)
-
-        // Default Constructor
-        TempVsHeightPattern()
-        {
-        }
     };
 
-    struct TemperaturePatternStruct // RoomAirPattern
+    struct TemperaturePattern // RoomAirPattern
     {
         // Members
-        std::string Name;                        // unique identifier
-        int PatrnID;                             // control ID for referencing in Schedules
-        UserDefinedPatternType PatternMode;      // Control for what type of calcs in this pattern
+        std::string Name = "";                        // unique identifier
+        int PatrnID = 0;                             // control ID for referencing in Schedules
+        UserDefinedPatternType PatternMode = UserDefinedPatternType::Invalid;      // Control for what type of calcs in this pattern
         ConstGradPattern GradPatrn;              // Constant gradient pattern
         TwoVertGradInterpolPattern TwoGradPatrn; // Two gradient interpolation pattern
         TempVsHeightPattern VertPatrn;           // Vertical gradient profile pattern
         SurfMapPattern MapPatrn;                 // Generic Surface map pattern
-        Real64 DeltaTstat;                       // (Tstat - MAT) offset   deg C
-        Real64 DeltaTleaving;                    // (Tleaving - MAT) deg C
-        Real64 DeltaTexhaust;                    // (Texhaust - MAT) deg C
-
-        // Default Constructor
-        TemperaturePatternStruct() : PatrnID(0), PatternMode(UserDefinedPatternType::Invalid), DeltaTstat(0.0), DeltaTleaving(0.0), DeltaTexhaust(0.0)
-        {
-        }
+        Real64 DeltaTstat = 0.0;                       // (Tstat - MAT) offset   deg C
+        Real64 DeltaTleaving = 0.0;                    // (Tleaving - MAT) deg C
+        Real64 DeltaTexhaust = 0.0;                    // (Texhaust - MAT) deg C
     };
 
-    struct SurfaceAssocNestedStruct
+    struct SurfaceAssocNested
     {
         // Members
-        std::string Name;    // unique identifier
-        int SurfID;          // id in HB surface structs
-        Real64 TadjacentAir; // place to put resulting temperature value
-        Real64 Zeta;         // non-dimensional height in zone ot
-
-        // Default Constructor
-        SurfaceAssocNestedStruct() : SurfID(0), TadjacentAir(23.0), Zeta(0.0)
-        {
-        }
+        std::string Name = "";    // unique identifier
+        int SurfID = 0;          // id in HB surface structs
+        Real64 TadjacentAir = 23.0; // place to put resulting temperature value
+        Real64 Zeta = 0.0;         // non-dimensional height in zone ot
     };
 
-    struct AirPatternInfobyZoneStruct // becomes AirPatternZoneInfo
+    struct AirPatternInfobyZone // becomes AirPatternZoneInfo
     {
         // Members
         // user variables
-        bool IsUsed;                   // .TRUE. if user-defined patterns used in zone
-        std::string Name;              // Name
-        std::string ZoneName;          // Zone name in building
-        int ZoneID;                    // Index of Zone in Heat Balance
-        std::string AvailSched;        // Name of availability schedule
-        int AvailSchedID;              // index of availability schedule
-        std::string PatternCntrlSched; // name of schedule that selects pattern
-        int PatternSchedID;            // index of pattern selecting schedule
+        bool IsUsed = false;                   // .TRUE. if user-defined patterns used in zone
+        std::string Name = "";              // Name
+        std::string ZoneName = "";          // Zone name in building
+        int ZoneID = 0;                    // Index of Zone in Heat Balance
+        std::string AvailSched = "";        // Name of availability schedule
+        int AvailSchedID = 0;              // index of availability schedule
+        std::string PatternCntrlSched = ""; // name of schedule that selects pattern
+        int PatternSchedID = 0;            // index of pattern selecting schedule
         // calculated and from elsewhere
-        Real64 ZoneHeight;                      // in meters, from Zone%CeilingHeight
-        int ZoneNodeID;                         // index in Node array for this zone
+        Real64 ZoneHeight = 0.0;                      // in meters, from Zone%CeilingHeight
+        int ZoneNodeID = 0;                         // index in Node array for this zone
         Array1D_int ExhaustAirNodeID;           // indexes in Node array
-        Real64 TairMean;                        // comes from MAT
-        Real64 Tstat;                           // temperature for thermostat
-        Real64 Tleaving;                        // temperature for return air node
-        Real64 Texhaust;                        // temperature for exhaust air node
-        Array1D<SurfaceAssocNestedStruct> Surf; // nested struct w/ surface info
-        int totNumSurfs;                        // total surfs for this zone
-        int firstSurfID;                        // Index of first surface
+        // Is 23.0 a constexpr somewhere
+        Real64 TairMean = 23.0;                        // comes from MAT
+        Real64 Tstat = 23.0;                           // temperature for thermostat
+        Real64 Tleaving = 23.0;                        // temperature for return air node
+        Real64 Texhaust = 23.0;                        // temperature for exhaust air node
+        Array1D<SurfaceAssocNested> Surf; // nested struct w/ surface info
+        int totNumSurfs = 0;                        // total surfs for this zone
+        int firstSurfID = 0;                        // Index of first surface
         // report
-        Real64 Gradient; // result for modeled gradient if using two-gradient interpolation
-
-        // Default Constructor
-        AirPatternInfobyZoneStruct()
-            : IsUsed(false), ZoneID(0), AvailSchedID(0), PatternSchedID(0), ZoneHeight(0.0), ZoneNodeID(0), TairMean(23.0), Tstat(23.0),
-              Tleaving(23.0), Texhaust(23.0), totNumSurfs(0), firstSurfID(0), Gradient(0.0)
-        {
-        }
+        Real64 Gradient = 0.0; // result for modeled gradient if using two-gradient interpolation
     };
 
-    struct AirflowLinkagesInfoNestedStruct // becomes link
+    struct AFNLinkagesInfoNested // becomes link
     {
         // Members
         // user variables
-        int AirflowNetworkLinkSimuID;    // point to this linkage in AirflowNetworkLinkSimu structure
-        int AirflowNetworkLinkageDataID; // point to this linkage in AirflowNetworkLinkageData structure
-        int AirflowNetworkLinkReportID;  // point to this linkage in AirflowNetworkLinkReport structure
-        Real64 MdotIn;                   // mass flow rate of air into control volume(neg means leaving control volume) (kg / s)
-        Real64 TempIn;                   // drybulb temperature of air into control volume
-        Real64 HumRatIn;                 // humidity ratio of air into control volume
-
-        // Default Constructor
-        AirflowLinkagesInfoNestedStruct()
-            : AirflowNetworkLinkSimuID(0), AirflowNetworkLinkageDataID(0), AirflowNetworkLinkReportID(0), MdotIn(0.0), TempIn(0.0), HumRatIn(0.0)
-        {
-        }
+        int AirflowNetworkLinkSimuID = 0;    // point to this linkage in AirflowNetworkLinkSimu structure
+        int AirflowNetworkLinkageDataID = 0; // point to this linkage in AirflowNetworkLinkageData structure
+        int AirflowNetworkLinkReportID = 0;  // point to this linkage in AirflowNetworkLinkReport structure
+        Real64 MdotIn = 0.0;                   // mass flow rate of air into control volume(neg means leaving control volume) (kg / s)
+        Real64 TempIn = 0.0;                   // drybulb temperature of air into control volume
+        Real64 HumRatIn = 0.0;                 // humidity ratio of air into control volume
     };
 
-    struct RoomAirflowNetworkNodeInternalGainsStruct // becomes IntGain
+    struct RoomAFNNodeInternalGains // becomes IntGain
     {
         // Members
         // user variables
-        DataHeatBalance::IntGainType Type; // Internal type
-        std::string Name;                  // Intenral gain name
-        bool UseRoomAirModelTempForGains;  // TRUE if user inputs temp for gains
-        bool FractionCheck;                // TRUE if a fraction of internal gain for each object is checked
-
-        // Default Constructor
-        RoomAirflowNetworkNodeInternalGainsStruct()
-            : Type(DataHeatBalance::IntGainType::Invalid), UseRoomAirModelTempForGains(false), FractionCheck(false)
-        {
-        }
+        DataHeatBalance::IntGainType type = DataHeatBalance::IntGainType::Invalid; // Internal type
+        std::string Name = "";                  // Intenral gain name
+        bool UseRoomAirModelTempForGains = false;  // TRUE if user inputs temp for gains
+        bool FractionCheck = false;                // TRUE if a fraction of internal gain for each object is checked
     };
 
-    struct RoomAirflowNetworkHVACStruct // becomes HVAC
+    struct RoomAFNHVAC // becomes HVAC
     {
         // Members
         // user variables
-        std::string Name;           // HVAC system name
-        std::string ObjectTypeName; // HVAC object type name
-        std::string SupplyNodeName; // HVAC system supply node name
-        std::string ReturnNodeName; // HVAC system return node name
-        int TypeOfNum;              // HVAC type num
-        Real64 SupplyFraction;      // Supply flow fraction
-        Real64 ReturnFraction;      // Return flow fraction
-        int EquipConfigIndex;       // HVAC equipment configuration index
-        int SupNodeNum;             // HVAC supply node number
-        int RetNodeNum;             // HVAC return node number
-        int CompIndex;              // Component index
-
-        // Default Constructor
-        RoomAirflowNetworkHVACStruct()
-            : TypeOfNum(0),        // HVAC type num
-              SupplyFraction(0),   // Supply flow fraction
-              ReturnFraction(0),   // Return flow fraction
-              EquipConfigIndex(0), // HVAC equipment configuration index
-              SupNodeNum(0),       // HVAC supply node number
-              RetNodeNum(0),       // HVAC return node number
-              CompIndex(0)         // Component index
-        {
-        }
+        std::string Name = "";           // HVAC system name
+        std::string ObjectTypeName = ""; // HVAC object type name
+        std::string SupplyNodeName = ""; // HVAC system supply node name
+        std::string ReturnNodeName = ""; // HVAC system return node name
+        DataHVACGlobals::ZoneEquipType zoneEquipType = DataHVACGlobals::ZoneEquipType::Invalid;              // HVAC type num
+        Real64 SupplyFraction = 0.0;      // Supply flow fraction
+        Real64 ReturnFraction = 0.0;      // Return flow fraction
+        int EquipConfigIndex = 0;       // HVAC equipment configuration index
+        int SupNodeNum = 0;             // HVAC supply node number
+        int RetNodeNum = 0;             // HVAC return node number
+        int CompIndex = 0;              // Component index
     };
-
-    struct RoomAirflowNetworkAirNodeNestedStruct // becomes Node
+        
+    struct RoomAFNAirNodeNested // becomes Node
     {
         // Members
         // user variables
-        std::string Name;                                           // name of the node itself
-        Real64 ZoneVolumeFraction;                                  // Zone volume fraction applied to this specific node
-        std::string NodeSurfListName;                               // name of nodes' adjacent surface list
-        bool HasSurfacesAssigned;                                   // True if this node has surfaces assigned
+        std::string Name = "";                                           // name of the node itself
+        Real64 ZoneVolumeFraction = 0.0;                                  // Zone volume fraction applied to this specific node
+        std::string NodeSurfListName = "";                               // name of nodes' adjacent surface list
+        bool HasSurfacesAssigned = false;                                   // True if this node has surfaces assigned
         Array1D<bool> SurfMask;                                     // Sized to num of surfs in Zone, true if surface is associated with this node
-        std::string NodeIntGainsListName;                           // name of node's internal gains list
-        bool HasIntGainsAssigned;                                   // True if this node has internal gain assigned
-        int NumIntGains;                                            // Number of matching internal gain objects for all spaces in the zone
+        std::string NodeIntGainsListName = "";                           // name of node's internal gains list
+        bool HasIntGainsAssigned = false;                                   // True if this node has internal gain assigned
+        int NumIntGains = 0;                                            // Number of matching internal gain objects for all spaces in the zone
         Array1D<int> intGainsDeviceSpaces;                          // index pointers to space struct
         Array1D<int> IntGainsDeviceIndices;                         // index pointers to internal gains struct
         Array1D<Real64> IntGainsFractions;                          // gain fractions to this node
-        Array1D<RoomAirflowNetworkNodeInternalGainsStruct> IntGain; // Internal gain struct
-        std::string NodeHVACListName;                               // name of node's HVAC list
-        bool HasHVACAssigned;                                       // True if HVAC systems are assigned to this node
-        int NumHVACs;                                               // Number of HVAC systems
-        Array1D<RoomAirflowNetworkHVACStruct> HVAC;                 // HVAC struct
-        int AirflowNetworkNodeID;                                   // pointer to AirflowNetworkNodeData structure
-        int NumOfAirflowLinks;                                      // Number of intra zone links
-        Array1D<AirflowLinkagesInfoNestedStruct> Link;              // Linkage struct
-        Real64 AirVolume;                                           // air volume in control volume associated with this node(m3 / s)
-        Real64 RhoAir;                                              // current density of air for nodal control volume
-        Real64 CpAir;                                               // current heat capacity of air for nodal control volume
+        Array1D<RoomAFNNodeInternalGains> IntGain; // Internal gain struct
+        std::string NodeHVACListName = "";                               // name of node's HVAC list
+        bool HasHVACAssigned = false;                                       // True if HVAC systems are assigned to this node
+        int NumHVACs = 0;                                               // Number of HVAC systems
+        Array1D<RoomAFNHVAC> HVAC;                 // HVAC struct
+        int AirflowNetworkNodeID = 0;                                   // pointer to AirflowNetworkNodeData structure
+        int NumOfAirflowLinks = 0;                                      // Number of intra zone links
+        Array1D<AFNLinkagesInfoNested> Link;              // Linkage struct
+        Real64 AirVolume = 0.0;                                           // air volume in control volume associated with this node(m3 / s)
+        Real64 RhoAir = 0.0;                                              // current density of air for nodal control volume
+        Real64 CpAir = 0.0;                                               // current heat capacity of air for nodal control volume
 
-        Real64 AirTemp;     // node air temperature
-        Real64 AirTempX1;   // node air temperature at t minus 1 zone timestep
-        Real64 AirTempX2;   // node air temperature at t minus 2 zone timestep
-        Real64 AirTempX3;   // node air temperature at t minus 3 zone timestep
-        Real64 AirTempX4;   // node air temperature at t minus 4 zone timestep
-        Real64 AirTempDSX1; // node air temperature at t minus 1 system timestep
-        Real64 AirTempDSX2; // node air temperature at t minus 2 system timestep
-        Real64 AirTempDSX3; // node air temperature at t minus 3 system timestep
-        Real64 AirTempDSX4; // node air temperature at t minus 4 system timestep
-        Real64 AirTempT1;   // node air temperature at the previous time step used in Exact and Euler method
-        Real64 AirTempTMX;  // temporary node air temperature to test convergence used in Exact and Euler method
-        Real64 AirTempTM2;  // node air temperature at time step t-2 used in Exact and Euler method
+        Real64 AirTemp = 0.0;     // node air temperature
+        Real64 AirTempX1 = 0.0;   // node air temperature at t minus 1 zone timestep
+        Real64 AirTempX2 = 0.0;   // node air temperature at t minus 2 zone timestep
+        Real64 AirTempX3 = 0.0;   // node air temperature at t minus 3 zone timestep
+        Real64 AirTempX4 = 0.0;   // node air temperature at t minus 4 zone timestep
+        Real64 AirTempDSX1 = 0.0; // node air temperature at t minus 1 system timestep
+        Real64 AirTempDSX2 = 0.0; // node air temperature at t minus 2 system timestep
+        Real64 AirTempDSX3 = 0.0; // node air temperature at t minus 3 system timestep
+        Real64 AirTempDSX4 = 0.0; // node air temperature at t minus 4 system timestep
+        Real64 AirTempT1 = 0.0;   // node air temperature at the previous time step used in Exact and Euler method
+        Real64 AirTempTMX = 0.0;  // temporary node air temperature to test convergence used in Exact and Euler method
+        Real64 AirTempTM2 = 0.0;  // node air temperature at time step t-2 used in Exact and Euler method
 
-        Real64 HumRat;     // node air humidity ratio
-        Real64 HumRatX1;   // node air humidity ratio at t minus 1 zone timestep
-        Real64 HumRatX2;   // node air humidity ratio at t minus 2 zone timestep
-        Real64 HumRatX3;   // node air humidity ratio at t minus 3 zone timestep
-        Real64 HumRatX4;   // node air humidity ratio at t minus 4 zone timestep
-        Real64 HumRatDSX1; // node air humidity ratio at t minus 1 system timestep
-        Real64 HumRatDSX2; // node air humidity ratio at t minus 2 system timestep
-        Real64 HumRatDSX3; // node air humidity ratio at t minus 3 system timestep
-        Real64 HumRatDSX4; // node air humidity ratio at t minus 4 system timestep
-        Real64 HumRatW1;   // node air humidity ratio at the previous time step used in Exact and Euler method
-        Real64 HumRatWMX;  // temporary node air humidity ratio to test convergence used in Exact and Euler method
-        Real64 HumRatWM2;  // node air humidity ratio at time step t-2 used in Exact and Euler method
+        Real64 HumRat = 0.0;     // node air humidity ratio
+        Real64 HumRatX1 = 0.0;   // node air humidity ratio at t minus 1 zone timestep
+        Real64 HumRatX2 = 0.0;   // node air humidity ratio at t minus 2 zone timestep
+        Real64 HumRatX3 = 0.0;   // node air humidity ratio at t minus 3 zone timestep
+        Real64 HumRatX4 = 0.0;   // node air humidity ratio at t minus 4 zone timestep
+        Real64 HumRatDSX1 = 0.0; // node air humidity ratio at t minus 1 system timestep
+        Real64 HumRatDSX2 = 0.0; // node air humidity ratio at t minus 2 system timestep
+        Real64 HumRatDSX3 = 0.0; // node air humidity ratio at t minus 3 system timestep
+        Real64 HumRatDSX4 = 0.0; // node air humidity ratio at t minus 4 system timestep
+        Real64 HumRatW1 = 0.0;   // node air humidity ratio at the previous time step used in Exact and Euler method
+        Real64 HumRatWMX = 0.0;  // temporary node air humidity ratio to test convergence used in Exact and Euler method
+        Real64 HumRatWM2 = 0.0;  // node air humidity ratio at time step t-2 used in Exact and Euler method
 
-        Real64 RelHumidity; // node air relative humidity
+        Real64 RelHumidity = 0.0; // node air relative humidity
 
         // sensible heat balance terms for node
-        Real64 SumIntSensibleGain; // rate of heat gain from internal sensible gains(after fraction)
-        Real64 SumHA;              // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
-        Real64 SumHATsurf;         // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
-        Real64 SumHATref;          // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
-        Real64 SumLinkMCp;         // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model
-        Real64 SumLinkMCpT; // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model
-        Real64 SumSysMCp;   // sum of mdor*Cp for incoming supply airflows for this node
-        Real64 SumSysMCpT;  // sum of mdor*Cp*T for incoming supply airflows and temperature for this node
-        Real64 SumSysM;     // sum of mdot for incoming supply airflows for this node
-        Real64 SumSysMW;    // sum of mdot*W for incoming supply airflows and temperature for this node
-        Real64 NonAirSystemResponse;     // sum of convective system load
-        Real64 SysDepZoneLoadsLagged;    // sum of system lagged load
-        Real64 SysDepZoneLoadsLaggedOld; // sum of system lagged load
-        Real64 AirCap;                   // Air storage term for energy balalce at each node
-        Real64 AirHumRat;                // Air storage term for moisture balalce at each node
+        Real64 SumIntSensibleGain = 0.0; // rate of heat gain from internal sensible gains(after fraction)
+        Real64 SumHA = 0.0;              // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
+        Real64 SumHATsurf = 0.0;         // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
+        Real64 SumHATref = 0.0;          // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
+        Real64 SumLinkMCp = 0.0;         // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model
+        Real64 SumLinkMCpT = 0.0; // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model
+        Real64 SumSysMCp = 0.0;   // sum of mdor*Cp for incoming supply airflows for this node
+        Real64 SumSysMCpT = 0.0;  // sum of mdor*Cp*T for incoming supply airflows and temperature for this node
+        Real64 SumSysM = 0.0;     // sum of mdot for incoming supply airflows for this node
+        Real64 SumSysMW = 0.0;    // sum of mdot*W for incoming supply airflows and temperature for this node
+        Real64 NonAirSystemResponse = 0.0;     // sum of convective system load
+        Real64 SysDepZoneLoadsLagged = 0.0;    // sum of system lagged load
+        Real64 SysDepZoneLoadsLaggedOld = 0.0; // sum of system lagged load
+        Real64 AirCap = 0.0;                   // Air storage term for energy balalce at each node
+        Real64 AirHumRat = 0.0;                // Air storage term for moisture balalce at each node
         // latent moisture balance terms for node
-        Real64 SumIntLatentGain; // rate of heat gain form internal latent gains(after fraction)
-        Real64 SumHmAW;          // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
-        Real64 SumHmARa;         // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
-        Real64 SumHmARaW;        // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
-        Real64 SumLinkM;         // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
-        Real64 SumLinkMW; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model
-
-        // Default Constructor
-        RoomAirflowNetworkAirNodeNestedStruct()
-            : ZoneVolumeFraction(0.0), HasSurfacesAssigned(false), HasIntGainsAssigned(false), NumIntGains(0), HasHVACAssigned(false), NumHVACs(0),
-              AirflowNetworkNodeID(0),              // pointer to AirflowNetworkNodeData structure
-              NumOfAirflowLinks(0), AirVolume(0.0), // air volume in control volume associated with this node(m3 / s)
-              RhoAir(0.0),                          // current density of air for nodal control volume
-              CpAir(0.0),                           // current heat capacity of air for nodal control volume
-              AirTemp(0.0),                         // node air temperature
-              AirTempX1(0.0),                       // node air temperature at t minus 1 zone timestep
-              AirTempX2(0.0),                       // node air temperature at t minus 2 zone timestep
-              AirTempX3(0.0),                       // node air temperature at t minus 3 zone timestep
-              AirTempX4(0.0),                       // node air temperature at t minus 4 zone timestep
-              AirTempDSX1(0.0),                     // node air temperature at t minus 1 system timestep
-              AirTempDSX2(0.0),                     // node air temperature at t minus 2 system timestep
-              AirTempDSX3(0.0),                     // node air temperature at t minus 3 system timestep
-              AirTempDSX4(0.0),                     // node air temperature at t minus 4 system timestep
-              AirTempT1(0.0),                       // node air temperature at the previous time step used in Exact and Euler method
-              AirTempTMX(0.0),                      // temporary node air temperature to test convergence used in Exact and Euler method
-              AirTempTM2(0.0),                      // node air temperature at time step t-2 used in Exact and Euler method
-              HumRat(0.0),                          // node air humidity ratio
-              HumRatX1(0.0),                        // node air humidity ratio at t minus 1 zone timestep
-              HumRatX2(0.0),                        // node air humidity ratio at t minus 2 zone timestep
-              HumRatX3(0.0),                        // node air humidity ratio at t minus 3 zone timestep
-              HumRatX4(0.0),                        // node air humidity ratio at t minus 4 zone timestep
-              HumRatDSX1(0.0),                      // node air humidity ratio at t minus 1 system timestep
-              HumRatDSX2(0.0),                      // node air humidity ratio at t minus 2 system timestep
-              HumRatDSX3(0.0),                      // node air humidity ratio at t minus 3 system timestep
-              HumRatDSX4(0.0),                      // node air humidity ratio at t minus 4 system timestep
-              HumRatW1(0.0),                        // node air humidity ratio at the previous time step used in Exact and Euler method
-              HumRatWMX(0.0),                       // temporary node air humidity ratio to test convergence used in Exact and Euler method
-              HumRatWM2(0.0),                       // node air humidity ratio at time step t-2 used in Exact and Euler method
-              RelHumidity(0.0),                     // node air relative humidity
-              // sensible heat balance terms for node
-              SumIntSensibleGain(0.0),         // rate of heat gain from internal sensible gains(after fraction)
-              SumHA(0.0),                      // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
-              SumHATsurf(0.0), SumHATref(0.0), // sum of Hc * Area * Temp for surfaces associated with this node
-              SumLinkMCp(0.0), SumLinkMCpT(0.0), SumSysMCp(0.0), SumSysMCpT(0.0), SumSysM(0.0), SumSysMW(0.0), NonAirSystemResponse(0.0),
-              SysDepZoneLoadsLagged(0.0), SysDepZoneLoadsLaggedOld(0.0), AirCap(0.0), AirHumRat(0.0),
-              // latent moisture balance terms for node
-              SumIntLatentGain(0.0), // rate of heat gain form internal latent gains(after fraction)
-              SumHmAW(0.0),          // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
-              SumHmARa(0.0),         // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
-              SumHmARaW(0.0),        // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
-              SumLinkM(0.0), SumLinkMW(0.0)
-        {
-        }
+        Real64 SumIntLatentGain = 0.0; // rate of heat gain form internal latent gains(after fraction)
+        Real64 SumHmAW = 0.0;          // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+        Real64 SumHmARa = 0.0;         // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+        Real64 SumHmARaW = 0.0;        // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
+        Real64 SumLinkM = 0.0;         // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
+        Real64 SumLinkMW = 0.0; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model
     };
 
-    struct RoomAirflowNetworkInfoByZoneStruct // becomes RoomAirflowNetworkZoneInfo
+    struct RoomAFNInfoByZone // becomes RoomAirflowNetworkZoneInfo
     {
         // Members
         // user variables
-        bool IsUsed;                                         // true. if RoomAirflowNetwork model used in zone
-        std::string Name;                                    // Name
-        std::string ZoneName;                                // Zone name in building
-        int ZoneID;                                          // Index of Zone in Heat Balance
-        int ActualZoneID;                                    // Index of controlled zones in ZoneCOnfigure
-        std::string AvailSched;                              // Name of availability schedule
-        int AvailSchedID;                                    // index of availability schedule
-        int ControlAirNodeID;                                // index of roomair node that is HVAC control sensor location
-        int NumOfAirNodes;                                   // Number of air nodes
-        Array1D<RoomAirflowNetworkAirNodeNestedStruct> Node; // Node struct
-        int ZoneNodeID;                                      // index in system Node array for this zone
-        Real64 TairMean;                                     // comes from MAT
-        Real64 Tstat;                                        // temperature for thermostat
-        Real64 Tleaving;                                     // temperature for return air node
-        Real64 Texhaust;                                     // temperature for exhaust air node
-        int totNumSurfs;                                     // total surfs for this zone
-        int firstSurfID;                                     // Index of first surface
-        int RAFNNum;                                         // RAFN number
-
-        // Default Constructor
-        RoomAirflowNetworkInfoByZoneStruct()
-            : IsUsed(false),       // true. if RoomAirflowNetwork model used in zone
-              ZoneID(0),           // Index of Zone in Heat Balance
-              ActualZoneID(0),     // Index of controlled zones in ZoneCOnfigure
-              AvailSchedID(0),     // index of availability schedule
-              ControlAirNodeID(0), // index of roomair node that is HVAC control sensor location
-              NumOfAirNodes(0),    // Number of air nodes
-              ZoneNodeID(0),       // index in system Node array for this zone
-              TairMean(23.0),      // comes from MAT
-              Tstat(23.0),         // temperature for thermostat
-              Tleaving(23.0),      // temperature for return air node
-              Texhaust(23.0),      // temperature for exhaust air node
-              totNumSurfs(0),      // total surfs for this zone
-              firstSurfID(0),      // Index of first surface
-              RAFNNum(0)           // RAFN number
-        {
-        }
+        bool IsUsed = false;                                         // true. if RoomAirflowNetwork model used in zone
+        std::string Name = "";                                    // Name
+        std::string ZoneName = "";                                // Zone name in building
+        int ZoneID = 0;                                          // Index of Zone in Heat Balance
+        int ActualZoneID = 0;                                    // Index of controlled zones in ZoneCOnfigure
+        std::string AvailSched = "";                              // Name of availability schedule
+        int AvailSchedID = 0;                                    // index of availability schedule
+        int ControlAirNodeID = 0;                                // index of roomair node that is HVAC control sensor location
+        int NumOfAirNodes = 0;                                   // Number of air nodes
+        Array1D<RoomAFNAirNodeNested> Node; // Node struct
+        int ZoneNodeID = 0;                                       // index in system Node array for this zone
+        Real64 TairMean = 0.0;                                     // comes from MAT
+        Real64 Tstat = 0.0;                                        // temperature for thermostat
+        Real64 Tleaving = 0.0;                                     // temperature for return air node
+        Real64 Texhaust = 0.0;                                     // temperature for exhaust air node
+        int totNumSurfs = 0;                                     // total surfs for this zone
+        int firstSurfID = 0;                                     // Index of first surface
+        int RAFNNum = 0;                                         // RAFN number
     };
 
 } // namespace DataRoomAirModel
@@ -840,9 +676,9 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<DataRoomAirModel::UFEData> ZoneUCSDUE;
     Array2D<DataRoomAirModel::CVFlow> CVJetRecFlows;                                          // Jet and recirculation zone flows and properties
     Array1D<DataRoomAirModel::CVDVParameters> SurfParametersCVDV;                             // Surface parameters
-    Array1D<DataRoomAirModel::TemperaturePatternStruct> RoomAirPattern;                       // user defined patterns ,various types
-    Array1D<DataRoomAirModel::AirPatternInfobyZoneStruct> AirPatternZoneInfo;                 // added zone information for user defined patterns
-    Array1D<DataRoomAirModel::RoomAirflowNetworkInfoByZoneStruct> RoomAirflowNetworkZoneInfo; // added zone info
+    Array1D<DataRoomAirModel::TemperaturePattern> RoomAirPattern;                       // user defined patterns ,various types
+    Array1D<DataRoomAirModel::AirPatternInfobyZone> AirPatternZoneInfo;                 // added zone information for user defined patterns
+    Array1D<DataRoomAirModel::RoomAFNInfoByZone> RoomAirflowNetworkZoneInfo; // added zone info
 
     void clear_state() override
     {

@@ -393,7 +393,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
             std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
             thisZoneEquipList.LoadDistScheme = static_cast<DataZoneEquipment::LoadDist>(
-                getEnumerationValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::MakeUPPERCase(loadDistName)));
+                getEnumValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::makeUPPER(loadDistName)));
             if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
                 ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
                 ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));
@@ -521,7 +521,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     }
 
                     thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = static_cast<ZoneEquip>(
-                        getEnumerationValue(ZoneEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(thisZoneEquipList.EquipType(ZoneEquipTypeNum))));
+                        getEnumValue(ZoneEquipTypeNamesUC, UtilityRoutines::makeUPPER(thisZoneEquipList.EquipType(ZoneEquipTypeNum))));
 
                     if (thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::ZoneUnitarySys ||
                         thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::PkgTermACAirToAir ||
@@ -853,7 +853,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    (AirLoopHVACZone)getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter));
+                    (AirLoopHVACZone)getEnumValue(AirLoopHVACTypeNamesUC, AlphArray(Counter));
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cAlphaFields(1), state.dataZoneEquip->SupplyAirPath(PathNum).Name));
                 ShowContinueError(state, format("Unhandled component type =\"{}\".", AlphArray(Counter)));
@@ -922,7 +922,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
+                    static_cast<AirLoopHVACZone>(getEnumValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cAlphaFields(1), state.dataZoneEquip->ReturnAirPath(PathNum).Name));
                 ShowContinueError(state, format("Unhandled component type =\"{}\".", AlphArray(Counter)));

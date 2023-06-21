@@ -836,7 +836,7 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
+        //       MODIFIED       From UtilityRoutines::makeUPPER( function by Linda K. Lawrie
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:

@@ -567,7 +567,7 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
 
     ErrorsFound = false;
     state->dataRoomAirMod->AirModel.allocate(1);
-    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
+    state->dataRoomAirMod->AirModel(1).AirModel = DataRoomAirModel::RoomAirModel::AirflowNetwork;
     RoomAirModelManager::GetRoomAirflowNetworkData(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 

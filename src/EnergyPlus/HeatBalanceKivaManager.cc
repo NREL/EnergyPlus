@@ -502,7 +502,7 @@ void KivaManager::readWeatherData(EnergyPlusData &state)
         }
         if (Pos != std::string::npos) LineResult.data.erase(0, Pos + 1);
 
-        if (UtilityRoutines::MakeUPPERCase(Header(HdLine)) == "DATA PERIODS") {
+        if (UtilityRoutines::makeUPPER(Header(HdLine)) == "DATA PERIODS") {
             bool IOStatus;
             uppercase(LineResult.data);
             int NumHdArgs = 2;

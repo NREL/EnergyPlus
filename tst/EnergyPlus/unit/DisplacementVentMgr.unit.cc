@@ -165,7 +165,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataSurface->SurfTAirRefRpt.dimension(TotSurfaces, 0);
 
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
+    state->dataRoomAirMod->AirModel(1).AirModel = DataRoomAirModel::RoomAirModel::UCSDDV;
 
     state->dataUCSDShared->APos_Wall.allocate(TotSurfaces);
     state->dataUCSDShared->APos_Floor.allocate(TotSurfaces);

@@ -1192,7 +1192,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
     state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
-    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
+    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModel = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
@@ -1204,7 +1204,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
     state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
-    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
+    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModel = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;

@@ -306,7 +306,7 @@ namespace UnitVentilator {
             cHeatingCoilType = "";
 
             {
-                unitVent.OAControlType = (OAControl)getEnumerationValue(OAControlNamesUC, Alphas(3));
+                unitVent.OAControlType = (OAControl)getEnumValue(OAControlNamesUC, Alphas(3));
                 switch (unitVent.OAControlType) {
                 case OAControl::VariablePercent:
                 case OAControl::FixedAmount: {
@@ -590,7 +590,7 @@ namespace UnitVentilator {
                 }
             }
 
-            unitVent.CoilOption = (CoilsUsed)getEnumerationValue(CoilsUsedNamesUC, Alphas(13));
+            unitVent.CoilOption = (CoilsUsed)getEnumValue(CoilsUsedNamesUC, Alphas(13));
 
             unitVent.FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(14));
             // Default to cycling fan when fan mode schedule is not present
@@ -624,8 +624,8 @@ namespace UnitVentilator {
                     unitVent.HCoilPresent = true;
                     cHeatingCoilType = Alphas(15);
                     unitVent.HCoilTypeCh = cHeatingCoilType;
-                    unitVent.HCoilType = (HeatCoilType)getEnumerationValue(HeatCoilTypeNamesUC, cHeatingCoilType);
-                    unitVent.HeatingCoilType = (DataPlant::PlantEquipmentType)getEnumerationValue(DataPlant::PlantEquipTypeNamesUC, cHeatingCoilType);
+                    unitVent.HCoilType = (HeatCoilType)getEnumValue(HeatCoilTypeNamesUC, cHeatingCoilType);
+                    unitVent.HeatingCoilType = (DataPlant::PlantEquipmentType)getEnumValue(DataPlant::PlantEquipTypeNamesUC, cHeatingCoilType);
 
                     unitVent.HCoilName = Alphas(16);
                     ValidateComponent(state, cHeatingCoilType, unitVent.HCoilName, IsNotOK, CurrentModuleObject);
@@ -673,8 +673,8 @@ namespace UnitVentilator {
 
                     cCoolingCoilType = Alphas(17);
                     unitVent.CCoilTypeCh = cCoolingCoilType;
-                    unitVent.CCoilType = (CoolCoilType)getEnumerationValue(CoolCoilTypeNamesUC, cCoolingCoilType);
-                    unitVent.CoolingCoilType = (DataPlant::PlantEquipmentType)getEnumerationValue(DataPlant::PlantEquipTypeNamesUC, cCoolingCoilType);
+                    unitVent.CCoilType = (CoolCoilType)getEnumValue(CoolCoilTypeNamesUC, cCoolingCoilType);
+                    unitVent.CoolingCoilType = (DataPlant::PlantEquipmentType)getEnumValue(DataPlant::PlantEquipTypeNamesUC, cCoolingCoilType);
                     unitVent.CCoilPlantName = Alphas(18);
 
                     if (cCoolingCoilType == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
