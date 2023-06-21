@@ -1342,6 +1342,7 @@ namespace DataPlant {
                                        .NodeNumIn;
         Real64 CW_RetMdot = state.dataLoopNodes->Node(inletChWReturnNodeNum).MassFlowRate;
         Real64 HW_RetMdot = state.dataLoopNodes->Node(inletHWReturnNodeNum).MassFlowRate;
+
         bool flowInEach = false;
         // need flow in both returns.
         if (CW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow || HW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow) {
