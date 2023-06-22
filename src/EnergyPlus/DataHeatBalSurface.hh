@@ -135,6 +135,8 @@ struct HeatBalSurfData : BaseGlobalStruct
     // these next two all are for Lights visible radiation gains on inside face
     Array1D<Real64> SurfQRadLightsInReport; // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadLightsInRep; // Surface thermal radiation heat transfer inside face surface [W]
+    Array1D<Real64> SurfQRadLightsInReportOtherZones; // Surface thermal radiation heat gain at Inside face from other zones [J]
+    Array1D<Real64> SurfQdotRadLightsInRepOtherZones; // Surface thermal radiation heat transfer inside face surface from other zones [W]
     // these next two all are for Internal Gains sources of radiation gains on inside face
     Array1D<Real64> SurfQRadIntGainsInReport; // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadIntGainsInRep; // Surface thermal radiation heat transfer inside face surface [W]
@@ -195,6 +197,7 @@ struct HeatBalSurfData : BaseGlobalStruct
 
     Array1D<Real64> SurfQdotRadNetLWInPerArea;  // Net interior long wavelength radiation to a surface from other surfaces
     Array1D<Real64> SurfQdotRadLightsInPerArea; // Short wave from Lights radiation absorbed on inside of opaque surface
+    Array1D<Real64> SurfQdotRadLightsInPerAreaOtherZones; // Short wave from Lights radiation absorbed on inside of opaque surface
     // Variables that are used in both the Surface Heat Balance and the Moisture Balance
     Array1D<Real64> SurfOpaqQRadSWOutAbs;  // Short wave radiation absorbed on outside of opaque surface
     Array1D<Real64> SurfOpaqQRadSWInAbs;   // Short wave radiation absorbed on inside of opaque surface
