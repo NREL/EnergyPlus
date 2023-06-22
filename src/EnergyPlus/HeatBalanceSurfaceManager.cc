@@ -3742,7 +3742,7 @@ void InitIntSolarDistribution(EnergyPlusData &state)
         for (int enclosureNum = 1; enclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++enclosureNum) {
 
             if (state.dataHeatBalSurf->EnclSolRecDifShortFromZ(enclosureNum)) {
-                
+
                 state.dataHeatBal->EnclSolQSWRadLightsOtherZones(enclosureNum) = 0.0;
 
                 for (int OtherenclosureNum = 1; OtherenclosureNum <= state.dataViewFactor->NumOfSolarEnclosures; ++OtherenclosureNum) {
@@ -3821,7 +3821,8 @@ void InitIntSolarDistribution(EnergyPlusData &state)
 
                 state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(SurfNum) += state.dataHeatBal->EnclSolQSWRad(solEnclosureNum) * AbsIntSurf;
                 state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(SurfNum) += state.dataHeatBal->EnclSolQSWRadLights(solEnclosureNum) * AbsIntSurfVis;
-                state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(SurfNum) += state.dataHeatBal->EnclSolQSWRadLightsOtherZones(solEnclosureNum) * AbsIntSurfVis;
+                state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(SurfNum) +=
+                    state.dataHeatBal->EnclSolQSWRadLightsOtherZones(solEnclosureNum) * AbsIntSurfVis;
 
                 // Calculate absorbed solar on outside if movable exterior insulation in place
                 if (state.dataSurface->AnyMovableInsulation &&
@@ -4909,11 +4910,11 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, ObjexxFC
             int const lastSurf = thisSpace.OpaqOrIntMassSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                 Real64 lowValue = 0.0000001;
-                state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum)
-                                                                             - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum)
-                                                                             - state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(surfNum);
-                if (state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) <= lowValue) state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) = 0.0;
-                
+                state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) -
+                                                                               state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum) -
+                                                                               state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(surfNum);
+                if (state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) <= lowValue)
+                    state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) = 0.0;
             }
         }
     }
@@ -5026,7 +5027,8 @@ void UpdateNonRepresentativeSurfaceResults(EnergyPlusData &state, ObjexxFCL::Opt
                 if (surfNum != repSurfNum) {
                     // Surface Heat Balance Arrays
                     state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum) = state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(repSurfNum);
-                    state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(surfNum) = state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(repSurfNum);
+                    state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(surfNum) =
+                        state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(repSurfNum);
                     state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(repSurfNum);
                     state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) = state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(repSurfNum);
                 }
@@ -6573,7 +6575,8 @@ void ReportSurfaceHeatBalance(EnergyPlusData &state)
                     state.dataHeatBalSurf->SurfQdotRadSolarInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
 
                 state.dataHeatBalSurf->SurfQdotRadLightsInRep(surfNum) = state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum) * surface.Area;
-                state.dataHeatBalSurf->SurfQdotRadLightsInRepOtherZones(surfNum) = state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(surfNum) * surface.Area;
+                state.dataHeatBalSurf->SurfQdotRadLightsInRepOtherZones(surfNum) =
+                    state.dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(surfNum) * surface.Area;
                 state.dataHeatBalSurf->SurfQRadLightsInReport(surfNum) =
                     state.dataHeatBalSurf->SurfQdotRadLightsInRep(surfNum) * state.dataGlobal->TimeStepZoneSec;
                 state.dataHeatBalSurf->SurfQRadLightsInReportOtherZones(surfNum) =
