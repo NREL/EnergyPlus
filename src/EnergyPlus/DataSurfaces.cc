@@ -549,8 +549,10 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.ViewFactorSky = round(ViewFactorSky * 10.0) / 10.0;
 
     calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
-    calcHashKey.IntConvCoeff = state.dataSurface->SurfIntConvCoeffIndex(SurfNum);
-    calcHashKey.ExtConvCoeff = state.dataSurface->SurfExtConvCoeffIndex(SurfNum);
+    calcHashKey.intConvModel = state.dataSurface->surfIntConv(SurfNum).model;
+    calcHashKey.extConvModel = state.dataSurface->surfExtConv(SurfNum).model;
+    calcHashKey.intConvUserModelNum = state.dataSurface->surfIntConv(SurfNum).userModelNum;
+    calcHashKey.extConvUserModelNum = state.dataSurface->surfExtConv(SurfNum).userModelNum;
     calcHashKey.OSCPtr = OSCPtr;
     calcHashKey.OSCMPtr = OSCMPtr;
 
@@ -772,6 +774,38 @@ void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state)
             }
         }
     }
+}
+
+Compass4 AzimuthToCompass4(Real64 azimuth)
+{
+    assert(azimuth >= 0.0 && azimuth < 360.0);
+    for (int c4 = 0; c4 < static_cast<int>(Compass4::Num); ++c4) {
+        Real64 lo = Compass4AzimuthLo[c4];
+        Real64 hi = Compass4AzimuthHi[c4];
+        if (lo > hi) {
+            if (azimuth >= lo || azimuth < hi) return static_cast<Compass4>(c4);
+        } else {
+            if (azimuth >= lo && azimuth < hi) return static_cast<Compass4>(c4);
+        }
+    }
+    assert(false);
+    return Compass4::Invalid;
+}
+
+Compass8 AzimuthToCompass8(Real64 azimuth)
+{
+    assert(azimuth >= 0.0 && azimuth < 360.0);
+    for (int c8 = 0; c8 < static_cast<int>(Compass8::Num); ++c8) {
+        Real64 lo = Compass8AzimuthLo[c8];
+        Real64 hi = Compass8AzimuthHi[c8];
+        if (lo > hi) {
+            if (azimuth >= lo || azimuth < hi) return static_cast<Compass8>(c8);
+        } else {
+            if (azimuth >= lo && azimuth < hi) return static_cast<Compass8>(c8);
+        }
+    }
+    assert(false);
+    return Compass8::Invalid;
 }
 
 } // namespace EnergyPlus::DataSurfaces

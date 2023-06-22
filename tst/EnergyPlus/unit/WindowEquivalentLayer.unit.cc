@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     // check the slat angle
     EXPECT_NEAR(-71.0772, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
-    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+    Dayltg::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
     EXPECT_NEAR(-Constant::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
@@ -920,7 +920,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     // check the VB slat angle
     EXPECT_NEAR(18.9228, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
-    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
+    Dayltg::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataWindowEquivalentLayer::Orientation::Horizontal, ProfAngVer);
     EXPECT_NEAR(90.0 - Constant::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // get the slat angle from profile angle
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(Constant::RadToDeg * ProfAngVer);
