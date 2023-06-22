@@ -372,62 +372,7 @@ namespace DataHVACGlobals {
 
     // Parameters for HVACSystemRootFindingAlgorithm
     int constexpr Bisection(2);
-#ifdef GET_OUT
-    enum class ZoneEquipType {
-        Invalid = -1,
-        DUMMY, // There is some back and forth with AFN enumerations here that I just don't want to mess with
-        VariableRefrigerantFlow, // VRFTerminalUnit
-        EnergyRecoveryVentilator, // ERVStandAlone
-        FourPipeFanCoil, // FanCoil4Pipe
-        OutdoorAirUnit, // OutdoorAirUnit
-        PackagedTerminalAirConditioner, // PkgTermACAirToAir
-        PackagedTerminalHeatPump, // PkgTermHPAirToAir
-        UnitHeater,  // UnitHeater
-        UnitVentilator, // UnitVentilator
-        VentilatedSlab, // VentilatedSlab
-        WaterToAirHeatPump, // PkgTermHPWaterToAir
-        WindowAirConditioner, // WindowAC
-        BaseboardRadiantConvectiveElectric, // BBElectric
-        BaseboardRadiantConvectiveWater, // BBWater
-        BaseboardRadiantConvectiveSteam, // BBSteam
-        BaseboardConvectiveElectric, // BBElectricConvective
-        BaseboardConvectiveWater, // BBWaterConvective
-        HighTemperatureRadiant, // HiTempRadiant
-        DehumidifierDX, // ZoneDXDehumidifier
-        IdealLoadsAirSystem, // PurchasedAir
-        RefrigerationChillerSet, // RefrigerationAirChillerSet
-        HybridUnitaryAirConditioners, 
-        FanZoneExhaust, // FanZoneExhaust
-        WaterHeaterHeatPump, // HPWaterHeater
-        AirTerminalDualDuctConstantVolume,
-        AirTerminalDualDuctVAV, 
-        AirTerminalSingleDuctConstantVolumeReheat,
-        AirTerminalSingleDuctConstantVolumeNoReheat, 
-        AirTerminalSingleDuctVAVReheat, 
-        AirTerminalSingleDuctVAVNoReheat, 
-        AirTerminalSingleDuctSeriesPIUReheat,
-        AirTerminalSingleDuctParallelPIUReheat, 
-        AirTerminalSingleDuctCAVFourPipeInduction,
-        AirTerminalSingleDuctVAVReheatVariableSpeedFan,
-        AirTerminalSingleDuctVAVHeatAndCoolReheat,
-        AirTerminalSingleDuctVAVHeatAndCoolNoReheat, 
-        AirTerminalSingleDuctConstantVolumeCooledBeam, 
-        AirTerminalDualDuctVAVOutdoorAir, 
-        AirLoopHVACReturnAir, 
-        Num
-    };
 
-    // ZoneEvaporativeCoolerUnit
-    // ZoneHybridEvaporativeCooler
-    // AirDistUnit
-    // LoTempRadiant
-    // HeatExchanger
-    // UserDefinedZoneHVACForcedAir
-    // CoolingPanel
-    // ZoneUnitarySys
-    extern const std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNames;
-    extern const std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNamesUC;
-#endif //
     int constexpr MaxSpeedLevels = 10;
 
     extern Array1D_string const cFanTypes;

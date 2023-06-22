@@ -60,40 +60,23 @@ struct EnergyPlusData;
 namespace RoomAirModelAirflowNetwork {
 
     // Data
-    class RAFNData
-    {
-
-    private:
+    class RAFNData {
     public:
-        int ZoneNum;
-        int RoomAirNode;
+        int ZoneNum = 0;
+        int RoomAirNode = 0;
 
-        // constructor
-        RAFNData() : ZoneNum(0), RoomAirNode(0)
-        {
-        }
-
-        // functions
-
-        //*****************************************************************************************
         void InitRoomAirModelAirflowNetwork(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
 
-        //*****************************************************************************************
         void CalcRoomAirModelAirflowNetwork(EnergyPlusData &state,
                                             int const ThisRoomAirNode); // index number for the specified zone and room air node
 
-        //*****************************************************************************************
         void UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state); // index number for the specified zone
 
-        //*****************************************************************************************
         void CalcNodeSums(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
 
-        //*****************************************************************************************
         void SumNonAirSystemResponseForNode(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
-        //*****************************************************************************************
-        void SumSystemDepResponseForNode(EnergyPlusData &state); // index number for the specified zone and room air node
 
-        //*****************************************************************************************
+        void SumSystemDepResponseForNode(EnergyPlusData &state); // index number for the specified zone and room air node
 
         void CalcSurfaceMoistureSums(
             EnergyPlusData &state, int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &SurfMask);

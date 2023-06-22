@@ -2579,7 +2579,7 @@ namespace SimulationManager {
                     print(state.files.bnd,
                           "   Zone Equipment Component,{},{},{},{},{},{}\n",
                           Count1,
-                          state.dataZoneEquip->ZoneEquipList(Count).EquipType(Count1),
+                          state.dataZoneEquip->ZoneEquipList(Count).EquipTypeName(Count1),
                           state.dataZoneEquip->ZoneEquipList(Count).EquipName(Count1),
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
                           state.dataZoneEquip->ZoneEquipList(Count).CoolingPriority(Count1),
