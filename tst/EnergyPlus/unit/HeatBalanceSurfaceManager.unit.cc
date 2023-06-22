@@ -3668,7 +3668,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     int totDaylightingControls = state->dataGlobal->NumOfZones;
     state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
     state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
@@ -4397,7 +4397,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     int totDaylightingControls = state->dataGlobal->NumOfZones;
     state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
     state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
@@ -5966,7 +5966,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     }
 
     state->dataConstruction->Construct(state->dataSurface->Surface(8).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
-    DaylightingDevices::GetTDDInput(*state);
+    Dayltg::GetTDDInput(*state);
 
     state->dataGlobal->TimeStepZoneSec = 60.0;
 

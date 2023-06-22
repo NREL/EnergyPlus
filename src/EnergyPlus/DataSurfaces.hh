@@ -842,7 +842,7 @@ namespace DataSurfaces {
         Array2D<Real64> IllumFromWinAtRefPt;     // Illuminance from window at ref pts for window with and w/o shade (lux)
         Array2D<Real64> BackLumFromWinAtRefPt;   // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
         Array2D<Real64> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
-        Array1D<Real64> WinCenter;               // X,Y,Z coordinates of window center point in building coord system
+        Vector3<Real64> WinCenter;               // X,Y,Z coordinates of window center point in building coord system
         Array1D<Real64> ThetaFace;               // Face temperatures of window layers (K)
 
         Array1D<Real64> OutProjSLFracMult; // Multiplier on sunlit fraction due to shadowing of glass by frame
@@ -865,7 +865,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceWindowCalc()
-            : WinCenter(3, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0),
+            : WinCenter(0.0, 0.0, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0),
               EffShBlindEmiss(Material::MaxSlatAngs, 0.0), EffGlassEmiss(Material::MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0),
               EnclAreaReflProdMinusThisSurf(3, 0.0)
         {
