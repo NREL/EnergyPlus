@@ -4575,8 +4575,8 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         ErrorsFound = true;
     }
     if (NumOfAirModels > 0) {
-        state.dataRoomAirMod->IsZoneDV.dimension(state.dataGlobal->NumOfZones, false);
-        state.dataRoomAirMod->IsZoneCV.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataRoomAirMod->IsZoneDispVent3Node.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataRoomAirMod->IsZoneCrossVent.dimension(state.dataGlobal->NumOfZones, false);
         state.dataRoomAirMod->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
     }
 
@@ -4620,9 +4620,9 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 // nothing to do here actually
                 break;
 
-            case RoomAir::RoomAirModel::Mundt:
+            case RoomAir::RoomAirModel::DispVent1Node:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
-                state.dataRoomAirMod->MundtModelUsed = true;
+                state.dataRoomAirMod->DispVent1NodeModelUsed = true;
                 IsNotOK = false;
                 ValidateComponent(state,
                                   "RoomAirSettings:OneNodeDisplacementVentilation",
@@ -4636,7 +4636,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case RoomAir::RoomAirModel::UCSDDV:
+            case RoomAir::RoomAirModel::DispVent3Node:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 IsNotOK = false;
@@ -4652,7 +4652,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case RoomAir::RoomAirModel::UCSDCV:
+            case RoomAir::RoomAirModel::CrossVent:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 IsNotOK = false;
@@ -4668,7 +4668,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case RoomAir::RoomAirModel::UCSDUFI:
+            case RoomAir::RoomAirModel::UFADInt:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 ValidateComponent(state,
@@ -4683,7 +4683,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case RoomAir::RoomAirModel::UCSDUFE:
+            case RoomAir::RoomAirModel::UFADExt:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 ValidateComponent(state,

@@ -1981,9 +1981,9 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
         }
 
         assert(state.dataRoomAirMod->AirModel.allocated());
-        if (state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::UCSDDV ||
-            state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::UCSDUFI ||
-            state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::UCSDUFE) {
+        if (state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::DispVent3Node ||
+            state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::UFADInt ||
+            state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::UFADExt) {
 
             // Set HConvIn using the proper correlation based on DeltaTemp and CosTiltSurf
             if (state.dataSurface->surfIntConv(SurfNum).userModelNum != 0) {
@@ -1996,7 +1996,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
                                                       -surface.CosTilt); // negative CosTilt because CosTilt is relative to exterior
             }
 
-        } else if (state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::UCSDCV) {
+        } else if (state.dataRoomAirMod->AirModel(surface.Zone).AirModel == RoomAir::RoomAirModel::CrossVent) {
 
             Hf = 4.3 * Vhc()(surface.Zone);
 

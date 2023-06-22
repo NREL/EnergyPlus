@@ -165,7 +165,7 @@ namespace RoomAir {
         state.dataCrossVentMgr->HA_R = 0.0;
 
         // Is the air flow model for this zone set to UCSDCV Cross Ventilation?
-        if (state.dataRoomAirMod->IsZoneCV(ZoneNum)) {
+        if (state.dataRoomAirMod->IsZoneCrossVent(ZoneNum)) {
             // WALL Hc, HA and HAT calculation
             for (int Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2);
                  ++Ctd) {
@@ -175,8 +175,8 @@ namespace RoomAir {
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                 CalcDetailedHcInForDVModel(
-                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                state.dataUCSDShared->HWall(Ctd) = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                state.dataUCSDShared->HWall(Ctd) = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                 state.dataCrossVentMgr->HAT_R +=
                     state.dataSurface->Surface(SurfNum).Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataUCSDShared->HWall(Ctd);
                 state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWall(Ctd);
@@ -191,8 +191,8 @@ namespace RoomAir {
                 if (state.dataSurface->Surface(SurfNum).Tilt > 10.0 && state.dataSurface->Surface(SurfNum).Tilt < 170.0) { // Window Wall
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                     CalcDetailedHcInForDVModel(
-                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                    state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->CVHcIn(SurfNum);
+                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                    state.dataUCSDShared->HWindow(Ctd) = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                     state.dataCrossVentMgr->HAT_R +=
                         state.dataSurface->Surface(SurfNum).Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataUCSDShared->HWindow(Ctd);
                     state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWindow(Ctd);
@@ -200,12 +200,12 @@ namespace RoomAir {
                 if (state.dataSurface->Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                     CalcDetailedHcInForDVModel(
-                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                    Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Ujet);
+                    Real64 Hjet = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                     CalcDetailedHcInForDVModel(
-                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                    Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                    Real64 Hrec = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                     state.dataUCSDShared->HWindow(Ctd) =
                         state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                     state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area *
@@ -223,12 +223,12 @@ namespace RoomAir {
                 if (state.dataSurface->Surface(SurfNum).Tilt >= 170.0) { // Window Floor
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                     CalcDetailedHcInForDVModel(
-                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                    Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Ujet);
+                    Real64 Hjet = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                     CalcDetailedHcInForDVModel(
-                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                    Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                        state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                    Real64 Hrec = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                     state.dataUCSDShared->HWindow(Ctd) =
                         state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                     state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area *
@@ -243,7 +243,7 @@ namespace RoomAir {
                         state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * state.dataRoomAirMod->ZTJET(ZoneNum) +
                         (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * state.dataRoomAirMod->ZTREC(ZoneNum);
                 }
-                state.dataRoomAirMod->CVHcIn(SurfNum) = state.dataUCSDShared->HWindow(Ctd);
+                state.dataRoomAirMod->CrossVentHcIn(SurfNum) = state.dataUCSDShared->HWindow(Ctd);
             } // END WINDOW
             // DOOR Hc, HA and HAT CALCULATION
             for (int Ctd = state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 2);
@@ -254,8 +254,8 @@ namespace RoomAir {
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                 CalcDetailedHcInForDVModel(
-                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                state.dataUCSDShared->HDoor(Ctd) = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                 state.dataCrossVentMgr->HAT_R +=
                     state.dataSurface->Surface(SurfNum).Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataUCSDShared->HDoor(Ctd);
                 state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
@@ -270,8 +270,8 @@ namespace RoomAir {
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                 CalcDetailedHcInForDVModel(
-                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                state.dataUCSDShared->HInternal(Ctd) = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                state.dataUCSDShared->HInternal(Ctd) = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                 state.dataCrossVentMgr->HAT_R +=
                     state.dataSurface->Surface(SurfNum).Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataUCSDShared->HInternal(Ctd);
                 state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HInternal(Ctd);
@@ -287,12 +287,12 @@ namespace RoomAir {
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                 CalcDetailedHcInForDVModel(
-                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Ujet);
+                Real64 Hjet = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                 CalcDetailedHcInForDVModel(
-                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                Real64 Hrec = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                 state.dataUCSDShared->HCeiling(Ctd) =
                     state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                 state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area * (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) *
@@ -305,7 +305,7 @@ namespace RoomAir {
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) =
                     state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * state.dataRoomAirMod->ZTJET(ZoneNum) +
                     (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * state.dataRoomAirMod->ZTREC(ZoneNum);
-                state.dataRoomAirMod->CVHcIn(SurfNum) = state.dataUCSDShared->HCeiling(Ctd);
+                state.dataRoomAirMod->CrossVentHcIn(SurfNum) = state.dataUCSDShared->HCeiling(Ctd);
             } // END CEILING
             // FLOOR Hc, HA and HAT CALCULATION
             for (int Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2);
@@ -316,12 +316,12 @@ namespace RoomAir {
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                 CalcDetailedHcInForDVModel(
-                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Ujet);
-                Real64 Hjet = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Ujet);
+                Real64 Hjet = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTREC(ZoneNum);
                 CalcDetailedHcInForDVModel(
-                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CVHcIn, state.dataRoomAirMod->Urec);
-                Real64 Hrec = state.dataRoomAirMod->CVHcIn(SurfNum);
+                    state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAirMod->CrossVentHcIn, state.dataRoomAirMod->Urec);
+                Real64 Hrec = state.dataRoomAirMod->CrossVentHcIn(SurfNum);
                 state.dataUCSDShared->HFloor(Ctd) =
                     state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * Hjet + (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * Hrec;
                 state.dataCrossVentMgr->HAT_R += state.dataSurface->Surface(SurfNum).Area * (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) *
@@ -334,7 +334,7 @@ namespace RoomAir {
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) =
                     state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) * state.dataRoomAirMod->ZTJET(ZoneNum) +
                     (1 - state.dataRoomAirMod->JetRecAreaRatio(ZoneNum)) * state.dataRoomAirMod->ZTREC(ZoneNum);
-                state.dataRoomAirMod->CVHcIn(SurfNum) = state.dataUCSDShared->HFloor(Ctd);
+                state.dataRoomAirMod->CrossVentHcIn(SurfNum) = state.dataUCSDShared->HFloor(Ctd);
             } // END FLOOR
         }
     }
@@ -376,33 +376,36 @@ namespace RoomAir {
         auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
         // Identify the dominant aperture:
-        MaxSurf = state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, ZoneNum);
+        MaxSurf = state.dataRoomAirMod->AFNSurfaceCrossVent(1, ZoneNum);
         int const surfNum = state.afn->MultizoneSurfaceData(MaxSurf).SurfNum;
         auto const &thisSurface = state.dataSurface->Surface(surfNum);
+
+        int afnSurfNum1 = state.dataRoomAirMod->AFNSurfaceCrossVent(1, ZoneNum);
+        
         if (thisSurface.Zone == ZoneNum) {
             // this is a direct airflow network aperture
-            SumToZone = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, ZoneNum)).VolFLOW2;
-            MaxFlux = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, ZoneNum)).VolFLOW2;
+            SumToZone = state.afn->AirflowNetworkLinkSimu(afnSurfNum1).VolFLOW2;
+            MaxFlux = state.afn->AirflowNetworkLinkSimu(afnSurfNum1).VolFLOW2;
         } else {
             // this is an indirect airflow network aperture
-            SumToZone = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, ZoneNum)).VolFLOW;
-            MaxFlux = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, ZoneNum)).VolFLOW;
+            SumToZone = state.afn->AirflowNetworkLinkSimu(afnSurfNum1).VolFLOW;
+            MaxFlux = state.afn->AirflowNetworkLinkSimu(afnSurfNum1).VolFLOW;
         }
 
-        for (int Ctd2 = 2; Ctd2 <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Ctd2) {
-            if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum)).SurfNum)
-                    .Zone == ZoneNum) {
-                if (state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum)).VolFLOW2 > MaxFlux) {
-                    MaxFlux = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum)).VolFLOW2;
-                    MaxSurf = state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum);
+        for (int Ctd2 = 2; Ctd2 <= state.dataRoomAirMod->AFNSurfaceCrossVent(0, ZoneNum); ++Ctd2) {
+            int afnSurfNum = state.dataRoomAirMod->AFNSurfaceCrossVent(Ctd2, ZoneNum);
+            if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(afnSurfNum).SurfNum).Zone == ZoneNum) {
+                if (state.afn->AirflowNetworkLinkSimu(afnSurfNum).VolFLOW2 > MaxFlux) {
+                    MaxFlux = state.afn->AirflowNetworkLinkSimu(afnSurfNum).VolFLOW2;
+                    MaxSurf = afnSurfNum;
                 }
-                SumToZone += state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum)).VolFLOW2;
+                SumToZone += state.afn->AirflowNetworkLinkSimu(afnSurfNum).VolFLOW2;
             } else {
-                if (state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum)).VolFLOW > MaxFlux) {
-                    MaxFlux = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum)).VolFLOW;
-                    MaxSurf = state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum);
+                if (state.afn->AirflowNetworkLinkSimu(afnSurfNum).VolFLOW > MaxFlux) {
+                    MaxFlux = state.afn->AirflowNetworkLinkSimu(afnSurfNum).VolFLOW;
+                    MaxSurf = afnSurfNum;
                 }
-                SumToZone += state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd2, ZoneNum)).VolFLOW;
+                SumToZone += state.afn->AirflowNetworkLinkSimu(afnSurfNum).VolFLOW;
             }
         }
 
@@ -411,7 +414,7 @@ namespace RoomAir {
         CosPhi = std::cos((state.dataEnvrn->WindDir - SurfNorm) * Constant::DegToRadians);
         if (CosPhi <= 0) {
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
+            auto flows(state.dataRoomAirMod->CrossVentJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -440,15 +443,14 @@ namespace RoomAir {
         }
 
         // Calculate the opening area for all apertures
-        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Ctd) {
+        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AFNSurfaceCrossVent(0, ZoneNum); ++Ctd) {
+            auto &jetRecFlows = state.dataRoomAirMod->CrossVentJetRecFlows(Ctd, ZoneNum);
+            auto const &surfParams = state.dataRoomAirMod->SurfParametersCrossDispVent(Ctd);
             int cCompNum = state.afn->AirflowNetworkLinkageData(Ctd).CompNum;
             if (state.afn->AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area = state.dataRoomAirMod->SurfParametersCVDV(Ctd).Width *
-                                                                         state.dataRoomAirMod->SurfParametersCVDV(Ctd).Height *
-                                                                         state.afn->MultizoneSurfaceData(Ctd).OpenFactor;
+                jetRecFlows.Area = surfParams.Width * surfParams.Height * state.afn->MultizoneSurfaceData(Ctd).OpenFactor;
             } else if (state.afn->AirflowNetworkCompData(cCompNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area =
-                    state.dataRoomAirMod->SurfParametersCVDV(Ctd).Width * state.dataRoomAirMod->SurfParametersCVDV(Ctd).Height;
+                jetRecFlows.Area = surfParams.Width * surfParams.Height;
             } else {
                 ShowSevereError(
                     state, "RoomAirModelCrossVent:EvolveParaUCSDCV: Illegal leakage component referenced in the cross ventilation room air model");
@@ -468,7 +470,7 @@ namespace RoomAir {
         // is a Window or Door it looks for the second base surface).
         // Dstar is Droom corrected for wind angle
         Wroom = state.dataHeatBal->Zone(ZoneNum).Volume / state.dataHeatBal->Zone(ZoneNum).FloorArea;
-        auto const &baseSurface(state.dataSurface->Surface(thisSurface.BaseSurf));
+        auto const &baseSurface = state.dataSurface->Surface(thisSurface.BaseSurf);
         if ((baseSurface.Sides == 3) || (baseSurface.Sides == 4)) {
             XX = baseSurface.Centroid.x;
             YY = baseSurface.Centroid.y;
@@ -523,21 +525,19 @@ namespace RoomAir {
 
         // Populate an array of inflow volume fluxes (Fin) for all apertures in the zone
         // Calculate inflow velocity (%Uin) for each aperture in the zone
-        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Ctd) {
+        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AFNSurfaceCrossVent(0, ZoneNum); ++Ctd) {
+            auto &jetRecFlows = state.dataRoomAirMod->CrossVentJetRecFlows(Ctd, ZoneNum);
             if (state.dataSurface->Surface(state.afn->MultizoneSurfaceData(Ctd).SurfNum).Zone == ZoneNum) {
                 // this is a direct airflow network aperture
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Fin =
-                    state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd, ZoneNum)).VolFLOW2;
+                jetRecFlows.Fin = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AFNSurfaceCrossVent(Ctd, ZoneNum)).VolFLOW2;
             } else {
                 // this is an indirect airflow network aperture
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Fin =
-                    state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Ctd, ZoneNum)).VolFLOW;
+                jetRecFlows.Fin = state.afn->AirflowNetworkLinkSimu(state.dataRoomAirMod->AFNSurfaceCrossVent(Ctd, ZoneNum)).VolFLOW;
             }
-            if (state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area != 0) {
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin =
-                    state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Fin / state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area;
+            if (jetRecFlows.Area != 0) {
+                jetRecFlows.Uin = jetRecFlows.Fin / jetRecFlows.Area;
             } else {
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin = 0.0;
+                jetRecFlows.Uin = 0.0;
             }
         }
 
@@ -546,15 +546,12 @@ namespace RoomAir {
         // Calculate the total area of all active apertures
         ActiveSurfNum = 0.0;
         state.dataRoomAirMod->Ain(ZoneNum) = 0.0;
-        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Ctd) {
-            if (state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin <= MinUin) {
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag = 0;
-            } else {
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag = 1;
-            }
-            ActiveSurfNum += state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag;
-            state.dataRoomAirMod->Ain(ZoneNum) +=
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area * state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag;
+        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AFNSurfaceCrossVent(0, ZoneNum); ++Ctd) {
+            auto &jetRecFlows = state.dataRoomAirMod->CrossVentJetRecFlows(Ctd, ZoneNum);
+            jetRecFlows.FlowFlag = (int)(jetRecFlows.Uin > MinUin);
+
+            ActiveSurfNum += jetRecFlows.FlowFlag;
+            state.dataRoomAirMod->Ain(ZoneNum) += jetRecFlows.Area * jetRecFlows.FlowFlag;
         }
 
         // Verify if any of the apertures have minimum flow
@@ -580,7 +577,7 @@ namespace RoomAir {
             state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
+            auto flows(state.dataRoomAirMod->CrossVentJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -592,9 +589,9 @@ namespace RoomAir {
         // Calculate Qtot, the total volumetric flow rate through all active openings in the zone
         Uin = 0.0;
 
-        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Ctd) {
-            Uin += state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area * state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin *
-                   state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag / state.dataRoomAirMod->Ain(ZoneNum);
+        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AFNSurfaceCrossVent(0, ZoneNum); ++Ctd) {
+            auto const &jetRecFlows = state.dataRoomAirMod->CrossVentJetRecFlows(Ctd, ZoneNum);
+            Uin += jetRecFlows.Area * jetRecFlows.Uin * jetRecFlows.FlowFlag / state.dataRoomAirMod->Ain(ZoneNum);
         }
 
         // Verify if Uin is higher than minimum:
@@ -604,7 +601,7 @@ namespace RoomAir {
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
             state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-            auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
+            auto flows(state.dataRoomAirMod->CrossVentJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
             for (int i = 1, u = flows.u(); i <= u; ++i) {
                 auto &e(flows(i));
                 e.Ujet = e.Urec = 0.0;
@@ -631,8 +628,8 @@ namespace RoomAir {
         }
 
         // Evaluate parameter that determines whether recirculations are present
-        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDCV; ++Ctd) {
-            if (ZoneNum == state.dataRoomAirMod->ZoneUCSDCV(Ctd).ZonePtr) {
+        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->TotCrossVent; ++Ctd) {
+            if (ZoneNum == state.dataRoomAirMod->ZoneCrossVent(Ctd).ZonePtr) {
                 if (state.dataRoomAirMod->Ain(ZoneNum) / Aroom > 1.0 / 2.0) {
                     state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) = 1.0;
                 } else {
@@ -647,49 +644,29 @@ namespace RoomAir {
         state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
         state.dataRoomAirMod->Qtot(ZoneNum) = 0.0;
-        auto flows(state.dataRoomAirMod->CVJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
+        auto flows(state.dataRoomAirMod->CrossVentJetRecFlows(_, ZoneNum)); // This is an array slice, need to get rid of this (THIS_AUTO_OK)
         for (int i = 1, u = flows.u(); i <= u; ++i) {
             auto &e(flows(i));
             e.Ujet = e.Urec = e.Qrec = 0.0;
         }
-        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, ZoneNum); ++Ctd) {
-            if (state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin != 0) {
-                Real64 dstarexp =
-                    max(state.dataRoomAirMod->Dstar(ZoneNum) / (6.0 * std::sqrt(state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area)), 1.0);
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Vjet = state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin *
-                                                                         std::sqrt(state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area) * 6.3 *
-                                                                         std::log(dstarexp) / state.dataRoomAirMod->Dstar(ZoneNum);
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Yjet =
-                    Cjet1 * std::sqrt(state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area / Aroom) *
-                        state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Vjet / state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin +
-                    Cjet2;
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Yrec =
-                    Crec1 * std::sqrt(state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area / Aroom) *
-                        state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Vjet / state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin +
-                    Crec2;
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).YQrec =
-                    CrecFlow1 * std::sqrt(state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area * Aroom) *
-                        state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Vjet / state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin +
-                    CrecFlow2;
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Ujet = state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag *
-                                                                         state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Yjet /
-                                                                         state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin;
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Urec = state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag *
-                                                                         state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Yrec /
-                                                                         state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin;
-                state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Qrec = state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag *
-                                                                         state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).YQrec /
-                                                                         state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Uin;
-                state.dataRoomAirMod->Ujet(ZoneNum) += state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area *
-                                                       state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Ujet / state.dataRoomAirMod->Ain(ZoneNum);
-                state.dataRoomAirMod->Urec(ZoneNum) += state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area *
-                                                       state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Urec / state.dataRoomAirMod->Ain(ZoneNum);
-                state.dataRoomAirMod->Qrec(ZoneNum) += state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Qrec;
-                state.dataRoomAirMod->Qtot(ZoneNum) +=
-                    state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Fin * state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).FlowFlag;
-                state.dataRoomAirMod->Urec(ZoneNum) += state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Area *
-                                                       state.dataRoomAirMod->CVJetRecFlows(Ctd, ZoneNum).Urec / state.dataRoomAirMod->Ain(ZoneNum);
-            }
+        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->AFNSurfaceCrossVent(0, ZoneNum); ++Ctd) {
+            auto &jetRecFlows = state.dataRoomAirMod->CrossVentJetRecFlows(Ctd, ZoneNum);
+            if (jetRecFlows.Uin == 0)
+                    continue;
+
+            Real64 dstarexp = max(state.dataRoomAirMod->Dstar(ZoneNum) / (6.0 * std::sqrt(jetRecFlows.Area)), 1.0);
+            jetRecFlows.Vjet = jetRecFlows.Uin * std::sqrt(jetRecFlows.Area) * 6.3 * std::log(dstarexp) / state.dataRoomAirMod->Dstar(ZoneNum);
+            jetRecFlows.Yjet = Cjet1 * std::sqrt(jetRecFlows.Area / Aroom) * jetRecFlows.Vjet / jetRecFlows.Uin + Cjet2;
+            jetRecFlows.Yrec = Crec1 * std::sqrt(jetRecFlows.Area / Aroom) * jetRecFlows.Vjet / jetRecFlows.Uin + Crec2;
+            jetRecFlows.YQrec = CrecFlow1 * std::sqrt(jetRecFlows.Area * Aroom) * jetRecFlows.Vjet / jetRecFlows.Uin + CrecFlow2;
+            jetRecFlows.Ujet = jetRecFlows.FlowFlag * jetRecFlows.Yjet / jetRecFlows.Uin;
+            jetRecFlows.Urec = jetRecFlows.FlowFlag * jetRecFlows.Yrec / jetRecFlows.Uin;
+            jetRecFlows.Qrec = jetRecFlows.FlowFlag * jetRecFlows.YQrec / jetRecFlows.Uin;
+            state.dataRoomAirMod->Ujet(ZoneNum) += jetRecFlows.Area * jetRecFlows.Ujet / state.dataRoomAirMod->Ain(ZoneNum);
+            state.dataRoomAirMod->Urec(ZoneNum) += jetRecFlows.Area * jetRecFlows.Urec / state.dataRoomAirMod->Ain(ZoneNum);
+            state.dataRoomAirMod->Qrec(ZoneNum) += jetRecFlows.Qrec;
+            state.dataRoomAirMod->Qtot(ZoneNum) += jetRecFlows.Fin * jetRecFlows.FlowFlag;
+            state.dataRoomAirMod->Urec(ZoneNum) += jetRecFlows.Area * jetRecFlows.Urec / state.dataRoomAirMod->Ain(ZoneNum);
         }
 
         // Ratio between recirculation flow rate and total inflow rate
@@ -724,7 +701,7 @@ namespace RoomAir {
                     if (state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
                     } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModel ==
-                               RoomAir::RoomAirModel::UCSDCV) {
+                               RoomAir::RoomAirModel::CrossVent) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
                             state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum);
                     } else {
@@ -737,7 +714,7 @@ namespace RoomAir {
                     if (state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
                     } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModel ==
-                               RoomAir::RoomAirModel::UCSDCV) {
+                               RoomAir::RoomAirModel::CrossVent) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
                             state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum);
                     } else {
@@ -747,10 +724,10 @@ namespace RoomAir {
                 }
             } else if ((thisSurface.Zone == ZoneNum) &&
                        (state.dataRoomAirMod->AirModel(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).AirModel ==
-                        RoomAir::RoomAirModel::UCSDCV)) {
+                        RoomAir::RoomAirModel::CrossVent)) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone);
             } else if ((thisSurface.Zone != ZoneNum) &&
-                       (state.dataRoomAirMod->AirModel(thisSurface.Zone).AirModel == RoomAir::RoomAirModel::UCSDCV)) {
+                       (state.dataRoomAirMod->AirModel(thisSurface.Zone).AirModel == RoomAir::RoomAirModel::CrossVent)) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(surfNum);
             } else {
                 if (thisSurface.Zone == ZoneNum) {
@@ -787,9 +764,9 @@ namespace RoomAir {
         Real64 ZoneMult = zone.Multiplier * zone.ListMultiplier; // total zone multiplier
         auto const &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
-        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDCV; ++Ctd) {
-            if (ZoneNum == state.dataRoomAirMod->ZoneUCSDCV(Ctd).ZonePtr) {
-                GainsFrac = ScheduleManager::GetCurrentScheduleValue(state, state.dataRoomAirMod->ZoneUCSDCV(Ctd).SchedGainsPtr);
+        for (int Ctd = 1; Ctd <= state.dataRoomAirMod->TotCrossVent; ++Ctd) {
+            if (ZoneNum == state.dataRoomAirMod->ZoneCrossVent(Ctd).ZonePtr) {
+                GainsFrac = ScheduleManager::GetCurrentScheduleValue(state, state.dataRoomAirMod->ZoneCrossVent(Ctd).SchedGainsPtr);
             }
         }
 
@@ -821,8 +798,8 @@ namespace RoomAir {
 
         if (state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel) {
             //=============================== CROSS VENTILATION  Calculation ==============================================
-            state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 0.0;
-            state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 1.0;
+            state.dataRoomAirMod->ZoneCrossVentIsMixing(ZoneNum) = 0.0;
+            state.dataRoomAirMod->ZoneCrossVentHasREC(ZoneNum) = 1.0;
             for (int Ctd = 1; Ctd <= 4; ++Ctd) {
                 HcUCSDCV(state, ZoneNum);
                 if (state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) != 1.0) {
@@ -841,21 +818,21 @@ namespace RoomAir {
                     MCp_Total;
             }
             if (state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) == 1.0) {
-                state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
+                state.dataRoomAirMod->ZoneCrossVentHasREC(ZoneNum) = 0.0;
                 state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(ZoneNum);
                 state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
                 state.dataRoomAirMod->ZTREC(ZoneNum) = state.dataRoomAirMod->ZTJET(ZoneNum);
             }
             // If temperature increase is above 1.5C then go to mixing
             if (state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) - state.dataRoomAirMod->Tin(ZoneNum) > 1.5) {
-                state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 1.0;
-                state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
+                state.dataRoomAirMod->ZoneCrossVentIsMixing(ZoneNum) = 1.0;
+                state.dataRoomAirMod->ZoneCrossVentHasREC(ZoneNum) = 0.0;
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
                 state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
                 state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
                 state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
                 state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-                for (auto &e : state.dataRoomAirMod->CVJetRecFlows) {
+                for (auto &e : state.dataRoomAirMod->CrossVentJetRecFlows) {
                     e.Ujet = 0.0;
                     e.Urec = 0.0;
                 }
@@ -881,13 +858,13 @@ namespace RoomAir {
             }
         } else {
             //=============================== M I X E D  Calculation ======================================================
-            state.dataRoomAirMod->ZoneCVisMixing(ZoneNum) = 1.0;
-            state.dataRoomAirMod->ZoneCVhasREC(ZoneNum) = 0.0;
+            state.dataRoomAirMod->ZoneCrossVentIsMixing(ZoneNum) = 1.0;
+            state.dataRoomAirMod->ZoneCrossVentHasREC(ZoneNum) = 0.0;
             state.dataRoomAirMod->Ujet(ZoneNum) = 0.0;
             state.dataRoomAirMod->Urec(ZoneNum) = 0.0;
             state.dataRoomAirMod->Qrec(ZoneNum) = 0.0;
             state.dataRoomAirMod->RecInflowRatio(ZoneNum) = 0.0;
-            for (auto &e : state.dataRoomAirMod->CVJetRecFlows) {
+            for (auto &e : state.dataRoomAirMod->CrossVentJetRecFlows) {
                 e.Ujet = 0.0;
                 e.Urec = 0.0;
             }

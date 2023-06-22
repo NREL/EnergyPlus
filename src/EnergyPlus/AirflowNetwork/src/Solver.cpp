@@ -4802,7 +4802,7 @@ namespace AirflowNetwork {
                 n = AirflowNetworkNodeData(i).EPlusZoneNum;
                 AirflowNetworkNodeData(i).NumOfLinks = 0;
                 if (n > 0 && AirflowNetworkNodeData(i).RAFNNodeNum > 0) {
-                    m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID = i;
+                    m_state.dataRoomAirMod->AFNZoneInfo(n).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID = i;
                     for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
                         if (AirflowNetworkLinkageData(j).NodeNums[0] == i) {
                             AirflowNetworkNodeData(i).NumOfLinks = AirflowNetworkNodeData(i).NumOfLinks + 1;
@@ -4813,21 +4813,21 @@ namespace AirflowNetwork {
                     }
                 }
                 if (AirflowNetworkNodeData(i).RAFNNodeNum > 0) {
-                    for (j = 1; j <= m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).NumOfAirNodes; ++j) {
-                        if (m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(j).AirflowNetworkNodeID == i) {
-                            m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(j).NumOfAirflowLinks = AirflowNetworkNodeData(i).NumOfLinks;
-                            m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(j).Link.allocate(AirflowNetworkNodeData(i).NumOfLinks);
+                    for (j = 1; j <= m_state.dataRoomAirMod->AFNZoneInfo(n).NumOfAirNodes; ++j) {
+                        if (m_state.dataRoomAirMod->AFNZoneInfo(n).Node(j).AirflowNetworkNodeID == i) {
+                            m_state.dataRoomAirMod->AFNZoneInfo(n).Node(j).NumOfAirflowLinks = AirflowNetworkNodeData(i).NumOfLinks;
+                            m_state.dataRoomAirMod->AFNZoneInfo(n).Node(j).Link.allocate(AirflowNetworkNodeData(i).NumOfLinks);
                             k = 1;
                             for (int m = 1; m <= AirflowNetworkNumOfSurfaces; ++m) {
                                 if (AirflowNetworkLinkageData(m).NodeNums[0] == i) {
-                                    m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkSimuID = m;
-                                    m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkageDataID = m;
+                                    m_state.dataRoomAirMod->AFNZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkSimuID = m;
+                                    m_state.dataRoomAirMod->AFNZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkageDataID = m;
                                     k = k + 1;
                                     if (k > AirflowNetworkNodeData(i).NumOfLinks) break;
                                 }
                                 if (AirflowNetworkLinkageData(m).NodeNums[1] == i) {
-                                    m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkSimuID = m;
-                                    m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkageDataID = m;
+                                    m_state.dataRoomAirMod->AFNZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkSimuID = m;
+                                    m_state.dataRoomAirMod->AFNZoneInfo(n).Node(j).Link(k).AirflowNetworkLinkageDataID = m;
                                     k = k + 1;
                                     if (k > AirflowNetworkNodeData(i).NumOfLinks) break;
                                 }
@@ -5386,8 +5386,8 @@ namespace AirflowNetwork {
                 }
                 if (AirflowNetworkNodeData(i).RAFNNodeNum > 0) {
                     ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                    m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp = 23.0;
-                    m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat = 0.0;
+                    m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp = 23.0;
+                    m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat = 0.0;
                 }
             }
 
@@ -5469,13 +5469,13 @@ namespace AirflowNetwork {
 
                     if (AirflowNetworkNodeData(i).RAFNNodeNum > 0) {
                         ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                        if (m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum)
+                        if (m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum)
                                 .Node(AirflowNetworkNodeData(i).RAFNNodeNum)
                                 .AirflowNetworkNodeID == i) {
                             AirflowNetworkNodeSimu(i).TZ =
-                                m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp;
+                                m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp;
                             AirflowNetworkNodeSimu(i).WZ =
-                                m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat;
+                                m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat;
                         }
                     }
                 }
@@ -7736,9 +7736,9 @@ namespace AirflowNetwork {
             if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                if (m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID ==
+                if (m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID ==
                     i) {
-                    MV(i) = m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp * 1.0e10;
+                    MV(i) = m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp * 1.0e10;
                 }
             }
         }
@@ -8030,9 +8030,9 @@ namespace AirflowNetwork {
             if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                if (m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID ==
+                if (m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirflowNetworkNodeID ==
                     i) {
-                    MV(i) = m_state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat * 1.0e10;
+                    MV(i) = m_state.dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat * 1.0e10;
                 }
             }
         }

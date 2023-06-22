@@ -74,12 +74,12 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataGlobal->NumOfZones = 1;
     int TotSurfaces = 3;
 
-    state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->IsZoneDV(1) = true;
+    state->dataRoomAirMod->IsZoneDispVent3Node.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->IsZoneDispVent3Node(1) = true;
     state->dataSurface->Surface.allocate(TotSurfaces);
     state->dataHeatBal->SurfTempEffBulkAir.allocate(TotSurfaces);
     state->dataHeatBalSurf->SurfTempIn.allocate(TotSurfaces);
-    state->dataRoomAirMod->DVHcIn.allocate(TotSurfaces);
+    state->dataRoomAirMod->DispVent3NodeHcIn.allocate(TotSurfaces);
     state->dataRoomAirMod->ZTMX.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->ZTOC.allocate(state->dataGlobal->NumOfZones);
 
@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataSurface->SurfTAirRefRpt.dimension(TotSurfaces, 0);
 
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->AirModel(1).AirModel = RoomAir::RoomAirModel::UCSDDV;
+    state->dataRoomAirMod->AirModel(1).AirModel = RoomAir::RoomAirModel::DispVent3Node;
 
     state->dataUCSDShared->APos_Wall.allocate(TotSurfaces);
     state->dataUCSDShared->APos_Floor.allocate(TotSurfaces);
@@ -215,8 +215,8 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataUCSDShared->HWindow = 0.0;
     state->dataUCSDShared->HDoor = 0.0;
 
-    state->dataRoomAirMod->ZoneUCSDCV.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->ZoneUCSDCV(1).ZonePtr = 1;
+    state->dataRoomAirMod->ZoneCrossVent.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->ZoneCrossVent(1).ZonePtr = 1;
     state->dataUCSDShared->PosZ_Door(1) = 1;
     state->dataUCSDShared->PosZ_Door(2) = 3;
     state->dataUCSDShared->APos_Door(1) = 1;
@@ -231,19 +231,19 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     HcUCSDDV(*state, 1, 0.5);
 
-    EXPECT_NEAR(1.889346, state->dataRoomAirMod->DVHcIn(1), 0.0001);
-    EXPECT_NEAR(1.650496, state->dataRoomAirMod->DVHcIn(2), 0.0001);
-    EXPECT_NEAR(1.889346, state->dataRoomAirMod->DVHcIn(3), 0.0001);
+    EXPECT_NEAR(1.889346, state->dataRoomAirMod->DispVent3NodeHcIn(1), 0.0001);
+    EXPECT_NEAR(1.650496, state->dataRoomAirMod->DispVent3NodeHcIn(2), 0.0001);
+    EXPECT_NEAR(1.889346, state->dataRoomAirMod->DispVent3NodeHcIn(3), 0.0001);
     EXPECT_NEAR(379.614212, state->dataDispVentMgr->HAT_OC, 0.0001);
     EXPECT_NEAR(16.504965, state->dataDispVentMgr->HA_OC, 0.0001);
     EXPECT_NEAR(869.099591, state->dataDispVentMgr->HAT_MX, 0.0001);
     EXPECT_NEAR(37.786938, state->dataDispVentMgr->HA_MX, 0.0001);
 
-    state->dataRoomAirMod->IsZoneDV.deallocate();
+    state->dataRoomAirMod->IsZoneDispVent3Node.deallocate();
     state->dataSurface->Surface.deallocate();
     state->dataHeatBal->SurfTempEffBulkAir.deallocate();
     state->dataHeatBalSurf->SurfTempIn.deallocate();
-    state->dataRoomAirMod->DVHcIn.deallocate();
+    state->dataRoomAirMod->DispVent3NodeHcIn.deallocate();
     state->dataRoomAirMod->ZTMX.deallocate();
     state->dataRoomAirMod->ZTOC.deallocate();
     state->dataRoomAirMod->AirModel.deallocate();
@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataUCSDShared->HWindow.deallocate();
     state->dataUCSDShared->HDoor.deallocate();
     state->dataRoomAirMod->ZoneCeilingHeight.deallocate();
-    state->dataRoomAirMod->ZoneUCSDCV.deallocate();
+    state->dataRoomAirMod->ZoneCrossVent.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, DVThirdOrderFloorTempCalculation)

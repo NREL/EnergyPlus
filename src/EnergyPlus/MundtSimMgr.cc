@@ -190,7 +190,7 @@ namespace RoomAir {
         ErrorsFound = false;
         for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
             auto &thisZone = state.dataHeatBal->Zone(ZoneIndex);
-            if (state.dataRoomAirMod->AirModel(ZoneIndex).AirModel == RoomAir::RoomAirModel::Mundt) {
+            if (state.dataRoomAirMod->AirModel(ZoneIndex).AirModel == RoomAir::RoomAirModel::DispVent1Node) {
                 // find number of zones using the Mundt model
                 ++NumOfMundtZones;
                 // find maximum number of surfaces in zones using the Mundt model

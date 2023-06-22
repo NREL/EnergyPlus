@@ -538,14 +538,14 @@ namespace ThermalComfort {
             }
             if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
                 state.dataThermalComforts->ZoneNum = state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).ZonePtr;
-                if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) ||
+                if (state.dataRoomAirMod->IsZoneDispVent3Node(state.dataThermalComforts->ZoneNum) ||
                     state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
                     state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
                     // UCSD-CV
-                } else if (state.dataRoomAirMod->IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                    if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Jet) {
+                } else if (state.dataRoomAirMod->IsZoneCrossVent(state.dataThermalComforts->ZoneNum)) {
+                    if (state.dataRoomAirMod->ZoneCrossVent(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Jet) {
                         state.dataThermalComforts->AirTemp = state.dataRoomAirMod->ZTJET(state.dataThermalComforts->ZoneNum);
-                    } else if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Recirculation) {
+                    } else if (state.dataRoomAirMod->ZoneCrossVent(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Recirculation) {
                         state.dataThermalComforts->AirTemp = state.dataRoomAirMod->ZTJET(state.dataThermalComforts->ZoneNum);
                     }
                 }
@@ -617,10 +617,10 @@ namespace ThermalComfort {
                     state, format("PEOPLE=\"{}\", Incorrect Clothing Type", state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).Name));
             }
 
-            if (state.dataRoomAirMod->anyNonMixingRoomAirModel && state.dataRoomAirMod->IsZoneCV(state.dataThermalComforts->ZoneNum)) {
-                if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Jet) {
+            if (state.dataRoomAirMod->anyNonMixingRoomAirModel && state.dataRoomAirMod->IsZoneCrossVent(state.dataThermalComforts->ZoneNum)) {
+                if (state.dataRoomAirMod->ZoneCrossVent(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Jet) {
                     state.dataThermalComforts->AirVel = state.dataRoomAirMod->Ujet(state.dataThermalComforts->ZoneNum);
-                } else if (state.dataRoomAirMod->ZoneUCSDCV(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Recirculation) {
+                } else if (state.dataRoomAirMod->ZoneCrossVent(state.dataThermalComforts->ZoneNum).VforComfort == RoomAir::Comfort::Recirculation) {
                     state.dataThermalComforts->AirVel = state.dataRoomAirMod->Urec(state.dataThermalComforts->ZoneNum);
                 } else {
                     state.dataThermalComforts->AirVel = 0.2;
@@ -827,7 +827,7 @@ namespace ThermalComfort {
         // (var TA)
         state.dataThermalComforts->AirTemp = thisZoneHB.ZTAVComf;
         if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-            if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) ||
+            if (state.dataRoomAirMod->IsZoneDispVent3Node(state.dataThermalComforts->ZoneNum) ||
                 state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
                 state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
             }
@@ -1475,7 +1475,7 @@ namespace ThermalComfort {
 
             state.dataThermalComforts->AirTemp = thisZoneHB.ZTAVComf;
             if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) ||
+                if (state.dataRoomAirMod->IsZoneDispVent3Node(state.dataThermalComforts->ZoneNum) ||
                     state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
                     state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum); // PH 3/7/04
                 }
@@ -2318,7 +2318,7 @@ namespace ThermalComfort {
                 state.dataThermalComforts->ZoneOccHrs(iZone) += state.dataGlobal->TimeStepZone;
                 CurAirTemp = thisZoneHB.ZTAVComf;
                 if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                    if (state.dataRoomAirMod->IsZoneDV(iZone) || state.dataRoomAirMod->IsZoneUI(iZone)) {
+                    if (state.dataRoomAirMod->IsZoneDispVent3Node(iZone) || state.dataRoomAirMod->IsZoneUI(iZone)) {
                         CurAirTemp = state.dataRoomAirMod->TCMF(iZone);
                     }
                 }
@@ -2876,7 +2876,7 @@ namespace ThermalComfort {
             state.dataThermalComforts->ZoneNum = state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).ZonePtr;
             state.dataThermalComforts->AirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataThermalComforts->ZoneNum).ZTAVComf;
             if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) ||
+                if (state.dataRoomAirMod->IsZoneDispVent3Node(state.dataThermalComforts->ZoneNum) ||
                     state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
                     state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum);
                 }
@@ -3087,7 +3087,7 @@ namespace ThermalComfort {
             state.dataThermalComforts->ZoneNum = state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).ZonePtr;
             state.dataThermalComforts->AirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataThermalComforts->ZoneNum).ZTAVComf;
             if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                if (state.dataRoomAirMod->IsZoneDV(state.dataThermalComforts->ZoneNum) ||
+                if (state.dataRoomAirMod->IsZoneDispVent3Node(state.dataThermalComforts->ZoneNum) ||
                     state.dataRoomAirMod->IsZoneUI(state.dataThermalComforts->ZoneNum)) {
                     state.dataThermalComforts->AirTemp = state.dataRoomAirMod->TCMF(state.dataThermalComforts->ZoneNum);
                 }

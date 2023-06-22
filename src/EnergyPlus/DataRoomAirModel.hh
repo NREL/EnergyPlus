@@ -75,11 +75,11 @@ namespace RoomAir {
         Invalid = -1,
         UserDefined,    // user defined patterns
         Mixing,         // mixing air model
-        Mundt,          // Mundt nodal model
-        UCSDDV,         // UCSD Displacement Ventilation model
-        UCSDCV,         // UCSD-CV
-        UCSDUFI,        // UCSD UFAD interior zone model
-        UCSDUFE,        // UCSD UFAD exterior zone model
+        DispVent1Node,          // Mundt nodal model
+        DispVent3Node,          // UCSD Displacement Ventilation model
+        CrossVent,         // UCSD-CV
+        UFADInt,        // UCSD UFAD interior zone model
+        UFADExt,        // UCSD UFAD exterior zone model
         AirflowNetwork, // RoomAirModel_AirflowNetwork interior zone model
         Num
     };
@@ -171,11 +171,8 @@ namespace RoomAir {
         std::string Name = "";
         std::string ZoneName = "";
         int ZonePtr = 0;               // Pointer to the zone number for this statement
-        RoomAirModel AirModel = RoomAirModel::Mixing; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
-        // 4 = UCSDDV, 5 = UCSDCV, -1 = user defined
-        // 6 = UCSDUFI, 7 = UCSDUFE, 8 = AirflowNetwork
-        CouplingScheme TempCoupleScheme = CouplingScheme::Direct; // 1 = absolute (direct),
-        // 2 = relative air model temperature passing scheme (indirect)
+        RoomAirModel AirModel = RoomAirModel::Mixing; 
+        CouplingScheme TempCoupleScheme = CouplingScheme::Direct; 
         bool SimAirModel = false; // FALSE if Mixing air model is currently used and
         // TRUE if other air models are currently used
     };
@@ -193,7 +190,7 @@ namespace RoomAir {
         bool IsZone = false;               // TRUE if this node is zone node
     };
 
-    struct DVData
+    struct DispVentData
     {
         // Members
         std::string ZoneName = "";       // Name of zone
@@ -206,7 +203,7 @@ namespace RoomAir {
         Real64 TempTrigger = 0.0;         // Minimum temperature difference between TOC TMX for stratification
     };
 
-    struct CVData
+    struct CrossVentData
     {
         // Members
         std::string ZoneName = "";       // Name of zone
@@ -217,7 +214,7 @@ namespace RoomAir {
         // for comfort models
     };
 
-    struct CVFlow
+    struct CrossVentFlow
     {
         // Members
         int FlowFlag = 0; // Equal to 1 if the opening has inflow, else equal to 0.
@@ -234,7 +231,7 @@ namespace RoomAir {
         Real64 Qrec = 0.0;  // Total flow rate for the recirculation regions in the plane of maximum flow [m3/s]
     };
 
-    struct CVDVParameters
+    struct CrossDispVentParameters
     {
         // Members
         Real64 Width = 0.0;
@@ -244,7 +241,7 @@ namespace RoomAir {
         Real64 Zmax = 0.0;
     };
 
-    struct UFIData
+    struct UFADIntData
     {
         // Members
         std::string ZoneName = "";    // Name of zone
@@ -270,7 +267,7 @@ namespace RoomAir {
         Real64 E_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
     };
 
-    struct UFEData
+    struct UFADExtData
     {
         // Members
         std::string ZoneName = "";    // Name of zone
@@ -394,7 +391,7 @@ namespace RoomAir {
         Real64 Gradient = 0.0; // result for modeled gradient if using two-gradient interpolation
     };
 
-    struct AFNLinkagesInfoNested // becomes link
+    struct AFNLinkInfoNested // becomes link
     {
         // Members
         // user variables
@@ -406,7 +403,7 @@ namespace RoomAir {
         Real64 HumRatIn = 0.0;                 // humidity ratio of air into control volume
     };
 
-    struct RoomAFNNodeInternalGains // becomes IntGain
+    struct AFNNodeInternalGains // becomes IntGain
     {
         // Members
         // user variables
@@ -416,7 +413,7 @@ namespace RoomAir {
         bool FractionCheck = false;                // TRUE if a fraction of internal gain for each object is checked
     };
 
-    struct RoomAFNHVAC // becomes HVAC
+    struct AFNHVAC // becomes HVAC
     {
         // Members
         // user variables
@@ -433,7 +430,7 @@ namespace RoomAir {
         int CompIndex = 0;              // Component index
     };
         
-    struct RoomAFNAirNodeNested // becomes Node
+    struct AFNAirNodeNested // becomes Node
     {
         // Members
         // user variables
@@ -448,14 +445,14 @@ namespace RoomAir {
         Array1D<int> intGainsDeviceSpaces;                          // index pointers to space struct
         Array1D<int> IntGainsDeviceIndices;                         // index pointers to internal gains struct
         Array1D<Real64> IntGainsFractions;                          // gain fractions to this node
-        Array1D<RoomAFNNodeInternalGains> IntGain; // Internal gain struct
+        Array1D<AFNNodeInternalGains> IntGain; // Internal gain struct
         std::string NodeHVACListName = "";                               // name of node's HVAC list
         bool HasHVACAssigned = false;                                       // True if HVAC systems are assigned to this node
         int NumHVACs = 0;                                               // Number of HVAC systems
-        Array1D<RoomAFNHVAC> HVAC;                 // HVAC struct
+        Array1D<AFNHVAC> HVAC;                 // HVAC struct
         int AirflowNetworkNodeID = 0;                                   // pointer to AirflowNetworkNodeData structure
         int NumOfAirflowLinks = 0;                                      // Number of intra zone links
-        Array1D<AFNLinkagesInfoNested> Link;              // Linkage struct
+        Array1D<AFNLinkInfoNested> Link;              // Linkage struct
         Real64 AirVolume = 0.0;                                           // air volume in control volume associated with this node(m3 / s)
         Real64 RhoAir = 0.0;                                              // current density of air for nodal control volume
         Real64 CpAir = 0.0;                                               // current heat capacity of air for nodal control volume
@@ -513,7 +510,7 @@ namespace RoomAir {
         Real64 SumLinkMW = 0.0; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model
     };
 
-    struct RoomAFNInfoByZone // becomes RoomAirflowNetworkZoneInfo
+    struct AFNInfoByZone // becomes RoomAirflowNetworkZoneInfo
     {
         // Members
         // user variables
@@ -526,7 +523,7 @@ namespace RoomAir {
         int AvailSchedID = 0;                                    // index of availability schedule
         int ControlAirNodeID = 0;                                // index of roomair node that is HVAC control sensor location
         int NumOfAirNodes = 0;                                   // Number of air nodes
-        Array1D<RoomAFNAirNodeNested> Node; // Node struct
+        Array1D<AFNAirNodeNested> Node; // Node struct
         int ZoneNodeID = 0;                                       // index in system Node array for this zone
         Real64 TairMean = 0.0;                                     // comes from MAT
         Real64 Tstat = 0.0;                                        // temperature for thermostat
@@ -548,9 +545,9 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> ConvectiveFloorSplit;
     Array1D<Real64> InfiltratFloorSplit;
     // UCSD
-    int TotUCSDDV = 0; // Total number of UCSDDV zones
-    Array1D<Real64> DVHcIn;
-    Array1D_bool IsZoneDV;        // Is the air model for the zone UCSDDV?
+    int TotDispVent3Node = 0; // Total number of UCSDDV zones
+    Array1D<Real64> DispVent3NodeHcIn;
+    Array1D_bool IsZoneDispVent3Node;        // Is the air model for the zone UCSDDV?
     Array1D<Real64> ZTOC;         // Temperature of occupied (lower) zone
     Array1D<Real64> AvgTempGrad;  // vertical Average Temperature Gradient in the room
     Array1D<Real64> ZTMX;         // Temperature of the mixing(upper) layer
@@ -560,8 +557,8 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> ZTFloor;
     Array1D<Real64> HeightTransition;
     Array1D<Real64> FracMinFlow;
-    Array1D_int ZoneDVMixedFlag;
-    Array1D<Real64> ZoneDVMixedFlagRep;
+    Array1D_int ZoneDispVent3NodeMixedFlag;
+    Array1D<Real64> ZoneDispVent3NodeMixedFlagRep;
     Array1D_bool ZoneAirSystemON;
     Array1D<Real64> TCMF; // comfort temperature
     Array1D<Real64> ZoneCeilingHeight;
@@ -615,11 +612,11 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> ZoneMXMX;    // [C] difference equation's Mixed  air temp at t minus 1
     Array1D<Real64> ZoneM2MX;    // [C] difference equation's Mixed  air temp at t minus 2
     // UCSD-CV
-    int TotUCSDCV = 0;                   // Total number of UCSDDV zones
-    int CVNumAirflowNetworkSurfaces = 0; // total number of AirFlowNetwork surfaces.
-    Array1D<Real64> CVHcIn;
-    Array1D_bool IsZoneCV;           // Is the air model for the zone UCSDDV?
-    Array1D<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
+    int TotCrossVent = 0;                   // Total number of UCSDDV zones
+    int CrossVentNumAFNSurfaces = 0; // total number of AirFlowNetwork surfaces.
+    Array1D<Real64> CrossVentHcIn;
+    Array1D_bool IsZoneCrossVent;           // Is the air model for the zone UCSDDV?
+    Array1D<Real64> ZoneCrossVentIsMixing;  // Zone set to CV is actually using a mixing model
     Array1D<Real64> ZTJET;           // Jet Temperatures
     Array1D<Real64> ZTREC;           // Recirculation Temperatures
     Array1D<Real64> RoomOutflowTemp; // Temperature of air flowing out of the room
@@ -635,23 +632,23 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> Dstar;                   // CV Zone average length, wind direction corrected
     Array1D<Real64> Tin;                     // Inflow air temperature
     Array1D<Real64> TotArea;                 // Sum of the areas of all apertures in the zone
-    Array2D_int AirflowNetworkSurfaceUCSDCV; // table for AirflowNetwork surfaces organization
+    Array2D_int AFNSurfaceCrossVent; // table for AirflowNetwork surfaces organization
     // Interzone surfaces counts twice.
     Array1D<Real64> Rfr;          // Ration between inflow and recirculation air flows
-    Array1D<Real64> ZoneCVhasREC; // Airflow pattern is C = 0, CR(1)
+    Array1D<Real64> ZoneCrossVentHasREC; // Airflow pattern is C = 0, CR(1)
     bool UCSDModelUsed = false;
-    bool MundtModelUsed = false;
+    bool DispVent1NodeModelUsed = false;
     // UCSD-UF
-    int TotUCSDUI = 0;     // total number of UCSDUI zones
-    int TotUCSDUE = 0;     // total number of UCSDUE zones
+    int TotUFADInt = 0;     // total number of UCSDUI zones
+    int TotUFADExt = 0;     // total number of UCSDUE zones
     Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
-    Array1D_int ZoneUFPtr;
-    Array1D<Real64> UFHcIn;
-    Array1D_int ZoneUFMixedFlag;
-    Array1D<Real64> ZoneUFMixedFlagRep;
-    Array1D<Real64> ZoneUFGamma;
-    Array1D<Real64> ZoneUFPowInPlumes;            // [W]
-    Array1D<Real64> ZoneUFPowInPlumesfromWindows; // [W]
+    Array1D_int ZoneUFADPtr;
+    Array1D<Real64> UFADHcIn;
+    Array1D_int ZoneUFADMixedFlag;
+    Array1D<Real64> ZoneUFADMixedFlagRep;
+    Array1D<Real64> ZoneUFADGamma;
+    Array1D<Real64> ZoneUFADPowInPlumes;            // [W]
+    Array1D<Real64> ZoneUFADPowInPlumesfromWindows; // [W]
     Array1D<Real64> Phi;                          // dimensionless measure of occupied subzone temperature
     // END UCSD
     // Begin NREL User-defined patterns
@@ -670,15 +667,15 @@ struct RoomAirModelData : BaseGlobalStruct
     // Object Data
     Array1D<RoomAir::AirModelData> AirModel;
     Array1D<RoomAir::AirNodeData> AirNode;
-    Array1D<RoomAir::DVData> ZoneUCSDDV; // UCSD
-    Array1D<RoomAir::CVData> ZoneUCSDCV;
-    Array1D<RoomAir::UFIData> ZoneUCSDUI;
-    Array1D<RoomAir::UFEData> ZoneUCSDUE;
-    Array2D<RoomAir::CVFlow> CVJetRecFlows;                                          // Jet and recirculation zone flows and properties
-    Array1D<RoomAir::CVDVParameters> SurfParametersCVDV;                             // Surface parameters
-    Array1D<RoomAir::TemperaturePattern> RoomAirPattern;                       // user defined patterns ,various types
+    Array1D<RoomAir::DispVentData> ZoneDispVent3Node; // UCSD
+    Array1D<RoomAir::CrossVentData> ZoneCrossVent;
+    Array1D<RoomAir::UFADIntData> ZoneUFADInt;
+    Array1D<RoomAir::UFADExtData> ZoneUFADExt;
+    Array2D<RoomAir::CrossVentFlow> CrossVentJetRecFlows;                                          // Jet and recirculation zone flows and properties
+    Array1D<RoomAir::CrossDispVentParameters> SurfParametersCrossDispVent;                             // Surface parameters
+    Array1D<RoomAir::TemperaturePattern> AirPattern;                       // user defined patterns ,various types
     Array1D<RoomAir::AirPatternInfobyZone> AirPatternZoneInfo;                 // added zone information for user defined patterns
-    Array1D<RoomAir::RoomAFNInfoByZone> RoomAirflowNetworkZoneInfo; // added zone info
+    Array1D<RoomAir::AFNInfoByZone> AFNZoneInfo; // added zone info
 
     void clear_state() override
     {
@@ -689,9 +686,9 @@ struct RoomAirModelData : BaseGlobalStruct
         ConvectiveFloorSplit.clear();
         InfiltratFloorSplit.clear();
         // UCSD
-        TotUCSDDV = 0; // Total number of UCSDDV zones
-        DVHcIn.clear();
-        IsZoneDV.clear();     // Is the air model for the zone UCSDDV?
+        TotDispVent3Node = 0; // Total number of UCSDDV zones
+        DispVent3NodeHcIn.clear();
+        IsZoneDispVent3Node.clear();     // Is the air model for the zone UCSDDV?
         ZTOC.clear();         // Temperature of occupied (lower) zone
         AvgTempGrad.clear();  // vertical Average Temperature Gradient in the room
         ZTMX.clear();         // Temperature of the mixing(upper) layer
@@ -701,8 +698,8 @@ struct RoomAirModelData : BaseGlobalStruct
         ZTFloor.clear();
         HeightTransition.clear();
         FracMinFlow.clear();
-        ZoneDVMixedFlag.clear();
-        ZoneDVMixedFlagRep.clear();
+        ZoneDispVent3NodeMixedFlag.clear();
+        ZoneDispVent3NodeMixedFlagRep.clear();
         ZoneAirSystemON.clear();
         TCMF.clear(); // comfort temperature
         ZoneCeilingHeight.clear();
@@ -756,11 +753,11 @@ struct RoomAirModelData : BaseGlobalStruct
         ZoneMXMX.clear();    // [C] difference equation's Mixed  air temp at t minus 1
         ZoneM2MX.clear();    // [C] difference equation's Mixed  air temp at t minus 2
         // UCSD-CV
-        TotUCSDCV = 0;                   // Total number of UCSDDV zones
-        CVNumAirflowNetworkSurfaces = 0; // total number of AirFlowNetwork surfaces.
-        CVHcIn.clear();
-        IsZoneCV.clear();        // Is the air model for the zone UCSDDV?
-        ZoneCVisMixing.clear();  // Zone set to CV is actually using a mixing model
+        TotCrossVent = 0;                   // Total number of UCSDDV zones
+        CrossVentNumAFNSurfaces = 0; // total number of AirFlowNetwork surfaces.
+        CrossVentHcIn.clear();
+        IsZoneCrossVent.clear();        // Is the air model for the zone UCSDDV?
+        ZoneCrossVentIsMixing.clear();  // Zone set to CV is actually using a mixing model
         ZTJET.clear();           // Jet Temperatures
         ZTREC.clear();           // Recirculation Temperatures
         RoomOutflowTemp.clear(); // Temperature of air flowing out of the room
@@ -776,23 +773,23 @@ struct RoomAirModelData : BaseGlobalStruct
         Dstar.clear();                       // CV Zone average length, wind direction corrected
         Tin.clear();                         // Inflow air temperature
         TotArea.clear();                     // Sum of the areas of all apertures in the zone
-        AirflowNetworkSurfaceUCSDCV.clear(); // table for AirflowNetwork surfaces organization
+        AFNSurfaceCrossVent.clear(); // table for AirflowNetwork surfaces organization
         // Interzone surfaces counts twice.
         Rfr.clear();          // Ration between inflow and recirculation air flows
-        ZoneCVhasREC.clear(); // Airflow pattern is C = 0, CR(1)
+        ZoneCrossVentHasREC.clear(); // Airflow pattern is C = 0, CR(1)
         UCSDModelUsed = false;
-        MundtModelUsed = false;
+        DispVent1NodeModelUsed = false;
         // UCSD-UF
-        TotUCSDUI = 0;    // total number of UCSDUI zones
-        TotUCSDUE = 0;    // total number of UCSDUE zones
+        TotUFADInt = 0;    // total number of UCSDUI zones
+        TotUFADExt = 0;    // total number of UCSDUE zones
         IsZoneUI.clear(); // controls program flow, for interior or exterior UFAD model
-        ZoneUFPtr.clear();
-        UFHcIn.clear();
-        ZoneUFMixedFlag.clear();
-        ZoneUFMixedFlagRep.clear();
-        ZoneUFGamma.clear();
-        ZoneUFPowInPlumes.clear();            // [W]
-        ZoneUFPowInPlumesfromWindows.clear(); // [W]
+        ZoneUFADPtr.clear();
+        UFADHcIn.clear();
+        ZoneUFADMixedFlag.clear();
+        ZoneUFADMixedFlagRep.clear();
+        ZoneUFADGamma.clear();
+        ZoneUFADPowInPlumes.clear();            // [W]
+        ZoneUFADPowInPlumesfromWindows.clear(); // [W]
         Phi.clear();                          // dimensionless measure of occupied subzone temperature
         // END UCSD
         // Begin NREL User-defined patterns
@@ -811,15 +808,15 @@ struct RoomAirModelData : BaseGlobalStruct
         // Object Data
         AirModel.clear();
         AirNode.clear();
-        ZoneUCSDDV.clear(); // UCSD
-        ZoneUCSDCV.clear();
-        ZoneUCSDUI.clear();
-        ZoneUCSDUE.clear();
-        CVJetRecFlows.clear();              // Jet and recirculation zone flows and properties
-        SurfParametersCVDV.clear();         // Surface parameters
-        RoomAirPattern.clear();             // user defined patterns ,various types
+        ZoneDispVent3Node.clear(); // UCSD
+        ZoneCrossVent.clear();
+        ZoneUFADInt.clear();
+        ZoneUFADExt.clear();
+        CrossVentJetRecFlows.clear();              // Jet and recirculation zone flows and properties
+        SurfParametersCrossDispVent.clear();         // Surface parameters
+        AirPattern.clear();             // user defined patterns ,various types
         AirPatternZoneInfo.clear();         // added zone information for user defined patterns
-        RoomAirflowNetworkZoneInfo.clear(); // added zone info
+        AFNZoneInfo.clear(); // added zone info
     }
 };
 

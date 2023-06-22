@@ -79,10 +79,10 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataRoomAirMod->RecInflowRatio.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV.allocate({0, MaxSurf}, state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(1, 1) = 1;
-    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 1) = 1;
-    state->dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(0, 2) = 2;
+    state->dataRoomAirMod->AFNSurfaceCrossVent.allocate({0, MaxSurf}, state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->AFNSurfaceCrossVent(1, 1) = 1;
+    state->dataRoomAirMod->AFNSurfaceCrossVent(0, 1) = 1;
+    state->dataRoomAirMod->AFNSurfaceCrossVent(0, 2) = 2;
 
     state->afn->MultizoneSurfaceData.allocate(MaxSurf);
     state->afn->MultizoneSurfaceData(1).SurfNum = 6;
@@ -138,13 +138,13 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->afn->AirflowNetworkCompData(3).TypeNum = 2;
     state->afn->AirflowNetworkCompData(3).CompTypeNum = AirflowNetwork::iComponentTypeNum::SOP;
 
-    state->dataRoomAirMod->SurfParametersCVDV.allocate(2);
-    state->dataRoomAirMod->SurfParametersCVDV(1).Width = 22.715219999999999;
-    state->dataRoomAirMod->SurfParametersCVDV(1).Height = 1.3715999999999999;
-    state->dataRoomAirMod->SurfParametersCVDV(2).Width = 22.869143999999999;
-    state->dataRoomAirMod->SurfParametersCVDV(2).Height = 1.3715999999999999;
+    state->dataRoomAirMod->SurfParametersCrossDispVent.allocate(2);
+    state->dataRoomAirMod->SurfParametersCrossDispVent(1).Width = 22.715219999999999;
+    state->dataRoomAirMod->SurfParametersCrossDispVent(1).Height = 1.3715999999999999;
+    state->dataRoomAirMod->SurfParametersCrossDispVent(2).Width = 22.869143999999999;
+    state->dataRoomAirMod->SurfParametersCrossDispVent(2).Height = 1.3715999999999999;
 
-    state->dataRoomAirMod->CVJetRecFlows.allocate({0, MaxSurf}, 1);
+    state->dataRoomAirMod->CrossVentJetRecFlows.allocate({0, MaxSurf}, 1);
 
     state->dataUCSDShared->PosZ_Wall.allocate(2);
     state->dataUCSDShared->PosZ_Wall(1) = 1;
@@ -160,8 +160,8 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataRoomAirMod->Droom(1) = 13.631070390838719;
     state->dataRoomAirMod->Dstar.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->Ain.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->ZoneUCSDCV.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->ZoneUCSDCV(1).ZonePtr = 1;
+    state->dataRoomAirMod->ZoneCrossVent.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->ZoneCrossVent(1).ZonePtr = 1;
     state->dataRoomAirMod->JetRecAreaRatio.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->Ujet.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->Urec.allocate(state->dataGlobal->NumOfZones);
@@ -171,13 +171,13 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 
     EvolveParaUCSDCV(*state, 1);
 
-    EXPECT_NEAR(27.14, state->dataRoomAirMod->CVJetRecFlows(1, 1).Fin, 0.01);
-    EXPECT_NEAR(0.871, state->dataRoomAirMod->CVJetRecFlows(1, 1).Uin, 0.001);
-    EXPECT_NEAR(0.000, state->dataRoomAirMod->CVJetRecFlows(1, 1).Vjet, 0.001);
-    EXPECT_NEAR(0.243, state->dataRoomAirMod->CVJetRecFlows(1, 1).Yjet, 0.001);
-    EXPECT_NEAR(0.279, state->dataRoomAirMod->CVJetRecFlows(1, 1).Ujet, 0.001);
-    EXPECT_NEAR(0.070, state->dataRoomAirMod->CVJetRecFlows(1, 1).Yrec, 0.001);
-    EXPECT_NEAR(0.080, state->dataRoomAirMod->CVJetRecFlows(1, 1).Urec, 0.001);
-    EXPECT_NEAR(0.466, state->dataRoomAirMod->CVJetRecFlows(1, 1).YQrec, 0.001);
-    EXPECT_NEAR(0.535, state->dataRoomAirMod->CVJetRecFlows(1, 1).Qrec, 0.001);
+    EXPECT_NEAR(27.14, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Fin, 0.01);
+    EXPECT_NEAR(0.871, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Uin, 0.001);
+    EXPECT_NEAR(0.000, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Vjet, 0.001);
+    EXPECT_NEAR(0.243, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Yjet, 0.001);
+    EXPECT_NEAR(0.279, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Ujet, 0.001);
+    EXPECT_NEAR(0.070, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Yrec, 0.001);
+    EXPECT_NEAR(0.080, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Urec, 0.001);
+    EXPECT_NEAR(0.466, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).YQrec, 0.001);
+    EXPECT_NEAR(0.535, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Qrec, 0.001);
 }

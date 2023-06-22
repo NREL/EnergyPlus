@@ -125,11 +125,10 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    state->dataRoomAirMod->IsZoneDV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
+    state->dataRoomAirMod->IsZoneDispVent3Node.dimension(1, false);
+    state->dataRoomAirMod->IsZoneCrossVent.dimension(1, false);
     state->dataRoomAirMod->IsZoneUI.dimension(1, false);
-    state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
+    state->dataRoomAirMod->ZoneDispVent3NodeMixedFlag.allocate(1);
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
@@ -501,10 +500,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBalSurf->SurfHConvInt.allocate(1);
-    state->dataRoomAirMod->IsZoneDV.dimension(1, false);
-    state->dataRoomAirMod->IsZoneCV.dimension(1, false);
+    state->dataRoomAirMod->IsZoneDispVent3Node.dimension(1, false);
+    state->dataRoomAirMod->IsZoneCrossVent.dimension(1, false);
     state->dataRoomAirMod->IsZoneUI.dimension(1, false);
-    state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
+    state->dataRoomAirMod->ZoneDispVent3NodeMixedFlag.allocate(1);
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);

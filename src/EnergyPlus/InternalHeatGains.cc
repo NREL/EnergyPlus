@@ -7342,7 +7342,7 @@ namespace InternalHeatGains {
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
                     if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                        if (state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
+                        if (state.dataRoomAirMod->IsZoneDispVent3Node(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
                             airTemp = state.dataRoomAirMod->TCMF(NZ);
                         }
                     }
