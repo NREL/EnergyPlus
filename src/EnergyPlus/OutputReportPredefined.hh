@@ -242,7 +242,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFanPwrPerFlow = 0;
     int pdchFanDesDay = 0;
     int pdchFanPkTime = 0;
-
+    int pdchFanPurpose = 0; // or enum?
+    int pdchFanOccOp = 0; // or enum?
     // Pump subtable
     int pdstPump = 0;
     int pdchPumpType = 0;

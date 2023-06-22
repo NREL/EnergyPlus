@@ -415,6 +415,9 @@ namespace OutputReportPredefined {
         s->pdchFanEndUse = newPreDefColumn(state, s->pdstFan, "End Use Subcategory");
         s->pdchFanDesDay = newPreDefColumn(state, s->pdstFan, "Design Day Name for Fan Sizing Peak");
         s->pdchFanPkTime = newPreDefColumn(state, s->pdstFan, "Date/Time for Fan Sizing Peak");
+        // Standard 229 Fans
+        s->pdchFanPurpose = newPreDefColumn(state, s->pdstFan, "Purpose (supply, return, exhaust, relief)");
+        s->pdchFanOccOp = newPreDefColumn(state, s->pdstFan, "Occupied operation (cycling, continuous, off)");
 
         s->pdstPump = newPreDefSubTable(state, s->pdrEquip, "Pumps");
         s->pdchPumpType = newPreDefColumn(state, s->pdstPump, "Type");
