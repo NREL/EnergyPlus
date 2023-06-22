@@ -169,15 +169,15 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataUCSDShared->APos_Wall.allocate(TotSurfaces);
     state->dataUCSDShared->APos_Floor.allocate(TotSurfaces);
     state->dataUCSDShared->APos_Ceiling.allocate(TotSurfaces);
-    state->dataUCSDShared->PosZ_Wall.allocate(state->dataGlobal->NumOfZones * 2);
-    state->dataUCSDShared->PosZ_Floor.allocate(state->dataGlobal->NumOfZones * 2);
-    state->dataUCSDShared->PosZ_Ceiling.allocate(state->dataGlobal->NumOfZones * 2);
+    state->dataUCSDShared->PosZ_Wall.allocate(state->dataGlobal->NumOfZones);
+    state->dataUCSDShared->PosZ_Floor.allocate(state->dataGlobal->NumOfZones);
+    state->dataUCSDShared->PosZ_Ceiling.allocate(state->dataGlobal->NumOfZones);
     state->dataUCSDShared->APos_Window.allocate(TotSurfaces);
     state->dataUCSDShared->APos_Door.allocate(TotSurfaces);
     state->dataUCSDShared->APos_Internal.allocate(TotSurfaces);
-    state->dataUCSDShared->PosZ_Window.allocate(state->dataGlobal->NumOfZones * 2);
-    state->dataUCSDShared->PosZ_Door.allocate(state->dataGlobal->NumOfZones * 2);
-    state->dataUCSDShared->PosZ_Internal.allocate(state->dataGlobal->NumOfZones * 2);
+    state->dataUCSDShared->PosZ_Window.allocate(state->dataGlobal->NumOfZones);
+    state->dataUCSDShared->PosZ_Door.allocate(state->dataGlobal->NumOfZones);
+    state->dataUCSDShared->PosZ_Internal.allocate(state->dataGlobal->NumOfZones);
     state->dataUCSDShared->HCeiling.allocate(TotSurfaces);
     state->dataUCSDShared->HWall.allocate(TotSurfaces);
     state->dataUCSDShared->HFloor.allocate(TotSurfaces);
@@ -185,29 +185,30 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataUCSDShared->HWindow.allocate(TotSurfaces);
     state->dataUCSDShared->HDoor.allocate(TotSurfaces);
 
-    state->dataRoomAirMod->ZoneCeilingHeight.allocate(state->dataGlobal->NumOfZones * 2);
-    state->dataRoomAirMod->ZoneCeilingHeight(1) = 4.9784;
-    state->dataRoomAirMod->ZoneCeilingHeight(2) = 4.9784;
+    state->dataRoomAirMod->ZoneCeilingHeight1.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->ZoneCeilingHeight2.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->ZoneCeilingHeight1(1) = 4.9784;
+    state->dataRoomAirMod->ZoneCeilingHeight2(1) = 4.9784;
 
     // Arrays initializations
     state->dataUCSDShared->APos_Wall = 0;
     state->dataUCSDShared->APos_Floor = 0;
     state->dataUCSDShared->APos_Ceiling = 0;
-    state->dataUCSDShared->PosZ_Wall(1) = 1;
-    state->dataUCSDShared->PosZ_Wall(2) = 0;
-    state->dataUCSDShared->PosZ_Floor(1) = 1;
-    state->dataUCSDShared->PosZ_Floor(2) = 0;
-    state->dataUCSDShared->PosZ_Ceiling(1) = 1;
-    state->dataUCSDShared->PosZ_Ceiling(2) = 0;
+    state->dataUCSDShared->PosZ_Wall(1).beg = 1;
+    state->dataUCSDShared->PosZ_Wall(1).end = 0;
+    state->dataUCSDShared->PosZ_Floor(1).beg = 1;
+    state->dataUCSDShared->PosZ_Floor(1).end = 0;
+    state->dataUCSDShared->PosZ_Ceiling(1).beg = 1;
+    state->dataUCSDShared->PosZ_Ceiling(1).end = 0;
     state->dataUCSDShared->APos_Window = 0;
     state->dataUCSDShared->APos_Door = 0;
     state->dataUCSDShared->APos_Internal = 0;
-    state->dataUCSDShared->PosZ_Window(1) = 1;
-    state->dataUCSDShared->PosZ_Window(2) = 0;
-    state->dataUCSDShared->PosZ_Door(1) = 1;
-    state->dataUCSDShared->PosZ_Door(2) = 3;
-    state->dataUCSDShared->PosZ_Internal(1) = 1;
-    state->dataUCSDShared->PosZ_Internal(2) = 0;
+    state->dataUCSDShared->PosZ_Window(1).beg = 1;
+    state->dataUCSDShared->PosZ_Window(1).end = 0;
+    state->dataUCSDShared->PosZ_Door(1).beg = 1;
+    state->dataUCSDShared->PosZ_Door(1).end = 3;
+    state->dataUCSDShared->PosZ_Internal(1).beg = 1;
+    state->dataUCSDShared->PosZ_Internal(1).end = 0;
     state->dataUCSDShared->HCeiling = 0.0;
     state->dataUCSDShared->HWall = 0.0;
     state->dataUCSDShared->HFloor = 0.0;
@@ -217,8 +218,8 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     state->dataRoomAirMod->ZoneCrossVent.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->ZoneCrossVent(1).ZonePtr = 1;
-    state->dataUCSDShared->PosZ_Door(1) = 1;
-    state->dataUCSDShared->PosZ_Door(2) = 3;
+    state->dataUCSDShared->PosZ_Door(1).beg = 1;
+    state->dataUCSDShared->PosZ_Door(1).end = 3;
     state->dataUCSDShared->APos_Door(1) = 1;
     state->dataUCSDShared->APos_Door(2) = 2;
     state->dataUCSDShared->APos_Door(3) = 3;
@@ -266,7 +267,8 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataUCSDShared->HInternal.deallocate();
     state->dataUCSDShared->HWindow.deallocate();
     state->dataUCSDShared->HDoor.deallocate();
-    state->dataRoomAirMod->ZoneCeilingHeight.deallocate();
+    state->dataRoomAirMod->ZoneCeilingHeight1.deallocate();
+    state->dataRoomAirMod->ZoneCeilingHeight2.deallocate();
     state->dataRoomAirMod->ZoneCrossVent.deallocate();
 }
 

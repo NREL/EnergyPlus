@@ -167,8 +167,7 @@ namespace RoomAir {
         // Is the air flow model for this zone set to UCSDCV Cross Ventilation?
         if (state.dataRoomAirMod->IsZoneCrossVent(ZoneNum)) {
             // WALL Hc, HA and HAT calculation
-            for (int Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2);
-                 ++Ctd) {
+            for (int Ctd = state.dataUCSDShared->PosZ_Wall(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Wall(ZoneNum).end; ++Ctd) {
                 int SurfNum = state.dataUCSDShared->APos_Wall(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -182,8 +181,7 @@ namespace RoomAir {
                 state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HWall(Ctd);
             } // END WALL
             // WINDOW Hc, HA and HAT CALCULATION
-            for (int Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2);
-                 ++Ctd) {
+            for (int Ctd = state.dataUCSDShared->PosZ_Window(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Window(ZoneNum).end; ++Ctd) {
                 int SurfNum = state.dataUCSDShared->APos_Window(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -246,8 +244,7 @@ namespace RoomAir {
                 state.dataRoomAirMod->CrossVentHcIn(SurfNum) = state.dataUCSDShared->HWindow(Ctd);
             } // END WINDOW
             // DOOR Hc, HA and HAT CALCULATION
-            for (int Ctd = state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 2);
-                 ++Ctd) { // DOOR
+            for (int Ctd = state.dataUCSDShared->PosZ_Door(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Door(ZoneNum).end; ++Ctd) { // DOOR
                 int SurfNum = state.dataUCSDShared->APos_Door(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -261,9 +258,7 @@ namespace RoomAir {
                 state.dataCrossVentMgr->HA_R += state.dataSurface->Surface(SurfNum).Area * state.dataUCSDShared->HDoor(Ctd);
             } // END DOOR
             // INTERNAL Hc, HA and HAT CALCULATION
-            for (int Ctd = state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 1);
-                 Ctd <= state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 2);
-                 ++Ctd) {
+            for (int Ctd = state.dataUCSDShared->PosZ_Internal(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Internal(ZoneNum).end; ++Ctd) {
                 int SurfNum = state.dataUCSDShared->APos_Internal(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -278,9 +273,7 @@ namespace RoomAir {
             } // END INTERNAL
 
             // CEILING Hc, HA and HAT CALCULATION
-            for (int Ctd = state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 1);
-                 Ctd <= state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 2);
-                 ++Ctd) {
+            for (int Ctd = state.dataUCSDShared->PosZ_Ceiling(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Ceiling(ZoneNum).end; ++Ctd) {
                 int SurfNum = state.dataUCSDShared->APos_Ceiling(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -308,8 +301,7 @@ namespace RoomAir {
                 state.dataRoomAirMod->CrossVentHcIn(SurfNum) = state.dataUCSDShared->HCeiling(Ctd);
             } // END CEILING
             // FLOOR Hc, HA and HAT CALCULATION
-            for (int Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2);
-                 ++Ctd) {
+            for (int Ctd = state.dataUCSDShared->PosZ_Floor(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Floor(ZoneNum).end; ++Ctd) {
                 int SurfNum = state.dataUCSDShared->APos_Floor(Ctd);
                 state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
                 state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -492,7 +484,7 @@ namespace RoomAir {
         }
 
         Real64 const Wroom_2(pow_2(Wroom));
-        for (int Ctd = state.dataUCSDShared->PosZ_Wall(2 * ZoneNum - 1); Ctd <= state.dataUCSDShared->PosZ_Wall(2 * ZoneNum); ++Ctd) {
+        for (int Ctd = state.dataUCSDShared->PosZ_Wall(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Wall(ZoneNum).end; ++Ctd) {
             if ((state.dataSurface->Surface(state.dataUCSDShared->APos_Wall(Ctd)).Sides == 3) ||
                 (state.dataSurface->Surface(state.dataUCSDShared->APos_Wall(Ctd)).Sides == 4)) {
                 XX_Wall = state.dataSurface->Surface(state.dataUCSDShared->APos_Wall(Ctd)).Centroid.x;

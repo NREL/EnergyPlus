@@ -146,9 +146,9 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 
     state->dataRoomAirMod->CrossVentJetRecFlows.allocate({0, MaxSurf}, 1);
 
-    state->dataUCSDShared->PosZ_Wall.allocate(2);
-    state->dataUCSDShared->PosZ_Wall(1) = 1;
-    state->dataUCSDShared->PosZ_Wall(2) = 4;
+    state->dataUCSDShared->PosZ_Wall.allocate(1);
+    state->dataUCSDShared->PosZ_Wall(1).beg = 1;
+    state->dataUCSDShared->PosZ_Wall(1).end = 4;
 
     state->dataUCSDShared->APos_Wall.allocate(12);
     state->dataUCSDShared->APos_Wall(1) = 5;

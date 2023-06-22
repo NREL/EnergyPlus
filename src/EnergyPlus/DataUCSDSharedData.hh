@@ -57,6 +57,13 @@
 
 namespace EnergyPlus {
 
+namespace RoomAir {
+    struct BegEnd {
+        int beg = 0;
+        int end = 0;
+    };
+} // namespace RoomAir
+        
 struct UCSDSharedData : BaseGlobalStruct
 {
     // The Eplus surface numbers will be stored in the arrays Apos according to the
@@ -66,15 +73,15 @@ struct UCSDSharedData : BaseGlobalStruct
     Array1D_int APos_Wall;
     Array1D_int APos_Floor;
     Array1D_int APos_Ceiling;
-    Array1D_int PosZ_Wall;
-    Array1D_int PosZ_Floor;
-    Array1D_int PosZ_Ceiling;
+    Array1D<RoomAir::BegEnd> PosZ_Wall;
+    Array1D<RoomAir::BegEnd> PosZ_Floor;
+    Array1D<RoomAir::BegEnd> PosZ_Ceiling;
     Array1D_int APos_Window;
     Array1D_int APos_Door;
     Array1D_int APos_Internal;
-    Array1D_int PosZ_Window;
-    Array1D_int PosZ_Door;
-    Array1D_int PosZ_Internal;
+    Array1D<RoomAir::BegEnd> PosZ_Window;
+    Array1D<RoomAir::BegEnd> PosZ_Door;
+    Array1D<RoomAir::BegEnd> PosZ_Internal;
     // Convection coefficients for the various surfaces
     Array1D<Real64> HCeiling;
     Array1D<Real64> HWall;

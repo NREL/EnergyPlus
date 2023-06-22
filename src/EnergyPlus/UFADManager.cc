@@ -195,7 +195,7 @@ void InitUCSDUF(EnergyPlusData &state,
     state.dataRoomAirMod->ZoneUFADGamma(ZoneNum) = 0.0;
     state.dataRoomAirMod->ZoneUFADPowInPlumes(ZoneNum) = 0.0;
     NumShadesDown = 0.0;
-    for (int Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
+    for (int Ctd = state.dataUCSDShared->PosZ_Window(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Window(ZoneNum).end; ++Ctd) {
         int SurfNum = state.dataUCSDShared->APos_Window(Ctd);
         if (SurfNum == 0) continue;
         auto &surf = state.dataSurface->Surface(SurfNum);
@@ -448,8 +448,7 @@ void SizeUCSDUF(EnergyPlusData &state,
         UINum = state.dataRoomAirMod->ZoneUFADPtr(ZoneNum);
         auto &zoneUE = state.dataRoomAirMod->ZoneUFADExt(UINum);
         // calculate total window width in zone
-        for (int Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2);
-             ++Ctd) {
+        for (int Ctd = state.dataUCSDShared->PosZ_Window(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Window(ZoneNum).end; ++Ctd) {
             int SurfNum = state.dataUCSDShared->APos_Window(Ctd);
             if (SurfNum == 0) continue;
             auto &surf = state.dataSurface->Surface(SurfNum);
@@ -675,7 +674,6 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     using namespace DataHeatBalance;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Ctd;         // DO loop counter for surfaces
     Real64 HLD;      // Convection coefficient for the lower area of surface
     Real64 TmedDV;   // Average temperature for DV
     Real64 Z1;       // auxiliary var for lowest height
@@ -703,9 +701,9 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
         LayFrac = FractionHeight;
         LayH = FractionHeight *
-               (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1));
+               (state.dataRoomAirMod->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum));
         // WALL Hc, HA and HAT calculation
-        for (Ctd = state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Wall((ZoneNum - 1) * 2 + 2); ++Ctd) {
+        for (int Ctd = state.dataUCSDShared->PosZ_Wall(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Wall(ZoneNum).end; ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Wall(Ctd);
             auto &surf = state.dataSurface->Surface(SurfNum);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
@@ -713,8 +711,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
             if (SurfNum == 0) continue;
             Z1 = minval(surf.Vertex, &Vector::z);
             Z2 = maxval(surf.Vertex, &Vector::z);
-            ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-            ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+            ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
+            ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
 
             // The Wall surface is in the upper subzone
             if (ZInfSurf > LayH) {
@@ -772,7 +770,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         } // END WALL
 
         // WINDOW Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
+        for (int Ctd = state.dataUCSDShared->PosZ_Window(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Window(ZoneNum).end; ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Window(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
             state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -782,8 +780,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
             if (surf.Tilt > 10.0 && surf.Tilt < 170.0) { // Window Wall
                 Z1 = minval(surf.Vertex, &Vector::z);
                 Z2 = maxval(surf.Vertex, &Vector::z);
-                ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-                ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+                ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
+                ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
 
                 if (ZInfSurf > LayH) {
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
@@ -858,8 +856,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         } // END WINDOW
 
         // DOOR Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Door((ZoneNum - 1) * 2 + 2);
-             ++Ctd) { // DOOR
+        for (int Ctd = state.dataUCSDShared->PosZ_Door(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Door(ZoneNum).end; ++Ctd) { // DOOR
             SurfNum = state.dataUCSDShared->APos_Door(Ctd);
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
             state.dataSurface->SurfTAirRefRpt(SurfNum) = DataSurfaces::SurfTAirRefReportVals[state.dataSurface->SurfTAirRef(SurfNum)];
@@ -868,8 +865,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
             
             Z1 = minval(surf.Vertex, &Vector::z);
             Z2 = maxval(surf.Vertex, &Vector::z);
-            ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-            ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+            ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
+            ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
 
             if (ZInfSurf > LayH) {
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
@@ -915,9 +912,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         // INTERNAL Hc, HA and HAT CALCULATION
         state.dataUFADManager->HeightIntMass =
             min(state.dataUFADManager->HeightIntMassDefault,
-                (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1)));
-        for (Ctd = state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Internal((ZoneNum - 1) * 2 + 2);
-             ++Ctd) {
+                (state.dataRoomAirMod->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum)));
+        for (int Ctd = state.dataUCSDShared->PosZ_Internal(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Internal(ZoneNum).end; ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Internal(Ctd);
             auto &surf = state.dataSurface->Surface(SurfNum);
             
@@ -959,8 +955,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         } // END INTERNAL
 
         // CEILING Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Ceiling((ZoneNum - 1) * 2 + 2);
-             ++Ctd) {
+        for (int Ctd = state.dataUCSDShared->PosZ_Ceiling(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Ceiling(ZoneNum).end; ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Ceiling(Ctd);
             auto &surf = state.dataSurface->Surface(SurfNum);
             
@@ -977,7 +972,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
         } // END CEILING
 
         // FLOOR Hc, HA and HAT CALCULATION
-        for (Ctd = state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Floor((ZoneNum - 1) * 2 + 2); ++Ctd) {
+        for (int Ctd = state.dataUCSDShared->PosZ_Floor(ZoneNum).beg; Ctd <= state.dataUCSDShared->PosZ_Floor(ZoneNum).end; ++Ctd) {
             SurfNum = state.dataUCSDShared->APos_Floor(Ctd);
             auto &surf = state.dataSurface->Surface(SurfNum);
             
@@ -1141,7 +1136,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     TSupK = 0.0;
     SumSysM = 0.0;
     ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-    CeilingHeight = state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+    CeilingHeight = state.dataRoomAirMod->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
     UINum = state.dataRoomAirMod->ZoneUFADPtr(ZoneNum);
     auto &zoneUI = state.dataRoomAirMod->ZoneUFADInt(UINum);
     HeightThermostat = zoneUI.ThermostatHeight;
@@ -1649,7 +1644,7 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     ConvGainsWindows = 0.0;
     Gamma = 0.0;
     ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-    CeilingHeight = state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
+    CeilingHeight = state.dataRoomAirMod->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAirMod->ZoneCeilingHeight1(ZoneNum);
     UINum = state.dataRoomAirMod->ZoneUFADPtr(ZoneNum);
     auto &zoneUE = state.dataRoomAirMod->ZoneUFADExt(UINum);
     HeightThermostat = zoneUE.ThermostatHeight;

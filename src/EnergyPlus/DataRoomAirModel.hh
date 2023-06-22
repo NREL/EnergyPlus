@@ -561,7 +561,8 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> ZoneDispVent3NodeMixedFlagRep;
     Array1D_bool ZoneAirSystemON;
     Array1D<Real64> TCMF; // comfort temperature
-    Array1D<Real64> ZoneCeilingHeight;
+    Array1D<Real64> ZoneCeilingHeight1;
+    Array1D<Real64> ZoneCeilingHeight2;
     Array1D<Real64> MATFloor;    // [C] floor level mean air temp
     Array1D<Real64> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
     Array1D<Real64> XM2TFloor;   // [C] floor level mean air temp at t minus 2 zone time step
@@ -702,7 +703,8 @@ struct RoomAirModelData : BaseGlobalStruct
         ZoneDispVent3NodeMixedFlagRep.clear();
         ZoneAirSystemON.clear();
         TCMF.clear(); // comfort temperature
-        ZoneCeilingHeight.clear();
+        ZoneCeilingHeight1.clear();
+        ZoneCeilingHeight2.clear();
         MATFloor.clear();    // [C] floor level mean air temp
         XMATFloor.clear();   // [C] floor level mean air temp at t minus 1 zone time step
         XM2TFloor.clear();   // [C] floor level mean air temp at t minus 2 zone time step

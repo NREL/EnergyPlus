@@ -1816,15 +1816,15 @@ namespace RoomAir {
             state.dataUCSDShared->APos_Wall.allocate(state.dataSurface->TotSurfaces);
             state.dataUCSDShared->APos_Floor.allocate(state.dataSurface->TotSurfaces);
             state.dataUCSDShared->APos_Ceiling.allocate(state.dataSurface->TotSurfaces);
-            state.dataUCSDShared->PosZ_Wall.allocate(state.dataGlobal->NumOfZones * 2);
-            state.dataUCSDShared->PosZ_Floor.allocate(state.dataGlobal->NumOfZones * 2);
-            state.dataUCSDShared->PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->PosZ_Wall.allocate(state.dataGlobal->NumOfZones);
+            state.dataUCSDShared->PosZ_Floor.allocate(state.dataGlobal->NumOfZones);
+            state.dataUCSDShared->PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones);
             state.dataUCSDShared->APos_Window.allocate(state.dataSurface->TotSurfaces);
             state.dataUCSDShared->APos_Door.allocate(state.dataSurface->TotSurfaces);
             state.dataUCSDShared->APos_Internal.allocate(state.dataSurface->TotSurfaces);
-            state.dataUCSDShared->PosZ_Window.allocate(state.dataGlobal->NumOfZones * 2);
-            state.dataUCSDShared->PosZ_Door.allocate(state.dataGlobal->NumOfZones * 2);
-            state.dataUCSDShared->PosZ_Internal.allocate(state.dataGlobal->NumOfZones * 2);
+            state.dataUCSDShared->PosZ_Window.allocate(state.dataGlobal->NumOfZones);
+            state.dataUCSDShared->PosZ_Door.allocate(state.dataGlobal->NumOfZones);
+            state.dataUCSDShared->PosZ_Internal.allocate(state.dataGlobal->NumOfZones);
             state.dataUCSDShared->HCeiling.allocate(state.dataSurface->TotSurfaces);
             state.dataUCSDShared->HWall.allocate(state.dataSurface->TotSurfaces);
             state.dataUCSDShared->HFloor.allocate(state.dataSurface->TotSurfaces);
@@ -1834,22 +1834,24 @@ namespace RoomAir {
 
             AuxSurf.allocate(state.dataGlobal->NumOfZones);
 
-            state.dataRoomAirMod->ZoneCeilingHeight.allocate(state.dataGlobal->NumOfZones * 2);
-            state.dataRoomAirMod->ZoneCeilingHeight = 0.0;
+            state.dataRoomAirMod->ZoneCeilingHeight1.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAirMod->ZoneCeilingHeight2.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAirMod->ZoneCeilingHeight1 = 0.0;
+            state.dataRoomAirMod->ZoneCeilingHeight2 = 0.0;
 
             // Arrays initializations
             state.dataUCSDShared->APos_Wall = 0;
             state.dataUCSDShared->APos_Floor = 0;
             state.dataUCSDShared->APos_Ceiling = 0;
-            state.dataUCSDShared->PosZ_Wall = 0;
-            state.dataUCSDShared->PosZ_Floor = 0;
-            state.dataUCSDShared->PosZ_Ceiling = 0;
+            std::fill(state.dataUCSDShared->PosZ_Wall.begin(),state.dataUCSDShared->PosZ_Wall.end(), BegEnd());
+            std::fill(state.dataUCSDShared->PosZ_Floor.begin(),state.dataUCSDShared->PosZ_Floor.end(), BegEnd());
+            std::fill(state.dataUCSDShared->PosZ_Ceiling.begin(),state.dataUCSDShared->PosZ_Ceiling.end(), BegEnd());
             state.dataUCSDShared->APos_Window = 0;
             state.dataUCSDShared->APos_Door = 0;
             state.dataUCSDShared->APos_Internal = 0;
-            state.dataUCSDShared->PosZ_Window = 0;
-            state.dataUCSDShared->PosZ_Door = 0;
-            state.dataUCSDShared->PosZ_Internal = 0;
+            std::fill(state.dataUCSDShared->PosZ_Window.begin(),state.dataUCSDShared->PosZ_Window.end(), BegEnd());
+            std::fill(state.dataUCSDShared->PosZ_Door.begin(),state.dataUCSDShared->PosZ_Door.end(), BegEnd());
+            std::fill(state.dataUCSDShared->PosZ_Internal.begin(),state.dataUCSDShared->PosZ_Internal.end(), BegEnd());
             state.dataUCSDShared->HCeiling = 0.0;
             state.dataUCSDShared->HWall = 0.0;
             state.dataUCSDShared->HFloor = 0.0;
@@ -1921,21 +1923,21 @@ namespace RoomAir {
                 contInternalLast = contInternal;
                 // PosZ_Wall (... + 1) has the Begin Wall reference in Apos_Wall for the ZNum
                 // PosZ_Wall (... + 2) has the End Wall reference in Apos_Wall for the ZNum
-                state.dataUCSDShared->PosZ_Wall((ZNum - 1) * 2 + 1) = contWallBeg;
-                state.dataUCSDShared->PosZ_Wall((ZNum - 1) * 2 + 2) = contWallLast;
-                state.dataUCSDShared->PosZ_Floor((ZNum - 1) * 2 + 1) = contFloorBeg;
-                state.dataUCSDShared->PosZ_Floor((ZNum - 1) * 2 + 2) = contFloorLast;
-                state.dataUCSDShared->PosZ_Ceiling((ZNum - 1) * 2 + 1) = contCeilingBeg;
-                state.dataUCSDShared->PosZ_Ceiling((ZNum - 1) * 2 + 2) = contCeilingLast;
-                state.dataUCSDShared->PosZ_Window((ZNum - 1) * 2 + 1) = contWindowBeg;
-                state.dataUCSDShared->PosZ_Window((ZNum - 1) * 2 + 2) = contWindowLast;
-                state.dataUCSDShared->PosZ_Door((ZNum - 1) * 2 + 1) = contDoorBeg;
-                state.dataUCSDShared->PosZ_Door((ZNum - 1) * 2 + 2) = contDoorLast;
-                state.dataUCSDShared->PosZ_Internal((ZNum - 1) * 2 + 1) = contInternalBeg;
-                state.dataUCSDShared->PosZ_Internal((ZNum - 1) * 2 + 2) = contInternalLast;
+                state.dataUCSDShared->PosZ_Wall(ZNum).beg = contWallBeg;
+                state.dataUCSDShared->PosZ_Wall(ZNum).end = contWallLast;
+                state.dataUCSDShared->PosZ_Floor(ZNum).beg = contFloorBeg;
+                state.dataUCSDShared->PosZ_Floor(ZNum).end = contFloorLast;
+                state.dataUCSDShared->PosZ_Ceiling(ZNum).beg = contCeilingBeg;
+                state.dataUCSDShared->PosZ_Ceiling(ZNum).end = contCeilingLast;
+                state.dataUCSDShared->PosZ_Window(ZNum).beg = contWindowBeg;
+                state.dataUCSDShared->PosZ_Window(ZNum).end = contWindowLast;
+                state.dataUCSDShared->PosZ_Door(ZNum).beg = contDoorBeg;
+                state.dataUCSDShared->PosZ_Door(ZNum).end = contDoorLast;
+                state.dataUCSDShared->PosZ_Internal(ZNum).beg = contInternalBeg;
+                state.dataUCSDShared->PosZ_Internal(ZNum).end = contInternalLast;
                 // Save the highest and lowest height for this zone
-                state.dataRoomAirMod->ZoneCeilingHeight((ZNum - 1) * 2 + 1) = Z1ofZone;
-                state.dataRoomAirMod->ZoneCeilingHeight((ZNum - 1) * 2 + 2) = Z2ofZone;
+                state.dataRoomAirMod->ZoneCeilingHeight1(ZNum) = Z1ofZone;
+                state.dataRoomAirMod->ZoneCeilingHeight2(ZNum) = Z2ofZone;
 
                 constexpr Real64 CeilingHeightDiffMaximum = 0.1;
                 if (std::abs((Z2ofZone - Z1ofZone) - state.dataHeatBal->Zone(ZNum).CeilingHeight) > CeilingHeightDiffMaximum) {
@@ -1987,7 +1989,7 @@ namespace RoomAir {
                 if (AuxSurf(iZone) == 0)
                         continue;
                 
-                Real64 const ceilingHeight(state.dataRoomAirMod->ZoneCeilingHeight((iZone - 1) * 2 + 1));
+                Real64 const ceilingHeight = state.dataRoomAirMod->ZoneCeilingHeight1(iZone);
                 int SurfNum = 1;
 
                 for (int iMzLink = 1; iMzLink <= state.afn->NumOfLinksMultiZone; ++iMzLink) {
