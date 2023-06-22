@@ -353,6 +353,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilHSPFSI;    // HSPF value in SI unit at AHRI std. 340/360 conditions [W/W]
     int pdchDXHeatCoilHSPFIP;    // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
     int pdchDXHeatCoilRegionNum; // Region number for which HSPF is calculated
+    // Standard 229 Predef outputs for DX Heating Coils
+    int pdchDXHeatCoilMinOADBTforCompOp; // 2023-06-22: initialization to zero?
+    int pdchDXHeatCoilAirloopName;
+    int pdchDXHeatCoilAirloopBranchName;
 
     // TODO: As not inlcuded in clearState() , Confirm and update
     // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
@@ -370,6 +374,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHeatCoilDesCap = 0;
     int pdchHeatCoilNomCap = 0;
     int pdchHeatCoilNomEff = 0;
+    // Standard 229 Predef outputs for Heating Coils
+    int pdchHeatCoilUsedAsSupHeat = 0;
+    int pdchHeatCoilAirloopName = 0;
+    int pdchHeatCoilAirloopBranchName = 0;
+    int pdchHeatCoilPlantloopName = 0;
+    int pdchHeatCoilPlantloopBranchName = 0;
+    int pdchHeatCoilSupHeatHighShutoffTemp = 0;
 
     // SWH subtable
     int pdstSWH = 0;
@@ -728,6 +739,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDCVZoneADEffCooling = 0;
     int pdchDCVZoneADEffHeating = 0;
     int pdchDCVZoneADEffSchName = 0;
+    // Standard 229 Predef outputs for DCV using Controller:MechanicalVentilation
+    int pdchDCVTypeCO2ZoneOrOther = 0;
 
     int pdstSimpleComfort = 0;
     int pdchSCwinterClothes = 0;

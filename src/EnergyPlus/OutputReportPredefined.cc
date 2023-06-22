@@ -386,6 +386,11 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilLowCap = newPreDefColumn(state, s->pdstDXHeatCoil, "Low Temperature Heating (net) Rating Capacity [W]");
         s->pdchDXHeatCoilHSPFIP = newPreDefColumn(state, s->pdstDXHeatCoil, "HSPF [Btu/W-h]");
         s->pdchDXHeatCoilRegionNum = newPreDefColumn(state, s->pdstDXHeatCoil, "Region Number");
+        // Standard 229 Predef outputs for DX Heating Coils
+        s->pdchDXHeatCoilMinOADBTforCompOp =
+            newPreDefColumn(state, s->pdstDXHeatCoil, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation");
+        s->pdchDXHeatCoilAirloopName = newPreDefColumn(state, s->pdstDXHeatCoil, "Airloop name");
+        s->pdchDXHeatCoilAirloopBranchName = newPreDefColumn(state, s->pdstDXHeatCoil, "Airloop branch name");
 
         // for DX Heating Coil AHRI Standard 2023 Ratings | HSPF2
         s->pdstDXHeatCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils [ HSPF2 ]");
@@ -401,6 +406,13 @@ namespace OutputReportPredefined {
         s->pdchHeatCoilDesCap = newPreDefColumn(state, s->pdstHeatCoil, "Design Coil Load [W]");
         s->pdchHeatCoilNomCap = newPreDefColumn(state, s->pdstHeatCoil, "Nominal Total Capacity [W]");
         s->pdchHeatCoilNomEff = newPreDefColumn(state, s->pdstHeatCoil, "Nominal Efficiency [W/W]");
+        // Standard 229 Predef outputs for Heating Coils
+        s->pdchHeatCoilUsedAsSupHeat = newPreDefColumn(state, s->pdstHeatCoil, "Used as Supplementary Heat");
+        s->pdchHeatCoilAirloopName = newPreDefColumn(state, s->pdstHeatCoil, "Airloop name");
+        s->pdchHeatCoilAirloopBranchName = newPreDefColumn(state, s->pdstHeatCoil, "Airloop branch name");
+        s->pdchHeatCoilPlantloopName = newPreDefColumn(state, s->pdstHeatCoil, "Plantloop name");
+        s->pdchHeatCoilPlantloopBranchName = newPreDefColumn(state, s->pdstHeatCoil, "Plantloop branch name");
+        s->pdchHeatCoilSupHeatHighShutoffTemp = newPreDefColumn(state, s->pdstHeatCoil, "Supplemental heat high shutoff temperature [C]");
 
         s->pdstFan = newPreDefSubTable(state, s->pdrEquip, "Fans");
 
@@ -728,11 +740,12 @@ namespace OutputReportPredefined {
         s->pdchDCVperACH = newPreDefColumn(state, s->pdstDemCntlVent, "Outdoor Air ACH [ach]");
         s->pdchDCVMethod = newPreDefColumn(state, s->pdstDemCntlVent, "Outdoor Air Method");
         s->pdchDCVOASchName = newPreDefColumn(state, s->pdstDemCntlVent, "Outdoor Air Schedule Name");
-
         // added for new DCV
         s->pdchDCVZoneADEffCooling = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness in Cooling Mode");
         s->pdchDCVZoneADEffHeating = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness in Heating Mode");
         s->pdchDCVZoneADEffSchName = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness Schedule Name");
+        // Standard 229 Predef outputs for DCV using Controller:MechanicalVentilation
+        s->pdchDCVTypeCO2ZoneOrOther = newPreDefColumn(state, s->pdstDemCntlVent, "Type (CO2 Zone/Other)");
 
         s->pdstSimpleComfort = newPreDefSubTable(state, s->pdrSystem, "Time Not Comfortable Based on Simple ASHRAE 55-2004");
         s->pdchSCwinterClothes = newPreDefColumn(state, s->pdstSimpleComfort, "Winter Clothes [hr]");
