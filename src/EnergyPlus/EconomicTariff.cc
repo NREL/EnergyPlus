@@ -664,7 +664,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resourceNum = static_cast<Constant::eResource>(getEnumerationValue(
+            tariff(iInObj).resource = static_cast<Constant::eResource>(getEnumerationValue(
                 Constant::eResourceNamesUC,
                 UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
         }
@@ -4903,7 +4903,7 @@ void GetMonthlyCostForResource(EnergyPlusData &state, Constant::eResource const 
     for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
         auto const &tariff = state.dataEconTariff->tariff(iTariff);
         if (tariff.isSelected) {
-            if (tariff.resourceNum == inResourceNumber) {
+            if (tariff.resource == inResourceNumber) {
                 auto const &econVar = state.dataEconTariff->econVar(tariff.ptTotal);
                 for (int jMonth = 1; jMonth <= 12; ++jMonth) { // use 12 because LCC assume 12 months
                     outMonthlyCosts(jMonth) += econVar.values(jMonth);
