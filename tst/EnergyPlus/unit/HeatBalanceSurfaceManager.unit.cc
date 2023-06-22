@@ -8552,4 +8552,77 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptanc
     EXPECT_NEAR(state->dataHeatBalSurf->SurfAbsSolarExt(2), 0.5, 1e-6);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPerAreaCalc)
+{
+    Real64 const diffTol = 0.0000000001;
+    Real64 expectedResult;
+
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->space.allocate(1);
+    state->dataSurface->Surface.allocate(1);
+    state->dataHeatBal->ZoneWinHeatGain.dimension(1, 0.0);
+    state->dataSurface->SurfWinHeatGain.dimension(1, 0.0);
+    state->dataHeatBal->ZoneWinHeatGainRep.dimension(1, 0.0);
+    state->dataHeatBal->ZoneWinHeatGainRepEnergy.dimension(1, 0.0);
+    state->dataHeatBal->ZoneWinHeatLossRep.dimension(1, 0.0);
+    state->dataHeatBal->ZoneWinHeatLossRepEnergy.dimension(1, 0.0);
+    state->dataHeatBalSurf->SurfQdotRadSolarInRepPerArea.dimension(1, 0.0);
+    state->dataHeatBalSurf->SurfOpaqQRadSWInAbs.dimension(1, 0.0);
+    state->dataHeatBalSurf->SurfQdotRadLightsInPerArea.dimension(1, 0.0);
+    state->dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones.dimension(1, 0.0);
+
+    auto &thisZone = state->dataHeatBal->Zone(1);
+    auto &thisSpace = state->dataHeatBal->space(1);
+    auto &thisSurface = state->dataSurface->Surface(1);
+    auto &thisRep = state->dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(1);
+    auto &thisQRadSW = state->dataHeatBalSurf->SurfOpaqQRadSWInAbs(1);
+    auto &thisLights = state->dataHeatBalSurf->SurfQdotRadLightsInPerArea(1);
+    auto &thisOther = state->dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(1);
+
+    state->dataGlobal->NumOfZones = 1;
+    thisZone.spaceIndexes.allocate(1);
+    thisZone.spaceIndexes(1) = 1;
+    thisSpace.WindowSurfaceFirst = 1;
+    thisSpace.WindowSurfaceLast = 0;
+    thisSurface.ExtSolar = false;
+    state->dataSurface->UseRepresentativeSurfaceCalculations = false;
+    thisSpace.OpaqOrWinSurfaceFirst = 1;
+    thisSpace.OpaqOrWinSurfaceLast = 0;
+    thisSpace.OpaqOrIntMassSurfaceFirst = 1;
+    thisSpace.OpaqOrIntMassSurfaceLast = 1;
+
+    // Test 1: all zero values--returns a zero (all are already zero--so just call and check)
+    thisRep = -9999.9;
+    expectedResult = 0.0;
+    UpdateIntermediateSurfaceHeatBalanceResults(*state);
+    EXPECT_NEAR(thisRep, expectedResult, diffTol);
+
+    // Test 2: positive values that shouldn't return zero
+    thisRep = -9999.9;
+    expectedResult = 2.0;
+    thisQRadSW = 6.0;
+    thisLights = 3.0;
+    thisOther = 1.0;
+    UpdateIntermediateSurfaceHeatBalanceResults(*state);
+    EXPECT_NEAR(thisRep, expectedResult, diffTol);
+
+    // Test 3: positive value that would calculate negative--should return zero
+    thisRep = -9999.9;
+    expectedResult = 0.0;
+    thisQRadSW = 6.0;
+    thisLights = 5.0;
+    thisOther = 2.0;
+    UpdateIntermediateSurfaceHeatBalanceResults(*state);
+    EXPECT_NEAR(thisRep, expectedResult, diffTol);
+
+    // Test 4: positive values that would calculate a very small number--should return zero
+    thisRep = -9999.9;
+    expectedResult = 0.0;
+    thisQRadSW = 6.0;
+    thisLights = 5.0;
+    thisOther = 0.999999999;
+    UpdateIntermediateSurfaceHeatBalanceResults(*state);
+    EXPECT_NEAR(thisRep, expectedResult, diffTol);
+}
+
 } // namespace EnergyPlus
