@@ -415,9 +415,17 @@ namespace OutputReportPredefined {
         s->pdchFanEndUse = newPreDefColumn(state, s->pdstFan, "End Use Subcategory");
         s->pdchFanDesDay = newPreDefColumn(state, s->pdstFan, "Design Day Name for Fan Sizing Peak");
         s->pdchFanPkTime = newPreDefColumn(state, s->pdstFan, "Date/Time for Fan Sizing Peak");
-        // Standard 229 Fans
+        // Standard 229 Predef outputs for Fans
         s->pdchFanPurpose = newPreDefColumn(state, s->pdstFan, "Purpose (supply, return, exhaust, relief)");
         s->pdchFanOccOp = newPreDefColumn(state, s->pdstFan, "Occupied operation (cycling, continuous, off)");
+        s->pdchFanUnoccOp = newPreDefColumn(state, s->pdstFan, "Unoccupied operation (cycling, continuous, off)");
+        s->pdchFanLockOutAtCenHeat = newPreDefColumn(state, s->pdstFan, "Locked out during central heating (yes, no, N/A)");
+        s->pdchFanAutosized = newPreDefColumn(state, s->pdstFan, "Is autosized");
+        s->pdchFanMotorEff = newPreDefColumn(state, s->pdstFan, "Motor efficiency");
+        s->pdchFanMotorHeatToZoneFrac = newPreDefColumn(state, s->pdstFan, "Motor heat to zone fraction");
+        s->pdchFanMotorLossZoneName = newPreDefColumn(state, s->pdstFan, "Motor loss zone name");
+        s->pdchFanAirLoopName = newPreDefColumn(state, s->pdstFan, "Airloop name");
+        s->pdchFanAirBranchName = newPreDefColumn(state, s->pdstFan, "Airloop branch name");
 
         s->pdstPump = newPreDefSubTable(state, s->pdrEquip, "Pumps");
         s->pdchPumpType = newPreDefColumn(state, s->pdstPump, "Type");
@@ -428,6 +436,10 @@ namespace OutputReportPredefined {
         s->pdchPumpPwrPerFlow = newPreDefColumn(state, s->pdstPump, "Power Per Water Flow Rate [W-s/m3]");
         s->pdchMotEff = newPreDefColumn(state, s->pdstPump, "Motor Efficiency [W/W]");
         s->pdchPumpEndUse = newPreDefColumn(state, s->pdstPump, "End Use Subcategory");
+        // Standard 229 Predef outputs for Pumps
+        s->pdchPumpAutosized = newPreDefColumn(state, s->pdstPump, "Is autosized");
+        s->pdchPumpPlantloopName = newPreDefColumn(state, s->pdstPump, "Plantloop name");
+        s->pdchPumpPlantloopBranchName = newPreDefColumn(state, s->pdstPump, "Plantloop branch name");
 
         s->pdstSWH = newPreDefSubTable(state, s->pdrEquip, "Service Water Heating");
         s->pdchSWHType = newPreDefColumn(state, s->pdstSWH, "Type");

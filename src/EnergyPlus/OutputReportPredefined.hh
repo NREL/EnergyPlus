@@ -242,8 +242,18 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFanPwrPerFlow = 0;
     int pdchFanDesDay = 0;
     int pdchFanPkTime = 0;
-    int pdchFanPurpose = 0; // or enum?
-    int pdchFanOccOp = 0; // or enum?
+    // Standard 229 Predef outputs for Fans
+    int pdchFanPurpose = 0;
+    int pdchFanOccOp = 0;
+    int pdchFanUnoccOp = 0;
+    int pdchFanLockOutAtCenHeat = 0;
+    int pdchFanAutosized = 0;
+    int pdchFanMotorEff = 0;
+    int pdchFanMotorHeatToZoneFrac = 0;
+    int pdchFanMotorLossZoneName = 0;
+    int pdchFanAirLoopName = 0;
+    int pdchFanAirBranchName = 0;
+
     // Pump subtable
     int pdstPump = 0;
     int pdchPumpType = 0;
@@ -254,6 +264,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchPumpPwrPerFlow = 0;
     int pdchPumpEndUse = 0;
     int pdchMotEff = 0;
+    // Standard 229 Predef outputs for Pumps
+    int pdchPumpAutosized = 0;
+    int pdchPumpPlantloopName = 0;
+    int pdchPumpPlantloopBranchName = 0;
 
     // Cooling coil subtable
     int pdstCoolCoil = 0;
