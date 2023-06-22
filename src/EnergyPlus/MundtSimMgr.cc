@@ -68,7 +68,7 @@
 
 namespace EnergyPlus {
 
-namespace MundtSimMgr {
+namespace RoomAir {
 
     // MODULE INFORMATION:
     //       AUTHOR         Brent Griffith
@@ -190,7 +190,7 @@ namespace MundtSimMgr {
         ErrorsFound = false;
         for (ZoneIndex = 1; ZoneIndex <= state.dataGlobal->NumOfZones; ++ZoneIndex) {
             auto &thisZone = state.dataHeatBal->Zone(ZoneIndex);
-            if (state.dataRoomAirMod->AirModel(ZoneIndex).AirModel == DataRoomAirModel::RoomAirModel::Mundt) {
+            if (state.dataRoomAirMod->AirModel(ZoneIndex).AirModel == RoomAir::RoomAirModel::Mundt) {
                 // find number of zones using the Mundt model
                 ++NumOfMundtZones;
                 // find maximum number of surfaces in zones using the Mundt model
@@ -227,7 +227,7 @@ namespace MundtSimMgr {
         }
         for (auto &e : state.dataMundtSimMgr->LineNode) {
             e.AirNodeName.clear();
-            e.ClassType = DataRoomAirModel::AirNodeType::Invalid;
+            e.ClassType = RoomAir::AirNodeType::Invalid;
             e.Height = 0.0;
             e.Temp = 25.0;
         }
@@ -292,12 +292,12 @@ namespace MundtSimMgr {
                         }
 
                         // count air nodes connected to walls in each zone
-                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::Mundt) {
+                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == RoomAir::AirNodeType::Mundt) {
                             ++RoomNodesCount;
                         }
 
                         // count floors in each zone
-                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == DataRoomAirModel::AirNodeType::Floor) {
+                        if (state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType == RoomAir::AirNodeType::Floor) {
                             FloorSurfCount += count(state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).SurfMask);
                         }
                     }
@@ -449,9 +449,6 @@ namespace MundtSimMgr {
         // REFERENCES:
         // na
 
-        // Using/Aliasing
-        using namespace DataRoomAirModel;
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -472,23 +469,23 @@ namespace MundtSimMgr {
         state.dataMundtSimMgr->NumRoomNodes = 0;
         for (NodeNum = 1; NodeNum <= state.dataRoomAirMod->TotNumOfZoneAirNodes(ZoneNum); ++NodeNum) {
             switch (state.dataMundtSimMgr->LineNode(NodeNum, state.dataMundtSimMgr->MundtZoneNum).ClassType) {
-            case AirNodeType::Inlet: { // inlet
+            case RoomAir::AirNodeType::Inlet: { // inlet
                 state.dataMundtSimMgr->SupplyNodeID = NodeNum;
             } break;
-            case AirNodeType::Floor: { // floor
+            case RoomAir::AirNodeType::Floor: { // floor
                 state.dataMundtSimMgr->MundtFootAirID = NodeNum;
             } break;
-            case AirNodeType::Control: { // thermostat
+            case RoomAir::AirNodeType::Control: { // thermostat
                 state.dataMundtSimMgr->TstatNodeID = NodeNum;
             } break;
-            case AirNodeType::Ceiling: { // ceiling
+            case RoomAir::AirNodeType::Ceiling: { // ceiling
                 state.dataMundtSimMgr->MundtCeilAirID = NodeNum;
             } break;
-            case AirNodeType::Mundt: { // wall
+            case RoomAir::AirNodeType::Mundt: { // wall
                 ++state.dataMundtSimMgr->NumRoomNodes;
                 state.dataMundtSimMgr->RoomNodeIDs(state.dataMundtSimMgr->NumRoomNodes) = NodeNum;
             } break;
-            case AirNodeType::Return: { // return
+            case RoomAir::AirNodeType::Return: { // return
                 state.dataMundtSimMgr->ReturnNodeID = NodeNum;
             } break;
             default: {
@@ -742,7 +739,7 @@ namespace MundtSimMgr {
         if ((state.dataMundtSimMgr->SupplyAirVolumeRate > 0.0001) &&
             (state.dataMundtSimMgr->QsysCoolTot > 0.0001)) { // Controlled zone when the system is on
 
-            if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == DataRoomAirModel::CouplingScheme::Direct) {
+            if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == RoomAir::CouplingScheme::Direct) {
                 // Use direct coupling scheme to report air temperatures back to surface/system domains
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
                 for (int SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
@@ -808,6 +805,6 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-} // namespace MundtSimMgr
+} // namespace RoomAir
 
 } // namespace EnergyPlus

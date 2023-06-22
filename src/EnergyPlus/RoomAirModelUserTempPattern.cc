@@ -74,7 +74,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus::RoomAirModelUserTempPattern {
+namespace EnergyPlus::RoomAir {
 
 // MODULE INFORMATION:
 //       AUTHOR         Brent Griffith
@@ -93,9 +93,6 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
 // This module contains all subroutines required by the
 // user defined temperature pattern roomair modeling.
 // See DataRoomAir.cc for variable declarations
-
-// Using/Aliasing
-using namespace DataRoomAirModel;
 
 // Functions
 
@@ -245,16 +242,16 @@ void CalcTempDistModel(EnergyPlusData &state, int const ZoneNum) // index number
         }
 
         switch (state.dataRoomAirMod->RoomAirPattern(CurPatrnID).PatternMode) {
-        case DataRoomAirModel::UserDefinedPatternType::ConstGradTemp: {
+        case UserDefinedPatternType::ConstGradTemp: {
             FigureConstGradPattern(state, CurPatrnID, ZoneNum);
         } break;
-        case DataRoomAirModel::UserDefinedPatternType::TwoGradInterp: {
+        case UserDefinedPatternType::TwoGradInterp: {
             FigureTwoGradInterpPattern(state, CurPatrnID, ZoneNum);
         } break;
-        case DataRoomAirModel::UserDefinedPatternType::NonDimenHeight: {
+        case UserDefinedPatternType::NonDimenHeight: {
             FigureHeightPattern(state, CurPatrnID, ZoneNum);
         } break;
-        case DataRoomAirModel::UserDefinedPatternType::SurfMapTemp:
+        case UserDefinedPatternType::SurfMapTemp:
             FigureSurfMapPattern(state, CurPatrnID, ZoneNum);
             break;
         default: {
@@ -427,14 +424,14 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
 
     // determine gradient depending on mode
     switch (state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.InterpolationMode) {
-    case DataRoomAirModel::UserDefinedPatternMode::OutdoorDryBulb: {
+    case UserDefinedPatternMode::OutdoorDryBulb: {
         Grad = OutdoorDryBulbGrad(state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp,
                                   state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale,
                                   state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient,
                                   state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowerBoundTempScale,
                                   state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.LowGradient);
     } break;
-    case DataRoomAirModel::UserDefinedPatternMode::ZoneAirTemp: {
+    case UserDefinedPatternMode::ZoneAirTemp: {
         if (Tmean >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
             Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
 
@@ -457,7 +454,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
             }
         }
     } break;
-    case DataRoomAirModel::UserDefinedPatternMode::DeltaOutdoorZone: {
+    case UserDefinedPatternMode::DeltaOutdoorZone: {
         DeltaT = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp - Tmean;
         if (DeltaT >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundTempScale) {
             Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
@@ -481,7 +478,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
             }
         }
     } break;
-    case DataRoomAirModel::UserDefinedPatternMode::SensibleCooling: {
+    case UserDefinedPatternMode::SensibleCooling: {
         CoolLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadCoolRate;
         if (CoolLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
             Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
@@ -504,7 +501,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
             }
         }
     } break;
-    case DataRoomAirModel::UserDefinedPatternMode::SensibleHeating: {
+    case UserDefinedPatternMode::SensibleHeating: {
         HeatLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadHeatRate;
         if (HeatLoad >= state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.UpperBoundHeatRateScale) {
             Grad = state.dataRoomAirMod->RoomAirPattern(PattrnID).TwoGradPatrn.HiGradient;
@@ -958,4 +955,4 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
 
 //*****************************************************************************************
 
-} // namespace EnergyPlus::RoomAirModelUserTempPattern
+} // namespace EnergyPlus::RoomAir

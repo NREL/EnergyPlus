@@ -57,7 +57,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace RoomAirModelAirflowNetwork {
+namespace RoomAir {
 
     // Data
     class RAFNData {
@@ -92,7 +92,7 @@ namespace RoomAirModelAirflowNetwork {
 
     //*****************************************************************************************
 
-} // namespace RoomAirModelAirflowNetwork
+} // namespace RoomAir
 
 struct RoomAirModelAirflowNetworkData : BaseGlobalStruct
 {
@@ -100,7 +100,7 @@ struct RoomAirModelAirflowNetworkData : BaseGlobalStruct
     bool InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
     bool InitRoomAirModelAirflowNetworkEnvrnFlag = true;
     bool LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = true;
-    Array1D<RoomAirModelAirflowNetwork::RAFNData> RAFN;
+    Array1D<RoomAir::RAFNData> RAFN;
 
     void clear_state() override
     {

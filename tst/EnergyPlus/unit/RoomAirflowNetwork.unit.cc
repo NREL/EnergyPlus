@@ -83,11 +83,10 @@ using namespace DataEnvironment;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
-using namespace DataRoomAirModel;
+using namespace RoomAir;
 using namespace DataMoistureBalanceEMPD;
 using namespace DataSurfaces;
 using namespace DataHeatBalSurface;
-using namespace EnergyPlus::RoomAirModelAirflowNetwork;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::Psychrometrics;
@@ -567,8 +566,8 @@ TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
 
     ErrorsFound = false;
     state->dataRoomAirMod->AirModel.allocate(1);
-    state->dataRoomAirMod->AirModel(1).AirModel = DataRoomAirModel::RoomAirModel::AirflowNetwork;
-    RoomAirModelManager::GetRoomAirflowNetworkData(*state, ErrorsFound);
+    state->dataRoomAirMod->AirModel(1).AirModel = RoomAir::RoomAirModel::AirflowNetwork;
+    RoomAir::GetRoomAirflowNetworkData(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string =

@@ -1643,7 +1643,7 @@ namespace AirflowNetwork {
         using MixedAir::GetOAMixerNumber;
         using NodeInputManager::GetOnlySingleNode;
         using OutAirNodeManager::SetOutAirNodes;
-        using RoomAirModelManager::GetRAFNNodeNum;
+        using RoomAir::GetRAFNNodeNum;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("AirflowNetwork::Solver::get_input: "); // include trailing blank space

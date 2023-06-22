@@ -67,8 +67,7 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace CrossVentMgr;
-using namespace DataRoomAirModel;
+using namespace RoomAir;
 
 TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
 {

@@ -58,7 +58,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace DisplacementVentMgr {
+namespace RoomAir {
 
     void ManageUCSDDVModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
@@ -113,7 +113,7 @@ namespace DisplacementVentMgr {
     static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                                                                              DataHeatBalance::IntGainType::Lights};
 
-} // namespace DisplacementVentMgr
+} // namespace RoomAir
 
 struct DisplacementVentMgrData : BaseGlobalStruct
 {

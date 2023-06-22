@@ -806,12 +806,12 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createZoneExtendedOutput)
     ventilationData1->SchedPtr = 1;
     ventilationData1->DesignLevel = 2;
 
-    auto const roomAirModelData0 = std::make_unique<DataRoomAirModel::AirModelData>();
+    auto const roomAirModelData0 = std::make_unique<RoomAir::AirModelData>();
     roomAirModelData0->Name = "test roomAirModel 1";
-    auto const roomAirModelData1 = std::make_unique<DataRoomAirModel::AirModelData>();
+    auto const roomAirModelData1 = std::make_unique<RoomAir::AirModelData>();
     roomAirModelData1->Name = "test roomAirModel 2";
-    roomAirModelData1->AirModel = DataRoomAirModel::RoomAirModel::Mundt;
-    roomAirModelData1->TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct; // hmm this was set to 3 which wasn't a valid option
+    roomAirModelData1->AirModel = RoomAir::RoomAirModel::Mundt;
+    roomAirModelData1->TempCoupleScheme = RoomAir::CouplingScheme::Direct; // hmm this was set to 3 which wasn't a valid option
     roomAirModelData1->SimAirModel = true;
 
     std::string const alwaysOn("always on");

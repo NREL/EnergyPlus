@@ -64,8 +64,7 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DisplacementVentMgr;
-using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::RoomAir;
 
 TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 {
@@ -165,7 +164,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataSurface->SurfTAirRefRpt.dimension(TotSurfaces, 0);
 
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAirMod->AirModel(1).AirModel = DataRoomAirModel::RoomAirModel::UCSDDV;
+    state->dataRoomAirMod->AirModel(1).AirModel = RoomAir::RoomAirModel::UCSDDV;
 
     state->dataUCSDShared->APos_Wall.allocate(TotSurfaces);
     state->dataUCSDShared->APos_Floor.allocate(TotSurfaces);

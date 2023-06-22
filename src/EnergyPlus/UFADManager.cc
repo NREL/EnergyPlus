@@ -75,7 +75,9 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus::UFADManager {
+namespace EnergyPlus {
+
+namespace RoomAir {
 
 // Module containing the routines dealing with the UnderFloor Air
 // Distribution zone model
@@ -83,8 +85,6 @@ namespace EnergyPlus::UFADManager {
 // MODULE INFORMATION:
 //       AUTHOR         Fred Buhl
 //       DATE WRITTEN   August 2005
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // Encapsulate the routines that do the simulation of the UCSD UFAD non-uniform
@@ -106,12 +106,11 @@ using namespace DataEnvironment;
 using namespace DataHeatBalance;
 using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
-using namespace DataRoomAirModel;
 using Convect::CalcDetailedHcInForDVModel;
 
 void ManageUCSDUFModels(EnergyPlusData &state,
                         int const ZoneNum,                                 // index number for the specified zone
-                        DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+                        RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
 )
 {
 
@@ -135,7 +134,6 @@ void ManageUCSDUFModels(EnergyPlusData &state,
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
-    using namespace DataRoomAirModel;
     using Convect::CalcDetailedHcInForDVModel;
 
     // input was obtained in RoomAirManager, GetUFADIntZoneData
@@ -143,11 +141,11 @@ void ManageUCSDUFModels(EnergyPlusData &state,
     InitUCSDUF(state, ZoneNum, ZoneModelType); // initialize some module variables
 
     switch (ZoneModelType) {
-    case DataRoomAirModel::RoomAirModel::UCSDUFI: { // UCSD UFAD interior zone model
+    case RoomAirModel::UCSDUFI: { // UCSD UFAD interior zone model
         // simulate room airflow using the UCSDUFI model
         CalcUCSDUI(state, ZoneNum);
     } break;
-    case DataRoomAirModel::RoomAirModel::UCSDUFE: { // UCSD UFAD interior zone model
+    case RoomAirModel::UCSDUFE: { // UCSD UFAD interior zone model
         // simulate room airflow using the UCSDUFI model
         CalcUCSDUE(state, ZoneNum);
     } break;
@@ -158,7 +156,7 @@ void ManageUCSDUFModels(EnergyPlusData &state,
 
 void InitUCSDUF(EnergyPlusData &state,
                 int const ZoneNum,
-                DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+                RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
 )
 {
 
@@ -209,7 +207,7 @@ void InitUCSDUF(EnergyPlusData &state,
             }
         }
     }
-    if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+    if (ZoneModelType == RoomAirModel::UCSDUFE) {
         UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
         if (state.dataRoomAirMod->ZoneUCSDUE(UINum).NumExtWin > 1.0) {
             if (NumShadesDown / state.dataRoomAirMod->ZoneUCSDUE(UINum).NumExtWin >= 0.5) {
@@ -225,7 +223,7 @@ void InitUCSDUF(EnergyPlusData &state,
 
 void SizeUCSDUF(EnergyPlusData &state,
                 int const ZoneNum,
-                DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+                RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
 )
 {
 
@@ -252,7 +250,7 @@ void SizeUCSDUF(EnergyPlusData &state,
     Real64 ZoneHWEqConv(0.0);      // zone hot water equip design convective gain [W]
     Real64 ZoneSteamEqConv(0.0);   // zone steam equip design convective gain [W]
 
-    if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFI) {
+    if (ZoneModelType == RoomAirModel::UCSDUFI) {
         UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
         NumberOfOccupants = 0.0;
         for (int Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
@@ -442,7 +440,7 @@ void SizeUCSDUF(EnergyPlusData &state,
         }
     }
 
-    if (ZoneModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
+    if (ZoneModelType == RoomAirModel::UCSDUFE) {
         UINum = state.dataRoomAirMod->ZoneUFPtr(ZoneNum);
         // calculate total window width in zone
         for (int Ctd = state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= state.dataUCSDShared->PosZ_Window((ZoneNum - 1) * 2 + 2);
@@ -2035,4 +2033,5 @@ void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for th
     }
 }
 
-} // namespace EnergyPlus::UFADManager
+} // namespace RoomAir 
+} // namespace EnergyPlus

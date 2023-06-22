@@ -129,7 +129,7 @@ constexpr std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> ai
 constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::VentilationType::Num)> ventilationTypeNamesUC = {
     "NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
 
-constexpr std::array<std::string_view, static_cast<int>(DataRoomAirModel::RoomAirModel::Num)> roomAirModelNamesUC = {
+constexpr std::array<std::string_view, static_cast<int>(RoomAir::RoomAirModel::Num)> roomAirModelNamesUC = {
     "USERDEFINED",
     "MIXING",
     "ONENODEDISPLACEMENTVENTILATION",
@@ -139,7 +139,7 @@ constexpr std::array<std::string_view, static_cast<int>(DataRoomAirModel::RoomAi
     "UNDERFLOORAIRDISTRIBUTIONEXTERIOR",
     "AIRFLOWNETWORK"};
 
-constexpr std::array<std::string_view, static_cast<int>(DataRoomAirModel::CouplingScheme::Num)> couplingSchemeNamesUC = {"DIRECT", "INDIRECT"};
+constexpr std::array<std::string_view, static_cast<int>(RoomAir::CouplingScheme::Num)> couplingSchemeNamesUC = {"DIRECT", "INDIRECT"};
 
 void ManageAirHeatBalance(EnergyPlusData &state)
 {
@@ -4614,13 +4614,13 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
 
             // state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAirMod->AirModel(ZoneNum).AirModel =
-                    static_cast<DataRoomAirModel::RoomAirModel>(getEnumValue(roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3))); // is this arg1 or arg3?
+                    static_cast<RoomAir::RoomAirModel>(getEnumValue(roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3))); // is this arg1 or arg3?
             switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModel) {
-            case DataRoomAirModel::RoomAirModel::Mixing:
+            case RoomAir::RoomAirModel::Mixing:
                 // nothing to do here actually
                 break;
 
-            case DataRoomAirModel::RoomAirModel::Mundt:
+            case RoomAir::RoomAirModel::Mundt:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->MundtModelUsed = true;
                 IsNotOK = false;
@@ -4636,7 +4636,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case DataRoomAirModel::RoomAirModel::UCSDDV:
+            case RoomAir::RoomAirModel::UCSDDV:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 IsNotOK = false;
@@ -4652,7 +4652,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case DataRoomAirModel::RoomAirModel::UCSDCV:
+            case RoomAir::RoomAirModel::UCSDCV:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 IsNotOK = false;
@@ -4668,7 +4668,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case DataRoomAirModel::RoomAirModel::UCSDUFI:
+            case RoomAir::RoomAirModel::UCSDUFI:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 ValidateComponent(state,
@@ -4683,7 +4683,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case DataRoomAirModel::RoomAirModel::UCSDUFE:
+            case RoomAir::RoomAirModel::UCSDUFE:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UCSDModelUsed = true;
                 ValidateComponent(state,
@@ -4698,12 +4698,12 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 }
                 break;
 
-            case DataRoomAirModel::RoomAirModel::UserDefined:
+            case RoomAir::RoomAirModel::UserDefined:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 state.dataRoomAirMod->UserDefinedUsed = true;
                 break;
 
-            case DataRoomAirModel::RoomAirModel::AirflowNetwork:
+            case RoomAir::RoomAirModel::AirflowNetwork:
                 state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                 if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
                     ShowSevereError(state,
@@ -4723,16 +4723,16 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                 ShowWarningError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("The mixing air model will be used for Zone ={}", state.dataIPShortCut->cAlphaArgs(2)));
-                state.dataRoomAirMod->AirModel(ZoneNum).AirModel = DataRoomAirModel::RoomAirModel::Mixing;
+                state.dataRoomAirMod->AirModel(ZoneNum).AirModel = RoomAir::RoomAirModel::Mixing;
             }
 
             state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme =
-                static_cast<DataRoomAirModel::CouplingScheme>(getEnumValue(couplingSchemeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
-            if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == DataRoomAirModel::CouplingScheme::Invalid) {
+                static_cast<RoomAir::CouplingScheme>(getEnumValue(couplingSchemeNamesUC, state.dataIPShortCut->cAlphaArgs(4)));
+            if (state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme == RoomAir::CouplingScheme::Invalid) {
                 ShowWarningError(state, format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4)));
                 ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("The direct coupling scheme will be used for Zone ={}", state.dataIPShortCut->cAlphaArgs(2)));
-                state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
+                state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = RoomAir::CouplingScheme::Direct;
             }
 
         } else { // Zone Not Found
@@ -4747,7 +4747,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
         state.dataRoomAirMod->AirModel(ZoneNum).Name = "MIXING AIR MODEL FOR " + state.dataHeatBal->Zone(ZoneNum).Name;
         state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = state.dataHeatBal->Zone(ZoneNum).Name;
         // set global flag for non-mixing model
-        if (state.dataRoomAirMod->AirModel(ZoneNum).AirModel != DataRoomAirModel::RoomAirModel::Mixing) {
+        if (state.dataRoomAirMod->AirModel(ZoneNum).AirModel != RoomAir::RoomAirModel::Mixing) {
             state.dataRoomAirMod->anyNonMixingRoomAirModel = true;
         }
     }
@@ -4763,38 +4763,16 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
     static constexpr std::string_view RoomAirHeader("! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined\n");
     print(state.files.eio, RoomAirHeader);
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        {
-            static constexpr std::string_view RoomAirZoneFmt("RoomAir Model,{},{}\n");
-
-            switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModel) {
-            case DataRoomAirModel::RoomAirModel::Mixing: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "Mixing/Well-Stirred");
-            } break;
-            case DataRoomAirModel::RoomAirModel::Mundt: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "OneNodeDisplacementVentilation");
-            } break;
-            case DataRoomAirModel::RoomAirModel::UCSDDV: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "ThreeNodeDisplacementVentilation");
-            } break;
-            case DataRoomAirModel::RoomAirModel::UCSDCV: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "CrossVentilation");
-            } break;
-            case DataRoomAirModel::RoomAirModel::UCSDUFI: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UnderFloorAirDistributionInterior");
-            } break;
-            case DataRoomAirModel::RoomAirModel::UCSDUFE: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UnderFloorAirDistributionExterior");
-            } break;
-            case DataRoomAirModel::RoomAirModel::UserDefined: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "UserDefined");
-            } break;
-            case DataRoomAirModel::RoomAirModel::AirflowNetwork: {
-                print(state.files.eio, RoomAirZoneFmt, state.dataHeatBal->Zone(ZoneNum).Name, "AirflowNetwork");
-            } break;
-            default:
-                break;
-            }
-        }
+        static constexpr std::array<std::string_view, (int)RoomAir::RoomAirModel::Num> roomAirModelStrings = {
+            "UserDefined", "Mixing/Well-Stirred",
+            "OneNodeDisplacementVentilation", "ThreeNodeDisplacementVentilation",
+            "CrossVentilation",
+            "UnderFloorAirDistributionInterior", "UnderFloorAirDistributionExterior",
+            "AirflowNetwork"};
+        
+        print(state.files.eio, "RoomAir Model,{},{}\n",
+              state.dataHeatBal->Zone(ZoneNum).Name,
+              roomAirModelStrings[(int)state.dataRoomAirMod->AirModel(ZoneNum).AirModel]);
     }
 
     if (ErrorsFound) {

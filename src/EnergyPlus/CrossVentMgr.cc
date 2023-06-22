@@ -73,7 +73,7 @@
 
 namespace EnergyPlus {
 
-namespace CrossVentMgr {
+namespace RoomAir {
 
     // MODULE INFORMATION:
     //       AUTHOR         G. Carrilho da Graca
@@ -86,7 +86,6 @@ namespace CrossVentMgr {
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
-    using namespace DataRoomAirModel;
     using Convect::CalcDetailedHcInForDVModel;
 
     Real64 constexpr Cjet1(1.873);     // First correlation constant for the jet velocity
@@ -725,7 +724,7 @@ namespace CrossVentMgr {
                     if (state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
                     } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum).AirModel ==
-                               DataRoomAirModel::RoomAirModel::UCSDCV) {
+                               RoomAir::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
                             state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum1).EPlusZoneNum);
                     } else {
@@ -738,7 +737,7 @@ namespace CrossVentMgr {
                     if (state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum <= 0) {
                         state.dataRoomAirMod->Tin(ZoneNum) = state.dataSurface->SurfOutDryBulbTemp(surfNum);
                     } else if (state.dataRoomAirMod->AirModel(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum).AirModel ==
-                               DataRoomAirModel::RoomAirModel::UCSDCV) {
+                               RoomAir::RoomAirModel::UCSDCV) {
                         state.dataRoomAirMod->Tin(ZoneNum) =
                             state.dataRoomAirMod->RoomOutflowTemp(state.afn->AirflowNetworkNodeData(NodeNum2).EPlusZoneNum);
                     } else {
@@ -748,10 +747,10 @@ namespace CrossVentMgr {
                 }
             } else if ((thisSurface.Zone == ZoneNum) &&
                        (state.dataRoomAirMod->AirModel(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone).AirModel ==
-                        DataRoomAirModel::RoomAirModel::UCSDCV)) {
+                        RoomAir::RoomAirModel::UCSDCV)) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(state.dataSurface->Surface(thisSurface.ExtBoundCond).Zone);
             } else if ((thisSurface.Zone != ZoneNum) &&
-                       (state.dataRoomAirMod->AirModel(thisSurface.Zone).AirModel == DataRoomAirModel::RoomAirModel::UCSDCV)) {
+                       (state.dataRoomAirMod->AirModel(thisSurface.Zone).AirModel == RoomAir::RoomAirModel::UCSDCV)) {
                 state.dataRoomAirMod->Tin(ZoneNum) = state.dataRoomAirMod->RoomOutflowTemp(surfNum);
             } else {
                 if (thisSurface.Zone == ZoneNum) {
@@ -914,6 +913,6 @@ namespace CrossVentMgr {
         }
     }
 
-} // namespace CrossVentMgr
+} // namespace RoomAir
 
 } // namespace EnergyPlus

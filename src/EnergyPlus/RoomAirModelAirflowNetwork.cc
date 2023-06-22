@@ -91,13 +91,12 @@
 
 namespace EnergyPlus {
 
-namespace RoomAirModelAirflowNetwork {
+namespace RoomAir {
 
     // MODULE INFORMATION:
     //       AUTHOR         Brent Griffith
     //       DATE WRITTEN   November 2009
     //       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // contains the RoomAir model portions of RoomAirflowNetwork modeling
@@ -107,7 +106,6 @@ namespace RoomAirModelAirflowNetwork {
     // Do heat and moisture balance calculations on roomair nodes.
 
     // Using/Aliasing
-    using namespace DataRoomAirModel;
     using namespace DataHeatBalSurface;
     using namespace DataSurfaces;
     using namespace DataHeatBalance;
@@ -123,19 +121,12 @@ namespace RoomAirModelAirflowNetwork {
         //       AUTHOR         Brent Griffith
         //       DATE WRITTEN   January 2004/Aug 2005
         //       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages RoomAirflowNetwork model simulation
 
         // METHODOLOGY EMPLOYED:
-        // calls subroutines
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
+        // calls subroutines (LOL)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ThisRoomAirNode;
@@ -225,7 +216,7 @@ namespace RoomAirModelAirflowNetwork {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2009
-        //       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 replease
+        //       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 release
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -1417,6 +1408,6 @@ namespace RoomAirModelAirflowNetwork {
 
     //*****************************************************************************************
 
-} // namespace RoomAirModelAirflowNetwork
+} // namespace RoomAir
 
 } // namespace EnergyPlus

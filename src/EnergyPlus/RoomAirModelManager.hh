@@ -57,7 +57,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace RoomAirModelManager {
+namespace RoomAir {
 
     void ManageAirModel(EnergyPlusData &state, int const ZoneNum);
 
@@ -92,7 +92,7 @@ namespace RoomAirModelManager {
                         int TotNumEquip,              // how many of this equipment type
                         DataZoneEquipment::ZoneEquipType zoneEquipType);                 // equipment type number
 
-} // namespace RoomAirModelManager
+} // namespace RoomAir
 
 struct RoomAirModelManagerData : BaseGlobalStruct
 {

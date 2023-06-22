@@ -57,21 +57,21 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace UFADManager {
+namespace RoomAir {
 
     void ManageUCSDUFModels(EnergyPlusData &state,
                             int const ZoneNum,                                 // index number for the specified zone
-                            DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+                            RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
     void InitUCSDUF(EnergyPlusData &state,
                     int const ZoneNum,
-                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+                    RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
     void SizeUCSDUF(EnergyPlusData &state,
                     int const ZoneNum,
-                    DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+                    RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
     void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
@@ -80,7 +80,7 @@ namespace UFADManager {
 
     void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
-} // namespace UFADManager
+} // namespace RoomAir
 
 struct UFADManagerData : BaseGlobalStruct
 {

@@ -93,7 +93,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
-using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::RoomAir;
 using namespace EnergyPlus::HybridModel;
 using namespace EnergyPlus::DataPrecisionGlobals;
 

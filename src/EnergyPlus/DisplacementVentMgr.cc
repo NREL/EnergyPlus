@@ -74,7 +74,9 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus::DisplacementVentMgr {
+namespace EnergyPlus {
+
+namespace RoomAir {
 
 // MODULE INFORMATION:
 //       AUTHOR         G. Carrilho da Graca
@@ -91,7 +93,6 @@ using namespace DataEnvironment;
 using namespace DataHeatBalance;
 using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
-using namespace DataRoomAirModel;
 using Convect::CalcDetailedHcInForDVModel;
 
 void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
@@ -100,8 +101,6 @@ void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number
     // SUBROUTINE INFORMATION:
     //       AUTHOR         G. Carrilho da Graca
     //       DATE WRITTEN   February 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     //   manage the UCSD Displacement Ventilation model
@@ -611,22 +610,22 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         }
     }
 
-    ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesOccupied);
+    ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
     ConvGainsOccupiedSubzone += 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (zone.NoHeatToReturnAir) {
-        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesOccupied);
+        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
         ConvGainsOccupiedSubzone += RetAirGain;
     }
 
-    ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
+    ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
     ConvGainsMixedSubzone +=
         state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) + 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
     if (zone.NoHeatToReturnAir) {
-        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, DisplacementVentMgr::IntGainTypesMixedSubzone);
+        RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
         ConvGainsMixedSubzone += RetAirGain;
     }
 
@@ -1121,4 +1120,5 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
     }
 }
 
-} // namespace EnergyPlus::DisplacementVentMgr
+} // namespace RoomAir
+} // namespace EnergyPlus

@@ -61,13 +61,13 @@
 
 namespace EnergyPlus {
 
-namespace DataRoomAirModel {
+namespace RoomAir {
 
-    auto constexpr cUserDefinedControlObject("RoomAir:TemperaturePattern:UserDefined");
-    auto constexpr cTempPatternConstGradientObject("RoomAir:TemperaturePattern:ConstantGradient");
-    auto constexpr cTempPatternTwoGradientObject("RoomAir:TemperaturePattern:TwoGradient");
-    auto constexpr cTempPatternNDHeightObject("RoomAir:TemperaturePattern:NondimensionalHeight");
-    auto constexpr cTempPatternSurfMapObject("RoomAir:TemperaturePattern:SurfaceMapping");
+    constexpr std::string_view cUserDefinedControlObject("RoomAir:TemperaturePattern:UserDefined");
+    constexpr std::string_view cTempPatternConstGradientObject("RoomAir:TemperaturePattern:ConstantGradient");
+    constexpr std::string_view cTempPatternTwoGradientObject("RoomAir:TemperaturePattern:TwoGradient");
+    constexpr std::string_view cTempPatternNDHeightObject("RoomAir:TemperaturePattern:NondimensionalHeight");
+    constexpr std::string_view cTempPatternSurfMapObject("RoomAir:TemperaturePattern:SurfaceMapping");
 
     // Parameters to indicate room air model selected
     enum class RoomAirModel : int
@@ -537,7 +537,7 @@ namespace DataRoomAirModel {
         int RAFNNum = 0;                                         // RAFN number
     };
 
-} // namespace DataRoomAirModel
+} // namespace RoomAir
 
 struct RoomAirModelData : BaseGlobalStruct
 {
@@ -668,17 +668,17 @@ struct RoomAirModelData : BaseGlobalStruct
     int NumOfRoomAirflowNetControl = 0; // count of RoomAirSettings:AirflowNetwork
 
     // Object Data
-    Array1D<DataRoomAirModel::AirModelData> AirModel;
-    Array1D<DataRoomAirModel::AirNodeData> AirNode;
-    Array1D<DataRoomAirModel::DVData> ZoneUCSDDV; // UCSD
-    Array1D<DataRoomAirModel::CVData> ZoneUCSDCV;
-    Array1D<DataRoomAirModel::UFIData> ZoneUCSDUI;
-    Array1D<DataRoomAirModel::UFEData> ZoneUCSDUE;
-    Array2D<DataRoomAirModel::CVFlow> CVJetRecFlows;                                          // Jet and recirculation zone flows and properties
-    Array1D<DataRoomAirModel::CVDVParameters> SurfParametersCVDV;                             // Surface parameters
-    Array1D<DataRoomAirModel::TemperaturePattern> RoomAirPattern;                       // user defined patterns ,various types
-    Array1D<DataRoomAirModel::AirPatternInfobyZone> AirPatternZoneInfo;                 // added zone information for user defined patterns
-    Array1D<DataRoomAirModel::RoomAFNInfoByZone> RoomAirflowNetworkZoneInfo; // added zone info
+    Array1D<RoomAir::AirModelData> AirModel;
+    Array1D<RoomAir::AirNodeData> AirNode;
+    Array1D<RoomAir::DVData> ZoneUCSDDV; // UCSD
+    Array1D<RoomAir::CVData> ZoneUCSDCV;
+    Array1D<RoomAir::UFIData> ZoneUCSDUI;
+    Array1D<RoomAir::UFEData> ZoneUCSDUE;
+    Array2D<RoomAir::CVFlow> CVJetRecFlows;                                          // Jet and recirculation zone flows and properties
+    Array1D<RoomAir::CVDVParameters> SurfParametersCVDV;                             // Surface parameters
+    Array1D<RoomAir::TemperaturePattern> RoomAirPattern;                       // user defined patterns ,various types
+    Array1D<RoomAir::AirPatternInfobyZone> AirPatternZoneInfo;                 // added zone information for user defined patterns
+    Array1D<RoomAir::RoomAFNInfoByZone> RoomAirflowNetworkZoneInfo; // added zone info
 
     void clear_state() override
     {

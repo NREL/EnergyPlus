@@ -57,7 +57,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace CrossVentMgr {
+namespace RoomAir {
 
     void ManageUCSDCVModel(EnergyPlusData &state, int ZoneNum);
 
@@ -69,7 +69,7 @@ namespace CrossVentMgr {
 
     void CalcUCSDCV(EnergyPlusData &state, int ZoneNum);
 
-} // namespace CrossVentMgr
+} // namespace RoomAir
 
 struct CrossVentMgrData : BaseGlobalStruct
 {

@@ -62,37 +62,27 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace MundtSimMgr {
+namespace RoomAir {
 
     // Types
 
     struct DefineLinearModelNode
     {
         // Members
-        std::string AirNodeName;                 // Name of air nodes
-        DataRoomAirModel::AirNodeType ClassType; // Type of air nodes
-        Real64 Height;                           // Z coordinates [m] node's Control Vol. center
-        Real64 Temp;                             // Surface temperature BC
+        std::string AirNodeName = "";                 // Name of air nodes
+        RoomAir::AirNodeType ClassType = RoomAir::AirNodeType::Invalid; // Type of air nodes
+        Real64 Height = 0.0;                           // Z coordinates [m] node's Control Vol. center
+        Real64 Temp = 0.0;                             // Surface temperature BC
         Array1D_bool SurfMask;                   // Limit of 60 surfaces at current sizing
-
-        // Default Constructor
-        DefineLinearModelNode() : ClassType(DataRoomAirModel::AirNodeType::Invalid), Height(0.0), Temp(0.0)
-        {
-        }
     };
 
     struct DefineSurfaceSettings
     {
         // Members
-        Real64 Area;     // m2
-        Real64 Temp;     // surface temperature BC
-        Real64 Hc;       // convective film coeff BC
-        Real64 TMeanAir; // effective near-surface air temp from air model solution
-
-        // Default Constructor
-        DefineSurfaceSettings() : Area(0.0), Temp(0.0), Hc(0.0), TMeanAir(0.0)
-        {
-        }
+        Real64 Area = 0.0;     // m2
+        Real64 Temp = 0.0;     // surface temperature BC
+        Real64 Hc = 0.0;       // convective film coeff BC
+        Real64 TMeanAir = 0.0; // effective near-surface air temp from air model solution
     };
 
     struct DefineZoneData
@@ -146,7 +136,7 @@ namespace MundtSimMgr {
 
     //*****************************************************************************************
 
-} // namespace MundtSimMgr
+} // namespace RoomAir
 
 struct MundtSimMgrData : BaseGlobalStruct
 {
@@ -173,10 +163,10 @@ struct MundtSimMgrData : BaseGlobalStruct
     Real64 QsysCoolTot = 0.0;         // zone sensible cooling load
 
     // Object Data
-    Array1D<MundtSimMgr::DefineZoneData> ZoneData;            // zone data
-    Array2D<MundtSimMgr::DefineLinearModelNode> LineNode;     // air nodes
-    Array2D<MundtSimMgr::DefineSurfaceSettings> MundtAirSurf; // surfaces
-    Array1D<MundtSimMgr::DefineSurfaceSettings> FloorSurf;    // floor
+    Array1D<RoomAir::DefineZoneData> ZoneData;            // zone data
+    Array2D<RoomAir::DefineLinearModelNode> LineNode;     // air nodes
+    Array2D<RoomAir::DefineSurfaceSettings> MundtAirSurf; // surfaces
+    Array1D<RoomAir::DefineSurfaceSettings> FloorSurf;    // floor
 
     void clear_state() override
     {

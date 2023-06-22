@@ -89,20 +89,16 @@
 
 namespace EnergyPlus {
 
-namespace RoomAirModelManager {
+namespace RoomAir {
 
     // MODULE INFORMATION
     //       AUTHOR         Weixiu Kong
     //       DATE WRITTEN   March 2003
     //       MODIFIED       July 2003, CC
     //                      Aug, 2005, BG
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // Contains subroutines for managing the room air models
-
-    // Using/Aliasing
-    using namespace DataRoomAirModel;
 
     constexpr std::array<std::string_view, (int)RoomAirModel::Num> roomAirModelNamesUC =
         { "USERDEFINED", "MIXING", "MUNDT", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AIRFLOWNETWORK"};
@@ -119,7 +115,7 @@ namespace RoomAirModelManager {
     constexpr std::array<std::string_view, (int)UserDefinedPatternMode::Num> userDefinedPatternModeNamesUC =
         {"OUTDOORDRYBULBTEMPERATURE", "SENSIBLECOOLINGLOAD", "SENSIBLEHEATINGLOAD", "ZONEDRYBULBTEMPERATURE", "ZONEANDOUTDOORTEMPERATUREDIFFERENCE"};
 
-     void ManageAirModel(EnergyPlusData &state, int const ZoneNum)
+    void ManageAirModel(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -127,7 +123,6 @@ namespace RoomAirModelManager {
         //       DATE WRITTEN   April 2003
         //       MODIFIED       July 2003, CC
         //                      Jan 2004, CC
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         //     manage room air models.
@@ -145,7 +140,7 @@ namespace RoomAirModelManager {
 
         switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModel) {
         case RoomAirModel::UserDefined:
-            RoomAirModelUserTempPattern::ManageUserDefinedPatterns(state, ZoneNum);
+            ManageUserDefinedPatterns(state, ZoneNum);
             break;
 
         case RoomAirModel::Mixing: // Mixing air model
@@ -153,32 +148,32 @@ namespace RoomAirModelManager {
 
         case RoomAirModel::Mundt: // Mundt air model
             // simulate room airflow using Mundt model
-            MundtSimMgr::ManageMundtModel(state, ZoneNum);
+            ManageMundtModel(state, ZoneNum);
             break;
 
         case RoomAirModel::UCSDDV: // UCDV Displacement Ventilation model
             // simulate room airflow using UCSDDV model
-            DisplacementVentMgr::ManageUCSDDVModel(state, ZoneNum);
+            ManageUCSDDVModel(state, ZoneNum);
             break;
 
         case RoomAirModel::UCSDCV: // UCSD Cross Ventilation model
             // simulate room airflow using UCSDDV model
-            CrossVentMgr::ManageUCSDCVModel(state, ZoneNum);
+            ManageUCSDCVModel(state, ZoneNum);
             break;
 
         case RoomAirModel::UCSDUFI: // UCSD UFAD interior zone model
             // simulate room airflow using the UCSDUFI model
-            UFADManager::ManageUCSDUFModels(state, ZoneNum, RoomAirModel::UCSDUFI);
+            ManageUCSDUFModels(state, ZoneNum, RoomAirModel::UCSDUFI);
             break;
 
         case RoomAirModel::UCSDUFE: // UCSD UFAD exterior zone model
             // simulate room airflow using the UCSDUFE model
-            UFADManager::ManageUCSDUFModels(state, ZoneNum, RoomAirModel::UCSDUFE);
+            ManageUCSDUFModels(state, ZoneNum, RoomAirModel::UCSDUFE);
             break;
 
         case RoomAirModel::AirflowNetwork: // RoomAirflowNetwork zone model
             // simulate room airflow using the AirflowNetwork - based model
-            RoomAirModelAirflowNetwork::SimRoomAirModelAirflowNetwork(state, ZoneNum);
+            SimRoomAirModelAirflowNetwork(state, ZoneNum);
             break;
 
         default:   // mixing air model
@@ -251,7 +246,6 @@ namespace RoomAirModelManager {
         // Using/Aliasing
         using DataZoneEquipment::EquipConfiguration;
 
-        using RoomAirModelUserTempPattern::FigureNDheightInZone;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -3034,6 +3028,6 @@ namespace RoomAirModelManager {
 
     //*****************************************************************************************
 
-} // namespace RoomAirModelManager
+} // namespace RoomAir
 
 } // namespace EnergyPlus

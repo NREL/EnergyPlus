@@ -2239,7 +2239,7 @@ void SQLite::addVentilationData(int const number, DataHeatBalance::VentilationDa
 {
     ventilations.push_back(std::make_unique<Ventilation>(m_errorStream, m_db, number, ventilationData));
 }
-void SQLite::addRoomAirModelData(int const number, DataRoomAirModel::AirModelData const &roomAirModelData)
+void SQLite::addRoomAirModelData(int const number, RoomAir::AirModelData const &roomAirModelData)
 {
     roomAirModels.push_back(std::make_unique<RoomAirModel>(m_errorStream, m_db, number, roomAirModelData));
 }
