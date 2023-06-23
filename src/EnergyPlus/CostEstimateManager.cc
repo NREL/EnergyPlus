@@ -884,7 +884,7 @@ namespace CostEstimateManager {
             case ParentObject::DaylightingControls: {
                 if (state.dataCostEstimateManager->CostLineItem(Item).ParentObjName == "*") { // wildcard, apply to all such components
                     state.dataCostEstimateManager->CostLineItem(Item).Qty =
-                        sum(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::totRefPts);
+                        sum(state.dataDaylightingData->ZoneDaylight, &Dayltg::ZoneDaylightCalc::totRefPts);
                 } else if (!state.dataCostEstimateManager->CostLineItem(Item).ParentObjName.empty()) {
                     ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                     if (ThisZoneID > 0) {

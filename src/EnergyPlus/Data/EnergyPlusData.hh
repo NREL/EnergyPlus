@@ -283,7 +283,6 @@ struct TARCOGGasses90Data;
 struct TARCOGMainData;
 struct TarcogShadingData;
 struct TranspiredCollectorData;
-struct UCSDSharedData;
 struct UFADManagerData;
 struct UnitHeatersData;
 struct UnitVentilatorsData;
@@ -542,7 +541,6 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<TARCOGMainData> dataTARCOGMain;
     std::unique_ptr<TarcogShadingData> dataTarcogShading;
     std::unique_ptr<TranspiredCollectorData> dataTranspiredCollector;
-    std::unique_ptr<UCSDSharedData> dataUCSDShared;
     std::unique_ptr<UFADManagerData> dataUFADManager;
     std::unique_ptr<UnitHeatersData> dataUnitHeaters;
     std::unique_ptr<UnitVentilatorsData> dataUnitVentilators;

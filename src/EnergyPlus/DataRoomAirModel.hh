@@ -534,8 +534,12 @@ namespace RoomAir {
         int RAFNNum = 0;                                         // RAFN number
     };
 
+    struct BegEnd {
+        int beg = 0;
+        int end = 0;
+    };
 } // namespace RoomAir
-
+        
 struct RoomAirModelData : BaseGlobalStruct
 {
     bool anyNonMixingRoomAirModel = false; // True if any zone RoomAirModelType is not Mixing
@@ -612,6 +616,32 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> Zone1MX;     // [C] difference equation's Mixed  air temp at previous dt
     Array1D<Real64> ZoneMXMX;    // [C] difference equation's Mixed  air temp at t minus 1
     Array1D<Real64> ZoneM2MX;    // [C] difference equation's Mixed  air temp at t minus 2
+
+    // UCSD-Shared
+    // The Eplus surface numbers will be stored in the arrays Apos according to the
+    // type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
+    // for each zone it has 2 positions: the start and end positions in the Apos_Wall array
+    // for that specific zone.
+    Array1D_int APos_Wall;
+    Array1D_int APos_Floor;
+    Array1D_int APos_Ceiling;
+    Array1D<RoomAir::BegEnd> PosZ_Wall;
+    Array1D<RoomAir::BegEnd> PosZ_Floor;
+    Array1D<RoomAir::BegEnd> PosZ_Ceiling;
+    Array1D_int APos_Window;
+    Array1D_int APos_Door;
+    Array1D_int APos_Internal;
+    Array1D<RoomAir::BegEnd> PosZ_Window;
+    Array1D<RoomAir::BegEnd> PosZ_Door;
+    Array1D<RoomAir::BegEnd> PosZ_Internal;
+    // Convection coefficients for the various surfaces
+    Array1D<Real64> HCeiling;
+    Array1D<Real64> HWall;
+    Array1D<Real64> HFloor;
+    Array1D<Real64> HInternal;
+    Array1D<Real64> HWindow;
+    Array1D<Real64> HDoor;
+
     // UCSD-CV
     int TotCrossVent = 0;                   // Total number of UCSDDV zones
     int CrossVentNumAFNSurfaces = 0; // total number of AirFlowNetwork surfaces.
@@ -687,6 +717,26 @@ struct RoomAirModelData : BaseGlobalStruct
         ConvectiveFloorSplit.clear();
         InfiltratFloorSplit.clear();
         // UCSD
+        APos_Wall.clear();
+        APos_Floor.clear();
+        APos_Ceiling.clear();
+        PosZ_Wall.clear();
+        PosZ_Floor.clear();
+        PosZ_Ceiling.clear();
+        APos_Window.clear();
+        APos_Door.clear();
+        APos_Internal.clear();
+        PosZ_Window.clear();
+        PosZ_Door.clear();
+        PosZ_Internal.clear();
+        // Convection coeficients for the various surfaces
+        HCeiling.clear();
+        HWall.clear();
+        HFloor.clear();
+        HInternal.clear();
+        HWindow.clear();
+        HDoor.clear();
+
         TotDispVent3Node = 0; // Total number of UCSDDV zones
         DispVent3NodeHcIn.clear();
         IsZoneDispVent3Node.clear();     // Is the air model for the zone UCSDDV?

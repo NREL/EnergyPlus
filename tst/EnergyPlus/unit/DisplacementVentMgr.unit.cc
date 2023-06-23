@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 
@@ -166,24 +165,24 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->AirModel(1).AirModel = RoomAir::RoomAirModel::DispVent3Node;
 
-    state->dataUCSDShared->APos_Wall.allocate(TotSurfaces);
-    state->dataUCSDShared->APos_Floor.allocate(TotSurfaces);
-    state->dataUCSDShared->APos_Ceiling.allocate(TotSurfaces);
-    state->dataUCSDShared->PosZ_Wall.allocate(state->dataGlobal->NumOfZones);
-    state->dataUCSDShared->PosZ_Floor.allocate(state->dataGlobal->NumOfZones);
-    state->dataUCSDShared->PosZ_Ceiling.allocate(state->dataGlobal->NumOfZones);
-    state->dataUCSDShared->APos_Window.allocate(TotSurfaces);
-    state->dataUCSDShared->APos_Door.allocate(TotSurfaces);
-    state->dataUCSDShared->APos_Internal.allocate(TotSurfaces);
-    state->dataUCSDShared->PosZ_Window.allocate(state->dataGlobal->NumOfZones);
-    state->dataUCSDShared->PosZ_Door.allocate(state->dataGlobal->NumOfZones);
-    state->dataUCSDShared->PosZ_Internal.allocate(state->dataGlobal->NumOfZones);
-    state->dataUCSDShared->HCeiling.allocate(TotSurfaces);
-    state->dataUCSDShared->HWall.allocate(TotSurfaces);
-    state->dataUCSDShared->HFloor.allocate(TotSurfaces);
-    state->dataUCSDShared->HInternal.allocate(TotSurfaces);
-    state->dataUCSDShared->HWindow.allocate(TotSurfaces);
-    state->dataUCSDShared->HDoor.allocate(TotSurfaces);
+    state->dataRoomAirMod->APos_Wall.allocate(TotSurfaces);
+    state->dataRoomAirMod->APos_Floor.allocate(TotSurfaces);
+    state->dataRoomAirMod->APos_Ceiling.allocate(TotSurfaces);
+    state->dataRoomAirMod->PosZ_Wall.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->PosZ_Floor.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->PosZ_Ceiling.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->APos_Window.allocate(TotSurfaces);
+    state->dataRoomAirMod->APos_Door.allocate(TotSurfaces);
+    state->dataRoomAirMod->APos_Internal.allocate(TotSurfaces);
+    state->dataRoomAirMod->PosZ_Window.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->PosZ_Door.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->PosZ_Internal.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->HCeiling.allocate(TotSurfaces);
+    state->dataRoomAirMod->HWall.allocate(TotSurfaces);
+    state->dataRoomAirMod->HFloor.allocate(TotSurfaces);
+    state->dataRoomAirMod->HInternal.allocate(TotSurfaces);
+    state->dataRoomAirMod->HWindow.allocate(TotSurfaces);
+    state->dataRoomAirMod->HDoor.allocate(TotSurfaces);
 
     state->dataRoomAirMod->ZoneCeilingHeight1.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->ZoneCeilingHeight2.allocate(state->dataGlobal->NumOfZones);
@@ -191,38 +190,38 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataRoomAirMod->ZoneCeilingHeight2(1) = 4.9784;
 
     // Arrays initializations
-    state->dataUCSDShared->APos_Wall = 0;
-    state->dataUCSDShared->APos_Floor = 0;
-    state->dataUCSDShared->APos_Ceiling = 0;
-    state->dataUCSDShared->PosZ_Wall(1).beg = 1;
-    state->dataUCSDShared->PosZ_Wall(1).end = 0;
-    state->dataUCSDShared->PosZ_Floor(1).beg = 1;
-    state->dataUCSDShared->PosZ_Floor(1).end = 0;
-    state->dataUCSDShared->PosZ_Ceiling(1).beg = 1;
-    state->dataUCSDShared->PosZ_Ceiling(1).end = 0;
-    state->dataUCSDShared->APos_Window = 0;
-    state->dataUCSDShared->APos_Door = 0;
-    state->dataUCSDShared->APos_Internal = 0;
-    state->dataUCSDShared->PosZ_Window(1).beg = 1;
-    state->dataUCSDShared->PosZ_Window(1).end = 0;
-    state->dataUCSDShared->PosZ_Door(1).beg = 1;
-    state->dataUCSDShared->PosZ_Door(1).end = 3;
-    state->dataUCSDShared->PosZ_Internal(1).beg = 1;
-    state->dataUCSDShared->PosZ_Internal(1).end = 0;
-    state->dataUCSDShared->HCeiling = 0.0;
-    state->dataUCSDShared->HWall = 0.0;
-    state->dataUCSDShared->HFloor = 0.0;
-    state->dataUCSDShared->HInternal = 0.0;
-    state->dataUCSDShared->HWindow = 0.0;
-    state->dataUCSDShared->HDoor = 0.0;
+    state->dataRoomAirMod->APos_Wall = 0;
+    state->dataRoomAirMod->APos_Floor = 0;
+    state->dataRoomAirMod->APos_Ceiling = 0;
+    state->dataRoomAirMod->PosZ_Wall(1).beg = 1;
+    state->dataRoomAirMod->PosZ_Wall(1).end = 0;
+    state->dataRoomAirMod->PosZ_Floor(1).beg = 1;
+    state->dataRoomAirMod->PosZ_Floor(1).end = 0;
+    state->dataRoomAirMod->PosZ_Ceiling(1).beg = 1;
+    state->dataRoomAirMod->PosZ_Ceiling(1).end = 0;
+    state->dataRoomAirMod->APos_Window = 0;
+    state->dataRoomAirMod->APos_Door = 0;
+    state->dataRoomAirMod->APos_Internal = 0;
+    state->dataRoomAirMod->PosZ_Window(1).beg = 1;
+    state->dataRoomAirMod->PosZ_Window(1).end = 0;
+    state->dataRoomAirMod->PosZ_Door(1).beg = 1;
+    state->dataRoomAirMod->PosZ_Door(1).end = 3;
+    state->dataRoomAirMod->PosZ_Internal(1).beg = 1;
+    state->dataRoomAirMod->PosZ_Internal(1).end = 0;
+    state->dataRoomAirMod->HCeiling = 0.0;
+    state->dataRoomAirMod->HWall = 0.0;
+    state->dataRoomAirMod->HFloor = 0.0;
+    state->dataRoomAirMod->HInternal = 0.0;
+    state->dataRoomAirMod->HWindow = 0.0;
+    state->dataRoomAirMod->HDoor = 0.0;
 
     state->dataRoomAirMod->ZoneCrossVent.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->ZoneCrossVent(1).ZonePtr = 1;
-    state->dataUCSDShared->PosZ_Door(1).beg = 1;
-    state->dataUCSDShared->PosZ_Door(1).end = 3;
-    state->dataUCSDShared->APos_Door(1) = 1;
-    state->dataUCSDShared->APos_Door(2) = 2;
-    state->dataUCSDShared->APos_Door(3) = 3;
+    state->dataRoomAirMod->PosZ_Door(1).beg = 1;
+    state->dataRoomAirMod->PosZ_Door(1).end = 3;
+    state->dataRoomAirMod->APos_Door(1) = 1;
+    state->dataRoomAirMod->APos_Door(2) = 2;
+    state->dataRoomAirMod->APos_Door(3) = 3;
 
     state->dataRoomAirMod->ZTMX(1) = 20.0;
     state->dataRoomAirMod->ZTOC(1) = 21.0;
@@ -249,24 +248,24 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataRoomAirMod->ZTOC.deallocate();
     state->dataRoomAirMod->AirModel.deallocate();
 
-    state->dataUCSDShared->APos_Wall.deallocate();
-    state->dataUCSDShared->APos_Floor.deallocate();
-    state->dataUCSDShared->APos_Ceiling.deallocate();
-    state->dataUCSDShared->PosZ_Wall.deallocate();
-    state->dataUCSDShared->PosZ_Floor.deallocate();
-    state->dataUCSDShared->PosZ_Ceiling.deallocate();
-    state->dataUCSDShared->APos_Window.deallocate();
-    state->dataUCSDShared->APos_Door.deallocate();
-    state->dataUCSDShared->APos_Internal.deallocate();
-    state->dataUCSDShared->PosZ_Window.deallocate();
-    state->dataUCSDShared->PosZ_Door.deallocate();
-    state->dataUCSDShared->PosZ_Internal.deallocate();
-    state->dataUCSDShared->HCeiling.deallocate();
-    state->dataUCSDShared->HWall.deallocate();
-    state->dataUCSDShared->HFloor.deallocate();
-    state->dataUCSDShared->HInternal.deallocate();
-    state->dataUCSDShared->HWindow.deallocate();
-    state->dataUCSDShared->HDoor.deallocate();
+    state->dataRoomAirMod->APos_Wall.deallocate();
+    state->dataRoomAirMod->APos_Floor.deallocate();
+    state->dataRoomAirMod->APos_Ceiling.deallocate();
+    state->dataRoomAirMod->PosZ_Wall.deallocate();
+    state->dataRoomAirMod->PosZ_Floor.deallocate();
+    state->dataRoomAirMod->PosZ_Ceiling.deallocate();
+    state->dataRoomAirMod->APos_Window.deallocate();
+    state->dataRoomAirMod->APos_Door.deallocate();
+    state->dataRoomAirMod->APos_Internal.deallocate();
+    state->dataRoomAirMod->PosZ_Window.deallocate();
+    state->dataRoomAirMod->PosZ_Door.deallocate();
+    state->dataRoomAirMod->PosZ_Internal.deallocate();
+    state->dataRoomAirMod->HCeiling.deallocate();
+    state->dataRoomAirMod->HWall.deallocate();
+    state->dataRoomAirMod->HFloor.deallocate();
+    state->dataRoomAirMod->HInternal.deallocate();
+    state->dataRoomAirMod->HWindow.deallocate();
+    state->dataRoomAirMod->HDoor.deallocate();
     state->dataRoomAirMod->ZoneCeilingHeight1.deallocate();
     state->dataRoomAirMod->ZoneCeilingHeight2.deallocate();
     state->dataRoomAirMod->ZoneCrossVent.deallocate();

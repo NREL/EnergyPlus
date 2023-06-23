@@ -270,7 +270,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataTarcogShading = std::make_unique<TarcogShadingData>();
     this->dataTimingsData = std::make_unique<DataTimingsData>();
     this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
-    this->dataUCSDShared = std::make_unique<UCSDSharedData>();
     this->dataUFADManager = std::make_unique<UFADManagerData>();
     this->dataUnitHeaters = std::make_unique<UnitHeatersData>();
     this->dataUnitVentilators = std::make_unique<UnitVentilatorsData>();
@@ -528,7 +527,6 @@ void EnergyPlusData::clear_state()
     this->dataTarcogShading->clear_state();
     this->dataTimingsData->clear_state();
     this->dataTranspiredCollector->clear_state();
-    this->dataUCSDShared->clear_state();
     this->dataUFADManager->clear_state();
     this->dataUnitHeaters->clear_state();
     this->dataUnitVentilators->clear_state();
