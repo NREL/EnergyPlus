@@ -173,27 +173,22 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
     // REFERENCES:
     // Based on DOE-2.1E subroutine DAVREF
 
-    SurfaceClass IType; // Surface type/class
     Real64 AREA;        // Inside surface area (m2)
-    Real64 AInsTot;     // Total inside surface area of an enclosure (m2)
-    Real64 ARHTOT;      // Sum over surfaces of AREA*(inside visible reflectance) (m2)
-    int ITILT;          // Surface tilt category (1 = floor, 2 = wall, 3 = ceiling)
-    Real64 ATWL;        // Opaque surface area (m2)
-    Real64 ARHTWL;      // ATWL times inside visible reflectance of surface (m2)
     Real64 ETA;         // Ratio of floor-to-window-center height and average floor-to-ceiling height
 
     // Total inside surface area, including windows
-    AInsTot = 0.0;
+    Real64 AInsTot = 0.0;
     // Sum of products of inside surface area * vis reflectance
-    ARHTOT = 0.0;
+    Real64 ARHTOT = 0.0;
+    
     // Area sum and area * reflectance sum for different orientations
-    state.dataDaylightingManager->AR = 0.0;
-    state.dataDaylightingManager->ARH = 0.0;
+    std::array<Real64, (int)FWC::Num> AR = {0.0, 0.0, 0.0};
+    std::array<Real64, (int)FWC::Num> ARH = {0.0, 0.0, 0.0};
     // Loop over surfaces in the zone's enclosure
 
     auto &thisEnclosure(state.dataViewFactor->EnclSolInfo(enclNum));
     for (int ISurf : thisEnclosure.SurfacePtr) {
-        IType = state.dataSurface->Surface(ISurf).Class;
+        SurfaceClass IType = state.dataSurface->Surface(ISurf).Class;
         // Error if window has multiplier > 1 since this causes incorrect illuminance calc
         if (IType == SurfaceClass::Window && state.dataSurface->Surface(ISurf).Multiplier > 1.0) {
             if (thisEnclosure.TotalEnclosureDaylRefPoints > 0) {
@@ -223,13 +218,14 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
                           (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(ISurf)) +
                       state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf)) *
                           (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(ISurf));
-            ITILT = 3;                                                                                                      // Ceiling
-            if (state.dataSurface->Surface(ISurf).Tilt > 10.0 && state.dataSurface->Surface(ISurf).Tilt < 170.0) ITILT = 2; // Wall
-            if (state.dataSurface->Surface(ISurf).Tilt >= 170.0) ITILT = 1;                                                 // Floor
-            state.dataDaylightingManager->AR(ITILT) +=
+
+            FWC fwc = FWC::Ceiling; // Ceiling
+            if (state.dataSurface->Surface(ISurf).Tilt > 10.0 && state.dataSurface->Surface(ISurf).Tilt < 170.0) fwc = FWC::Wall; // Wall
+            if (state.dataSurface->Surface(ISurf).Tilt >= 170.0) fwc = FWC::Floor;                                                 // Floor
+            AR[(int)fwc] +=
                 AREA + state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) +
                 state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf));
-            state.dataDaylightingManager->ARH(ITILT) +=
+            ARH[(int)fwc] +=
                 AREA * state.dataConstruction->Construct(state.dataSurface->Surface(ISurf).Construction).ReflectVisDiffBack +
                 state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) *
                     (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(ISurf)) +
@@ -247,26 +243,26 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
     // Total inside surface area of enclosure
     state.dataDaylightingData->enclDaylight(enclNum).totInsSurfArea = AInsTot;
     // Average floor visible reflectance
-    state.dataDaylightingData->enclDaylight(enclNum).floorVisRefl =
-        state.dataDaylightingManager->ARH(3) / (state.dataDaylightingManager->AR(3) + 1.e-6);
+    state.dataDaylightingData->enclDaylight(enclNum).floorVisRefl = ARH[(int)FWC::Ceiling] / (AR[(int)FWC::Ceiling] + 1.e-6);
 
     for (int ISurf : thisEnclosure.SurfacePtr) {
         auto const &surf = state.dataSurface->Surface(ISurf);
-        IType = surf.Class;
+        SurfaceClass IType = surf.Class;
         if (IType == SurfaceClass::Wall || IType == SurfaceClass::Floor || IType == SurfaceClass::Roof) {
             // Remove this surface from the space inside surface area and area*reflectivity
             // The resulting areas are AP(ITILT). The resulting area*reflectivity is ARHP(ITILT).
             // Initialize gross area of surface (including subsurfaces)
-            ATWL = surf.Area; // This is the surface area less subsurfaces
+            Real64 ATWL = surf.Area; // This is the surface area less subsurfaces
             // Area * reflectance for this surface, excluding attached windows and doors
-            ARHTWL = surf.Area * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack;
-            // Tilt index
+            Real64 ARHTWL = surf.Area * state.dataConstruction->Construct(surf.Construction).ReflectVisDiffBack;
+
+            FWC fwc;
             if (surf.Tilt > 45.0 && surf.Tilt < 135.0) {
-                ITILT = 2; // Wall
+                fwc = FWC::Wall; // Wall
             } else if (surf.Tilt >= 135.0) {
-                ITILT = 1; // Floor
+                fwc = FWC::Floor; // Floor
             } else {
-                ITILT = 3; // Ceiling
+                fwc = FWC::Ceiling; // Ceiling
             }
             // Loop over windows and doors on this wall
             for (int IWinDr : thisEnclosure.SurfacePtr) {
@@ -284,18 +280,21 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
                                   (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(IWinDr));
                 }
             }
+
+            std::array<Real64, (int)FWC::Num> AP;
+            std::array<Real64, (int)FWC::Num> ARHP;
             // Inside surface area of floor, walls and ceilings, minus surface ISurf and its subsurfaces
-            for (int IT = 1; IT <= 3; ++IT) {
-                if (IT == ITILT) {
-                    state.dataDaylightingManager->AP(IT) = state.dataDaylightingManager->AR(IT) - ATWL;
-                    state.dataDaylightingManager->ARHP(IT) = state.dataDaylightingManager->ARH(IT) - ARHTWL;
+            for (int iFWC = (int)FWC::Floor; iFWC < (int)FWC::Ceiling; ++iFWC) {
+                if (iFWC == (int)fwc) {
+                    AP[iFWC] = AR[iFWC] - ATWL;
+                    ARHP[iFWC] = ARH[iFWC] - ARHTWL;
                 } else {
-                    state.dataDaylightingManager->AP(IT) = state.dataDaylightingManager->AR(IT);
-                    state.dataDaylightingManager->ARHP(IT) = state.dataDaylightingManager->ARH(IT);
+                    AP[iFWC] = AR[iFWC];
+                    ARHP[iFWC] = ARH[iFWC];
                 }
             }
-            state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf = state.dataDaylightingManager->AP;
-            state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf = state.dataDaylightingManager->ARHP;
+            state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf = AP;
+            state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf = ARHP;
         }
     } // End of loop over opaque surfaces in enclosure
 
@@ -308,15 +307,15 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
                       min(1.0,
                           (state.dataSurface->SurfaceWindow(IWin).WinCenter.z - state.dataHeatBal->Zone(zoneNum).OriginZ) *
                               state.dataHeatBal->Zone(zoneNum).FloorArea / state.dataHeatBal->Zone(zoneNum).Volume));
-            state.dataDaylightingManager->AP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf;
-            state.dataDaylightingManager->ARHP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf;
+
+            std::array<Real64, (int)FWC::Num> AP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaMinusThisSurf;
+            std::array<Real64, (int)FWC::Num> ARHP = state.dataSurface->SurfaceWindow(ISurf).EnclAreaReflProdMinusThisSurf;
             // Average reflectance seen by light moving up (RhoCeilingWall) and down (RhoFloorWall)
             // across horizontal plane through center of window
             state.dataSurface->SurfWinRhoCeilingWall(IWin) =
-                (state.dataDaylightingManager->ARHP(2) * (1.0 - ETA) + state.dataDaylightingManager->ARHP(3)) /
-                (state.dataDaylightingManager->AP(2) * (1.0 - ETA) + state.dataDaylightingManager->AP(3) + 1.0e-5);
-            state.dataSurface->SurfWinRhoFloorWall(IWin) = (state.dataDaylightingManager->ARHP(2) * ETA + state.dataDaylightingManager->ARHP(1)) /
-                                                           (state.dataDaylightingManager->AP(2) * ETA + state.dataDaylightingManager->AP(1) + 1.e-9);
+                (ARHP[(int)FWC::Wall] * (1.0-ETA) + ARHP[(int)FWC::Ceiling]) / (AP[(int)FWC::Wall] * (1.0-ETA) + AP[(int)FWC::Ceiling] + 1.0e-5);
+            state.dataSurface->SurfWinRhoFloorWall(IWin) =
+                    (ARHP[(int)FWC::Wall] * ETA + ARHP[(int)FWC::Floor]) / (AP[(int)FWC::Wall] * ETA + AP[(int)FWC::Floor] + 1.e-9);
 
             // Angle factor for windows with diffusing shades. SurfaceWindow(IWin)%FractionUpgoing is
             // fraction of light from the shade that goes up toward ceiling and upper part of walls.
@@ -819,20 +818,20 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
     Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
     Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
 
-    auto &W2 = state.dataDaylightingManager->W2;
-    auto &W3 = state.dataDaylightingManager->W3;
-    auto &W21 = state.dataDaylightingManager->W21;
-    auto &W23 = state.dataDaylightingManager->W23;
-    auto &RREF2 = state.dataDaylightingManager->RREF2;
-    auto &RWIN = state.dataDaylightingManager->RWIN;
-    auto &RWIN2 = state.dataDaylightingManager->RWIN2;
-    auto &Ray = state.dataDaylightingManager->Ray;
-    auto &WNORM2 = state.dataDaylightingManager->WNORM2;
-    auto &VIEWVC = state.dataDaylightingManager->VIEWVC;
-    auto &U2 = state.dataDaylightingManager->U2;
-    auto &U21 = state.dataDaylightingManager->U21;
-    auto &U23 = state.dataDaylightingManager->U23;
-    auto &VIEWVC2 = state.dataDaylightingManager->VIEWVC2;
+    Vector3<Real64> W2;
+    Vector3<Real64> W3;
+    Vector3<Real64> W21;
+    Vector3<Real64> W23;
+    Vector3<Real64> RREF2;
+    Vector3<Real64> RWIN;
+    Vector3<Real64> RWIN2;
+    Vector3<Real64> Ray;
+    Vector3<Real64> WNORM2;
+    Vector3<Real64> VIEWVC;
+    Vector3<Real64> U2;
+    Vector3<Real64> U21;
+    Vector3<Real64> U23;
+    Vector3<Real64> VIEWVC2;
 
     int WinEl; // Current window element
 
@@ -889,7 +888,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
 
     for (int IL = 1; IL <= NRF; ++IL) {
         // Reference point in absolute coordinate system
-        state.dataDaylightingManager->RREF = thisDaylightControl.DaylRefPtAbsCoord({1, 3}, IL); // ( x, y, z )
+        Vector3<Real64> RREF = thisDaylightControl.DaylRefPtAbsCoord(IL); // ( x, y, z )
 
         //           -------------
         // ---------- WINDOW LOOP ----------
@@ -901,7 +900,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
                                                      IL,
                                                      loopwin,
                                                      CalledFor::RefPoint,
-                                                     state.dataDaylightingManager->RREF,
+                                                     RREF,
                                                      VIEWVC,
                                                      IWin,
                                                      IWin2,
@@ -960,7 +959,7 @@ void CalcDayltgCoeffsRefPoints(EnergyPlusData &state, int const daylightCtrlNum)
                                                                 W2,
                                                                 W21,
                                                                 W23,
-                                                                state.dataDaylightingManager->RREF,
+                                                                RREF,
                                                                 NWYlim,
                                                                 VIEWVC2,
                                                                 DWX,
@@ -1181,20 +1180,20 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
     Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
     int WinEl;             // window elements counter
 
-    auto &W2 = state.dataDaylightingManager->W2;
-    auto &W3 = state.dataDaylightingManager->W3;
-    auto &W21 = state.dataDaylightingManager->W21;
-    auto &W23 = state.dataDaylightingManager->W23;
-    auto &RREF2 = state.dataDaylightingManager->RREF2;
-    auto &RWIN = state.dataDaylightingManager->RWIN;
-    auto &RWIN2 = state.dataDaylightingManager->RWIN2;
-    auto &Ray = state.dataDaylightingManager->Ray;
-    auto &WNORM2 = state.dataDaylightingManager->WNORM2;
-    auto &VIEWVC = state.dataDaylightingManager->VIEWVC;
-    auto &U2 = state.dataDaylightingManager->U2;
-    auto &U21 = state.dataDaylightingManager->U21;
-    auto &U23 = state.dataDaylightingManager->U23;
-    auto &VIEWVC2 = state.dataDaylightingManager->VIEWVC2;
+    Vector3<Real64> W2;
+    Vector3<Real64> W3;
+    Vector3<Real64> W21;
+    Vector3<Real64> W23;
+    Vector3<Real64> RREF2;
+    Vector3<Real64> RWIN;
+    Vector3<Real64> RWIN2;
+    Vector3<Real64> Ray;
+    Vector3<Real64> WNORM2;
+    Vector3<Real64> VIEWVC;
+    Vector3<Real64> U2;
+    Vector3<Real64> U21;
+    Vector3<Real64> U23;
+    Vector3<Real64> VIEWVC2;
 
     if (state.dataDaylightingManager->mapFirstTime && (int)state.dataDaylightingData->IllumMap.size() > 0) {
         IL = -999;
@@ -1239,7 +1238,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
 
     for (int IL = 1; IL <= numRefPts; ++IL) {
 
-        state.dataDaylightingManager->RREF = illumMapCalc.MapRefPtAbsCoord({1, 3}, IL); // (x, y, z)
+        Vector3<Real64> RREF = illumMapCalc.MapRefPtAbsCoord(IL); // (x, y, z)
 
         //           -------------
         // ---------- WINDOW LOOP ----------
@@ -1253,7 +1252,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                      IL,
                                                      loopwin,
                                                      CalledFor::MapPoint,
-                                                     state.dataDaylightingManager->RREF,
+                                                     RREF,
                                                      VIEWVC,
                                                      IWin,
                                                      IWin2,
@@ -1313,7 +1312,7 @@ void CalcDayltgCoeffsMapPoints(EnergyPlusData &state, int const mapNum)
                                                                 W2,
                                                                 W21,
                                                                 W23,
-                                                                state.dataDaylightingManager->RREF,
+                                                                RREF,
                                                                 NWYlim,
                                                                 VIEWVC2,
                                                                 DWX,
@@ -1526,6 +1525,9 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     int zoneNum = 0; // zone number
     int enclNum = 0; // enclosure number
 
+    Vector3<Real64> W1;
+    Vector3<Real64> WC;
+    
     if (CalledFrom == CalledFor::RefPoint) {
         state.dataDaylightingData->daylightControl(daylightCtrlNum).SolidAngAtRefPt(loopwin, iRefPoint) = 0.0;
         state.dataDaylightingData->daylightControl(daylightCtrlNum).SolidAngAtRefPtWtd(loopwin, iRefPoint) = 0.0;
@@ -1583,11 +1585,11 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
         // upper left as viewed from outside.
         W3 = state.dataSurface->Surface(IWin).Vertex(2);
         W2 = state.dataSurface->Surface(IWin).Vertex(3);
-        state.dataDaylightingManager->W1 = state.dataSurface->Surface(IWin).Vertex(4);
+        W1 = state.dataSurface->Surface(IWin).Vertex(4);
     } else if (is_Triangle) {
         W3 = state.dataSurface->Surface(IWin).Vertex(2);
         W2 = state.dataSurface->Surface(IWin).Vertex(3);
-        state.dataDaylightingManager->W1 = state.dataSurface->Surface(IWin).Vertex(1);
+        W1 = state.dataSurface->Surface(IWin).Vertex(1);
     }
 
     // Shade/blind calculation flag
@@ -1610,39 +1612,39 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
 
     // Unit vectors from window vertex 2 to 1 and 2 to 3,
     // center point of window, and vector from ref pt to center of window
-    W21 = state.dataDaylightingManager->W1 - W2;
+    W21 = W1 - W2;
     W23 = W3 - W2;
     HW = W21.magnitude();
     WW = W23.magnitude();
     if (is_Rectangle) {
-        state.dataDaylightingManager->WC = W2 + (W23 + W21) / 2.0;
+        WC = W2 + (W23 + W21) / 2.0;
     } else if (is_Triangle) {
-        state.dataDaylightingManager->WC = W2 + (W23 + W21) / 3.0;
+        WC = W2 + (W23 + W21) / 3.0;
     }
-    state.dataSurface->SurfaceWindow(IWin).WinCenter = state.dataDaylightingManager->WC;
-    state.dataDaylightingManager->REFWC = state.dataDaylightingManager->WC - RREF;
+    state.dataSurface->SurfaceWindow(IWin).WinCenter = WC;
+    Vector3<Real64> REFWC = WC - RREF;
     // Unit vectors
     W21 /= HW;
     W23 /= WW;
 
     // Unit vector normal to window (pointing away from room)
-    state.dataDaylightingManager->WNORM = state.dataSurface->Surface(IWin).lcsz;
+    Vector3<Real64> WNORM = state.dataSurface->Surface(IWin).lcsz;
 
     // Initialize number of window elements
     NDIVX = 40;
     NDIVY = 40;
 
     // Distance from ref point to window plane
-    ALF = std::abs(dot(state.dataDaylightingManager->WNORM, state.dataDaylightingManager->REFWC));
+    ALF = std::abs(dot(WNORM, REFWC));
     if (CalledFrom == CalledFor::RefPoint) {
         // Check if ref point to close to window due to input error (0.1524 m below is 0.5 ft)
         if (ALF < 0.1524 && extWinType == ExtWinType::InZone) {
             // Ref pt is close to window plane. Get vector from window
             // origin to projection of ref pt on window plane.
-            state.dataDaylightingManager->W2REF = RREF + ALF * state.dataDaylightingManager->WNORM - W2;
+            Vector3<Real64> W2REF = RREF + ALF * WNORM - W2;
 
-            D1a = dot(state.dataDaylightingManager->W2REF, W23);
-            D1b = dot(state.dataDaylightingManager->W2REF, W21);
+            D1a = dot(W2REF, W23);
+            D1b = dot(W2REF, W21);
 
             //            ! Error message if ref pt is too close to window.
             if (D1a > 0.0 && D1b > 0.0 && D1b <= HW && D1a <= WW) {
@@ -1721,9 +1723,9 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     DWY = HW / NWY;
 
     // Azimuth and altitude of window normal
-    state.dataSurface->SurfWinPhi(IWin) = std::asin(state.dataDaylightingManager->WNORM.z);
-    if (std::abs(state.dataDaylightingManager->WNORM.x) > 1.0e-5 || std::abs(state.dataDaylightingManager->WNORM.y) > 1.0e-5) {
-        state.dataSurface->SurfWinTheta(IWin) = std::atan2(state.dataDaylightingManager->WNORM.y, state.dataDaylightingManager->WNORM.x);
+    state.dataSurface->SurfWinPhi(IWin) = std::asin(WNORM.z);
+    if (std::abs(WNORM.x) > 1.0e-5 || std::abs(WNORM.y) > 1.0e-5) {
+        state.dataSurface->SurfWinTheta(IWin) = std::atan2(WNORM.y, WNORM.x);
     } else {
         state.dataSurface->SurfWinTheta(IWin) = 0.0;
     }
@@ -1739,42 +1741,41 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
 
         // Calculate reference point coords relative to the diffuser coordinate system
         // W21, W23, and WNORM are the unit vectors
-        state.dataDaylightingManager->REFD.x = dot(state.dataDaylightingManager->REFWC, W21);
-        state.dataDaylightingManager->REFD.y = dot(state.dataDaylightingManager->REFWC, W23);
-        state.dataDaylightingManager->REFD.z = dot(state.dataDaylightingManager->REFWC, state.dataDaylightingManager->WNORM);
+        Vector3<Real64> REFD = {dot(REFWC, W21), dot(REFWC, W23), dot(REFWC, WNORM)};
 
         // Calculate view vector coords relative to the diffuser coordinate system
-        state.dataDaylightingManager->VIEWVD = {dot(VIEWVC, W21), dot(VIEWVC, W23), dot(VIEWVC, state.dataDaylightingManager->WNORM)};
+        Vector3<Real64> VIEWVD = {dot(VIEWVC, W21), dot(VIEWVC, W23), dot(VIEWVC, WNORM)};
 
-        state.dataDaylightingManager->U3 = surf2.Vertex(2);
+        Vector3<Real64> U3 = surf2.Vertex(2);
         U2 = surf2.Vertex(3);
+        Vector3<Real64> U1;
 
         if (surf2.Sides == 4) {
             // Vertices of window (numbered counter-clockwise starting
             // at upper left as viewed from inside of room)
             // Assumes original vertices are numbered counter-clockwise from
             // upper left as viewed from outside.
-            state.dataDaylightingManager->U3 = surf2.Vertex(2);
+            U3 = surf2.Vertex(2);
             U2 = surf2.Vertex(3);
-            state.dataDaylightingManager->U1 = surf2.Vertex(4);
+            U1 = surf2.Vertex(4);
         } else if (surf2.Sides == 3) {
-            state.dataDaylightingManager->U3 = surf2.Vertex(2);
+            U3 = surf2.Vertex(2);
             U2 = surf2.Vertex(3);
-            state.dataDaylightingManager->U1 = surf2.Vertex(1);
+            U1 = surf2.Vertex(1);
         }
 
         // Unit vectors from window vertex 2 to 1 and 2 to 3,
         // center point of window, and vector from ref pt to center of window
-        U21 = state.dataDaylightingManager->U1 - U2;
-        U23 = state.dataDaylightingManager->U3 - U2;
+        U21 = U1 - U2;
+        U23 = U3 - U2;
         HW = U21.magnitude();
         WW = U23.magnitude();
         if (surf2.Sides == 4) {
-            state.dataDaylightingManager->WC = U2 + (U23 + U21) / 2.0;
+            WC = U2 + (U23 + U21) / 2.0;
         } else if (surf2.Sides == 3) {
-            state.dataDaylightingManager->WC = U2 + (U23 + U21) / 3.0;
+            WC = U2 + (U23 + U21) / 3.0;
         }
-        state.dataSurface->SurfaceWindow(IWin2).WinCenter = state.dataDaylightingManager->WC;
+        state.dataSurface->SurfaceWindow(IWin2).WinCenter = WC;
         // Unit vectors
         U21 /= HW;
         U23 /= WW;
@@ -1795,13 +1796,11 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
 
         // Calculate new virtual reference point coords relative to dome coord system
         // W21, W23, and WNORM2 are now the unit vectors for the dome coord system
-        state.dataDaylightingManager->REFWC =
-            state.dataDaylightingManager->REFD.x * U21 + state.dataDaylightingManager->REFD.y * U23 + state.dataDaylightingManager->REFD.z * WNORM2;
-        RREF2 = state.dataDaylightingManager->WC - state.dataDaylightingManager->REFWC;
+        REFWC = REFD.x * U21 + REFD.y * U23 + REFD.z * WNORM2;
+        RREF2 = WC - REFWC;
 
         // Calculate new virtual view vector coords relative to dome coord system
-        VIEWVC2 = state.dataDaylightingManager->VIEWVD.x * U21 + state.dataDaylightingManager->VIEWVD.y * U23 +
-                  state.dataDaylightingManager->VIEWVD.z * WNORM2;
+        VIEWVC2 = VIEWVD.x * U21 + VIEWVD.y * U23 + VIEWVD.z * WNORM2;
 
         // Copy several values from the diffuser so that DayltgInterReflectedIllum works correctly
         // These are specific to the interior.
@@ -1813,7 +1812,7 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     } else {
         // This is not a TDD:DIFFUSER.  Make sure nothing is messed up for a regular window.
         IWin2 = IWin;
-        WNORM2 = state.dataDaylightingManager->WNORM;
+        WNORM2 = WNORM;
         RREF2 = RREF;
         VIEWVC2 = VIEWVC;
 
@@ -2044,7 +2043,9 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                             1) { // in develop this was Surface(IntWin).Class == SurfaceClass::Window && Surface(IntWin).ExtBoundCond >= 1
                             if (state.dataSurface->Surface(state.dataSurface->Surface(IntWin).ExtBoundCond).Zone ==
                                 state.dataSurface->Surface(IWin).Zone) {
-                                PierceSurface(state, IntWin, RREF, Ray, state.dataDaylightingManager->HitPtIntWin, hitIntWin);
+
+                                Vector3<Real64> HitPtIntWin;
+                                PierceSurface(state, IntWin, RREF, Ray, HitPtIntWin, hitIntWin);
                                 if (hitIntWin) {
                                     IntWinHitNum = IntWin;
                                     COSBIntWin = dot(state.dataSurface->Surface(IntWin).OutNormVec, Ray);
@@ -2083,10 +2084,11 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
 
         if (extWinType == ExtWinType::AdjZone && IntWinHitNum > 0 && !hitIntObs) {
             // Check for obstruction between ref point and interior window through which ray passes
-            DayltgHitInteriorObstruction(state, IntWinHitNum, RREF, state.dataDaylightingManager->HitPtIntWin, hitIntObs);
+            Vector3<Real64> HitPtIntWin;
+            DayltgHitInteriorObstruction(state, IntWinHitNum, RREF, HitPtIntWin, hitIntObs);
             if (!hitIntObs) {
                 // Check for obstruction between intersection point on int window and ext win element
-                DayltgHitBetWinObstruction(state, IntWinHitNum, IWin, state.dataDaylightingManager->HitPtIntWin, RWIN, hitIntObs);
+                DayltgHitBetWinObstruction(state, IntWinHitNum, IWin, HitPtIntWin, RWIN, hitIntObs);
             }
         }
         if (CalledFrom == CalledFor::RefPoint) {
@@ -2130,17 +2132,13 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                 int RayIndex;
                 for (int ICplxFen = 1; ICplxFen <= NReflSurf; ++ICplxFen) {
                     if (CalledFrom == CalledFor::RefPoint) {
-                        RayIndex =
-                            state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).RefSurfIndex(ICplxFen, WinEl);
+                        RayIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).RefSurfIndex(ICplxFen, WinEl);
                     } else if (CalledFrom == CalledFor::MapPoint) {
-                        RayIndex = state.dataBSDFWindow->ComplexWind(IWin)
-                                       .DaylghtGeom(CplxFenState)
-                                       .IlluminanceMap(iRefPoint, MapNum)
-                                       .RefSurfIndex(ICplxFen, WinEl);
+                        RayIndex = state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).IlluminanceMap(iRefPoint, MapNum).RefSurfIndex(ICplxFen, WinEl);
                     }
-                    state.dataDaylightingManager->RayVector = state.dataBSDFWindow->ComplexWind(IWin).Geom(CplxFenState).sInc(RayIndex);
+                    Vector3<Real64> RayVector = state.dataBSDFWindow->ComplexWind(IWin).Geom(CplxFenState).sInc(RayIndex);
                     // It will get product of all transmittances
-                    DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin, RWIN, state.dataDaylightingManager->RayVector, TransBeam);
+                    DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin, RWIN, RayVector, TransBeam);
                     // IF (TransBeam > 0.0d0) ObTrans = TransBeam
                     if (CalledFrom == CalledFor::RefPoint) {
                         state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).TransOutSurf(ICplxFen, WinEl) =
@@ -2166,11 +2164,9 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             Alfa = std::acos(-Ray.z);
             Beta = std::atan2(Ray.y, Ray.x);
             HorDis = (RWIN2.z - state.dataSurface->GroundLevelZ) * std::tan(Alfa);
-            state.dataDaylightingManager->GroundHitPt = {
-                RWIN2.x + HorDis * std::cos(Beta), RWIN2.y + HorDis * std::sin(Beta), state.dataSurface->GroundLevelZ};
+            Vector3<Real64> GroundHitPt = {RWIN2.x + HorDis * std::cos(Beta), RWIN2.y + HorDis * std::sin(Beta), state.dataSurface->GroundLevelZ};
 
-            SkyObstructionMult = CalcObstrMultiplier(
-                state, state.dataDaylightingManager->GroundHitPt, AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
+            SkyObstructionMult = CalcObstrMultiplier(state, GroundHitPt, AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
         } // End of check if solar reflection calculation is in effect
 
     } // End of check if COSB > 0
@@ -2201,12 +2197,12 @@ void InitializeCFSDaylighting(EnergyPlusData &state,
     Real64 DWY;       // Window element height
     Real64 WinElArea; // Window element area
 
-    auto &W1 = state.dataDaylightingManager->W1;
-    auto &W2 = state.dataDaylightingManager->W2;
-    auto &W3 = state.dataDaylightingManager->W3;
-    auto &W21 = state.dataDaylightingManager->W21;
-    auto &W23 = state.dataDaylightingManager->W23;
-    auto &WNorm = state.dataDaylightingManager->WNorm; // unit vector from window (point towards outside)
+    Vector3<Real64> W1;
+    Vector3<Real64> W2;
+    Vector3<Real64> W3;
+    Vector3<Real64> W21;
+    Vector3<Real64> W23;
+    Vector3<Real64> WNorm;
 
     // Position factor variables
     Real64 AZVIEW; // Azimuth of view vector
@@ -2392,9 +2388,9 @@ void InitializeCFSStateData(EnergyPlusData &state,
     Real64 TransRSurf;
     int J;
 
-    auto &RWin = state.dataDaylightingManager->RWin;
-    auto &V = state.dataDaylightingManager->V;
-    auto &GroundHitPt = state.dataDaylightingManager->GroundHitPt;
+    Vector3<Real64> RWin;
+    Vector3<Real64> V;
+    Vector3<Real64> GroundHitPt;
 
     // temporary arrays for surfaces
     // Each complex fenestration state can have different number of basis elements
@@ -2707,22 +2703,14 @@ void CFSRefPointSolidAngle(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate position factor for given reference point.
 
-    // SUBROUTINE LOCAL VARIABLES
-    auto &Ray = state.dataDaylightingManager->Ray;
-    auto &RayNorm = state.dataDaylightingManager->RayNorm;
-    Real64 BestMatch;
-    Real64 temp;
-    Real64 Dist;
-    Real64 CosB;
-
     // calculate vector from center of window element to the current reference point
-    Ray = RefPoint - RWin;
+    Vector3<Real64> Ray = RefPoint - RWin;
 
     // figure out outgoing beam direction from current reference point
-    BestMatch = 0.0;
+    Real64 BestMatch = 0.0;
     for (int iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
-        state.dataDaylightingManager->V = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn(iTrnRay);
-        temp = dot(Ray, state.dataDaylightingManager->V);
+        Vector3<Real64> const &V = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn(iTrnRay);
+        Real64 temp = dot(Ray, V);
         if (temp > BestMatch) {
             BestMatch = temp;
             RefPointMap.RefPointIndex(curWinEl) = iTrnRay;
@@ -2730,10 +2718,10 @@ void CFSRefPointSolidAngle(EnergyPlusData &state,
     }
 
     // calculate solid view angle
-    Dist = Ray.magnitude();
-    RayNorm = Ray / (-Dist);
+    Real64 Dist = Ray.magnitude();
+    Vector3<Real64> RayNorm = Ray / (-Dist);
     RefPointGeomMap.SolidAngleVec(curWinEl) = RayNorm;
-    CosB = dot(WNorm, RayNorm);
+    Real64 CosB = dot(WNorm, RayNorm);
     RefPointGeomMap.SolidAngle(curWinEl) = WinElArea * CosB / (Dist * Dist);
 }
 
@@ -2762,13 +2750,16 @@ void CFSRefPointPosFactor(EnergyPlusData &state,
 
     auto const &sTrn = state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sTrn;
     for (int iTrnRay = 1; iTrnRay <= NTrnBasis; ++iTrnRay) {
-        state.dataDaylightingManager->V = sTrn(iTrnRay);
-        state.dataDaylightingManager->V.negate();
-        PierceSurface(state, iWin, RefPoint, state.dataDaylightingManager->V, state.dataDaylightingManager->InterPoint, hit);
+        Vector3<Real64> V = sTrn(iTrnRay);
+        V.negate();
+
+        Vector3<Real64> InterPoint;
+        
+        PierceSurface(state, iWin, RefPoint, V, InterPoint, hit);
         if (hit) {
             RefPointMap.RefPointIntersection(iTrnRay) = true;
 
-            elPos = WindowComplexManager::DaylghtAltAndAzimuth(state.dataDaylightingManager->V);
+            elPos = WindowComplexManager::DaylghtAltAndAzimuth(V);
 
             XR = std::tan(std::abs(Constant::PiOvr2 - AZVIEW - elPos.Azimuth) + 0.001);
             YR = std::tan(elPos.Altitude + 0.001);
@@ -2815,10 +2806,11 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     Real64 dOmegaGnd;                                                  // Solid angle element of ray from ground point (steradians)
     Real64 IncAngSolidAngFac;                                          // CosIncAngURay*dOmegaGnd/Pi
     bool hitObs;                                                       // True iff obstruction is hit
-    auto &URay = state.dataDaylightingManager->URay;                   // Unit vector in (Phi,Theta) direction
-    auto &ObsHitPt = state.dataDaylightingManager->ObsHitPt;           // Unit vector in (Phi,Theta) direction
-    auto &AltSteps_last = state.dataDaylightingManager->AltSteps_last; // Unit vector in (Phi,Theta) direction
-    auto &AzimSteps_last = state.dataDaylightingManager->AzimSteps_last;
+
+    Vector3<Real64> URay;                   // Unit vector in (Phi,Theta) direction
+    Vector3<Real64> ObsHitPt;           // Unit vector in (Phi,Theta) direction
+    Vector3<Real64> AltSteps_last; // Unit vector in (Phi,Theta) direction
+    Vector3<Real64> AzimSteps_last;
 
     assert(AzimSteps <= DataSurfaces::AzimAngStepsForSolReflCalc);
 
@@ -3068,7 +3060,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
     //                  hitExtObs == true  ==> one or more exterior obstructions hit.
     if (state.dataSurface->CalcSolRefl && !hitIntObs && hitExtObs) {
         int NearestHitSurfNum;                                           // Surface number of nearest obstruction
-        auto &NearestHitPt = state.dataDaylightingManager->NearestHitPt; // Hit point of ray on nearest obstruction
+        Vector3<Real64> NearestHitPt; // Hit point of ray on nearest obstruction
         // One or more exterior obstructions was hit; get contribution of reflection
         // from nearest obstruction.
         // Find obstruction whose hit point is closest to this ray's window element
@@ -3159,7 +3151,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
 
             if (PHRAY > 0.0) state.dataDaylightingManager->EDIRSU(iHour, 1) += state.dataDaylightingManager->WLUMSU(iHour, 1) * DOMEGA_Ray_3;
         } else {                                                           // Bare window
-            auto &GroundHitPt = state.dataDaylightingManager->GroundHitPt; // Coordinates of point that ray hits ground (m)
+            Vector3<Real64> GroundHitPt; // Coordinates of point that ray hits ground (m)
             // Tuned Hoisted operations out of loop and linear indexing
             if (state.dataSurface->CalcSolRefl) { // Coordinates of ground point hit by the ray
                 Alfa = std::acos(-Ray_3);
@@ -3213,7 +3205,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 if (state.dataSurface->CalcSolRefl) { // Coordinates of ground point hit by the ray
                     // Sun reaches ground point if vector from this point to the sun is unobstructed
                     hitObs = false;
-                    auto &ObsHitPt = state.dataDaylightingManager->ObsHitPt; // Coordinates of hit point on an obstruction (m)
+                    Vector3<Real64> ObsHitPt; // Coordinates of hit point on an obstruction (m)
                     for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
                         PierceSurface(state, ObsSurfNum, GroundHitPt, SUNCOS_iHour, ObsHitPt, hitObs);
                         if (hitObs) break;
@@ -3265,7 +3257,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     // Surface number of int window intersected by ray betw ref pt and sun
                     int IntWinDiskHitNum;
                     // Intersection point on an interior window for ray from ref pt to sun (m)
-                    auto &HitPtIntWinDisk = state.dataDaylightingManager->HitPtIntWinDisk;
+                    Vector3<Real64> HitPtIntWinDisk;
                     auto const &thisZone = state.dataHeatBal->Zone(zoneNum);
                     for (int const spaceNum : thisZone.spaceIndexes) {
                         auto const &thisSpace = state.dataHeatBal->space(spaceNum);
@@ -3431,10 +3423,10 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
             if (RecSurfNum > 0) { // interior windows do not apply
                 if (state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs > 0) {
                     bool hitRefl;                                              // True iff ray hits reflecting surface
-                    auto &HitPtRefl = state.dataDaylightingManager->HitPtRefl; // Point that ray hits reflecting surface
-                    auto &SunVecMir = state.dataDaylightingManager->SunVecMir; // Sun ray mirrored in reflecting surface
-                    auto &ReflNorm = state.dataDaylightingManager->ReflNorm;   // Normal vector to reflecting surface
-                    auto &TransBmBmMultRefl = state.dataDaylightingManager->TransBmBmMultRefl;
+                    Vector3<Real64> HitPtRefl; // Point that ray hits reflecting surface
+                    Vector3<Real64> SunVecMir; // Sun ray mirrored in reflecting surface
+                    Vector3<Real64> ReflNorm;   // Normal vector to reflecting surface
+                    Vector3<Real64> TransBmBmMultRefl;
                     // This window has associated obstructions that could reflect beam onto the window
                     for (int loop = 1, loop_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end;
                          ++loop) {
@@ -3472,7 +3464,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             ReflDistance = std::sqrt(ReflDistanceSq);
                             // Is ray from ref. pt. to reflection point (HitPtRefl) obstructed?
                             bool hitObsRefl = false;
-                            auto &HitPtObs = state.dataDaylightingManager->HitPtObs; // Hit point on obstruction
+                            Vector3<Real64> HitPtObs; // Hit point on obstruction
                             for (int loop2 = 1, loop2_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs;
                                  loop2 <= loop2_end;
                                  ++loop2) {
@@ -4365,8 +4357,8 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                 // Add additional daylighting reference points for map
                 AddMapPoints = illumMap.Xnum * illumMap.Ynum;
                 illumMapCalc.TotalMapRefPoints = AddMapPoints;
-                illumMapCalc.MapRefPtAbsCoord.allocate(3, AddMapPoints);
-                illumMapCalc.MapRefPtAbsCoord = 0.0;
+                illumMapCalc.MapRefPtAbsCoord.allocate(AddMapPoints);
+                illumMapCalc.MapRefPtAbsCoord = Vector3<Real64>(0.0);
                 illumMapCalc.MapRefPtInBounds.allocate(AddMapPoints);
                 illumMapCalc.MapRefPtInBounds = true;
                 illumMapCalc.DaylIllumAtMapPt.allocate(AddMapPoints);
@@ -4402,26 +4394,24 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                 // Map points and increments are stored in AbsCoord and then that is operated on if relative coords entered.
                 for (int Y = 1; Y <= illumMap.Ynum; ++Y) {
                     for (int X = 1; X <= illumMap.Xnum; ++X) {
-                        illumMapCalc.MapRefPtAbsCoord(1, RefPt) = illumMap.Xmin + (X - 1) * illumMap.Xinc;
-                        illumMapCalc.MapRefPtAbsCoord(2, RefPt) = illumMap.Ymin + (Y - 1) * illumMap.Yinc;
-                        illumMapCalc.MapRefPtAbsCoord(3, RefPt) = illumMap.Z;
+                        illumMapCalc.MapRefPtAbsCoord(RefPt) = {illumMap.Xmin + (X - 1) * illumMap.Xinc, illumMap.Ymin + (Y - 1) * illumMap.Yinc, illumMap.Z};
                         ++RefPt;
                     }
                 }
+
                 RefPt = 1;
                 for (int Y = 1; Y <= illumMap.Ynum; ++Y) {
                     for (int X = 1; X <= illumMap.Xnum; ++X) {
+                        auto &mapRefPtAbsCoord = illumMapCalc.MapRefPtAbsCoord(RefPt);
                         if (!state.dataSurface->DaylRefWorldCoordSystem) {
-                            Xb = illumMapCalc.MapRefPtAbsCoord(1, RefPt) * CosZoneRelNorth -
-                                 illumMapCalc.MapRefPtAbsCoord(2, RefPt) * SinZoneRelNorth + zone.OriginX;
-                            Yb = illumMapCalc.MapRefPtAbsCoord(1, RefPt) * SinZoneRelNorth +
-                                 illumMapCalc.MapRefPtAbsCoord(2, RefPt) * CosZoneRelNorth + zone.OriginY;
-                            illumMapCalc.MapRefPtAbsCoord(1, RefPt) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-                            illumMapCalc.MapRefPtAbsCoord(2, RefPt) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-                            illumMapCalc.MapRefPtAbsCoord(3, RefPt) += zone.OriginZ;
+                            Xb = mapRefPtAbsCoord.x * CosZoneRelNorth - mapRefPtAbsCoord.y * SinZoneRelNorth + zone.OriginX;
+                            Yb = mapRefPtAbsCoord.x * SinZoneRelNorth + mapRefPtAbsCoord.y * CosZoneRelNorth + zone.OriginY;
+                            mapRefPtAbsCoord.x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+                            mapRefPtAbsCoord.y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+                            mapRefPtAbsCoord.z += zone.OriginZ;
                             if (doTransform) {
-                                Xo = illumMapCalc.MapRefPtAbsCoord(1, RefPt); // world coordinates.... shifted by relative north angle...
-                                Yo = illumMapCalc.MapRefPtAbsCoord(2, RefPt);
+                                Xo = mapRefPtAbsCoord.x; // world coordinates.... shifted by relative north angle...
+                                Yo = mapRefPtAbsCoord.y;
                                 // next derotate the building
                                 XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
                                 YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
@@ -4429,107 +4419,96 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
                                 Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
                                 Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
                                 // rerotate
-                                illumMapCalc.MapRefPtAbsCoord(1, RefPt) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+                                mapRefPtAbsCoord.x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
 
-                                illumMapCalc.MapRefPtAbsCoord(2, RefPt) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+                                mapRefPtAbsCoord.y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                             }
                         } else {
-                            Xb = illumMapCalc.MapRefPtAbsCoord(1, RefPt);
-                            Yb = illumMapCalc.MapRefPtAbsCoord(2, RefPt);
-                            illumMapCalc.MapRefPtAbsCoord(1, RefPt) = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
-                            illumMapCalc.MapRefPtAbsCoord(2, RefPt) = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
+                            Xb = mapRefPtAbsCoord.x;
+                            Yb = mapRefPtAbsCoord.y;
+                            mapRefPtAbsCoord.x = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
+                            mapRefPtAbsCoord.y = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
                         }
                         if (RefPt == 1) {
-                            illumMap.Xmin = illumMapCalc.MapRefPtAbsCoord(1, RefPt);
-                            illumMap.Ymin = illumMapCalc.MapRefPtAbsCoord(2, RefPt);
-                            illumMap.Xmax = illumMapCalc.MapRefPtAbsCoord(1, RefPt);
-                            illumMap.Ymax = illumMapCalc.MapRefPtAbsCoord(2, RefPt);
-                            illumMap.Z = illumMapCalc.MapRefPtAbsCoord(3, RefPt);
+                            illumMap.Xmin = mapRefPtAbsCoord.x;
+                            illumMap.Ymin = mapRefPtAbsCoord.y;
+                            illumMap.Xmax = mapRefPtAbsCoord.x;
+                            illumMap.Ymax = mapRefPtAbsCoord.y;
+                            illumMap.Z = mapRefPtAbsCoord.z;
                         }
-                        illumMap.Xmin = min(illumMap.Xmin, illumMapCalc.MapRefPtAbsCoord(1, RefPt));
-                        illumMap.Ymin = min(illumMap.Ymin, illumMapCalc.MapRefPtAbsCoord(2, RefPt));
-                        illumMap.Xmax = max(illumMap.Xmax, illumMapCalc.MapRefPtAbsCoord(1, RefPt));
-                        illumMap.Ymax = max(illumMap.Ymax, illumMapCalc.MapRefPtAbsCoord(2, RefPt));
-                        if ((illumMapCalc.MapRefPtAbsCoord(1, RefPt) < zone.MinimumX &&
-                             (zone.MinimumX - illumMapCalc.MapRefPtAbsCoord(1, RefPt)) > 0.001) ||
-                            (illumMapCalc.MapRefPtAbsCoord(1, RefPt) > zone.MaximumX &&
-                             (illumMapCalc.MapRefPtAbsCoord(1, RefPt) - zone.MaximumX) > 0.001) ||
-                            (illumMapCalc.MapRefPtAbsCoord(2, RefPt) < zone.MinimumY &&
-                             (zone.MinimumY - illumMapCalc.MapRefPtAbsCoord(2, RefPt)) > 0.001) ||
-                            (illumMapCalc.MapRefPtAbsCoord(2, RefPt) > zone.MaximumY &&
-                             (illumMapCalc.MapRefPtAbsCoord(2, RefPt) - zone.MaximumY) > 0.001) ||
-                            (illumMapCalc.MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ &&
-                             (zone.MinimumZ - illumMapCalc.MapRefPtAbsCoord(3, RefPt)) > 0.001) ||
-                            (illumMapCalc.MapRefPtAbsCoord(3, RefPt) > zone.MaximumZ &&
-                             (illumMapCalc.MapRefPtAbsCoord(3, RefPt) - zone.MaximumZ) > 0.001)) {
+                        illumMap.Xmin = min(illumMap.Xmin, mapRefPtAbsCoord.x);
+                        illumMap.Ymin = min(illumMap.Ymin, mapRefPtAbsCoord.y);
+                        illumMap.Xmax = max(illumMap.Xmax, mapRefPtAbsCoord.x);
+                        illumMap.Ymax = max(illumMap.Ymax, mapRefPtAbsCoord.y);
+                        if ((mapRefPtAbsCoord.x < zone.MinimumX && (zone.MinimumX - mapRefPtAbsCoord.x) > 0.001) ||
+                            (mapRefPtAbsCoord.x > zone.MaximumX && (mapRefPtAbsCoord.x - zone.MaximumX) > 0.001) ||
+                            (mapRefPtAbsCoord.y < zone.MinimumY && (zone.MinimumY - mapRefPtAbsCoord.y) > 0.001) ||
+                            (mapRefPtAbsCoord.y > zone.MaximumY && (mapRefPtAbsCoord.y - zone.MaximumY) > 0.001) ||
+                            (mapRefPtAbsCoord.z < zone.MinimumZ && (zone.MinimumZ - mapRefPtAbsCoord.z) > 0.001) ||
+                            (mapRefPtAbsCoord.z > zone.MaximumZ && (mapRefPtAbsCoord.z - zone.MaximumZ) > 0.001)) {
                             illumMapCalc.MapRefPtInBounds(RefPt) = false;
                         }
                         // Test extremes of Map Points against Zone Min/Max
                         if (RefPt == 1 || RefPt == illumMapCalc.TotalMapRefPoints) {
-                            if ((illumMapCalc.MapRefPtAbsCoord(1, RefPt) < zone.MinimumX ||
-                                 illumMapCalc.MapRefPtAbsCoord(1, RefPt) > zone.MaximumX) &&
-                                !illumMapCalc.MapRefPtInBounds(RefPt)) {
+                            auto const &mapRefPtAbsCoord2 = illumMapCalc.MapRefPtAbsCoord(RefPt);
+                            if ((mapRefPtAbsCoord2.x < zone.MinimumX || mapRefPtAbsCoord2.x > zone.MaximumX) && !illumMapCalc.MapRefPtInBounds(RefPt)) {
                                 ShowWarningError(state,
                                                  format("GetInputIlluminanceMap: Reference Map point #[{}], X Value outside Zone Min/Max X, Zone={}",
                                                         RefPt,
                                                         zone.Name));
                                 ShowContinueError(state,
                                                   format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
-                                                         illumMapCalc.MapRefPtAbsCoord(1, RefPt),
+                                                         mapRefPtAbsCoord2.x,
                                                          zone.MinimumX,
                                                          zone.MaximumX));
-                                if (illumMapCalc.MapRefPtAbsCoord(1, RefPt) < zone.MinimumX) {
+                                if (mapRefPtAbsCoord2.x < zone.MinimumX) {
                                     ShowContinueError(state,
                                                       format("...X Reference Distance Outside MinimumX= {:.4R} m.",
-                                                             zone.MinimumX - illumMapCalc.MapRefPtAbsCoord(1, RefPt)));
+                                                             zone.MinimumX - mapRefPtAbsCoord2.x));
                                 } else {
                                     ShowContinueError(state,
                                                       format("...X Reference Distance Outside MaximumX= {:.4R} m.",
-                                                             illumMapCalc.MapRefPtAbsCoord(1, RefPt) - zone.MaximumX));
+                                                             mapRefPtAbsCoord2.x - zone.MaximumX));
                                 }
                             }
-                            if ((illumMapCalc.MapRefPtAbsCoord(2, RefPt) < zone.MinimumY ||
-                                 illumMapCalc.MapRefPtAbsCoord(2, RefPt) > zone.MaximumY) &&
-                                !illumMapCalc.MapRefPtInBounds(RefPt)) {
+                            if ((mapRefPtAbsCoord2.y < zone.MinimumY || mapRefPtAbsCoord2.y > zone.MaximumY) && !illumMapCalc.MapRefPtInBounds(RefPt)) {
                                 ShowWarningError(state,
                                                  format("GetInputIlluminanceMap: Reference Map point #[{}], Y Value outside Zone Min/Max Y, Zone={}",
                                                         RefPt,
                                                         zone.Name));
                                 ShowContinueError(state,
                                                   format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
-                                                         illumMapCalc.MapRefPtAbsCoord(2, RefPt),
+                                                         mapRefPtAbsCoord2.y,
                                                          zone.MinimumY,
                                                          zone.MaximumY));
-                                if (illumMapCalc.MapRefPtAbsCoord(2, RefPt) < zone.MinimumY) {
+                                if (mapRefPtAbsCoord2.y < zone.MinimumY) {
                                     ShowContinueError(state,
                                                       format("...Y Reference Distance Outside MinimumY= {:.4R} m.",
-                                                             zone.MinimumY - illumMapCalc.MapRefPtAbsCoord(2, RefPt)));
+                                                             zone.MinimumY - mapRefPtAbsCoord2.y));
                                 } else {
                                     ShowContinueError(state,
                                                       format("...Y Reference Distance Outside MaximumY= {:.4R} m.",
-                                                             illumMapCalc.MapRefPtAbsCoord(2, RefPt) - zone.MaximumY));
+                                                             mapRefPtAbsCoord2.y - zone.MaximumY));
                                 }
                             }
-                            if ((illumMapCalc.MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ ||
-                                 illumMapCalc.MapRefPtAbsCoord(3, RefPt) > zone.MaximumZ) &&
-                                !illumMapCalc.MapRefPtInBounds(RefPt)) {
+                            if ((mapRefPtAbsCoord2.z < zone.MinimumZ || mapRefPtAbsCoord2.z > zone.MaximumZ) && !illumMapCalc.MapRefPtInBounds(RefPt)) {
                                 ShowWarningError(state,
                                                  format("GetInputIlluminanceMap: Reference Map point #[{}], Z Value outside Zone Min/Max Z, Zone={}",
                                                         RefPt,
                                                         zone.Name));
                                 ShowContinueError(state,
                                                   format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
-                                                         illumMapCalc.MapRefPtAbsCoord(3, RefPt),
+                                                         mapRefPtAbsCoord2.z,
                                                          zone.MinimumZ,
                                                          zone.MaximumZ));
-                                if (illumMapCalc.MapRefPtAbsCoord(3, RefPt) < zone.MinimumZ) {
+                                if (mapRefPtAbsCoord2.z < zone.MinimumZ) {
                                     ShowContinueError(state,
                                                       format("...Z Reference Distance Outside MinimumZ= {:.4R} m.",
-                                                             zone.MinimumZ - illumMapCalc.MapRefPtAbsCoord(3, RefPt)));
+                                                             zone.MinimumZ - mapRefPtAbsCoord2.z));
                                 } else {
                                     ShowContinueError(state,
                                                       format("...Z Reference Distance Outside MaximumZ= {:.4R} m.",
-                                                             illumMapCalc.MapRefPtAbsCoord(3, RefPt) - zone.MaximumZ));
+                                                             mapRefPtAbsCoord2.z - zone.MaximumZ));
                                 }
                             }
                         }
@@ -4539,6 +4518,7 @@ void GetInputIlluminanceMap(EnergyPlusData &state, bool &ErrorsFound)
             }
         }
     } // MapNum
+        
     ZoneMsgDone.dimension(state.dataGlobal->NumOfZones, false);
     for (int MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
         auto const &illumMap = state.dataDaylightingData->IllumMap(MapNum);
@@ -4788,7 +4768,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
         daylightControl.IllumSetPoint.allocate(curTotalDaylRefPts);
         daylightControl.DaylIllumAtRefPt.allocate(curTotalDaylRefPts);
         daylightControl.GlareIndexAtRefPt.allocate(curTotalDaylRefPts);
-        daylightControl.DaylRefPtAbsCoord.allocate(3, curTotalDaylRefPts);
+        daylightControl.DaylRefPtAbsCoord.allocate(curTotalDaylRefPts);
         daylightControl.DaylRefPtInBounds.allocate(curTotalDaylRefPts);
         daylightControl.RefPtPowerReductionFactor.allocate(curTotalDaylRefPts);
         daylightControl.BacLum.allocate(curTotalDaylRefPts);
@@ -4806,9 +4786,7 @@ void GetDaylightingControls(EnergyPlusData &state, bool &ErrorsFound)
             daylightControl.BacLum(refPt) = 0.0;
             daylightControl.TimeExceedingGlareIndexSPAtRefPt(refPt) = 0.0;
             daylightControl.TimeExceedingDaylightIlluminanceSPAtRefPt(refPt) = 0.0;
-            for (int coord = 1; coord <= 3; ++coord) {
-                daylightControl.DaylRefPtAbsCoord(coord, refPt) = 0.0;
-            }
+            daylightControl.DaylRefPtAbsCoord(refPt) = {0.0, 0.0, 0.0};
         }
 
         int countRefPts = 0;
@@ -4958,20 +4936,20 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
             curRefPt.indexToFracAndIllum = refPtNum; // back reference to the index to the ZoneDaylight structure arrays related to reference points
             if (state.dataSurface->DaylRefWorldCoordSystem) {
                 // transform only by appendix G rotation
-                daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
-                daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
-                daylCntrl.DaylRefPtAbsCoord(3, refPtNum) = curRefPt.z;
+                daylCntrl.DaylRefPtAbsCoord(refPtNum).x = curRefPt.x * CosBldgRotAppGonly - curRefPt.y * SinBldgRotAppGonly;
+                daylCntrl.DaylRefPtAbsCoord(refPtNum).y = curRefPt.x * SinBldgRotAppGonly + curRefPt.y * CosBldgRotAppGonly;
+                daylCntrl.DaylRefPtAbsCoord(refPtNum).z = curRefPt.z;
             } else {
                 // Transform reference point coordinates into building coordinate system
                 Xb = curRefPt.x * CosZoneRelNorth - curRefPt.y * SinZoneRelNorth + zone.OriginX;
                 Yb = curRefPt.x * SinZoneRelNorth + curRefPt.y * CosZoneRelNorth + zone.OriginY;
                 // Transform into World Coordinate System
-                daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-                daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-                daylCntrl.DaylRefPtAbsCoord(3, refPtNum) = curRefPt.z + zone.OriginZ;
+                daylCntrl.DaylRefPtAbsCoord(refPtNum).x = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+                daylCntrl.DaylRefPtAbsCoord(refPtNum).y = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+                daylCntrl.DaylRefPtAbsCoord(refPtNum).z = curRefPt.z + zone.OriginZ;
                 if (doTransform) {
-                    Xo = daylCntrl.DaylRefPtAbsCoord(1, refPtNum); // world coordinates.... shifted by relative north angle...
-                    Yo = daylCntrl.DaylRefPtAbsCoord(2, refPtNum);
+                    Xo = daylCntrl.DaylRefPtAbsCoord(refPtNum).x; // world coordinates.... shifted by relative north angle...
+                    Yo = daylCntrl.DaylRefPtAbsCoord(refPtNum).y;
                     // next derotate the building
                     XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
                     YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
@@ -4979,8 +4957,8 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
                     Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
                     Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
                     // rerotate
-                    daylCntrl.DaylRefPtAbsCoord(1, refPtNum) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
-                    daylCntrl.DaylRefPtAbsCoord(2, refPtNum) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+                    daylCntrl.DaylRefPtAbsCoord(refPtNum).x = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+                    daylCntrl.DaylRefPtAbsCoord(refPtNum).y = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                 }
             }
             refName = curRefPt.Name;
@@ -5004,61 +4982,61 @@ void GeometryTransformForDaylighting(EnergyPlusData &state)
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchDyLtWCtrl, refName, rLightLevel * daylCntrl.FracZoneDaylit(refPtNum));
 
-            if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(1, refPtNum) > zone.MaximumX) {
+            if (daylCntrl.DaylRefPtAbsCoord(refPtNum).x < zone.MinimumX || daylCntrl.DaylRefPtAbsCoord(refPtNum).x > zone.MaximumX) {
                 daylCntrl.DaylRefPtInBounds(refPtNum) = false;
                 ShowWarningError(state,
                                  format("GeometryTransformForDaylighting: Reference point X Value outside Zone Min/Max X, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...X Reference Point= {:.2R}, Zone Minimum X= {:.2R}, Zone Maximum X= {:.2R}",
-                                         daylCntrl.DaylRefPtAbsCoord(1, refPtNum),
+                                         daylCntrl.DaylRefPtAbsCoord(refPtNum).x,
                                          zone.MinimumX,
                                          zone.MaximumX));
-                if (daylCntrl.DaylRefPtAbsCoord(1, refPtNum) < zone.MinimumX) {
+                if (daylCntrl.DaylRefPtAbsCoord(refPtNum).x < zone.MinimumX) {
                     ShowContinueError(
                         state,
-                        format("...X Reference Distance Outside MinimumX= {:.4R} m.", zone.MinimumX - daylCntrl.DaylRefPtAbsCoord(1, refPtNum)));
+                        format("...X Reference Distance Outside MinimumX= {:.4R} m.", zone.MinimumX - daylCntrl.DaylRefPtAbsCoord(refPtNum).x));
                 } else {
                     ShowContinueError(
                         state,
-                        format("...X Reference Distance Outside MaximumX= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(1, refPtNum) - zone.MaximumX));
+                        format("...X Reference Distance Outside MaximumX= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(refPtNum).x - zone.MaximumX));
                 }
             }
-            if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord(2, refPtNum) > zone.MaximumY) {
+            if (daylCntrl.DaylRefPtAbsCoord(refPtNum).y < zone.MinimumY || daylCntrl.DaylRefPtAbsCoord(refPtNum).y > zone.MaximumY) {
                 daylCntrl.DaylRefPtInBounds(refPtNum) = false;
                 ShowWarningError(state,
                                  format("GeometryTransformForDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...Y Reference Point= {:.2R}, Zone Minimum Y= {:.2R}, Zone Maximum Y= {:.2R}",
-                                         daylCntrl.DaylRefPtAbsCoord(2, refPtNum),
+                                         daylCntrl.DaylRefPtAbsCoord(refPtNum).x,
                                          zone.MinimumY,
                                          zone.MaximumY));
-                if (daylCntrl.DaylRefPtAbsCoord(2, refPtNum) < zone.MinimumY) {
+                if (daylCntrl.DaylRefPtAbsCoord(refPtNum).y < zone.MinimumY) {
                     ShowContinueError(
                         state,
-                        format("...Y Reference Distance Outside MinimumY= {:.4R} m.", zone.MinimumY - daylCntrl.DaylRefPtAbsCoord(2, refPtNum)));
+                        format("...Y Reference Distance Outside MinimumY= {:.4R} m.", zone.MinimumY - daylCntrl.DaylRefPtAbsCoord(refPtNum).y));
                 } else {
                     ShowContinueError(
                         state,
-                        format("...Y Reference Distance Outside MaximumY= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(2, refPtNum) - zone.MaximumY));
+                        format("...Y Reference Distance Outside MaximumY= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(refPtNum).y - zone.MaximumY));
                 }
             }
-            if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord(3, refPtNum) > zone.MaximumZ) {
+            if (daylCntrl.DaylRefPtAbsCoord(refPtNum).z < zone.MinimumZ || daylCntrl.DaylRefPtAbsCoord(refPtNum).z > zone.MaximumZ) {
                 daylCntrl.DaylRefPtInBounds(refPtNum) = false;
                 ShowWarningError(state,
                                  format("GeometryTransformForDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone={}", zone.Name));
                 ShowContinueError(state,
                                   format("...Z Reference Point= {:.2R}, Zone Minimum Z= {:.2R}, Zone Maximum Z= {:.2R}",
-                                         daylCntrl.DaylRefPtAbsCoord(3, refPtNum),
+                                         daylCntrl.DaylRefPtAbsCoord(refPtNum).z,
                                          zone.MinimumZ,
                                          zone.MaximumZ));
-                if (daylCntrl.DaylRefPtAbsCoord(3, refPtNum) < zone.MinimumZ) {
+                if (daylCntrl.DaylRefPtAbsCoord(refPtNum).z < zone.MinimumZ) {
                     ShowContinueError(
                         state,
-                        format("...Z Reference Distance Outside MinimumZ= {:.4R} m.", zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord(3, refPtNum)));
+                        format("...Z Reference Distance Outside MinimumZ= {:.4R} m.", zone.MinimumZ - daylCntrl.DaylRefPtAbsCoord(refPtNum).z));
                 } else {
                     ShowContinueError(
                         state,
-                        format("...Z Reference Distance Outside MaximumZ= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(3, refPtNum) - zone.MaximumZ));
+                        format("...Z Reference Distance Outside MaximumZ= {:.4R} m.", daylCntrl.DaylRefPtAbsCoord(refPtNum).z - zone.MaximumZ));
                 }
             }
         } // for (refPtNum) reference point
@@ -9460,9 +9438,9 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
                 ++rCount;
                 illumMap.pointsHeader += format(" RefPt{}=({:.2R}:{:.2R}:{:.2R}),",
                                                 rCount,
-                                                thisDaylightControl.DaylRefPtAbsCoord(1, R),
-                                                thisDaylightControl.DaylRefPtAbsCoord(2, R),
-                                                thisDaylightControl.DaylRefPtAbsCoord(3, R));
+                                                thisDaylightControl.DaylRefPtAbsCoord(R).x,
+                                                thisDaylightControl.DaylRefPtAbsCoord(R).y,
+                                                thisDaylightControl.DaylRefPtAbsCoord(R).z);
             }
         }
     }
@@ -9489,8 +9467,8 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
             for (int X = 1; X <= illumMap.Xnum; ++X) {
                 const std::string AddXorYString = format("{}({:.2R};{:.2R})=",
                                                          state.dataDaylightingData->MapColSep,
-                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(1, RefPt),
-                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(2, RefPt));
+                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(RefPt).x,
+                                                         state.dataDaylightingData->IllumMapCalc(MapNum).MapRefPtAbsCoord(RefPt).y);
                 if (illumMap.HeaderXLineLengthNeeded) linelen += int(len(AddXorYString));
                 mapLine += AddXorYString;
                 ++RefPt;
@@ -9513,7 +9491,7 @@ void ReportIllumMap(EnergyPlusData &state, int const MapNum)
             // Write Y scale prefix and illuminance values
             RefPt = 1;
             for (int Y = 1; Y <= illumMap.Ynum; ++Y) {
-                mapLine = format("({:.2R};{:.2R})=", illumMapCalc.MapRefPtAbsCoord(1, RefPt), illumMapCalc.MapRefPtAbsCoord(2, RefPt));
+                mapLine = format("({:.2R};{:.2R})=", illumMapCalc.MapRefPtAbsCoord(RefPt).x, illumMapCalc.MapRefPtAbsCoord(RefPt).y);
                 for (int R = RefPt; R <= RefPt + illumMap.Xnum - 1; ++R) {
                     int IllumOut = nint(illumMapCalc.DaylIllumAtMapPtHr(R));
                     std::string String;
@@ -10236,7 +10214,7 @@ void CalcMinIntWinSolidAngs(EnergyPlusData &state)
                 auto &thisDaylightControl = state.dataDaylightingData->daylightControl(controlNum);
                 for (int IL = 1; IL <= thisDaylightControl.TotalDaylRefPoints; ++IL) {
                     // Reference point in absolute coordinate system
-                    RREF = thisDaylightControl.DaylRefPtAbsCoord({1, 3}, IL);
+                    RREF = thisDaylightControl.DaylRefPtAbsCoord(IL);
                     is_Triangle = (surf.Sides == 3);
                     is_Rectangle = (surf.Sides == 4);
                     if (is_Rectangle) {

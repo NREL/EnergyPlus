@@ -165,7 +165,7 @@ namespace Dayltg {
         int AvailSchedNum = 0;                                              // pointer to availability schedule if present
         int TotalDaylRefPoints = 0;                                         // Number of daylighting reference points for this control
         Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
-        Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
+        Array1D<Vector3<Real64>> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
         Array1D_bool DaylRefPtInBounds;                         // True when coordinates are in bounds of zone coordinates
@@ -259,7 +259,7 @@ namespace Dayltg {
         int TotalMapRefPoints = 0;        // Number of illuminance map reference points in this zone (up to 100)
         int zoneIndex = 0;                // Pointer to zone being mapped
         int enclIndex = 0;                // Index to enclosure for this map
-        Array2D<Real64> MapRefPtAbsCoord; // X,Y,Z coordinates of all illuminance map reference points
+        Array1D<Vector3<Real64>> MapRefPtAbsCoord; // X,Y,Z coordinates of all illuminance map reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
         Array1D_bool MapRefPtInBounds;    // True when coordinates are in bounds of zone coordinates
