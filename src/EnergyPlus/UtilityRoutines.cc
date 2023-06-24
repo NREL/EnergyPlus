@@ -661,8 +661,8 @@ void CloseMiscOpenFiles(EnergyPlusData &state)
     // Use INQUIRE to determine if file is open.
 
     // Using/Aliasing
-    using DaylightingManager::CloseDFSFile;
-    using DaylightingManager::CloseReportIllumMaps;
+    using Dayltg::CloseDFSFile;
+    using Dayltg::CloseReportIllumMaps;
 
     CloseReportIllumMaps(state);
     CloseDFSFile(state);
