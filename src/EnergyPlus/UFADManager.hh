@@ -59,26 +59,26 @@ struct EnergyPlusData;
 
 namespace RoomAir {
 
-    void ManageUCSDUFModels(EnergyPlusData &state,
-                            int const ZoneNum,                                 // index number for the specified zone
-                            RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
-    );
-
-    void InitUCSDUF(EnergyPlusData &state,
-                    int const ZoneNum,
+    void ManageUFAD(EnergyPlusData &state,
+                    int const ZoneNum,                                 // index number for the specified zone
                     RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void SizeUCSDUF(EnergyPlusData &state,
-                    int const ZoneNum,
-                    RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+    void InitUFAD(EnergyPlusData &state,
+                  int const ZoneNum,
+                  RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
+    void SizeUFAD(EnergyPlusData &state,
+                  int const ZoneNum,
+                  RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+    );
 
-    void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
 
-    void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void CalcUFADInt(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+
+    void CalcUFADExt(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
 } // namespace RoomAir
 

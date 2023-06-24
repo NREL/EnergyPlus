@@ -107,9 +107,9 @@ using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
 using Convect::CalcDetailedHcInForDVModel;
 
-void ManageUCSDUFModels(EnergyPlusData &state,
-                        int const ZoneNum,                                 // index number for the specified zone
-                        RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+void ManageUFAD(EnergyPlusData &state,
+                int const ZoneNum,                                 // index number for the specified zone
+                RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
 )
 {
 
@@ -137,23 +137,23 @@ void ManageUCSDUFModels(EnergyPlusData &state,
 
     // input was obtained in RoomAirManager, GetUFADIntZoneData
 
-    InitUCSDUF(state, ZoneNum, ZoneModelType); // initialize some module variables
+    InitUFAD(state, ZoneNum, ZoneModelType); // initialize some module variables
 
     switch (ZoneModelType) {
     case RoomAirModel::UFADInt: { // UCSD UFAD interior zone model
         // simulate room airflow using the UCSDUFI model
-        CalcUCSDUI(state, ZoneNum);
+        CalcUFADInt(state, ZoneNum);
     } break;
     case RoomAirModel::UFADExt: { // UCSD UFAD exterior zone model
         // simulate room airflow using the UCSDUFE model
-        CalcUCSDUE(state, ZoneNum);
+        CalcUFADExt(state, ZoneNum);
     } break;
     default:
         break;
     }
 }
 
-void InitUCSDUF(EnergyPlusData &state,
+void InitUFAD(EnergyPlusData &state,
                 int const ZoneNum,
                 RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
 )
@@ -184,7 +184,7 @@ void InitUCSDUF(EnergyPlusData &state,
     }
 
     if (state.dataUFADManager->MySizeFlag(ZoneNum)) {
-        SizeUCSDUF(state, ZoneNum, ZoneModelType);
+        SizeUFAD(state, ZoneNum, ZoneModelType);
         state.dataUFADManager->MySizeFlag(ZoneNum) = false;
     }
 
@@ -222,9 +222,9 @@ void InitUCSDUF(EnergyPlusData &state,
     }
 }
 
-void SizeUCSDUF(EnergyPlusData &state,
-                int const ZoneNum,
-                RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+void SizeUFAD(EnergyPlusData &state,
+              int const ZoneNum,
+              RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
 )
 {
 
@@ -982,7 +982,7 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     }
 }
 
-void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
 {
 
     // SUBROUTINE INFORMATION:
@@ -1494,7 +1494,7 @@ void CalcUCSDUI(EnergyPlusData &state, int const ZoneNum) // index number for th
     }
 }
 
-void CalcUCSDUE(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
 {
 
     // SUBROUTINE INFORMATION:

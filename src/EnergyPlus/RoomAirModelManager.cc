@@ -147,27 +147,27 @@ namespace RoomAir {
 
         case RoomAirModel::DispVent1Node: // Mundt air model
             // simulate room airflow using Mundt model
-            ManageMundtModel(state, ZoneNum);
+            ManageDispVent1Node(state, ZoneNum);
             break;
 
         case RoomAirModel::DispVent3Node: // UCDV Displacement Ventilation model
             // simulate room airflow using UCSDDV model
-            ManageUCSDDVModel(state, ZoneNum);
+            ManageDispVent3Node(state, ZoneNum);
             break;
 
         case RoomAirModel::CrossVent: // UCSD Cross Ventilation model
             // simulate room airflow using UCSDDV model
-            ManageUCSDCVModel(state, ZoneNum);
+            ManageCrossVent(state, ZoneNum);
             break;
 
         case RoomAirModel::UFADInt: // UCSD UFAD interior zone model
             // simulate room airflow using the UCSDUFI model
-            ManageUCSDUFModels(state, ZoneNum, RoomAirModel::UFADInt);
+            ManageUFAD(state, ZoneNum, RoomAirModel::UFADInt);
             break;
 
         case RoomAirModel::UFADExt: // UCSD UFAD exterior zone model
             // simulate room airflow using the UCSDUFE model
-            ManageUCSDUFModels(state, ZoneNum, RoomAirModel::UFADExt);
+            ManageUFAD(state, ZoneNum, RoomAirModel::UFADExt);
             break;
 
         case RoomAirModel::AirflowNetwork: // RoomAirflowNetwork zone model

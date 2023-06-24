@@ -96,7 +96,7 @@ namespace RoomAir {
     Real64 constexpr CrecFlow1(0.415); // First correlation constant for the recirculation flow rate
     Real64 constexpr CrecFlow2(0.466); // Second correlation constant for the recirculation flow rate
 
-    void ManageUCSDCVModel(EnergyPlusData &state,
+    void ManageCrossVent(EnergyPlusData &state,
                            int const ZoneNum) // index number for the specified zone
     {
 
@@ -107,13 +107,13 @@ namespace RoomAir {
         // PURPOSE OF THIS SUBROUTINE:
         //   manage the UCSD Cross Ventilation model
 
-        InitUCSDCV(state, ZoneNum);
+        InitCrossVent(state, ZoneNum);
 
         // perform Cross Ventilation model calculations
-        CalcUCSDCV(state, ZoneNum);
+        CalcCrossVent(state, ZoneNum);
     }
 
-    void InitUCSDCV(EnergyPlusData &state, int const ZoneNum)
+    void InitCrossVent(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -142,7 +142,7 @@ namespace RoomAir {
         }
     }
 
-    void HcUCSDCV(EnergyPlusData &state, int const ZoneNum)
+    void HcCrossVent(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -325,7 +325,7 @@ namespace RoomAir {
         }
     }
 
-    void EvolveParaUCSDCV(EnergyPlusData &state, int const ZoneNum)
+    void EvolveParaCrossVent(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -712,8 +712,8 @@ namespace RoomAir {
         }
     }
 
-    void CalcUCSDCV(EnergyPlusData &state,
-                    int const ZoneNum) // Which Zonenum
+    void CalcCrossVent(EnergyPlusData &state,
+                       int const ZoneNum) // Which Zonenum
     {
 
         // SUBROUTINE INFORMATION:
@@ -765,7 +765,7 @@ namespace RoomAir {
                 state.afn->exchangeData(ZoneNum).SumMCpT + state.afn->exchangeData(ZoneNum).SumMVCpT + state.afn->exchangeData(ZoneNum).SumMMCpT;
         }
 
-        EvolveParaUCSDCV(state, ZoneNum);
+        EvolveParaCrossVent(state, ZoneNum);
         // Real64 L = state.dataRoomAirMod->Droom(ZoneNum);
 
         if (state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel) {
@@ -773,7 +773,7 @@ namespace RoomAir {
             state.dataRoomAirMod->ZoneCrossVentIsMixing(ZoneNum) = 0.0;
             state.dataRoomAirMod->ZoneCrossVentHasREC(ZoneNum) = 1.0;
             for (int Ctd = 1; Ctd <= 4; ++Ctd) {
-                HcUCSDCV(state, ZoneNum);
+                HcCrossVent(state, ZoneNum);
                 if (state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) != 1.0) {
                     state.dataRoomAirMod->ZTREC(ZoneNum) =
                         (ConvGainsRec * CrecTemp + CrecTemp * state.dataCrossVentMgr->HAT_R + state.dataRoomAirMod->Tin(ZoneNum) * MCp_Total) /
@@ -817,7 +817,7 @@ namespace RoomAir {
                     state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
                     state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
                     state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                    HcUCSDCV(state, ZoneNum);
+                    HcCrossVent(state, ZoneNum);
                     ZTAveraged = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                     state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
                     state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
@@ -849,7 +849,7 @@ namespace RoomAir {
                 state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
                 state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;
                 state.dataRoomAirMod->ZTREC(ZoneNum) = ZTAveraged;
-                HcUCSDCV(state, ZoneNum);
+                HcCrossVent(state, ZoneNum);
                 ZTAveraged = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
                 state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = ZTAveraged;
                 state.dataRoomAirMod->ZTJET(ZoneNum) = ZTAveraged;

@@ -94,7 +94,7 @@ using namespace DataHeatBalSurface;
 using namespace DataSurfaces;
 using Convect::CalcDetailedHcInForDVModel;
 
-void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+void ManageDispVent3Node(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
 {
 
     // SUBROUTINE INFORMATION:
@@ -105,15 +105,15 @@ void ManageUCSDDVModel(EnergyPlusData &state, int const ZoneNum) // index number
     //   manage the UCSD Displacement Ventilation model
 
     // initialize Displacement Ventilation model
-    InitUCSDDV(state, ZoneNum);
+    InitDispVent3Node(state, ZoneNum);
 
     // perform Displacement Ventilation model calculations
-    CalcUCSDDV(state, ZoneNum);
+    CalcDispVent3Node(state, ZoneNum);
 }
 
 //**************************************************************************************************
 
-void InitUCSDDV(EnergyPlusData &state, int const ZoneNum)
+void InitDispVent3Node(EnergyPlusData &state, int const ZoneNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -158,7 +158,7 @@ void InitUCSDDV(EnergyPlusData &state, int const ZoneNum)
 
 //**************************************************************************************************
 
-void HcUCSDDV(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight)
+void HcDispVent3Node(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight)
 {
 
     // SUBROUTINE INFORMATION:
@@ -485,7 +485,7 @@ Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
            (elevenOverSix * airCap + HA_floor + 1.6 * MCp_Total);
 }
 
-void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
+void CalcDispVent3Node(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
 {
 
     // SUBROUTINE INFORMATION:
@@ -725,7 +725,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
         Real64 const plume_fac(NumberOfPlumes * std::pow(PowerPerPlume, OneThird));
         HeightFrac = min(24.55 * std::pow(MCp_Total * 0.000833 / plume_fac, 0.6) / CeilingHeight, 1.0);
         for (Ctd = 1; Ctd <= 4; ++Ctd) {
-            HcUCSDDV(state, ZoneNum, HeightFrac);
+            HcDispVent3Node(state, ZoneNum, HeightFrac);
             // HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) /
             // CeilingHeight, 1.0 ); //Tuned This does not vary in loop  EPTeam-replaces above (cause diffs)      HeightFrac =
             // MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
@@ -916,7 +916,7 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
             state.dataRoomAirMod->ZTOC(ZoneNum) = ZTAveraged;
             state.dataRoomAirMod->ZTMX(ZoneNum) = ZTAveraged;
             state.dataRoomAirMod->ZTFloor(ZoneNum) = ZTAveraged;
-            HcUCSDDV(state, ZoneNum, HeightFrac);
+            HcDispVent3Node(state, ZoneNum, HeightFrac);
             TempDepCoef = state.dataDispVentMgr->HA_MX + state.dataDispVentMgr->HA_OC + state.dataDispVentMgr->HA_FLOOR + MCp_Total;
             TempIndCoef = ConvGains + state.dataDispVentMgr->HAT_MX + state.dataDispVentMgr->HAT_OC + state.dataDispVentMgr->HAT_FLOOR + MCpT_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {

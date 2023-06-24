@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataHeatBalSurf->SurfTempIn(2) = 23.0;
     state->dataHeatBalSurf->SurfTempIn(3) = 23.0;
 
-    HcUCSDDV(*state, 1, 0.5);
+    HcDispVent3Node(*state, 1, 0.5);
 
     EXPECT_NEAR(1.889346, state->dataRoomAirMod->DispVent3NodeHcIn(1), 0.0001);
     EXPECT_NEAR(1.650496, state->dataRoomAirMod->DispVent3NodeHcIn(2), 0.0001);

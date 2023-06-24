@@ -168,7 +168,7 @@ TEST_F(EnergyPlusFixture, CrossVentMgr_EvolveParaUCSDCV_Test)
     state->dataRoomAirMod->Qtot.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->Tin.allocate(state->dataGlobal->NumOfZones);
 
-    EvolveParaUCSDCV(*state, 1);
+    EvolveParaCrossVent(*state, 1);
 
     EXPECT_NEAR(27.14, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Fin, 0.01);
     EXPECT_NEAR(0.871, state->dataRoomAirMod->CrossVentJetRecFlows(1, 1).Uin, 0.001);

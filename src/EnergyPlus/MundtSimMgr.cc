@@ -101,7 +101,7 @@ namespace RoomAir {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    void ManageMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void ManageDispVent1Node(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -117,7 +117,7 @@ namespace RoomAir {
 
         // initialize Mundt model data
         if (state.dataHeatBal->MundtFirstTimeFlag) {
-            InitMundtModel(state);
+            InitDispVent1Node(state);
             state.dataHeatBal->MundtFirstTimeFlag = false;
         }
 
@@ -125,27 +125,27 @@ namespace RoomAir {
         state.dataMundtSimMgr->MundtZoneNum = state.dataMundtSimMgr->ZoneData(ZoneNum).MundtZoneIndex;
 
         // transfer data from surface domain to air domain for the specified zone
-        GetSurfHBDataForMundtModel(state, ZoneNum);
+        GetSurfHBDataForDispVent1Node(state, ZoneNum);
 
         // use the Mundt model only for cooling case
         if ((state.dataMundtSimMgr->SupplyAirVolumeRate > 0.0001) && (state.dataMundtSimMgr->QsysCoolTot > 0.0001)) {
 
             // setup Mundt model
             ErrorsFound = false;
-            SetupMundtModel(state, ZoneNum, ErrorsFound);
+            SetupDispVent1Node(state, ZoneNum, ErrorsFound);
             if (ErrorsFound) ShowFatalError(state, "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination.");
 
             // perform Mundt model calculations
-            CalcMundtModel(state, ZoneNum);
+            CalcDispVent1Node(state, ZoneNum);
         }
 
         // transfer data from air domain back to surface domain for the specified zone
-        SetSurfHBDataForMundtModel(state, ZoneNum);
+        SetSurfHBDataForDispVent1Node(state, ZoneNum);
     }
 
     //*****************************************************************************************
 
-    void InitMundtModel(EnergyPlusData &state)
+    void InitDispVent1Node(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -320,7 +320,7 @@ namespace RoomAir {
 
     //*****************************************************************************************
 
-    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void GetSurfHBDataForDispVent1Node(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -426,7 +426,7 @@ namespace RoomAir {
 
     //*****************************************************************************************
 
-    void SetupMundtModel(EnergyPlusData &state,
+    void SetupDispVent1Node(EnergyPlusData &state,
                          int const ZoneNum, // index number for the specified zone
                          bool &ErrorsFound  // true if problems setting up model
     )
@@ -525,7 +525,7 @@ namespace RoomAir {
 
     //*****************************************************************************************
 
-    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void CalcDispVent1Node(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -717,7 +717,7 @@ namespace RoomAir {
 
     //*****************************************************************************************
 
-    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
+    void SetSurfHBDataForDispVent1Node(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:

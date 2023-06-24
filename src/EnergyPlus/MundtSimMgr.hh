@@ -95,26 +95,26 @@ namespace RoomAir {
 
     // Functions
 
-    void ManageMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
+    void ManageDispVent1Node(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void InitMundtModel(EnergyPlusData &state);
+    void InitDispVent1Node(EnergyPlusData &state);
 
     //*****************************************************************************************
 
-    void GetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
+    void GetSurfHBDataForDispVent1Node(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
-    void SetupMundtModel(EnergyPlusData &state,
+    void SetupDispVent1Node(EnergyPlusData &state,
                          int ZoneNum,      // index number for the specified zone
                          bool &ErrorsFound // true if problems setting up model
     );
 
     //*****************************************************************************************
 
-    void CalcMundtModel(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
+    void CalcDispVent1Node(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
@@ -132,7 +132,7 @@ namespace RoomAir {
 
     //*****************************************************************************************
 
-    void SetSurfHBDataForMundtModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
+    void SetSurfHBDataForDispVent1Node(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
     //*****************************************************************************************
 
