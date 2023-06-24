@@ -4521,8 +4521,8 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
             tempChange = max(tempChange, std::abs(this->ZT - this->ZTM[0]));
         } else {
             tempChange = max(tempChange,
-                             max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->ZTM1OC(zoneNum)),
-                                 std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->ZTM1MX(zoneNum))));
+                             max(std::abs(state.dataRoomAirMod->ZTOC(zoneNum) - state.dataRoomAirMod->ZTMOC(zoneNum)[0]),
+                                 std::abs(state.dataRoomAirMod->ZTMX(zoneNum) - state.dataRoomAirMod->ZTMMX(zoneNum)[0])));
         }
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution:
@@ -4602,22 +4602,22 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
         if (thisAirModel.AirModel == RoomAir::RoomAirModel::DispVent3Node ||
             thisAirModel.AirModel == RoomAir::RoomAirModel::UFADInt ||
             thisAirModel.AirModel == RoomAir::RoomAirModel::UFADExt) {
-            state.dataRoomAirMod->XM4TFloor(zoneNum) = state.dataRoomAirMod->XM3TFloor(zoneNum);
-            state.dataRoomAirMod->XM3TFloor(zoneNum) = state.dataRoomAirMod->XM2TFloor(zoneNum);
-            state.dataRoomAirMod->XM2TFloor(zoneNum) = state.dataRoomAirMod->XMATFloor(zoneNum);
-            state.dataRoomAirMod->XMATFloor(zoneNum) = state.dataRoomAirMod->ZTFloor(zoneNum);
+            state.dataRoomAirMod->XMATFloor(zoneNum)[3] = state.dataRoomAirMod->XMATFloor(zoneNum)[2];
+            state.dataRoomAirMod->XMATFloor(zoneNum)[2] = state.dataRoomAirMod->XMATFloor(zoneNum)[1];
+            state.dataRoomAirMod->XMATFloor(zoneNum)[1] = state.dataRoomAirMod->XMATFloor(zoneNum)[0];
+            state.dataRoomAirMod->XMATFloor(zoneNum)[0] = state.dataRoomAirMod->ZTFloor(zoneNum);
             state.dataRoomAirMod->MATFloor(zoneNum) = state.dataRoomAirMod->ZTFloor(zoneNum);
 
-            state.dataRoomAirMod->XM4TOC(zoneNum) = state.dataRoomAirMod->XM3TOC(zoneNum);
-            state.dataRoomAirMod->XM3TOC(zoneNum) = state.dataRoomAirMod->XM2TOC(zoneNum);
-            state.dataRoomAirMod->XM2TOC(zoneNum) = state.dataRoomAirMod->XMATOC(zoneNum);
-            state.dataRoomAirMod->XMATOC(zoneNum) = state.dataRoomAirMod->ZTOC(zoneNum);
+            state.dataRoomAirMod->XMATOC(zoneNum)[3] = state.dataRoomAirMod->XMATOC(zoneNum)[2];
+            state.dataRoomAirMod->XMATOC(zoneNum)[2] = state.dataRoomAirMod->XMATOC(zoneNum)[1];
+            state.dataRoomAirMod->XMATOC(zoneNum)[1] = state.dataRoomAirMod->XMATOC(zoneNum)[0];
+            state.dataRoomAirMod->XMATOC(zoneNum)[0] = state.dataRoomAirMod->ZTOC(zoneNum);
             state.dataRoomAirMod->MATOC(zoneNum) = state.dataRoomAirMod->ZTOC(zoneNum);
 
-            state.dataRoomAirMod->XM4TMX(zoneNum) = state.dataRoomAirMod->XM3TMX(zoneNum);
-            state.dataRoomAirMod->XM3TMX(zoneNum) = state.dataRoomAirMod->XM2TMX(zoneNum);
-            state.dataRoomAirMod->XM2TMX(zoneNum) = state.dataRoomAirMod->XMATMX(zoneNum);
-            state.dataRoomAirMod->XMATMX(zoneNum) = state.dataRoomAirMod->ZTMX(zoneNum);
+            state.dataRoomAirMod->XMATMX(zoneNum)[3] = state.dataRoomAirMod->XMATMX(zoneNum)[2];
+            state.dataRoomAirMod->XMATMX(zoneNum)[2] = state.dataRoomAirMod->XMATMX(zoneNum)[1];
+            state.dataRoomAirMod->XMATMX(zoneNum)[1] = state.dataRoomAirMod->XMATMX(zoneNum)[0];
+            state.dataRoomAirMod->XMATMX(zoneNum)[0] = state.dataRoomAirMod->ZTMX(zoneNum);
             state.dataRoomAirMod->MATMX(zoneNum) = state.dataRoomAirMod->ZTMX(zoneNum);
         }
 
@@ -4703,20 +4703,20 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0 && state.dataRoomAirMod->anyNonMixingRoomAirModel) {
         if (state.dataRoomAirMod->IsZoneDispVent3Node(zoneNum) || state.dataRoomAirMod->IsZoneUI(zoneNum)) {
-            state.dataRoomAirMod->DSXM4TFloor(zoneNum) = state.dataRoomAirMod->DSXM3TFloor(zoneNum);
-            state.dataRoomAirMod->DSXM3TFloor(zoneNum) = state.dataRoomAirMod->DSXM2TFloor(zoneNum);
-            state.dataRoomAirMod->DSXM2TFloor(zoneNum) = state.dataRoomAirMod->DSXMATFloor(zoneNum);
-            state.dataRoomAirMod->DSXMATFloor(zoneNum) = state.dataRoomAirMod->MATFloor(zoneNum);
+            state.dataRoomAirMod->DSXMATFloor(zoneNum)[3] = state.dataRoomAirMod->DSXMATFloor(zoneNum)[2];
+            state.dataRoomAirMod->DSXMATFloor(zoneNum)[2] = state.dataRoomAirMod->DSXMATFloor(zoneNum)[1];
+            state.dataRoomAirMod->DSXMATFloor(zoneNum)[1] = state.dataRoomAirMod->DSXMATFloor(zoneNum)[0];
+            state.dataRoomAirMod->DSXMATFloor(zoneNum)[0] = state.dataRoomAirMod->MATFloor(zoneNum);
 
-            state.dataRoomAirMod->DSXM4TOC(zoneNum) = state.dataRoomAirMod->DSXM3TOC(zoneNum);
-            state.dataRoomAirMod->DSXM3TOC(zoneNum) = state.dataRoomAirMod->DSXM2TOC(zoneNum);
-            state.dataRoomAirMod->DSXM2TOC(zoneNum) = state.dataRoomAirMod->DSXMATOC(zoneNum);
-            state.dataRoomAirMod->DSXMATOC(zoneNum) = state.dataRoomAirMod->MATOC(zoneNum);
+            state.dataRoomAirMod->DSXMATOC(zoneNum)[3] = state.dataRoomAirMod->DSXMATOC(zoneNum)[2];
+            state.dataRoomAirMod->DSXMATOC(zoneNum)[2] = state.dataRoomAirMod->DSXMATOC(zoneNum)[1];
+            state.dataRoomAirMod->DSXMATOC(zoneNum)[1] = state.dataRoomAirMod->DSXMATOC(zoneNum)[0];
+            state.dataRoomAirMod->DSXMATOC(zoneNum)[0] = state.dataRoomAirMod->MATOC(zoneNum);
 
-            state.dataRoomAirMod->DSXM4TMX(zoneNum) = state.dataRoomAirMod->DSXM3TMX(zoneNum);
-            state.dataRoomAirMod->DSXM3TMX(zoneNum) = state.dataRoomAirMod->DSXM2TMX(zoneNum);
-            state.dataRoomAirMod->DSXM2TMX(zoneNum) = state.dataRoomAirMod->DSXMATMX(zoneNum);
-            state.dataRoomAirMod->DSXMATMX(zoneNum) = state.dataRoomAirMod->MATMX(zoneNum);
+            state.dataRoomAirMod->DSXMATMX(zoneNum)[3] = state.dataRoomAirMod->DSXMATMX(zoneNum)[2];
+            state.dataRoomAirMod->DSXMATMX(zoneNum)[2] = state.dataRoomAirMod->DSXMATMX(zoneNum)[1];
+            state.dataRoomAirMod->DSXMATMX(zoneNum)[1] = state.dataRoomAirMod->DSXMATMX(zoneNum)[0];
+            state.dataRoomAirMod->DSXMATMX(zoneNum)[0] = state.dataRoomAirMod->MATMX(zoneNum);
         }
         if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
             for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
@@ -4800,17 +4800,17 @@ void ZoneSpaceHeatBalanceData::revertZoneTimestepHistory(EnergyPlusData &state, 
             state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::UFADInt ||
             state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::UFADExt) {
 
-            state.dataRoomAirMod->XMATFloor(zoneNum) = state.dataRoomAirMod->XM2TFloor(zoneNum);
-            state.dataRoomAirMod->XM2TFloor(zoneNum) = state.dataRoomAirMod->XM3TFloor(zoneNum);
-            state.dataRoomAirMod->XM3TFloor(zoneNum) = state.dataRoomAirMod->XM4TFloor(zoneNum);
+            state.dataRoomAirMod->XMATFloor(zoneNum)[0] = state.dataRoomAirMod->XMATFloor(zoneNum)[1];
+            state.dataRoomAirMod->XMATFloor(zoneNum)[1] = state.dataRoomAirMod->XMATFloor(zoneNum)[2];
+            state.dataRoomAirMod->XMATFloor(zoneNum)[2] = state.dataRoomAirMod->XMATFloor(zoneNum)[3];
 
-            state.dataRoomAirMod->XMATOC(zoneNum) = state.dataRoomAirMod->XM2TOC(zoneNum);
-            state.dataRoomAirMod->XM2TOC(zoneNum) = state.dataRoomAirMod->XM3TOC(zoneNum);
-            state.dataRoomAirMod->XM3TOC(zoneNum) = state.dataRoomAirMod->XM4TOC(zoneNum);
+            state.dataRoomAirMod->XMATOC(zoneNum)[0] = state.dataRoomAirMod->XMATOC(zoneNum)[1];
+            state.dataRoomAirMod->XMATOC(zoneNum)[1] = state.dataRoomAirMod->XMATOC(zoneNum)[2];
+            state.dataRoomAirMod->XMATOC(zoneNum)[2] = state.dataRoomAirMod->XMATOC(zoneNum)[3];
 
-            state.dataRoomAirMod->XMATMX(zoneNum) = state.dataRoomAirMod->XM2TMX(zoneNum);
-            state.dataRoomAirMod->XM2TMX(zoneNum) = state.dataRoomAirMod->XM3TMX(zoneNum);
-            state.dataRoomAirMod->XM3TMX(zoneNum) = state.dataRoomAirMod->XM4TMX(zoneNum);
+            state.dataRoomAirMod->XMATMX(zoneNum)[0] = state.dataRoomAirMod->XMATMX(zoneNum)[1];
+            state.dataRoomAirMod->XMATMX(zoneNum)[1] = state.dataRoomAirMod->XMATMX(zoneNum)[2];
+            state.dataRoomAirMod->XMATMX(zoneNum)[3] = state.dataRoomAirMod->XMATMX(zoneNum)[3];
         }
 
         if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
@@ -7128,36 +7128,22 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
             if (spaceNum == 0 && state.dataRoomAirMod->anyNonMixingRoomAirModel) {
                 if (state.dataRoomAirMod->IsZoneDispVent3Node(zoneNum) || state.dataRoomAirMod->IsZoneUI(zoneNum)) {
 
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->XMATFloor(zoneNum),
-                                                  state.dataRoomAirMod->XM2TFloor(zoneNum),
-                                                  state.dataRoomAirMod->XM3TFloor(zoneNum),
-                                                  state.dataRoomAirMod->MATFloor(zoneNum),
-                                                  state.dataRoomAirMod->DSXMATFloor(zoneNum),
-                                                  state.dataRoomAirMod->DSXM2TFloor(zoneNum),
-                                                  state.dataRoomAirMod->DSXM3TFloor(zoneNum),
-                                                  state.dataRoomAirMod->DSXM4TFloor(zoneNum));
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->XMATOC(zoneNum),
-                                                  state.dataRoomAirMod->XM2TOC(zoneNum),
-                                                  state.dataRoomAirMod->XM3TOC(zoneNum),
-                                                  state.dataRoomAirMod->MATOC(zoneNum),
-                                                  state.dataRoomAirMod->DSXMATOC(zoneNum),
-                                                  state.dataRoomAirMod->DSXM2TOC(zoneNum),
-                                                  state.dataRoomAirMod->DSXM3TOC(zoneNum),
-                                                  state.dataRoomAirMod->DSXM4TOC(zoneNum));
-                    DownInterpolate4HistoryValues(PriorTimeStep,
-                                                  TimeStepSys,
-                                                  state.dataRoomAirMod->XMATMX(zoneNum),
-                                                  state.dataRoomAirMod->XM2TMX(zoneNum),
-                                                  state.dataRoomAirMod->XM3TMX(zoneNum),
-                                                  state.dataRoomAirMod->MATMX(zoneNum),
-                                                  state.dataRoomAirMod->DSXMATMX(zoneNum),
-                                                  state.dataRoomAirMod->DSXM2TMX(zoneNum),
-                                                  state.dataRoomAirMod->DSXM3TMX(zoneNum),
-                                                  state.dataRoomAirMod->DSXM4TMX(zoneNum));
+                    state.dataRoomAirMod->MATFloor(zoneNum) =
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      state.dataRoomAirMod->XMATFloor(zoneNum),
+                                                      state.dataRoomAirMod->DSXMATFloor(zoneNum));
+                    state.dataRoomAirMod->MATOC(zoneNum) =
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      state.dataRoomAirMod->XMATOC(zoneNum),
+                                                      state.dataRoomAirMod->DSXMATOC(zoneNum));
+                    state.dataRoomAirMod->MATMX(zoneNum) =
+                        DownInterpolate4HistoryValues(PriorTimeStep,
+                                                      TimeStepSys,
+                                                      state.dataRoomAirMod->XMATMX(zoneNum),
+                                                      state.dataRoomAirMod->DSXMATMX(zoneNum));
+
                 }
                 if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                     for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {

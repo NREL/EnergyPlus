@@ -568,41 +568,59 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> ZoneCeilingHeight1;
     Array1D<Real64> ZoneCeilingHeight2;
     Array1D<Real64> MATFloor;    // [C] floor level mean air temp
-    Array1D<Real64> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
+    Array1D<std::array<Real64, 4>> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
+#ifdef GET_OUT
     Array1D<Real64> XM2TFloor;   // [C] floor level mean air temp at t minus 2 zone time step
     Array1D<Real64> XM3TFloor;   // [C] floor level mean air temp at t minus 3 zone time step
     Array1D<Real64> XM4TFloor;   // [C] floor level mean air temp at t minus 4 zone time step
-    Array1D<Real64> DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
+#endif //         
+    Array1D<std::array<Real64, 4>> DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
+#ifdef GET_OUT        
     Array1D<Real64> DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
     Array1D<Real64> DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
     Array1D<Real64> DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
+#endif //         
     Array1D<Real64> MATOC;       // [C] occupied mean air temp
-    Array1D<Real64> XMATOC;      // [C] occupied mean air temp at t minus 1 zone time step
+    Array1D<std::array<Real64, 4>> XMATOC;      // [C] occupied mean air temp at t minus 1 zone time step
+#ifdef GET_OUT
     Array1D<Real64> XM2TOC;      // [C] occupied mean air temp at t minus 2 zone time step
     Array1D<Real64> XM3TOC;      // [C] occupied mean air temp at t minus 3 zone time step
     Array1D<Real64> XM4TOC;      // [C] occupied mean air temp at t minus 4 zone time step
-    Array1D<Real64> DSXMATOC;    // [C] occupied mean air temp at t minus 1 system time step
+#endif //         
+    Array1D<std::array<Real64, 4>> DSXMATOC;    // [C] occupied mean air temp at t minus 1 system time step
+#ifdef GET_OUT
     Array1D<Real64> DSXM2TOC;    // [C] occupied mean air temp at t minus 2 system time step
     Array1D<Real64> DSXM3TOC;    // [C] occupied mean air temp at t minus 3 system time step
     Array1D<Real64> DSXM4TOC;    // [C] occupied mean air temp at t minus 4 system time step
+#endif //        
     Array1D<Real64> MATMX;       // [C] mixed (upper) mean air temp
-    Array1D<Real64> XMATMX;      // [C] mixed (upper) mean air temp at t minus 1 zone time step
+    Array1D<std::array<Real64, 4>> XMATMX;      // [C] mixed (upper) mean air temp at t minus 1 zone time step
+#ifdef GET_OUT
     Array1D<Real64> XM2TMX;      // [C] mixed (upper) mean air temp at t minus 2 zone time step
     Array1D<Real64> XM3TMX;      // [C] mixed (upper) mean air temp at t minus 3 zone time step
     Array1D<Real64> XM4TMX;      // [C] mixed (upper) mean air temp at t minus 4 zone time step
-    Array1D<Real64> DSXMATMX;    // [C] mixed  mean air temp at t minus 1 system time step
+#endif //         
+    Array1D<std::array<Real64, 4>> DSXMATMX;    // [C] mixed  mean air temp at t minus 1 system time step
+#ifdef GET_OUT
     Array1D<Real64> DSXM2TMX;    // [C] mixed  mean air temp at t minus 2 system time step
     Array1D<Real64> DSXM3TMX;    // [C] mixed  mean air temp at t minus 3 system time step
     Array1D<Real64> DSXM4TMX;    // [C] mixed  mean air temp at t minus 4 system time step
-    Array1D<Real64> ZTM1Floor;   // [C] difference equation's Floor air temp at t minus 1
+#endif //
+    Array1D<std::array<Real64, 3>> ZTMFloor;   // [C] difference equation's Floor air temp at t minus 1
+#ifdef GET_OUT
     Array1D<Real64> ZTM2Floor;   // [C] difference equation's Floor air temp at t minus 2
     Array1D<Real64> ZTM3Floor;   // [C] difference equation's Floor air temp at t minus 3
-    Array1D<Real64> ZTM1OC;      // [C] difference equation's Occupied air temp at t minus 1
+#endif //
+    Array1D<std::array<Real64, 3>> ZTMOC;      // [C] difference equation's Occupied air temp at t minus 1
+#ifdef GET_OUT
     Array1D<Real64> ZTM2OC;      // [C] difference equation's Occupied air temp at t minus 2
     Array1D<Real64> ZTM3OC;      // [C] difference equation's Occupied air temp at t minus 3
-    Array1D<Real64> ZTM1MX;      // [C] difference equation's Mixed  air temp at t minus 1
+#endif //
+    Array1D<std::array<Real64, 3>> ZTMMX;      // [C] difference equation's Mixed  air temp at t minus 1
+#ifdef GET_OUT
     Array1D<Real64> ZTM2MX;      // [C] difference equation's Mixed  air temp at t minus 1
     Array1D<Real64> ZTM3MX;      // [C] difference equation's Mixed  air temp at t minus 1
+#endif //
     Array1D<Real64> AIRRATFloor;
     Array1D<Real64> AIRRATOC;
     Array1D<Real64> AIRRATMX;
@@ -757,40 +775,58 @@ struct RoomAirModelData : BaseGlobalStruct
         ZoneCeilingHeight2.clear();
         MATFloor.clear();    // [C] floor level mean air temp
         XMATFloor.clear();   // [C] floor level mean air temp at t minus 1 zone time step
+#ifdef GET_OUT
         XM2TFloor.clear();   // [C] floor level mean air temp at t minus 2 zone time step
         XM3TFloor.clear();   // [C] floor level mean air temp at t minus 3 zone time step
         XM4TFloor.clear();   // [C] floor level mean air temp at t minus 4 zone time step
+#endif //        
         DSXMATFloor.clear(); // [C] floor level mean air temp at t minus 1 system time step
+#ifdef GET_OUT
         DSXM2TFloor.clear(); // [C] floor level mean air temp at t minus 2 system time step
         DSXM3TFloor.clear(); // [C] floor level mean air temp at t minus 3 system time step
         DSXM4TFloor.clear(); // [C] floor level mean air temp at t minus 4 system time step
+#endif //        
         MATOC.clear();       // [C] occupied mean air temp
         XMATOC.clear();      // [C] occupied mean air temp at t minus 1 zone time step
+#ifdef GET_OUT
         XM2TOC.clear();      // [C] occupied mean air temp at t minus 2 zone time step
         XM3TOC.clear();      // [C] occupied mean air temp at t minus 3 zone time step
         XM4TOC.clear();      // [C] occupied mean air temp at t minus 4 zone time step
+#endif //         
         DSXMATOC.clear();    // [C] occupied mean air temp at t minus 1 system time step
+#ifdef GET_OUT
         DSXM2TOC.clear();    // [C] occupied mean air temp at t minus 2 system time step
         DSXM3TOC.clear();    // [C] occupied mean air temp at t minus 3 system time step
         DSXM4TOC.clear();    // [C] occupied mean air temp at t minus 4 system time step
+#endif //
         MATMX.clear();       // [C] mixed (upper) mean air temp
         XMATMX.clear();      // [C] mixed (upper) mean air temp at t minus 1 zone time step
+#ifdef GET_OUT
         XM2TMX.clear();      // [C] mixed (upper) mean air temp at t minus 2 zone time step
         XM3TMX.clear();      // [C] mixed (upper) mean air temp at t minus 3 zone time step
         XM4TMX.clear();      // [C] mixed (upper) mean air temp at t minus 4 zone time step
+#endif //        
         DSXMATMX.clear();    // [C] mixed  mean air temp at t minus 1 system time step
+#ifdef GET_OUT
         DSXM2TMX.clear();    // [C] mixed  mean air temp at t minus 2 system time step
         DSXM3TMX.clear();    // [C] mixed  mean air temp at t minus 3 system time step
         DSXM4TMX.clear();    // [C] mixed  mean air temp at t minus 4 system time step
-        ZTM1Floor.clear();   // [C] difference equation's Floor air temp at t minus 1
+#endif //        
+        ZTMFloor.clear();   // [C] difference equation's Floor air temp at t minus 1
+#ifdef GET_OUT
         ZTM2Floor.clear();   // [C] difference equation's Floor air temp at t minus 2
         ZTM3Floor.clear();   // [C] difference equation's Floor air temp at t minus 3
-        ZTM1OC.clear();      // [C] difference equation's Occupied air temp at t minus 1
+#endif //
+        ZTMOC.clear();      // [C] difference equation's Occupied air temp at t minus 1
+#ifdef GET_OUT
         ZTM2OC.clear();      // [C] difference equation's Occupied air temp at t minus 2
         ZTM3OC.clear();      // [C] difference equation's Occupied air temp at t minus 3
-        ZTM1MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
+#endif //
+        ZTMMX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
+#ifdef GET_OUT
         ZTM2MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
         ZTM3MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
+#endif //
         AIRRATFloor.clear();
         AIRRATOC.clear();
         AIRRATMX.clear();

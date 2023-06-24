@@ -746,35 +746,35 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                 PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
 
             if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
-                state.dataRoomAirMod->ZTM3Floor(ZoneNum) = state.dataRoomAirMod->XM3TFloor(ZoneNum);
-                state.dataRoomAirMod->ZTM2Floor(ZoneNum) = state.dataRoomAirMod->XM2TFloor(ZoneNum);
-                state.dataRoomAirMod->ZTM1Floor(ZoneNum) = state.dataRoomAirMod->XMATFloor(ZoneNum);
+                state.dataRoomAirMod->ZTMFloor(ZoneNum)[2] = state.dataRoomAirMod->XMATFloor(ZoneNum)[2];
+                state.dataRoomAirMod->ZTMFloor(ZoneNum)[1] = state.dataRoomAirMod->XMATFloor(ZoneNum)[1];
+                state.dataRoomAirMod->ZTMFloor(ZoneNum)[0] = state.dataRoomAirMod->XMATFloor(ZoneNum)[0];
 
-                state.dataRoomAirMod->ZTM3OC(ZoneNum) = state.dataRoomAirMod->XM3TOC(ZoneNum);
-                state.dataRoomAirMod->ZTM2OC(ZoneNum) = state.dataRoomAirMod->XM2TOC(ZoneNum);
-                state.dataRoomAirMod->ZTM1OC(ZoneNum) = state.dataRoomAirMod->XMATOC(ZoneNum);
+                state.dataRoomAirMod->ZTMOC(ZoneNum)[2] = state.dataRoomAirMod->XMATOC(ZoneNum)[2];
+                state.dataRoomAirMod->ZTMOC(ZoneNum)[1] = state.dataRoomAirMod->XMATOC(ZoneNum)[1];
+                state.dataRoomAirMod->ZTMOC(ZoneNum)[0] = state.dataRoomAirMod->XMATOC(ZoneNum)[0];
 
-                state.dataRoomAirMod->ZTM3MX(ZoneNum) = state.dataRoomAirMod->XM3TMX(ZoneNum);
-                state.dataRoomAirMod->ZTM2MX(ZoneNum) = state.dataRoomAirMod->XM2TMX(ZoneNum);
-                state.dataRoomAirMod->ZTM1MX(ZoneNum) = state.dataRoomAirMod->XMATMX(ZoneNum);
+                state.dataRoomAirMod->ZTMMX(ZoneNum)[2] = state.dataRoomAirMod->XMATMX(ZoneNum)[2];
+                state.dataRoomAirMod->ZTMMX(ZoneNum)[1] = state.dataRoomAirMod->XMATMX(ZoneNum)[1];
+                state.dataRoomAirMod->ZTMMX(ZoneNum)[0] = state.dataRoomAirMod->XMATMX(ZoneNum)[0];
 
             } else {
-                state.dataRoomAirMod->ZTM3Floor(ZoneNum) = state.dataRoomAirMod->DSXM3TFloor(ZoneNum);
-                state.dataRoomAirMod->ZTM2Floor(ZoneNum) = state.dataRoomAirMod->DSXM2TFloor(ZoneNum);
-                state.dataRoomAirMod->ZTM1Floor(ZoneNum) = state.dataRoomAirMod->DSXMATFloor(ZoneNum);
+                state.dataRoomAirMod->ZTMFloor(ZoneNum)[2] = state.dataRoomAirMod->DSXMATFloor(ZoneNum)[2];
+                state.dataRoomAirMod->ZTMFloor(ZoneNum)[1] = state.dataRoomAirMod->DSXMATFloor(ZoneNum)[1];
+                state.dataRoomAirMod->ZTMFloor(ZoneNum)[0] = state.dataRoomAirMod->DSXMATFloor(ZoneNum)[0];
 
-                state.dataRoomAirMod->ZTM3OC(ZoneNum) = state.dataRoomAirMod->DSXM3TOC(ZoneNum);
-                state.dataRoomAirMod->ZTM2OC(ZoneNum) = state.dataRoomAirMod->DSXM2TOC(ZoneNum);
-                state.dataRoomAirMod->ZTM1OC(ZoneNum) = state.dataRoomAirMod->DSXMATOC(ZoneNum);
+                state.dataRoomAirMod->ZTMOC(ZoneNum)[2] = state.dataRoomAirMod->DSXMATOC(ZoneNum)[2];
+                state.dataRoomAirMod->ZTMOC(ZoneNum)[1] = state.dataRoomAirMod->DSXMATOC(ZoneNum)[1];
+                state.dataRoomAirMod->ZTMOC(ZoneNum)[0] = state.dataRoomAirMod->DSXMATOC(ZoneNum)[0];
 
-                state.dataRoomAirMod->ZTM3MX(ZoneNum) = state.dataRoomAirMod->DSXM3TMX(ZoneNum);
-                state.dataRoomAirMod->ZTM2MX(ZoneNum) = state.dataRoomAirMod->DSXM2TMX(ZoneNum);
-                state.dataRoomAirMod->ZTM1MX(ZoneNum) = state.dataRoomAirMod->DSXMATMX(ZoneNum);
+                state.dataRoomAirMod->ZTMMX(ZoneNum)[2] = state.dataRoomAirMod->DSXMATMX(ZoneNum)[2];
+                state.dataRoomAirMod->ZTMMX(ZoneNum)[1] = state.dataRoomAirMod->DSXMATMX(ZoneNum)[1];
+                state.dataRoomAirMod->ZTMMX(ZoneNum)[0] = state.dataRoomAirMod->DSXMATMX(ZoneNum)[0];
             }
 
             Real64 AirCap = state.dataRoomAirMod->AIRRATFloor(ZoneNum);
-            TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1Floor(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2Floor(ZoneNum) +
-                                     OneThird * state.dataRoomAirMod->ZTM3Floor(ZoneNum));
+            TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTMFloor(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAirMod->ZTMFloor(ZoneNum)[1] +
+                                     OneThird * state.dataRoomAirMod->ZTMFloor(ZoneNum)[2]);
             TempDepCoef = state.dataDispVentMgr->HA_FLOOR + MCp_Total;
             TempIndCoef = state.dataDispVentMgr->HAT_FLOOR + MCpT_Total + thisZoneHB.NonAirSystemResponse / ZoneMult;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
@@ -805,8 +805,8 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                 break;
             }
             AirCap = state.dataRoomAirMod->AIRRATOC(ZoneNum);
-            TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1OC(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2OC(ZoneNum) +
-                                     OneThird * state.dataRoomAirMod->ZTM3OC(ZoneNum));
+            TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTMOC(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAirMod->ZTMOC(ZoneNum)[1] +
+                                     OneThird * state.dataRoomAirMod->ZTMOC(ZoneNum)[2]);
             TempDepCoef = state.dataDispVentMgr->HA_OC + MCp_Total;
             TempIndCoef = ConvGainsOccupiedSubzone * GainsFrac + state.dataDispVentMgr->HAT_OC + state.dataRoomAirMod->ZTFloor(ZoneNum) * MCp_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
@@ -835,8 +835,8 @@ void CalcUCSDDV(EnergyPlusData &state, int const ZoneNum) // Which Zonenum
                 break;
             }
             AirCap = state.dataRoomAirMod->AIRRATMX(ZoneNum);
-            TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1MX(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2MX(ZoneNum) +
-                                     OneThird * state.dataRoomAirMod->ZTM3MX(ZoneNum));
+            TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTMMX(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAirMod->ZTMMX(ZoneNum)[1] +
+                                     OneThird * state.dataRoomAirMod->ZTMMX(ZoneNum)[2]);
             TempDepCoef = state.dataDispVentMgr->HA_MX + MCp_Total;
             TempIndCoef = ConvGainsOccupiedSubzone * (1.0 - GainsFrac) + ConvGainsMixedSubzone + state.dataDispVentMgr->HAT_MX +
                           state.dataRoomAirMod->ZTOC(ZoneNum) * MCp_Total;

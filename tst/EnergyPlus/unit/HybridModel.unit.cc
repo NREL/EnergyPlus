@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, HybridModel_correctZoneAirTempsTest)
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
     state->dataRoomAirMod->ZTMX.allocate(1);
-    state->dataRoomAirMod->ZTM1MX.allocate(1);
+    state->dataRoomAirMod->ZTMMX.allocate(1);
     state->afn->exchangeData.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
     state->dataHeatBalFanSys->TempTstatAir.allocate(1);

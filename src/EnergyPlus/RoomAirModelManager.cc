@@ -2083,40 +2083,58 @@ namespace RoomAir {
                 // Allocate histories of displacement ventilation temperatures PH 3/5/04
                 state.dataRoomAirMod->MATFloor.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XMATFloor.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TFloor.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XM3TFloor.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XM4TFloor.allocate(state.dataGlobal->NumOfZones);
+#endif //                
                 state.dataRoomAirMod->DSXMATFloor.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TFloor.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->DSXM3TFloor.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->DSXM4TFloor.allocate(state.dataGlobal->NumOfZones);
+#endif //                
                 state.dataRoomAirMod->MATOC.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XMATOC.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TOC.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XM3TOC.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XM4TOC.allocate(state.dataGlobal->NumOfZones);
+#endif //                
                 state.dataRoomAirMod->DSXMATOC.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TOC.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->DSXM3TOC.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->DSXM4TOC.allocate(state.dataGlobal->NumOfZones);
+#endif //                
                 state.dataRoomAirMod->MATMX.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XMATMX.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TMX.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XM3TMX.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->XM4TMX.allocate(state.dataGlobal->NumOfZones);
+#endif //                
                 state.dataRoomAirMod->DSXMATMX.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TMX.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->DSXM3TMX.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->DSXM4TMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTM1Floor.allocate(state.dataGlobal->NumOfZones);
+#endif //                
+                state.dataRoomAirMod->ZTMFloor.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2Floor.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->ZTM3Floor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTM1OC.allocate(state.dataGlobal->NumOfZones);
+#endif //                
+                state.dataRoomAirMod->ZTMOC.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2OC.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->ZTM3OC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTM1MX.allocate(state.dataGlobal->NumOfZones);
+#endif //                
+                state.dataRoomAirMod->ZTMMX.allocate(state.dataGlobal->NumOfZones);
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2MX.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->ZTM3MX.allocate(state.dataGlobal->NumOfZones);
+#endif //                
                 state.dataRoomAirMod->AIRRATFloor.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->AIRRATOC.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAirMod->AIRRATMX.allocate(state.dataGlobal->NumOfZones);
@@ -2143,41 +2161,59 @@ namespace RoomAir {
                 state.dataRoomAirMod->ZoneAirSystemON = false;
                 //      ZoneDVMixedFlag=0
                 state.dataRoomAirMod->MATFloor = 23.0;
-                state.dataRoomAirMod->XMATFloor = 23.0;
+                state.dataRoomAirMod->XMATFloor = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TFloor = 23.0;
                 state.dataRoomAirMod->XM3TFloor = 23.0;
                 state.dataRoomAirMod->XM4TFloor = 23.0;
-                state.dataRoomAirMod->DSXMATFloor = 23.0;
+#endif //                
+                state.dataRoomAirMod->DSXMATFloor = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TFloor = 23.0;
                 state.dataRoomAirMod->DSXM3TFloor = 23.0;
                 state.dataRoomAirMod->DSXM4TFloor = 23.0;
-                state.dataRoomAirMod->MATOC = 23.0;
-                state.dataRoomAirMod->XMATOC = 23.0;
+#endif //                
+                state.dataRoomAirMod->MATOC = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAirMod->XMATOC = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TOC = 23.0;
                 state.dataRoomAirMod->XM3TOC = 23.0;
                 state.dataRoomAirMod->XM4TOC = 23.0;
-                state.dataRoomAirMod->DSXMATOC = 23.0;
+#endif //                
+                state.dataRoomAirMod->DSXMATOC = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TOC = 23.0;
                 state.dataRoomAirMod->DSXM3TOC = 23.0;
                 state.dataRoomAirMod->DSXM4TOC = 23.0;
-                state.dataRoomAirMod->MATMX = 23.0;
-                state.dataRoomAirMod->XMATMX = 23.0;
+#endif //                
+                state.dataRoomAirMod->MATMX = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAirMod->XMATMX = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TMX = 23.0;
                 state.dataRoomAirMod->XM3TMX = 23.0;
                 state.dataRoomAirMod->XM4TMX = 23.0;
-                state.dataRoomAirMod->DSXMATMX = 23.0;
+#endif //                
+                state.dataRoomAirMod->DSXMATMX = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TMX = 23.0;
                 state.dataRoomAirMod->DSXM3TMX = 23.0;
                 state.dataRoomAirMod->DSXM4TMX = 23.0;
-                state.dataRoomAirMod->ZTM1Floor = 23.0;
+#endif //                
+                state.dataRoomAirMod->ZTMFloor = {23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2Floor = 23.0;
                 state.dataRoomAirMod->ZTM3Floor = 23.0;
-                state.dataRoomAirMod->ZTM1OC = 23.0;
+#endif //
+                state.dataRoomAirMod->ZTMOC = {23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2OC = 23.0;
                 state.dataRoomAirMod->ZTM3OC = 23.0;
-                state.dataRoomAirMod->ZTM1MX = 23.0;
+#endif //                
+                state.dataRoomAirMod->ZTMMX = {23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2MX = 23.0;
                 state.dataRoomAirMod->ZTM3MX = 23.0;
+#endif //                
                 state.dataRoomAirMod->Zone1Floor = 23.0;
                 state.dataRoomAirMod->ZoneMXFloor = 23.0;
                 state.dataRoomAirMod->ZoneM2Floor = 23.0;
@@ -2630,47 +2666,65 @@ namespace RoomAir {
                 state.dataRoomAirMod->FracMinFlow(ZoneNum) = 0.0;
                 state.dataRoomAirMod->ZoneAirSystemON(ZoneNum) = false;
                 state.dataRoomAirMod->MATFloor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->XMATFloor(ZoneNum) = 23.0;
+                state.dataRoomAirMod->XMATFloor(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TFloor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->XM3TFloor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->XM4TFloor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->DSXMATFloor(ZoneNum) = 23.0;
+#endif //                
+                state.dataRoomAirMod->DSXMATFloor(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TFloor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->DSXM3TFloor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->DSXM4TFloor(ZoneNum) = 23.0;
+#endif //                
                 state.dataRoomAirMod->MATOC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->XMATOC(ZoneNum) = 23.0;
+                state.dataRoomAirMod->XMATOC(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TOC(ZoneNum) = 23.0;
                 state.dataRoomAirMod->XM3TOC(ZoneNum) = 23.0;
                 state.dataRoomAirMod->XM4TOC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->DSXMATOC(ZoneNum) = 23.0;
+#endif //                
+                state.dataRoomAirMod->DSXMATOC(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TOC(ZoneNum) = 23.0;
                 state.dataRoomAirMod->DSXM3TOC(ZoneNum) = 23.0;
                 state.dataRoomAirMod->DSXM4TOC(ZoneNum) = 23.0;
+#endif //                
                 state.dataRoomAirMod->MATMX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->XMATMX(ZoneNum) = 23.0;
+                state.dataRoomAirMod->XMATMX(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->XM2TMX(ZoneNum) = 23.0;
                 state.dataRoomAirMod->XM3TMX(ZoneNum) = 23.0;
                 state.dataRoomAirMod->XM4TMX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->DSXMATMX(ZoneNum) = 23.0;
+#endif //                
+                state.dataRoomAirMod->DSXMATMX(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->DSXM2TMX(ZoneNum) = 23.0;
                 state.dataRoomAirMod->DSXM3TMX(ZoneNum) = 23.0;
                 state.dataRoomAirMod->DSXM4TMX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTM1Floor(ZoneNum) = 23.0;
+#endif //                
+                state.dataRoomAirMod->ZTMFloor(ZoneNum) = {23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2Floor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZTM3Floor(ZoneNum) = 23.0;
+#endif //                
                 state.dataRoomAirMod->Zone1Floor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZoneMXFloor(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZoneM2Floor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTM1OC(ZoneNum) = 23.0;
+                state.dataRoomAirMod->ZTMOC(ZoneNum) = {23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2OC(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZTM3OC(ZoneNum) = 23.0;
+#endif //                
                 state.dataRoomAirMod->Zone1OC(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZoneMXOC(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZoneM2OC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTM1MX(ZoneNum) = 23.0;
+                state.dataRoomAirMod->ZTMMX(ZoneNum) = {23.0, 23.0, 23.0};
+#ifdef GET_OUT
                 state.dataRoomAirMod->ZTM2MX(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZTM3MX(ZoneNum) = 23.0;
+#endif //                
                 state.dataRoomAirMod->Zone1MX(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZoneMXMX(ZoneNum) = 23.0;
                 state.dataRoomAirMod->ZoneM2MX(ZoneNum) = 23.0;
