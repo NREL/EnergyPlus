@@ -3620,9 +3620,9 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                 this->ZoneW1 = this->ZoneWM2;
                 if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                     auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum);
-                    for (int LoopNode = 1; LoopNode <= afnZoneInfo.NumOfAirNodes; ++LoopNode) {
-                        afnZoneInfo.Node(LoopNode).AirTempT1 = afnZoneInfo.Node(LoopNode).AirTempTM2;
-                        afnZoneInfo.Node(LoopNode).HumRatW1 = afnZoneInfo.Node(LoopNode).HumRatWM2;
+                    for (auto &afnNode : afnZoneInfo.Node) {
+                        afnNode.AirTempT1 = afnNode.AirTempT2;
+                        afnNode.HumRatT1 = afnNode.HumRatT2;
                     }
                 }
             } else {
@@ -3630,9 +3630,9 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                 this->ZoneW1 = this->ZoneWMX;
                 if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                     auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum);
-                    for (int LoopNode = 1; LoopNode <= afnZoneInfo.NumOfAirNodes; ++LoopNode) {
-                        afnZoneInfo.Node(LoopNode).AirTempT1 = afnZoneInfo.Node(LoopNode).AirTempTMX;
-                        afnZoneInfo.Node(LoopNode).HumRatW1 = afnZoneInfo.Node(LoopNode).HumRatWMX;
+                    for (auto &afnNode : afnZoneInfo.Node) {
+                        afnNode.AirTempT1 = afnNode.AirTempTX;
+                        afnNode.HumRatT1 = afnNode.HumRatTX;
                     }
                 }
             }
@@ -3642,9 +3642,9 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
             this->ZoneW1 = this->ZoneAirHumRat;
             if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                 auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum);
-                for (int LoopNode = 1; LoopNode <= afnZoneInfo.NumOfAirNodes; ++LoopNode) {
-                    afnZoneInfo.Node(LoopNode).AirTempT1 = afnZoneInfo.Node(LoopNode).AirTemp;
-                    afnZoneInfo.Node(LoopNode).HumRatW1 = afnZoneInfo.Node(LoopNode).HumRat;
+                for (auto &afnNode : afnZoneInfo.Node) {
+                    afnNode.AirTempT1 = afnNode.AirTemp;
+                    afnNode.HumRatT1 = afnNode.HumRat;
                 }
             }
         }
@@ -4623,17 +4623,16 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
 
         // for RoomAirflowNetwork model
         if (thisAirModel.AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
-            for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
-                auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node(LoopNode);
-                afnZoneInfo.AirTempX4 = afnZoneInfo.AirTempX3;
-                afnZoneInfo.AirTempX3 = afnZoneInfo.AirTempX2;
-                afnZoneInfo.AirTempX2 = afnZoneInfo.AirTempX1;
-                afnZoneInfo.AirTempX1 = afnZoneInfo.AirTemp;
+            for (auto &afnNode : state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node) {
+                afnNode.AirTempX[3] = afnNode.AirTempX[2];
+                afnNode.AirTempX[2] = afnNode.AirTempX[1];
+                afnNode.AirTempX[1] = afnNode.AirTempX[0];
+                afnNode.AirTempX[0] = afnNode.AirTemp;
 
-                afnZoneInfo.HumRatX4 = afnZoneInfo.HumRatX3;
-                afnZoneInfo.HumRatX3 = afnZoneInfo.HumRatX2;
-                afnZoneInfo.HumRatX2 = afnZoneInfo.HumRatX1;
-                afnZoneInfo.HumRatX1 = afnZoneInfo.HumRat;
+                afnNode.HumRatX[3] = afnNode.HumRatX[2];
+                afnNode.HumRatX[2] = afnNode.HumRatX[1];
+                afnNode.HumRatX[1] = afnNode.HumRatX[0];
+                afnNode.HumRatX[0] = afnNode.HumRat;
             }
         }
     }
@@ -4657,13 +4656,12 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
             }
 
             if (thisAirModel.AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
-                for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
-                    auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node(LoopNode);
-                    afnZoneInfo.AirTempTM2 = afnZoneInfo.AirTempTMX;
-                    afnZoneInfo.AirTempTMX = afnZoneInfo.AirTemp;
+                for (auto &afnNode : state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node) {
+                    afnNode.AirTempT2 = afnNode.AirTempTX;
+                    afnNode.AirTempTX = afnNode.AirTemp;
 
-                    afnZoneInfo.HumRatWM2 = afnZoneInfo.HumRatWMX;
-                    afnZoneInfo.HumRatWMX = afnZoneInfo.HumRat;
+                    afnNode.HumRatT2 = afnNode.HumRatTX;
+                    afnNode.HumRatTX = afnNode.HumRat;
                 }
             }
         }
@@ -4719,17 +4717,16 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
             state.dataRoomAirMod->DSXMATMX(zoneNum)[0] = state.dataRoomAirMod->MATMX(zoneNum);
         }
         if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
-            for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
-                auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node(LoopNode);
-                afnZoneInfo.AirTempDSX4 = afnZoneInfo.AirTempDSX3;
-                afnZoneInfo.AirTempDSX3 = afnZoneInfo.AirTempDSX2;
-                afnZoneInfo.AirTempDSX2 = afnZoneInfo.AirTempDSX1;
-                afnZoneInfo.AirTempDSX1 = afnZoneInfo.AirTemp;
+            for (auto &afnNode : state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node) {
+                afnNode.AirTempDSX[3] = afnNode.AirTempDSX[2];
+                afnNode.AirTempDSX[2] = afnNode.AirTempDSX[1];
+                afnNode.AirTempDSX[1] = afnNode.AirTempDSX[0];
+                afnNode.AirTempDSX[0] = afnNode.AirTemp;
 
-                afnZoneInfo.HumRatDSX4 = afnZoneInfo.HumRatDSX3;
-                afnZoneInfo.HumRatDSX3 = afnZoneInfo.HumRatDSX2;
-                afnZoneInfo.HumRatDSX2 = afnZoneInfo.HumRatDSX1;
-                afnZoneInfo.HumRatDSX1 = afnZoneInfo.HumRat;
+                afnNode.HumRatDSX[3] = afnNode.HumRatDSX[2];
+                afnNode.HumRatDSX[2] = afnNode.HumRatDSX[1];
+                afnNode.HumRatDSX[1] = afnNode.HumRatDSX[0];
+                afnNode.HumRatDSX[0] = afnNode.HumRat;
             }
         }
     }
@@ -4754,12 +4751,12 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
             }
             if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                 for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
-                    auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node(LoopNode);
-                    afnZoneInfo.AirTempTM2 = afnZoneInfo.AirTempTMX;
-                    afnZoneInfo.AirTempTMX = afnZoneInfo.AirTemp;
+                    auto &afnNode = state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node(LoopNode);
+                    afnNode.AirTempT2 = afnNode.AirTempTX;
+                    afnNode.AirTempTX = afnNode.AirTemp;
 
-                    afnZoneInfo.HumRatWM2 = afnZoneInfo.HumRatWMX;
-                    afnZoneInfo.HumRatWMX = afnZoneInfo.HumRat;
+                    afnNode.HumRatT2 = afnNode.HumRatTX;
+                    afnNode.HumRatTX = afnNode.HumRat;
                 }
             }
         }
@@ -4814,15 +4811,14 @@ void ZoneSpaceHeatBalanceData::revertZoneTimestepHistory(EnergyPlusData &state, 
         }
 
         if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
-            for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
-                auto &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node(LoopNode);
-                afnZoneInfo.AirTempX1 = afnZoneInfo.AirTempX2;
-                afnZoneInfo.AirTempX2 = afnZoneInfo.AirTempX3;
-                afnZoneInfo.AirTempX3 = afnZoneInfo.AirTempX4;
+            for (auto &afnNode : state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node) {
+                afnNode.AirTempX[0] = afnNode.AirTempX[1];
+                afnNode.AirTempX[1] = afnNode.AirTempX[2];
+                afnNode.AirTempX[2] = afnNode.AirTempX[3];
 
-                afnZoneInfo.HumRatX1 = afnZoneInfo.HumRatX2;
-                afnZoneInfo.HumRatX2 = afnZoneInfo.HumRatX3;
-                afnZoneInfo.HumRatX3 = afnZoneInfo.HumRatX4;
+                afnNode.HumRatX[0] = afnNode.HumRatX[1];
+                afnNode.HumRatX[1] = afnNode.HumRatX[2];
+                afnNode.HumRatX[2] = afnNode.HumRatX[3];
             }
         }
     }
@@ -7146,28 +7142,16 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
 
                 }
                 if (state.dataRoomAirMod->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
-                    for (int LoopNode = 1; LoopNode <= state.dataRoomAirMod->AFNZoneInfo(zoneNum).NumOfAirNodes; ++LoopNode) {
-                        auto &ThisRAFNNode(state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node(LoopNode));
-                        DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
-                                                      ThisRAFNNode.AirTempX1,
-                                                      ThisRAFNNode.AirTempX2,
-                                                      ThisRAFNNode.AirTempX3,
-                                                      ThisRAFNNode.AirTemp,
-                                                      ThisRAFNNode.AirTempDSX1,
-                                                      ThisRAFNNode.AirTempDSX2,
-                                                      ThisRAFNNode.AirTempDSX3,
-                                                      ThisRAFNNode.AirTempDSX4);
-                        DownInterpolate4HistoryValues(PriorTimeStep,
-                                                      TimeStepSys,
-                                                      ThisRAFNNode.HumRatX1,
-                                                      ThisRAFNNode.HumRatX2,
-                                                      ThisRAFNNode.HumRatX3,
-                                                      ThisRAFNNode.HumRat,
-                                                      ThisRAFNNode.HumRatDSX1,
-                                                      ThisRAFNNode.HumRatDSX2,
-                                                      ThisRAFNNode.HumRatDSX3,
-                                                      ThisRAFNNode.HumRatDSX4);
+                    for (auto &afnNode : state.dataRoomAirMod->AFNZoneInfo(zoneNum).Node) {
+                        afnNode.AirTemp = DownInterpolate4HistoryValues(PriorTimeStep,
+                                                                        TimeStepSys,
+                                                                        afnNode.AirTempX,
+                                                                        afnNode.AirTempDSX);
+
+                        afnNode.HumRat = DownInterpolate4HistoryValues(PriorTimeStep,
+                                                                       TimeStepSys,
+                                                                       afnNode.HumRatX,
+                                                                       afnNode.HumRatDSX);
                     }
                 }
             }

@@ -202,16 +202,16 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).SurfMask(2) = true;
     state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).NumOfAirflowLinks = 3;
     state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).Link.allocate(3);
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).Link(1).AirflowNetworkLinkSimuID = 1;
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).Link(2).AirflowNetworkLinkSimuID = 2;
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).Link(3).AirflowNetworkLinkSimuID = 3;
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).AirflowNetworkNodeID = 1;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).Link(1).AFNSimuID = 1;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).Link(2).AFNSimuID = 2;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).Link(3).AFNSimuID = 3;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(1).AFNNodeID = 1;
     state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).NumOfAirflowLinks = 3;
     state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).Link.allocate(3);
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).Link(1).AirflowNetworkLinkSimuID = 3;
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).Link(2).AirflowNetworkLinkSimuID = 4;
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).Link(3).AirflowNetworkLinkSimuID = 5;
-    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).AirflowNetworkNodeID = 2;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).Link(1).AFNSimuID = 3;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).Link(2).AFNSimuID = 4;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).Link(3).AFNSimuID = 5;
+    state->dataRoomAirMod->AFNZoneInfo(ZoneNum).Node(2).AFNNodeID = 2;
 
     state->afn->AirflowNetworkLinkageData(1).NodeNums[0] = 1;
     state->afn->AirflowNetworkLinkageData(2).NodeNums[0] = 1;

@@ -395,9 +395,9 @@ namespace RoomAir {
     {
         // Members
         // user variables
-        int AirflowNetworkLinkSimuID = 0;    // point to this linkage in AirflowNetworkLinkSimu structure
-        int AirflowNetworkLinkageDataID = 0; // point to this linkage in AirflowNetworkLinkageData structure
-        int AirflowNetworkLinkReportID = 0;  // point to this linkage in AirflowNetworkLinkReport structure
+        int AFNSimuID = 0;    // point to this linkage in AirflowNetworkLinkSimu structure
+        int AFNDataID = 0; // point to this linkage in AirflowNetworkLinkageData structure
+        int AFNReportID = 0;  // point to this linkage in AirflowNetworkLinkReport structure
         Real64 MdotIn = 0.0;                   // mass flow rate of air into control volume(neg means leaving control volume) (kg / s)
         Real64 TempIn = 0.0;                   // drybulb temperature of air into control volume
         Real64 HumRatIn = 0.0;                 // humidity ratio of air into control volume
@@ -450,7 +450,7 @@ namespace RoomAir {
         bool HasHVACAssigned = false;                                       // True if HVAC systems are assigned to this node
         int NumHVACs = 0;                                               // Number of HVAC systems
         Array1D<AFNHVAC> HVAC;                 // HVAC struct
-        int AirflowNetworkNodeID = 0;                                   // pointer to AirflowNetworkNodeData structure
+        int AFNNodeID = 0;                                   // pointer to AirflowNetworkNodeData structure
         int NumOfAirflowLinks = 0;                                      // Number of intra zone links
         Array1D<AFNLinkInfoNested> Link;              // Linkage struct
         Real64 AirVolume = 0.0;                                           // air volume in control volume associated with this node(m3 / s)
@@ -458,30 +458,18 @@ namespace RoomAir {
         Real64 CpAir = 0.0;                                               // current heat capacity of air for nodal control volume
 
         Real64 AirTemp = 0.0;     // node air temperature
-        Real64 AirTempX1 = 0.0;   // node air temperature at t minus 1 zone timestep
-        Real64 AirTempX2 = 0.0;   // node air temperature at t minus 2 zone timestep
-        Real64 AirTempX3 = 0.0;   // node air temperature at t minus 3 zone timestep
-        Real64 AirTempX4 = 0.0;   // node air temperature at t minus 4 zone timestep
-        Real64 AirTempDSX1 = 0.0; // node air temperature at t minus 1 system timestep
-        Real64 AirTempDSX2 = 0.0; // node air temperature at t minus 2 system timestep
-        Real64 AirTempDSX3 = 0.0; // node air temperature at t minus 3 system timestep
-        Real64 AirTempDSX4 = 0.0; // node air temperature at t minus 4 system timestep
+        std::array<Real64, 4> AirTempX = {0.0, 0.0, 0.0, 0.0};   // node air temperature at t minus X zone timestep
+        std::array<Real64, 4> AirTempDSX = {0.0, 0.0, 0.0, 0.0}; // node air temperature at t minus X system timestep
         Real64 AirTempT1 = 0.0;   // node air temperature at the previous time step used in Exact and Euler method
-        Real64 AirTempTMX = 0.0;  // temporary node air temperature to test convergence used in Exact and Euler method
-        Real64 AirTempTM2 = 0.0;  // node air temperature at time step t-2 used in Exact and Euler method
+        Real64 AirTempTX = 0.0;  // temporary node air temperature to test convergence used in Exact and Euler method
+        Real64 AirTempT2 = 0.0;  // node air temperature at time step t-2 used in Exact and Euler method
 
         Real64 HumRat = 0.0;     // node air humidity ratio
-        Real64 HumRatX1 = 0.0;   // node air humidity ratio at t minus 1 zone timestep
-        Real64 HumRatX2 = 0.0;   // node air humidity ratio at t minus 2 zone timestep
-        Real64 HumRatX3 = 0.0;   // node air humidity ratio at t minus 3 zone timestep
-        Real64 HumRatX4 = 0.0;   // node air humidity ratio at t minus 4 zone timestep
-        Real64 HumRatDSX1 = 0.0; // node air humidity ratio at t minus 1 system timestep
-        Real64 HumRatDSX2 = 0.0; // node air humidity ratio at t minus 2 system timestep
-        Real64 HumRatDSX3 = 0.0; // node air humidity ratio at t minus 3 system timestep
-        Real64 HumRatDSX4 = 0.0; // node air humidity ratio at t minus 4 system timestep
-        Real64 HumRatW1 = 0.0;   // node air humidity ratio at the previous time step used in Exact and Euler method
-        Real64 HumRatWMX = 0.0;  // temporary node air humidity ratio to test convergence used in Exact and Euler method
-        Real64 HumRatWM2 = 0.0;  // node air humidity ratio at time step t-2 used in Exact and Euler method
+        std::array<Real64, 4> HumRatX = {0.0, 0.0, 0.0, 0.0};   // node air humidity ratio at t minus X zone timestep
+        std::array<Real64, 4> HumRatDSX = {0.0, 0.0, 0.0, 0.0}; // node air humidity ratio at t minus 1 system timestep
+        Real64 HumRatT1 = 0.0;   // node air humidity ratio at the previous time step used in Exact and Euler method
+        Real64 HumRatTX = 0.0;  // temporary node air humidity ratio to test convergence used in Exact and Euler method
+        Real64 HumRatT2 = 0.0;  // node air humidity ratio at time step t-2 used in Exact and Euler method
 
         Real64 RelHumidity = 0.0; // node air relative humidity
 
@@ -568,59 +556,17 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> ZoneCeilingHeight1;
     Array1D<Real64> ZoneCeilingHeight2;
     Array1D<Real64> MATFloor;    // [C] floor level mean air temp
-    Array1D<std::array<Real64, 4>> XMATFloor;   // [C] floor level mean air temp at t minus 1 zone time step
-#ifdef GET_OUT
-    Array1D<Real64> XM2TFloor;   // [C] floor level mean air temp at t minus 2 zone time step
-    Array1D<Real64> XM3TFloor;   // [C] floor level mean air temp at t minus 3 zone time step
-    Array1D<Real64> XM4TFloor;   // [C] floor level mean air temp at t minus 4 zone time step
-#endif //         
-    Array1D<std::array<Real64, 4>> DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
-#ifdef GET_OUT        
-    Array1D<Real64> DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
-    Array1D<Real64> DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
-    Array1D<Real64> DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
-#endif //         
+    Array1D<std::array<Real64, 4>> XMATFloor;   // [C] floor level mean air temp at t minus X zone time step
+    Array1D<std::array<Real64, 4>> DSXMATFloor; // [C] floor level mean air temp at t minus X system time step
     Array1D<Real64> MATOC;       // [C] occupied mean air temp
-    Array1D<std::array<Real64, 4>> XMATOC;      // [C] occupied mean air temp at t minus 1 zone time step
-#ifdef GET_OUT
-    Array1D<Real64> XM2TOC;      // [C] occupied mean air temp at t minus 2 zone time step
-    Array1D<Real64> XM3TOC;      // [C] occupied mean air temp at t minus 3 zone time step
-    Array1D<Real64> XM4TOC;      // [C] occupied mean air temp at t minus 4 zone time step
-#endif //         
-    Array1D<std::array<Real64, 4>> DSXMATOC;    // [C] occupied mean air temp at t minus 1 system time step
-#ifdef GET_OUT
-    Array1D<Real64> DSXM2TOC;    // [C] occupied mean air temp at t minus 2 system time step
-    Array1D<Real64> DSXM3TOC;    // [C] occupied mean air temp at t minus 3 system time step
-    Array1D<Real64> DSXM4TOC;    // [C] occupied mean air temp at t minus 4 system time step
-#endif //        
+    Array1D<std::array<Real64, 4>> XMATOC;      // [C] occupied mean air temp at t minus X zone time step
+    Array1D<std::array<Real64, 4>> DSXMATOC;    // [C] occupied mean air temp at t minus X system time step
     Array1D<Real64> MATMX;       // [C] mixed (upper) mean air temp
-    Array1D<std::array<Real64, 4>> XMATMX;      // [C] mixed (upper) mean air temp at t minus 1 zone time step
-#ifdef GET_OUT
-    Array1D<Real64> XM2TMX;      // [C] mixed (upper) mean air temp at t minus 2 zone time step
-    Array1D<Real64> XM3TMX;      // [C] mixed (upper) mean air temp at t minus 3 zone time step
-    Array1D<Real64> XM4TMX;      // [C] mixed (upper) mean air temp at t minus 4 zone time step
-#endif //         
-    Array1D<std::array<Real64, 4>> DSXMATMX;    // [C] mixed  mean air temp at t minus 1 system time step
-#ifdef GET_OUT
-    Array1D<Real64> DSXM2TMX;    // [C] mixed  mean air temp at t minus 2 system time step
-    Array1D<Real64> DSXM3TMX;    // [C] mixed  mean air temp at t minus 3 system time step
-    Array1D<Real64> DSXM4TMX;    // [C] mixed  mean air temp at t minus 4 system time step
-#endif //
-    Array1D<std::array<Real64, 3>> ZTMFloor;   // [C] difference equation's Floor air temp at t minus 1
-#ifdef GET_OUT
-    Array1D<Real64> ZTM2Floor;   // [C] difference equation's Floor air temp at t minus 2
-    Array1D<Real64> ZTM3Floor;   // [C] difference equation's Floor air temp at t minus 3
-#endif //
-    Array1D<std::array<Real64, 3>> ZTMOC;      // [C] difference equation's Occupied air temp at t minus 1
-#ifdef GET_OUT
-    Array1D<Real64> ZTM2OC;      // [C] difference equation's Occupied air temp at t minus 2
-    Array1D<Real64> ZTM3OC;      // [C] difference equation's Occupied air temp at t minus 3
-#endif //
-    Array1D<std::array<Real64, 3>> ZTMMX;      // [C] difference equation's Mixed  air temp at t minus 1
-#ifdef GET_OUT
-    Array1D<Real64> ZTM2MX;      // [C] difference equation's Mixed  air temp at t minus 1
-    Array1D<Real64> ZTM3MX;      // [C] difference equation's Mixed  air temp at t minus 1
-#endif //
+    Array1D<std::array<Real64, 4>> XMATMX;      // [C] mixed (upper) mean air temp at t minus X zone time step
+    Array1D<std::array<Real64, 4>> DSXMATMX;    // [C] mixed  mean air temp at t minus X system time step
+    Array1D<std::array<Real64, 3>> ZTMFloor;   // [C] difference equation's Floor air temp at t minus X
+    Array1D<std::array<Real64, 3>> ZTMOC;      // [C] difference equation's Occupied air temp at t minus X
+    Array1D<std::array<Real64, 3>> ZTMMX;      // [C] difference equation's Mixed  air temp at t minus X
     Array1D<Real64> AIRRATFloor;
     Array1D<Real64> AIRRATOC;
     Array1D<Real64> AIRRATMX;
@@ -711,7 +657,7 @@ struct RoomAirModelData : BaseGlobalStruct
     // End User-defined patterns
 
     // RoomAirflowNetwork
-    int NumOfRoomAirflowNetControl = 0; // count of RoomAirSettings:AirflowNetwork
+    int NumOfRoomAFNControl = 0; // count of RoomAirSettings:AirflowNetwork
 
     // Object Data
     Array1D<RoomAir::AirModelData> AirModel;
@@ -891,7 +837,7 @@ struct RoomAirModelData : BaseGlobalStruct
         // End User-defined patterns
 
         // RoomAirflowNetwork
-        NumOfRoomAirflowNetControl = 0; // count of RoomAirSettings:AirflowNetwork
+        NumOfRoomAFNControl = 0; // count of RoomAirSettings:AirflowNetwork
 
         // Object Data
         AirModel.clear();
