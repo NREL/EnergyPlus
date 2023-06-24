@@ -7110,7 +7110,7 @@ namespace Weather {
         static constexpr std::array<Real64, 8> CDiffLumEff = {12.00, 0.59, -5.53, -13.95, -22.75, -36.15, -53.24, -45.27};
         static constexpr std::array<Real64, 8> DDiffLumEff = {-8.91, -3.95, -8.77, -13.90, -23.74, -28.83, -14.03, -7.98};
         // Direct luminous efficacy coefficients
-        static constexpr std::array<Real64, 8> ADirLumEff = { 7.20, 98.99, 109.83, 110.34, 106.36, 107.19, 105.75, 101.18}; 
+        static constexpr std::array<Real64, 8> ADirLumEff = {57.20, 98.99, 109.83, 110.34, 106.36, 107.19, 105.75, 101.18}; 
         static constexpr std::array<Real64, 8> BDirLumEff = {-4.55, -3.46, -4.90, -5.84, -3.97, -1.25, 0.77, 1.58};
         static constexpr std::array<Real64, 8> CDirLumEff = {-2.98, -1.21, -1.71, -1.99, -1.75, -1.51, -1.26, -1.10};
         static constexpr std::array<Real64, 8> DDirLumEff = {117.12, 12.38, -8.81, -4.56, -6.16, -26.73, -34.44, -8.29};
