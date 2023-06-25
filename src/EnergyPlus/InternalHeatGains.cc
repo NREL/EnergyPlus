@@ -7341,9 +7341,9 @@ namespace InternalHeatGains {
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
-                    if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                        if (state.dataRoomAirMod->IsZoneDispVent3Node(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
-                            airTemp = state.dataRoomAirMod->TCMF(NZ);
+                    if (state.dataRoomAir->anyNonMixingRoomAirModel) {
+                        if (state.dataRoomAir->IsZoneDispVent3Node(NZ) || state.dataRoomAir->IsZoneUI(NZ)) {
+                            airTemp = state.dataRoomAir->TCMF(NZ);
                         }
                     }
                     SensiblePeopleGain =

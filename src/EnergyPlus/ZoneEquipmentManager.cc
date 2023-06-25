@@ -4851,9 +4851,9 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
             }
 
             // user defined room air model may feed temp that differs from zone node
-            if (allocated(state.dataRoomAirMod->AirPatternZoneInfo)) {
-                if ((state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
-                    TempZoneAir = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving;
+            if (allocated(state.dataRoomAir->AirPatternZoneInfo)) {
+                if ((state.dataRoomAir->AirPatternZoneInfo(ZoneNum).IsUsed) && (!state.dataGlobal->BeginEnvrnFlag)) {
+                    TempZoneAir = state.dataRoomAir->AirPatternZoneInfo(ZoneNum).Tleaving;
                     TempRetAir = TempZoneAir;
                 } else {
                     TempZoneAir = state.dataLoopNodes->Node(ZoneNode).Temp;

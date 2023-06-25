@@ -244,7 +244,6 @@ struct ExhaustAirSystemMgr;
 struct ExhaustControlSystemMgr;
 struct RoomAirModelAirflowNetworkData;
 struct RoomAirModelData;
-struct RoomAirModelManagerData;
 struct RoomAirModelUserTempPatternData;
 struct RootFindingData;
 struct RuntimeLanguageData;
@@ -501,8 +500,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ExhaustAirSystemMgr> dataExhAirSystemMrg;
     std::unique_ptr<ExhaustControlSystemMgr> dataExhCtrlSystemMrg;
     std::unique_ptr<RoomAirModelAirflowNetworkData> dataRoomAirflowNetModel;
-    std::unique_ptr<RoomAirModelData> dataRoomAirMod;
-    std::unique_ptr<RoomAirModelManagerData> dataRoomAirModelMgr;
+    std::unique_ptr<RoomAirModelData> dataRoomAir;
     std::unique_ptr<RoomAirModelUserTempPatternData> dataRoomAirModelTempPattern;
     std::unique_ptr<RootFindingData> dataRootFinder;
     std::unique_ptr<RuntimeLanguageData> dataRuntimeLang;

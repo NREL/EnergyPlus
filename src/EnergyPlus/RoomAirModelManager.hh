@@ -94,20 +94,6 @@ namespace RoomAir {
 
 } // namespace RoomAir
 
-struct RoomAirModelManagerData : BaseGlobalStruct
-{
-
-    bool GetUCSDDVDataFlag = true; // UCSD
-    bool GetAirModelData = true;   // Used to "get" all air model data
-    bool MyOneTimeFlag = true;
-    Array1D_bool MyEnvrnFlag;
-
-    void clear_state() override
-    {
-        new (this) RoomAirModelManagerData();
-    }
-};
-
 } // namespace EnergyPlus
 
 #endif

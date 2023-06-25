@@ -530,6 +530,10 @@ namespace RoomAir {
         
 struct RoomAirModelData : BaseGlobalStruct
 {
+    bool GetAirModelData = true;   // Used to "get" all air model data
+    bool MyOneTimeFlag = true;
+    Array1D_bool MyEnvrnFlag;
+
     bool anyNonMixingRoomAirModel = false; // True if any zone RoomAirModelType is not Mixing
     int TotNumOfAirNodes = 0;
     int TotNumOfRoomAFNNodes = 0;

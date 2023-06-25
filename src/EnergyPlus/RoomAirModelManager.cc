@@ -126,18 +126,18 @@ namespace RoomAir {
         // PURPOSE OF THIS SUBROUTINE:
         //     manage room air models.
 
-        if (state.dataRoomAirModelMgr->GetAirModelData) {
+        if (state.dataRoomAir->GetAirModelData) {
             GetAirModelDatas(state);
-            state.dataRoomAirModelMgr->GetAirModelData = false;
+            state.dataRoomAir->GetAirModelData = false;
         }
 
-        if (!state.dataRoomAirMod->anyNonMixingRoomAirModel) return;
+        if (!state.dataRoomAir->anyNonMixingRoomAirModel) return;
 
-        if (state.dataRoomAirMod->UCSDModelUsed) {
+        if (state.dataRoomAir->UCSDModelUsed) {
             SharedDVCVUFDataInit(state, ZoneNum);
         }
 
-        switch (state.dataRoomAirMod->AirModel(ZoneNum).AirModel) {
+        switch (state.dataRoomAir->AirModel(ZoneNum).AirModel) {
         case RoomAirModel::UserDefined:
             ManageUserDefinedPatterns(state, ZoneNum);
             break;
@@ -258,22 +258,22 @@ namespace RoomAir {
         auto &ipsc = state.dataIPShortCut;
         
         // access input file and setup
-        state.dataRoomAirMod->numTempDistContrldZones =
+        state.dataRoomAir->numTempDistContrldZones =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cUserDefinedControlObject);
 
-        state.dataRoomAirMod->NumConstantGradient =
+        state.dataRoomAir->NumConstantGradient =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternConstGradientObject);
-        state.dataRoomAirMod->NumTwoGradientInterp =
+        state.dataRoomAir->NumTwoGradientInterp =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternTwoGradientObject);
-        state.dataRoomAirMod->NumNonDimensionalHeight =
+        state.dataRoomAir->NumNonDimensionalHeight =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternNDHeightObject);
-        state.dataRoomAirMod->NumSurfaceMapping = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternSurfMapObject);
+        state.dataRoomAir->NumSurfaceMapping = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cTempPatternSurfMapObject);
 
-        state.dataRoomAirMod->NumAirTempPatterns = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp +
-                                                   state.dataRoomAirMod->NumNonDimensionalHeight + state.dataRoomAirMod->NumSurfaceMapping;
+        state.dataRoomAir->NumAirTempPatterns = state.dataRoomAir->NumConstantGradient + state.dataRoomAir->NumTwoGradientInterp +
+                                                   state.dataRoomAir->NumNonDimensionalHeight + state.dataRoomAir->NumSurfaceMapping;
         ipsc->cCurrentModuleObject = cUserDefinedControlObject;
-        if (state.dataRoomAirMod->numTempDistContrldZones == 0) {
-            if (state.dataRoomAirMod->NumAirTempPatterns != 0) { // user may have missed control object
+        if (state.dataRoomAir->numTempDistContrldZones == 0) {
+            if (state.dataRoomAir->NumAirTempPatterns != 0) { // user may have missed control object
                 ShowWarningError(state, format("Missing {} object needed to use roomair temperature patterns", ipsc->cCurrentModuleObject));
                 // ErrorsFound = .TRUE.
             }
@@ -281,11 +281,11 @@ namespace RoomAir {
         }
 
         // now allocate AirPatternZoneInfo to length of all zones for easy indexing
-        if (!allocated(state.dataRoomAirMod->AirPatternZoneInfo)) {
-            state.dataRoomAirMod->AirPatternZoneInfo.allocate(state.dataGlobal->NumOfZones);
+        if (!allocated(state.dataRoomAir->AirPatternZoneInfo)) {
+            state.dataRoomAir->AirPatternZoneInfo.allocate(state.dataGlobal->NumOfZones);
         }
 
-        for (int ObjNum = 1; ObjNum <= state.dataRoomAirMod->numTempDistContrldZones; ++ObjNum) {
+        for (int ObjNum = 1; ObjNum <= state.dataRoomAir->numTempDistContrldZones; ++ObjNum) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
@@ -309,7 +309,7 @@ namespace RoomAir {
                 return; // halt to avoid hard crash
             }
 
-            auto &airPatternZoneInfo = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum);
+            auto &airPatternZoneInfo = state.dataRoomAir->AirPatternZoneInfo(ZoneNum);
             airPatternZoneInfo.IsUsed = true;
             airPatternZoneInfo.Name = ipsc->cAlphaArgs(1);     // Name of this Control Object
             airPatternZoneInfo.ZoneName = ipsc->cAlphaArgs(2); // Zone Name
@@ -366,8 +366,8 @@ namespace RoomAir {
 
         // Check against AirModel.  Make sure there is a match here.
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            if (state.dataRoomAirMod->AirModel(iZone).AirModel != RoomAirModel::UserDefined) continue;
-            if (state.dataRoomAirMod->AirPatternZoneInfo(iZone).IsUsed) continue; // There is a Room Air Temperatures object for this zone
+            if (state.dataRoomAir->AirModel(iZone).AirModel != RoomAirModel::UserDefined) continue;
+            if (state.dataRoomAir->AirPatternZoneInfo(iZone).IsUsed) continue; // There is a Room Air Temperatures object for this zone
             ShowSevereError(state,
                             format("{}AirModel for Zone=[{}] is indicated as \"User Defined\".", routineName, state.dataHeatBal->Zone(iZone).Name));
             ShowContinueError(state, format("...but missing a {} object for control.", ipsc->cCurrentModuleObject));
@@ -375,13 +375,13 @@ namespace RoomAir {
         }
 
         // now get user defined temperature patterns
-        if (!allocated(state.dataRoomAirMod->AirPattern)) {
-            state.dataRoomAirMod->AirPattern.allocate(state.dataRoomAirMod->NumAirTempPatterns);
+        if (!allocated(state.dataRoomAir->AirPattern)) {
+            state.dataRoomAir->AirPattern.allocate(state.dataRoomAir->NumAirTempPatterns);
         }
 
         // Four different objects to get
         ipsc->cCurrentModuleObject = cTempPatternConstGradientObject;
-        for (int ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumConstantGradient; ++ObjNum) {
+        for (int ObjNum = 1; ObjNum <= state.dataRoomAir->NumConstantGradient; ++ObjNum) {
             int thisPattern = ObjNum;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
@@ -396,7 +396,7 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            auto &roomAirPattern = state.dataRoomAirMod->AirPattern(thisPattern);
+            auto &roomAirPattern = state.dataRoomAir->AirPattern(thisPattern);
             roomAirPattern.Name = ipsc->cAlphaArgs(1);
             roomAirPattern.PatrnID = ipsc->rNumericArgs(1);
             roomAirPattern.PatternMode = UserDefinedPatternType::ConstGradTemp;
@@ -407,8 +407,8 @@ namespace RoomAir {
         }
 
         ipsc->cCurrentModuleObject = cTempPatternTwoGradientObject;
-        for (int ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumTwoGradientInterp; ++ObjNum) {
-            int thisPattern = state.dataRoomAirMod->NumConstantGradient + ObjNum;
+        for (int ObjNum = 1; ObjNum <= state.dataRoomAir->NumTwoGradientInterp; ++ObjNum) {
+            int thisPattern = state.dataRoomAir->NumConstantGradient + ObjNum;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
                                                                      ObjNum,
@@ -423,7 +423,7 @@ namespace RoomAir {
                                                                      ipsc->cNumericFieldNames);
 
 
-            auto &roomAirPattern = state.dataRoomAirMod->AirPattern(thisPattern);
+            auto &roomAirPattern = state.dataRoomAir->AirPattern(thisPattern);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             roomAirPattern.PatternMode = UserDefinedPatternType::TwoGradInterp;
             roomAirPattern.Name = ipsc->cAlphaArgs(1);
@@ -471,8 +471,8 @@ namespace RoomAir {
         }
 
         ipsc->cCurrentModuleObject = cTempPatternNDHeightObject;
-        for (int ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumNonDimensionalHeight; ++ObjNum) {
-            int thisPattern = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp + ObjNum;
+        for (int ObjNum = 1; ObjNum <= state.dataRoomAir->NumNonDimensionalHeight; ++ObjNum) {
+            int thisPattern = state.dataRoomAir->NumConstantGradient + state.dataRoomAir->NumTwoGradientInterp + ObjNum;
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
                                                                      ObjNum,
@@ -485,7 +485,7 @@ namespace RoomAir {
                                                                      _,
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
-            auto &roomAirPattern = state.dataRoomAirMod->AirPattern(thisPattern);
+            auto &roomAirPattern = state.dataRoomAir->AirPattern(thisPattern);
             roomAirPattern.PatternMode = UserDefinedPatternType::NonDimenHeight;
 
             roomAirPattern.Name = ipsc->cAlphaArgs(1);
@@ -522,9 +522,9 @@ namespace RoomAir {
         }
 
         ipsc->cCurrentModuleObject = cTempPatternSurfMapObject;
-        for (int ObjNum = 1; ObjNum <= state.dataRoomAirMod->NumSurfaceMapping; ++ObjNum) {
-            int thisPattern = state.dataRoomAirMod->NumConstantGradient + state.dataRoomAirMod->NumTwoGradientInterp +
-                          state.dataRoomAirMod->NumNonDimensionalHeight + ObjNum;
+        for (int ObjNum = 1; ObjNum <= state.dataRoomAir->NumSurfaceMapping; ++ObjNum) {
+            int thisPattern = state.dataRoomAir->NumConstantGradient + state.dataRoomAir->NumTwoGradientInterp +
+                          state.dataRoomAir->NumNonDimensionalHeight + ObjNum;
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
@@ -539,7 +539,7 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            auto &roomAirPattern = state.dataRoomAirMod->AirPattern(thisPattern);
+            auto &roomAirPattern = state.dataRoomAir->AirPattern(thisPattern);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             
             roomAirPattern.PatternMode = UserDefinedPatternType::SurfMapTemp;
@@ -599,22 +599,22 @@ namespace RoomAir {
         // Find and set return and exhaust node ids
 
         for (int i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
-            if (state.dataRoomAirMod->AirPatternZoneInfo(i).IsUsed) {
+            if (state.dataRoomAir->AirPatternZoneInfo(i).IsUsed) {
                 // first get return and exhaust air node index
                 int found = UtilityRoutines::FindItemInList(
-                    state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
+                    state.dataRoomAir->AirPatternZoneInfo(i).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
                 if (found != 0) {
 
-                    state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ZoneNode;
+                    state.dataRoomAir->AirPatternZoneInfo(i).ZoneNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ZoneNode;
                     if (allocated(state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNode)) {
-                        state.dataRoomAirMod->AirPatternZoneInfo(i).ExhaustAirNodeID.allocate(
+                        state.dataRoomAir->AirPatternZoneInfo(i).ExhaustAirNodeID.allocate(
                             state.dataZoneEquip->ZoneEquipConfig(found).NumExhaustNodes);
-                        state.dataRoomAirMod->AirPatternZoneInfo(i).ExhaustAirNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNode;
+                        state.dataRoomAir->AirPatternZoneInfo(i).ExhaustAirNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNode;
                     } // exhaust nodes present
                 }     // found ZoneEquipConf
 
                 // second get zone height values
-                state.dataRoomAirMod->AirPatternZoneInfo(i).ZoneHeight = state.dataHeatBal->Zone(i).CeilingHeight;
+                state.dataRoomAir->AirPatternZoneInfo(i).ZoneHeight = state.dataHeatBal->Zone(i).CeilingHeight;
 
             } // air pattern is used
         }
@@ -640,18 +640,18 @@ namespace RoomAir {
         int NumNumbers;       // Number of numbers encountered
         int Status;           // Notes if there was an error in processing the input
 
-        if (!state.dataRoomAirMod->DispVent1NodeModelUsed) return;
+        if (!state.dataRoomAir->DispVent1NodeModelUsed) return;
 
         auto &ipsc = state.dataIPShortCut;
         
         // Initialize default values for air nodes
-        state.dataRoomAirMod->TotNumOfZoneAirNodes.allocate(state.dataGlobal->NumOfZones);
-        state.dataRoomAirMod->TotNumOfAirNodes = 0;
-        state.dataRoomAirMod->TotNumOfZoneAirNodes = 0;
+        state.dataRoomAir->TotNumOfZoneAirNodes.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAir->TotNumOfAirNodes = 0;
+        state.dataRoomAir->TotNumOfZoneAirNodes = 0;
         ipsc->cCurrentModuleObject = "RoomAir:Node";
-        state.dataRoomAirMod->TotNumOfAirNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        state.dataRoomAir->TotNumOfAirNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
 
-        if (state.dataRoomAirMod->TotNumOfAirNodes <= 0) {
+        if (state.dataRoomAir->TotNumOfAirNodes <= 0) {
             // no air node object is found, terminate the program
             ShowSevereError(state, format("No {} objects found in input.", ipsc->cCurrentModuleObject));
             ShowContinueError(state, format("The OneNodeDisplacementVentilation model requires {} objects", ipsc->cCurrentModuleObject));
@@ -659,10 +659,10 @@ namespace RoomAir {
             return;
         } else {
             // air node objects are found so allocate airnode variable
-            state.dataRoomAirMod->AirNode.allocate(state.dataRoomAirMod->TotNumOfAirNodes);
+            state.dataRoomAir->AirNode.allocate(state.dataRoomAir->TotNumOfAirNodes);
         }
 
-        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
+        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAir->TotNumOfAirNodes; ++AirNodeNum) {
 
             // get air node objects
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -678,7 +678,7 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            auto &airNode = state.dataRoomAirMod->AirNode(AirNodeNum);
+            auto &airNode = state.dataRoomAir->AirNode(AirNodeNum);
             airNode.Name = ipsc->cAlphaArgs(1);
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, airNode.Name};
@@ -779,11 +779,11 @@ namespace RoomAir {
         } // for (AirNodeNum)
 
         // get number of air nodes in each zone
-        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAirMod->TotNumOfAirNodes; ++AirNodeNum) {
-            auto const &airNode = state.dataRoomAirMod->AirNode(AirNodeNum);
+        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAir->TotNumOfAirNodes; ++AirNodeNum) {
+            auto const &airNode = state.dataRoomAir->AirNode(AirNodeNum);
             // this zone uses other air model so skip the rest
-            if (state.dataRoomAirMod->AirModel(airNode.ZonePtr).AirModel == RoomAirModel::DispVent1Node) 
-                ++state.dataRoomAirMod->TotNumOfZoneAirNodes(airNode.ZonePtr);
+            if (state.dataRoomAir->AirModel(airNode.ZonePtr).AirModel == RoomAirModel::DispVent1Node) 
+                ++state.dataRoomAir->TotNumOfZoneAirNodes(airNode.ZonePtr);
         }
     }
 
@@ -815,13 +815,13 @@ namespace RoomAir {
 
         auto &ipsc = state.dataIPShortCut;
         
-        if (!state.dataRoomAirMod->DispVent1NodeModelUsed) return;
+        if (!state.dataRoomAir->DispVent1NodeModelUsed) return;
 
         // Initialize default values for Mundt model controls
-        state.dataRoomAirMod->ConvectiveFloorSplit.allocate(state.dataGlobal->NumOfZones);
-        state.dataRoomAirMod->InfiltratFloorSplit.allocate(state.dataGlobal->NumOfZones);
-        state.dataRoomAirMod->ConvectiveFloorSplit = 0.0;
-        state.dataRoomAirMod->InfiltratFloorSplit = 0.0;
+        state.dataRoomAir->ConvectiveFloorSplit.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAir->InfiltratFloorSplit.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAir->ConvectiveFloorSplit = 0.0;
+        state.dataRoomAir->InfiltratFloorSplit = 0.0;
         auto &cCurrentModuleObject = ipsc->cCurrentModuleObject;
         cCurrentModuleObject = "RoomAirSettings:OneNodeDisplacementVentilation";
         NumOfMundtContrl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -861,17 +861,17 @@ namespace RoomAir {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataRoomAirMod->AirModel(ZoneNum).AirModel != RoomAirModel::DispVent1Node) {
+            if (state.dataRoomAir->AirModel(ZoneNum).AirModel != RoomAirModel::DispVent1Node) {
                 ShowSevereError(
                     state,
                     format("Zone specified=\"{}\", Air Model type is not OneNodeDisplacementVentilation.", ipsc->cAlphaArgs(1)));
                 ShowContinueError(
-                                  state, format("Air Model Type for zone={}", roomAirModelNamesUC[(int)state.dataRoomAirMod->AirModel(ZoneNum).AirModel]));
+                                  state, format("Air Model Type for zone={}", roomAirModelNamesUC[(int)state.dataRoomAir->AirModel(ZoneNum).AirModel]));
                 ErrorsFound = true;
                 continue;
             }
-            state.dataRoomAirMod->ConvectiveFloorSplit(ZoneNum) = ipsc->rNumericArgs(1);
-            state.dataRoomAirMod->InfiltratFloorSplit(ZoneNum) = ipsc->rNumericArgs(2);
+            state.dataRoomAir->ConvectiveFloorSplit(ZoneNum) = ipsc->rNumericArgs(1);
+            state.dataRoomAir->InfiltratFloorSplit(ZoneNum) = ipsc->rNumericArgs(2);
         }
     }
 
@@ -899,15 +899,15 @@ namespace RoomAir {
 
         auto &ipsc = state.dataIPShortCut;
 
-        if (!state.dataRoomAirMod->UCSDModelUsed) return;
+        if (!state.dataRoomAir->UCSDModelUsed) return;
         ipsc->cCurrentModuleObject = "RoomAirSettings:ThreeNodeDisplacementVentilation";
-        state.dataRoomAirMod->TotDispVent3Node = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        state.dataRoomAir->TotDispVent3Node = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
 
-        if (state.dataRoomAirMod->TotDispVent3Node <= 0) return;
+        if (state.dataRoomAir->TotDispVent3Node <= 0) return;
 
-        state.dataRoomAirMod->ZoneDispVent3Node.allocate(state.dataRoomAirMod->TotDispVent3Node);
+        state.dataRoomAir->ZoneDispVent3Node.allocate(state.dataRoomAir->TotDispVent3Node);
 
-        for (int Loop = 1; Loop <= state.dataRoomAirMod->TotDispVent3Node; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataRoomAir->TotDispVent3Node; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
@@ -922,7 +922,7 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            auto &zoneDV3N = state.dataRoomAirMod->ZoneDispVent3Node(Loop);
+            auto &zoneDV3N = state.dataRoomAir->ZoneDispVent3Node(Loop);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             // First is Zone Name
             // zoneUCSDDV.ZoneName = ipsc->cAlphaArgs(1);
@@ -931,7 +931,7 @@ namespace RoomAir {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
-                state.dataRoomAirMod->IsZoneDispVent3Node(zoneDV3N.ZonePtr) = true;
+                state.dataRoomAir->IsZoneDispVent3Node(zoneDV3N.ZonePtr) = true;
             }
             // Second Alpha is Schedule Name
             // zoneUCSDDV.SchedGainsName = ipsc->cAlphaArgs(2);
@@ -974,15 +974,15 @@ namespace RoomAir {
         int NumNumber;
 
         auto &ipsc = state.dataIPShortCut;
-        if (!state.dataRoomAirMod->UCSDModelUsed) return;
+        if (!state.dataRoomAir->UCSDModelUsed) return;
         ipsc->cCurrentModuleObject = "RoomAirSettings:CrossVentilation";
-        state.dataRoomAirMod->TotCrossVent = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        state.dataRoomAir->TotCrossVent = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
 
-        if (state.dataRoomAirMod->TotCrossVent <= 0) return;
+        if (state.dataRoomAir->TotCrossVent <= 0) return;
 
-        state.dataRoomAirMod->ZoneCrossVent.allocate(state.dataRoomAirMod->TotCrossVent);
+        state.dataRoomAir->ZoneCrossVent.allocate(state.dataRoomAir->TotCrossVent);
 
-        for (int Loop = 1; Loop <= state.dataRoomAirMod->TotCrossVent; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataRoomAir->TotCrossVent; ++Loop) {
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
@@ -997,15 +997,15 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            auto &zoneCV = state.dataRoomAirMod->ZoneCrossVent(Loop);
+            auto &zoneCV = state.dataRoomAir->ZoneCrossVent(Loop);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             // First is Zone Name
-            // state.dataRoomAirMod->ZoneUCSDCV(Loop).ZoneName = ipsc->cAlphaArgs(1);
+            // state.dataRoomAir->ZoneUCSDCV(Loop).ZoneName = ipsc->cAlphaArgs(1);
             if ((zoneCV.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone)) == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
-                state.dataRoomAirMod->IsZoneCrossVent(zoneCV.ZonePtr) = true;
+                state.dataRoomAir->IsZoneCrossVent(zoneCV.ZonePtr) = true;
             }
             // Second Alpha is Schedule Name
             // zoneUCSDCV.SchedGainsName = ipsc->cAlphaArgs(2);
@@ -1057,7 +1057,7 @@ namespace RoomAir {
                     int typeNum = state.afn->AirflowNetworkCompData(compNum).TypeNum;
                     if (state.afn->AirflowNetworkCompData(compNum).CompTypeNum == AirflowNetwork::iComponentTypeNum::SCR) {
                         if (state.afn->MultizoneSurfaceCrackData(typeNum).exponent != 0.50) {
-                            state.dataRoomAirMod->AirModel(zoneCV.ZonePtr).AirModel = RoomAirModel::Mixing;
+                            state.dataRoomAir->AirModel(zoneCV.ZonePtr).AirModel = RoomAirModel::Mixing;
                             ShowWarningError(state, format("Problem with {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                             ShowWarningError(state, format("Roomair model will not be applied for Zone={}.", ipsc->cAlphaArgs(1)));
                             ShowContinueError(
@@ -1094,27 +1094,27 @@ namespace RoomAir {
         int NumAlpha;
         int NumNumber;
 
-        if (!state.dataRoomAirMod->UCSDModelUsed) {
-            state.dataRoomAirMod->TotUFADInt = 0;
-            state.dataRoomAirMod->TotUFADExt = 0;
+        if (!state.dataRoomAir->UCSDModelUsed) {
+            state.dataRoomAir->TotUFADInt = 0;
+            state.dataRoomAir->TotUFADExt = 0;
             return;
         }
 
         auto &ipsc = state.dataIPShortCut;
         
         ipsc->cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
-        state.dataRoomAirMod->TotUFADInt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        state.dataRoomAir->TotUFADInt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
         ipsc->cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionExterior";
-        state.dataRoomAirMod->TotUFADExt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        state.dataRoomAir->TotUFADExt = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
 
-        if (state.dataRoomAirMod->TotUFADInt <= 0 && state.dataRoomAirMod->TotUFADExt <= 0) return;
+        if (state.dataRoomAir->TotUFADInt <= 0 && state.dataRoomAir->TotUFADExt <= 0) return;
 
-        state.dataRoomAirMod->ZoneUFADInt.allocate(state.dataRoomAirMod->TotUFADInt);
-        state.dataRoomAirMod->ZoneUFADExt.allocate(state.dataRoomAirMod->TotUFADExt);
-        state.dataRoomAirMod->ZoneUFADPtr.dimension(state.dataGlobal->NumOfZones, 0);
+        state.dataRoomAir->ZoneUFADInt.allocate(state.dataRoomAir->TotUFADInt);
+        state.dataRoomAir->ZoneUFADExt.allocate(state.dataRoomAir->TotUFADExt);
+        state.dataRoomAir->ZoneUFADPtr.dimension(state.dataGlobal->NumOfZones, 0);
 
         ipsc->cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
-        for (int Loop = 1; Loop <= state.dataRoomAirMod->TotUFADInt; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataRoomAir->TotUFADInt; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
                                                                      Loop,
@@ -1128,17 +1128,17 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
             // First is Zone Name
-            auto &zoneUI = state.dataRoomAirMod->ZoneUFADInt(Loop);
+            auto &zoneUI = state.dataRoomAir->ZoneUFADInt(Loop);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             
             zoneUI.ZoneName = ipsc->cAlphaArgs(1);
             zoneUI.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
-            state.dataRoomAirMod->ZoneUFADPtr(zoneUI.ZonePtr) = Loop;
+            state.dataRoomAir->ZoneUFADPtr(zoneUI.ZonePtr) = Loop;
             if (zoneUI.ZonePtr == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
-                state.dataRoomAirMod->IsZoneUI(zoneUI.ZonePtr) = true;
+                state.dataRoomAir->IsZoneUI(zoneUI.ZonePtr) = true;
             }
 
             // 2nd alpha is diffuser type
@@ -1176,7 +1176,7 @@ namespace RoomAir {
         }
 
         ipsc->cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionExterior";
-        for (int Loop = 1; Loop <= state.dataRoomAirMod->TotUFADExt; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataRoomAir->TotUFADExt; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
                                                                      Loop,
@@ -1190,7 +1190,7 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
             // First is Zone Name
-            auto &zoneUE = state.dataRoomAirMod->ZoneUFADExt(Loop);
+            auto &zoneUE = state.dataRoomAir->ZoneUFADExt(Loop);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             zoneUE.ZoneName = ipsc->cAlphaArgs(1);
             zoneUE.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
@@ -1198,8 +1198,8 @@ namespace RoomAir {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
-                state.dataRoomAirMod->IsZoneUI(zoneUE.ZonePtr) = true;
-                state.dataRoomAirMod->ZoneUFADPtr(zoneUE.ZonePtr) = Loop;
+                state.dataRoomAir->IsZoneUI(zoneUE.ZonePtr) = true;
+                state.dataRoomAir->ZoneUFADPtr(zoneUE.ZonePtr) = Loop;
             }
 
             zoneUE.DiffuserType = static_cast<Diffuser>(getEnumValue(diffuserNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
@@ -1266,18 +1266,18 @@ namespace RoomAir {
 
         auto &ipsc = state.dataIPShortCut;
         ipsc->cCurrentModuleObject = "RoomAirSettings:AirflowNetwork";
-        state.dataRoomAirMod->NumOfRoomAFNControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
-        if (state.dataRoomAirMod->NumOfRoomAFNControl == 0) return;
-        if (state.dataRoomAirMod->NumOfRoomAFNControl > state.dataGlobal->NumOfZones) {
+        state.dataRoomAir->NumOfRoomAFNControl = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        if (state.dataRoomAir->NumOfRoomAFNControl == 0) return;
+        if (state.dataRoomAir->NumOfRoomAFNControl > state.dataGlobal->NumOfZones) {
             ShowSevereError(state, format("Too many {} objects in input file", ipsc->cCurrentModuleObject));
             ShowContinueError(state, format("There cannot be more {} objects than number of zones.", ipsc->cCurrentModuleObject));
             ErrorsFound = true;
         }
 
-        if (!allocated(state.dataRoomAirMod->AFNZoneInfo)) {
-            state.dataRoomAirMod->AFNZoneInfo.allocate(state.dataGlobal->NumOfZones);
+        if (!allocated(state.dataRoomAir->AFNZoneInfo)) {
+            state.dataRoomAir->AFNZoneInfo.allocate(state.dataGlobal->NumOfZones);
         }
-        for (int Loop = 1; Loop <= state.dataRoomAirMod->NumOfRoomAFNControl; ++Loop) {
+        for (int Loop = 1; Loop <= state.dataRoomAir->NumOfRoomAFNControl; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
                                                                      Loop,
@@ -1299,17 +1299,17 @@ namespace RoomAir {
                 ErrorsFound = true;
                 continue;
             }
-            if (state.dataRoomAirMod->AirModel(ZoneNum).AirModel != RoomAirModel::AirflowNetwork) {
+            if (state.dataRoomAir->AirModel(ZoneNum).AirModel != RoomAirModel::AirflowNetwork) {
                 ShowSevereError(state,
                                 format("GetRoomAirflowNetworkData: Zone specified='{}', Air Model type is not AirflowNetwork.",
                                        ipsc->cAlphaArgs(1)));
                 ShowContinueError(
-                                  state, format("Air Model Type for zone ={}", roomAirModelNamesUC[(int)state.dataRoomAirMod->AirModel(ZoneNum).AirModel]));
+                                  state, format("Air Model Type for zone ={}", roomAirModelNamesUC[(int)state.dataRoomAir->AirModel(ZoneNum).AirModel]));
                 ErrorsFound = true;
                 continue;
             }
 
-            auto &roomAFNZoneInfo = state.dataRoomAirMod->AFNZoneInfo(ZoneNum);
+            auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
             roomAFNZoneInfo.ZoneID = ZoneNum;
             roomAFNZoneInfo.RAFNNum = Loop;
             roomAFNZoneInfo.IsUsed = true;
@@ -1347,8 +1347,8 @@ namespace RoomAir {
         } // for (Loop)
         
         ipsc->cCurrentModuleObject = "RoomAir:Node:AirflowNetwork";
-        state.dataRoomAirMod->TotNumOfRoomAFNNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
-        for (int Loop = 1; Loop <= state.dataRoomAirMod->TotNumOfRoomAFNNodes; ++Loop) {
+        state.dataRoomAir->TotNumOfRoomAFNNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        for (int Loop = 1; Loop <= state.dataRoomAir->TotNumOfRoomAFNNodes; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
                                                                      Loop,
@@ -1370,7 +1370,7 @@ namespace RoomAir {
                 continue;
             }
 
-            auto &roomAFNZoneInfo = state.dataRoomAirMod->AFNZoneInfo(ZoneNum);
+            auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
             int RAFNNodeNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
             if (RAFNNodeNum == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
@@ -1419,7 +1419,7 @@ namespace RoomAir {
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 // find surface list
                 int RAFNNodeNum = 0;
-                auto &roomAFNZoneInfo = state.dataRoomAirMod->AFNZoneInfo(iZone);
+                auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
                 if (roomAFNZoneInfo.NumOfAirNodes > 0) {
                     RAFNNodeNum = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1),
                                                                   roomAFNZoneInfo.Node,
@@ -1519,7 +1519,7 @@ namespace RoomAir {
             }
 
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                auto &roomAFNZoneInfo = state.dataRoomAirMod->AFNZoneInfo(iZone);
+                auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
                 // find surface list
                 int RAFNNodeNum = 0;
                 if (roomAFNZoneInfo.NumOfAirNodes > 0) {
@@ -1622,7 +1622,7 @@ namespace RoomAir {
             }
             
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                auto &roomAFNZoneInfo = state.dataRoomAirMod->AFNZoneInfo(iZone);
+                auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
                 // find surface list
                 int RAFNNodeNum = 0;    
                 if (roomAFNZoneInfo.NumOfAirNodes > 0) {
@@ -1693,7 +1693,7 @@ namespace RoomAir {
 
         // do some checks on input data
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            auto &roomAFNZoneInfo = state.dataRoomAirMod->AFNZoneInfo(iZone);
+            auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
             if (roomAFNZoneInfo.NumOfAirNodes == 0)
                 continue;
 
@@ -1749,7 +1749,7 @@ namespace RoomAir {
             return;
         
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-            auto &roomAFNZoneInfo = state.dataRoomAirMod->AFNZoneInfo(iZone);
+            auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
             if (!roomAFNZoneInfo.IsUsed || roomAFNZoneInfo.NumOfAirNodes == 0) continue;
             
             for (int iAirNode = 1; iAirNode <= roomAFNZoneInfo.NumOfAirNodes; ++iAirNode) {
@@ -1807,55 +1807,55 @@ namespace RoomAir {
         int ZoneEquipConfigNum; // counter
 
         // Do the one time initializations
-        if (state.dataRoomAirModelMgr->MyOneTimeFlag) {
+        if (state.dataRoomAir->MyOneTimeFlag) {
 
-            state.dataRoomAirModelMgr->MyEnvrnFlag.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->MyEnvrnFlag.allocate(state.dataGlobal->NumOfZones);
 
-            state.dataRoomAirMod->APos_Wall.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->APos_Floor.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->APos_Ceiling.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->PosZ_Wall.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->PosZ_Floor.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->APos_Window.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->APos_Door.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->APos_Internal.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->PosZ_Window.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->PosZ_Door.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->PosZ_Internal.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->HCeiling.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->HWall.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->HFloor.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->HInternal.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->HWindow.allocate(state.dataSurface->TotSurfaces);
-            state.dataRoomAirMod->HDoor.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->APos_Wall.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->APos_Floor.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->APos_Ceiling.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->PosZ_Wall.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->PosZ_Floor.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->PosZ_Ceiling.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->APos_Window.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->APos_Door.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->APos_Internal.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->PosZ_Window.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->PosZ_Door.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->PosZ_Internal.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->HCeiling.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->HWall.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->HFloor.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->HInternal.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->HWindow.allocate(state.dataSurface->TotSurfaces);
+            state.dataRoomAir->HDoor.allocate(state.dataSurface->TotSurfaces);
 
             AuxSurf.allocate(state.dataGlobal->NumOfZones);
 
-            state.dataRoomAirMod->ZoneCeilingHeight1.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->ZoneCeilingHeight2.allocate(state.dataGlobal->NumOfZones);
-            state.dataRoomAirMod->ZoneCeilingHeight1 = 0.0;
-            state.dataRoomAirMod->ZoneCeilingHeight2 = 0.0;
+            state.dataRoomAir->ZoneCeilingHeight1.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->ZoneCeilingHeight2.allocate(state.dataGlobal->NumOfZones);
+            state.dataRoomAir->ZoneCeilingHeight1 = 0.0;
+            state.dataRoomAir->ZoneCeilingHeight2 = 0.0;
 
             // Arrays initializations
-            state.dataRoomAirMod->APos_Wall = 0;
-            state.dataRoomAirMod->APos_Floor = 0;
-            state.dataRoomAirMod->APos_Ceiling = 0;
-            std::fill(state.dataRoomAirMod->PosZ_Wall.begin(),state.dataRoomAirMod->PosZ_Wall.end(), BegEnd());
-            std::fill(state.dataRoomAirMod->PosZ_Floor.begin(),state.dataRoomAirMod->PosZ_Floor.end(), BegEnd());
-            std::fill(state.dataRoomAirMod->PosZ_Ceiling.begin(),state.dataRoomAirMod->PosZ_Ceiling.end(), BegEnd());
-            state.dataRoomAirMod->APos_Window = 0;
-            state.dataRoomAirMod->APos_Door = 0;
-            state.dataRoomAirMod->APos_Internal = 0;
-            std::fill(state.dataRoomAirMod->PosZ_Window.begin(),state.dataRoomAirMod->PosZ_Window.end(), BegEnd());
-            std::fill(state.dataRoomAirMod->PosZ_Door.begin(),state.dataRoomAirMod->PosZ_Door.end(), BegEnd());
-            std::fill(state.dataRoomAirMod->PosZ_Internal.begin(),state.dataRoomAirMod->PosZ_Internal.end(), BegEnd());
-            state.dataRoomAirMod->HCeiling = 0.0;
-            state.dataRoomAirMod->HWall = 0.0;
-            state.dataRoomAirMod->HFloor = 0.0;
-            state.dataRoomAirMod->HInternal = 0.0;
-            state.dataRoomAirMod->HWindow = 0.0;
-            state.dataRoomAirMod->HDoor = 0.0;
+            state.dataRoomAir->APos_Wall = 0;
+            state.dataRoomAir->APos_Floor = 0;
+            state.dataRoomAir->APos_Ceiling = 0;
+            std::fill(state.dataRoomAir->PosZ_Wall.begin(),state.dataRoomAir->PosZ_Wall.end(), BegEnd());
+            std::fill(state.dataRoomAir->PosZ_Floor.begin(),state.dataRoomAir->PosZ_Floor.end(), BegEnd());
+            std::fill(state.dataRoomAir->PosZ_Ceiling.begin(),state.dataRoomAir->PosZ_Ceiling.end(), BegEnd());
+            state.dataRoomAir->APos_Window = 0;
+            state.dataRoomAir->APos_Door = 0;
+            state.dataRoomAir->APos_Internal = 0;
+            std::fill(state.dataRoomAir->PosZ_Window.begin(),state.dataRoomAir->PosZ_Window.end(), BegEnd());
+            std::fill(state.dataRoomAir->PosZ_Door.begin(),state.dataRoomAir->PosZ_Door.end(), BegEnd());
+            std::fill(state.dataRoomAir->PosZ_Internal.begin(),state.dataRoomAir->PosZ_Internal.end(), BegEnd());
+            state.dataRoomAir->HCeiling = 0.0;
+            state.dataRoomAir->HWall = 0.0;
+            state.dataRoomAir->HFloor = 0.0;
+            state.dataRoomAir->HInternal = 0.0;
+            state.dataRoomAir->HWindow = 0.0;
+            state.dataRoomAir->HDoor = 0.0;
 
             int contWall = 0, contFloor = 0, contCeiling = 0, contWindow = 0, contInternal = 0, contDoor = 0;
             int contWallBeg = 0, contFloorBeg = 0, contCeilingBeg = 0, contWindowBeg = 0, contInternalBeg = 0, contDoorBeg = 0;
@@ -1893,22 +1893,22 @@ namespace RoomAir {
                         // Put the reference to this surface in the appropriate array
                         if (surf.Class == SurfaceClass::Floor) {
                             ++contFloor;
-                            state.dataRoomAirMod->APos_Floor(contFloor) = SurfNum;
+                            state.dataRoomAir->APos_Floor(contFloor) = SurfNum;
                         } else if (surf.Class == SurfaceClass::Wall) {
                             ++contWall;
-                            state.dataRoomAirMod->APos_Wall(contWall) = SurfNum;
+                            state.dataRoomAir->APos_Wall(contWall) = SurfNum;
                         } else if (surf.Class == SurfaceClass::Window) {
                             ++contWindow;
-                            state.dataRoomAirMod->APos_Window(contWindow) = SurfNum;
+                            state.dataRoomAir->APos_Window(contWindow) = SurfNum;
                         } else if (surf.Class == SurfaceClass::IntMass) {
                             ++contInternal;
-                            state.dataRoomAirMod->APos_Internal(contInternal) = SurfNum;
+                            state.dataRoomAir->APos_Internal(contInternal) = SurfNum;
                         } else if (surf.Class == SurfaceClass::Door) {
                             ++contDoor;
-                            state.dataRoomAirMod->APos_Door(contDoor) = SurfNum;
+                            state.dataRoomAir->APos_Door(contDoor) = SurfNum;
                         } else {
                             ++contCeiling;
-                            state.dataRoomAirMod->APos_Ceiling(contCeiling) = SurfNum;
+                            state.dataRoomAir->APos_Ceiling(contCeiling) = SurfNum;
                         }
                     }
                 } // for (SurfNum)
@@ -1921,21 +1921,21 @@ namespace RoomAir {
                 contInternalLast = contInternal;
                 // PosZ_Wall (... + 1) has the Begin Wall reference in Apos_Wall for the ZNum
                 // PosZ_Wall (... + 2) has the End Wall reference in Apos_Wall for the ZNum
-                state.dataRoomAirMod->PosZ_Wall(ZNum).beg = contWallBeg;
-                state.dataRoomAirMod->PosZ_Wall(ZNum).end = contWallLast;
-                state.dataRoomAirMod->PosZ_Floor(ZNum).beg = contFloorBeg;
-                state.dataRoomAirMod->PosZ_Floor(ZNum).end = contFloorLast;
-                state.dataRoomAirMod->PosZ_Ceiling(ZNum).beg = contCeilingBeg;
-                state.dataRoomAirMod->PosZ_Ceiling(ZNum).end = contCeilingLast;
-                state.dataRoomAirMod->PosZ_Window(ZNum).beg = contWindowBeg;
-                state.dataRoomAirMod->PosZ_Window(ZNum).end = contWindowLast;
-                state.dataRoomAirMod->PosZ_Door(ZNum).beg = contDoorBeg;
-                state.dataRoomAirMod->PosZ_Door(ZNum).end = contDoorLast;
-                state.dataRoomAirMod->PosZ_Internal(ZNum).beg = contInternalBeg;
-                state.dataRoomAirMod->PosZ_Internal(ZNum).end = contInternalLast;
+                state.dataRoomAir->PosZ_Wall(ZNum).beg = contWallBeg;
+                state.dataRoomAir->PosZ_Wall(ZNum).end = contWallLast;
+                state.dataRoomAir->PosZ_Floor(ZNum).beg = contFloorBeg;
+                state.dataRoomAir->PosZ_Floor(ZNum).end = contFloorLast;
+                state.dataRoomAir->PosZ_Ceiling(ZNum).beg = contCeilingBeg;
+                state.dataRoomAir->PosZ_Ceiling(ZNum).end = contCeilingLast;
+                state.dataRoomAir->PosZ_Window(ZNum).beg = contWindowBeg;
+                state.dataRoomAir->PosZ_Window(ZNum).end = contWindowLast;
+                state.dataRoomAir->PosZ_Door(ZNum).beg = contDoorBeg;
+                state.dataRoomAir->PosZ_Door(ZNum).end = contDoorLast;
+                state.dataRoomAir->PosZ_Internal(ZNum).beg = contInternalBeg;
+                state.dataRoomAir->PosZ_Internal(ZNum).end = contInternalLast;
                 // Save the highest and lowest height for this zone
-                state.dataRoomAirMod->ZoneCeilingHeight1(ZNum) = Z1ofZone;
-                state.dataRoomAirMod->ZoneCeilingHeight2(ZNum) = Z2ofZone;
+                state.dataRoomAir->ZoneCeilingHeight1(ZNum) = Z1ofZone;
+                state.dataRoomAir->ZoneCeilingHeight2(ZNum) = Z2ofZone;
 
                 constexpr Real64 CeilingHeightDiffMaximum = 0.1;
                 if (std::abs((Z2ofZone - Z1ofZone) - state.dataHeatBal->Zone(ZNum).CeilingHeight) > CeilingHeightDiffMaximum) {
@@ -1947,18 +1947,18 @@ namespace RoomAir {
             } // for (ZoneNum)
 
             AuxSurf = 0;
-            state.dataRoomAirMod->CrossVentNumAFNSurfaces = 0;
+            state.dataRoomAir->CrossVentNumAFNSurfaces = 0;
 
             // calculate maximum number of airflow network surfaces in each zone
             for (int iMzLink = 1; iMzLink <= state.afn->NumOfLinksMultiZone; ++iMzLink) {
                 auto const &mzSurf = state.dataSurface->Surface(state.afn->MultizoneSurfaceData(iMzLink).SurfNum);
                 ++AuxSurf(mzSurf.Zone);
-                ++state.dataRoomAirMod->CrossVentNumAFNSurfaces;
+                ++state.dataRoomAir->CrossVentNumAFNSurfaces;
                 // Check if this is an interzone airflow network surface
                 if (mzSurf.ExtBoundCond > 0 &&
                     (state.afn->MultizoneSurfaceData(iMzLink).SurfNum != mzSurf.ExtBoundCond)) {
                     ++AuxSurf(state.dataSurface->Surface(mzSurf.ExtBoundCond).Zone);
-                    ++state.dataRoomAirMod->CrossVentNumAFNSurfaces;
+                    ++state.dataRoomAir->CrossVentNumAFNSurfaces;
                 }
             }
             // calculate maximum number of airflow network surfaces in a single zone
@@ -1967,36 +1967,36 @@ namespace RoomAir {
                 if (AuxSurf(iZone) > MaxSurf) MaxSurf = AuxSurf(iZone);
             }
 
-            if (!allocated(state.dataRoomAirMod->AFNSurfaceCrossVent)) {
-                state.dataRoomAirMod->AFNSurfaceCrossVent.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
+            if (!allocated(state.dataRoomAir->AFNSurfaceCrossVent)) {
+                state.dataRoomAir->AFNSurfaceCrossVent.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
             }
-            if (!allocated(state.dataRoomAirMod->CrossVentJetRecFlows)) {
-                state.dataRoomAirMod->CrossVentJetRecFlows.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
+            if (!allocated(state.dataRoomAir->CrossVentJetRecFlows)) {
+                state.dataRoomAir->CrossVentJetRecFlows.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
             }
             AuxAirflowNetworkSurf.allocate({0, MaxSurf}, state.dataGlobal->NumOfZones);
             // Width and Height for airflow network surfaces
-            if (!allocated(state.dataRoomAirMod->SurfParametersCrossDispVent)) {
-                state.dataRoomAirMod->SurfParametersCrossDispVent.allocate(state.afn->NumOfLinksMultiZone);
+            if (!allocated(state.dataRoomAir->SurfParametersCrossDispVent)) {
+                state.dataRoomAir->SurfParametersCrossDispVent.allocate(state.afn->NumOfLinksMultiZone);
             }
 
-            state.dataRoomAirMod->AFNSurfaceCrossVent = 0;
+            state.dataRoomAir->AFNSurfaceCrossVent = 0;
             // Organize surfaces in vector AirflowNetworkSurfaceUCSDCV(Zone, surface indexes)
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 // the 0 component of the array has the number of relevant AirflowNetwork surfaces for the zone
-                state.dataRoomAirMod->AFNSurfaceCrossVent(0, iZone) = AuxSurf(iZone);
+                state.dataRoomAir->AFNSurfaceCrossVent(0, iZone) = AuxSurf(iZone);
                 if (AuxSurf(iZone) == 0)
                         continue;
                 
-                Real64 const ceilingHeight = state.dataRoomAirMod->ZoneCeilingHeight1(iZone);
+                Real64 const ceilingHeight = state.dataRoomAir->ZoneCeilingHeight1(iZone);
                 int SurfNum = 1;
 
                 for (int iMzLink = 1; iMzLink <= state.afn->NumOfLinksMultiZone; ++iMzLink) {
                     auto const &mzSurf = state.dataSurface->Surface(state.afn->MultizoneSurfaceData(iMzLink).SurfNum);
-                    auto &surfParams = state.dataRoomAirMod->SurfParametersCrossDispVent(iMzLink);
+                    auto &surfParams = state.dataRoomAir->SurfParametersCrossDispVent(iMzLink);
 
                     if (mzSurf.Zone == iZone) {
                         // SurfNum has the reference surface number relative to AirflowNetworkSurfaceData
-                        state.dataRoomAirMod->AFNSurfaceCrossVent(SurfNum, iZone) = iMzLink;
+                        state.dataRoomAir->AFNSurfaceCrossVent(SurfNum, iZone) = iMzLink;
                         // calculate the surface width and height
                         int compNum = state.afn->AirflowNetworkLinkageData(iMzLink).CompNum;
                         int typeNum = state.afn->AirflowNetworkCompData(compNum).TypeNum;
@@ -2064,7 +2064,7 @@ namespace RoomAir {
                              state.afn->AirflowNetworkNodeData(nodeNum1).EPlusZoneNum > 0) ||
                             (state.afn->AirflowNetworkNodeData(nodeNum2).EPlusZoneNum > 0 &&
                              state.afn->AirflowNetworkNodeData(nodeNum1).EPlusZoneNum == iZone)) {
-                            state.dataRoomAirMod->AFNSurfaceCrossVent(SurfNum, iZone) = iMzLink;
+                            state.dataRoomAir->AFNSurfaceCrossVent(SurfNum, iZone) = iMzLink;
                             ++SurfNum;
                         }
                     }
@@ -2073,160 +2073,160 @@ namespace RoomAir {
 
             AuxSurf.deallocate();
 
-            if (any(state.dataRoomAirMod->IsZoneDispVent3Node) || any(state.dataRoomAirMod->IsZoneUI)) {
-                state.dataRoomAirMod->MaxTempGrad.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->AvgTempGrad.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->TCMF.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->FracMinFlow.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneAirSystemON.allocate(state.dataGlobal->NumOfZones);
+            if (any(state.dataRoomAir->IsZoneDispVent3Node) || any(state.dataRoomAir->IsZoneUI)) {
+                state.dataRoomAir->MaxTempGrad.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->AvgTempGrad.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->TCMF.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->FracMinFlow.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneAirSystemON.allocate(state.dataGlobal->NumOfZones);
                 // Allocate histories of displacement ventilation temperatures PH 3/5/04
-                state.dataRoomAirMod->MATFloor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->XMATFloor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->DSXMATFloor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->MATOC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->XMATOC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->DSXMATOC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->MATMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->XMATMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->DSXMATMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTMFloor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTMOC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTMMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->AIRRATFloor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->AIRRATOC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->AIRRATMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTOC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZTFloor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->HeightTransition.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Phi.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Zone1Floor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneMXFloor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneM2Floor.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Zone1OC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneMXOC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneM2OC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Zone1MX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneMXMX.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneM2MX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->MATFloor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->XMATFloor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->DSXMATFloor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->MATOC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->XMATOC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->DSXMATOC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->MATMX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->XMATMX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->DSXMATMX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZTMFloor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZTMOC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZTMMX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->AIRRATFloor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->AIRRATOC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->AIRRATMX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZTOC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZTMX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZTFloor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->HeightTransition.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Phi.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Zone1Floor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneMXFloor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneM2Floor.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Zone1OC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneMXOC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneM2OC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Zone1MX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneMXMX.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneM2MX.allocate(state.dataGlobal->NumOfZones);
 
-                state.dataRoomAirMod->MaxTempGrad = 0.0;
-                state.dataRoomAirMod->AvgTempGrad = 0.0;
-                state.dataRoomAirMod->TCMF = 23.0;
-                state.dataRoomAirMod->FracMinFlow = 0.0;
+                state.dataRoomAir->MaxTempGrad = 0.0;
+                state.dataRoomAir->AvgTempGrad = 0.0;
+                state.dataRoomAir->TCMF = 23.0;
+                state.dataRoomAir->FracMinFlow = 0.0;
                 //      ZoneDVMixedFlagRep    = 0.0
-                state.dataRoomAirMod->ZoneAirSystemON = false;
+                state.dataRoomAir->ZoneAirSystemON = false;
                 //      ZoneDVMixedFlag=0
-                state.dataRoomAirMod->MATFloor = 23.0;
-                state.dataRoomAirMod->XMATFloor = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->DSXMATFloor = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->MATOC = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->XMATOC = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->DSXMATOC = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->MATMX = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->XMATMX = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->DSXMATMX = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->ZTMFloor = {23.0, 23.0, 23.0};
-                state.dataRoomAirMod->ZTMOC = {23.0, 23.0, 23.0};
-                state.dataRoomAirMod->ZTMMX = {23.0, 23.0, 23.0};
-                state.dataRoomAirMod->Zone1Floor = 23.0;
-                state.dataRoomAirMod->ZoneMXFloor = 23.0;
-                state.dataRoomAirMod->ZoneM2Floor = 23.0;
-                state.dataRoomAirMod->Zone1OC = 23.0;
-                state.dataRoomAirMod->ZoneMXOC = 23.0;
-                state.dataRoomAirMod->ZoneM2OC = 23.0;
-                state.dataRoomAirMod->Zone1MX = 23.0;
-                state.dataRoomAirMod->ZoneMXMX = 23.0;
-                state.dataRoomAirMod->ZoneM2MX = 23.0;
-                state.dataRoomAirMod->AIRRATFloor = 0.0;
-                state.dataRoomAirMod->AIRRATOC = 0.0;
-                state.dataRoomAirMod->AIRRATMX = 0.0;
-                state.dataRoomAirMod->ZTOC = 23.0;
-                state.dataRoomAirMod->ZTMX = 23.0;
-                state.dataRoomAirMod->ZTFloor = 23.0;
-                state.dataRoomAirMod->HeightTransition = 0.0;
-                state.dataRoomAirMod->Phi = 0.0;
-                state.dataRoomAirMod->HCeiling = 0.0;
-                state.dataRoomAirMod->HWall = 0.0;
-                state.dataRoomAirMod->HFloor = 0.0;
-                state.dataRoomAirMod->HInternal = 0.0;
-                state.dataRoomAirMod->HWindow = 0.0;
-                state.dataRoomAirMod->HDoor = 0.0;
+                state.dataRoomAir->MATFloor = 23.0;
+                state.dataRoomAir->XMATFloor = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->DSXMATFloor = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->MATOC = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->XMATOC = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->DSXMATOC = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->MATMX = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->XMATMX = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->DSXMATMX = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->ZTMFloor = {23.0, 23.0, 23.0};
+                state.dataRoomAir->ZTMOC = {23.0, 23.0, 23.0};
+                state.dataRoomAir->ZTMMX = {23.0, 23.0, 23.0};
+                state.dataRoomAir->Zone1Floor = 23.0;
+                state.dataRoomAir->ZoneMXFloor = 23.0;
+                state.dataRoomAir->ZoneM2Floor = 23.0;
+                state.dataRoomAir->Zone1OC = 23.0;
+                state.dataRoomAir->ZoneMXOC = 23.0;
+                state.dataRoomAir->ZoneM2OC = 23.0;
+                state.dataRoomAir->Zone1MX = 23.0;
+                state.dataRoomAir->ZoneMXMX = 23.0;
+                state.dataRoomAir->ZoneM2MX = 23.0;
+                state.dataRoomAir->AIRRATFloor = 0.0;
+                state.dataRoomAir->AIRRATOC = 0.0;
+                state.dataRoomAir->AIRRATMX = 0.0;
+                state.dataRoomAir->ZTOC = 23.0;
+                state.dataRoomAir->ZTMX = 23.0;
+                state.dataRoomAir->ZTFloor = 23.0;
+                state.dataRoomAir->HeightTransition = 0.0;
+                state.dataRoomAir->Phi = 0.0;
+                state.dataRoomAir->HCeiling = 0.0;
+                state.dataRoomAir->HWall = 0.0;
+                state.dataRoomAir->HFloor = 0.0;
+                state.dataRoomAir->HInternal = 0.0;
+                state.dataRoomAir->HWindow = 0.0;
+                state.dataRoomAir->HDoor = 0.0;
             }
 
-            if (any(state.dataRoomAirMod->IsZoneDispVent3Node)) {
+            if (any(state.dataRoomAir->IsZoneDispVent3Node)) {
 
-                state.dataRoomAirMod->DispVent3NodeHcIn.allocate(state.dataSurface->TotSurfaces);
-                state.dataRoomAirMod->ZoneDispVent3NodeMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneDispVent3NodeMixedFlag.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->DispVent3NodeHcIn = 0.0;
-                state.dataRoomAirMod->ZoneDispVent3NodeMixedFlagRep = 0.0;
-                state.dataRoomAirMod->ZoneDispVent3NodeMixedFlag = 0;
+                state.dataRoomAir->DispVent3NodeHcIn.allocate(state.dataSurface->TotSurfaces);
+                state.dataRoomAir->ZoneDispVent3NodeMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneDispVent3NodeMixedFlag.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->DispVent3NodeHcIn = 0.0;
+                state.dataRoomAir->ZoneDispVent3NodeMixedFlagRep = 0.0;
+                state.dataRoomAir->ZoneDispVent3NodeMixedFlag = 0;
                 // Output variables and DV zone flag
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (state.dataRoomAirMod->AirModel(iZone).AirModel != RoomAirModel::DispVent3Node)
+                    if (state.dataRoomAir->AirModel(iZone).AirModel != RoomAirModel::DispVent3Node)
                         continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:ThreeNodeDisplacementVentilation'
                     SetupOutputVariable(state,
                                         "Room Air Zone Mixed Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTMX(iZone),
+                                        state.dataRoomAir->ZTMX(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTOC(iZone),
+                                        state.dataRoomAir->ZTOC(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Floor Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTFloor(iZone),
+                                        state.dataRoomAir->ZTFloor(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->HeightTransition(iZone),
+                                        state.dataRoomAir->HeightTransition(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recommended Minimum Flow Fraction",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->FracMinFlow(iZone),
+                                        state.dataRoomAir->FracMinFlow(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneDispVent3NodeMixedFlagRep(iZone),
+                                        state.dataRoomAir->ZoneDispVent3NodeMixedFlagRep(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->AvgTempGrad(iZone),
+                                        state.dataRoomAir->AvgTempGrad(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Maximum Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->MaxTempGrad(iZone),
+                                        state.dataRoomAir->MaxTempGrad(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermal Comfort Effective Air Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->TCMF(iZone),
+                                        state.dataRoomAir->TCMF(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         state.dataHeatBal->Zone(iZone).Name);
@@ -2240,23 +2240,23 @@ namespace RoomAir {
                 } // for (iZone)
             } // if (any(IsZoneDV))
 
-            if (any(state.dataRoomAirMod->IsZoneUI)) {
-                state.dataRoomAirMod->ZoneUFADMixedFlag.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneUFADMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->UFADHcIn.allocate(state.dataSurface->TotSurfaces);
-                state.dataRoomAirMod->ZoneUFADGamma.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneUFADPowInPlumes.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneUFADPowInPlumesfromWindows.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneUFADMixedFlag = 0;
-                state.dataRoomAirMod->ZoneUFADMixedFlagRep = 0.0;
-                state.dataRoomAirMod->UFADHcIn = 0.0;
-                state.dataRoomAirMod->ZoneUFADGamma = 0.0;
-                state.dataRoomAirMod->ZoneUFADPowInPlumes = 0.0;
-                state.dataRoomAirMod->ZoneUFADPowInPlumesfromWindows = 0.0;
+            if (any(state.dataRoomAir->IsZoneUI)) {
+                state.dataRoomAir->ZoneUFADMixedFlag.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneUFADMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->UFADHcIn.allocate(state.dataSurface->TotSurfaces);
+                state.dataRoomAir->ZoneUFADGamma.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneUFADPowInPlumes.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneUFADPowInPlumesfromWindows.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneUFADMixedFlag = 0;
+                state.dataRoomAir->ZoneUFADMixedFlagRep = 0.0;
+                state.dataRoomAir->UFADHcIn = 0.0;
+                state.dataRoomAir->ZoneUFADGamma = 0.0;
+                state.dataRoomAir->ZoneUFADPowInPlumes = 0.0;
+                state.dataRoomAir->ZoneUFADPowInPlumesfromWindows = 0.0;
                 
                 // Output variables and UF zone flag
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (state.dataRoomAirMod->AirModel(iZone).AirModel != RoomAirModel::UFADInt)
+                    if (state.dataRoomAir->AirModel(iZone).AirModel != RoomAirModel::UFADInt)
                         continue; // don't set these up if they don't make sense
 
                     auto &zone = state.dataHeatBal->Zone(iZone);
@@ -2264,42 +2264,42 @@ namespace RoomAir {
                     SetupOutputVariable(state,
                                         "Room Air Zone Mixed Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTMX(iZone),
+                                        state.dataRoomAir->ZTMX(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTOC(iZone),
+                                        state.dataRoomAir->ZTOC(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->HeightTransition(iZone),
+                                        state.dataRoomAir->HeightTransition(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFADMixedFlagRep(iZone),
+                                        state.dataRoomAir->ZoneUFADMixedFlagRep(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->AvgTempGrad(iZone),
+                                        state.dataRoomAir->AvgTempGrad(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Effective Comfort Air Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->TCMF(iZone),
+                                        state.dataRoomAir->TCMF(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
@@ -2313,74 +2313,74 @@ namespace RoomAir {
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height Gamma Value",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFADGamma(iZone),
+                                        state.dataRoomAir->ZoneUFADGamma(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Plume Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        state.dataRoomAirMod->ZoneUFADPowInPlumes(iZone),
+                                        state.dataRoomAir->ZoneUFADPowInPlumes(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Temperature Stratification Fraction",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->Phi(iZone),
+                                        state.dataRoomAir->Phi(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
 
                     // set zone equip pointer in the UCSDUI data structure
-                    state.dataRoomAirMod->ZoneUFADInt(state.dataRoomAirMod->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
+                    state.dataRoomAir->ZoneUFADInt(state.dataRoomAir->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
                 } // for (iZone)
 
                 
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (state.dataRoomAirMod->AirModel(iZone).AirModel != RoomAirModel::UFADExt)
+                    if (state.dataRoomAir->AirModel(iZone).AirModel != RoomAirModel::UFADExt)
                         continue; // don't set these up if they don't make sense
                     // CurrentModuleObject='RoomAirSettings:UnderFloorAirDistributionExterior'
                     auto const &zone = state.dataHeatBal->Zone(iZone);
                     SetupOutputVariable(state,
                                         "Room Air Zone Mixed Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTMX(iZone),
+                                        state.dataRoomAir->ZTMX(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTOC(iZone),
+                                        state.dataRoomAir->ZTOC(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->HeightTransition(iZone),
+                                        state.dataRoomAir->HeightTransition(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFADMixedFlagRep(iZone),
+                                        state.dataRoomAir->ZoneUFADMixedFlagRep(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         OutputProcessor::Unit::K_m,
-                                        state.dataRoomAirMod->AvgTempGrad(iZone),
+                                        state.dataRoomAir->AvgTempGrad(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Effective Comfort Air Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->TCMF(iZone),
+                                        state.dataRoomAir->TCMF(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
@@ -2394,82 +2394,82 @@ namespace RoomAir {
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height Gamma Value",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneUFADGamma(iZone),
+                                        state.dataRoomAir->ZoneUFADGamma(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Plume Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        state.dataRoomAirMod->ZoneUFADPowInPlumes(iZone),
+                                        state.dataRoomAir->ZoneUFADPowInPlumes(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Window Plume Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        state.dataRoomAirMod->ZoneUFADPowInPlumesfromWindows(iZone),
+                                        state.dataRoomAir->ZoneUFADPowInPlumesfromWindows(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Temperature Stratification Fraction",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->Phi(iZone),
+                                        state.dataRoomAir->Phi(iZone),
                                         OutputProcessor::SOVTimeStepType::HVAC,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     // set zone equip pointer in the UCSDUE data structure
-                    state.dataRoomAirMod->ZoneUFADExt(state.dataRoomAirMod->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
+                    state.dataRoomAir->ZoneUFADExt(state.dataRoomAir->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
                 }
             }
 
-            if (any(state.dataRoomAirMod->IsZoneCrossVent)) {
-                state.dataRoomAirMod->CrossVentHcIn.allocate(state.dataSurface->TotSurfaces);
-                state.dataRoomAirMod->ZTJET.allocate(state.dataGlobal->NumOfZones);
+            if (any(state.dataRoomAir->IsZoneCrossVent)) {
+                state.dataRoomAir->CrossVentHcIn.allocate(state.dataSurface->TotSurfaces);
+                state.dataRoomAir->ZTJET.allocate(state.dataGlobal->NumOfZones);
                 // Most ZTJet takes defaults
-                state.dataRoomAirMod->ZTREC.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->RoomOutflowTemp.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZTREC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->RoomOutflowTemp.allocate(state.dataGlobal->NumOfZones);
                 // Most ZTREC takes defaults
-                state.dataRoomAirMod->JetRecAreaRatio.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Urec.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Ujet.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Qrec.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Qtot.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->RecInflowRatio.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Uhc.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Ain.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Tin.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Droom.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Dstar.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneCrossVentIsMixing.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->Rfr.allocate(state.dataGlobal->NumOfZones);
-                state.dataRoomAirMod->ZoneCrossVentHasREC.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->JetRecAreaRatio.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Urec.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Ujet.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Qrec.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Qtot.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->RecInflowRatio.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Uhc.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Ain.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Tin.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Droom.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Dstar.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneCrossVentIsMixing.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->Rfr.allocate(state.dataGlobal->NumOfZones);
+                state.dataRoomAir->ZoneCrossVentHasREC.allocate(state.dataGlobal->NumOfZones);
 
-                state.dataRoomAirMod->ZTJET = 23.0;
-                state.dataRoomAirMod->RoomOutflowTemp = 23.0;
-                state.dataRoomAirMod->ZTREC = 23.0;
-                state.dataRoomAirMod->CrossVentHcIn = 0.0;
-                state.dataRoomAirMod->JetRecAreaRatio = 0.2;
-                state.dataRoomAirMod->Urec = 0.2;
-                state.dataRoomAirMod->Ujet = 0.2;
-                state.dataRoomAirMod->Qrec = 0.2;
-                state.dataRoomAirMod->Uhc = 0.2;
-                state.dataRoomAirMod->Ain = 1.0;
-                state.dataRoomAirMod->Tin = 23.0;
-                state.dataRoomAirMod->Droom = 6.0;
-                state.dataRoomAirMod->ZoneCrossVentIsMixing = 0.0;
-                state.dataRoomAirMod->Rfr = 10.0;
-                state.dataRoomAirMod->ZoneCrossVentHasREC = 1.0;
-                state.dataRoomAirMod->HCeiling = 0.0;
-                state.dataRoomAirMod->HWall = 0.0;
-                state.dataRoomAirMod->HFloor = 0.0;
-                state.dataRoomAirMod->HInternal = 0.0;
-                state.dataRoomAirMod->HWindow = 0.0;
-                state.dataRoomAirMod->HDoor = 0.0;
+                state.dataRoomAir->ZTJET = 23.0;
+                state.dataRoomAir->RoomOutflowTemp = 23.0;
+                state.dataRoomAir->ZTREC = 23.0;
+                state.dataRoomAir->CrossVentHcIn = 0.0;
+                state.dataRoomAir->JetRecAreaRatio = 0.2;
+                state.dataRoomAir->Urec = 0.2;
+                state.dataRoomAir->Ujet = 0.2;
+                state.dataRoomAir->Qrec = 0.2;
+                state.dataRoomAir->Uhc = 0.2;
+                state.dataRoomAir->Ain = 1.0;
+                state.dataRoomAir->Tin = 23.0;
+                state.dataRoomAir->Droom = 6.0;
+                state.dataRoomAir->ZoneCrossVentIsMixing = 0.0;
+                state.dataRoomAir->Rfr = 10.0;
+                state.dataRoomAir->ZoneCrossVentHasREC = 1.0;
+                state.dataRoomAir->HCeiling = 0.0;
+                state.dataRoomAir->HWall = 0.0;
+                state.dataRoomAir->HFloor = 0.0;
+                state.dataRoomAir->HInternal = 0.0;
+                state.dataRoomAir->HWindow = 0.0;
+                state.dataRoomAir->HDoor = 0.0;
 
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (state.dataRoomAirMod->AirModel(iZone).AirModel != RoomAirModel::CrossVent)
+                    if (state.dataRoomAir->AirModel(iZone).AirModel != RoomAirModel::CrossVent)
                         continue; // don't set these up if they don't make sense
 
                     ZoneEquipConfigNum = ZoneNum; // Where does this ZoneNum come from?
@@ -2477,8 +2477,8 @@ namespace RoomAir {
                     auto const &zone = state.dataHeatBal->Zone(iZone);
                     // check whether this zone is a controlled zone or not
                     if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
-                        state.dataRoomAirMod->IsZoneCrossVent(iZone) = false;
-                        state.dataRoomAirMod->AirModel(iZone).SimAirModel = false;
+                        state.dataRoomAir->IsZoneCrossVent(iZone) = false;
+                        state.dataRoomAir->AirModel(iZone).SimAirModel = false;
                         ShowSevereError(state,
                                         format("Unmixed Flow: Cross Ventilation cannot be applied for Zone={}", zone.Name));
                         ShowContinueError(state,
@@ -2489,74 +2489,74 @@ namespace RoomAir {
                     SetupOutputVariable(state,
                                         "Room Air Zone Jet Region Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTJET(iZone),
+                                        state.dataRoomAir->ZTJET(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation Region Temperature",
                                         OutputProcessor::Unit::C,
-                                        state.dataRoomAirMod->ZTREC(iZone),
+                                        state.dataRoomAir->ZTREC(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Jet Region Average Air Velocity",
                                         OutputProcessor::Unit::m_s,
-                                        state.dataRoomAirMod->Ujet(iZone),
+                                        state.dataRoomAir->Ujet(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation Region Average Air Velocity",
                                         OutputProcessor::Unit::m_s,
-                                        state.dataRoomAirMod->Urec(iZone),
+                                        state.dataRoomAir->Urec(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation and Inflow Rate Ratio",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->RecInflowRatio(iZone),
+                                        state.dataRoomAir->RecInflowRatio(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Inflow Opening Area",
                                         OutputProcessor::Unit::m2,
-                                        state.dataRoomAirMod->Ain(iZone),
+                                        state.dataRoomAir->Ain(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Room Length",
                                         OutputProcessor::Unit::m,
-                                        state.dataRoomAirMod->Dstar(iZone),
+                                        state.dataRoomAir->Dstar(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixing Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneCrossVentIsMixing(iZone),
+                                        state.dataRoomAir->ZoneCrossVentIsMixing(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Recirculating Status",
                                         OutputProcessor::Unit::None,
-                                        state.dataRoomAirMod->ZoneCrossVentHasREC(iZone),
+                                        state.dataRoomAir->ZoneCrossVentHasREC(iZone),
                                         OutputProcessor::SOVTimeStepType::Zone,
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
-                    for (int i = 1; i <= state.dataRoomAirMod->AFNSurfaceCrossVent(0, ZoneNum); ++i) {
+                    for (int i = 1; i <= state.dataRoomAir->AFNSurfaceCrossVent(0, ZoneNum); ++i) {
                         int N = state.afn->AirflowNetworkLinkageData(i).CompNum;
                         if (state.afn->AirflowNetworkCompData(N).CompTypeNum == AirflowNetwork::iComponentTypeNum::DOP) {
                             SetupOutputVariable(
                                 state,
                                 "Room Air Window Jet Region Average Air Velocity",
                                 OutputProcessor::Unit::m_s,
-                                state.dataRoomAirMod->CrossVentJetRecFlows(i, iZone).Ujet,
+                                state.dataRoomAir->CrossVentJetRecFlows(i, iZone).Ujet,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.afn->MultizoneSurfaceData(i).SurfName);
@@ -2565,104 +2565,104 @@ namespace RoomAir {
                 } // for (iZone)
             } // if (any(isZoneCV))
 
-            state.dataRoomAirModelMgr->MyEnvrnFlag = true;
+            state.dataRoomAir->MyEnvrnFlag = true;
 
-            state.dataRoomAirModelMgr->MyOneTimeFlag = false;
+            state.dataRoomAir->MyOneTimeFlag = false;
         } // if (myOneTimeFlag)
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAirModelMgr->MyEnvrnFlag(ZoneNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAir->MyEnvrnFlag(ZoneNum)) {
 
-            if (state.dataRoomAirMod->IsZoneDispVent3Node(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
+            if (state.dataRoomAir->IsZoneDispVent3Node(ZoneNum) || state.dataRoomAir->IsZoneUI(ZoneNum)) {
 
-                state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
-                state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
-                state.dataRoomAirMod->TCMF(ZoneNum) = 23.0;
-                state.dataRoomAirMod->FracMinFlow(ZoneNum) = 0.0;
-                state.dataRoomAirMod->ZoneAirSystemON(ZoneNum) = false;
-                state.dataRoomAirMod->MATFloor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->XMATFloor(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->DSXMATFloor(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->MATOC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->XMATOC(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->DSXMATOC(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->MATMX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->XMATMX(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->DSXMATMX(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAirMod->ZTMFloor(ZoneNum) = {23.0, 23.0, 23.0};
-                state.dataRoomAirMod->Zone1Floor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZoneMXFloor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZoneM2Floor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTMOC(ZoneNum) = {23.0, 23.0, 23.0};
-                state.dataRoomAirMod->Zone1OC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZoneMXOC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZoneM2OC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTMMX(ZoneNum) = {23.0, 23.0, 23.0};
-                state.dataRoomAirMod->Zone1MX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZoneMXMX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZoneM2MX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->AIRRATFloor(ZoneNum) = 0.0;
-                state.dataRoomAirMod->AIRRATOC(ZoneNum) = 0.0;
-                state.dataRoomAirMod->AIRRATMX(ZoneNum) = 0.0;
-                state.dataRoomAirMod->ZTOC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTMX(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTFloor(ZoneNum) = 23.0;
-                state.dataRoomAirMod->HeightTransition(ZoneNum) = 0.0;
-                state.dataRoomAirMod->Phi(ZoneNum) = 0.0;
-                state.dataRoomAirMod->HCeiling = 0.0;
-                state.dataRoomAirMod->HWall = 0.0;
-                state.dataRoomAirMod->HFloor = 0.0;
-                state.dataRoomAirMod->HInternal = 0.0;
-                state.dataRoomAirMod->HWindow = 0.0;
-                state.dataRoomAirMod->HDoor = 0.0;
+                state.dataRoomAir->MaxTempGrad(ZoneNum) = 0.0;
+                state.dataRoomAir->AvgTempGrad(ZoneNum) = 0.0;
+                state.dataRoomAir->TCMF(ZoneNum) = 23.0;
+                state.dataRoomAir->FracMinFlow(ZoneNum) = 0.0;
+                state.dataRoomAir->ZoneAirSystemON(ZoneNum) = false;
+                state.dataRoomAir->MATFloor(ZoneNum) = 23.0;
+                state.dataRoomAir->XMATFloor(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->DSXMATFloor(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->MATOC(ZoneNum) = 23.0;
+                state.dataRoomAir->XMATOC(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->DSXMATOC(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->MATMX(ZoneNum) = 23.0;
+                state.dataRoomAir->XMATMX(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->DSXMATMX(ZoneNum) = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->ZTMFloor(ZoneNum) = {23.0, 23.0, 23.0};
+                state.dataRoomAir->Zone1Floor(ZoneNum) = 23.0;
+                state.dataRoomAir->ZoneMXFloor(ZoneNum) = 23.0;
+                state.dataRoomAir->ZoneM2Floor(ZoneNum) = 23.0;
+                state.dataRoomAir->ZTMOC(ZoneNum) = {23.0, 23.0, 23.0};
+                state.dataRoomAir->Zone1OC(ZoneNum) = 23.0;
+                state.dataRoomAir->ZoneMXOC(ZoneNum) = 23.0;
+                state.dataRoomAir->ZoneM2OC(ZoneNum) = 23.0;
+                state.dataRoomAir->ZTMMX(ZoneNum) = {23.0, 23.0, 23.0};
+                state.dataRoomAir->Zone1MX(ZoneNum) = 23.0;
+                state.dataRoomAir->ZoneMXMX(ZoneNum) = 23.0;
+                state.dataRoomAir->ZoneM2MX(ZoneNum) = 23.0;
+                state.dataRoomAir->AIRRATFloor(ZoneNum) = 0.0;
+                state.dataRoomAir->AIRRATOC(ZoneNum) = 0.0;
+                state.dataRoomAir->AIRRATMX(ZoneNum) = 0.0;
+                state.dataRoomAir->ZTOC(ZoneNum) = 23.0;
+                state.dataRoomAir->ZTMX(ZoneNum) = 23.0;
+                state.dataRoomAir->ZTFloor(ZoneNum) = 23.0;
+                state.dataRoomAir->HeightTransition(ZoneNum) = 0.0;
+                state.dataRoomAir->Phi(ZoneNum) = 0.0;
+                state.dataRoomAir->HCeiling = 0.0;
+                state.dataRoomAir->HWall = 0.0;
+                state.dataRoomAir->HFloor = 0.0;
+                state.dataRoomAir->HInternal = 0.0;
+                state.dataRoomAir->HWindow = 0.0;
+                state.dataRoomAir->HDoor = 0.0;
             }
 
-            if (state.dataRoomAirMod->IsZoneDispVent3Node(ZoneNum)) {
+            if (state.dataRoomAir->IsZoneDispVent3Node(ZoneNum)) {
 
-                state.dataRoomAirMod->DispVent3NodeHcIn = 0.0;
-                state.dataRoomAirMod->ZoneDispVent3NodeMixedFlagRep(ZoneNum) = 0.0;
-                state.dataRoomAirMod->ZoneDispVent3NodeMixedFlag(ZoneNum) = 0;
+                state.dataRoomAir->DispVent3NodeHcIn = 0.0;
+                state.dataRoomAir->ZoneDispVent3NodeMixedFlagRep(ZoneNum) = 0.0;
+                state.dataRoomAir->ZoneDispVent3NodeMixedFlag(ZoneNum) = 0;
             }
 
-            if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
+            if (state.dataRoomAir->IsZoneUI(ZoneNum)) {
 
-                state.dataRoomAirMod->UFADHcIn = 0.0;
-                state.dataRoomAirMod->ZoneUFADMixedFlag(ZoneNum) = 0;
-                state.dataRoomAirMod->ZoneUFADMixedFlagRep(ZoneNum) = 0.0;
-                state.dataRoomAirMod->ZoneUFADGamma(ZoneNum) = 0.0;
-                state.dataRoomAirMod->ZoneUFADPowInPlumes(ZoneNum) = 0.0;
-                state.dataRoomAirMod->ZoneUFADPowInPlumesfromWindows(ZoneNum) = 0.0;
+                state.dataRoomAir->UFADHcIn = 0.0;
+                state.dataRoomAir->ZoneUFADMixedFlag(ZoneNum) = 0;
+                state.dataRoomAir->ZoneUFADMixedFlagRep(ZoneNum) = 0.0;
+                state.dataRoomAir->ZoneUFADGamma(ZoneNum) = 0.0;
+                state.dataRoomAir->ZoneUFADPowInPlumes(ZoneNum) = 0.0;
+                state.dataRoomAir->ZoneUFADPowInPlumesfromWindows(ZoneNum) = 0.0;
             }
 
-            if (state.dataRoomAirMod->IsZoneCrossVent(ZoneNum)) {
-                state.dataRoomAirMod->ZTJET(ZoneNum) = 23.0;
-                state.dataRoomAirMod->RoomOutflowTemp(ZoneNum) = 23.0;
-                state.dataRoomAirMod->ZTREC(ZoneNum) = 23.0;
-                state.dataRoomAirMod->CrossVentHcIn = 0.0;
-                state.dataRoomAirMod->JetRecAreaRatio(ZoneNum) = 0.2;
-                state.dataRoomAirMod->Urec(ZoneNum) = 0.2;
-                state.dataRoomAirMod->Ujet(ZoneNum) = 0.2;
-                state.dataRoomAirMod->Uhc(ZoneNum) = 0.2;
-                state.dataRoomAirMod->Ain(ZoneNum) = 1.0;
-                state.dataRoomAirMod->Tin(ZoneNum) = 23.0;
-                state.dataRoomAirMod->Droom(ZoneNum) = 6.0;
-                state.dataRoomAirMod->Dstar(ZoneNum) = 6.0;
-                state.dataRoomAirMod->ZoneCrossVentIsMixing(ZoneNum) = 0.0;
-                state.dataRoomAirMod->Rfr(ZoneNum) = 10.0;
-                state.dataRoomAirMod->ZoneCrossVentHasREC(ZoneNum) = 1.0;
-                state.dataRoomAirMod->HCeiling = 0.0;
-                state.dataRoomAirMod->HWall = 0.0;
-                state.dataRoomAirMod->HFloor = 0.0;
-                state.dataRoomAirMod->HInternal = 0.0;
-                state.dataRoomAirMod->HWindow = 0.0;
-                state.dataRoomAirMod->HDoor = 0.0;
+            if (state.dataRoomAir->IsZoneCrossVent(ZoneNum)) {
+                state.dataRoomAir->ZTJET(ZoneNum) = 23.0;
+                state.dataRoomAir->RoomOutflowTemp(ZoneNum) = 23.0;
+                state.dataRoomAir->ZTREC(ZoneNum) = 23.0;
+                state.dataRoomAir->CrossVentHcIn = 0.0;
+                state.dataRoomAir->JetRecAreaRatio(ZoneNum) = 0.2;
+                state.dataRoomAir->Urec(ZoneNum) = 0.2;
+                state.dataRoomAir->Ujet(ZoneNum) = 0.2;
+                state.dataRoomAir->Uhc(ZoneNum) = 0.2;
+                state.dataRoomAir->Ain(ZoneNum) = 1.0;
+                state.dataRoomAir->Tin(ZoneNum) = 23.0;
+                state.dataRoomAir->Droom(ZoneNum) = 6.0;
+                state.dataRoomAir->Dstar(ZoneNum) = 6.0;
+                state.dataRoomAir->ZoneCrossVentIsMixing(ZoneNum) = 0.0;
+                state.dataRoomAir->Rfr(ZoneNum) = 10.0;
+                state.dataRoomAir->ZoneCrossVentHasREC(ZoneNum) = 1.0;
+                state.dataRoomAir->HCeiling = 0.0;
+                state.dataRoomAir->HWall = 0.0;
+                state.dataRoomAir->HFloor = 0.0;
+                state.dataRoomAir->HInternal = 0.0;
+                state.dataRoomAir->HWindow = 0.0;
+                state.dataRoomAir->HDoor = 0.0;
             }
 
-            state.dataRoomAirModelMgr->MyEnvrnFlag(ZoneNum) = false;
+            state.dataRoomAir->MyEnvrnFlag(ZoneNum) = false;
         } // end one time inits
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            state.dataRoomAirModelMgr->MyEnvrnFlag(ZoneNum) = true;
+            state.dataRoomAir->MyEnvrnFlag(ZoneNum) = true;
         }
     }
 
@@ -2684,15 +2684,15 @@ namespace RoomAir {
         // as zero.
 
         // Obtains and Allocates RoomAirSettings : AirflowNetwork
-        if (state.dataRoomAirModelMgr->GetAirModelData) {
+        if (state.dataRoomAir->GetAirModelData) {
             GetAirModelDatas(state);
-            state.dataRoomAirModelMgr->GetAirModelData = false;
+            state.dataRoomAir->GetAirModelData = false;
         }
 
         Errorfound = false;
         RAFNNodeNum = 0;
         for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
-            auto const &afnZoneInfo = state.dataRoomAirMod->AFNZoneInfo(I);
+            auto const &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(I);
             if (afnZoneInfo.NumOfAirNodes > 0) {
                 RAFNNodeNum = UtilityRoutines::FindItemInList(RAFNNodeName, afnZoneInfo.Node, afnZoneInfo.NumOfAirNodes);
                 if (RAFNNodeNum > 0) {

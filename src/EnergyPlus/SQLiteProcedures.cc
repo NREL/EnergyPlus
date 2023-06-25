@@ -232,7 +232,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
             state.dataSQLiteProcedures->sqlite->addVentilationData(ventNum, state.dataHeatBal->Ventilation(ventNum));
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataSQLiteProcedures->sqlite->addRoomAirModelData(zoneNum, state.dataRoomAirMod->AirModel(zoneNum));
+            state.dataSQLiteProcedures->sqlite->addRoomAirModelData(zoneNum, state.dataRoomAir->AirModel(zoneNum));
         }
 
         state.dataSQLiteProcedures->sqlite->createZoneExtendedOutput();

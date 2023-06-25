@@ -494,8 +494,8 @@ namespace HybridModel {
                 for (ZonePtr = 1; ZonePtr <= state.dataGlobal->NumOfZones; ZonePtr++) {
                     if ((state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T ||
                          state.dataHybridModel->HybridModelZone(ZonePtr).InfiltrationCalc_T) &&
-                        (state.dataRoomAirMod->AirModel(ZonePtr).AirModel != RoomAir::RoomAirModel::Mixing)) {
-                        state.dataRoomAirMod->AirModel(ZonePtr).AirModel = RoomAir::RoomAirModel::Mixing;
+                        (state.dataRoomAir->AirModel(ZonePtr).AirModel != RoomAir::RoomAirModel::Mixing)) {
+                        state.dataRoomAir->AirModel(ZonePtr).AirModel = RoomAir::RoomAirModel::Mixing;
                         ShowWarningError(state, "Room Air Model Type should be Mixing if Hybrid Modeling is performed for the zone.");
                     }
                 }

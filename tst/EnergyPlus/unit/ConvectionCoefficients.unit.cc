@@ -1172,7 +1172,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     SurfNum = 1;
     state->dataSurface->Surface.allocate(SurfNum);
     state->dataSurface->Surface(SurfNum).Zone = 1;
-    state->dataRoomAirMod->AirModel.allocate(1);
+    state->dataRoomAir->AirModel.allocate(1);
     state->dataHeatBal->SurfTempEffBulkAir.allocate(1);
     state->dataHeatBal->SurfTempEffBulkAir(1) = 1.0;
     SurfTemp.allocate(1);
@@ -1192,7 +1192,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
     state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
-    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModel = RoomAir::RoomAirModel::DispVent3Node;
+    state->dataRoomAir->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModel = RoomAir::RoomAirModel::DispVent3Node;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
@@ -1204,7 +1204,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
     state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
     state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
-    state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModel = RoomAir::RoomAirModel::CrossVent;
+    state->dataRoomAir->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModel = RoomAir::RoomAirModel::CrossVent;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
