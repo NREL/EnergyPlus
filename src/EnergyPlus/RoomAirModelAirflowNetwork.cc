@@ -131,28 +131,26 @@ namespace RoomAir {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         auto &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
-        int RAFNNum = afnZoneInfo.RAFNNum;
 
-        if (RAFNNum == 0) {
+        // At this point, this should probably be an assert, not a ShowFatalError. This should have been trapped already.
+        if (afnZoneInfo.roomAFNNodeNum == 0) {
             ShowFatalError(state,
                            format("SimRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model ={}",
                                   state.dataHeatBal->Zone(ZoneNum).Name));
         }
 
-        auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
-        thisRAFN.ZoneNum = ZoneNum;
+        auto &roomAFNNode = state.dataRoomAirflowNetModel->RAFN(afnZoneInfo.roomAFNNodeNum);
+        roomAFNNode.ZoneNum = ZoneNum;
 
         // model control volume for each roomAir:node in the zone.
-        for (int ThisRoomAirNode = 1; ThisRoomAirNode <= afnZoneInfo.NumOfAirNodes; ++ThisRoomAirNode) {
+        for (int roomAirNode = 1; roomAirNode <= afnZoneInfo.NumOfAirNodes; ++roomAirNode) {
 
-            thisRAFN.RoomAirNode = ThisRoomAirNode;
-
-            thisRAFN.InitRoomAirModelAirflowNetwork(state, ThisRoomAirNode);
-
-            thisRAFN.CalcRoomAirModelAirflowNetwork(state, ThisRoomAirNode);
+            roomAFNNode.RoomAirNode = roomAirNode;
+            roomAFNNode.InitRoomAirModelAirflowNetwork(state, roomAirNode);
+            roomAFNNode.CalcRoomAirModelAirflowNetwork(state, roomAirNode);
         }
 
-        thisRAFN.UpdateRoomAirModelAirflowNetwork(state);
+        roomAFNNode.UpdateRoomAirModelAirflowNetwork(state);
 
     } // SimRoomAirModelAirflowNetwork
 
@@ -166,22 +164,10 @@ namespace RoomAir {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   June, 2015
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Predict zone loads at a controlled node
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace ////////////////////////////////////////////////
         // static bool OneTimeFlag_FindFirstLastPtr( true );  // one time setup flag //
         // state.dataRoomAirflowNetModel->LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag
@@ -192,17 +178,15 @@ namespace RoomAir {
         }
 
         auto &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
-        int RAFNNum = afnZoneInfo.RAFNNum;
 
-        if (RAFNNum == 0) {
+        if (afnZoneInfo.roomAFNNodeNum == 0) { // Again?
             ShowFatalError(state,
                            format("LoadPredictionRoomAirModelAirflowNetwork: Zone is not defined in the RoomAirModelAirflowNetwork model ={}",
                                   state.dataHeatBal->Zone(ZoneNum).Name));
         }
-        auto &thisRAFN(state.dataRoomAirflowNetModel->RAFN(RAFNNum));
-        thisRAFN.ZoneNum = ZoneNum;
-
-        thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
+        auto &roomAFNNode = state.dataRoomAirflowNetModel->RAFN(afnZoneInfo.roomAFNNodeNum);
+        roomAFNNode.ZoneNum = ZoneNum;
+        roomAFNNode.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
 
     } // LoadPredictionRoomAirModelAirflowNetwork
 
@@ -215,7 +199,6 @@ namespace RoomAir {
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   November 2009
         //       MODIFIED       Lixing Gu, Aug. 2015 for v8.4 release
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // Perform one-time checking and term calculations
@@ -259,7 +242,7 @@ namespace RoomAir {
         if (state.dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlag) { // then do one - time setup inits
 
             // loop over all zones with RoomAirflowNetwork model
-            for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
+            for (int LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                 if (!state.dataRoomAir->AFNZoneInfo(LoopZone).IsUsed) continue;
                 int NumSurfs = 0;
                 for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {

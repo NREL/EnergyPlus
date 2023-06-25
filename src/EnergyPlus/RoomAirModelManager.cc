@@ -1311,7 +1311,7 @@ namespace RoomAir {
 
             auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
             roomAFNZoneInfo.ZoneID = ZoneNum;
-            roomAFNZoneInfo.RAFNNum = Loop;
+            roomAFNZoneInfo.roomAFNNodeNum = Loop;
             roomAFNZoneInfo.IsUsed = true;
             roomAFNZoneInfo.Name = ipsc->cAlphaArgs(1);
             roomAFNZoneInfo.ZoneName = ipsc->cAlphaArgs(2); // Zone Name
@@ -2120,10 +2120,10 @@ namespace RoomAir {
                 state.dataRoomAir->MATFloor = 23.0;
                 state.dataRoomAir->XMATFloor = {23.0, 23.0, 23.0, 23.0};
                 state.dataRoomAir->DSXMATFloor = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAir->MATOC = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->MATOC = 23.0;
                 state.dataRoomAir->XMATOC = {23.0, 23.0, 23.0, 23.0};
                 state.dataRoomAir->DSXMATOC = {23.0, 23.0, 23.0, 23.0};
-                state.dataRoomAir->MATMX = {23.0, 23.0, 23.0, 23.0};
+                state.dataRoomAir->MATMX = 23.0;
                 state.dataRoomAir->XMATMX = {23.0, 23.0, 23.0, 23.0};
                 state.dataRoomAir->DSXMATMX = {23.0, 23.0, 23.0, 23.0};
                 state.dataRoomAir->ZTMFloor = {23.0, 23.0, 23.0};

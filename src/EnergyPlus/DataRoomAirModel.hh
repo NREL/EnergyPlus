@@ -519,7 +519,7 @@ namespace RoomAir {
         Real64 Texhaust = 0.0;                                     // temperature for exhaust air node
         int totNumSurfs = 0;                                     // total surfs for this zone
         int firstSurfID = 0;                                     // Index of first surface
-        int RAFNNum = 0;                                         // RAFN number
+        int roomAFNNodeNum = 0;                                         // RAFN number
     };
 
     struct BegEnd {
