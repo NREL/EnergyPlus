@@ -979,13 +979,6 @@ struct WeatherManagerData : BaseGlobalStruct
         this->wvarsHrTsToday.deallocate();
         this->wvarsHrTsTomorrow.deallocate();
         this->desDayMods.deallocate();
-#ifdef GET_OUT
-        this->DDDBRngModifier.deallocate();         // Design Day Dry-bulb Temperature Range Modifier
-        this->DDHumIndModifier.deallocate();        // Design Day relative humidity values
-        this->DDBeamSolarValues.deallocate();       // Design Day Beam Solar Values
-        this->DDDiffuseSolarValues.deallocate();    // Design Day Relative Humidity Values
-        this->DDSkyTempScheduleValues.deallocate(); // Sky temperature - DesignDay input
-#endif // GET_OUT        
         this->RptIsRain = 0;                        // Rain Report Value
         this->RptIsSnow = 0;                        // Snow Report Value
         this->RptDayType = 0;                       // DayType Report Value
