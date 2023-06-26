@@ -284,7 +284,7 @@ void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum) // E
             std::array<Real64, (int)FWC::Num> AP;
             std::array<Real64, (int)FWC::Num> ARHP;
             // Inside surface area of floor, walls and ceilings, minus surface ISurf and its subsurfaces
-            for (int iFWC = (int)FWC::Floor; iFWC < (int)FWC::Ceiling; ++iFWC) {
+            for (int iFWC = (int)FWC::Floor; iFWC < (int)FWC::Num; ++iFWC) {
                 if (iFWC == (int)fwc) {
                     AP[iFWC] = AR[iFWC] - ATWL;
                     ARHP[iFWC] = ARH[iFWC] - ARHTWL;
@@ -2809,8 +2809,6 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
 
     Vector3<Real64> URay;                   // Unit vector in (Phi,Theta) direction
     Vector3<Real64> ObsHitPt;           // Unit vector in (Phi,Theta) direction
-    Vector3<Real64> AltSteps_last; // Unit vector in (Phi,Theta) direction
-    Vector3<Real64> AzimSteps_last;
 
     assert(AzimSteps <= DataSurfaces::AzimAngStepsForSolReflCalc);
 
@@ -2820,22 +2818,22 @@ Real64 CalcObstrMultiplier(EnergyPlusData &state,
     SkyGndUnObs = 0.0;
 
     // Tuned Precompute Phi trig table
-    if (AltSteps != AltSteps_last) {
+    if (AltSteps != state.dataDaylightingManager->AltSteps_last) {
         for (int IPhi = 1, IPhi_end = (AltSteps / 2); IPhi <= IPhi_end; ++IPhi) {
             Phi = (IPhi - 0.5) * DPhi;
             state.dataDaylightingManager->cos_Phi(IPhi) = std::cos(Phi);
             state.dataDaylightingManager->sin_Phi(IPhi) = std::sin(Phi);
         }
-        AltSteps_last = AltSteps;
+        state.dataDaylightingManager->AltSteps_last = AltSteps;
     }
     // Tuned Precompute Theta trig table
-    if (AzimSteps != AzimSteps_last) {
+    if (AzimSteps != state.dataDaylightingManager->AzimSteps_last) {
         for (int ITheta = 1; ITheta <= 2 * AzimSteps; ++ITheta) {
             Theta = (ITheta - 0.5) * DTheta;
             state.dataDaylightingManager->cos_Theta(ITheta) = std::cos(Theta);
             state.dataDaylightingManager->sin_Theta(ITheta) = std::sin(Theta);
         }
-        AzimSteps_last = AzimSteps;
+        state.dataDaylightingManager->AzimSteps_last = AzimSteps;
     }
 
     // Altitude loop
