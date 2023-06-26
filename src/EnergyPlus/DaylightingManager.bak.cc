@@ -685,7 +685,7 @@ void CalcDayltgCoefficients(EnergyPlusData &state)
                     for (int IHR = 1; IHR <= Constant::HoursInDay; ++IHR) {
                         // For each Daylight Reference Point
                         for (int refPtNum = 1; refPtNum <= thisDaylightControl.TotalDaylRefPoints; ++refPtNum) {
-                            auto &illums = thisDaylightControl.DaylIllFacSky(IHR, windowCounter, refPtNum, ISlatAngle);
+                            auto const &illums = thisDaylightControl.DaylIllFacSky(IHR, windowCounter, refPtNum, ISlatAngle);
 
                             // write daylight factors - 4 sky types for each daylight ref point
                             print(state.files.dfs,
@@ -2010,8 +2010,6 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
         TVISIntWinDisk = 0.0;   // Init Value
         TVISIntWin = 0.0;
 
-        Vector3<Real64> HitPtIntWin = {0.0, 0.0, 0.0};
-        
         if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
             // Look up the TDD:DOME object
             int PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
@@ -2046,6 +2044,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                             if (state.dataSurface->Surface(state.dataSurface->Surface(IntWin).ExtBoundCond).Zone ==
                                 state.dataSurface->Surface(IWin).Zone) {
 
+                                Vector3<Real64> HitPtIntWin;
                                 PierceSurface(state, IntWin, RREF, Ray, HitPtIntWin, hitIntWin);
                                 if (hitIntWin) {
                                     IntWinHitNum = IntWin;
@@ -2080,15 +2079,16 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
             // Returns hitIntObs = true iff obstruction is hit
             // (Example of interior obstruction is a wall in an L-shaped room that lies
             // between reference point and window.)
-            DayltgHitInteriorObstruction(state, IWin, RREF, RWIN, hitIntObs);
+            hitIntObs = DayltgHitInteriorObstruction(state, IWin, RREF, RWIN);
         }
 
         if (extWinType == ExtWinType::AdjZone && IntWinHitNum > 0 && !hitIntObs) {
             // Check for obstruction between ref point and interior window through which ray passes
-            DayltgHitInteriorObstruction(state, IntWinHitNum, RREF, HitPtIntWin, hitIntObs);
+            Vector3<Real64> HitPtIntWin;
+            hitIntObs = DayltgHitInteriorObstruction(state, IntWinHitNum, RREF, HitPtIntWin);
             if (!hitIntObs) {
                 // Check for obstruction between intersection point on int window and ext win element
-                DayltgHitBetWinObstruction(state, IntWinHitNum, IWin, HitPtIntWin, RWIN, hitIntObs);
+                hitIntObs = DayltgHitBetWinObstruction(state, IntWinHitNum, IWin, HitPtIntWin, RWIN);
             }
         }
         if (CalledFrom == CalledFor::RefPoint) {
@@ -2117,7 +2117,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                 // the IHR (now HourOfDay) here is/was not correct, this is outside of hour loop
                 // the hour is used to query schedule for transmission , not sure what to do
                 // it will work for detailed and never did work correctly before.
-                DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin2, RWIN2, Ray, ObTrans);
+                ObTrans = DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin2, RWIN2, Ray);
                 if (ObTrans < 1.0) hitExtObs = true;
             } else {
                 // Transmittance from exterior obstruction surfaces is calculated here. This needs to be done for each timestep
@@ -2138,7 +2138,7 @@ void FigureDayltgCoeffsAtPointsForWindowElements(
                     }
                     Vector3<Real64> RayVector = state.dataBSDFWindow->ComplexWind(IWin).Geom(CplxFenState).sInc(RayIndex);
                     // It will get product of all transmittances
-                    DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin, RWIN, RayVector, TransBeam);
+                    TransBeam = DayltgHitObstruction(state, state.dataGlobal->HourOfDay, IWin, RWIN, RayVector);
                     // IF (TransBeam > 0.0d0) ObTrans = TransBeam
                     if (CalledFrom == CalledFor::RefPoint) {
                         state.dataBSDFWindow->ComplexWind(IWin).DaylghtGeom(CplxFenState).RefPoint(iRefPoint).TransOutSurf(ICplxFen, WinEl) =
@@ -3241,7 +3241,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 bool hitIntObsDisk = false;
                 if (extWinType == ExtWinType::InZone) {
                     // Check for interior obstructions between reference point and HP.
-                    DayltgHitInteriorObstruction(state, IWin2, RREF2, HP, hitIntObsDisk);
+                    hitIntObsDisk = DayltgHitInteriorObstruction(state, IWin2, RREF2, HP);
                 }
                 ObTransDisk = 0.0; // Init value
                 // Init flag for vector from RP to sun passing through interior window
@@ -3290,11 +3290,11 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                     // Check for interior obstructions between ref point and interior window
                     hitIntObsDisk = false;
                     if (hitIntWinDisk) {
-                        DayltgHitInteriorObstruction(state, IntWinDiskHitNum, RREF, HitPtIntWinDisk, hitIntObsDisk);
+                        hitIntObsDisk = DayltgHitInteriorObstruction(state, IntWinDiskHitNum, RREF, HitPtIntWinDisk);
                         // If no obstruction between RP and hit int win, check for obstruction
                         // between int win and ext win
                         if (!hitIntObsDisk) {
-                            DayltgHitBetWinObstruction(state, IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP, hitIntObsDisk);
+                            hitIntObsDisk = DayltgHitBetWinObstruction(state, IntWinDiskHitNum, IWin2, HitPtIntWinDisk, HP);
                         }
                     }
                     if (hitIntObsDisk) ObTransDisk = 0.0;
@@ -3308,7 +3308,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                 if (!hitIntObsDisk) { // No interior obstruction was hit
                     // Net transmittance of exterior obstructions encountered by RAYCOS
                     // ObTransDisk = 1.0 will be returned if no exterior obstructions are hit.
-                    DayltgHitObstruction(state, iHour, IWin2, RREF2, RAYCOS, ObTransDisk);
+                    ObTransDisk = DayltgHitObstruction(state, iHour, IWin2, RREF2, RAYCOS);
                     //                        if ( ObTransDisk < 1.0 ) hitExtObsDisk = true; //Unused Set but never used
                     // RJH 08-26-07 However, if this is a case of interior window
                     // and vector to sun does not pass through interior window
@@ -3451,7 +3451,7 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                             PierceSurface(state, IWin2, RREF2, SunVecMir, HP, hitWin);
                             if (!hitWin) continue; // Ray did not pass through window
                             // Check if this ray hits interior obstructions
-                            DayltgHitInteriorObstruction(state, IWin2, RREF2, HP, hit);
+                            hit = DayltgHitInteriorObstruction(state, IWin2, RREF2, HP);
                             if (hit) continue; // Interior obstruction was hit
                             // Does ray hit this reflecting surface?
                             PierceSurface(state, ReflSurfNum, RREF2, SunVecMir, HitPtRefl, hitRefl);
@@ -5461,13 +5461,12 @@ void DayltgExtHorizIllum(EnergyPlusData &state,
     HISU = state.dataDaylightingManager->SPHSUN * 1.0;
 }
 
-void DayltgHitObstruction(EnergyPlusData &state,
-                          int const IHOUR,           // Hour number
-                          int const IWin,            // Window index
-                          Vector3<Real64> const &R1, // Origin of ray (m)
-                          Vector3<Real64> const &RN, // Unit vector along ray
-                          Real64 &ObTrans            // Product of solar transmittances of exterior obstructions
-)
+Real64
+DayltgHitObstruction(EnergyPlusData &state,
+                     int const IHOUR,           // Hour number
+                     int const IWin,            // Window index
+                     Vector3<Real64> const &R1, // Origin of ray (m)
+                     Vector3<Real64> const &RN) // Unit vector along ray
 {
 
     // SUBROUTINE INFORMATION:
@@ -5494,12 +5493,12 @@ void DayltgHitObstruction(EnergyPlusData &state,
     // Local declarations
     bool hit; // True iff a particular obstruction is hit
 
-    ObTrans = 1.0;
+    Real64 ObTrans = 1.0;            // Product of solar transmittances of exterior obstructions
 
     auto const &window(state.dataSurface->Surface(IWin));
     int const window_iBaseSurf(window.BaseSurf);
 
-    Vector3<Real64> DayltgHitObstructionHP;
+    Vector3<Real64> HP;
     // Loop over potentially obstructing surfaces, which can be building elements, like walls, or shadowing surfaces, like overhangs
     // Building elements are assumed to be opaque
     // A shadowing surface is opaque unless its transmittance schedule value is non-zero
@@ -5509,13 +5508,13 @@ void DayltgHitObstruction(EnergyPlusData &state,
             auto const &surface = state.dataSurface->Surface(ISurf);
             SurfaceClass IType = surface.Class;
             if ((IType == SurfaceClass::Wall || IType == SurfaceClass::Roof || IType == SurfaceClass::Floor) && (ISurf != window_iBaseSurf)) {
-                PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
+                PierceSurface(state, ISurf, R1, RN, HP, hit);
                 if (hit) { // Building element is hit (assumed opaque)
                     ObTrans = 0.0;
                     break;
                 }
             } else if (surface.IsShadowing) {
-                PierceSurface(state, ISurf, R1, RN, DayltgHitObstructionHP, hit);
+                PierceSurface(state, ISurf, R1, RN, HP, hit);
                 if (hit) { // Shading surface is hit
                     // Get solar transmittance of the shading surface
                     Real64 const Trans(
@@ -5568,14 +5567,13 @@ void DayltgHitObstruction(EnergyPlusData &state,
         Vector3<Real64> const RN_inv(SurfaceOctreeCube::safe_inverse(RN));
         state.dataHeatBalMgr->surfaceOctree.processSomeSurfaceRayIntersectsCube(state, R1, RN, RN_inv, solarTransmittance);
     }
+    return ObTrans;
 }
 
-void DayltgHitInteriorObstruction(EnergyPlusData &state,
+bool DayltgHitInteriorObstruction(EnergyPlusData &state,
                                   int const IWin,            // Window index
                                   Vector3<Real64> const &R1, // Origin of ray (m)
-                                  Vector3<Real64> const &R2, // Destination of ray (m)
-                                  bool &hit                  // True iff ray hits an obstruction
-)
+                                  Vector3<Real64> const &R2) // Destination of ray (m)
 {
 
     // SUBROUTINE INFORMATION:
@@ -5589,7 +5587,7 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
     // Preconditions
     assert(magnitude(R2 - R1) > 0.0); // Protect normalize() from divide by zero
 
-    hit = false;
+    bool hit = false;
     Vector3<Real64> RN = (R2 - R1).normalize();         // Make unit vector
     Real64 const d12(distance(R1, R2)); // Distance between R1 and R2
 
@@ -5642,15 +5640,15 @@ void DayltgHitInteriorObstruction(EnergyPlusData &state,
         // Check octree surface candidates until a hit is found, if any
         state.dataHeatBalMgr->surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
     }
+
+    return hit;
 }
 
-void DayltgHitBetWinObstruction(EnergyPlusData &state,
+bool DayltgHitBetWinObstruction(EnergyPlusData &state,
                                 int const IWin1,           // Surface number of origin window
                                 int const IWin2,           // Surface number of destination window
                                 Vector3<Real64> const &R1, // Origin of ray (on IWin1) (m)
-                                Vector3<Real64> const &R2, // Destination of ray (on IWin2) (m)
-                                bool &hit                  // True iff ray hits an obstruction
-)
+                                Vector3<Real64> const &R2) // Destination of ray (on IWin2) (m)
 {
 
     // SUBROUTINE INFORMATION:
@@ -5668,7 +5666,7 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     SurfaceClass IType; // Surface type/class
 
-    hit = false;
+    bool hit = false;
     Vector3<Real64> RN = (R2 - R1).normalize(); // Unit vector
     
     Real64 const d12(distance(R1, R2));                                                 // Distance between R1 and R2 (m)
@@ -5741,6 +5739,8 @@ void DayltgHitBetWinObstruction(EnergyPlusData &state,
         // Check octree surface candidates until a hit is found, if any
         state.dataHeatBalMgr->surfaceOctree.hasSurfaceSegmentIntersectsCube(R1, R2, surfaceHit);
     }
+
+    return hit;
 }
 
 void initDaylighting(EnergyPlusData &state, bool const initSurfaceHeatBalancefirstTime)
@@ -7326,7 +7326,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     Vector3<Real64> nearestHitPt; // Hit point of ray on nearest obstruction (m)
     Vector3<Real64> obsHitPt; // Coordinates of hit point on an obstruction (m)
     Vector3<Real64> groundHitPt; // Coordinates of point that ray from window center hits the ground (m)
-    auto &SkyObstructionMult = state.dataDaylightingManager->SkyObstructionMult;
+    std::array<std::array<Real64, NPHMAX+1>, NTHMAX+1> skyObsMult;
+    std::array<std::array<Real64, NPHMAX+1>, NTHMAX+1> obsTransM;
     auto &FLFWSK = state.dataDaylightingManager->FLFWSK;
     auto &FLFWSU = state.dataDaylightingManager->FLFWSU;
     auto &FLFWSUdisk = state.dataDaylightingManager->FLFWSUdisk;
@@ -7334,7 +7335,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     auto &FLCWSU = state.dataDaylightingManager->FLCWSU;
     std::array<Real64, (int)Material::MaxSlatAngs+1> transMult;
     std::array<Real64, (int)Material::MaxSlatAngs+1> transBmBmMult;
-    auto &ObTransM = state.dataDaylightingManager->ObTransM;
 
     //  3=intermediate, 4=overcast
     Real64 DPH; // Sky/ground element altitude and azimuth increments (radians)
@@ -7356,7 +7356,6 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
     //  (times light well efficiency, if appropriate)
     Real64 ZSU;
     //  element for clear and overcast sky
-    Real64 ObTrans; // Product of solar transmittances of obstructions seen by a light ray
     // unused  REAL(r64)         :: HitPointLumFrClearSky     ! Luminance of obstruction from clear sky (cd/m2)
     // unused  REAL(r64)         :: HitPointLumFrOvercSky     ! Luminance of obstruction from overcast sky (cd/m2)
     // unused  REAL(r64)         :: HitPointLumFrSun          ! Luminance of obstruction from sun (cd/m2)
@@ -7545,9 +7544,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
             if (ISunPos == 1) { // Intersection calculation has to be done only for first sun position
                 // Determine net transmittance of obstructions that the ray hits. ObTrans will be 1.0
                 // if no obstructions are hit.
-                DayltgHitObstruction(state, IHR, IWin, state.dataSurface->SurfaceWindow(IWin).WinCenter, U, ObTrans);
-                ObTransM(IPH, ITH) = ObTrans;
-                SkyObstructionMult(IPH, ITH) = 1.0;
+                obsTransM[IPH][ITH] = DayltgHitObstruction(state, IHR, IWin, state.dataSurface->SurfaceWindow(IWin).WinCenter, U);
+                skyObsMult[IPH][ITH] = 1.0;
             }
 
             // SKY AND GROUND RADIATION ON WINDOW
@@ -7558,10 +7556,10 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
 
             if (PH > 0.0) { // Contribution is from sky
                 for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
-                    ZSK.sky[iSky] = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), TH, PH) * COSB * DA * ObTransM(IPH, ITH);
+                    ZSK.sky[iSky] = DayltgSkyLuminance(state, static_cast<SkyType>(iSky), TH, PH) * COSB * DA * obsTransM[IPH][ITH];
                 }
             } else { // PH <= 0.0; contribution is from ground
-                if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6 && ISunPos == 1) {
+                if (state.dataSurface->CalcSolRefl && obsTransM[IPH][ITH] > 1.e-6 && ISunPos == 1) {
                     // Calculate effect of obstructions on shading of sky diffuse reaching the ground point hit
                     // by the ray. This effect is given by the ratio SkyObstructionMult =
                     // (obstructed sky diffuse at ground point)/(unobstructed sky diffuse at ground point).
@@ -7574,7 +7572,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     groundHitPt.x = state.dataSurface->SurfaceWindow(IWin).WinCenter.x + HorDis * std::cos(Beta);
                     groundHitPt.y = state.dataSurface->SurfaceWindow(IWin).WinCenter.y + HorDis * std::sin(Beta);
 
-                    SkyObstructionMult(IPH, ITH) = CalcObstrMultiplier(
+                    skyObsMult[IPH][ITH] = CalcObstrMultiplier(
                         state, groundHitPt, AltAngStepsForSolReflCalc, DataSurfaces::AzimAngStepsForSolReflCalc);
                 } // End of check if solar reflection calc is in effect
 
@@ -7582,15 +7580,15 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 for (int iSky = (int)SkyType::Clear; iSky < (int)SkyType::Num; ++iSky) {
                     // Below, luminance of ground in cd/m2 is illuminance on ground in lumens/m2
                     // times ground reflectance, divided by pi, times obstruction multiplier.
-                    ZSK.sky[iSky] = (gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * COSB * DA * ObTransM(IPH, ITH) *
-                                    SkyObstructionMult(IPH, ITH);
+                    ZSK.sky[iSky] = (gilsk.sky[iSky] * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * COSB * DA * obsTransM[IPH][ITH] *
+                                    skyObsMult[IPH][ITH];
                 }
                 // Determine if sun illuminates the point that ray hits the ground. If the solar reflection
                 // calculation has been requested (CalcSolRefl = .TRUE.) shading by obstructions, including
                 // the building itself, is considered in determining whether sun hits the ground point.
                 // Otherwise this shading is ignored and the sun always hits the ground point.
                 SunObstructionMult = 1.0;
-                if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) > 1.e-6) {
+                if (state.dataSurface->CalcSolRefl && obsTransM[IPH][ITH] > 1.e-6) {
                     // Sun reaches ground point if vector from this point to the sun is unobstructed
                     hitObs = false;
                     for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
@@ -7600,11 +7598,11 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     if (hitObs) SunObstructionMult = 0.0;
                 }
                 ZSU = (state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / Constant::Pi) * COSB * DA *
-                      ObTransM(IPH, ITH) * SunObstructionMult;
+                      obsTransM[IPH][ITH] * SunObstructionMult;
             }
             // BEAM SOLAR AND SKY SOLAR REFLECTED FROM NEAREST OBSTRUCTION
 
-            if (state.dataSurface->CalcSolRefl && ObTransM(IPH, ITH) < 1.0) {
+            if (state.dataSurface->CalcSolRefl && obsTransM[IPH][ITH] < 1.0) {
                 // Find obstruction whose hit point is closest to the center of the window
                 DayltgClosestObstruction(
                     state, state.dataSurface->SurfaceWindow(IWin).WinCenter, U, NearestHitSurfNum, nearestHitPt);
@@ -8753,12 +8751,7 @@ void DayltgDirectSunDiskComplexFenestration(EnergyPlusData &state,
                 // Window center
                 Vector3<Real64> RWin = state.dataSurface->Surface(iWin).Centroid;
 
-                DayltgHitObstruction(state,
-                                     iHour,
-                                     iWin,
-                                     RWin,
-                                     V,
-                                     TransBeam);
+                TransBeam = DayltgHitObstruction(state, iHour, iWin, RWin, V);
 
                 WinLumSunDisk += (14700.0 * std::sqrt(0.000068 * PosFac) * double(NumEl) / std::pow(WindowSolidAngleDaylightPoint, 0.8)) * dirTrans *
                                  LambdaTrn * TransBeam;
@@ -9941,6 +9934,12 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
     state.dataDaylightingManager->FLFWSU.dimension(numSlatAngs);
     state.dataDaylightingManager->FLFWSUdisk.dimension(numSlatAngs);
     state.dataDaylightingManager->FLCWSU.dimension(numSlatAngs);
+#ifdef GET_OUT
+    state.dataDaylightingManager->TransMult.dimension(state.dataSurface->actualMaxSlatAngs);
+    state.dataDaylightingManager->DayltgInterReflectedIllumTransBmBmMult.dimension(state.dataSurface->actualMaxSlatAngs);
+    state.dataDaylightingManager->TransBmBmMult.dimension(state.dataSurface->actualMaxSlatAngs);
+    state.dataDaylightingManager->TransBmBmMultRefl.dimension(state.dataSurface->actualMaxSlatAngs);
+#endif //    
     state.dataDaylightingManager->FLCWSK.dimension(numSlatAngs, Illums());
     state.dataDaylightingManager->FLFWSK.dimension(numSlatAngs, Illums());
 
