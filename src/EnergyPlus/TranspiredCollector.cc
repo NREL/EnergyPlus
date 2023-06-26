@@ -1860,7 +1860,6 @@ namespace TranspiredCollector {
         HPlenARR.deallocate();
         Real64 HExt = sum(HExtARR * Area) / A; // dummy for call to InitExteriorConvectionCoeff
         HExtARR.deallocate();
-        Real64 HSrdSurfExt = sum(HSrdSurfARR * Area) / A; // radiation coeff for surrounding surfaces, not used now
         HSrdSurfARR.deallocate();
 
         if (state.dataEnvrn->IsRain) HExt = 1000.0;

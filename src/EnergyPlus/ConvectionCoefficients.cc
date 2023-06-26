@@ -433,6 +433,7 @@ void InitExtConvCoeff(EnergyPlusData &state,
     Real64 TSurf = TempExt + Constant::KelvinConv;
     Real64 TSky = state.dataEnvrn->SkyTempKelvin;
     Real64 TGround = TAir;
+    HSrdSurf = 0.0;
 
     if (surface.SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
@@ -440,6 +441,7 @@ void InitExtConvCoeff(EnergyPlusData &state,
             TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
                    Constant::KelvinConv;
         }
+        HSrdSurf = SurroundingSurfacesRadCoeffAverage(state, SurfNum, TSurf, AbsExt);
     }
     if (surface.UseSurfPropertyGndSurfTemp) {
         int gndSurfsNum = surface.SurfPropertyGndSurfIndex;
