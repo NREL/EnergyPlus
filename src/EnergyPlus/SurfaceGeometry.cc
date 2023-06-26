@@ -946,64 +946,17 @@ namespace SurfaceGeometry {
         }
         state.dataSurface->SurfLowTempErrCount.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfHighTempErrCount.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvCoeff.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvUserCoeffNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvCoeff.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvUserCoeffNum.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->surfIntConv.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfTAirRef.allocate(state.dataSurface->TotSurfaces);
         state.dataSurface->SurfTAirRefRpt.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvClass.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvClassRpt.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvHcModelEq.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvHcModelEqRpt.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvHcUserCurveNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvClass.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvClassRpt.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvHfModelEq.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvHfModelEqRpt.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvHfUserCurveNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvHnModelEq.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvHnModelEqRpt.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvHnUserCurveNum.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvFaceArea.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvFacePerimeter.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfExtConvFaceHeight.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvZoneWallHeight.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvZonePerimLength.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvZoneHorizHydrDiam.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvWindowWallRatio.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvWindowLocation.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvSurfGetsRadiantHeat.allocate(state.dataSurface->TotSurfaces);
-        state.dataSurface->SurfIntConvSurfHasActiveInIt.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->surfExtConv.allocate(state.dataSurface->TotSurfaces);
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfLowTempErrCount(SurfNum) = 0;
             state.dataSurface->SurfHighTempErrCount(SurfNum) = 0;
-            state.dataSurface->SurfIntConvCoeff(SurfNum) = Convect::HcInt::SetByZone;
-            state.dataSurface->SurfIntConvUserCoeffNum(SurfNum) = 0;
-            state.dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::SetByZone;
-            state.dataSurface->SurfExtConvUserCoeffNum(SurfNum) = 0;
+            state.dataSurface->surfIntConv(SurfNum) = SurfIntConv();
+            state.dataSurface->surfExtConv(SurfNum) = SurfExtConv();
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::Invalid;
             state.dataSurface->SurfTAirRefRpt(SurfNum) = static_cast<int>(DataSurfaces::RefAirTemp::Invalid);
-            state.dataSurface->SurfIntConvClass(SurfNum) = Convect::IntConvClass::Invalid;
-            state.dataSurface->SurfIntConvClassRpt(SurfNum) = static_cast<int>(Convect::IntConvClass::Invalid);
-            state.dataSurface->SurfIntConvHcModelEq(SurfNum) = Convect::HcInt::Invalid;
-            state.dataSurface->SurfIntConvHcUserCurveNum(SurfNum) = 0;
-            state.dataSurface->SurfExtConvClass(SurfNum) = Convect::ExtConvClass::Invalid;
-            state.dataSurface->SurfExtConvClassRpt(SurfNum) = static_cast<int>(Convect::ExtConvClass::Invalid);
-            state.dataSurface->SurfExtConvHfModelEq(SurfNum) = Convect::HcExt::Invalid;
-            state.dataSurface->SurfExtConvHfUserCurveNum(SurfNum) = 0;
-            state.dataSurface->SurfExtConvHnModelEq(SurfNum) = Convect::HcExt::Invalid;
-            state.dataSurface->SurfExtConvHnUserCurveNum(SurfNum) = 0;
-            state.dataSurface->SurfExtConvFaceArea(SurfNum) = 0;
-            state.dataSurface->SurfExtConvFacePerimeter(SurfNum) = 0;
-            state.dataSurface->SurfExtConvFaceHeight(SurfNum) = 0;
-            state.dataSurface->SurfIntConvZoneWallHeight(SurfNum) = 0;
-            state.dataSurface->SurfIntConvZonePerimLength(SurfNum) = 0;
-            state.dataSurface->SurfIntConvZoneHorizHydrDiam(SurfNum) = 0;
-            state.dataSurface->SurfIntConvWindowWallRatio(SurfNum) = 0;
-            state.dataSurface->SurfIntConvWindowLocation(SurfNum) = Convect::IntConvWinLoc::NotSet;
-            state.dataSurface->SurfIntConvSurfGetsRadiantHeat(SurfNum) = false;
-            state.dataSurface->SurfIntConvSurfHasActiveInIt(SurfNum) = false;
         }
     }
 
@@ -2946,7 +2899,7 @@ namespace SurfaceGeometry {
             int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
                               TotOverhangsProjection + TotFins + TotFinsProjection;
             int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
-            if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
+            if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || Dayltg::doesDayLightingUseDElight(state))) {
                 ShowWarningError(state,
                                  format("{}When using DElight daylighting the presence of exterior shading surfaces is ignored.", RoutineName));
             }

@@ -661,8 +661,8 @@ void CloseMiscOpenFiles(EnergyPlusData &state)
     // Use INQUIRE to determine if file is open.
 
     // Using/Aliasing
-    using DaylightingManager::CloseDFSFile;
-    using DaylightingManager::CloseReportIllumMaps;
+    using Dayltg::CloseDFSFile;
+    using Dayltg::CloseReportIllumMaps;
 
     CloseReportIllumMaps(state);
     CloseDFSFile(state);
@@ -775,6 +775,13 @@ int EndEnergyPlus(EnergyPlusData &state)
     // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
+
+    if (state.dataGlobal->fProgressPtr) {
+        state.dataGlobal->fProgressPtr(100);
+    }
+    if (state.dataGlobal->progressCallback) {
+        state.dataGlobal->progressCallback(100);
+    }
 
     if (state.dataGlobal->eplusRunningViaAPI) {
         state.files.flushAll();
@@ -1640,6 +1647,18 @@ void ShowRecurringErrors(EnergyPlusData &state)
         }
         ShowMessage(state, "");
     }
+}
+
+void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found", fieldName, fieldVal));
+}
+
+void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid key", fieldName, fieldVal));
 }
 
 } // namespace EnergyPlus

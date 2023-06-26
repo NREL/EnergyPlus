@@ -942,99 +942,99 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 30.0;
 
     Convect::DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(1), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(1).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(2), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(2).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(3), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(3).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(4), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(4).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(5), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(5).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
     //    DynamicIntConvSurfaceClassification(*state, 6);
     //    EXPECT_EQ(state->dataSurface->SurfIntConvClassification(6), 0);
 
     Convect::DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(7), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(7).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(8), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(8).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(9), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(9).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(10), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(10).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(11), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(11).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(12), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(12).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(13), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(13).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(14), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(14).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(15), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(15).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     // Case 2 - Zone air colder than surfaces
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 10.0;
 
     Convect::DynamicIntConvSurfaceClassification(*state, 1);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(1), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(1).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 2);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(2), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(2).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 3);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(3), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(3).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 4);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(4), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(4).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 5);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(5), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(5).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     // vertical floor is currently not a valid case, so returns zero with a severe error
     //    DynamicIntConvSurfaceClassification(*state, 6);
-    //    EXPECT_EQ(state->dataSurface->SurfIntConvClass(6), 0));
+    //    EXPECT_EQ(state->dataSurface->surfIntConv().convClass(6), 0));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 7);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(7), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(7).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 8);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(8), Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(8).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 9);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(9), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(9).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 10);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(10), Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(10).convClass, Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 11);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(11), Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(11).convClass, Convect::IntConvClass::A3_SimpleBuoy_VertWalls));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 12);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(12), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(12).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 13);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(13), Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(13).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableTilted));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 14);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(14), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(14).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 
     Convect::DynamicIntConvSurfaceClassification(*state, 15);
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfIntConvClass(15), Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
+    EXPECT_TRUE(compare_enums(state->dataSurface->surfIntConv(15).convClass, Convect::IntConvClass::A3_SimpleBuoy_StableHoriz));
 }
 
 TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
@@ -1050,6 +1050,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataSurface->TotSurfaces = 1;
     state->dataGlobal->NumOfZones = 1;
     state->dataSurface->Surface.allocate(1);
+    state->dataSurface->surfIntConv.allocate(1);
+    state->dataSurface->surfExtConv.allocate(1);
     state->dataConstruction->Construct.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataLoopNodes->Node.allocate(1);
@@ -1178,8 +1180,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);
-    state->dataSurface->SurfIntConvCoeff.allocate(SurfNum);
-    state->dataSurface->SurfIntConvUserCoeffNum.allocate(SurfNum);
+    state->dataSurface->surfIntConv.allocate(SurfNum);
     state->dataSurface->SurfTAirRef.allocate(SurfNum);
     // Test 1: CalcWaltonUnstableHorizontalOrTilt calculation for Hn
     DeltaTemp = 1.0;
@@ -1191,8 +1192,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     // Test 2/3: CalcDetailedHcInForDVModel calculation for Hn
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-    state->dataSurface->SurfIntConvCoeff(SurfNum) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum(SurfNum) = 0;
+    state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
@@ -1203,8 +1204,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
 
     state->dataSurface->Surface(SurfNum).HeatTransSurf = true;
     state->dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::AdjacentAirTemp;
-    state->dataSurface->SurfIntConvCoeff(SurfNum) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum(SurfNum) = 0;
+    state->dataSurface->surfIntConv(SurfNum).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(SurfNum).userModelNum = 0;
     state->dataRoomAirMod->AirModel(state->dataSurface->Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     state->dataSurface->Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
@@ -1921,152 +1922,109 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ProperConstruction)
 
     Convect::HcInt algo;
 
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FohannoPolidoriVerticalWall));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondUnstableHorizontal));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq3WallAwayFromHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq4CeilingAwayFromHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_HeatedFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_HeatedFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AwbiHattonHeatedFloor));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_ChilledCeil)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_ChilledCeil)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KaradagChilledCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_VertWallsNonHeated)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_VertWallsNonHeated)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq6NonHeatedWalls));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_HeatedVerticalWall)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_HeatedVerticalWall)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AwbiHattonHeatedWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq7Ceiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FohannoPolidoriVerticalWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWallsNearHeat)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWallsNearHeat)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq5WallNearHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq7Ceiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Walls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Walls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWalls));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Ceiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Ceiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FisherPedersenCeilDiffuserCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Floor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Floor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWindow));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Walls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Walls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq3WallAwayFromHeat));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq4CeilingAwayFromHeat));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_AssistFlowWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_AssistFlowWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedAssistingWall));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_OpposFlowWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_OpposFlowWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedOppossingWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedStableFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedUnstableFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableCeiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableCeiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedStableCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableCeiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableCeiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedUnstableCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWindow));
 
     Convect::HcExt algo2;
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::SparrowWindward));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallLeeward)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallLeeward)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::SparrowLeeward));
-    algo2 =
-        state->dataConvectionCoefficient->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_HorizRoof)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_HorizRoof)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::ClearRoof));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_VertWall)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_VertWall)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalASHRAEVerticalWall));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_StableHoriz)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalWaltonStableHorizontalOrTilt));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_UnstableHoriz)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalWaltonUnstableHorizontalOrTilt));
 }
 
@@ -2101,152 +2059,109 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
 
     Convect::HcInt algo;
 
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FohannoPolidoriVerticalWall));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondUnstableHorizontal));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq3WallAwayFromHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq4CeilingAwayFromHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_HeatedFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_HeatedFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AwbiHattonHeatedFloor));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_ChilledCeil)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_ChilledCeil)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KaradagChilledCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_VertWallsNonHeated)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_VertWallsNonHeated)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq6NonHeatedWalls));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_HeatedVerticalWall)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_HeatedVerticalWall)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AwbiHattonHeatedWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq7Ceiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FohannoPolidoriVerticalWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWallsNearHeat)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWallsNearHeat)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq5WallNearHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq7Ceiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Walls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Walls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWalls));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Ceiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Ceiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FisherPedersenCeilDiffuserCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Floor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Floor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWindow));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Walls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Walls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq3WallAwayFromHeat));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq4CeilingAwayFromHeat));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_AssistFlowWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_AssistFlowWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedAssistingWall));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_OpposFlowWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_OpposFlowWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedOppossingWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedStableFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedUnstableFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableCeiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableCeiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedStableCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableCeiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableCeiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedUnstableCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWindow));
 
     Convect::HcExt algo2;
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::SparrowWindward));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallLeeward)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallLeeward)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::SparrowLeeward));
-    algo2 =
-        state->dataConvectionCoefficient->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_HorizRoof)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_HorizRoof)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::ClearRoof));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_VertWall)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_VertWall)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalASHRAEVerticalWall));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_StableHoriz)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalWaltonStableHorizontalOrTilt));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_UnstableHoriz)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalWaltonUnstableHorizontalOrTilt));
 
     state->dataHeatBalSurf->SurfTempInTmp.deallocate();
@@ -2385,152 +2300,109 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
 
     Convect::HcInt algo;
 
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondUnstableHorizontal));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq3WallAwayFromHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq4CeilingAwayFromHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_HeatedFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_HeatedFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AwbiHattonHeatedFloor));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_ChilledCeil)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_ChilledCeil)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KaradagChilledCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A1_FloorHeatCeilCool_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_VertWallsNonHeated)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_VertWallsNonHeated)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq6NonHeatedWalls));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_HeatedVerticalWall)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_HeatedVerticalWall)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AwbiHattonHeatedWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq7Ceiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A2_WallPanelHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FohannoPolidoriVerticalWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWallsNearHeat)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_VertWallsNearHeat)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq5WallNearHeat));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq7Ceiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::B_ConvectiveHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Walls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Walls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWalls));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Ceiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Ceiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::FisherPedersenCeilDiffuserCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Floor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Floor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::C_CentralAirHeat_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWindow));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Walls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Walls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq3WallAwayFromHeat));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::AlamdariHammondStableHorizontal));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableHoriz)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::KhalifaEq4CeilingAwayFromHeat));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_StableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonStableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableTilted)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_UnstableTilted)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::WaltonUnstableHorizontalOrTilt));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::D_ZoneFanCirc_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::ISO15099Windows));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_AssistFlowWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_AssistFlowWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedAssistingWall));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_OpposFlowWalls)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_OpposFlowWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedOppossingWall));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedStableFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableFloor)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableFloor)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedUnstableFloor));
-    algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableCeiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_StableCeiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedStableCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-               .intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableCeiling)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_UnstableCeiling)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::BeausoleilMorrisonMixedUnstableCeiling));
-    algo = state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_Windows)];
+    algo = state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::E_MixedBuoy_Windows)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::GoldsteinNovoselacCeilingDiffuserWindow));
 
     Convect::HcExt algo2;
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::SparrowWindward));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallLeeward)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallLeeward)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::SparrowLeeward));
-    algo2 =
-        state->dataConvectionCoefficient->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_HorizRoof)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_HorizRoof)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::ClearRoof));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_VertWall)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_VertWall)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalASHRAEVerticalWall));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_StableHoriz)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_StableHoriz)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalWaltonStableHorizontalOrTilt));
-    algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_UnstableHoriz)];
+    algo2 = state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::NaturalConvection_UnstableHoriz)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::NaturalWaltonUnstableHorizontalOrTilt));
 
     state->dataHeatBalSurf->SurfTempInTmp.deallocate();
@@ -2769,19 +2641,17 @@ TEST_F(ConvectionCoefficientsFixture, TestSetAdaptiveConvectionAlgoCoefficient)
     int expected_curve;
 
     Convect::HcInt algo =
-        state->dataConvectionCoefficient->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
+        state->dataConvect->intAdaptiveConvAlgo.intConvClassEqNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
     EXPECT_TRUE(compare_enums(algo, Convect::HcInt::UserCurve));
-    curve = state->dataConvectionCoefficient->intAdaptiveConvAlgo
-                .intConvClassUserCurveNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
-    expected_curve = UtilityRoutines::FindItemInList("ASHRAE VERT DUPLICATE", state->dataConvectionCoefficient->hcIntUserCurve);
+    curve = state->dataConvect->intAdaptiveConvAlgo.intConvClassUserCurveNums[static_cast<int>(Convect::IntConvClass::A3_SimpleBuoy_VertWalls)];
+    expected_curve = UtilityRoutines::FindItemInList("ASHRAE VERT DUPLICATE", state->dataConvect->hcIntUserCurve);
     ASSERT_EQ(curve, expected_curve);
 
-    Convect::HcExt algo2 = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                               .extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
+    Convect::HcExt algo2 =
+        state->dataConvect->extAdaptiveConvAlgo.extConvClass2EqNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
     EXPECT_TRUE(compare_enums(algo2, Convect::HcExt::UserCurve));
-    curve = state->dataConvectionCoefficient->extAdaptiveConvAlgo
-                .extConvClass2UserCurveNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
-    expected_curve = UtilityRoutines::FindItemInList("NUSSELTJURGESDUPCURVE", state->dataConvectionCoefficient->hcExtUserCurve);
+    curve = state->dataConvect->extAdaptiveConvAlgo.extConvClass2UserCurveNums[static_cast<int>(Convect::ExtConvClass2::WindConvection_WallWindward)];
+    expected_curve = UtilityRoutines::FindItemInList("NUSSELTJURGESDUPCURVE", state->dataConvect->hcExtUserCurve);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestCalcWindSurfaceTheta)
@@ -2987,7 +2857,7 @@ TEST_F(ConvectionCoefficientsFixture, TestBlockenWindward)
         actualHc = emmelVertActualHcOneThirtyFiveDegTheta[idx];
         expectedHc = Convect::CalcBlockenWindward(*state, windSpeed, 135, 0, 1);
         ASSERT_NEAR(actualHc, expectedHc, 0.001);
-        ASSERT_EQ(state->dataConvectionCoefficient->CalcBlockenWindwardErrorIDX, 1);
+        ASSERT_EQ(state->dataConvect->CalcBlockenWindwardErrorIDX, 1);
     }
 }
 
@@ -3010,12 +2880,12 @@ TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocati
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataSurface->SurfIntConvCoeff.allocate(2);
-    state->dataSurface->SurfExtConvCoeff.allocate(2);
+    state->dataSurface->surfIntConv.allocate(2);
+    state->dataSurface->surfExtConv.allocate(2);
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 2u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 0u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 2u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 0u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocation2)
@@ -3037,12 +2907,12 @@ TEST_F(ConvectionCoefficientsFixture, TestMultipleSurfaceConvectionArrayAllocati
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataSurface->SurfIntConvCoeff.allocate(2);
-    state->dataSurface->SurfExtConvCoeff.allocate(2);
+    state->dataSurface->surfIntConv.allocate(2);
+    state->dataSurface->surfExtConv.allocate(2);
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 0u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 2u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 0u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 2u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation1)
@@ -3062,18 +2932,16 @@ TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation1)
 
     state->dataSurface->Surface.allocate(2);
     state->dataSurface->Surface(1).Name = "FAKESURFACE";
-    state->dataSurface->SurfIntConvCoeff.allocate(1);
-    state->dataSurface->SurfIntConvCoeff(1) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfIntConvUserCoeffNum(1) = 0;
-    state->dataSurface->SurfExtConvCoeff.allocate(1);
-    state->dataSurface->SurfExtConvCoeff(1) = Convect::HcExt::SetByZone;
-    state->dataSurface->SurfExtConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfExtConvUserCoeffNum(1) = 0;
+    state->dataSurface->surfIntConv.allocate(1);
+    state->dataSurface->surfIntConv(1).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(1).userModelNum = 0;
+    state->dataSurface->surfExtConv.allocate(1);
+    state->dataSurface->surfExtConv(1).model = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv(1).userModelNum = 0;
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 1u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 1u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation2)
@@ -3093,18 +2961,16 @@ TEST_F(ConvectionCoefficientsFixture, TestSurfaceConvectionArrayAllocation2)
 
     state->dataSurface->Surface.allocate(2);
     state->dataSurface->Surface(1).Name = "FAKESURFACE";
-    state->dataSurface->SurfIntConvCoeff.allocate(1);
-    state->dataSurface->SurfIntConvCoeff(1) = Convect::HcInt::SetByZone;
-    state->dataSurface->SurfIntConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfIntConvUserCoeffNum(1) = 0;
-    state->dataSurface->SurfExtConvCoeff.allocate(1);
-    state->dataSurface->SurfExtConvCoeff(1) = Convect::HcExt::SetByZone;
-    state->dataSurface->SurfExtConvUserCoeffNum.allocate(1);
-    state->dataSurface->SurfExtConvUserCoeffNum(1) = 0;
+    state->dataSurface->surfIntConv.allocate(1);
+    state->dataSurface->surfIntConv(1).model = Convect::HcInt::SetByZone;
+    state->dataSurface->surfIntConv(1).userModelNum = 0;
+    state->dataSurface->surfExtConv.allocate(1);
+    state->dataSurface->surfExtConv(1).model = Convect::HcExt::SetByZone;
+    state->dataSurface->surfExtConv(1).userModelNum = 0;
 
     Convect::GetUserConvCoeffs(*state);
-    EXPECT_EQ(state->dataSurface->UserIntConvCoeffs.size(), 1u);
-    EXPECT_EQ(state->dataSurface->UserExtConvCoeffs.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userIntConvModels.size(), 1u);
+    EXPECT_EQ(state->dataSurface->userExtConvModels.size(), 1u);
 }
 
 TEST_F(ConvectionCoefficientsFixture, RoofPerimeter_PerfectSquare_Rotated)
