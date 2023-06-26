@@ -172,7 +172,7 @@ namespace RoomAir {
 
         case RoomAirModel::AirflowNetwork: // RoomAirflowNetwork zone model
             // simulate room airflow using the AirflowNetwork - based model
-            SimRoomAirModelAirflowNetwork(state, ZoneNum);
+            SimRoomAirModelAFN(state, ZoneNum);
             break;
 
         default:   // mixing air model
@@ -1311,7 +1311,6 @@ namespace RoomAir {
 
             auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
             roomAFNZoneInfo.ZoneID = ZoneNum;
-            roomAFNZoneInfo.roomAFNNodeNum = Loop;
             roomAFNZoneInfo.IsUsed = true;
             roomAFNZoneInfo.Name = ipsc->cAlphaArgs(1);
             roomAFNZoneInfo.ZoneName = ipsc->cAlphaArgs(2); // Zone Name

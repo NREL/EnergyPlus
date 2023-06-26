@@ -132,7 +132,6 @@ protected:
         state->afn->AirflowNetworkLinkageData.allocate(5);
         state->afn->AirflowNetworkNodeSimu.allocate(6);
         state->afn->AirflowNetworkLinkSimu.allocate(5);
-        state->dataRoomAirflowNetModel->RAFN.allocate(state->dataGlobal->NumOfZones);
     }
 
     virtual void TearDown()
@@ -316,10 +315,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
          PsyCpAirFnW(thisZoneHB.ZoneAirHumRat));
 
     RoomAirNode = 1;
-    auto &thisRAFN(state->dataRoomAirflowNetModel->RAFN(ZoneNum));
-    thisRAFN.ZoneNum = ZoneNum;
-
-    thisRAFN.InitRoomAirModelAirflowNetwork(*state, RoomAirNode);
+    InitRoomAirModelAFN(*state, ZoneNum, RoomAirNode);
 
     EXPECT_NEAR(120.0, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain, 0.00001);
     EXPECT_NEAR(80.0, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain, 0.00001);
@@ -338,14 +334,14 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0009756833, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARa, 0.0000001);
     EXPECT_NEAR(9.0784549e-7, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW, 0.0000001);
 
-    thisRAFN.CalcRoomAirModelAirflowNetwork(*state, RoomAirNode);
+    CalcRoomAirModelAFN(*state, ZoneNum, RoomAirNode);
 
     EXPECT_NEAR(24.907085, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).AirTemp, 0.00001);
     EXPECT_NEAR(0.00189601, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).HumRat, 0.00001);
     EXPECT_NEAR(9.770445, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).RelHumidity, 0.00001);
 
     RoomAirNode = 2;
-    thisRAFN.InitRoomAirModelAirflowNetwork(*state, RoomAirNode);
+    InitRoomAirModelAFN(*state, ZoneNum, RoomAirNode);
 
     EXPECT_NEAR(180.0, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain, 0.00001);
     EXPECT_NEAR(120.0, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain, 0.00001);
@@ -364,13 +360,13 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0019191284, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARa, 0.0000001);
     EXPECT_NEAR(1.98975381e-6, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).SumHmARaW, 0.0000001);
 
-    thisRAFN.CalcRoomAirModelAirflowNetwork(*state, RoomAirNode);
+    CalcRoomAirModelAFN(*state, ZoneNum, RoomAirNode);
 
     EXPECT_NEAR(24.057841, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).AirTemp, 0.00001);
     EXPECT_NEAR(0.0028697086, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).HumRat, 0.00001);
     EXPECT_NEAR(15.53486185, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).RelHumidity, 0.00001);
 
-    thisRAFN.UpdateRoomAirModelAirflowNetwork(*state);
+    UpdateRoomAirModelAFN(*state, ZoneNum);
 
     EXPECT_NEAR(24.397538, state->dataLoopNodes->Node(2).Temp, 0.00001);
     EXPECT_NEAR(0.0024802305, state->dataLoopNodes->Node(2).HumRat, 0.000001);
@@ -394,7 +390,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->afn->get_input();
 
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipType(1) = DataZoneEquipment::ZoneEquipType::AirDistributionUnit;
-    state->dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf = true;
+    state->dataRoomAirflowNetModel->OneTimeFlagConf = true;
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
     state->dataDefineEquipment->AirDistUnit.allocate(1);
     state->dataZoneEquip->ZoneEquipList(ZoneNum).EquipName(1) = "ADU";
@@ -408,12 +404,12 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).HVAC(1).SupplyFraction = 0.6;
     state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(2).HVAC(1).ReturnFraction = 0.6;
 
-    thisRAFN.InitRoomAirModelAirflowNetwork(*state, RoomAirNode);
+    InitRoomAirModelAFN(*state, ZoneNum, RoomAirNode);
     // No errorfound
     EXPECT_NEAR(1.1824296, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir, 0.00001);
     EXPECT_NEAR(1010.1746, state->dataRoomAir->AFNZoneInfo(ZoneNum).Node(RoomAirNode).CpAir, 0.001);
 
-    state->dataRoomAirflowNetModel->InitRoomAirModelAirflowNetworkOneTimeFlagConf = false;
+    state->dataRoomAirflowNetModel->OneTimeFlagConf = false;
 }
 TEST_F(EnergyPlusFixture, RoomAirInternalGains_InternalHeatGains_Check)
 {

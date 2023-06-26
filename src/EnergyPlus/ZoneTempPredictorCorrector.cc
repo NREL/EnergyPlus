@@ -3591,7 +3591,7 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
             auto &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(zoneNum);
             if (afnZoneInfo.IsUsed) {
                 int RoomAirNode = afnZoneInfo.ControlAirNodeID;
-                RoomAir::LoadPredictionRoomAirModelAirflowNetwork(state, zoneNum, RoomAirNode);
+                RoomAir::LoadPredictionRoomAirModelAFN(state, zoneNum, RoomAirNode);
                 this->TempDepCoef =
                     afnZoneInfo.Node(RoomAirNode).SumHA + afnZoneInfo.Node(RoomAirNode).SumLinkMCp;
                 this->TempIndCoef = afnZoneInfo.Node(RoomAirNode).SumIntSensibleGain +

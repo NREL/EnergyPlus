@@ -734,7 +734,6 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
         returnNode.Press = zoneNode.Press;
 
         Real64 H2OHtOfVap = PsyHgAirFnWTdb(zoneNode.HumRat, returnNode.Temp);
-        Real64 RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, returnNode.Temp, zoneNode.HumRat);
 
         // Include impact of under case returns for refrigerated display cases when updateing return node
         // humidity ratio
