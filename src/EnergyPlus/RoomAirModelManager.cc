@@ -1199,7 +1199,7 @@ namespace RoomAir {
                 ErrorsFound = true;
             } else {
                 state.dataRoomAir->IsZoneUFAD(zoneUE.ZonePtr) = true;
-                state.dataRoomAir->ZoneUFADPtr(zoneUE.ZonePtr) = Loop;
+                state.dataRoomAir->ZoneUFADPtr(zoneUE.ZonePtr) = Loop + state.dataRoomAir->TotUFADInt;
             }
 
             zoneUE.DiffuserType = static_cast<Diffuser>(getEnumValue(diffuserNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
