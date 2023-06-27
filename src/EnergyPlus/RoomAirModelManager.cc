@@ -1109,8 +1109,7 @@ namespace RoomAir {
 
         if (state.dataRoomAir->TotUFADInt <= 0 && state.dataRoomAir->TotUFADExt <= 0) return;
 
-        state.dataRoomAir->ZoneUFADInt.allocate(state.dataRoomAir->TotUFADInt);
-        state.dataRoomAir->ZoneUFADExt.allocate(state.dataRoomAir->TotUFADExt);
+        state.dataRoomAir->ZoneUFAD.allocate(state.dataRoomAir->TotUFADInt + state.dataRoomAir->TotUFADExt);
         state.dataRoomAir->ZoneUFADPtr.dimension(state.dataGlobal->NumOfZones, 0);
 
         ipsc->cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
@@ -1128,7 +1127,7 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
             // First is Zone Name
-            auto &zoneUI = state.dataRoomAir->ZoneUFADInt(Loop);
+            auto &zoneUI = state.dataRoomAir->ZoneUFAD(Loop);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             
             zoneUI.ZoneName = ipsc->cAlphaArgs(1);
@@ -1138,7 +1137,8 @@ namespace RoomAir {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
-                state.dataRoomAir->IsZoneUI(zoneUI.ZonePtr) = true;
+                state.dataRoomAir->IsZoneUFAD(zoneUI.ZonePtr) = true;
+                state.dataRoomAir->ZoneUFADPtr(zoneUI.ZonePtr) = Loop;
             }
 
             // 2nd alpha is diffuser type
@@ -1190,7 +1190,7 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
             // First is Zone Name
-            auto &zoneUE = state.dataRoomAir->ZoneUFADExt(Loop);
+            auto &zoneUE = state.dataRoomAir->ZoneUFAD(Loop + state.dataRoomAir->TotUFADInt);
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
             zoneUE.ZoneName = ipsc->cAlphaArgs(1);
             zoneUE.ZonePtr = UtilityRoutines::FindItemInList(ipsc->cAlphaArgs(1), state.dataHeatBal->Zone);
@@ -1198,7 +1198,7 @@ namespace RoomAir {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
             } else {
-                state.dataRoomAir->IsZoneUI(zoneUE.ZonePtr) = true;
+                state.dataRoomAir->IsZoneUFAD(zoneUE.ZonePtr) = true;
                 state.dataRoomAir->ZoneUFADPtr(zoneUE.ZonePtr) = Loop;
             }
 
@@ -2072,7 +2072,7 @@ namespace RoomAir {
 
             AuxSurf.deallocate();
 
-            if (any(state.dataRoomAir->IsZoneDispVent3Node) || any(state.dataRoomAir->IsZoneUI)) {
+            if (any(state.dataRoomAir->IsZoneDispVent3Node) || any(state.dataRoomAir->IsZoneUFAD)) {
                 state.dataRoomAir->MaxTempGrad.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAir->AvgTempGrad.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAir->TCMF.allocate(state.dataGlobal->NumOfZones);
@@ -2239,7 +2239,7 @@ namespace RoomAir {
                 } // for (iZone)
             } // if (any(IsZoneDV))
 
-            if (any(state.dataRoomAir->IsZoneUI)) {
+            if (any(state.dataRoomAir->IsZoneUFAD)) {
                 state.dataRoomAir->ZoneUFADMixedFlag.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAir->ZoneUFADMixedFlagRep.allocate(state.dataGlobal->NumOfZones);
                 state.dataRoomAir->UFADHcIn.allocate(state.dataSurface->TotSurfaces);
@@ -2332,7 +2332,7 @@ namespace RoomAir {
                                         zone.Name);
 
                     // set zone equip pointer in the UCSDUI data structure
-                    state.dataRoomAir->ZoneUFADInt(state.dataRoomAir->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
+                    state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
                 } // for (iZone)
 
                 
@@ -2419,7 +2419,7 @@ namespace RoomAir {
                                         OutputProcessor::SOVStoreType::State,
                                         zone.Name);
                     // set zone equip pointer in the UCSDUE data structure
-                    state.dataRoomAir->ZoneUFADExt(state.dataRoomAir->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
+                    state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
                 }
             }
 
@@ -2572,7 +2572,7 @@ namespace RoomAir {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && state.dataRoomAir->MyEnvrnFlag(ZoneNum)) {
 
-            if (state.dataRoomAir->IsZoneDispVent3Node(ZoneNum) || state.dataRoomAir->IsZoneUI(ZoneNum)) {
+            if (state.dataRoomAir->IsZoneDispVent3Node(ZoneNum) || state.dataRoomAir->IsZoneUFAD(ZoneNum)) {
 
                 state.dataRoomAir->MaxTempGrad(ZoneNum) = 0.0;
                 state.dataRoomAir->AvgTempGrad(ZoneNum) = 0.0;
@@ -2623,7 +2623,7 @@ namespace RoomAir {
                 state.dataRoomAir->ZoneDispVent3NodeMixedFlag(ZoneNum) = 0;
             }
 
-            if (state.dataRoomAir->IsZoneUI(ZoneNum)) {
+            if (state.dataRoomAir->IsZoneUFAD(ZoneNum)) {
 
                 state.dataRoomAir->UFADHcIn = 0.0;
                 state.dataRoomAir->ZoneUFADMixedFlag(ZoneNum) = 0;

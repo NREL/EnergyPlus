@@ -162,8 +162,6 @@ void InitUFAD(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // initialize arrays & variables used by the UCSD UFAD zone models
@@ -172,7 +170,6 @@ void InitUFAD(EnergyPlusData &state,
     // Note that much of the initialization is done in RoomAirManager, SharedDVCVUFDataInit
 
     Real64 NumShadesDown(0.0);
-    int UINum; // index to underfloor interior zone model data
 
     // Do the one time initializations
     if (state.dataUFADManager->MyOneTimeFlag) {
@@ -208,31 +205,20 @@ void InitUFAD(EnergyPlusData &state,
         }
     }
     if (ZoneModelType == RoomAirModel::UFADExt) {
-        UINum = state.dataRoomAir->ZoneUFADPtr(ZoneNum);
-        auto &zoneUE = state.dataRoomAir->ZoneUFADExt(UINum);
-        if (zoneUE.NumExtWin > 1.0) {
-            if (NumShadesDown / zoneUE.NumExtWin >= 0.5) {
-                zoneUE.ShadeDown = true;
-            } else {
-                zoneUE.ShadeDown = false;
-            }
-        } else {
-            zoneUE.ShadeDown = false;
-        }
+        auto &zoneUE = state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(ZoneNum));
+        zoneUE.ShadeDown = (zoneUE.NumExtWin > 1.0) && (NumShadesDown / zoneUE.NumExtWin >= 0.5);
     }
 }
 
 void SizeUFAD(EnergyPlusData &state,
               int const ZoneNum,
-              RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
+              RoomAirModel const model // type of zone model; UCSDUFI = 6
 )
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   August 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // set some smart defaults for UFAD systems
@@ -242,7 +228,6 @@ void SizeUFAD(EnergyPlusData &state,
 
     using DataSizing::AutoSize;
 
-    int UINum;                     // index to underfloor interior zone model data
     Real64 NumberOfOccupants(0.0); // design number of occupants in the zone
     Real64 NumberOfPlumes(0.0);    // design number of plumes in the zone
     Real64 ZoneElecConv(0.0);      // zone elec equip design convective gain [W]
@@ -251,201 +236,15 @@ void SizeUFAD(EnergyPlusData &state,
     Real64 ZoneHWEqConv(0.0);      // zone hot water equip design convective gain [W]
     Real64 ZoneSteamEqConv(0.0);   // zone steam equip design convective gain [W]
 
-    if (ZoneModelType == RoomAirModel::UFADInt) {
-        UINum = state.dataRoomAir->ZoneUFADPtr(ZoneNum);
-        NumberOfOccupants = 0.0;
-        for (int Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
-            if (state.dataHeatBal->People(Ctd).ZonePtr == ZoneNum) {
-                NumberOfOccupants += state.dataHeatBal->People(Ctd).NumberOfPeople;
-            }
-        }
+    // This is for both UFADInt and UFADExt
+    auto &zoneU = state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(ZoneNum));
 
-        auto &zoneUI = state.dataRoomAir->ZoneUFADInt(UINum);
-        if (zoneUI.DiffArea == AutoSize) {
-            if (zoneUI.DiffuserType == Diffuser::Swirl) {
-                zoneUI.DiffArea = 0.0075;
-            } else if (zoneUI.DiffuserType == Diffuser::VarArea) {
-                zoneUI.DiffArea = 0.035;
-            } else if (zoneUI.DiffuserType == Diffuser::DisplVent) {
-                zoneUI.DiffArea = 0.0060;
-            } else if (zoneUI.DiffuserType == Diffuser::LinBarGrille) {
-                // 4 ft x 4 inches; 75 cfm per linear foot; area is .025 m2/m
-                zoneUI.DiffArea = 0.03;
-            } else {
-                zoneUI.DiffArea = 0.0075;
-            }
-            BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionInterior",
-                                         zoneUI.ZoneName,
-                                         "Design effective area of diffuser",
-                                         zoneUI.DiffArea);
-        }
-        if (zoneUI.DiffAngle == AutoSize) {
-            if (zoneUI.DiffuserType == Diffuser::Swirl) {
-                zoneUI.DiffAngle = 28.0;
-            } else if (zoneUI.DiffuserType == Diffuser::VarArea) {
-                zoneUI.DiffAngle = 45.0;
-            } else if (zoneUI.DiffuserType == Diffuser::DisplVent) {
-                zoneUI.DiffAngle = 73.0;
-            } else if (zoneUI.DiffuserType == Diffuser::LinBarGrille) {
-                zoneUI.DiffAngle = 15.0;
-            } else {
-                zoneUI.DiffAngle = 28.0;
-            }
-            BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionInterior",
-                                         zoneUI.ZoneName,
-                                         "Angle between diffuser slots and the vertical",
-                                         zoneUI.DiffAngle);
-        }
-        if (zoneUI.TransHeight == AutoSize) {
-            zoneUI.CalcTransHeight = true;
-            zoneUI.TransHeight = 0.0;
-        } else {
-            zoneUI.CalcTransHeight = false;
-        }
-        if (zoneUI.DiffuserType == Diffuser::Swirl) {
-            if (zoneUI.A_Kc != Constant::AutoCalculate ||
-                zoneUI.B_Kc != Constant::AutoCalculate ||
-                zoneUI.C_Kc != Constant::AutoCalculate ||
-                zoneUI.D_Kc != Constant::AutoCalculate ||
-                zoneUI.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionInterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = Swirl.",
-                                        zoneUI.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUI.A_Kc = 0.0;
-            zoneUI.B_Kc = 0.0;
-            zoneUI.C_Kc = 0.6531;
-            zoneUI.D_Kc = 0.0069;
-            zoneUI.E_Kc = -0.00004;
-        } else if (zoneUI.DiffuserType == Diffuser::VarArea) {
-            if (zoneUI.A_Kc != Constant::AutoCalculate ||
-                zoneUI.B_Kc != Constant::AutoCalculate ||
-                zoneUI.C_Kc != Constant::AutoCalculate ||
-                zoneUI.D_Kc != Constant::AutoCalculate ||
-                zoneUI.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionInterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = VariableArea.",
-                                        zoneUI.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUI.A_Kc = 0.0;
-            zoneUI.B_Kc = 0.0;
-            zoneUI.C_Kc = 0.88;
-            zoneUI.D_Kc = 0.0;
-            zoneUI.E_Kc = 0.0;
-        } else if (zoneUI.DiffuserType == Diffuser::DisplVent) {
-            if (zoneUI.A_Kc != Constant::AutoCalculate ||
-                zoneUI.B_Kc != Constant::AutoCalculate ||
-                zoneUI.C_Kc != Constant::AutoCalculate ||
-                zoneUI.D_Kc != Constant::AutoCalculate ||
-                zoneUI.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionInterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = HorizontalDisplacement.",
-                                        zoneUI.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUI.A_Kc = 0.0;
-            zoneUI.B_Kc = 0.0;
-            zoneUI.C_Kc = 0.67;
-            zoneUI.D_Kc = 0.0;
-            zoneUI.E_Kc = 0.0;
-        } else if (zoneUI.DiffuserType == Diffuser::LinBarGrille) {
-            if (zoneUI.A_Kc != Constant::AutoCalculate ||
-                zoneUI.B_Kc != Constant::AutoCalculate ||
-                zoneUI.C_Kc != Constant::AutoCalculate ||
-                zoneUI.D_Kc != Constant::AutoCalculate ||
-                zoneUI.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionInterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = LinearBarGrille.",
-                                        zoneUI.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUI.A_Kc = 0.0;
-            zoneUI.B_Kc = 0.0;
-            zoneUI.C_Kc = 0.8;
-            zoneUI.D_Kc = 0.0;
-            zoneUI.E_Kc = 0.0;
-        } else {
-            if (zoneUI.A_Kc == Constant::AutoCalculate ||
-                zoneUI.B_Kc == Constant::AutoCalculate ||
-                zoneUI.C_Kc == Constant::AutoCalculate ||
-                zoneUI.D_Kc == Constant::AutoCalculate ||
-                zoneUI.E_Kc == Constant::AutoCalculate) {
-                ShowFatalError(state,
-                               format("For RoomAirSettings:UnderFloorAirDistributionInterior for Zone {}, input for Coefficients A - E must be "
-                                      "specified when Floor Diffuser Type = Custom.",
-                                      zoneUI.ZoneName));
-            }
-        }
-        if (zoneUI.PowerPerPlume == Constant::AutoCalculate) {
-            NumberOfPlumes = 0.0;
-            if (NumberOfOccupants > 0.0) {
-                NumberOfPlumes = NumberOfOccupants;
-            } else {
-                NumberOfPlumes = 1.0;
-            }
-            ZoneElecConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotElecEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneElectric(Ctd).ZonePtr == ZoneNum) {
-                    ZoneElecConv += state.dataHeatBal->ZoneElectric(Ctd).DesignLevel * state.dataHeatBal->ZoneElectric(Ctd).FractionConvected;
-                }
-            }
-            ZoneGasConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotGasEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneGas(Ctd).ZonePtr == ZoneNum) {
-                    ZoneGasConv += state.dataHeatBal->ZoneGas(Ctd).DesignLevel * state.dataHeatBal->ZoneGas(Ctd).FractionConvected;
-                }
-            }
-            ZoneOthEqConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotOthEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
-                    ZoneOthEqConv += state.dataHeatBal->ZoneOtherEq(Ctd).DesignLevel * state.dataHeatBal->ZoneOtherEq(Ctd).FractionConvected;
-                }
-            }
-            ZoneHWEqConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotHWEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
-                    ZoneHWEqConv += state.dataHeatBal->ZoneHWEq(Ctd).DesignLevel * state.dataHeatBal->ZoneHWEq(Ctd).FractionConvected;
-                }
-            }
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotStmEquip; ++Ctd) {
-                ZoneSteamEqConv = 0.0;
-                if (state.dataHeatBal->ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
-                    ZoneSteamEqConv += state.dataHeatBal->ZoneSteamEq(Ctd).DesignLevel * state.dataHeatBal->ZoneSteamEq(Ctd).FractionConvected;
-                }
-            }
-            zoneUI.PowerPerPlume =
-                (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
-            BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionInterior",
-                                         zoneUI.ZoneName,
-                                         "Power per plume [W]",
-                                         zoneUI.PowerPerPlume);
-        }
-        if (zoneUI.DiffusersPerZone == AutoSize) {
-            if (NumberOfOccupants > 0.0) {
-                zoneUI.DiffusersPerZone = NumberOfOccupants;
-            } else {
-                zoneUI.DiffusersPerZone = 1.0;
-            }
-            BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionInterior",
-                                         zoneUI.ZoneName,
-                                         "Number of diffusers per zone",
-                                         zoneUI.DiffusersPerZone);
-        }
+    NumberOfOccupants = 0.0;
+    for (auto const &people : state.dataHeatBal->People) {
+        if (people.ZonePtr == ZoneNum) NumberOfOccupants += people.NumberOfPeople;
     }
 
-    if (ZoneModelType == RoomAirModel::UFADExt) {
-        UINum = state.dataRoomAir->ZoneUFADPtr(ZoneNum);
-        auto &zoneUE = state.dataRoomAir->ZoneUFADExt(UINum);
+    if (model == RoomAirModel::UFADExt) {
         // calculate total window width in zone
         for (int Ctd = state.dataRoomAir->PosZ_Window(ZoneNum).beg; Ctd <= state.dataRoomAir->PosZ_Window(ZoneNum).end; ++Ctd) {
             int SurfNum = state.dataRoomAir->APos_Window(Ctd);
@@ -455,212 +254,164 @@ void SizeUFAD(EnergyPlusData &state,
                 surf.ExtBoundCond == OtherSideCoefNoCalcExt ||
                 surf.ExtBoundCond == OtherSideCoefCalcExt ||
                 surf.ExtBoundCond == OtherSideCondModeledExt) {
-                zoneUE.WinWidth += surf.Width;
-                ++zoneUE.NumExtWin;
+                zoneU.WinWidth += surf.Width;
+                ++zoneU.NumExtWin;
             }
         }
-        if (zoneUE.WinWidth <= 0.0) {
+        if (zoneU.WinWidth <= 0.0) {
             ShowWarningError(state,
                              format("For RoomAirSettings:UnderFloorAirDistributionExterior for Zone {} there are no exterior windows.",
-                                    zoneUE.ZoneName));
+                                    zoneU.ZoneName));
             ShowContinueError(state, "  The zone will be treated as a UFAD interior zone");
         }
-        NumberOfOccupants = 0.0;
-        for (int Ctd = 1; Ctd <= state.dataHeatBal->TotPeople; ++Ctd) {
-            if (state.dataHeatBal->People(Ctd).ZonePtr == ZoneNum) {
-                NumberOfOccupants += state.dataHeatBal->People(Ctd).NumberOfPeople;
-            }
+    } // if (model == RoomAirModel::UFADExt)
+
+    if (zoneU.DiffArea == AutoSize) {
+        constexpr std::array<Real64, (int)Diffuser::Num> diffArea = {0.0075, 0.035, 0.0060, 0.03, 0.0075};
+        zoneU.DiffArea = diffArea[(int)zoneU.DiffuserType];
+        // 4 ft x 4 inches; 75 cfm per linear foot; area is .025 m2/m
+
+        BaseSizer::reportSizerOutput(state,
+                                     "RoomAirSettings:UnderFloorAirDistributionInterior",
+                                     zoneU.ZoneName,
+                                     "Design effective area of diffuser",
+                                     zoneU.DiffArea);
         }
-        if (zoneUE.DiffArea == AutoSize) {
-            if (zoneUE.DiffuserType == Diffuser::Swirl) {
-                zoneUE.DiffArea = 0.0075;
-            } else if (zoneUE.DiffuserType == Diffuser::VarArea) {
-                zoneUE.DiffArea = 0.035;
-            } else if (zoneUE.DiffuserType == Diffuser::DisplVent) {
-                zoneUE.DiffArea = 0.0060;
-            } else if (zoneUE.DiffuserType == Diffuser::LinBarGrille) {
-                // 4 ft x 4 inches; eff area is 50% of total area; 75 cfm per linear foot.
-                zoneUE.DiffArea = 0.03;
-            } else {
-                zoneUE.DiffArea = 0.0075;
-            }
-            BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionExterior",
-                                         zoneUE.ZoneName,
-                                         "Design effective area of diffuser",
-                                         zoneUE.DiffArea);
-        }
-        if (zoneUE.DiffAngle == AutoSize) {
-            if (zoneUE.DiffuserType == Diffuser::Swirl) {
-                zoneUE.DiffAngle = 28.0;
-            } else if (zoneUE.DiffuserType == Diffuser::VarArea) {
-                zoneUE.DiffAngle = 45.0;
-            } else if (zoneUE.DiffuserType == Diffuser::DisplVent) {
-                zoneUE.DiffAngle = 73.0;
-            } else if (zoneUE.DiffuserType == Diffuser::LinBarGrille) {
-                zoneUE.DiffAngle = 15.0;
-            } else {
-                zoneUE.DiffAngle = 28.0;
-            }
-            BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionExterior",
-                                         zoneUE.ZoneName,
-                                         "Angle between diffuser slots and the vertical",
-                                         zoneUE.DiffAngle);
-        }
-        if (zoneUE.TransHeight == AutoSize) {
-            zoneUE.CalcTransHeight = true;
-            zoneUE.TransHeight = 0.0;
+    if (zoneU.DiffAngle == AutoSize) {
+        constexpr std::array<Real64, (int)Diffuser::Num> diffAngle = {28.0, 45.0, 73.0, 15.0, 28.0};
+        zoneU.DiffAngle = diffAngle[(int)zoneU.DiffuserType];
+        
+        BaseSizer::reportSizerOutput(state,
+                                     "RoomAirSettings:UnderFloorAirDistributionInterior",
+                                     zoneU.ZoneName,
+                                     "Angle between diffuser slots and the vertical",
+                                     zoneU.DiffAngle);
+    }
+    if (zoneU.TransHeight == AutoSize) {
+        zoneU.CalcTransHeight = true;
+        zoneU.TransHeight = 0.0;
+    } else {
+        zoneU.CalcTransHeight = false;
+    }
+
+    if (zoneU.DiffuserType != Diffuser::Custom &&
+        (zoneU.A_Kc != Constant::AutoCalculate ||
+         zoneU.B_Kc != Constant::AutoCalculate ||
+         zoneU.C_Kc != Constant::AutoCalculate ||
+         zoneU.D_Kc != Constant::AutoCalculate ||
+         zoneU.E_Kc != Constant::AutoCalculate)) {
+        ShowWarningError(state,
+                         format("For RoomAirSettings:UnderFloorAirDistributionInterior for Zone {}, input for Coefficients A - E will be "
+                                "ignored when Floor Diffuser Type = {}.", zoneU.ZoneName, diffuserNamesUC[(int)zoneU.DiffuserType]));
+        ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
+    }
+    
+    if (zoneU.DiffuserType == Diffuser::Swirl) {
+        zoneU.A_Kc = 0.0;
+        zoneU.B_Kc = 0.0;
+        zoneU.C_Kc = 0.6531;
+        zoneU.D_Kc = 0.0069;
+        zoneU.E_Kc = -0.00004;
+    } else if (zoneU.DiffuserType == Diffuser::VarArea) {
+        zoneU.A_Kc = 0.0;
+        zoneU.B_Kc = 0.0;
+        zoneU.C_Kc = (model == RoomAirModel::UFADExt) ? 0.83 : 0.88;
+        zoneU.D_Kc = 0.0;
+        zoneU.E_Kc = 0.0;
+    } else if (zoneU.DiffuserType == Diffuser::DisplVent) {
+        zoneU.A_Kc = 0.0;
+        zoneU.B_Kc = 0.0;
+        zoneU.C_Kc = 0.67;
+        zoneU.D_Kc = 0.0;
+        zoneU.E_Kc = 0.0;
+    } else if (zoneU.DiffuserType == Diffuser::LinBarGrille) {
+        zoneU.A_Kc = 0.0;
+        zoneU.B_Kc = 0.0;
+        zoneU.C_Kc = (model == RoomAirModel::UFADExt) ? 0.8214 : 0.8;
+        zoneU.D_Kc = (model == RoomAirModel::UFADExt) ? -0.0263 : 0.0;
+        zoneU.E_Kc = (model == RoomAirModel::UFADExt) ? 0.0014 : 0.0;
+    } else if (zoneU.A_Kc == Constant::AutoCalculate ||
+               zoneU.B_Kc == Constant::AutoCalculate ||
+               zoneU.C_Kc == Constant::AutoCalculate ||
+               zoneU.D_Kc == Constant::AutoCalculate ||
+               zoneU.E_Kc == Constant::AutoCalculate) {
+        ShowFatalError(state,
+                       format("For RoomAirSettings:UnderFloorAirDistributionInterior for Zone {}, input for Coefficients A - E must be "
+                              "specified when Floor Diffuser Type = Custom.", zoneU.ZoneName));
+    }
+
+    if (zoneU.PowerPerPlume == Constant::AutoCalculate) {
+        NumberOfPlumes = 0.0;
+        if (NumberOfOccupants > 0.0) {
+            NumberOfPlumes = NumberOfOccupants;
         } else {
-            zoneUE.CalcTransHeight = false;
+            NumberOfPlumes = 1.0;
         }
-        if (zoneUE.DiffuserType == Diffuser::Swirl) {
-            if (zoneUE.A_Kc != Constant::AutoCalculate ||
-                zoneUE.B_Kc != Constant::AutoCalculate ||
-                zoneUE.C_Kc != Constant::AutoCalculate ||
-                zoneUE.D_Kc != Constant::AutoCalculate ||
-                zoneUE.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionExterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = Swirl.",
-                                        zoneUE.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUE.A_Kc = 0.0;
-            zoneUE.B_Kc = 0.0;
-            zoneUE.C_Kc = 0.6531;
-            zoneUE.D_Kc = 0.0069;
-            zoneUE.E_Kc = -0.00004;
-        } else if (zoneUE.DiffuserType == Diffuser::VarArea) {
-            if (zoneUE.A_Kc != Constant::AutoCalculate ||
-                zoneUE.B_Kc != Constant::AutoCalculate ||
-                zoneUE.C_Kc != Constant::AutoCalculate ||
-                zoneUE.D_Kc != Constant::AutoCalculate ||
-                zoneUE.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionExterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = VariableArea.",
-                                        zoneUE.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUE.A_Kc = 0.0;
-            zoneUE.B_Kc = 0.0;
-            zoneUE.C_Kc = 0.83;
-            zoneUE.D_Kc = 0.0;
-            zoneUE.E_Kc = 0.0;
-        } else if (zoneUE.DiffuserType == Diffuser::DisplVent) {
-            if (zoneUE.A_Kc != Constant::AutoCalculate ||
-                zoneUE.B_Kc != Constant::AutoCalculate ||
-                zoneUE.C_Kc != Constant::AutoCalculate ||
-                zoneUE.D_Kc != Constant::AutoCalculate ||
-                zoneUE.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionExterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = HorizontalDisplacement.",
-                                        zoneUE.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUE.A_Kc = 0.0;
-            zoneUE.B_Kc = 0.0;
-            zoneUE.C_Kc = 0.67;
-            zoneUE.D_Kc = 0.0;
-            zoneUE.E_Kc = 0.0;
-        } else if (zoneUE.DiffuserType == Diffuser::LinBarGrille) {
-            if (zoneUE.A_Kc != Constant::AutoCalculate ||
-                zoneUE.B_Kc != Constant::AutoCalculate ||
-                zoneUE.C_Kc != Constant::AutoCalculate ||
-                zoneUE.D_Kc != Constant::AutoCalculate ||
-                zoneUE.E_Kc != Constant::AutoCalculate) {
-                ShowWarningError(state,
-                                 format("For RoomAirSettings:UnderFloorAirDistributionExterior for Zone {}, input for Coefficients A - E will be "
-                                        "ignored when Floor Diffuser Type = LinearBarGrille.",
-                                        zoneUE.ZoneName));
-                ShowContinueError(state, "  To input these Coefficients, use Floor Diffuser Type = Custom.");
-            }
-            zoneUE.A_Kc = 0.0;
-            zoneUE.B_Kc = 0.0;
-            zoneUE.C_Kc = 0.8214;
-            zoneUE.D_Kc = -0.0263;
-            zoneUE.E_Kc = 0.0014;
-        } else {
-            if (zoneUE.A_Kc == Constant::AutoCalculate ||
-                zoneUE.B_Kc == Constant::AutoCalculate ||
-                zoneUE.C_Kc == Constant::AutoCalculate ||
-                zoneUE.D_Kc == Constant::AutoCalculate ||
-                zoneUE.E_Kc == Constant::AutoCalculate) {
-                ShowFatalError(state,
-                               format("For RoomAirSettings:UnderFloorAirDistributionExterior for Zone {}, input for Coefficients A - E must be "
-                                      "specified when Floor Diffuser Type = Custom.",
-                                      zoneUE.ZoneName));
+        ZoneElecConv = 0.0;
+        for (int Ctd = 1; Ctd <= state.dataHeatBal->TotElecEquip; ++Ctd) {
+            if (state.dataHeatBal->ZoneElectric(Ctd).ZonePtr == ZoneNum) {
+                ZoneElecConv += state.dataHeatBal->ZoneElectric(Ctd).DesignLevel * state.dataHeatBal->ZoneElectric(Ctd).FractionConvected;
             }
         }
-        if (zoneUE.PowerPerPlume == Constant::AutoCalculate) {
-            if (NumberOfOccupants > 0) {
-                NumberOfPlumes = NumberOfOccupants;
-            } else {
-                NumberOfPlumes = 1.0;
+        ZoneGasConv = 0.0;
+        for (int Ctd = 1; Ctd <= state.dataHeatBal->TotGasEquip; ++Ctd) {
+            if (state.dataHeatBal->ZoneGas(Ctd).ZonePtr == ZoneNum) {
+                ZoneGasConv += state.dataHeatBal->ZoneGas(Ctd).DesignLevel * state.dataHeatBal->ZoneGas(Ctd).FractionConvected;
             }
-            ZoneElecConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotElecEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneElectric(Ctd).ZonePtr == ZoneNum) {
-                    ZoneElecConv += state.dataHeatBal->ZoneElectric(Ctd).DesignLevel;
-                }
+        }
+        ZoneOthEqConv = 0.0;
+        for (int Ctd = 1; Ctd <= state.dataHeatBal->TotOthEquip; ++Ctd) {
+            if (state.dataHeatBal->ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
+                ZoneOthEqConv += state.dataHeatBal->ZoneOtherEq(Ctd).DesignLevel * state.dataHeatBal->ZoneOtherEq(Ctd).FractionConvected;
             }
-            ZoneGasConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotGasEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneGas(Ctd).ZonePtr == ZoneNum) {
-                    ZoneGasConv += state.dataHeatBal->ZoneGas(Ctd).DesignLevel;
-                }
+        }
+        ZoneHWEqConv = 0.0;
+        for (int Ctd = 1; Ctd <= state.dataHeatBal->TotHWEquip; ++Ctd) {
+            if (state.dataHeatBal->ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
+                ZoneHWEqConv += state.dataHeatBal->ZoneHWEq(Ctd).DesignLevel * state.dataHeatBal->ZoneHWEq(Ctd).FractionConvected;
             }
-            ZoneOthEqConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotOthEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneOtherEq(Ctd).ZonePtr == ZoneNum) {
-                    ZoneOthEqConv += state.dataHeatBal->ZoneOtherEq(Ctd).DesignLevel;
-                }
+        }
+        for (int Ctd = 1; Ctd <= state.dataHeatBal->TotStmEquip; ++Ctd) {
+            ZoneSteamEqConv = 0.0; // This should be outside the outer loop, no?
+            if (state.dataHeatBal->ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
+                ZoneSteamEqConv += state.dataHeatBal->ZoneSteamEq(Ctd).DesignLevel * state.dataHeatBal->ZoneSteamEq(Ctd).FractionConvected;
             }
-            ZoneHWEqConv = 0.0;
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotHWEquip; ++Ctd) {
-                if (state.dataHeatBal->ZoneHWEq(Ctd).ZonePtr == ZoneNum) {
-                    ZoneHWEqConv += state.dataHeatBal->ZoneHWEq(Ctd).DesignLevel;
-                }
-            }
-            for (int Ctd = 1; Ctd <= state.dataHeatBal->TotStmEquip; ++Ctd) {
-                ZoneSteamEqConv = 0.0;
-                if (state.dataHeatBal->ZoneSteamEq(Ctd).ZonePtr == ZoneNum) {
-                    ZoneSteamEqConv += state.dataHeatBal->ZoneSteamEq(Ctd).DesignLevel;
-                }
-            }
-            zoneUE.PowerPerPlume =
+        }
+        zoneU.PowerPerPlume =
                 (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
+        BaseSizer::reportSizerOutput(state,
+                                     "RoomAirSettings:UnderFloorAirDistributionInterior",
+                                     zoneU.ZoneName,
+                                     "Power per plume [W]",
+                                     zoneU.PowerPerPlume);
+
+        if (zoneU.DiffusersPerZone == AutoSize) {
+            zoneU.DiffusersPerZone = (NumberOfOccupants > 0.0) ? NumberOfOccupants : 1.0;
             BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionExterior",
-                                         zoneUE.ZoneName,
-                                         "Power per plume [W]",
-                                         zoneUE.PowerPerPlume);
-        }
-        if (zoneUE.DiffusersPerZone == AutoSize) {
-            if (NumberOfOccupants > 0.0) {
-                zoneUE.DiffusersPerZone = NumberOfOccupants;
-            } else {
-                zoneUE.DiffusersPerZone = 1.0;
-            }
-            BaseSizer::reportSizerOutput(state,
-                                         "RoomAirSettings:UnderFloorAirDistributionExterior",
-                                         zoneUE.ZoneName,
+                                         "RoomAirSettings:UnderFloorAirDistributionInterior",
+                                         zoneU.ZoneName,
                                          "Number of diffusers per zone",
-                                         zoneUE.DiffusersPerZone);
+                                         zoneU.DiffusersPerZone);
         }
+    }
+
+    if (zoneU.DiffusersPerZone == AutoSize) {
+        zoneU.DiffusersPerZone = (NumberOfOccupants > 0.0) ? NumberOfOccupants : 1.0;
+        
+        BaseSizer::reportSizerOutput(state,
+                                     "RoomAirSettings:UnderFloorAirDistributionExterior",
+                                     zoneU.ZoneName,
+                                     "Number of diffusers per zone",
+                                     zoneU.DiffusersPerZone);
     }
 }
 
-void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight)
+void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight, UFADConvCoef &ufadCC)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         G. Carrilho da Graca
     //       DATE WRITTEN   February 2004
-    //       MODIFIED       -
-    //       RE-ENGINEERED  -
 
     // PURPOSE OF THIS SUBROUTINE:
     // Main subroutine for convection calculation in the UCSD Displacement Ventilation model.
@@ -685,19 +436,19 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
     int SurfNum;     // Surface number
     // Initialize HAT and HA
 
-    state.dataUFADManager->HAT_MX = 0.0;
-    state.dataUFADManager->HAT_OC = 0.0;
-    state.dataUFADManager->HA_MX = 0.0;
-    state.dataUFADManager->HA_OC = 0.0;
-    state.dataUFADManager->HAT_FLOOR = 0.0;
-    state.dataUFADManager->HA_FLOOR = 0.0;
-    state.dataUFADManager->HAT_MXWin = 0.0;
-    state.dataUFADManager->HAT_OCWin = 0.0;
-    state.dataUFADManager->HA_MXWin = 0.0;
-    state.dataUFADManager->HA_OCWin = 0.0;
+    ufadCC.HAT_MX = 0.0;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
+    ufadCC.HAT_MXWin = 0.0;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
+    ufadCC.HA_MX = 0.0;                   // HA_MX Convection Coefficient times Area for the upper subzone
+    ufadCC.HA_MXWin = 0.0;                // HA_MX Convection Coefficient times Area for the upper subzone (windows only)
+    ufadCC.HAT_OC = 0.0;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
+    ufadCC.HAT_OCWin = 0.0;               // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone (windows only)
+    ufadCC.HA_OC = 0.0;                   // HA_OC Convection Coefficient times Area for the lower subzone
+    ufadCC.HA_OCWin = 0.0;                // HA_OC Convection Coefficient times Area for the lower subzone (windows only)
+    ufadCC.HAT_FLOOR = 0.0;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
+    ufadCC.HA_FLOOR = 0.0;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
 
     // Is the air flow model for this zone set to UCSDDV Displacement Ventilation?
-    if (state.dataRoomAir->IsZoneUI(ZoneNum)) {
+    if (state.dataRoomAir->IsZoneUFAD(ZoneNum)) {
         Real64 zoneCeilingHeight1 = state.dataRoomAir->ZoneCeilingHeight1(ZoneNum);
         Real64 zoneCeilingHeight2 = state.dataRoomAir->ZoneCeilingHeight2(ZoneNum);
  
@@ -721,8 +472,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTMX(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                 state.dataRoomAir->HWall(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                state.dataUFADManager->HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWall(Ctd);
-                state.dataUFADManager->HA_MX += surf.Area * state.dataRoomAir->HWall(Ctd);
+                ufadCC.HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWall(Ctd);
+                ufadCC.HA_MX += surf.Area * state.dataRoomAir->HWall(Ctd);
             }
 
             // The Wall surface is in the lower subzone
@@ -730,8 +481,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTOC(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                 state.dataRoomAir->HWall(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                state.dataUFADManager->HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWall(Ctd);
-                state.dataUFADManager->HA_OC += surf.Area * state.dataRoomAir->HWall(Ctd);
+                ufadCC.HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWall(Ctd);
+                ufadCC.HA_OC += surf.Area * state.dataRoomAir->HWall(Ctd);
             }
 
             if (std::abs(ZInfSurf - ZSupSurf) < 1.e-10) {
@@ -756,12 +507,12 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 TmedDV = ((ZSupSurf - LayH) * state.dataRoomAir->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAir->ZTOC(ZoneNum)) /
                          (ZSupSurf - ZInfSurf);
                 state.dataRoomAir->HWall(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                state.dataUFADManager->HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
+                ufadCC.HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
                                                  state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLU;
-                state.dataUFADManager->HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                state.dataUFADManager->HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
+                ufadCC.HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                ufadCC.HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
                                                  state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLD;
-                state.dataUFADManager->HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                ufadCC.HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
             }
 
@@ -788,20 +539,20 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTMX(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                     state.dataRoomAir->HWindow(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                    state.dataUFADManager->HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
-                    state.dataUFADManager->HA_MX += surf.Area * state.dataRoomAir->HWindow(Ctd);
-                    state.dataUFADManager->HAT_MXWin += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
-                    state.dataUFADManager->HA_MXWin += surf.Area * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HA_MX += surf.Area * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HAT_MXWin += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HA_MXWin += surf.Area * state.dataRoomAir->HWindow(Ctd);
                 }
 
                 if (ZSupSurf < LayH) {
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTOC(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                     state.dataRoomAir->HWindow(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                    state.dataUFADManager->HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
-                    state.dataUFADManager->HA_OC += surf.Area * state.dataRoomAir->HWindow(Ctd);
-                    state.dataUFADManager->HAT_OCWin += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
-                    state.dataUFADManager->HA_OCWin += surf.Area * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HA_OC += surf.Area * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HAT_OCWin += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
+                    ufadCC.HA_OCWin += surf.Area * state.dataRoomAir->HWindow(Ctd);
                 }
 
                 if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
@@ -814,18 +565,18 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                     TmedDV = ((ZSupSurf - LayH) * state.dataRoomAir->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAir->ZTOC(ZoneNum)) /
                              (ZSupSurf - ZInfSurf);
                     state.dataRoomAir->HWindow(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                    state.dataUFADManager->HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
+                    ufadCC.HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
                                                      state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLU;
-                    state.dataUFADManager->HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                    state.dataUFADManager->HAT_MXWin += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
+                    ufadCC.HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                    ufadCC.HAT_MXWin += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
                                                         state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLU;
-                    state.dataUFADManager->HA_MXWin += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                    state.dataUFADManager->HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
+                    ufadCC.HA_MXWin += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                    ufadCC.HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
                                                      state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLD;
-                    state.dataUFADManager->HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
-                    state.dataUFADManager->HAT_OCWin += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
+                    ufadCC.HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                    ufadCC.HAT_OCWin += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
                                                         state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLD;
-                    state.dataUFADManager->HA_OCWin += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                    ufadCC.HA_OCWin += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                     state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
                 }
             }
@@ -834,16 +585,16 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTMX(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                 state.dataRoomAir->HWindow(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                state.dataUFADManager->HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
-                state.dataUFADManager->HA_MX += surf.Area * state.dataRoomAir->HWindow(Ctd);
+                ufadCC.HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
+                ufadCC.HA_MX += surf.Area * state.dataRoomAir->HWindow(Ctd);
             }
 
             if (surf.Tilt >= 170.0) { // Window Floor
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTOC(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                 state.dataRoomAir->HWindow(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                state.dataUFADManager->HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
-                state.dataUFADManager->HA_OC += surf.Area * state.dataRoomAir->HWindow(Ctd);
+                ufadCC.HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HWindow(Ctd);
+                ufadCC.HA_OC += surf.Area * state.dataRoomAir->HWindow(Ctd);
             }
 
             state.dataRoomAir->UFADHcIn(SurfNum) = state.dataRoomAir->HWindow(Ctd);
@@ -867,16 +618,16 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTMX(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                 state.dataRoomAir->HDoor(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                state.dataUFADManager->HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HDoor(Ctd);
-                state.dataUFADManager->HA_MX += surf.Area * state.dataRoomAir->HDoor(Ctd);
+                ufadCC.HAT_MX += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HDoor(Ctd);
+                ufadCC.HA_MX += surf.Area * state.dataRoomAir->HDoor(Ctd);
             }
 
             if (ZSupSurf < LayH) {
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTOC(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                 state.dataRoomAir->HDoor(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                state.dataUFADManager->HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HDoor(Ctd);
-                state.dataUFADManager->HA_OC += surf.Area * state.dataRoomAir->HDoor(Ctd);
+                ufadCC.HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HDoor(Ctd);
+                ufadCC.HA_OC += surf.Area * state.dataRoomAir->HDoor(Ctd);
             }
 
             if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
@@ -889,12 +640,12 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 TmedDV = ((ZSupSurf - LayH) * state.dataRoomAir->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAir->ZTOC(ZoneNum)) /
                          (ZSupSurf - ZInfSurf);
                 state.dataRoomAir->HDoor(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                state.dataUFADManager->HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
+                ufadCC.HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
                                                  state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLU;
-                state.dataUFADManager->HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                state.dataUFADManager->HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
+                ufadCC.HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                ufadCC.HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
                                                  state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLD;
-                state.dataUFADManager->HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                ufadCC.HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
             }
 
@@ -920,8 +671,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTOC(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
                 state.dataRoomAir->HInternal(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-                state.dataUFADManager->HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HInternal(Ctd);
-                state.dataUFADManager->HA_OC += surf.Area * state.dataRoomAir->HInternal(Ctd);
+                ufadCC.HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HInternal(Ctd);
+                ufadCC.HA_OC += surf.Area * state.dataRoomAir->HInternal(Ctd);
             }
 
             if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
@@ -934,12 +685,12 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
                 TmedDV = ((ZSupSurf - LayH) * state.dataRoomAir->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAir->ZTOC(ZoneNum)) /
                          (ZSupSurf - ZInfSurf);
                 state.dataRoomAir->HInternal(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                state.dataUFADManager->HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
+                ufadCC.HAT_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) *
                                                  state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLU;
-                state.dataUFADManager->HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                state.dataUFADManager->HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
+                ufadCC.HA_MX += surf.Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                ufadCC.HAT_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) *
                                                  state.dataHeatBalSurf->SurfTempIn(SurfNum) * HLD;
-                state.dataUFADManager->HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                ufadCC.HA_OC += surf.Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                 state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = TmedDV;
             }
 
@@ -957,9 +708,9 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
             state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTMX(ZoneNum);
             CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
             state.dataRoomAir->HCeiling(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-            state.dataUFADManager->HAT_MX +=
+            ufadCC.HAT_MX +=
                 surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HCeiling(Ctd);
-            state.dataUFADManager->HA_MX += surf.Area * state.dataRoomAir->HCeiling(Ctd);
+            ufadCC.HA_MX += surf.Area * state.dataRoomAir->HCeiling(Ctd);
             state.dataRoomAir->UFADHcIn(SurfNum) = state.dataRoomAir->HCeiling(Ctd);
         } // END CEILING
 
@@ -974,8 +725,8 @@ void HcUCSDUF(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHei
             state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTFloor(ZoneNum);
             CalcDetailedHcInForDVModel(state, SurfNum, state.dataHeatBalSurf->SurfTempIn, state.dataRoomAir->UFADHcIn);
             state.dataRoomAir->HFloor(Ctd) = state.dataRoomAir->UFADHcIn(SurfNum);
-            state.dataUFADManager->HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HFloor(Ctd);
-            state.dataUFADManager->HA_OC += surf.Area * state.dataRoomAir->HFloor(Ctd);
+            ufadCC.HAT_OC += surf.Area * state.dataHeatBalSurf->SurfTempIn(SurfNum) * state.dataRoomAir->HFloor(Ctd);
+            ufadCC.HA_OC += surf.Area * state.dataRoomAir->HFloor(Ctd);
             state.dataHeatBal->SurfTempEffBulkAir(SurfNum) = state.dataRoomAir->ZTFloor(ZoneNum);
             state.dataRoomAir->UFADHcIn(SurfNum) = state.dataRoomAir->HFloor(Ctd);
         } // END FLOOR
@@ -1129,15 +880,16 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
     CeilingHeight = state.dataRoomAir->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAir->ZoneCeilingHeight1(ZoneNum);
     UINum = state.dataRoomAir->ZoneUFADPtr(ZoneNum);
-    auto &zoneUI = state.dataRoomAir->ZoneUFADInt(UINum);
-    HeightThermostat = zoneUI.ThermostatHeight;
-    HeightComfort = zoneUI.ComfortHeight;
-    TempDiffCritRep = zoneUI.TempTrigger;
-    DiffArea = zoneUI.DiffArea;
-    ThrowAngle = Constant::DegToRadians * zoneUI.DiffAngle;
+
+    auto &zoneU = state.dataRoomAir->ZoneUFAD(UINum);
+    HeightThermostat = zoneU.ThermostatHeight;
+    HeightComfort = zoneU.ComfortHeight;
+    TempDiffCritRep = zoneU.TempTrigger;
+    DiffArea = zoneU.DiffArea;
+    ThrowAngle = Constant::DegToRadians * zoneU.DiffAngle;
     SourceHeight = 0.0;
-    NumDiffusers = zoneUI.DiffusersPerZone;
-    PowerPerPlume = zoneUI.PowerPerPlume;
+    NumDiffusers = zoneU.DiffusersPerZone;
+    PowerPerPlume = zoneU.PowerPerPlume;
     // gains from occupants, task lighting, elec equip, gas equip, other equip, hot water equip, steam equip,
     // baseboards (nonthermostatic), water heater skin loss
     ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
@@ -1161,7 +913,7 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
         ConvGainsUpSubzone += RetAirGains;
     }
     ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
-    ZoneEquipConfigNum = zoneUI.ZoneEquipPtr;
+    ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
     if (ZoneEquipConfigNum > 0) {
         for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
             NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
@@ -1189,14 +941,15 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     // For the York MIT diffusers (variable area) the area varies with the flow rate. Assume 400 ft/min velocity
     // at the diffuser, and a design flow rate of 150 cfm (.0708 m3/s). Then the design area for each diffuser is
     // 150 ft3/min / 400 ft/min = .375 ft2 = .035 m2. This is adjusted each time step by
-    //               (TotSysFlow/(NumDiffusers*.0708))*.035
-    if (zoneUI.DiffuserType == Diffuser::VarArea) {
+    // (TotSysFlow/(NumDiffusers*.0708))*.035
+    if (zoneU.DiffuserType == Diffuser::VarArea) {
         DiffArea = 0.035 * TotSysFlow / (0.0708 * NumDiffusers);
     }
     // initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
-    HcUCSDUF(state, ZoneNum, 0.5);
-    PowerInPlumes = ConvGains + state.dataUFADManager->HAT_OC - state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
-                    state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
+    UFADConvCoef ufadCC;
+    HcUFAD(state, ZoneNum, 0.5, ufadCC);
+    PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
+                    ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
     if (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) {
         NumberOfPlumes = PowerInPlumes / PowerPerPlume;
         NumDiffusersPerPlume = NumDiffusers / NumberOfPlumes;
@@ -1210,16 +963,16 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     } else {
         Gamma = std::pow(TotSysFlow * std::cos(ThrowAngle), 1.5) /
                 (NumberOfPlumes * std::pow(NumDiffusersPerPlume * DiffArea, 1.25) * std::sqrt(0.0281 * 0.001 * PowerInPlumes));
-        if (zoneUI.CalcTransHeight) {
+        if (zoneU.CalcTransHeight) {
             HeightFrac = (std::sqrt(NumDiffusersPerPlume * DiffArea) * (7.43 * std::log(Gamma) - 1.35) + 0.5 * SourceHeight) / CeilingHeight;
         } else {
-            HeightFrac = zoneUI.TransHeight / CeilingHeight;
+            HeightFrac = zoneU.TransHeight / CeilingHeight;
         }
         HeightFrac = max(0.0, min(1.0, HeightFrac));
         for (Ctd = 1; Ctd <= 4; ++Ctd) {
-            HcUCSDUF(state, ZoneNum, HeightFrac);
-            PowerInPlumes = ConvGains + state.dataUFADManager->HAT_OC - state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
-                            state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
+            HcUFAD(state, ZoneNum, HeightFrac, ufadCC);
+            PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
+                            ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
             if (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) {
                 NumberOfPlumes = PowerInPlumes / PowerPerPlume;
                 NumDiffusersPerPlume = NumDiffusers / NumberOfPlumes;
@@ -1230,16 +983,16 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             if (PowerInPlumes <= 0.0) break;
             Gamma = std::pow(TotSysFlow * std::cos(ThrowAngle), 1.5) /
                     (NumberOfPlumes * std::pow(NumDiffusersPerPlume * DiffArea, 1.25) * std::sqrt(0.0281 * 0.001 * PowerInPlumes));
-            if (zoneUI.CalcTransHeight) {
+            if (zoneU.CalcTransHeight) {
                 HeightFrac = (std::sqrt(NumDiffusersPerPlume * DiffArea) * (7.43 * std::log(Gamma) - 1.35) + 0.5 * SourceHeight) / CeilingHeight;
             } else {
-                HeightFrac = zoneUI.TransHeight / CeilingHeight;
+                HeightFrac = zoneU.TransHeight / CeilingHeight;
             }
             HeightFrac = max(0.0, min(1.0, HeightFrac));
             state.dataRoomAir->HeightTransition(ZoneNum) = HeightFrac * CeilingHeight;
-            GainsFrac = zoneUI.A_Kc * std::pow(Gamma, zoneUI.B_Kc) +
-                        zoneUI.C_Kc + zoneUI.D_Kc * Gamma +
-                        zoneUI.E_Kc * pow_2(Gamma);
+            GainsFrac = zoneU.A_Kc * std::pow(Gamma, zoneU.B_Kc) +
+                        zoneU.C_Kc + zoneU.D_Kc * Gamma +
+                        zoneU.E_Kc * pow_2(Gamma);
             GainsFrac = max(0.6, min(GainsFrac, 1.0));
             state.dataRoomAir->AIRRATOC(ZoneNum) =
                 state.dataHeatBal->Zone(ZoneNum).Volume *
@@ -1276,17 +1029,17 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMOC(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMOC(ZoneNum)[1] +
                                      (1.0 / 3.0) * state.dataRoomAir->ZTMOC(ZoneNum)[2]);
             // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-            Real64 TempDepCoef = GainsFrac * state.dataUFADManager->HA_OC + MCp_Total;
-            Real64 TempIndCoef = GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                              state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
+            Real64 TempDepCoef = GainsFrac * ufadCC.HA_OC + MCp_Total;
+            Real64 TempIndCoef = GainsFrac * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
+                                              ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
                                  MCpT_Total + thisZoneHB.NonAirSystemResponse / ZoneMult;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
                 state.dataRoomAir->ZTOC(ZoneNum) = (TempHistTerm +
-                                                       GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                                                    state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
+                                                       GainsFrac * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
+                                                                    ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
                                                        MCpT_Total + thisZoneHB.NonAirSystemResponse / ZoneMult) /
-                                                      ((11.0 / 6.0) * AirCap + GainsFrac * state.dataUFADManager->HA_OC + MCp_Total);
+                                                      ((11.0 / 6.0) * AirCap + GainsFrac * ufadCC.HA_OC + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
@@ -1306,18 +1059,18 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             AirCap = state.dataRoomAir->AIRRATMX(ZoneNum);
             TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMMX(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMMX(ZoneNum)[1] +
                                      (1.0 / 3.0) * state.dataRoomAir->ZTMMX(ZoneNum)[2]);
-            TempDepCoef = (1.0 - GainsFrac) * state.dataUFADManager->HA_MX + MCp_Total;
-            TempIndCoef = (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                               state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
+            TempDepCoef = (1.0 - GainsFrac) * ufadCC.HA_MX + MCp_Total;
+            TempIndCoef = (1.0 - GainsFrac) * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
+                                               ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
                           state.dataRoomAir->ZTOC(ZoneNum) * MCp_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
                 state.dataRoomAir->ZTMX(ZoneNum) =
                     (TempHistTerm +
-                     (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                          state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
+                     (1.0 - GainsFrac) * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
+                                          ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
                      state.dataRoomAir->ZTOC(ZoneNum) * MCp_Total) /
-                    ((11.0 / 6.0) * AirCap + (1.0 - GainsFrac) * state.dataUFADManager->HA_MX + MCp_Total);
+                    ((11.0 / 6.0) * AirCap + (1.0 - GainsFrac) * ufadCC.HA_MX + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
@@ -1360,14 +1113,14 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
         TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {
-            Real64 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
+            Real64 TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
             Real64 const thisZoneT1 = thisZoneHB.ZoneT1;
             // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-            Real64 TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
+            Real64 TempIndCoef = ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) /
-                             ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
+                ZTAveraged = (TempHistTerm + ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total) /
+                             ((11.0 / 6.0) * AirCap + ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
@@ -1385,13 +1138,13 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             state.dataRoomAir->ZTOC(ZoneNum) = ZTAveraged;
             state.dataRoomAir->ZTMX(ZoneNum) = ZTAveraged;
             state.dataRoomAir->ZTFloor(ZoneNum) = ZTAveraged;
-            HcUCSDUF(state, ZoneNum, HeightFrac);
-            TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
-            TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
+            HcUFAD(state, ZoneNum, HeightFrac, ufadCC);
+            TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
+            TempIndCoef = ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) /
-                             ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
+                ZTAveraged = (TempHistTerm + ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total) /
+                             ((11.0 / 6.0) * AirCap + ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
@@ -1637,7 +1390,8 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
     ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
     CeilingHeight = state.dataRoomAir->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAir->ZoneCeilingHeight1(ZoneNum);
     UINum = state.dataRoomAir->ZoneUFADPtr(ZoneNum);
-    auto &zoneUE = state.dataRoomAir->ZoneUFADExt(UINum);
+
+    auto &zoneUE = state.dataRoomAir->ZoneUFAD(UINum);
     HeightThermostat = zoneUE.ThermostatHeight;
     HeightComfort = zoneUE.ComfortHeight;
     TempDiffCritRep = zoneUE.TempTrigger;
@@ -1702,12 +1456,13 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
         DiffArea = 0.035 * TotSysFlow / (0.0708 * NumDiffusers);
     }
     // initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
-    HcUCSDUF(state, ZoneNum, 0.5);
-    ConvGainsWindows = state.dataUFADManager->HAT_MXWin + state.dataUFADManager->HAT_OCWin -
-                       state.dataUFADManager->HA_MXWin * state.dataRoomAir->ZTMX(ZoneNum) -
-                       state.dataUFADManager->HA_OCWin * state.dataRoomAir->ZTOC(ZoneNum);
-    PowerInPlumes = ConvGains + state.dataUFADManager->HAT_OC - state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
-                    state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
+    UFADConvCoef ufadCC;
+    HcUFAD(state, ZoneNum, 0.5, ufadCC);
+    ConvGainsWindows = ufadCC.HAT_MXWin + ufadCC.HAT_OCWin -
+                       ufadCC.HA_MXWin * state.dataRoomAir->ZTMX(ZoneNum) -
+                       ufadCC.HA_OCWin * state.dataRoomAir->ZTOC(ZoneNum);
+    PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
+                    ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
     // NumberOfPlumes = PowerInPlumes / PowerPerPlume
     if (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) {
         NumberOfPlumes = PowerInPlumes / PowerPerPlume;
@@ -1750,13 +1505,12 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
         }
         state.dataRoomAir->ZoneUFADPowInPlumes(ZoneNum) = PowerInPlumes;
         for (Ctd = 1; Ctd <= 4; ++Ctd) {
-            HcUCSDUF(state, ZoneNum, HeightFrac);
-            ConvGainsWindows = state.dataUFADManager->HAT_MXWin + state.dataUFADManager->HAT_OCWin -
-                               state.dataUFADManager->HA_MXWin * state.dataRoomAir->ZTMX(ZoneNum) -
-                               state.dataUFADManager->HA_OCWin * state.dataRoomAir->ZTOC(ZoneNum);
+                HcUFAD(state, ZoneNum, HeightFrac, ufadCC);
+            ConvGainsWindows = ufadCC.HAT_MXWin + ufadCC.HAT_OCWin - ufadCC.HA_MXWin * state.dataRoomAir->ZTMX(ZoneNum) -
+                    ufadCC.HA_OCWin * state.dataRoomAir->ZTOC(ZoneNum);
             ConvGainsWindows = max(ConvGainsWindows, 0.0);
-            PowerInPlumes = ConvGains + state.dataUFADManager->HAT_OC - state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
-                            state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
+            PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
+                            ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
             // NumberOfPlumes = PowerInPlumes / PowerPerPlume
             NumberOfPlumes = 1.0;
             if (PowerInPlumes <= 0.0) break;
@@ -1819,17 +1573,17 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
             AirCap = state.dataRoomAir->AIRRATOC(ZoneNum);
             TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMOC(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMOC(ZoneNum)[1] +
                                      (1.0 / 3.0) * state.dataRoomAir->ZTMOC(ZoneNum)[2]);
-            TempDepCoef = GainsFrac * state.dataUFADManager->HA_OC + MCp_Total;
-            TempIndCoef = GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                       state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
+            TempDepCoef = GainsFrac * ufadCC.HA_OC + MCp_Total;
+            TempIndCoef = GainsFrac * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
+                                       ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
                           MCpT_Total + thisZoneHB.NonAirSystemResponse / ZoneMult;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
                 state.dataRoomAir->ZTOC(ZoneNum) = (TempHistTerm +
-                                                       GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                                                    state.dataUFADManager->HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
+                                                       GainsFrac * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
+                                                                    ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
                                                        MCpT_Total + thisZoneHB.NonAirSystemResponse / ZoneMult) /
-                                                      ((11.0 / 6.0) * AirCap + GainsFrac * state.dataUFADManager->HA_OC + MCp_Total);
+                                                      ((11.0 / 6.0) * AirCap + GainsFrac * ufadCC.HA_OC + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
@@ -1849,18 +1603,15 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
             AirCap = state.dataRoomAir->AIRRATMX(ZoneNum);
             TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMMX(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMMX(ZoneNum)[1] +
                                      (1.0 / 3.0) * state.dataRoomAir->ZTMMX(ZoneNum)[2]);
-            TempDepCoef = (1.0 - GainsFrac) * state.dataUFADManager->HA_MX + MCp_Total;
-            TempIndCoef = (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                               state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
-                          state.dataRoomAir->ZTOC(ZoneNum) * MCp_Total;
+            TempDepCoef = (1.0 - GainsFrac) * ufadCC.HA_MX + MCp_Total;
+            TempIndCoef = (1.0 - GainsFrac) * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
+                    state.dataRoomAir->ZTOC(ZoneNum) * MCp_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
                 state.dataRoomAir->ZTMX(ZoneNum) =
-                    (TempHistTerm +
-                     (1.0 - GainsFrac) * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX -
-                                          state.dataUFADManager->HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
-                     state.dataRoomAir->ZTOC(ZoneNum) * MCp_Total) /
-                    ((11.0 / 6.0) * AirCap + (1.0 - GainsFrac) * state.dataUFADManager->HA_MX + MCp_Total);
+                        (TempHistTerm +
+                         (1.0 - GainsFrac) * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum)) +
+                         state.dataRoomAir->ZTOC(ZoneNum) * MCp_Total) / ((11.0 / 6.0) * AirCap + (1.0 - GainsFrac) * ufadCC.HA_MX + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
@@ -1907,12 +1658,12 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
         TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
 
         for (Ctd = 1; Ctd <= 3; ++Ctd) {
-            TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
-            TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
+            TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
+            TempIndCoef = ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) /
-                             ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
+                ZTAveraged = (TempHistTerm + ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total) /
+                             ((11.0 / 6.0) * AirCap + ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0
@@ -1930,13 +1681,13 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
             state.dataRoomAir->ZTOC(ZoneNum) = ZTAveraged;
             state.dataRoomAir->ZTMX(ZoneNum) = ZTAveraged;
             state.dataRoomAir->ZTFloor(ZoneNum) = ZTAveraged;
-            HcUCSDUF(state, ZoneNum, HeightFrac);
-            TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
-            TempIndCoef = ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total;
+            HcUFAD(state, ZoneNum, HeightFrac, ufadCC);
+            TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
+            TempIndCoef = ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) /
-                             ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
+                ZTAveraged = (TempHistTerm + ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total) /
+                             ((11.0 / 6.0) * AirCap + ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total);
             } break;
             case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
                 if (TempDepCoef == 0.0) { // B=0

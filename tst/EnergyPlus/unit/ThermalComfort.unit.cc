@@ -987,7 +987,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->ZoneMRT.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAir->IsZoneDispVent3Node.allocate(state->dataGlobal->NumOfZones);
-    state->dataRoomAir->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAir->IsZoneUFAD.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneQdotRadHVACToPerson.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneQHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
@@ -1011,7 +1011,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).WorkEffPtr = 0;
     state->dataHeatBal->People(1).clothingType = ClothingType::InsulationSchedule;
 
-    state->dataRoomAir->IsZoneDispVent3Node(1) = state->dataRoomAir->IsZoneUI(1) = false;
+    state->dataRoomAir->IsZoneDispVent3Node(1) = state->dataRoomAir->IsZoneUFAD(1) = false;
     state->dataHeatBalFanSys->ZoneQHTRadSysToPerson(1) = 0.0;
     state->dataHeatBalFanSys->ZoneQCoolingPanelToPerson(1) = 0.0;
     state->dataHeatBalFanSys->ZoneQHWBaseboardToPerson(1) = 0.0;

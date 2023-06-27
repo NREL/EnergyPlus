@@ -59,6 +59,20 @@ struct EnergyPlusData;
 
 namespace RoomAir {
 
+    struct UFADConvCoef
+    {
+        Real64 HAT_MX = 0.0;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
+        Real64 HAT_MXWin = 0.0;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
+        Real64 HA_MX = 0.0;                   // HA_MX Convection Coefficient times Area for the upper subzone
+        Real64 HA_MXWin = 0.0;                // HA_MX Convection Coefficient times Area for the upper subzone (windows only)
+        Real64 HAT_OC = 0.0;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
+        Real64 HAT_OCWin = 0.0;               // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone (windows only)
+        Real64 HA_OC = 0.0;                   // HA_OC Convection Coefficient times Area for the lower subzone
+        Real64 HA_OCWin = 0.0;                // HA_OC Convection Coefficient times Area for the lower subzone (windows only)
+        Real64 HAT_FLOOR = 0.0;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
+        Real64 HA_FLOOR = 0.0;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
+    };
+        
     void ManageUFAD(EnergyPlusData &state,
                     int const ZoneNum,                                 // index number for the specified zone
                     RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
@@ -74,7 +88,7 @@ namespace RoomAir {
                   RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
-    void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight);
+    void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight, UFADConvCoef &ufadCC);
 
     void CalcUFADInt(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
 
@@ -85,16 +99,6 @@ namespace RoomAir {
 struct UFADManagerData : BaseGlobalStruct
 {
 
-    Real64 HAT_MX = 0.0;                  // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
-    Real64 HAT_MXWin = 0.0;               // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
-    Real64 HA_MX = 0.0;                   // HA_MX Convection Coefficient times Area for the upper subzone
-    Real64 HA_MXWin = 0.0;                // HA_MX Convection Coefficient times Area for the upper subzone (windows only)
-    Real64 HAT_OC = 0.0;                  // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone
-    Real64 HAT_OCWin = 0.0;               // HAT_OC Convection Coefficient times Area times Temperature for the lower subzone (windows only)
-    Real64 HA_OC = 0.0;                   // HA_OC Convection Coefficient times Area for the lower subzone
-    Real64 HA_OCWin = 0.0;                // HA_OC Convection Coefficient times Area for the lower subzone (windows only)
-    Real64 HAT_FLOOR = 0.0;               // HAT_FLOOR Convection Coefficient times Area times Temperature for the floor(?) subzone
-    Real64 HA_FLOOR = 0.0;                // HA_FLOOR Convection Coefficient times Area for the floor(?) subzone
     Real64 HeightFloorSubzoneTop = 0.2;   // Assumed thickness of floor subzone
     Real64 ThickOccupiedSubzoneMin = 0.2; // Minimum thickness of occupied subzone
     Real64 HeightIntMass = 0.0;           // Height of internal mass surfaces, assumed vertical, cannot exceed ceiling height

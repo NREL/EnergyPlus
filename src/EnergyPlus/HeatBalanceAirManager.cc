@@ -4577,7 +4577,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
     if (NumOfAirModels > 0) {
         state.dataRoomAir->IsZoneDispVent3Node.dimension(state.dataGlobal->NumOfZones, false);
         state.dataRoomAir->IsZoneCrossVent.dimension(state.dataGlobal->NumOfZones, false);
-        state.dataRoomAir->IsZoneUI.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataRoomAir->IsZoneUFAD.dimension(state.dataGlobal->NumOfZones, false);
     }
 
     for (AirModelNum = 1; AirModelNum <= NumOfAirModels; ++AirModelNum) {

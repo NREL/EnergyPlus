@@ -241,33 +241,7 @@ namespace RoomAir {
         Real64 Zmax = 0.0;
     };
 
-    struct UFADIntData
-    {
-        // Members
-        std::string ZoneName = "";    // Name of zone
-        int ZonePtr = 0;             // Pointer to the zone number for this statement
-        int ZoneEquipPtr = 0;        // Pointer to zone equip for this UFAD zone
-        Real64 DiffusersPerZone = 0.0; // Number of diffusers in this zone
-        Real64 PowerPerPlume = 0.0;    // Power in each plume [W]
-        Real64 DiffArea = 0.0;         // Effective area of a diffuser [m2]
-        Real64 DiffAngle = 0.0;        // angle between diffuser slots and vertical (degrees)
-        Real64 HeatSrcHeight = 0.0;    // height of heat source above floor [m]
-        Real64 ThermostatHeight = 0.0; // Height of thermostat/ temperature control sensor [m]
-        Real64 ComfortHeight = 0.0;    // Height at which air temperature is measured for
-        // comfort purposes [m]
-        Real64 TempTrigger = 0.0; // Minimum temperature difference between TOC TMX
-        // for stratification [deltaC]
-        Diffuser DiffuserType = Diffuser::Invalid; // 1=Swirl, 2=variable area, 3=displacement, 4=linear bar grille, 5=custom
-        Real64 TransHeight = 0.0;    // user specified transition height [m]
-        bool CalcTransHeight;  // flag to calc trans height or use user specified input
-        Real64 A_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 B_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 C_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 D_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-        Real64 E_Kc = 0.0;           // Coefficient A in Formula Kc = A*Gamma**B + C + D*Gamma + E*Gamma**2
-    };
-
-    struct UFADExtData
+    struct UFADData
     {
         // Members
         std::string ZoneName = "";    // Name of zone
@@ -639,7 +613,7 @@ struct RoomAirModelData : BaseGlobalStruct
     // UCSD-UF
     int TotUFADInt = 0;     // total number of UCSDUI zones
     int TotUFADExt = 0;     // total number of UCSDUE zones
-    Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
+    Array1D_bool IsZoneUFAD; // controls program flow, for interior or exterior UFAD model
     Array1D_int ZoneUFADPtr;
     Array1D<Real64> UFADHcIn;
     Array1D_int ZoneUFADMixedFlag;
@@ -667,8 +641,7 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<RoomAir::AirNodeData> AirNode;
     Array1D<RoomAir::DispVentData> ZoneDispVent3Node; // UCSD
     Array1D<RoomAir::CrossVentData> ZoneCrossVent;
-    Array1D<RoomAir::UFADIntData> ZoneUFADInt;
-    Array1D<RoomAir::UFADExtData> ZoneUFADExt;
+    Array1D<RoomAir::UFADData> ZoneUFAD;
     Array2D<RoomAir::CrossVentFlow> CrossVentJetRecFlows;                                          // Jet and recirculation zone flows and properties
     Array1D<RoomAir::CrossDispVentParameters> SurfParametersCrossDispVent;                             // Surface parameters
     Array1D<RoomAir::TemperaturePattern> AirPattern;                       // user defined patterns ,various types
@@ -724,58 +697,16 @@ struct RoomAirModelData : BaseGlobalStruct
         ZoneCeilingHeight2.clear();
         MATFloor.clear();    // [C] floor level mean air temp
         XMATFloor.clear();   // [C] floor level mean air temp at t minus 1 zone time step
-#ifdef GET_OUT
-        XM2TFloor.clear();   // [C] floor level mean air temp at t minus 2 zone time step
-        XM3TFloor.clear();   // [C] floor level mean air temp at t minus 3 zone time step
-        XM4TFloor.clear();   // [C] floor level mean air temp at t minus 4 zone time step
-#endif //        
         DSXMATFloor.clear(); // [C] floor level mean air temp at t minus 1 system time step
-#ifdef GET_OUT
-        DSXM2TFloor.clear(); // [C] floor level mean air temp at t minus 2 system time step
-        DSXM3TFloor.clear(); // [C] floor level mean air temp at t minus 3 system time step
-        DSXM4TFloor.clear(); // [C] floor level mean air temp at t minus 4 system time step
-#endif //        
         MATOC.clear();       // [C] occupied mean air temp
         XMATOC.clear();      // [C] occupied mean air temp at t minus 1 zone time step
-#ifdef GET_OUT
-        XM2TOC.clear();      // [C] occupied mean air temp at t minus 2 zone time step
-        XM3TOC.clear();      // [C] occupied mean air temp at t minus 3 zone time step
-        XM4TOC.clear();      // [C] occupied mean air temp at t minus 4 zone time step
-#endif //         
         DSXMATOC.clear();    // [C] occupied mean air temp at t minus 1 system time step
-#ifdef GET_OUT
-        DSXM2TOC.clear();    // [C] occupied mean air temp at t minus 2 system time step
-        DSXM3TOC.clear();    // [C] occupied mean air temp at t minus 3 system time step
-        DSXM4TOC.clear();    // [C] occupied mean air temp at t minus 4 system time step
-#endif //
         MATMX.clear();       // [C] mixed (upper) mean air temp
         XMATMX.clear();      // [C] mixed (upper) mean air temp at t minus 1 zone time step
-#ifdef GET_OUT
-        XM2TMX.clear();      // [C] mixed (upper) mean air temp at t minus 2 zone time step
-        XM3TMX.clear();      // [C] mixed (upper) mean air temp at t minus 3 zone time step
-        XM4TMX.clear();      // [C] mixed (upper) mean air temp at t minus 4 zone time step
-#endif //        
         DSXMATMX.clear();    // [C] mixed  mean air temp at t minus 1 system time step
-#ifdef GET_OUT
-        DSXM2TMX.clear();    // [C] mixed  mean air temp at t minus 2 system time step
-        DSXM3TMX.clear();    // [C] mixed  mean air temp at t minus 3 system time step
-        DSXM4TMX.clear();    // [C] mixed  mean air temp at t minus 4 system time step
-#endif //        
         ZTMFloor.clear();   // [C] difference equation's Floor air temp at t minus 1
-#ifdef GET_OUT
-        ZTM2Floor.clear();   // [C] difference equation's Floor air temp at t minus 2
-        ZTM3Floor.clear();   // [C] difference equation's Floor air temp at t minus 3
-#endif //
         ZTMOC.clear();      // [C] difference equation's Occupied air temp at t minus 1
-#ifdef GET_OUT
-        ZTM2OC.clear();      // [C] difference equation's Occupied air temp at t minus 2
-        ZTM3OC.clear();      // [C] difference equation's Occupied air temp at t minus 3
-#endif //
         ZTMMX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
-#ifdef GET_OUT
-        ZTM2MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
-        ZTM3MX.clear();      // [C] difference equation's Mixed  air temp at t minus 1
-#endif //
         AIRRATFloor.clear();
         AIRRATOC.clear();
         AIRRATMX.clear();
@@ -819,7 +750,7 @@ struct RoomAirModelData : BaseGlobalStruct
         // UCSD-UF
         TotUFADInt = 0;    // total number of UCSDUI zones
         TotUFADExt = 0;    // total number of UCSDUE zones
-        IsZoneUI.clear(); // controls program flow, for interior or exterior UFAD model
+        IsZoneUFAD.clear(); // controls program flow, for interior or exterior UFAD model
         ZoneUFADPtr.clear();
         UFADHcIn.clear();
         ZoneUFADMixedFlag.clear();
@@ -847,8 +778,7 @@ struct RoomAirModelData : BaseGlobalStruct
         AirNode.clear();
         ZoneDispVent3Node.clear(); // UCSD
         ZoneCrossVent.clear();
-        ZoneUFADInt.clear();
-        ZoneUFADExt.clear();
+        ZoneUFAD.clear();
         CrossVentJetRecFlows.clear();              // Jet and recirculation zone flows and properties
         SurfParametersCrossDispVent.clear();         // Surface parameters
         AirPattern.clear();             // user defined patterns ,various types
