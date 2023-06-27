@@ -205,6 +205,13 @@ namespace DataSurfaces {
                                                                                                          "ALLINTERIORCEILINGS",
                                                                                                          "ALLINTERIORFLOORS"};
 
+    enum class WinCover {
+        Invalid = -1,
+        Bare,
+        Shaded,
+        Num
+    };
+        
     enum class WinShadingType
     {
         Invalid = -1,
@@ -652,6 +659,7 @@ namespace DataSurfaces {
         }
     };
 
+        
     struct SurfaceData
     {
 
@@ -848,9 +856,9 @@ namespace DataSurfaces {
         // Members
         Array1D<Real64> SolidAngAtRefPt;         // Solid angle subtended by window from daylit ref points 1 and 2
         Array1D<Real64> SolidAngAtRefPtWtd;      // Solid angle subtended by window from ref pts weighted by glare pos factor
-        Array2D<Real64> IllumFromWinAtRefPt;     // Illuminance from window at ref pts for window with and w/o shade (lux)
-        Array2D<Real64> BackLumFromWinAtRefPt;   // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
-        Array2D<Real64> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
+        Array1D<std::array<Real64, (int)WinCover::Num>> IllumFromWinAtRefPt; // Illuminance from window at ref pts for window with and w/o shade (lux)
+        Array1D<std::array<Real64, (int)WinCover::Num>> BackLumFromWinAtRefPt; // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
+        Array1D<std::array<Real64, (int)WinCover::Num>> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
         Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};               // X,Y,Z coordinates of window center point in building coord system
         Array1D<Real64> ThetaFace;               // Face temperatures of window layers (K)
 
