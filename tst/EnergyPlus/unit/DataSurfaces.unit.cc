@@ -357,12 +357,10 @@ TEST_F(EnergyPlusFixture, SurfaceTest_HashMap)
     int numSurfs = state->dataSurface->TotSurfaces = 4;
     state->dataSurface->Surface.allocate(numSurfs);
     state->dataSurface->SurfTAirRef.dimension(numSurfs, 0);
-    state->dataSurface->SurfIntConvCoeff.allocate(numSurfs);
-    std::fill(state->dataSurface->SurfIntConvCoeff.begin(), state->dataSurface->SurfIntConvCoeff.end(), Convect::HcInt::Invalid);
-    state->dataSurface->SurfExtConvCoeff.allocate(numSurfs);
-    std::fill(state->dataSurface->SurfExtConvCoeff.begin(), state->dataSurface->SurfExtConvCoeff.end(), Convect::HcExt::Invalid);
-    state->dataSurface->SurfIntConvUserCoeffNum.dimension(numSurfs, 0);
-    state->dataSurface->SurfExtConvUserCoeffNum.dimension(numSurfs, 0);
+    state->dataSurface->surfIntConv.allocate(numSurfs);
+    std::fill(state->dataSurface->surfIntConv.begin(), state->dataSurface->surfIntConv.end(), SurfIntConv());
+    state->dataSurface->surfExtConv.allocate(numSurfs);
+    std::fill(state->dataSurface->surfExtConv.begin(), state->dataSurface->surfExtConv.end(), SurfExtConv());
     state->dataSurface->SurfWinStormWinConstr.dimension(numSurfs, 0);
     state->dataSurface->SurfMaterialMovInsulExt.dimension(numSurfs, 0);
     state->dataSurface->SurfMaterialMovInsulInt.dimension(numSurfs, 0);

@@ -1914,7 +1914,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     // Test if local value used in surface hc calculation
     // Surface(1) - local; Surface(2) - global;
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::ASHRAESimple;
+        state->dataSurface->surfExtConv(SurfNum).model = Convect::HcExt::ASHRAESimple;
     }
     CalcHeatBalanceOutsideSurf(*state);
     Real64 HExt_Expect_Surf1 = Convect::CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness::Smooth, 1.5);
@@ -2475,7 +2475,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = 20; // Surf temp
         state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22;         // Air temp
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::MoWiTTHcOutside;
+        state->dataSurface->surfExtConv(SurfNum).model = Convect::HcExt::MoWiTTHcOutside;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }
     CalcHeatBalanceOutsideSurf(*state);
@@ -3041,7 +3041,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
 
     InitSurfaceHeatBalance(*state);
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::ASHRAESimple;
+        state->dataSurface->surfExtConv(SurfNum).model = Convect::HcExt::ASHRAESimple;
     }
 
     // Test Additional Heat Source Calculation
@@ -3668,7 +3668,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     int totDaylightingControls = state->dataGlobal->NumOfZones;
     state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
     state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
@@ -4397,7 +4397,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestVisualResilienceReportRe
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
     int totDaylightingControls = state->dataGlobal->NumOfZones;
     state->dataDaylightingData->daylightControl.allocate(totDaylightingControls);
-    state->dataDaylightingData->daylightControl(1).DaylightMethod = DataDaylighting::DaylightingMethod::SplitFlux;
+    state->dataDaylightingData->daylightControl(1).DaylightMethod = Dayltg::DaylightingMethod::SplitFlux;
     state->dataDaylightingData->daylightControl(1).zoneIndex = 1;
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 1;
     state->dataDaylightingData->ZoneDaylight(1).totRefPts = 1;
@@ -5966,7 +5966,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestTDDSurfWinHeatGain)
     }
 
     state->dataConstruction->Construct(state->dataSurface->Surface(8).Construction).TransDiff = 0.001; // required for GetTDDInput function to work.
-    DaylightingDevices::GetTDDInput(*state);
+    Dayltg::GetTDDInput(*state);
 
     state->dataGlobal->TimeStepZoneSec = 60.0;
 
@@ -7132,7 +7132,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySurfToGndLWR
     for (int SurfNum = 1; SurfNum <= 6; SurfNum++) {
         state->dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = 20; // Surf temp
         state->dataSurface->SurfOutDryBulbTemp(SurfNum) = 22;         // Air temp
-        state->dataSurface->SurfExtConvCoeff(SurfNum) = Convect::HcExt::MoWiTTHcOutside;
+        state->dataSurface->surfExtConv(SurfNum).model = Convect::HcExt::MoWiTTHcOutside;
         state->dataSurface->SurfAirSkyRadSplit(SurfNum) = 1.0;
     }
 
