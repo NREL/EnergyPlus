@@ -2899,7 +2899,7 @@ namespace SurfaceGeometry {
             int TotShadSurf = TotDetachedFixed + TotDetachedBldg + TotRectDetachedFixed + TotRectDetachedBldg + TotShdSubs + TotOverhangs +
                               TotOverhangsProjection + TotFins + TotFinsProjection;
             int NumDElightCmplxFen = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:DElight:ComplexFenestration");
-            if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || DaylightingManager::doesDayLightingUseDElight(state))) {
+            if (TotShadSurf > 0 && (NumDElightCmplxFen > 0 || Dayltg::doesDayLightingUseDElight(state))) {
                 ShowWarningError(state,
                                  format("{}When using DElight daylighting the presence of exterior shading surfaces is ignored.", RoutineName));
             }
