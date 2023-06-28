@@ -1860,6 +1860,22 @@ namespace HeatingCoils {
         default:
             break;
         }
+
+        //std 229
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchHeatCoilUsedAsSupHeat, heatingCoil.Name, heatingCoil.HCoilType_Num); // usage?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchHeatCoilAirloopName, heatingCoil.Name, heatingCoil.AirLoopNum); // to name?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchHeatCoilAirloopBranchName, heatingCoil.Name, heatingCoil.AirLoopNum); // to branch name?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchHeatCoilPlantloopName,
+                                                 heatingCoil.Name,
+                                                 state.dataPlnt->PlantLoop(1).Name); // no plantloc.num available?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchHeatCoilSupHeatHighShutoffTemp,
+                                                 heatingCoil.Name,
+                                                 heatingCoil.DesiredOutletTemp); // no Super heating high shut off temp defined?
     }
 
     void CalcElectricHeatingCoil(EnergyPlusData &state,

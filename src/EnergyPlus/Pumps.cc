@@ -2305,6 +2305,11 @@ void PumpDataForTable(EnergyPlusData &state, int const NumPump)
     }
     PreDefTableEntry(state, thisReport->pdchPumpEndUse, equipName, thisPump.EndUseSubcategoryName);
     PreDefTableEntry(state, thisReport->pdchMotEff, equipName, thisPump.MotorEffic);
+    // Std 229
+    PreDefTableEntry(state, thisReport->pdchPumpAutosized, equipName, thisPump.NomVolFlowRateWasAutoSized);
+    PreDefTableEntry(state, thisReport->pdchPumpPlantloopName, equipName, state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum).Name);
+    PreDefTableEntry(
+        state, thisReport->pdchPumpPlantloopBranchName, equipName, thisPump.plantLoc.branchNum); // branch name?
 }
 
 void GetRequiredMassFlowRate(EnergyPlusData &state,
