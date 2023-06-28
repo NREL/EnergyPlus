@@ -700,6 +700,42 @@ void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeigh
     } // END FLOOR
 }
 
+static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
+    DataHeatBalance::IntGainType::People,
+    DataHeatBalance::IntGainType::WaterHeaterMixed,
+    DataHeatBalance::IntGainType::WaterHeaterStratified,
+    DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
+    DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
+    DataHeatBalance::IntGainType::ElectricEquipment,
+    DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
+    DataHeatBalance::IntGainType::GasEquipment,
+    DataHeatBalance::IntGainType::HotWaterEquipment,
+    DataHeatBalance::IntGainType::SteamEquipment,
+    DataHeatBalance::IntGainType::OtherEquipment,
+    DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
+    DataHeatBalance::IntGainType::GeneratorFuelCell,
+    DataHeatBalance::IntGainType::WaterUseEquipment,
+    DataHeatBalance::IntGainType::GeneratorMicroCHP,
+    DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
+    DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
+    DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
+    DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
+    DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
+    DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
+    DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
+    DataHeatBalance::IntGainType::PipeIndoor,
+    DataHeatBalance::IntGainType::RefrigerationCase,
+    DataHeatBalance::IntGainType::RefrigerationCompressorRack,
+    DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
+    DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
+    DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
+    DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
+    DataHeatBalance::IntGainType::RefrigerationWalkIn};
+
+static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {
+    DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+    DataHeatBalance::IntGainType::Lights};
+        
 void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
 {
 
@@ -728,85 +764,11 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool MIXFLAG(false);  // if true treat as a mixed zone
-    Real64 CeilingHeight; // zone ceiling height above floor [m]
-    int UINum;            // index to underfloor interior zone model data
-    Real64 GainsFrac;     // fraction of occupied subzone heat gains that remain in the subzone;
-    // that is, don't go into the plumes
-    // REAL(r64)   :: NumPLPP            ! number of plumes per person
-    Real64 HeightThermostat;    // height of the thermostat above the floor [m]
-    Real64 HeightComfort;       // height at which comfort temperature is calculated
-    Real64 TempDiffCritRep;     // Minimum temperature difference between upper and occupied subzones for reporting
-    Real64 ConvGainsOccSubzone; // convective heat gains into the lower (occupied) subzone [W]
-    Real64 ConvGainsUpSubzone;  // convective heat gains into the upper subzone [W]
-    Real64 ConvGains;           // total zone convective gains (excluding surfaces) [W]
-    int ZoneEquipConfigNum;     // ZoneEquipConfig index for this UFAD zone
-    Real64 SumSysMCp;           // Sum of system mass flow rate * specific heat for this zone [W/K]
-    Real64 SumSysMCpT;          // Sum of system mass flow rate * specific heat * temperature for this zone [W]
-    Real64 SumSysM;             // Sum of systems mass flow rate [kg/s]
-    Real64 NodeTemp;            // inlet node temperature [K]
-    Real64 MassFlowRate;        // system mass flow rate [kg/s]
-    Real64 CpAir;               // specific heat of air [J/kgK]
-    int InNodeIndex;            // inlet node index in ZoneEquipConfig
-    Real64 SumMCp;              // mass flow rate * specific heat for this zone for infiltration, ventilation, mixing [W/K]
-    Real64 SumMCpT;             // mass flow rate * specific heat* temp for this zone for infiltration, ventilation, mixing [W]
-    Real64 MCp_Total;           // total mass flow rate * specific heat for this zone [W/K]
-    Real64 MCpT_Total;          // total mass flow rate * specific heat* temp for this zone [W]
-    Real64 NumberOfPlumes;
-    Real64 PowerInPlumes;      // [W]
-    Real64 PowerPerPlume(0.0); // power generating each plume [W]
+
     Real64 HeightFrac;         // Fractional height of transition between occupied and upper subzones
-    Real64 TotSysFlow;         // [m3/s]
-    Real64 NumDiffusersPerPlume;
-    Real64 NumDiffusers;
-    Real64 TSupK; // supply yemperature [K]
     Real64 Gamma; // dimensionless height parameter; higher gamma means interface height will be
     // higher, smaller gamma means interface height will be lower.
-    Real64 DiffArea;     // diffuser effective area [m2]
-    Real64 ThrowAngle;   // diffuser slot angle relative to vertical [radians]
-    Real64 SourceHeight; // height of plume sources above the floor [m]
-    int Ctd;
-    Real64 TempHistTerm;
     Real64 ZTAveraged;
-    Real64 HeightUpSubzoneAve;       // Height of center of upper air subzone
-    Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
-    Real64 ZoneMult;                 // total zone multiplier
-    int ZoneNodeNum;                 // node number of the HVAC zone node
-    static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
-        DataHeatBalance::IntGainType::People,
-        DataHeatBalance::IntGainType::WaterHeaterMixed,
-        DataHeatBalance::IntGainType::WaterHeaterStratified,
-        DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
-        DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
-        DataHeatBalance::IntGainType::ElectricEquipment,
-        DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-        DataHeatBalance::IntGainType::GasEquipment,
-        DataHeatBalance::IntGainType::HotWaterEquipment,
-        DataHeatBalance::IntGainType::SteamEquipment,
-        DataHeatBalance::IntGainType::OtherEquipment,
-        DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
-        DataHeatBalance::IntGainType::GeneratorFuelCell,
-        DataHeatBalance::IntGainType::WaterUseEquipment,
-        DataHeatBalance::IntGainType::GeneratorMicroCHP,
-        DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
-        DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
-        DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
-        DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
-        DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
-        DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
-        DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
-        DataHeatBalance::IntGainType::PipeIndoor,
-        DataHeatBalance::IntGainType::RefrigerationCase,
-        DataHeatBalance::IntGainType::RefrigerationCompressorRack,
-        DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
-        DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
-        DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
-        DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-        DataHeatBalance::IntGainType::RefrigerationWalkIn};
-
-    static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
-                                                                                          DataHeatBalance::IntGainType::Lights};
-    Real64 RetAirGains;
 
     // Exact solution or Euler method
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
@@ -825,35 +787,33 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     }
 
     auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-    MIXFLAG = false;
+    bool MIXFLAG = false;
     state.dataRoomAir->UFADHcIn = state.dataHeatBalSurf->SurfHConvInt;
-    SumSysMCp = 0.0;
-    SumSysMCpT = 0.0;
-    TotSysFlow = 0.0;
-    TSupK = 0.0;
-    SumSysM = 0.0;
-    ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-    CeilingHeight = state.dataRoomAir->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAir->ZoneCeilingHeight1(ZoneNum);
-    UINum = state.dataRoomAir->ZoneUFADPtr(ZoneNum);
+    Real64 SumSysMCp = 0.0; // Sum of system mass flow rate * specific heat for this zone [W/K]
+    Real64 SumSysMCpT = 0.0; // Sum of system mass flow rate * specific heat * temperature for this zone [W]
+    Real64 TSupK = 0.0; // supply temperature [K]
+    Real64 SumSysM = 0.0; // Sum of systems mass flow rate [kg/s]
+    Real64 TotSysFlow = 0.0; // [m3/s]
+    int ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
+    Real64 CeilingHeight = state.dataRoomAir->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAir->ZoneCeilingHeight1(ZoneNum);
 
-    auto &zoneU = state.dataRoomAir->ZoneUFAD(UINum);
-    HeightThermostat = zoneU.ThermostatHeight;
-    HeightComfort = zoneU.ComfortHeight;
-    TempDiffCritRep = zoneU.TempTrigger;
-    DiffArea = zoneU.DiffArea;
-    ThrowAngle = Constant::DegToRadians * zoneU.DiffAngle;
-    SourceHeight = 0.0;
-    NumDiffusers = zoneU.DiffusersPerZone;
-    PowerPerPlume = zoneU.PowerPerPlume;
+    auto &zoneU = state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(ZoneNum));
+    Real64 HeightThermostat = zoneU.ThermostatHeight; // height of the thermostat above the floor [m]
+    Real64 HeightComfort = zoneU.ComfortHeight; // height at which comfort temperature is calculated
+    Real64 TempDiffCritRep = zoneU.TempTrigger; // Minimum temperature difference between upper and occupied subzones for reporting
+    Real64 DiffArea = zoneU.DiffArea; // diffuser effective area [m2]
+    Real64 ThrowAngle = Constant::DegToRadians * zoneU.DiffAngle; // diffuser slot angle relative to vertical [radians]
+    Real64 SourceHeight = 0.0; // height of plume sources above the floor [m]
+    Real64 NumDiffusers = zoneU.DiffusersPerZone;
+    Real64 PowerPerPlume = zoneU.PowerPerPlume;
     // gains from occupants, task lighting, elec equip, gas equip, other equip, hot water equip, steam equip,
     // baseboards (nonthermostatic), water heater skin loss
-    ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+    Real64 ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
-        ConvGainsOccSubzone += RetAirGains;
+        ConvGainsOccSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
     }
 
     // Add convection from pool cover to occupied region
@@ -861,19 +821,20 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
 
     // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
-    ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
+    Real64 ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
     ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
-        ConvGainsUpSubzone += RetAirGains;
+        ConvGainsUpSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
     }
-    ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
-    ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
+
+    Real64 ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
+    Real64 ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
     if (ZoneEquipConfigNum > 0) {
-        for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
-            NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
-            MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
-            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+        auto const &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum);
+        for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInletNodes; ++InNodeIndex) {
+            Real64 NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).Temp;
+            Real64 MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).MassFlowRate;
+            Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, thisZoneHB.ZoneAirHumRat);
@@ -886,13 +847,13 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             TSupK = 0.0;
         }
     }
-    // mass flow times specific heat for infiltration, ventilation, mixing, earth tube
-    SumMCp = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
-    // mass flow times specific heat times temperature for infiltration, ventilation, mixing, earth tube
-    SumMCpT = thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC +
+    // mass flow rate * specific heat for this zone for infiltration, ventilation, mixing [W/K]
+    Real64 SumMCp = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MCPE + thisZoneHB.MCPC + thisZoneHB.MDotCPOA;
+    // mass flow rate * specific heat* temp for this zone for infiltration, ventilation, mixing [W]
+    Real64 SumMCpT = thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MCPTE + thisZoneHB.MCPTC +
               thisZoneHB.MDotCPOA * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
-    MCp_Total = SumMCp + SumSysMCp;
-    MCpT_Total = SumMCpT + SumSysMCpT;
+    Real64 MCp_Total = SumMCp + SumSysMCp; // total mass flow rate * specific heat for this zone [W/K]
+    Real64 MCpT_Total = SumMCpT + SumSysMCpT; // total mass flow rate * specific heat* temp for this zone [W]
     // For the York MIT diffusers (variable area) the area varies with the flow rate. Assume 400 ft/min velocity
     // at the diffuser, and a design flow rate of 150 cfm (.0708 m3/s). Then the design area for each diffuser is
     // 150 ft3/min / 400 ft/min = .375 ft2 = .035 m2. This is adjusted each time step by
@@ -903,15 +864,12 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     // initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
     UFADConvCoef ufadCC;
     HcUFAD(state, ZoneNum, 0.5, ufadCC);
-    PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
-                    ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
-    if (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) {
-        NumberOfPlumes = PowerInPlumes / PowerPerPlume;
-        NumDiffusersPerPlume = NumDiffusers / NumberOfPlumes;
-    } else {
-        NumberOfPlumes = 1.0;
-        NumDiffusersPerPlume = 1.0;
-    }
+    Real64 PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
+            ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
+
+    Real64 NumberOfPlumes = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (PowerInPlumes / PowerPerPlume) : 1.0;
+    Real64 NumDiffusersPerPlume = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (NumDiffusers / NumberOfPlumes) : 1.0;
+
     if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
         // The system will mix
         HeightFrac = 0.0;
@@ -924,7 +882,7 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             HeightFrac = zoneU.TransHeight / CeilingHeight;
         }
         HeightFrac = max(0.0, min(1.0, HeightFrac));
-        for (Ctd = 1; Ctd <= 4; ++Ctd) {
+        for (int Ctd = 1; Ctd <= 4; ++Ctd) {
             HcUFAD(state, ZoneNum, HeightFrac, ufadCC);
             PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
                             ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
@@ -945,9 +903,7 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             }
             HeightFrac = max(0.0, min(1.0, HeightFrac));
             state.dataRoomAir->HeightTransition(ZoneNum) = HeightFrac * CeilingHeight;
-            GainsFrac = zoneU.A_Kc * std::pow(Gamma, zoneU.B_Kc) +
-                        zoneU.C_Kc + zoneU.D_Kc * Gamma +
-                        zoneU.E_Kc * pow_2(Gamma);
+            Real64 GainsFrac = zoneU.A_Kc * std::pow(Gamma, zoneU.B_Kc) + zoneU.C_Kc + zoneU.D_Kc * Gamma + zoneU.E_Kc * pow_2(Gamma);
             GainsFrac = max(0.6, min(GainsFrac, 1.0));
             state.dataRoomAir->AIRRATOC(ZoneNum) =
                 state.dataHeatBal->Zone(ZoneNum).Volume *
@@ -981,7 +937,7 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
             }
 
             Real64 AirCap = state.dataRoomAir->AIRRATOC(ZoneNum);
-            TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMOC(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMOC(ZoneNum)[1] +
+            Real64 TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMOC(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMOC(ZoneNum)[1] +
                                      (1.0 / 3.0) * state.dataRoomAir->ZTMOC(ZoneNum)[2]);
             // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
             Real64 TempDepCoef = GainsFrac * ufadCC.HA_OC + MCp_Total;
@@ -1065,9 +1021,9 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
         state.dataRoomAir->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAir->AirModel(ZoneNum).SimAirModel = false;
         Real64 AirCap = thisZoneHB.AirPowerCap;
-        TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
+        Real64 TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
 
-        for (Ctd = 1; Ctd <= 3; ++Ctd) {
+        for (int Ctd = 1; Ctd <= 3; ++Ctd) {
             Real64 TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
             Real64 const thisZoneT1 = thisZoneHB.ZoneT1;
             // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
@@ -1124,8 +1080,8 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     // Comfort temperature and temperature at the thermostat/temperature control sensor
 
     state.dataRoomAir->HeightTransition(ZoneNum) = HeightFrac * CeilingHeight;
-    HeightUpSubzoneAve = (CeilingHeight + state.dataRoomAir->HeightTransition(ZoneNum)) / 2.0;
-    HeightOccupiedSubzoneAve = state.dataRoomAir->HeightTransition(ZoneNum) / 2.0;
+    Real64 HeightUpSubzoneAve = (CeilingHeight + state.dataRoomAir->HeightTransition(ZoneNum)) / 2.0;
+    Real64 HeightOccupiedSubzoneAve = state.dataRoomAir->HeightTransition(ZoneNum) / 2.0;
     // Comfort temperature
 
     if (MIXFLAG) {
@@ -1181,7 +1137,7 @@ void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for t
     }
 
     if (ZoneEquipConfigNum > 0) {
-        ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+        int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
         state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataRoomAir->ZTMX(ZoneNum);
     }
 
@@ -1230,89 +1186,9 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
     using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool MIXFLAG(false);  // if true treat as a mixed zone
-    Real64 CeilingHeight; // zone ceiling height above floor [m]
-    int UINum;            // index to underfloor interior zone model data
-    Real64 GainsFrac;     // fraction of occupied subzone heat gains that remain in the subzone;
-    // that is, don't go into the plumes
-    Real64 HeightThermostat;    // height of the thermostat above the floor [m]
-    Real64 HeightComfort;       // height at which comfort temperature is calculated
-    Real64 TempDiffCritRep;     // Minimum temperature difference between upper and occupied subzones for reporting
-    Real64 ConvGainsOccSubzone; // convective heat gains into the lower (occupied) subzone [W]
-    Real64 ConvGainsUpSubzone;  // convective heat gains into the upper subzone [W]
-    Real64 ConvGains;           // total zone convective gains (excluding surfaces) [W]
-    Real64 ConvGainsWindows;    // convective gain from windows [W]
-    int ZoneEquipConfigNum;     // ZoneEquipConfig index for this UFAD zone
-    Real64 SumSysMCp;           // Sum of system mass flow rate * specific heat for this zone [W/K]
-    Real64 SumSysMCpT;          // Sum of system mass flow rate * specific heat * temperature for this zone [W]
-    Real64 SumSysM;             // Sum of systems mass flow rate [kg/s]
-    Real64 NodeTemp;            // inlet node temperature [K]
-    Real64 MassFlowRate;        // system mass flow rate [kg/s]
-    Real64 CpAir;               // specific heat of air [J/kgK]
-    int InNodeIndex;            // inlet node index in ZoneEquipConfig
-    Real64 SumMCp;              // mass flow rate * specific heat for this zone for infiltration, ventilation, mixing [W/K]
-    Real64 SumMCpT;             // mass flow rate * specific heat* temp for this zone for infiltration, ventilation, mixing [W]
-    Real64 MCp_Total;           // total mass flow rate * specific heat for this zone [W/K]
-    Real64 MCpT_Total;          // total mass flow rate * specific heat* temp for this zone [W]
-    Real64 NumberOfPlumes;
-    Real64 PowerInPlumes;         // [W]
-    Real64 PowerPerPlume(0.0);    // power carried by each plume [W]
+    
     Real64 PowerInPlumesPerMeter; // Power in Plumes per meter of window length [W/m]
-    Real64 NumDiffusersPerPlume(0.0);
-    Real64 HeightFrac; // Fractional height of transition between occupied and upper subzones
-    Real64 TotSysFlow; // [m3/s]
-    Real64 NumDiffusers;
-    Real64 TSupK; // supply yemperature [K]
-    Real64 Gamma; // dimensionless height parameter; higher gamma means interface height will be
-    // higher, smaller gamma means interface height will be lower.
-    Real64 DiffArea;     // diffuser effective area [m2]
-    Real64 ThrowAngle;   // diffuser slot angle relative to vertical [radians]
-    Real64 SourceHeight; // height of plume sources above the floor [m]
-    int Ctd;
-    Real64 AirCap;
-    Real64 TempHistTerm;
     Real64 ZTAveraged;
-    Real64 HeightUpSubzoneAve;       // Height of center of upper air subzone
-    Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
-    Real64 ZoneMult;                 // total zone multiplier
-    int ZoneNodeNum;                 // node number of the HVAC zone node
-    Real64 TempDepCoef(0.0);         // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
-    Real64 TempIndCoef(0.0);         // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-    static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
-        DataHeatBalance::IntGainType::People,
-        DataHeatBalance::IntGainType::WaterHeaterMixed,
-        DataHeatBalance::IntGainType::WaterHeaterStratified,
-        DataHeatBalance::IntGainType::ThermalStorageChilledWaterMixed,
-        DataHeatBalance::IntGainType::ThermalStorageChilledWaterStratified,
-        DataHeatBalance::IntGainType::ElectricEquipment,
-        DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
-        DataHeatBalance::IntGainType::GasEquipment,
-        DataHeatBalance::IntGainType::HotWaterEquipment,
-        DataHeatBalance::IntGainType::SteamEquipment,
-        DataHeatBalance::IntGainType::OtherEquipment,
-        DataHeatBalance::IntGainType::ZoneBaseboardOutdoorTemperatureControlled,
-        DataHeatBalance::IntGainType::GeneratorFuelCell,
-        DataHeatBalance::IntGainType::WaterUseEquipment,
-        DataHeatBalance::IntGainType::GeneratorMicroCHP,
-        DataHeatBalance::IntGainType::ElectricLoadCenterTransformer,
-        DataHeatBalance::IntGainType::ElectricLoadCenterInverterSimple,
-        DataHeatBalance::IntGainType::ElectricLoadCenterInverterFunctionOfPower,
-        DataHeatBalance::IntGainType::ElectricLoadCenterInverterLookUpTable,
-        DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
-        DataHeatBalance::IntGainType::ElectricLoadCenterStorageLiIonNmcBattery,
-        DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
-        DataHeatBalance::IntGainType::PipeIndoor,
-        DataHeatBalance::IntGainType::RefrigerationCase,
-        DataHeatBalance::IntGainType::RefrigerationCompressorRack,
-        DataHeatBalance::IntGainType::RefrigerationSystemAirCooledCondenser,
-        DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
-        DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
-        DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-        DataHeatBalance::IntGainType::RefrigerationWalkIn};
-
-    static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
-                                                                                          DataHeatBalance::IntGainType::Lights};
-    Real64 RetAirGains;
 
     // Exact solution or Euler method
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
@@ -1331,58 +1207,56 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
     }
 
     auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
-    HeightFrac = 0.0;
-    MIXFLAG = false;
+    Real64 HeightFrac = 0.0; // Fractional height of transition between occupied and upper subzones
+    bool MIXFLAG = false;
     state.dataRoomAir->UFADHcIn = state.dataHeatBalSurf->SurfHConvInt;
-    SumSysMCp = 0.0;
-    SumSysMCpT = 0.0;
-    TotSysFlow = 0.0;
-    TSupK = 0.0;
-    SumSysM = 0.0;
-    PowerInPlumes = 0.0;
-    ConvGainsWindows = 0.0;
-    Gamma = 0.0;
-    ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
-    CeilingHeight = state.dataRoomAir->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAir->ZoneCeilingHeight1(ZoneNum);
-    UINum = state.dataRoomAir->ZoneUFADPtr(ZoneNum);
+    Real64 SumSysMCp = 0.0; // Sum of system mass flow rate * specific heat for this zone [W/K]
+    Real64 SumSysMCpT = 0.0; // Sum of system mass flow rate * specific heat * temperature for this zone [W]
+    Real64 TotSysFlow = 0.0; // [m3/s]
+    Real64 TSupK = 0.0; // supply temperature [K]
+    Real64 SumSysM = 0.0; // Sum of systems mass flow rate [kg/s]
+    Real64 PowerInPlumes = 0.0; // [W]
+    Real64 Gamma = 0.0; // dimensionless height parameter; higher gamma means interface height will be
+    // higher, smaller gamma means interface height will be lower.
+    int ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
+    Real64 CeilingHeight = state.dataRoomAir->ZoneCeilingHeight2(ZoneNum) - state.dataRoomAir->ZoneCeilingHeight1(ZoneNum);
 
-    auto &zoneUE = state.dataRoomAir->ZoneUFAD(UINum);
-    HeightThermostat = zoneUE.ThermostatHeight;
-    HeightComfort = zoneUE.ComfortHeight;
-    TempDiffCritRep = zoneUE.TempTrigger;
-    DiffArea = zoneUE.DiffArea;
-    ThrowAngle = Constant::DegToRadians * zoneUE.DiffAngle;
-    SourceHeight = zoneUE.HeatSrcHeight;
-    NumDiffusers = zoneUE.DiffusersPerZone;
-    PowerPerPlume = zoneUE.PowerPerPlume;
+    auto &zoneU = state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(ZoneNum));
+    Real64 HeightThermostat = zoneU.ThermostatHeight; // height of the thermostat above the floor [m]
+    Real64 HeightComfort = zoneU.ComfortHeight; // height at which comfort temperature is calculated
+    Real64 TempDiffCritRep = zoneU.TempTrigger; // Minimum temperature difference between upper and occupied subzones for reporting
+    Real64 DiffArea = zoneU.DiffArea; // diffuser effective area [m2]
+    Real64 ThrowAngle = Constant::DegToRadians * zoneU.DiffAngle; // diffuser slot angle relative to vertical [radians]
+    Real64 SourceHeight = zoneU.HeatSrcHeight; // height of plume sources above the floor [m]
+    Real64 NumDiffusers = zoneU.DiffusersPerZone;
+    Real64 PowerPerPlume = zoneU.PowerPerPlume;
     // gains from occupants, task lighting, elec equip, gas equip, other equip, hot water equip, steam equip,
     // baseboards (nonthermostatic), water heater skin loss
-    ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+    Real64 ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
     // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
     // low or zero)
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
-        ConvGainsOccSubzone += RetAirGains;
+        ConvGainsOccSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
     }
 
     // Add convection from pool cover to occupied region
     ConvGainsOccSubzone += state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
     // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
-    ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
+    Real64 ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone); // convective heat gains into the upper subzone [W]
     ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-        RetAirGains = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
-        ConvGainsUpSubzone += RetAirGains;
+        ConvGainsUpSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
     }
-    ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
-    ZoneEquipConfigNum = zoneUE.ZoneEquipPtr;
+    Real64 ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged; // total zone convective gains (excluding surfaces) [W]
+    int ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
     if (ZoneEquipConfigNum > 0) {
-        for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
-            NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
-            MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
-            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+        auto const &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum);
+        for (int InNodeIndex = 1; InNodeIndex <= zoneEquipConfig.NumInletNodes; ++InNodeIndex) {
+            Real64 NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).Temp;
+            Real64 MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(InNodeIndex)).MassFlowRate;
+            Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, thisZoneHB.ZoneAirHumRat);
@@ -1395,44 +1269,41 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
             TSupK = 0.0;
         }
     }
-    // mass flow times specific heat for infiltration, ventilation, mixing
-    SumMCp = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MDotCPOA;
-    // mass flow times specific heat times temperature for infiltration, ventilation, mixing
-    SumMCpT = thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MDotCPOA * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
 
-    MCp_Total = SumMCp + SumSysMCp;
-    MCpT_Total = SumMCpT + SumSysMCpT;
+    // mass flow rate * specific heat for this zone for infiltration, ventilation, mixing [W/K]
+    Real64 SumMCp = thisZoneHB.MCPI + thisZoneHB.MCPV + thisZoneHB.MCPM + thisZoneHB.MDotCPOA;
+    // mass flow rate * specific heat* temp for this zone for infiltration, ventilation, mixing [W]
+    Real64 SumMCpT = thisZoneHB.MCPTI + thisZoneHB.MCPTV + thisZoneHB.MCPTM + thisZoneHB.MDotCPOA * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+
+    Real64 MCp_Total = SumMCp + SumSysMCp; // total mass flow rate * specific heat for this zone [W/K]
+    Real64 MCpT_Total = SumMCpT + SumSysMCpT; // total mass flow rate * specific heat* temp for this zone [W]
 
     // For the York MIT diffusers (variable area) the area varies with the flow rate. Assume 400 ft/min velocity
     // at the diffuser, and a design flow rate of 150 cfm (.0708 m3/s). Then the design area for each diffuser is
     // 150 ft3/min / 400 ft/min = .375 ft2 = .035 m2. This is adjusted each time step by
     //               (TotSysFlow/(NumDiffusers*.0708))*.035
-    if (zoneUE.DiffuserType == Diffuser::VarArea) {
+    if (zoneU.DiffuserType == Diffuser::VarArea) {
         DiffArea = 0.035 * TotSysFlow / (0.0708 * NumDiffusers);
     }
     // initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
     UFADConvCoef ufadCC;
     HcUFAD(state, ZoneNum, 0.5, ufadCC);
-    ConvGainsWindows = ufadCC.HAT_MXWin + ufadCC.HAT_OCWin -
+    Real64 ConvGainsWindows = ufadCC.HAT_MXWin + ufadCC.HAT_OCWin - // ZoneEquipConfig index for this UFAD zone
                        ufadCC.HA_MXWin * state.dataRoomAir->ZTMX(ZoneNum) -
                        ufadCC.HA_OCWin * state.dataRoomAir->ZTOC(ZoneNum);
     PowerInPlumes = ConvGains + ufadCC.HAT_OC - ufadCC.HA_OC * state.dataRoomAir->ZTOC(ZoneNum) +
                     ufadCC.HAT_MX - ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum);
     // NumberOfPlumes = PowerInPlumes / PowerPerPlume
-    if (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) {
-        NumberOfPlumes = PowerInPlumes / PowerPerPlume;
-        NumDiffusersPerPlume = NumDiffusers / NumberOfPlumes;
-    } else {
-        NumberOfPlumes = 1.0;
-        NumDiffusersPerPlume = 1.0;
-    }
+    Real64 NumberOfPlumes = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (PowerInPlumes / PowerPerPlume) : 1.0;
+    Real64 NumDiffusersPerPlume = (PowerPerPlume > 0.0 && PowerInPlumes > 0.0) ? (NumDiffusers / NumberOfPlumes) : 1.0;
+
     if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - Constant::KelvinConv) > thisZoneHB.MAT) {
         // The system will mix
         HeightFrac = 0.0;
     } else {
         if (PowerInPlumes > 0.0) {
-            if (zoneUE.WinWidth > 0.0) { // exterior zone formula
-                PowerInPlumesPerMeter = PowerInPlumes / zoneUE.WinWidth;
+            if (zoneU.WinWidth > 0.0) { // exterior zone formula
+                PowerInPlumesPerMeter = PowerInPlumes / zoneU.WinWidth;
                 Gamma = (TotSysFlow * std::cos(ThrowAngle)) / (NumDiffusers * DiffArea * std::pow(0.0281 * 0.001 * PowerInPlumesPerMeter, 0.333333));
             } else { // interior zone formula
                 Gamma = std::pow(TotSysFlow * std::cos(ThrowAngle), 1.5) /
@@ -1441,26 +1312,24 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
         } else {
             Gamma = 1000.0;
         }
-        if (zoneUE.CalcTransHeight) {
-            if (zoneUE.WinWidth > 0.0) { // use exterior zone formula
+        if (zoneU.CalcTransHeight) {
+            if (zoneU.WinWidth > 0.0) { // use exterior zone formula
                 HeightFrac = (std::sqrt(DiffArea) * (11.03 * std::log(Gamma) - 10.73) + 0.5 * SourceHeight) / CeilingHeight;
             } else { // use interior zone formula
                 HeightFrac = (std::sqrt(NumDiffusersPerPlume * DiffArea) * (7.43 * std::log(Gamma) - 1.35) + 0.5 * SourceHeight) / CeilingHeight;
             }
         } else {
-            HeightFrac = zoneUE.TransHeight / CeilingHeight;
+            HeightFrac = zoneU.TransHeight / CeilingHeight;
         }
         HeightFrac = max(0.0, min(1.0, HeightFrac));
-        GainsFrac = zoneUE.A_Kc * std::pow(Gamma, zoneUE.B_Kc) +
-                    zoneUE.C_Kc + zoneUE.D_Kc * Gamma +
-                    zoneUE.E_Kc * pow_2(Gamma);
+        Real64 GainsFrac = zoneU.A_Kc * std::pow(Gamma, zoneU.B_Kc) + zoneU.C_Kc + zoneU.D_Kc * Gamma + zoneU.E_Kc * pow_2(Gamma);
         GainsFrac = max(0.7, min(GainsFrac, 1.0));
-        if (zoneUE.ShadeDown) {
+        if (zoneU.ShadeDown) {
             GainsFrac -= 0.2;
         }
         state.dataRoomAir->ZoneUFADPowInPlumes(ZoneNum) = PowerInPlumes;
-        for (Ctd = 1; Ctd <= 4; ++Ctd) {
-                HcUFAD(state, ZoneNum, HeightFrac, ufadCC);
+        for (int Ctd = 1; Ctd <= 4; ++Ctd) {
+            HcUFAD(state, ZoneNum, HeightFrac, ufadCC);
             ConvGainsWindows = ufadCC.HAT_MXWin + ufadCC.HAT_OCWin - ufadCC.HA_MXWin * state.dataRoomAir->ZTMX(ZoneNum) -
                     ufadCC.HA_OCWin * state.dataRoomAir->ZTOC(ZoneNum);
             ConvGainsWindows = max(ConvGainsWindows, 0.0);
@@ -1469,29 +1338,27 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
             // NumberOfPlumes = PowerInPlumes / PowerPerPlume
             NumberOfPlumes = 1.0;
             if (PowerInPlumes <= 0.0) break;
-            if (zoneUE.WinWidth > 0.0) { // use exterior zone formula
-                PowerInPlumesPerMeter = PowerInPlumes / zoneUE.WinWidth;
+            if (zoneU.WinWidth > 0.0) { // use exterior zone formula
+                PowerInPlumesPerMeter = PowerInPlumes / zoneU.WinWidth;
                 Gamma = (TotSysFlow * std::cos(ThrowAngle)) / (NumDiffusers * DiffArea * std::pow(0.0281 * 0.001 * PowerInPlumesPerMeter, 0.333333));
             } else { // use interior zone formula
                 Gamma = std::pow(TotSysFlow * std::cos(ThrowAngle), 1.5) /
                         (NumberOfPlumes * std::pow(NumDiffusersPerPlume * DiffArea, 1.25) * std::sqrt(0.0281 * 0.001 * PowerInPlumes));
             }
-            if (zoneUE.CalcTransHeight) {
-                if (zoneUE.WinWidth > 0.0) { // exterior zone formula
+            if (zoneU.CalcTransHeight) {
+                if (zoneU.WinWidth > 0.0) { // exterior zone formula
                     HeightFrac = (std::sqrt(DiffArea) * (11.03 * std::log(Gamma) - 10.73) + 0.5 * SourceHeight) / CeilingHeight;
                 } else { // interior zone formula
                     HeightFrac = (std::sqrt(NumDiffusersPerPlume * DiffArea) * (7.43 * std::log(Gamma) - 1.35) + 0.5 * SourceHeight) / CeilingHeight;
                 }
             } else {
-                HeightFrac = zoneUE.TransHeight / CeilingHeight;
+                HeightFrac = zoneU.TransHeight / CeilingHeight;
             }
             HeightFrac = min(1.0, HeightFrac);
             state.dataRoomAir->HeightTransition(ZoneNum) = HeightFrac * CeilingHeight;
-            GainsFrac = zoneUE.A_Kc * std::pow(Gamma, zoneUE.B_Kc) +
-                        zoneUE.C_Kc + zoneUE.D_Kc * Gamma +
-                        zoneUE.E_Kc * pow_2(Gamma);
+            Real64 GainsFrac = zoneU.A_Kc * std::pow(Gamma, zoneU.B_Kc) + zoneU.C_Kc + zoneU.D_Kc * Gamma + zoneU.E_Kc * pow_2(Gamma);
             GainsFrac = max(0.7, min(GainsFrac, 1.0));
-            if (zoneUE.ShadeDown) {
+            if (zoneU.ShadeDown) {
                 GainsFrac -= 0.2;
             }
             state.dataRoomAir->AIRRATOC(ZoneNum) =
@@ -1525,11 +1392,11 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
                 state.dataRoomAir->ZTMMX(ZoneNum)[0] = state.dataRoomAir->DSXMATMX(ZoneNum)[0];
             }
 
-            AirCap = state.dataRoomAir->AIRRATOC(ZoneNum);
-            TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMOC(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMOC(ZoneNum)[1] +
+            Real64 AirCap = state.dataRoomAir->AIRRATOC(ZoneNum);
+            Real64 TempHistTerm = AirCap * (3.0 * state.dataRoomAir->ZTMOC(ZoneNum)[0] - (3.0 / 2.0) * state.dataRoomAir->ZTMOC(ZoneNum)[1] +
                                      (1.0 / 3.0) * state.dataRoomAir->ZTMOC(ZoneNum)[2]);
-            TempDepCoef = GainsFrac * ufadCC.HA_OC + MCp_Total;
-            TempIndCoef = GainsFrac * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
+            Real64 TempDepCoef = GainsFrac * ufadCC.HA_OC + MCp_Total;
+            Real64 TempIndCoef = GainsFrac * (ConvGains + ufadCC.HAT_OC + ufadCC.HAT_MX -
                                        ufadCC.HA_MX * state.dataRoomAir->ZTMX(ZoneNum)) +
                           MCpT_Total + thisZoneHB.NonAirSystemResponse / ZoneMult;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
@@ -1610,11 +1477,11 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
         state.dataRoomAir->MaxTempGrad(ZoneNum) = 0.0;
         state.dataRoomAir->AirModel(ZoneNum).SimAirModel = false;
         Real64 AirCap = thisZoneHB.AirPowerCap;
-        TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
+        Real64 TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + (1.0 / 3.0) * thisZoneHB.ZTM[2]);
 
-        for (Ctd = 1; Ctd <= 3; ++Ctd) {
-            TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
-            TempIndCoef = ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total;
+        for (int Ctd = 1; Ctd <= 3; ++Ctd) {
+            Real64 TempDepCoef = ufadCC.HA_MX + ufadCC.HA_OC + MCp_Total;
+            Real64 TempIndCoef = ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total;
             switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
             case DataHeatBalance::SolutionAlgo::ThirdOrder: {
                 ZTAveraged = (TempHistTerm + ConvGains + ufadCC.HAT_MX + ufadCC.HAT_OC + MCpT_Total) /
@@ -1666,8 +1533,8 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
 
     // Comfort temperature and temperature at the thermostat/temperature control sensor
 
-    HeightUpSubzoneAve = (CeilingHeight + state.dataRoomAir->HeightTransition(ZoneNum)) / 2.0;
-    HeightOccupiedSubzoneAve = state.dataRoomAir->HeightTransition(ZoneNum) / 2.0;
+    Real64 HeightUpSubzoneAve = (CeilingHeight + state.dataRoomAir->HeightTransition(ZoneNum)) / 2.0;
+    Real64 HeightOccupiedSubzoneAve = state.dataRoomAir->HeightTransition(ZoneNum) / 2.0;
     // Comfort temperature
 
     if (MIXFLAG) {
@@ -1723,7 +1590,7 @@ void CalcUFADExt(EnergyPlusData &state, int const ZoneNum) // index number for t
     }
 
     if (ZoneEquipConfigNum > 0) {
-        ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+        int ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
         state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataRoomAir->ZTMX(ZoneNum);
     }
 

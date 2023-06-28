@@ -533,17 +533,17 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D<Real64> ZoneCeilingHeight1;
     Array1D<Real64> ZoneCeilingHeight2;
     Array1D<Real64> MATFloor;    // [C] floor level mean air temp
-    Array1D<std::array<Real64, 4>> XMATFloor;   // [C] floor level mean air temp at t minus X zone time step
-    Array1D<std::array<Real64, 4>> DSXMATFloor; // [C] floor level mean air temp at t minus X system time step
+    EPVector<std::array<Real64, 4>> XMATFloor;   // [C] floor level mean air temp at t minus X zone time step
+    EPVector<std::array<Real64, 4>> DSXMATFloor; // [C] floor level mean air temp at t minus X system time step
     Array1D<Real64> MATOC;       // [C] occupied mean air temp
-    Array1D<std::array<Real64, 4>> XMATOC;      // [C] occupied mean air temp at t minus X zone time step
-    Array1D<std::array<Real64, 4>> DSXMATOC;    // [C] occupied mean air temp at t minus X system time step
+    EPVector<std::array<Real64, 4>> XMATOC;      // [C] occupied mean air temp at t minus X zone time step
+    EPVector<std::array<Real64, 4>> DSXMATOC;    // [C] occupied mean air temp at t minus X system time step
     Array1D<Real64> MATMX;       // [C] mixed (upper) mean air temp
-    Array1D<std::array<Real64, 4>> XMATMX;      // [C] mixed (upper) mean air temp at t minus X zone time step
-    Array1D<std::array<Real64, 4>> DSXMATMX;    // [C] mixed  mean air temp at t minus X system time step
-    Array1D<std::array<Real64, 3>> ZTMFloor;   // [C] difference equation's Floor air temp at t minus X
-    Array1D<std::array<Real64, 3>> ZTMOC;      // [C] difference equation's Occupied air temp at t minus X
-    Array1D<std::array<Real64, 3>> ZTMMX;      // [C] difference equation's Mixed  air temp at t minus X
+    EPVector<std::array<Real64, 4>> XMATMX;      // [C] mixed (upper) mean air temp at t minus X zone time step
+    EPVector<std::array<Real64, 4>> DSXMATMX;    // [C] mixed  mean air temp at t minus X system time step
+    EPVector<std::array<Real64, 3>> ZTMFloor;   // [C] difference equation's Floor air temp at t minus X
+    EPVector<std::array<Real64, 3>> ZTMOC;      // [C] difference equation's Occupied air temp at t minus X
+    EPVector<std::array<Real64, 3>> ZTMMX;      // [C] difference equation's Mixed  air temp at t minus X
     Array1D<Real64> AIRRATFloor;
     Array1D<Real64> AIRRATOC;
     Array1D<Real64> AIRRATMX;
@@ -566,15 +566,15 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D_int APos_Wall;
     Array1D_int APos_Floor;
     Array1D_int APos_Ceiling;
-    Array1D<RoomAir::BegEnd> PosZ_Wall;
-    Array1D<RoomAir::BegEnd> PosZ_Floor;
-    Array1D<RoomAir::BegEnd> PosZ_Ceiling;
+    EPVector<RoomAir::BegEnd> PosZ_Wall;
+    EPVector<RoomAir::BegEnd> PosZ_Floor;
+    EPVector<RoomAir::BegEnd> PosZ_Ceiling;
     Array1D_int APos_Window;
     Array1D_int APos_Door;
     Array1D_int APos_Internal;
-    Array1D<RoomAir::BegEnd> PosZ_Window;
-    Array1D<RoomAir::BegEnd> PosZ_Door;
-    Array1D<RoomAir::BegEnd> PosZ_Internal;
+    EPVector<RoomAir::BegEnd> PosZ_Window;
+    EPVector<RoomAir::BegEnd> PosZ_Door;
+    EPVector<RoomAir::BegEnd> PosZ_Internal;
     // Convection coefficients for the various surfaces
     Array1D<Real64> HCeiling;
     Array1D<Real64> HWall;
@@ -637,16 +637,16 @@ struct RoomAirModelData : BaseGlobalStruct
     int NumOfRoomAFNControl = 0; // count of RoomAirSettings:AirflowNetwork
 
     // Object Data
-    Array1D<RoomAir::AirModelData> AirModel;
-    Array1D<RoomAir::AirNodeData> AirNode;
-    Array1D<RoomAir::DispVentData> ZoneDispVent3Node; // UCSD
-    Array1D<RoomAir::CrossVentData> ZoneCrossVent;
-    Array1D<RoomAir::UFADData> ZoneUFAD;
+    EPVector<RoomAir::AirModelData> AirModel;
+    EPVector<RoomAir::AirNodeData> AirNode;
+    EPVector<RoomAir::DispVentData> ZoneDispVent3Node; // UCSD
+    EPVector<RoomAir::CrossVentData> ZoneCrossVent;
+    EPVector<RoomAir::UFADData> ZoneUFAD;
     Array2D<RoomAir::CrossVentFlow> CrossVentJetRecFlows;                                          // Jet and recirculation zone flows and properties
-    Array1D<RoomAir::CrossDispVentParameters> SurfParametersCrossDispVent;                             // Surface parameters
-    Array1D<RoomAir::TemperaturePattern> AirPattern;                       // user defined patterns ,various types
-    Array1D<RoomAir::AirPatternInfobyZone> AirPatternZoneInfo;                 // added zone information for user defined patterns
-    Array1D<RoomAir::AFNInfoByZone> AFNZoneInfo; // added zone info
+    EPVector<RoomAir::CrossDispVentParameters> SurfParametersCrossDispVent;                             // Surface parameters
+    EPVector<RoomAir::TemperaturePattern> AirPattern;                       // user defined patterns ,various types
+    EPVector<RoomAir::AirPatternInfobyZone> AirPatternZoneInfo;                 // added zone information for user defined patterns
+    EPVector<RoomAir::AFNInfoByZone> AFNZoneInfo; // added zone info
 
     void clear_state() override
     {
