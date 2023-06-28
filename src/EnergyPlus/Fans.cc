@@ -1440,21 +1440,21 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, fan.FanName, fan.EndUseSubcategoryName);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, fan.FanName, fan.DesignPointFEI);
 
-    // std 229
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPurpose, fan.FanName, fan.FanType); // purpose? not the same
+    // Std 229 Fans
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPurpose, fan.FanName, fan.FanType);   // purpose? not the same
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanOccOp, fan.FanName, fan.FanType_Num); // ?
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanUnoccOp, fan.FanName, fan.FanType_Num); // ?
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanLockOutAtCenHeat, fan.FanName, fan.FanName); // lock out for cental heat ?
     OutputReportPredefined::PreDefTableEntry(
-        state, state.dataOutRptPredefined->pdchFanAutosized, fan.FanName, fan.MaxAirFlowRateIsAutosizable ? "Yes" : "No"); // lock out for cental heat ?
+        state, state.dataOutRptPredefined->pdchFanLockOutAtCenHeat, fan.FanName, fan.FanName); // lock out for cental heat ?
+    OutputReportPredefined::PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchFanAutosized, fan.FanName, fan.MaxAirFlowRateIsAutosizable); // autosizable vs. autosized equivalent?
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, fan.FanName, fan.MotEff);
-    OutputReportPredefined::PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac,
-                                             fan.FanName,
-                                             fan.MotInAirFrac);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, fan.FanName, fan.FanName); // motor heat to zone name?
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, fan.FanName, fan.AirLoopNum); // convert to name 
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, fan.FanName, fan.AirLoopNum); // convert to branch name? 
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, fan.FanName, fan.MotInAirFrac);
+    OutputReportPredefined::PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchFanMotorLossZoneName, fan.FanName, fan.FanName); // motor heat to zone name?
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, fan.FanName, fan.AirLoopNum); // convert to name
+    OutputReportPredefined::PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchFanAirBranchName, fan.FanName, fan.AirLoopNum); // need branch name?
 
     if (fan.NVPerfNum > 0) {
         if (state.dataFans->NightVentPerf(fan.NVPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {
