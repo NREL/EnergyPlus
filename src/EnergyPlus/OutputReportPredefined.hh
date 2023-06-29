@@ -453,6 +453,32 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchPLCLTotPumpPwrOnLoop = 0; // Total pump power on loop
     int pdchPLCLBranchName = 0;       // Branch name
 
+    // Std 229 AirTerminal Table in Equipment Summary
+    int pdstAirTerm = 0;
+    int pdchAirTermName = 0;                  // name
+    int pdchAirTermTypeOfInputObj = 0;        // type of input object
+    int pdchAirTermHeatReheatCoilObjType = 0; // Heat/Reheat Coil Object Type
+    int pdchAirTermZoneName = 0;              // Zone Name
+    int pdchAirTermHWPlantloopName = 0;       // Hot Water Plant Loop Name
+    int pdchAirTermHWPlantBranchName = 0;     // Hot Water Plant Branch Name
+    int pdchAirTermCHWCoilOjbType = 0;        // Chilled Water Coil Object Type
+    int pdchAirTermCHWPlantloopName = 0;      // Chilled Water Plant Loop Name
+    int pdchAirTermCHWPlantBranchName = 0;    // Chilled Water Plant Branch Name
+    int pdchAirTermFanObjType = 0;            // Fan Object Type
+    int pdchAirTermFanName = 0;               // Fan Name
+    int pdchAirTermPriAirFlowRate = 0;        // Primary Air Flow Rate
+    int pdchAirTermSecAirFlowRate = 0;        // Secondary Air Flow Rate
+    int pdchAirTermMinFlow = 0;               // Minimum Flow
+    int pdchAirTermMinFlowSchName = 0;        // Minimum Flow Schedule Name
+    int pdchAirTermMaxFlowDuringReheat = 0;   // Maximum Flow During Reheat
+    int pdchAirTermMinOutdoorFlow = 0;        // Minimum Outdoor Flow
+    int pdchAirTermMinOutdoorFlowSchName = 0; // Minimum Outdoor Flow Schedule Name
+    int pdchAirTermSupCoolingSP = 0;          // Supply cooling setpoint
+    int pdchAirTermSupHeatingSP = 0;          // Supply heating setpoint
+    int pdchAirTermTempControl = 0;           // Temperature control
+    int pdchAirTermHeatingCap = 0;            // Heating capacity
+    int pdchAirTermCoolingCap = 0;            // Cooling capacity
+
     // Envelope Report
     int pdrEnvelope = 0;
     int pdstOpaque = 0;

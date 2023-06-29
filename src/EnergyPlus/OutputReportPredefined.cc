@@ -527,6 +527,33 @@ namespace OutputReportPredefined {
         s->pdchPLCLTotPumpPwrOnLoop = newPreDefColumn(state, s->pdstPLCL, "Total pump power on loop");
         s->pdchPLCLBranchName = newPreDefColumn(state, s->pdstPLCL, "Branch name");
 
+        // Std 229 AirTerminal Table in Equipment Summary
+        s->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");
+
+        s->pdchAirTermName = newPreDefColumn(state, s->pdstAirTerm, "name");
+        s->pdchAirTermTypeOfInputObj = newPreDefColumn(state, s->pdstAirTerm, "type of input object");
+        s->pdchAirTermHeatReheatCoilObjType = newPreDefColumn(state, s->pdstAirTerm, "Heat/Reheat Coil Object Type");
+        s->pdchAirTermZoneName = newPreDefColumn(state, s->pdstAirTerm, "Zone Name");
+        s->pdchAirTermHWPlantloopName = newPreDefColumn(state, s->pdstAirTerm, "Hot Water Plant Loop Name");
+        s->pdchAirTermHWPlantBranchName = newPreDefColumn(state, s->pdstAirTerm, "Hot Water Plant Branch Name");
+        s->pdchAirTermCHWCoilOjbType = newPreDefColumn(state, s->pdstAirTerm, "Chilled Water Coil Object Type");
+        s->pdchAirTermCHWPlantloopName = newPreDefColumn(state, s->pdstAirTerm, "Chilled Water Plant Loop Name");
+        s->pdchAirTermCHWPlantBranchName = newPreDefColumn(state, s->pdstAirTerm, "Chilled Water Plant Branch Name");
+        s->pdchAirTermFanObjType = newPreDefColumn(state, s->pdstAirTerm, "Fan Object Type");
+        s->pdchAirTermFanName = newPreDefColumn(state, s->pdstAirTerm, "Fan Name");
+        s->pdchAirTermPriAirFlowRate = newPreDefColumn(state, s->pdstAirTerm, "Primary Air Flow Rate");
+        s->pdchAirTermSecAirFlowRate = newPreDefColumn(state, s->pdstAirTerm, "Secondary Air Flow Rate");
+        s->pdchAirTermMinFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow");
+        s->pdchAirTermMinFlowSchName = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow Schedule Name");
+        s->pdchAirTermMaxFlowDuringReheat = newPreDefColumn(state, s->pdstAirTerm, "Maximum Flow During Reheat");
+        s->pdchAirTermMinOutdoorFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow");
+        s->pdchAirTermMinOutdoorFlowSchName = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow Schedule Name");
+        s->pdchAirTermSupCoolingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply cooling setpoint");
+        s->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply heating setpoint");
+        s->pdchAirTermTempControl = newPreDefColumn(state, s->pdstAirTerm, "Temperature control");
+        s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating capacity");
+        s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling capacity");
+
         // Sizing Report
 
         s->pdrSizing = newPreDefReport(state, "HVACSizingSummary", "Size", "HVAC Sizing Summary");
