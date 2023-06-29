@@ -677,6 +677,23 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDryAirSpecificHeat = 0;
     int pdchStandRhoAir = 0;
 
+    // Std 229 Coil Connections
+    int pdstCoilConnections = 0;
+    int pdchCoilName_CCs = 0;
+    int pdchCoilType_CCs = 0;
+    int pdchCoilLoc_CCs = 0;
+    int pdchCoilHVACType_CCs = 0;
+    int pdchCoilHVACName_CCs = 0;
+    int pdchCoilSupFanName_CCs = 0;
+    int pdchCoilSupFanType_CCs = 0;
+    int pdchCoilPlantName_CCs = 0;                 // Plant Name for Coil*
+    int pdchCoilAirloopName_CCs = 0;               // Airloop Name
+    int pdchCoilAirloopBranchName_CCs = 0;         // Airloop Branch Name
+    int pdchCoilLocCountOnAirloopBranch_CCs = 0;   // Location count on Airloop Branch
+    int pdchCoilPlantloopName_CCs = 0;             // Plant Loop Name
+    int pdchCoilPlantBranchName_CCs = 0;           // Plant Branch Name
+    int pdchCoilLocCountOnPlantloopBranch_CCs = 0; // Location count on Plantloop Branch
+
     // Coil Sizing Summary (subset of Coil Selection Table)
     int pdst2CoilSummaryCoilSelection = 0;
     int pdch2CoilName = 0;

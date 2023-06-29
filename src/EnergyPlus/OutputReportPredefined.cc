@@ -718,6 +718,24 @@ namespace OutputReportPredefined {
         s->pdchCoilRatedLvgEnthalpy =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]");
 
+        // Std 229 New Table "Coil Connections"
+        s->pdstCoilConnections = newPreDefSubTable(state, s->pdrCoilSizingDetailsTable, "Coil Connections");
+        // coil connections information
+        s->pdchCoilName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Coil Name");
+        s->pdchCoilType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Coil Type");
+        s->pdchCoilLoc_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Coil Location");
+        s->pdchCoilHVACType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "HVAC Type");
+        s->pdchCoilHVACName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "HVAC Name");
+        s->pdchCoilSupFanName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Name for HVAC");
+        s->pdchCoilSupFanType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Type for HVAC");
+        s->pdchCoilPlantName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Name for Coil");
+        s->pdchCoilAirloopName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Airloop Name");
+        s->pdchCoilAirloopBranchName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Airloop Branch Name");
+        s->pdchCoilLocCountOnAirloopBranch_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Location count on Airloop Branch");
+        s->pdchCoilPlantloopName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Loop Name");
+        s->pdchCoilPlantBranchName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Branch Name");
+        s->pdchCoilLocCountOnPlantloopBranch_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Location count on Plantloop Branch");
+
         // System Summary Report
 
         s->pdrSystem = newPreDefReport(state, "SystemSummary", "Sys", "System Summary");
