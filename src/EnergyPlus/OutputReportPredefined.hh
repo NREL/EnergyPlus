@@ -442,6 +442,17 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchCTFCDesWaterFlowRate = 0;   // Design Water Flow Rate
     int pdchCTFCLevWaterSPTemp = 0;     // Leaving water setpoint temperature
 
+    // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
+    int pdstPLCL = 0;
+    int pdchPLCLName = 0;             // name
+    int pdchPLCLType = 0;             // type (PlantLoop or CondenserLoop)
+    int pdchPLCLProvHeat = 0;         // provides heating
+    int pdchPLCLProvCool = 0;         // provides cooling
+    int pdchPLCLMaxLoopFlowRate = 0;  // Maximum Loop Flow Rate
+    int pdchPLCLMinLoopFlowRate = 0;  // Minimum Loop Flow Rate
+    int pdchPLCLTotPumpPwrOnLoop = 0; // Total pump power on loop
+    int pdchPLCLBranchName = 0;       // Branch name
+
     // Envelope Report
     int pdrEnvelope = 0;
     int pdstOpaque = 0;

@@ -515,6 +515,18 @@ namespace OutputReportPredefined {
         s->pdchCTFCDesWaterFlowRate = newPreDefColumn(state, s->pdstCTFC, "Design Water Flow Rate");
         s->pdchCTFCLevWaterSPTemp = newPreDefColumn(state, s->pdstCTFC, "Leaving water setpoint temperature");
 
+        // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
+        s->pdstPLCL = newPreDefSubTable(state, s->pdrEquip, "PlantLoop or CondenserLoop");
+
+        s->pdchPLCLName = newPreDefColumn(state, s->pdstPLCL, "name");
+        s->pdchPLCLType = newPreDefColumn(state, s->pdstPLCL, "type (PlantLoop or CondenserLoop)");
+        s->pdchPLCLProvHeat = newPreDefColumn(state, s->pdstPLCL, "provides heating");
+        s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "provides cooling");
+        s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate");
+        s->pdchPLCLMinLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Minimum Loop Flow Rate");
+        s->pdchPLCLTotPumpPwrOnLoop = newPreDefColumn(state, s->pdstPLCL, "Total pump power on loop");
+        s->pdchPLCLBranchName = newPreDefColumn(state, s->pdstPLCL, "Branch name");
+
         // Sizing Report
 
         s->pdrSizing = newPreDefReport(state, "HVACSizingSummary", "Size", "HVAC Sizing Summary");
