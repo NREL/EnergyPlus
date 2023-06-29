@@ -501,6 +501,20 @@ namespace OutputReportPredefined {
         s->pdchBoilerFuelType = newPreDefColumn(state, s->pdstBoiler, "Fuel type");
         s->pdchBoilerParaElecLoad = newPreDefColumn(state, s->pdstBoiler, "Parasitic electric load");
 
+        // Std 229 cooling towers and fluid coolers Table in Equipment Summary
+        s->pdstCTFC = newPreDefSubTable(state, s->pdrEquip, "Cooling Towers and Fluid Coolers");
+
+        s->pdchCTFCType = newPreDefColumn(state, s->pdstCTFC, "Type");
+        s->pdchCTFCCondLoopName = newPreDefColumn(state, s->pdstCTFC, "Condenser loop name");
+        s->pdchCTFCCondLoopBranchName = newPreDefColumn(state, s->pdstCTFC, "Condenser loop branch name");
+        s->pdchCTFCFluidType = newPreDefColumn(state, s->pdstCTFC, "Fluid type");
+        s->pdchCTFCRange = newPreDefColumn(state, s->pdstCTFC, "Range");
+        s->pdchCTFCApproach = newPreDefColumn(state, s->pdstCTFC, "Approach");
+        s->pdchCTFCDesFanPwr = newPreDefColumn(state, s->pdstCTFC, "Design Fan Power");
+        s->pdchCTFCDesInletAirWBT = newPreDefColumn(state, s->pdstCTFC, "Design inlet air wet-bulb temperature");
+        s->pdchCTFCDesWaterFlowRate = newPreDefColumn(state, s->pdstCTFC, "Design Water Flow Rate");
+        s->pdchCTFCLevWaterSPTemp = newPreDefColumn(state, s->pdstCTFC, "Leaving water setpoint temperature");
+
         // Sizing Report
 
         s->pdrSizing = newPreDefReport(state, "HVACSizingSummary", "Size", "HVAC Sizing Summary");

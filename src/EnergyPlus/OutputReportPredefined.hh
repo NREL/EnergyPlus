@@ -429,6 +429,19 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchBoilerFuelType = 0;            // Fuel type
     int pdchBoilerParaElecLoad = 0;        // Parasitic electric load
 
+    // Std 229 cooling towers and fluid coolers Table in Equipment Summary
+    int pdstCTFC = 0;
+    int pdchCTFCType = 0;               // Type
+    int pdchCTFCCondLoopName = 0;       // Condenser loop name
+    int pdchCTFCCondLoopBranchName = 0; // Condenser loop branch name
+    int pdchCTFCFluidType = 0;          // Fluid type
+    int pdchCTFCRange = 0;              // Range
+    int pdchCTFCApproach = 0;           // Approach
+    int pdchCTFCDesFanPwr = 0;          // Design Fan Power
+    int pdchCTFCDesInletAirWBT = 0;     // Design inlet air wet-bulb temperature
+    int pdchCTFCDesWaterFlowRate = 0;   // Design Water Flow Rate
+    int pdchCTFCLevWaterSPTemp = 0;     // Leaving water setpoint temperature
+
     // Envelope Report
     int pdrEnvelope = 0;
     int pdstOpaque = 0;
