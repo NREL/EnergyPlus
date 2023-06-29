@@ -461,6 +461,31 @@ namespace OutputReportPredefined {
         s->pdchSWHRecEff = newPreDefColumn(state, s->pdstSWH, "Recovery Efficiency [W/W]");
         s->pdchSWHEnFac = newPreDefColumn(state, s->pdstSWH, "Energy Factor");
 
+        // Std 229 Chillers in Equipment Summary
+        s->pdstChiller = newPreDefSubTable(state, s->pdrEquip, "Chillers");
+        s->pdchChillerType = newPreDefColumn(state, s->pdstChiller, "Type");
+        s->pdchChillerRefCap = newPreDefColumn(state, s->pdstChiller, "Reference Capacity[W]");
+        s->pdchChillerRefEff = newPreDefColumn(state, s->pdstChiller, "TypeReference Efficiency [W/W]");
+        s->pdchChillerRatedCap = newPreDefColumn(state, s->pdstChiller, "Rated Capacity [W]");
+        s->pdchChillerRatedEff = newPreDefColumn(state, s->pdstChiller, "Rated Efficiency [W/W]");
+        s->pdchChillerIPLVinSI = newPreDefColumn(state, s->pdstChiller, "IPLV in SI Units [W/W]");
+        s->pdchChillerIPLVinIP = newPreDefColumn(state, s->pdstChiller, "IPLV in IP Units [Btu/W-h]");
+        s->pdchChillerPlantloopName = newPreDefColumn(state, s->pdstChiller, "Plantloop name");
+        s->pdchChillerPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Plantloop branch name");
+        s->pdchChillerCondLoopName = newPreDefColumn(state, s->pdstChiller, "Condenser loop name");
+        s->pdchChillerCondLoopBranchName = newPreDefColumn(state, s->pdstChiller, "Condenser loop branch name");
+        s->pdchChillerMinPLR = newPreDefColumn(state, s->pdstChiller, "Minimum part load ratio");
+        s->pdchChillerFuelType = newPreDefColumn(state, s->pdstChiller, "Fuel type");
+        s->pdchChillerRatedEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Rated entering condenser temperature");
+        s->pdchChillerRatedLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Rated leaving evaporator temperature");
+        s->pdchChillerRefEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Reference entering condenser temperature");
+        s->pdchChillerRefLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Reference leaving evaporator temperature");
+        s->pdchChillerDesSizeRefCHWFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Chilled Water Flow Rate");
+        s->pdchChillerDesSizeRefCondFluidFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Condenser Fluid Flow Rate");
+        s->pdchChillerHeatRecPlantloopName = newPreDefColumn(state, s->pdstChiller, "Heat recovery Plantloop name");
+        s->pdchChillerHeatRecPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Heat recovery Plantloop branch name");
+        s->pdchChillerRecRelCapFrac = newPreDefColumn(state, s->pdstChiller, "Recovery Relative Capacity Fraction");
+
         // Sizing Report
 
         s->pdrSizing = newPreDefReport(state, "HVACSizingSummary", "Size", "HVAC Sizing Summary");

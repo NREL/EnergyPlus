@@ -391,6 +391,31 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchSWHRecEff = 0;
     int pdchSWHEnFac = 0;
 
+    // Std 229 Chiller Table in Equipment Summary
+    int pdstChiller = 0;
+    int pdchChillerType = 0;                        // Type
+    int pdchChillerRefCap = 0;                      // Reference Capacity[W]
+    int pdchChillerRefEff = 0;                      // Reference Efficiency [W/W]
+    int pdchChillerRatedCap = 0;                    // Rated Capacity [W]
+    int pdchChillerRatedEff = 0;                    // Rated Efficiency [W/W]
+    int pdchChillerIPLVinSI = 0;                    // IPLV in SI Units [W/W]
+    int pdchChillerIPLVinIP = 0;                    // IPLV in IP Units [Btu/W-h]
+    int pdchChillerPlantloopName = 0;               // Plantloop name
+    int pdchChillerPlantloopBranchName = 0;         // Plantloop branch name
+    int pdchChillerCondLoopName = 0;                // Condenser loop name
+    int pdchChillerCondLoopBranchName = 0;          // Condenser loop branch name
+    int pdchChillerMinPLR = 0;                      // Minimum part load ratio
+    int pdchChillerFuelType = 0;                    // Fuel type
+    int pdchChillerRatedEntCondTemp = 0;            // Rated entering condenser temperature
+    int pdchChillerRatedLevEvapTemp = 0;            // Rated leaving evaporator temperature
+    int pdchChillerRefEntCondTemp = 0;              // Reference entering condenser temperature
+    int pdchChillerRefLevEvapTemp = 0;              // Reference leaving evaporator temperature
+    int pdchChillerDesSizeRefCHWFlowRate = 0;       // Design Size Reference Chilled Water Flow Rate
+    int pdchChillerDesSizeRefCondFluidFlowRate = 0; // Design Size Reference Condenser Fluid Flow Rate
+    int pdchChillerHeatRecPlantloopName = 0;        // Heat recovery Plantloop name
+    int pdchChillerHeatRecPlantloopBranchName = 0;  // Heat recovery Plantloop branch name
+    int pdchChillerRecRelCapFrac = 0;               // Recovery Relative Capacity Fraction
+
     // Envelope Report
     int pdrEnvelope = 0;
     int pdstOpaque = 0;
