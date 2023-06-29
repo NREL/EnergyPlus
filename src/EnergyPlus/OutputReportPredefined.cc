@@ -554,6 +554,19 @@ namespace OutputReportPredefined {
         s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating capacity");
         s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling capacity");
 
+        // Std 229 Air Heat Recovery
+        s->pdstAirHR = newPreDefSubTable(state, s->pdrEquip, "Air Heat Recovery");
+
+        s->pdchAirHRInputObjName = newPreDefColumn(state, s->pdstAirHR, "name");
+        s->pdchAirHRInputObjType = newPreDefColumn(state, s->pdstAirHR, "input object type");
+        s->pdchAirHRPlateOrRotary = newPreDefColumn(state, s->pdstAirHR, "plate/rotary");
+        s->pdchAirHPSenEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Heating Air Flow");
+        s->pdchAirHPSenEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Cooling Air Flow");
+        s->pdchAirHPLatEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Heating Air Flow");
+        s->pdchAirHPLatEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Cooling Air Flow");
+        s->pdchAirHPExhaustAirflow = newPreDefColumn(state, s->pdstAirHR, "Exhaust airflow");
+        s->pdchAirHPOutdoorAirflow = newPreDefColumn(state, s->pdstAirHR, "Outdoor airflow");
+
         // Sizing Report
 
         s->pdrSizing = newPreDefReport(state, "HVACSizingSummary", "Size", "HVAC Sizing Summary");
