@@ -463,6 +463,7 @@ namespace OutputReportPredefined {
 
         // Std 229 Chillers in Equipment Summary
         s->pdstChiller = newPreDefSubTable(state, s->pdrEquip, "Chillers");
+
         s->pdchChillerType = newPreDefColumn(state, s->pdstChiller, "Type");
         s->pdchChillerRefCap = newPreDefColumn(state, s->pdstChiller, "Reference Capacity[W]");
         s->pdchChillerRefEff = newPreDefColumn(state, s->pdstChiller, "TypeReference Efficiency [W/W]");
@@ -485,6 +486,20 @@ namespace OutputReportPredefined {
         s->pdchChillerHeatRecPlantloopName = newPreDefColumn(state, s->pdstChiller, "Heat recovery Plantloop name");
         s->pdchChillerHeatRecPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Heat recovery Plantloop branch name");
         s->pdchChillerRecRelCapFrac = newPreDefColumn(state, s->pdstChiller, "Recovery Relative Capacity Fraction");
+
+        // Std 229 Boiler Table in Equipment Summary
+        s->pdstBoiler = newPreDefSubTable(state, s->pdrEquip, "Boilers");
+
+        s->pdchBoilerType = newPreDefColumn(state, s->pdstBoiler, "Type");
+        s->pdchBoilerRefCap = newPreDefColumn(state, s->pdstBoiler, "Reference Capacity [W]");
+        s->pdchBoilerRefEff = newPreDefColumn(state, s->pdstBoiler, "Reference Efficiency[W/W]");
+        s->pdchBoilerRatedCap = newPreDefColumn(state, s->pdstBoiler, "Rated Capacity [W]");
+        s->pdchBoilerRatedEff = newPreDefColumn(state, s->pdstBoiler, "Rated Efficiency [W/W]");
+        s->pdchBoilerPlantloopName = newPreDefColumn(state, s->pdstBoiler, "Plantloop name");
+        s->pdchBoilerPlantloopBranchName = newPreDefColumn(state, s->pdstBoiler, "Plantloop branch name");
+        s->pdchBoilerMinPLR = newPreDefColumn(state, s->pdstBoiler, "Minimum part load ratio");
+        s->pdchBoilerFuelType = newPreDefColumn(state, s->pdstBoiler, "Fuel type");
+        s->pdchBoilerParaElecLoad = newPreDefColumn(state, s->pdstBoiler, "Parasitic electric load");
 
         // Sizing Report
 

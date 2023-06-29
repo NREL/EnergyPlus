@@ -416,6 +416,19 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchChillerHeatRecPlantloopBranchName = 0;  // Heat recovery Plantloop branch name
     int pdchChillerRecRelCapFrac = 0;               // Recovery Relative Capacity Fraction
 
+    // Std 229 Boiler Table in Equipment Summary
+    int pdstBoiler = 0;
+    int pdchBoilerType = 0;                // Type
+    int pdchBoilerRefCap = 0;              // Reference Capacity [W]
+    int pdchBoilerRefEff = 0;              // Reference Efficiency [W/W]
+    int pdchBoilerRatedCap = 0;            // Rated Capacity [W]
+    int pdchBoilerRatedEff = 0;            // Rated Efficiency [W/W]
+    int pdchBoilerPlantloopName = 0;       // Plantloop name
+    int pdchBoilerPlantloopBranchName = 0; // Plantloop branch name
+    int pdchBoilerMinPLR = 0;              // Minimum part load ratio
+    int pdchBoilerFuelType = 0;            // Fuel type
+    int pdchBoilerParaElecLoad = 0;        // Parasitic electric load
+
     // Envelope Report
     int pdrEnvelope = 0;
     int pdstOpaque = 0;
