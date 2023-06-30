@@ -3512,6 +3512,12 @@ ElectricStorage::ElectricStorage( // main constructor
                 }
             }
 
+            // if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "CurrentAndEnergy")) {
+            conserveBattery_ = BatteryEnergyConservationType::CurrentAndEnergy;
+            // } else {
+            //     conserveBattery_ = BatteryEnergyConservationType::Basic;
+            // }
+
             parallelNum_ = state.dataIPShortCut->rNumericArgs(2);
             seriesNum_ = state.dataIPShortCut->rNumericArgs(3);
             numBattery_ = parallelNum_ * seriesNum_;
@@ -3525,6 +3531,9 @@ ElectricStorage::ElectricStorage( // main constructor
             maxDischargeI_ = state.dataIPShortCut->rNumericArgs(11);
             cutoffV_ = state.dataIPShortCut->rNumericArgs(12);
             maxChargeRate_ = state.dataIPShortCut->rNumericArgs(13);
+            // The next parameter is only used for the CurrentAndEnergy conservation strategy
+            // if (conserveBattery_ == BatteryEnergyConservationType::CurrentAndEnergy) initialEnergyStored_ = state.dataIPShortCut->rNumericArgs(14);
+            initialEnergyStored_ = 0.0;
 
             break;
         }
@@ -3662,6 +3671,28 @@ ElectricStorage::ElectricStorage( // main constructor
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 name_); // issue #4921
+            SetupOutputVariable(state,
+                                "Electric Storage Battery Charge State Change",
+                                OutputProcessor::Unit::Ah,
+                                changeSOC_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_); // issue #8817
+            SetupOutputVariable(state,
+                                "Electric Storage Battery Charge State Energy",
+                                OutputProcessor::Unit::J,
+                                currentEnergyStored_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_); // issue #8817
+            SetupOutputVariable(state,
+                                "Electric Storage Battery Charge State Energy Change",
+                                OutputProcessor::Unit::J,
+                                changeEnergyStored_,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                name_); // issue #8817
+
             SetupOutputVariable(state,
                                 "Electric Storage Charge Fraction",
                                 OutputProcessor::Unit::None,
@@ -3859,6 +3890,7 @@ void ElectricStorage::reinitAtBeginEnvironment()
     thermLossEnergy_ = 0.0;
     lastTimeStepStateOfCharge_ = startingEnergyStored_;
     thisTimeStepStateOfCharge_ = startingEnergyStored_;
+    currentEnergyStored_ = initialEnergyStored_;
 
     if (storageModelMode_ == StorageModelType::KIBaMBattery) {
         Real64 initialCharge = maxAhCapacity_ * startingSOC_;
@@ -3868,6 +3900,7 @@ void ElectricStorage::reinitAtBeginEnvironment()
         lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
         thisTimeStepAvailable_ = initialCharge * availableFrac_;
         thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        lastEnergyStored_ = currentEnergyStored_;
         if (lifeCalculation_ == BatteryDegradationModelType::LifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
@@ -3909,6 +3942,8 @@ void ElectricStorage::reinitAtEndWarmup()
         lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
         thisTimeStepAvailable_ = initialCharge * availableFrac_;
         thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
+        currentEnergyStored_ = initialEnergyStored_;
+        lastEnergyStored_ = currentEnergyStored_;
         if (lifeCalculation_ == BatteryDegradationModelType::LifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
@@ -3994,6 +4029,7 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
         lastTimeStepAvailable_ = thisTimeStepAvailable_;
         lastTimeStepBound_ = thisTimeStepBound_;
         timeElapsed_ = timeElapsedLoc;
+        lastEnergyStored_ = currentEnergyStored_;
 
     } // end if time changed
 }
@@ -4316,8 +4352,28 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     fractionSOC_ = TotalSOC / qmax;
     batteryCurrent_ = I0 * parallelNum_;
     batteryVoltage_ = Volt * seriesNum_;
+    changeSOC_ = -I0 * numBattery_ * state.dataHVACGlobal->TimeStepSys;
     thermLossRate_ = internalR_ * pow_2(I0) * numBattery_;
     thermLossEnergy_ = internalR_ * pow_2(I0) * state.dataHVACGlobal->TimeStepSysSec * numBattery_;
+    changeEnergyStored_ = storedEnergy_ - drawnEnergy_;
+    if (conserveBattery_ == BatteryEnergyConservationType::CurrentAndEnergy) {
+        checkKineticBatteryModelStored(state,
+                                       drawnEnergy_,
+                                       lastEnergyStored_,
+                                       drawnPower_,
+                                       currentEnergyStored_,
+                                       changeEnergyStored_,
+                                       absoluteSOC_,
+                                       changeSOC_,
+                                       lastTimeStepAvailable_,
+                                       lastTimeStepBound_,
+                                       numBattery_,
+                                       fractionSOC_,
+                                       thisTimeStepAvailable_,
+                                       thisTimeStepBound_);
+    } else {
+        currentEnergyStored_ = lastEnergyStored_ + changeEnergyStored_;
+    }
 
     if (zoneNum_ > 0) { // set values for zone heat gains
         qdotConvZone_ = ((1.0 - zoneRadFract_) * thermLossRate_) * numBattery_;
@@ -4395,6 +4451,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     fractionSOC_ = ssc_battery_->SOC() * 0.01; // % -> fraction
     batteryCurrent_ = ssc_battery_->I();
     batteryVoltage_ = ssc_battery_->V();
+    changeSOC_ = -ssc_battery_->I() * state.dataHVACGlobal->TimeStepSys;
     batteryDamage_ = 1.0 - (ssc_battery_->charge_maximum_lifetime() / maxAhCapacity_);
     storedPower_ = powerCharge;
     storedEnergy_ = storedPower_ * state.dataHVACGlobal->TimeStepSysSec;
@@ -4527,6 +4584,39 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
         }
     }
     return (!exceedIterationLimit);
+}
+
+void ElectricStorage::checkKineticBatteryModelStored(EnergyPlusData &state,
+                                                     Real64 &drawnEnergy,
+                                                     Real64 &lastEnergyStored,
+                                                     Real64 &drawnPower,
+                                                     Real64 &currentEnergyStored,
+                                                     Real64 &changeEnergyStored,
+                                                     Real64 &absoluteSOC,
+                                                     Real64 &changeSOC,
+                                                     Real64 const lastTimeStepAvailable,
+                                                     Real64 const lastTimeStepBound,
+                                                     int const numBattery,
+                                                     Real64 &fractionSOC,
+                                                     Real64 &thisTimeStepAvailable,
+                                                     Real64 &thisTimeStepBound)
+{
+    if (drawnEnergy > lastEnergyStored) {
+        drawnEnergy = max(0.0, lastEnergyStored); // just in case lastEnergyStored_ is negative (shouldn't be)
+        drawnPower = drawnEnergy / state.dataHVACGlobal->TimeStepSysSec;
+        currentEnergyStored = 0.0;
+    } else {
+        currentEnergyStored = lastEnergyStored + changeEnergyStored;
+    }
+    if (currentEnergyStored <= 0.0 || absoluteSOC <= 0.0) { // if either one of these is less than zero, zero them both out
+        changeEnergyStored = lastEnergyStored;
+        currentEnergyStored = 0.0;
+        changeSOC = -1.0 * (lastTimeStepAvailable + lastTimeStepBound) * numBattery;
+        absoluteSOC = 0.0;
+        fractionSOC = 0.0;
+        thisTimeStepAvailable = 0.0;
+        thisTimeStepBound = 0.0;
+    }
 }
 
 void ElectricStorage::rainflow(int const numbin,           // numbin = constant value
