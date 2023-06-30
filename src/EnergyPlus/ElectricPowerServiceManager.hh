@@ -389,6 +389,7 @@ private: // data
 
     enum class BatteryEnergyConservationType
     {
+        Invalid = -1,
         Basic,
         CurrentAndEnergy
     };
