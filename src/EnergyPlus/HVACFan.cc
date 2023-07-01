@@ -319,8 +319,14 @@ namespace HVACFan {
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, name, m_motorInAirFrac);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchFanMotorLossZoneName, name, m_zoneNum);                             // convert to zone name
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, name, name);   // airloop name needed?
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirBranchName, name, name); // branch name needed?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchFanAirLoopName,
+                                                 name,
+                                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name);        // airloop name needed?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchFanAirBranchName,
+                                                 name,
+                                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(1).Name); // branch name needed?
     }
 
     Real64 FanSystem::report_fei(

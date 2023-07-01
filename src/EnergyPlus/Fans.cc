@@ -1452,9 +1452,12 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, fan.FanName, fan.MotInAirFrac);
     OutputReportPredefined::PreDefTableEntry(
         state, state.dataOutRptPredefined->pdchFanMotorLossZoneName, fan.FanName, fan.FanName); // motor heat to zone name?
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, fan.FanName, fan.AirLoopNum); // convert to name
     OutputReportPredefined::PreDefTableEntry(
-        state, state.dataOutRptPredefined->pdchFanAirBranchName, fan.FanName, fan.AirLoopNum); // need branch name?
+        state, state.dataOutRptPredefined->pdchFanAirLoopName, fan.FanName, state.dataAirSystemsData->PrimaryAirSystems(fan.AirLoopNum).Name);
+    OutputReportPredefined::PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchFanAirBranchName,
+                                             fan.FanName,
+                                             state.dataAirSystemsData->PrimaryAirSystems(fan.AirLoopNum).Branch(1).Name); // need branch name?
 
     if (fan.NVPerfNum > 0) {
         if (state.dataFans->NightVentPerf(fan.NVPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {

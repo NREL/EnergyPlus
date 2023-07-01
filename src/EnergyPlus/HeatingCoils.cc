@@ -1861,13 +1861,18 @@ namespace HeatingCoils {
             break;
         }
 
-        //std 229
+        // std 229
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchHeatCoilUsedAsSupHeat, heatingCoil.Name, heatingCoil.HCoilType_Num); // usage?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchHeatCoilAirloopName,
+                                                 heatingCoil.Name,
+                                                 state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name);
         OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchHeatCoilAirloopName, heatingCoil.Name, heatingCoil.AirLoopNum); // to name?
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchHeatCoilAirloopBranchName, heatingCoil.Name, heatingCoil.AirLoopNum); // to branch name?
+            state,
+            state.dataOutRptPredefined->pdchHeatCoilAirloopBranchName,
+            heatingCoil.Name,
+            state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Branch(1).Name); // to branch name?
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchHeatCoilPlantloopName,
                                                  heatingCoil.Name,
