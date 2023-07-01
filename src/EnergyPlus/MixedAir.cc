@@ -2758,6 +2758,10 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                         state, state.dataOutRptPredefined->pdchDCVZoneADEffHeating, zoneName, thisMechVentZone.ZoneADEffHeating, 2);
                     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVZoneADEffSchName, zoneName, "");
                 }
+                OutputReportPredefined::PreDefTableEntry(state,
+                                                         state.dataOutRptPredefined->pdchDCVTypeCO2ZoneOrOther,
+                                                         zoneName,
+                                                         thisMechVentZone.name); // PH still, may need to check one of the design objects?
             }
 
             // Check to see if any zones on an air loop are not accounted for by a mechanical ventilation object
