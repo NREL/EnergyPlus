@@ -1534,8 +1534,8 @@ void FigureDayltgCoeffsAtPointsSetupForWindow(EnergyPlusData &state,
     int zoneNum = 0; // zone number
     int enclNum = 0; // enclosure number
 
-    Vector3<Real64> W1;
-    Vector3<Real64> WC;
+    Vector3<Real64> W1 = {0.0, 0.0, 0.0};
+    Vector3<Real64> WC = {0.0, 0.0, 0.0};
     
     if (CalledFrom == CalledFor::RefPoint) {
         state.dataDaylightingData->daylightControl(daylightCtrlNum).SolidAngAtRefPt(loopwin, iRefPoint) = 0.0;
