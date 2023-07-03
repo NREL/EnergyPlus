@@ -53,7 +53,7 @@
 #include "InputProcessing/InputProcessor.hh"
 #include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
-#include <EmbeddedEpJSONSchema.hh>
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <algorithm>
 #include <fmt/format.h>

@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <EmbeddedEpJSONSchema.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
@@ -72,6 +71,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <fmt/os.h>
 #include <milo/dtoa.h>

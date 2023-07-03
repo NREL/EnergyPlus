@@ -29,9 +29,9 @@ jobs:
       run: |
         cmake -E make_directory ./build/
         if [ "$RUNNER_OS" == "Windows" ]; then
-          echo "Setting CMAKE_GENERATOR options equivalent to ='-G \"Visual Studio 16 2019\" -A ${{ matrix.CMAKE_GENERATOR_PLATFORM }}'"
-          echo CMAKE_GENERATOR='Visual Studio 16 2019' >> $GITHUB_ENV
-          echo CMAKE_GENERATOR_PLATFORM=${{ matrix.CMAKE_GENERATOR_PLATFORM }} >> $GITHUB_ENV
+          echo "Setting CMAKE_GENERATOR options equivalent to ='-G \"Visual Studio 17 2022\" -A x64'"
+          echo CMAKE_GENERATOR='Visual Studio 17 2022' >> $GITHUB_ENV
+          echo CMAKE_GENERATOR_PLATFORM=x64 >> $GITHUB_ENV
           choco install ninja
         fi;
 

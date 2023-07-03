@@ -1,6 +1,6 @@
 message(AUTHOR_WARNING "generating embedded epJSON schema")
 execute_process(
-  COMMAND "${EnergyPlus_embeddable_epJSON_schema}" "${EnergyPlus_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON"
+  COMMAND "${EnergyPlus_embeddable_epJSON_schema}" "${EnergyPlus_EPJSON_SCHEMA}"
   TIMEOUT 90
   RESULT_VARIABLE generate_embedded_epJSON_schema
   OUTPUT_VARIABLE embedded_epJSON_schema
@@ -8,4 +8,6 @@ execute_process(
 if(${generate_embedded_epJSON_schema} MATCHES ".*timeout.*")
   message(FATAL_ERROR "Generating embedded epJSON Schema from epJSON Schema failed: ${generate_embedded_epJSON_schema}")
 endif()
-configure_file("${EnergyPlus_SOURCE_DIR}/generate_embeddable_epJSON_schema/EmbeddedEpJSONSchema.in.cc" "${EnergyPlus_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc")
+get_filename_component(PARENT_DIR ${EnergyPlus_EMBEDDED_OUTPUT} DIRECTORY)
+file(MAKE_DIRECTORY ${PARENT_DIR})
+configure_file("${EnergyPlus_EMBEDDED_OUTPUT_TEMPLATE}" "${EnergyPlus_EMBEDDED_OUTPUT}")
