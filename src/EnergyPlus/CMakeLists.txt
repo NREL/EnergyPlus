@@ -387,8 +387,6 @@ set(SRC
     InputProcessing/CsvParser.cc
     InputProcessing/CsvParser.hh
     InputProcessing/DataStorage.hh
-    InputProcessing/EmbeddedEpJSONSchema.hh
-    "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
     IOFiles.cc
     IOFiles.hh
     InputProcessing/IdfParser.cc
@@ -689,8 +687,6 @@ set(INPUTPARSING_SRC
     DataStringGlobals.hh
     FileSystem.cc
     FileSystem.hh
-    InputProcessing/EmbeddedEpJSONSchema.hh
-    "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
     InputProcessing/IdfParser.cc
     InputProcessing/IdfParser.hh
     InputProcessing/InputValidation.cc
@@ -698,45 +694,6 @@ set(INPUTPARSING_SRC
     UtilityRoutines.hh)
 
 create_src_groups("${INPUTPARSING_SRC}")
-
-configure_file("${PROJECT_SOURCE_DIR}/idd/Energy+.idd.in" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd")
-
-add_custom_command(
-        OUTPUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON"
-        COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-        MAIN_DEPENDENCY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd"
-        DEPENDS
-        "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py"
-        "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/idd_parser.py"
-        "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/modify_schema.py"
-        VERBATIM
-)
-
-# Since multiple targets depend on the JSON Schema, we need to make a custom target for it so the dependent targets don't try to run the custom command at the same time.
-# (see: https://cmake.org/cmake/help/latest/command/add_custom_command.html?highlight=add_custom_command#example-generating-files-for-multiple-targets)
-
-add_custom_target(epjson_schema ALL DEPENDS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
-set_target_properties(epjson_schema PROPERTIES FOLDER "Internal")
-
-add_custom_command(
-  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
-  COMMAND
-    ${CMAKE_COMMAND}
-        -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
-        -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-        -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
-        -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
-        -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddable_epJSON_schema>"
-        -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS
-    generate_embeddable_epJSON_schema
-    epjson_schema
-    "${CMAKE_CURRENT_SOURCE_DIR}/InputProcessing/EmbeddedEpJSONSchema.in.cc"
-  VERBATIM)
-
-add_custom_target(embedded_epjson_source ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc")
-set_target_properties(embedded_epjson_source PROPERTIES FOLDER "Internal")
 
 add_subdirectory(AirflowNetwork)
 
@@ -772,8 +729,7 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
-add_dependencies(energyplusparser embedded_epjson_source)
-target_link_libraries(energyplusparser PUBLIC ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
+target_link_libraries(energyplusparser PUBLIC embedded_epjson_source ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
@@ -787,11 +743,11 @@ endif()
 # first we will create a static library of EnergyPlus this will be linked
 # statically to create the DLL and also the unit tests
 add_library(energypluslib STATIC ${SRC})
-add_dependencies(energypluslib embedded_epjson_source)
 
 target_link_libraries(
   energypluslib
-  PUBLIC fmt::fmt
+  PUBLIC embedded_epjson_source
+         fmt::fmt
          ModernJSON
          objexx
          sqlite

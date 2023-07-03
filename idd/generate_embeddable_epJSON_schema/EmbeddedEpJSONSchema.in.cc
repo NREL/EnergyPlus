@@ -45,23 +45,29 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef InputProcessing_EmbeddedEpJSONSchema_HH
-#define InputProcessing_EmbeddedEpJSONSchema_HH
+#include <EmbeddedEpJSONSchema.hh>
 
-#include <GSL/span.h>
-#include <cstddef>
-#include <cstdint>
-#include <utility>
+#include <array>
 
 namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-    const gsl::span<const std::uint8_t> embeddedEpJSONSchema();
+    // clang-format off
+    ${embedded_epJSON_schema}
+    // clang-format on
 
-    const std::string_view embeddedEpJSONSchemaView();
+    const gsl::span<const std::uint8_t> embeddedEpJSONSchema()
+    {
+        return gsl::span<const std::uint8_t>(embeddedSchema);
+    }
+
+    const std::string_view embeddedEpJSONSchemaView()
+    {
+        static const std::string str(embeddedSchema.begin(), embeddedSchema.end());
+        return str;
+    }
+
 } // namespace EmbeddedEpJSONSchema
 
 } // namespace EnergyPlus
-
-#endif // InputProcessing_EmbeddedEpJSONSchema_HH

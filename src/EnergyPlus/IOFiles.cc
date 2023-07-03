@@ -50,10 +50,10 @@
 #include "Data/EnergyPlusData.hh"
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
-#include "InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "InputProcessing/InputProcessor.hh"
 #include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
+#include <EmbeddedEpJSONSchema.hh>
 
 #include <algorithm>
 #include <fmt/format.h>

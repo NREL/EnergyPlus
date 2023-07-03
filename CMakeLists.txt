@@ -283,9 +283,6 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE "${kiva_BINARY_DIR}/src/libkiva")
 target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/vendor/boost-1.61.0/")
 
-add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
-set_target_properties(generate_embeddable_epJSON_schema PROPERTIES FOLDER "Internal")
-
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP/include)
 

@@ -53,9 +53,9 @@
 
 #include "EnergyPlus/DataStringGlobals.hh"
 #include "EnergyPlus/FileSystem.hh"
-#include "EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "EnergyPlus/InputProcessing/IdfParser.hh"
 #include "EnergyPlus/InputProcessing/InputValidation.hh"
+#include <EmbeddedEpJSONSchema.hh>
 #include <ezOptionParser.hpp>
 #include <nlohmann/json.hpp>
 
