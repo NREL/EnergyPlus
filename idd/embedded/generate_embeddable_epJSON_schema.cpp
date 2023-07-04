@@ -104,7 +104,7 @@ int main(int argc, char const* argv[]) {
     return 1;
   }
 
-  fmt::print(stderr, "generating the embedded epJSON schema\n");
+  fmt::print(stderr, "Generating the **embedded** epJSON schema\n");
 
   std::ifstream schema_stream(argv[1], std::ifstream::in);
   if (!schema_stream.is_open()) {

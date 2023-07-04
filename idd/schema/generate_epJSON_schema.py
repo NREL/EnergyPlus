@@ -59,7 +59,7 @@ import json
 import sys
 from os import path
 
-print("Generating the epJSON schema!")
+print("Generating the epJSON schema!", file=sys.stderr)
 source_dir_path = sys.argv[1]
 data = idd_parser.Data()
 idd_path = path.join(source_dir_path, 'Energy+.idd')
