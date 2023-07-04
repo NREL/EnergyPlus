@@ -12,33 +12,22 @@ add_custom_command(
   VERBATIM
 )
 
-# Since multiple targets depend on the JSON Schema, we need to make a custom target for it so the dependent targets don't try to run the custom command at the same time.
-# (see: https://cmake.org/cmake/help/latest/command/add_custom_command.html?highlight=add_custom_command#example-generating-files-for-multiple-targets)
-add_custom_target(epjson_schema ALL DEPENDS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
-set_target_properties(epjson_schema PROPERTIES FOLDER "Internal")
-
 add_executable(generate_embeddable_epJSON_schema embedded/generate_embeddable_epJSON_schema.cpp)
-target_link_libraries(generate_embeddable_epJSON_schema PRIVATE project_options project_fp_options project_warnings)
+target_link_libraries(generate_embeddable_epJSON_schema PRIVATE project_options project_fp_options project_warnings fmt::fmt)
 set_target_properties(generate_embeddable_epJSON_schema PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/scripts")
+# See https://en.cppreference.com/w/cpp/filesystem#Notes
+if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) OR
+    ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
+  target_link_libraries(generate_embeddable_epJSON_schema PRIVATE stdc++fs)
+endif()
 
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/embedded/EmbeddedEpJSONSchema.cc"
   COMMAND
-    ${CMAKE_COMMAND}
-        # We call the executable on the epJSON schema
-        -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddable_epJSON_schema>"
-        -D "EnergyPlus_EPJSON_SCHEMA:FILEPATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON"
-        # And configure_file the template with to produce the final cc file
-        -D "EnergyPlus_EMBEDDED_OUTPUT_TEMPLATE:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/embedded/EmbeddedEpJSONSchema.in.cc"
-        -D "EnergyPlus_EMBEDDED_OUTPUT:FILEPATH=${CMAKE_CURRENT_BINARY_DIR}/embedded/EmbeddedEpJSONSchema.cc"
-        # Using this helper cmake script
-        -P "${CMAKE_CURRENT_SOURCE_DIR}/embedded/generate_embedded_epJSON_schema.cmake"
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    generate_embeddable_epJSON_schema "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" "${CMAKE_CURRENT_BINARY_DIR}/embedded/EmbeddedEpJSONSchema.cc"
   DEPENDS
     generate_embeddable_epJSON_schema
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON" # File-level dependency
-    epjson_schema                                             # target-level dependency, to avoid race conditions
-    "${CMAKE_CURRENT_SOURCE_DIR}/embedded/EmbeddedEpJSONSchema.in.cc"
   VERBATIM)
 
 add_library(embedded_epjson_source STATIC
