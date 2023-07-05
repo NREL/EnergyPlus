@@ -126,17 +126,20 @@ struct EquipOpList
 
 struct TempSetpoint
 {
-    Real64 PrimCW = 0.0;      // Chilled water setpoint for primary plant loop
-    Real64 SecCW = 0.0;       // Chilled water setpoint for secondary/distribution plant loop
-    Real64 PrimHW_High = 0.0; // Hot water primary plant setpoint at High Outdoor Air Temperature, or higher, Deg. C
-    Real64 PrimHW_Low = 0.0;  // Hot water primary plant setpoint at Low Outdoor Air Temperature, or Lower, Deg. C
-    Real64 SecHW = 0.0;       // hot water setpoint for secondary/distribution plant loop
+    Real64 PrimCW = 0.0;              // Chilled water setpoint for primary plant loop
+    Real64 SecCW = 0.0;               // Chilled water setpoint for secondary/distribution plant loop
+    Real64 PrimHW_High = 0.0;         // Hot water primary plant setpoint at High Outdoor Air Temperature, or higher, Deg. C
+    Real64 PrimHW_Low = 0.0;          // Hot water primary plant setpoint at Low Outdoor Air Temperature, or Lower, Deg. C
+    Real64 SecHW = 0.0;               // hot water setpoint for secondary/distribution plant loop
+    Real64 PrimHW_BackupLow = -999.0; // optional hot water setpoint at Backup Low Outdoor Air Temperature, or lower, Deg. C
 };
 
 struct TempResetData
 {
     Real64 HighOutdoorTemp = 0.0;
     Real64 LowOutdoorTemp = 0.0;
+    Real64 BackupLowOutdoorTemp = -999.0; // optional back up low outdoor air temperature, Deg.C
+    Real64 BoilerTemperatureOffset = 0.0;
 };
 
 struct PlantOpsData

@@ -11566,9 +11566,9 @@ Output:Variable,Cooling Side WSHP Load Side Outlet,System Node Mass Flow Rate,ti
     13.7,                                           !- Secondary Distribution Cooling Plant Setpoint Temperature
     59.8 ,                                          !- Primary Heating Plant Setpoint at Outdoor High Temperature
     10.0,                                           !- Outdoor High Temperature
-    37.6 ,                                          !- Primary Heating Plant Setpoint at Outdoor Low Temperature
-    0.0 ,                                           !- Outdoor Low Temperature
-    45.0 ,                                          !- Secondary Distribution Heating Plant Setpoint Temperature
+    37.6,                                           !- Primary Heating Plant Setpoint at Outdoor Low Temperature
+    -18.0,                                          !- Outdoor Low Temperature
+    45.0,                                           !- Secondary Distribution Heating Plant Setpoint Temperature
     All Conditioned Zones,                          !- Zone Load Polling ZoneList Name
     Two AWHP Cooling Operation Scheme,              !- Cooling Only Load Plant Equipment Operation Cooling Load Name
     Two AWHP Heating Operation Scheme,              !- Heating Only Load Plant Equipment Operation Heating Load Name

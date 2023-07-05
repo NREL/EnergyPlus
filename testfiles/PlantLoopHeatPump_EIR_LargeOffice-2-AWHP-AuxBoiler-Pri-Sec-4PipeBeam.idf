@@ -7685,9 +7685,9 @@
     13.7,                                           !- Secondary Distribution Cooling Plant Setpoint Temperature
     59.8 ,                                          !- Primary Heating Plant Setpoint at Outdoor High Temperature
     10.0,                                           !- Outdoor High Temperature
-    37.6 ,                                          !- Primary Heating Plant Setpoint at Outdoor Low Temperature
-    0.0 ,                                           !- Outdoor Low Temperature
-    45.0 ,                                          !- Secondary Distribution Heating Plant Setpoint Temperature
+    37.6,                                           !- Primary Heating Plant Setpoint at Outdoor Low Temperature
+    -18.0,                                          !- Outdoor Low Temperature
+    45.0,                                           !- Secondary Distribution Heating Plant Setpoint Temperature
     All Conditioned Zones,                          !- Zone Load Polling ZoneList Name
     Two AWHP Cooling Operation Scheme,              !- Cooling Only Load Plant Equipment Operation Cooling Load Name
     Two AWHP Heating Operation Scheme,              !- Heating Only Load Plant Equipment Operation Heating Load Name
@@ -10074,38 +10074,6 @@ Curve:Biquadratic,
 
   Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
-  Output:Variable,CV_1 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,CV_1 Supply Equipment Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam CW Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam CW Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam HW Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam HW Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam CW Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam CW Outlet Node,System Node Temperature,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam HW Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam HW Outlet Node,System Node Temperature,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam Inlet Node Name,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Core_bottom 4pipe Beam Outlet Node Name,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,CV_1 Zone Equipment Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,CV_2 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,CV_3 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,VAV_5 Supply Equipment Outlet Node,System Node Mass Flow Rate,hourly;
-
 ! ***REPORT TABLES***
 
   OutputControl:Table:Style,
@@ -10329,6 +10297,8 @@ Curve:Biquadratic,
   Output:Variable,*,Supervisory Plant Operation Primary Plant Cooling Load,hourly; !- HVAC Average [W]
   Output:Variable,*,Supervisory Plant Heat Recovery Operation Mode,hourly; !- HVAC Average [unknown]
   Output:Variable,*,Supervisory Plant Auxiliary Boiler Mode,hourly; !- HVAC Average [unknown]
+  Output:Variable,*,Supervisory Plant Operation Secondary Plant Heating Load,timestep; !- HVAC Average [W]
+  Output:Variable,*,Supervisory Plant Operation Secondary Plant Cooling Load,timestep; !- HVAC Average [W]
 
   Output:Variable,*,Heat Pump Part Load Ratio,hourly; !- HVAC Average []
   Output:Variable,*,Heat Pump Cycling Ratio,hourly; !- HVAC Average []
@@ -10369,3 +10339,20 @@ Curve:Biquadratic,
   Output:Variable,*,Plant Supply Side Inlet Mass Flow Rate,hourly; !- HVAC Average [kg/s]
   Output:Variable,*,Plant Supply Side Inlet Temperature,hourly; !- HVAC Average [C]
   Output:Variable,*,Plant Supply Side Outlet Temperature,hourly; !- HVAC Average [C]
+    Output:Variable,Heating Side WSHP Source Side Inlet,System Node Mass Flow Rate,hourly;
+    Output:Variable,Heating Side WSHP Source Side Inlet,System Node Temperature,hourly;
+
+    Output:Variable,Heating Side WSHP Source Side Oulet,System Node Mass Flow Rate,hourly;
+    Output:Variable,Heating Side WSHP Source Side Oulet,System Node Temperature,hourly;
+
+    Output:Variable,Cooling Side WSHP Source Side Inlet,System Node Mass Flow Rate,hourly;
+    Output:Variable,Cooling Side WSHP Source Side Inlet,System Node Temperature,hourly;
+
+    Output:Variable,Cooling Side WSHP Source Side Outlet,System Node Mass Flow Rate,hourly;
+    Output:Variable,Cooling Side WSHP Source Side Outlet,System Node Temperature,hourly;
+
+    Output:Variable,Cooling Side WSHP Load Side Inlet,System Node Mass Flow Rate,hourly;
+    Output:Variable,Cooling Side WSHP Load Side Inlet,System Node Temperature,hourly;
+
+    Output:Variable,Heating Side WSHP Load Side Inlet,System Node Mass Flow Rate,hourly;
+    Output:Variable,Heating Side WSHP Load Side Inlet,System Node Temperature,hourly;

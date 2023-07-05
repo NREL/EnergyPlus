@@ -1889,6 +1889,15 @@ void GetChillerHeaterChangeoverOpSchemeInput(EnergyPlusData &state,
                     if (secHWSP != fields.end()) { // not required field
                         scheme.Setpoint.SecHW = secHWSP.value().get<Real64>();
                     }
+                    auto const boilerOffset = fields.find("boiler_setpoint_temperature_offset");
+                    (boilerOffset != fields.end()) ? (scheme.TempReset.BoilerTemperatureOffset = boilerOffset.value().get<Real64>())
+                                                   : (scheme.TempReset.BoilerTemperatureOffset = 0.5);
+                    auto const backUpLow_HWset = fields.find("primary_heating_plant_setpoint_at_backup_outdoor_low_temperature");
+                    (backUpLow_HWset != fields.end()) ? (scheme.Setpoint.PrimHW_BackupLow = backUpLow_HWset.value().get<Real64>())
+                                                      : (scheme.Setpoint.PrimHW_BackupLow = scheme.Setpoint.PrimHW_Low);
+                    auto const backUpLowTemp = fields.find("backup_outdoor_low_temperature");
+                    (backUpLowTemp != fields.end()) ? (scheme.TempReset.BackupLowOutdoorTemp = backUpLowTemp.value().get<Real64>())
+                                                    : (scheme.TempReset.BackupLowOutdoorTemp = scheme.TempReset.LowOutdoorTemp);
                     auto const zoneNameList = fields.find("zone_load_polling_zonelist_name");
                     if (zoneNameList != fields.end()) {
                         scheme.ZoneListName = UtilityRoutines::MakeUPPERCase(zoneNameList.value().get<std::string>());
@@ -2690,7 +2699,6 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                         ShowFatalError(state, "Program halted because ChillerHeaterSupervisory operation scheme not found.");
                     }
                 }
-
             } // operation scheme
         }     // loop
 

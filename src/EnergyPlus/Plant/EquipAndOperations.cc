@@ -997,6 +997,21 @@ namespace DataPlant {
         }
 
         // do we need to turn on cooling-only if in off mode but PrimaryPlantCoolingLoad is loaded?
+        if (!this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (this->Report.PrimaryPlantCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+                this->PlantOps.AirSourcePlantCoolingOnly = true;
+            }
+        }
+
+        // do we need to turn on heating-only if in off mode but PrimaryPlantHeatingLoad is loaded?
+        if (!this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (this->Report.PrimaryPlantHeatingLoad > DataHVACGlobals::SmallLoad &&
+                state.dataEnvrn->OutDryBulbTemp >= this->TempReset.LowOutdoorTemp) {
+                this->PlantOps.AirSourcePlantHeatingOnly = true;
+            }
+        }
 
         // step 4, convert logical flags into integers for output variable reporting
         if (this->PlantOps.AirSourcePlantHeatingOnly) {
@@ -1122,6 +1137,8 @@ namespace DataPlant {
                         // todo, oa reset ?
 
                         state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = this->Setpoint.PrimCW;
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint =
+                            this->Setpoint.PrimCW;
                         if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp > this->Setpoint.PrimCW) {
 
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
@@ -1139,8 +1156,6 @@ namespace DataPlant {
                                 .Branch(this_equip.BranchNumPtr)
                                 .Comp(this_equip.CompNumPtr)
                                 .CurOpSchemeType = this->Type;
-                            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint =
-                                this->Setpoint.PrimCW;
                         }
                         //
                     }
@@ -1164,6 +1179,7 @@ namespace DataPlant {
                         // set heating setpoint at outlet
 
                         state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = HWsetpt;
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint = HWsetpt;
 
                         if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp < HWsetpt) {
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
@@ -1181,8 +1197,6 @@ namespace DataPlant {
                                 .Branch(this_equip.BranchNumPtr)
                                 .Comp(this_equip.CompNumPtr)
                                 .CurOpSchemeType = this->Type;
-
-                            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint = HWsetpt;
                         }
                         //
                     }
@@ -1207,6 +1221,8 @@ namespace DataPlant {
                         // set cooling setpoint at outlet
 
                         state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = this->Setpoint.PrimCW;
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint =
+                            this->Setpoint.PrimCW;
                         if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp > this->Setpoint.PrimCW) {
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                 .LoopSide(this_equip.LoopSideNumPtr)
@@ -1223,8 +1239,6 @@ namespace DataPlant {
                                 .Branch(this_equip.BranchNumPtr)
                                 .Comp(this_equip.CompNumPtr)
                                 .CurOpSchemeType = this->Type;
-                            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint =
-                                this->Setpoint.PrimCW;
                         }
                         //
                     }
@@ -1244,6 +1258,7 @@ namespace DataPlant {
                         // set heating setpoint at outlet
 
                         state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = HWsetpt;
+                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint = HWsetpt;
 
                         if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp < HWsetpt) {
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
@@ -1261,8 +1276,6 @@ namespace DataPlant {
                                 .Branch(this_equip.BranchNumPtr)
                                 .Comp(this_equip.CompNumPtr)
                                 .CurOpSchemeType = this->Type;
-
-                            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint = HWsetpt;
                         }
                         //
                     }
@@ -1567,21 +1580,18 @@ namespace DataPlant {
             for (int BoilerNum = 1; BoilerNum <= this->PlantOps.numBoilers; ++BoilerNum) {
                 // determine if primary or secondary setpoint in use
                 Real64 HWsetpt = 0.0;
-                Real64 BoilerStPntOffset = 0.0;
                 bool IsAuxiliaryBoiler = false;
                 if (this->SecondaryPlantLoopIndicesBeingSupervised(this->PlantBoilerComps(BoilerNum).loopNum) >
                     0) { // appears to be on secondary loop, supplemental boiler
                     HWsetpt = min(this->Setpoint.SecHW,
                                   DetermineHWSetpointOARest(
                                       state)); // Assume if OA reset is lower than setting for secondary HW loop, then use the lower of the two
-                    BoilerStPntOffset = 0.5;   // turn down the boiler a bit so it runs less
                 } else {                       // primary loop, auxiliary boiler
                     HWsetpt = DetermineHWSetpointOARest(state);
                     IsAuxiliaryBoiler = true;
-                    BoilerStPntOffset = 0.5; // turn down the boiler a bit so it runs less
                 }
 
-                HWsetpt = HWsetpt - BoilerStPntOffset;
+                HWsetpt = HWsetpt - this->TempReset.BoilerTemperatureOffset;
 
                 // check inlet temperature
                 int inletBoilerNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
@@ -1604,7 +1614,7 @@ namespace DataPlant {
                     0.001 * state.dataSize->PlantSizData(pltSizNum).DesCapacity; // model an operating threshold at 0.1% of loop capacity, only run if
                                                                                  // larger than that
 
-                if (((LoadToSetpoint > DataHVACGlobals::SmallLoad) &&
+                if (((LoadToSetpoint > thresholdPlantLoad) &&
                      ((this->Report.AirSourcePlant_OpMode == 0) ||
                       LowOAAuxiliaryNeeded)) || // run boiler if there is any heating load and also heatpumps are off or too cold outside
                     ((LoadToSetpoint > thresholdPlantLoad) &&
@@ -1659,22 +1669,53 @@ namespace DataPlant {
     {
         // algorithm from calcSetPointLinInt
         Real64 HWSetpoint = 0.0;
-        if (this->TempReset.LowOutdoorTemp < this->TempReset.HighOutdoorTemp) {
-            if (state.dataEnvrn->OutDryBulbTemp <= this->TempReset.LowOutdoorTemp) {
-                HWSetpoint = this->Setpoint.PrimHW_Low;
-            } else if (state.dataEnvrn->OutDryBulbTemp >= this->TempReset.HighOutdoorTemp) {
-                HWSetpoint = this->Setpoint.PrimHW_High;
+
+        if ((this->TempReset.LowOutdoorTemp == this->TempReset.BackupLowOutdoorTemp) &&
+            (this->Setpoint.PrimHW_Low == this->Setpoint.PrimHW_BackupLow)) { // no second-stage reset scheme
+
+            if (this->TempReset.LowOutdoorTemp < this->TempReset.HighOutdoorTemp) {
+                if (state.dataEnvrn->OutDryBulbTemp <= this->TempReset.LowOutdoorTemp) {
+                    HWSetpoint = this->Setpoint.PrimHW_Low;
+                } else if (state.dataEnvrn->OutDryBulbTemp >= this->TempReset.HighOutdoorTemp) {
+                    HWSetpoint = this->Setpoint.PrimHW_High;
+                } else {
+                    HWSetpoint = this->Setpoint.PrimHW_Low - ((state.dataEnvrn->OutDryBulbTemp - this->TempReset.LowOutdoorTemp) /
+                                                              (this->TempReset.HighOutdoorTemp - this->TempReset.LowOutdoorTemp)) *
+                                                                 (this->Setpoint.PrimHW_Low - this->Setpoint.PrimHW_High);
+                    HWSetpoint = min(HWSetpoint, this->Setpoint.PrimHW_High); // don't extrapolate, hold at high limit of primary HW
+                }
+
             } else {
-                HWSetpoint = this->Setpoint.PrimHW_Low - ((state.dataEnvrn->OutDryBulbTemp - this->TempReset.LowOutdoorTemp) /
-                                                          (this->TempReset.HighOutdoorTemp - this->TempReset.LowOutdoorTemp)) *
-                                                             (this->Setpoint.PrimHW_Low - this->Setpoint.PrimHW_High);
-                HWSetpoint = min(HWSetpoint, this->Setpoint.PrimHW_High); // don't extrapolate, hold at high limit of primary HW
+                HWSetpoint = 0.5 * (this->Setpoint.PrimHW_Low + this->Setpoint.PrimHW_High);
             }
+        } else { // apply two stage reset scheme
+            if ((this->TempReset.LowOutdoorTemp < this->TempReset.HighOutdoorTemp) &&
+                (this->TempReset.BackupLowOutdoorTemp < this->TempReset.LowOutdoorTemp)) { // expected configuration
 
-        } else {
-            HWSetpoint = 0.5 * (this->Setpoint.PrimHW_Low + this->Setpoint.PrimHW_High);
+                if (state.dataEnvrn->OutDryBulbTemp <= this->TempReset.BackupLowOutdoorTemp) {
+                    HWSetpoint = this->Setpoint.PrimHW_BackupLow;
+                } else if (state.dataEnvrn->OutDryBulbTemp >= this->TempReset.HighOutdoorTemp) {
+                    HWSetpoint = this->Setpoint.PrimHW_High;
+                } else if ((state.dataEnvrn->OutDryBulbTemp >= this->TempReset.LowOutdoorTemp) &&
+                           (state.dataEnvrn->OutDryBulbTemp < this->TempReset.HighOutdoorTemp)) { // first stage for Heat pump reset down
+                    HWSetpoint = this->Setpoint.PrimHW_Low - ((state.dataEnvrn->OutDryBulbTemp - this->TempReset.LowOutdoorTemp) /
+                                                              (this->TempReset.HighOutdoorTemp - this->TempReset.LowOutdoorTemp)) *
+                                                                 (this->Setpoint.PrimHW_Low - this->Setpoint.PrimHW_High);
+                    HWSetpoint = min(HWSetpoint, this->Setpoint.PrimHW_High); // don't extrapolate, hold at high limit of primary HW
+                } else if ((state.dataEnvrn->OutDryBulbTemp > this->TempReset.BackupLowOutdoorTemp) &&
+                           (state.dataEnvrn->OutDryBulbTemp < this->TempReset.LowOutdoorTemp)) { // second stage for backup boiler reset up
+                    HWSetpoint = this->Setpoint.PrimHW_BackupLow - ((state.dataEnvrn->OutDryBulbTemp - this->TempReset.BackupLowOutdoorTemp) /
+                                                                    (this->TempReset.LowOutdoorTemp - this->TempReset.BackupLowOutdoorTemp)) *
+                                                                       (this->Setpoint.PrimHW_BackupLow - this->Setpoint.PrimHW_Low);
+                    HWSetpoint = min(HWSetpoint, this->Setpoint.PrimHW_BackupLow); // don't extrapolate
+                    HWSetpoint = max(HWSetpoint, this->Setpoint.PrimHW_Low);       // don't extrapolate
+                } else {
+                    // shouldn't get here, throw error?
+                }
+            } else { // malformed input, take average of three setpoints
+                HWSetpoint = (this->Setpoint.PrimHW_Low + this->Setpoint.PrimHW_High + this->Setpoint.PrimHW_BackupLow) / 3.0;
+            }
         }
-
         return HWSetpoint;
     }
 
