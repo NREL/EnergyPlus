@@ -376,7 +376,8 @@ private: // data
     {
         Invalid = -1,
         Basic,
-        CurrentAndEnergy
+        CurrentAndEnergy,
+        Num
     };
 
     std::string name_;               // name of this electrical storage module
