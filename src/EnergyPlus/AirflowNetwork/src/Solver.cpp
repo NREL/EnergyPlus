@@ -1486,9 +1486,9 @@ namespace AirflowNetwork {
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
                 DisSysCompCoilData(i).name = UtilityRoutines::makeUPPER(coil_name); // Name of associated EPlus coil component
-                DisSysCompCoilData(i).EPlusType = coil_type;                            // coil type
-                DisSysCompCoilData(i).L = L;                                            // Air path length
-                DisSysCompCoilData(i).hydraulicDiameter = D;                            // Air path hydraulic diameter
+                DisSysCompCoilData(i).EPlusType = coil_type;                        // coil type
+                DisSysCompCoilData(i).L = L;                                        // Air path length
+                DisSysCompCoilData(i).hydraulicDiameter = D;                        // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
                 if (elements.find(DisSysCompCoilData(i).name) == elements.end()) {
@@ -1526,9 +1526,9 @@ namespace AirflowNetwork {
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
                 DisSysCompHXData(i).name = UtilityRoutines::makeUPPER(hx_name); // Name of associated EPlus heat exchange component
-                DisSysCompHXData(i).EPlusType = hx_type;                            // coil type
-                DisSysCompHXData(i).L = L;                                          // Air path length
-                DisSysCompHXData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
+                DisSysCompHXData(i).EPlusType = hx_type;                        // coil type
+                DisSysCompHXData(i).L = L;                                      // Air path length
+                DisSysCompHXData(i).hydraulicDiameter = D;                      // Air path hydraulic diameter
                 DisSysCompHXData(i).CoilParentExists = HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent(m_state, hx_type, hx_name);
 
                 // Add the element to the lookup table, check for name overlaps
@@ -1566,9 +1566,9 @@ namespace AirflowNetwork {
                 Real64 D{fields.at("air_path_hydraulic_diameter")};
 
                 DisSysCompTermUnitData(i).name = UtilityRoutines::makeUPPER(tu_name); // Name of associated EPlus coil component
-                DisSysCompTermUnitData(i).EPlusType = tu_type;                            // Terminal unit type
-                DisSysCompTermUnitData(i).L = L;                                          // Air path length
-                DisSysCompTermUnitData(i).hydraulicDiameter = D;                          // Air path hydraulic diameter
+                DisSysCompTermUnitData(i).EPlusType = tu_type;                        // Terminal unit type
+                DisSysCompTermUnitData(i).L = L;                                      // Air path length
+                DisSysCompTermUnitData(i).hydraulicDiameter = D;                      // Air path hydraulic diameter
 
                 // Add the element to the lookup table, check for name overlaps
                 if (elements.find(DisSysCompTermUnitData(i).name) == elements.end()) {
@@ -5469,9 +5469,7 @@ namespace AirflowNetwork {
 
                     if (AirflowNetworkNodeData(i).RAFNNodeNum > 0) {
                         ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                        if (m_state.dataRoomAir->AFNZoneInfo(ZoneNum)
-                                .Node(AirflowNetworkNodeData(i).RAFNNodeNum)
-                                .AFNNodeID == i) {
+                        if (m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AFNNodeID == i) {
                             AirflowNetworkNodeSimu(i).TZ =
                                 m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp;
                             AirflowNetworkNodeSimu(i).WZ =
@@ -7736,8 +7734,7 @@ namespace AirflowNetwork {
             if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                if (m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AFNNodeID ==
-                    i) {
+                if (m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AFNNodeID == i) {
                     MV(i) = m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AirTemp * 1.0e10;
                 }
             }
@@ -8030,8 +8027,7 @@ namespace AirflowNetwork {
             if (AirflowNetworkNodeData(i).RAFNNodeNum > 0 && MA((i - 1) * AirflowNetworkNumOfNodes + i) < 0.9e10) {
                 MA((i - 1) * AirflowNetworkNumOfNodes + i) = 1.0e10;
                 ZoneNum = AirflowNetworkNodeData(i).EPlusZoneNum;
-                if (m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AFNNodeID ==
-                    i) {
+                if (m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).AFNNodeID == i) {
                     MV(i) = m_state.dataRoomAir->AFNZoneInfo(ZoneNum).Node(AirflowNetworkNodeData(i).RAFNNodeNum).HumRat * 1.0e10;
                 }
             }
@@ -11789,10 +11785,9 @@ namespace AirflowNetwork {
                         return AirLoopNum;
                     }
                     if (m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).NumSubComps == 0) {
-                        DataLoopNode::ConnectionObjectType TypeOfComp =
-                            static_cast<DataLoopNode::ConnectionObjectType>(EnergyPlus::getEnumValue(
-                                BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf));
+                        DataLoopNode::ConnectionObjectType TypeOfComp = static_cast<DataLoopNode::ConnectionObjectType>(EnergyPlus::getEnumValue(
+                            BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                            m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).TypeOf));
                         std::string const &NameOfComp =
                             m_state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(NumOfComp).Name;
                         if (IsParentObject(m_state, TypeOfComp, NameOfComp)) {

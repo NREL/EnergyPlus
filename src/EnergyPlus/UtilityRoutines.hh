@@ -229,11 +229,12 @@ struct ErrorObjectHeader
 
 void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
 void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
-void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh,
-                          std::string_view fieldName, 
+void ShowSevereEmptyField(EnergyPlusData &state,
+                          ErrorObjectHeader const &eoh,
+                          std::string_view fieldName,
                           std::string_view depFieldName = {},
                           std::string_view depFieldVal = {});
-        
+
 namespace UtilityRoutines {
 
     static constexpr std::array<std::string_view, 12> MonthNamesCC{

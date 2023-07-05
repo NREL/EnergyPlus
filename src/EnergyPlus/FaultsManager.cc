@@ -854,8 +854,7 @@ namespace FaultsManager {
             }
 
             // Coil check and link
-            CoilType CoilTypeCheck =
-                static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, UtilityRoutines::makeUPPER(faultsCoilSATFouling.CoilType)));
+            CoilType CoilTypeCheck = static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, UtilityRoutines::makeUPPER(faultsCoilSATFouling.CoilType)));
             switch (CoilTypeCheck) {
             case CoilType::CoilHeatingElectric:
             case CoilType::CoilHeatingFuel:
@@ -1772,8 +1771,7 @@ namespace FaultsManager {
                 }
             }
 
-            faultsFoulCoil.FoulingInputMethod =
-                static_cast<FouledCoil>(getEnumValue(FouledCoilNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(5))));
+            faultsFoulCoil.FoulingInputMethod = static_cast<FouledCoil>(getEnumValue(FouledCoilNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(5))));
             if (faultsFoulCoil.FoulingInputMethod == FouledCoil::Invalid) {
                 faultsFoulCoil.FoulingInputMethod = FouledCoil::UARated;
             }

@@ -8556,16 +8556,14 @@ namespace SurfaceGeometry {
                         if (TempSchName != groundSurface.end()) {
                             std::string gnd_surf_TempSchName = TempSchName.value().get<std::string>();
                             if (!gnd_surf_TempSchName.empty()) {
-                                thisGndSurf.TempSchPtr =
-                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::makeUPPER(gnd_surf_TempSchName));
+                                thisGndSurf.TempSchPtr = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::makeUPPER(gnd_surf_TempSchName));
                             }
                         }
                         auto ReflSchName = groundSurface.find("ground_surface_reflectance_schedule_name");
                         if (ReflSchName != groundSurface.end()) {
                             std::string gnd_surf_ReflSchName = ReflSchName.value().get<std::string>();
                             if (!gnd_surf_ReflSchName.empty()) {
-                                thisGndSurf.ReflSchPtr =
-                                    ScheduleManager::GetScheduleIndex(state, UtilityRoutines::makeUPPER(gnd_surf_ReflSchName));
+                                thisGndSurf.ReflSchPtr = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::makeUPPER(gnd_surf_ReflSchName));
                             }
                         }
                         thisGndSurfsObj.GndSurfs.push_back(thisGndSurf);
@@ -10137,8 +10135,8 @@ namespace SurfaceGeometry {
                                        state.dataIPShortCut->cAlphaFieldNames(7),
                                        state.dataIPShortCut->cAlphaFieldNames(5)));
             }
-            windowShadingControl.slatAngleControl = static_cast<SlatAngleControl>(
-                getEnumValue(SlatAngleNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(10))));
+            windowShadingControl.slatAngleControl =
+                static_cast<SlatAngleControl>(getEnumValue(SlatAngleNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(10))));
 
             // For upward compatibility change old "noninsulating" and "insulating" shade types to
             // INTERIORSHADE or EXTERIORSHADE
@@ -12175,8 +12173,7 @@ namespace SurfaceGeometry {
                 state.dataIPShortCut->cAlphaArgs(3), state.dataMaterial->Material, state.dataMaterial->TotMaterials);
             auto *thisMaterial = state.dataMaterial->Material(MaterNum);
             SchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(4));
-            InsulationType insulationType =
-                static_cast<InsulationType>(getEnumValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
+            InsulationType insulationType = static_cast<InsulationType>(getEnumValue(insulationTypeNamesUC, state.dataIPShortCut->cAlphaArgs(1)));
             if (insulationType == InsulationType::Invalid) {
                 ShowSevereError(state,
                                 format("{}, {}=\"{}\", invalid data.",

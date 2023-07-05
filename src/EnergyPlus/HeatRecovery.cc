@@ -509,8 +509,7 @@ namespace HeatRecovery {
             }
 
             // Added additional inputs for frost control
-            thisExchanger.FrostControlType =
-                static_cast<FrostControlOption>(getEnumValue(frostControlNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+            thisExchanger.FrostControlType = static_cast<FrostControlOption>(getEnumValue(frostControlNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
             if (thisExchanger.FrostControlType == FrostControlOption::Invalid) {
                 ShowSevereError(state, format("Invalid Frost Control method for {} =  {}", thisExchanger.Name, state.dataIPShortCut->cAlphaArgs(9)));
                 ErrorsFound = true;

@@ -2164,11 +2164,11 @@ namespace UnitarySystems {
                         this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
                         WaterCoils::SimulateWaterCoilComponents(
                             state, this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                        EqSizing.DesCoolingLoad = WaterCoils::GetWaterCoilCapacity(
-                            state,
-                            UtilityRoutines::makeUPPER(DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num)),
-                            this->m_CoolingCoilName,
-                            ErrFound);
+                        EqSizing.DesCoolingLoad =
+                            WaterCoils::GetWaterCoilCapacity(state,
+                                                             UtilityRoutines::makeUPPER(DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num)),
+                                                             this->m_CoolingCoilName,
+                                                             ErrFound);
                     }
                 }
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.DesCoolingLoad;
@@ -2181,11 +2181,11 @@ namespace UnitarySystems {
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                         WaterCoils::SimulateWaterCoilComponents(
                             state, this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                        EqSizing.DesHeatingLoad = WaterCoils::GetWaterCoilCapacity(
-                            state,
-                            UtilityRoutines::makeUPPER(DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num)),
-                            this->m_HeatingCoilName,
-                            ErrFound);
+                        EqSizing.DesHeatingLoad =
+                            WaterCoils::GetWaterCoilCapacity(state,
+                                                             UtilityRoutines::makeUPPER(DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num)),
+                                                             this->m_HeatingCoilName,
+                                                             ErrFound);
                     }
                 }
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.DesHeatingLoad;
@@ -7192,8 +7192,7 @@ namespace UnitarySystems {
                     availScheduleName = UtilityRoutines::makeUPPER(fields.at("availability_schedule_name").get<std::string>());
                 }
                 thisSys.input_specs.availability_schedule_name = availScheduleName;
-                thisSys.input_specs.cooling_coil_object_type =
-                    UtilityRoutines::makeUPPER(fields.at("cooling_coil_object_type").get<std::string>());
+                thisSys.input_specs.cooling_coil_object_type = UtilityRoutines::makeUPPER(fields.at("cooling_coil_object_type").get<std::string>());
                 thisSys.input_specs.cooling_coil_name = UtilityRoutines::makeUPPER(fields.at("cooling_coil_name").get<std::string>());
                 // why is this cooling coil does not have a field for Design Air Vol Flow Rate
                 // set it "SupplyAirFlowRate" to avoid blank, which lead to fatal out during get input
@@ -7353,13 +7352,11 @@ namespace UnitarySystems {
                     thisSys.input_specs.availability_schedule_name =
                         UtilityRoutines::makeUPPER(fields.at("availability_schedule_name").get<std::string>());
                 }
-                thisSys.input_specs.air_inlet_node_name =
-                    UtilityRoutines::makeUPPER(fields.at("air_inlet_node_name").get<std::string>()); // required
+                thisSys.input_specs.air_inlet_node_name = UtilityRoutines::makeUPPER(fields.at("air_inlet_node_name").get<std::string>()); // required
                 thisSys.input_specs.air_outlet_node_name =
                     UtilityRoutines::makeUPPER(fields.at("air_outlet_node_name").get<std::string>()); // required
-                if (fields.find("supply_fan_object_type") != fields.end()) {                              // not required field
-                    thisSys.input_specs.supply_fan_object_type =
-                        UtilityRoutines::makeUPPER(fields.at("supply_fan_object_type").get<std::string>());
+                if (fields.find("supply_fan_object_type") != fields.end()) {                          // not required field
+                    thisSys.input_specs.supply_fan_object_type = UtilityRoutines::makeUPPER(fields.at("supply_fan_object_type").get<std::string>());
                 }
 
                 if (fields.find("supply_fan_name") != fields.end()) { // not required field
@@ -17120,8 +17117,7 @@ namespace UnitarySystems {
         this->NodeNumOfControlledZone = zoneEquipConfig.ZoneNode;
         TotalFloorAreaOnAirLoop = state.dataHeatBal->Zone(this->ControlZoneNum).FloorArea;
         this->m_AirLoopEquipment = false;
-        if (zoneEquipConfig.EquipListIndex == 0)
-            return;
+        if (zoneEquipConfig.EquipListIndex == 0) return;
 
         auto &zoneEquipList = state.dataZoneEquip->ZoneEquipList(zoneEquipConfig.EquipListIndex);
         for (int EquipNum = 1; EquipNum <= zoneEquipList.NumOfEquipTypes; ++EquipNum) {

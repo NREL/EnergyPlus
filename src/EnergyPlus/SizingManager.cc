@@ -2480,8 +2480,7 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     auto &thisOARequirements(state.dataSize->OARequirements(OAIndex));
 
     if (NumAlphas > 1) {
-        thisOARequirements.OAFlowMethod =
-            static_cast<OAFlowCalcMethod>(getEnumValue(OAFlowCalcMethodNamesUC, UtilityRoutines::makeUPPER(Alphas(2))));
+        thisOARequirements.OAFlowMethod = static_cast<OAFlowCalcMethod>(getEnumValue(OAFlowCalcMethodNamesUC, UtilityRoutines::makeUPPER(Alphas(2))));
         if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->OARequirements(OAIndex).Name));
             ShowContinueError(state, format("...Invalid {}=\"{}\",", cAlphaFields(2), Alphas(2)));
@@ -3423,8 +3422,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
-                zoneSizingIndex.zoneSizingMethod = static_cast<DataSizing::ZoneSizing>(
-                    getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+                zoneSizingIndex.zoneSizingMethod =
+                    static_cast<DataSizing::ZoneSizing>(getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {
                     zoneSizingIndex.zoneLatentSizing = true;
                     state.dataHeatBal->DoLatentSizing = true;
@@ -4261,8 +4260,8 @@ void GetPlantSizingInput(EnergyPlusData &state)
 
         constexpr static std::array<std::string_view, static_cast<int>(DataSizing::TypeOfPlantLoop::Num)> TypeOfPlantLoopNamesUC = {
             "HEATING", "COOLING", "CONDENSER", "STEAM"};
-        state.dataSize->PlantSizData(PltSizIndex).LoopType = static_cast<TypeOfPlantLoop>(
-            getEnumValue(TypeOfPlantLoopNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
+        state.dataSize->PlantSizData(PltSizIndex).LoopType =
+            static_cast<TypeOfPlantLoop>(getEnumValue(TypeOfPlantLoopNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
         assert(state.dataSize->PlantSizData(PltSizIndex).LoopType != TypeOfPlantLoop::Invalid);
 
         if (NumAlphas > 2) {

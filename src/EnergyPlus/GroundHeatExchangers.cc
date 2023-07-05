@@ -307,8 +307,7 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
 
     if (j.find("ghe_vertical_responsefactors_object_name") != j.end()) {
         // Response factors come from IDF object
-        this->myRespFactors =
-            GetResponseFactor(state, UtilityRoutines::makeUPPER(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
+        this->myRespFactors = GetResponseFactor(state, UtilityRoutines::makeUPPER(j["ghe_vertical_responsefactors_object_name"].get<std::string>()));
         this->gFunctionsExist = true;
     }
 
@@ -411,10 +410,9 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     state.dataGroundHeatExchanger->prevTimeSteps = 0.0;
 
     // Initialize ground temperature model and get pointer reference
-    this->groundTempModel =
-        GetGroundTempModelAndInit(state,
-                                  UtilityRoutines::makeUPPER(j["undisturbed_ground_temperature_model_type"].get<std::string>()),
-                                  UtilityRoutines::makeUPPER(j["undisturbed_ground_temperature_model_name"].get<std::string>()));
+    this->groundTempModel = GetGroundTempModelAndInit(state,
+                                                      UtilityRoutines::makeUPPER(j["undisturbed_ground_temperature_model_type"].get<std::string>()),
+                                                      UtilityRoutines::makeUPPER(j["undisturbed_ground_temperature_model_name"].get<std::string>()));
 
     // Check for Errors
     if (errorsFound) {

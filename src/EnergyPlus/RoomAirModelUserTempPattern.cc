@@ -322,7 +322,7 @@ void FigureHeightPattern(EnergyPlusData &state, int const PattrnID, int const Zo
         if ((hiSideZeta - lowSideZeta) != 0.0) {
             Real64 fractBtwn = (zeta - lowSideZeta) / (hiSideZeta - lowSideZeta);
             tmpDeltaTai = pattern.VertPatrn.DeltaTaiPatrn(lowSideID) +
-                    fractBtwn * (pattern.VertPatrn.DeltaTaiPatrn(highSideID) - pattern.VertPatrn.DeltaTaiPatrn(lowSideID));
+                          fractBtwn * (pattern.VertPatrn.DeltaTaiPatrn(highSideID) - pattern.VertPatrn.DeltaTaiPatrn(lowSideID));
 
         } else { // would divide by zero, using low side value
 
@@ -354,7 +354,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
     // calculations vary by mode
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 Grad;         // vertical temperature gradient C/m
+    Real64 Grad; // vertical temperature gradient C/m
 
     auto &patternZoneInfo = state.dataRoomAir->AirPatternZoneInfo(ZoneNum);
     auto &pattern = state.dataRoomAir->AirPattern(PattrnID);
@@ -383,7 +383,10 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
     switch (pattern.TwoGradPatrn.InterpolationMode) {
     case UserDefinedPatternMode::OutdoorDryBulb: {
         Grad = OutdoorDryBulbGrad(state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp,
-                                  twoGrad.UpperBoundTempScale, twoGrad.HiGradient, twoGrad.LowerBoundTempScale, twoGrad.LowGradient);
+                                  twoGrad.UpperBoundTempScale,
+                                  twoGrad.HiGradient,
+                                  twoGrad.LowerBoundTempScale,
+                                  twoGrad.LowGradient);
     } break;
     case UserDefinedPatternMode::ZoneAirTemp: {
         if (Tmean >= twoGrad.UpperBoundTempScale) {
@@ -394,9 +397,8 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
             // bad user input, trapped during get input
             Grad = twoGrad.LowGradient;
         } else {
-            Grad = twoGrad.LowGradient +
-                    ((Tmean - twoGrad.LowerBoundTempScale) / (twoGrad.UpperBoundTempScale - twoGrad.LowerBoundTempScale)) *
-                    (twoGrad.HiGradient - twoGrad.LowGradient);
+            Grad = twoGrad.LowGradient + ((Tmean - twoGrad.LowerBoundTempScale) / (twoGrad.UpperBoundTempScale - twoGrad.LowerBoundTempScale)) *
+                                             (twoGrad.HiGradient - twoGrad.LowGradient);
         }
     } break;
     case UserDefinedPatternMode::DeltaOutdoorZone: {
@@ -408,9 +410,8 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
         } else if ((twoGrad.UpperBoundTempScale - twoGrad.LowerBoundTempScale) == 0.0) {
             Grad = twoGrad.LowGradient;
         } else {
-            Grad = twoGrad.LowGradient +
-                    ((DeltaT - twoGrad.LowerBoundTempScale) / (twoGrad.UpperBoundTempScale - twoGrad.LowerBoundTempScale)) *
-                    (twoGrad.HiGradient - twoGrad.LowGradient);
+            Grad = twoGrad.LowGradient + ((DeltaT - twoGrad.LowerBoundTempScale) / (twoGrad.UpperBoundTempScale - twoGrad.LowerBoundTempScale)) *
+                                             (twoGrad.HiGradient - twoGrad.LowGradient);
         }
     } break;
     case UserDefinedPatternMode::SensibleCooling: {
@@ -428,7 +429,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
 
                 Grad = twoGrad.LowGradient +
                        ((CoolLoad - twoGrad.LowerBoundHeatRateScale) / (twoGrad.UpperBoundHeatRateScale - twoGrad.LowerBoundHeatRateScale)) *
-                        (twoGrad.HiGradient - twoGrad.LowGradient);
+                           (twoGrad.HiGradient - twoGrad.LowGradient);
             }
         }
     } break;
@@ -442,8 +443,8 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
             Grad = twoGrad.LowGradient;
         } else {
             Grad = twoGrad.LowGradient +
-                    ((HeatLoad - twoGrad.LowerBoundHeatRateScale) / (twoGrad.UpperBoundHeatRateScale - twoGrad.LowerBoundHeatRateScale)) *
-                    (twoGrad.HiGradient - twoGrad.LowGradient);
+                   ((HeatLoad - twoGrad.LowerBoundHeatRateScale) / (twoGrad.UpperBoundHeatRateScale - twoGrad.LowerBoundHeatRateScale)) *
+                       (twoGrad.HiGradient - twoGrad.LowGradient);
         }
     } break;
     default:
@@ -475,7 +476,7 @@ Real64 OutdoorDryBulbGrad(Real64 DryBulbTemp, // Zone(ZoneNum).OutDryBulbTemp
         return HiGradient;
     } else if (DryBulbTemp <= LowerBound) {
         return LowGradient;
-    } else  if ((UpperBound - LowerBound) == 0.0) {
+    } else if ((UpperBound - LowerBound) == 0.0) {
         return LowGradient;
     } else {
         return LowGradient + ((DryBulbTemp - LowerBound) / (UpperBound - LowerBound)) * (HiGradient - LowGradient);
@@ -491,7 +492,7 @@ void FigureConstGradPattern(EnergyPlusData &state, int const PattrnID, int const
 
     auto &patternZoneInfo = state.dataRoomAir->AirPatternZoneInfo(ZoneNum);
     auto &pattern = state.dataRoomAir->AirPattern(PattrnID);
-    Real64 Tmean = patternZoneInfo.TairMean; // MAT
+    Real64 Tmean = patternZoneInfo.TairMean;  // MAT
     Real64 Grad = pattern.GradPatrn.Gradient; // Vertical temperature gradient
 
     Real64 ZetaTmean = 0.5; // non-dimensional height for MAT
@@ -561,7 +562,7 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     }
 
     ZFlrAvg = (FloorCount > 0.0) ? (ZFlrAvg / FloorCount) : ZMin;
-    
+
     Real64 ZoneZorig = ZFlrAvg; // Z floor  [M]
     Real64 ZoneCeilHeight = zone.CeilingHeight;
 
@@ -573,9 +574,7 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     if (SurfMinZ < (ZoneZorig - TolValue)) {
         if (state.dataGlobal->DisplayExtraWarnings) {
             ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-            ShowContinueError(
-                state,
-                format("too low surface: {} in zone: {}", state.dataSurface->Surface(thisHBsurf).Name, zone.Name));
+            ShowContinueError(state, format("too low surface: {} in zone: {}", state.dataSurface->Surface(thisHBsurf).Name, zone.Name));
             ShowContinueError(state, format("**** Average floor height of zone is: {:.3R}", ZoneZorig));
             ShowContinueError(state, format("**** Surface minimum height is: {:.3R}", SurfMinZ));
         } else {
@@ -586,9 +585,7 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
     if (SurfMaxZ > (ZoneZorig + ZoneCeilHeight + TolValue)) {
         if (state.dataGlobal->DisplayExtraWarnings) {
             ShowWarningError(state, "RoomAirModelUserTempPattern: Problem in non-dimensional height calculation");
-            ShowContinueError(
-                state,
-                format(" too high surface: {} in zone: {}", state.dataSurface->Surface(thisHBsurf).Name, zone.Name));
+            ShowContinueError(state, format(" too high surface: {} in zone: {}", state.dataSurface->Surface(thisHBsurf).Name, zone.Name));
             ShowContinueError(state, format("**** Average Ceiling height of zone is: {:.3R}", (ZoneZorig + ZoneCeilHeight)));
             ShowContinueError(state, format("**** Surface Maximum height is: {:.3R}", SurfMaxZ));
         } else {
@@ -598,8 +595,10 @@ Real64 FigureNDheightInZone(EnergyPlusData &state, int const thisHBsurf) // inde
 
     // non dimensionalize.
     Real64 Zeta = (Zcm - ZoneZorig) / ZoneCeilHeight;
-    if (Zeta > 0.99) Zeta = 0.99;
-    else if (Zeta < 0.01) Zeta = 0.01;
+    if (Zeta > 0.99)
+        Zeta = 0.99;
+    else if (Zeta < 0.01)
+        Zeta = 0.01;
 
     return Zeta;
 }
@@ -643,7 +642,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     }
 
     // What if ZoneNodeID is 0?
-    
+
     auto &zoneNode = state.dataLoopNodes->Node(patternZoneInfo.ZoneNodeID);
     auto &zone = state.dataHeatBal->Zone(ZoneNum);
     auto &zoneHeatBal = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
@@ -678,11 +677,10 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                 for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
                     if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                         state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
-                        Real64 FlowThisTS = PsyRhoAirFnPbTdbW(state,
-                                                       state.dataEnvrn->OutBaroPress,
-                                                       state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum),
-                                                       zoneNode.HumRat) *
-                                     state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
+                        Real64 FlowThisTS =
+                            PsyRhoAirFnPbTdbW(
+                                state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), zoneNode.HumRat) *
+                            state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
                     }
@@ -753,7 +751,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
             returnNode.HumRat = zoneNode.HumRat;
             state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
             // shouldn't the HVAC term be zeroed out then?
-            
+
             zoneHeatBal.ZoneLatentGain += SumAllReturnAirLatentGains(state, ZoneNum, returnNodeNum);
         }
 

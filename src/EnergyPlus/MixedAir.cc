@@ -1041,8 +1041,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
         auto &OASys = state.dataAirLoop->OutsideAirSys(OASysNum);
         for (int CompNum = 1; CompNum <= OASys.NumComponents; ++CompNum) {
-            OASys.ComponentTypeEnum(CompNum) =
-                static_cast<SimAirServingZones::CompType>(getEnumValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
+            OASys.ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(getEnumValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
             if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OASys.ComponentName(CompNum)));

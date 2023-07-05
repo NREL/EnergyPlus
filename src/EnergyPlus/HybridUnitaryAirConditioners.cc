@@ -220,7 +220,7 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
 
     // set the availability status based on the availability manager list name
     if (allocated(ZoneComp)) {
-            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
+        auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
         if (state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;

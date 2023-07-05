@@ -467,8 +467,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             } else {
                 Pos = scan(Remainder, ' ');
                 if (Pos == std::string::npos) Pos = Remainder.length();
-                Variable =
-                    UtilityRoutines::makeUPPER(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
+                Variable = UtilityRoutines::makeUPPER(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
                 StackNum2 = UtilityRoutines::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
                 if (StackNum2 == 0) {
                     AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");

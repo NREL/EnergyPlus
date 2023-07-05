@@ -510,8 +510,7 @@ namespace OutdoorAirUnit {
             if (!lAlphaBlanks(9)) {
                 constexpr std::array<std::string_view, static_cast<int>(OAUnitCtrlType::Num)> ctrlTypeNamesUC = {
                     "NEUTRALCONTROL", "INVALID-UNCONDITIONED", "TEMPERATURECONTROL"};
-                OAUnitCtrlType const tmpCtrlType =
-                    static_cast<OAUnitCtrlType>(getEnumValue(ctrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+                OAUnitCtrlType const tmpCtrlType = static_cast<OAUnitCtrlType>(getEnumValue(ctrlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
                 switch (tmpCtrlType) {
                 case OAUnitCtrlType::Neutral:
                 case OAUnitCtrlType::Temperature:
@@ -1192,7 +1191,7 @@ namespace OutdoorAirUnit {
         if (allocated(ZoneComp)) {
             auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum);
             if (state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
-                    availMgr.AvailManagerListName = thisOutAirUnit.AvailManagerListName;
+                availMgr.AvailManagerListName = thisOutAirUnit.AvailManagerListName;
                 availMgr.ZoneNum = ZoneNum;
                 state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum) = false;
             }

@@ -426,8 +426,8 @@ void GetDemandManagerListInput(EnergyPlusData &state)
             thisDemandMgrList.History = 0.0;
 
             // Validate Demand Manager Priority
-            thisDemandMgrList.ManagerPriority = static_cast<ManagePriorityType>(
-                getEnumValue(ManagePriorityNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
+            thisDemandMgrList.ManagerPriority =
+                static_cast<ManagePriorityType>(getEnumValue(ManagePriorityNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
             ErrorsFound = ErrorsFound || (thisDemandMgrList.ManagerPriority == ManagePriorityType::Invalid);
 
             // Get DEMAND MANAGER Type and Name pairs
@@ -676,8 +676,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl =
-                static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -775,8 +774,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl =
-                static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -895,8 +893,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl =
-                static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -1016,8 +1013,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl =
-                static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)
@@ -1149,8 +1145,7 @@ void GetDemandManagerInput(EnergyPlusData &state)
             }
 
             // Validate Limiting Control
-            demandMgr.LimitControl =
-                static_cast<ManagerLimit>(getEnumValue(ManagerLimitVentNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
+            demandMgr.LimitControl = static_cast<ManagerLimit>(getEnumValue(ManagerLimitVentNamesUC, UtilityRoutines::makeUPPER(AlphArray(3))));
             ErrorsFound = ErrorsFound || (demandMgr.LimitControl == ManagerLimit::Invalid);
 
             if (NumArray(1) == 0.0)

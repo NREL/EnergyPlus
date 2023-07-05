@@ -268,8 +268,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             thisMaterial->Name = materialName;
 
             std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
-            thisMaterial->Roughness =
-                static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, UtilityRoutines::makeUPPER(roughness)));
+            thisMaterial->Roughness = static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, UtilityRoutines::makeUPPER(roughness)));
 
             thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
             thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
@@ -346,8 +345,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::Regular;
         thisMaterial->Name = MaterialNames(1);
 
-        thisMaterial->Roughness =
-            static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, UtilityRoutines::makeUPPER(MaterialNames(2))));
+        thisMaterial->Roughness = static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, UtilityRoutines::makeUPPER(MaterialNames(2))));
 
         thisMaterial->Resistance = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -1300,8 +1298,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             // Get gap vent type
-            thisMaterial->gapVentType =
-                static_cast<GapVentType>(getEnumValue(GapVentTypeUC, UtilityRoutines::makeUPPER(MaterialNames(3))));
+            thisMaterial->gapVentType = static_cast<GapVentType>(getEnumValue(GapVentTypeUC, UtilityRoutines::makeUPPER(MaterialNames(3))));
         }
 
         if (gasType == GasType::Custom) {
@@ -2394,8 +2391,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         //  MaximizeSolar or BlockBeamSolar
         thisMaterial->slatAngleType = SlatAngleType::FixedSlatAngle;
         if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            thisMaterial->slatAngleType =
-                static_cast<SlatAngleType>(getEnumValue(SlatAngleTypeUC, UtilityRoutines::makeUPPER(MaterialNames(3))));
+            thisMaterial->slatAngleType = static_cast<SlatAngleType>(getEnumValue(SlatAngleTypeUC, UtilityRoutines::makeUPPER(MaterialNames(3))));
         }
         if (thisMaterial->SlatWidth < thisMaterial->SlatSeparation) {
             ShowWarningError(state, format("{}=\"{}\", Slat Seperation/Width", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
@@ -2524,8 +2520,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Name = MaterialNames(1);
         // need to treat the A2 with is just the name of the soil(it is
         // not important)
-        thisMaterial->Roughness =
-            static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, UtilityRoutines::makeUPPER(MaterialNames(3))));
+        thisMaterial->Roughness = static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, UtilityRoutines::makeUPPER(MaterialNames(3))));
         if (UtilityRoutines::SameString(MaterialNames(4), "Simple")) {
             thisMaterial->EcoRoofCalculationMethod = 1;
         } else if (UtilityRoutines::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {

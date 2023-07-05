@@ -498,8 +498,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             }
             std::string inputFileDirFlagUC = "YES";
             try {
-                inputFileDirFlagUC =
-                    EnergyPlus::UtilityRoutines::makeUPPER(fields.at("add_input_file_directory_to_search_path").get<std::string>());
+                inputFileDirFlagUC = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("add_input_file_directory_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }
@@ -510,8 +509,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
 
             std::string epInDirFlagUC = "YES";
             try {
-                epInDirFlagUC =
-                    EnergyPlus::UtilityRoutines::makeUPPER(fields.at("add_epin_environment_variable_to_search_path").get<std::string>());
+                epInDirFlagUC = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("add_epin_environment_variable_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }

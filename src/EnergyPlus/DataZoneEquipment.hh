@@ -123,7 +123,7 @@ namespace DataZoneEquipment {
         PurchasedAir,
         EvaporativeCooler,
         HybridEvaporativeCooler, // last zone equipment type to use zone availability manager. The above list must not change or
-                                     // NumValidSysAvailZoneComponents must also change.
+                                 // NumValidSysAvailZoneComponents must also change.
         AirDistributionUnit,
         BaseboardConvectiveWater,
         BaseboardConvectiveElectric,
@@ -141,20 +141,20 @@ namespace DataZoneEquipment {
         CoolingPanel,
         UnitarySystem,
         AirTerminalDualDuctConstantVolume,
-        AirTerminalDualDuctVAV, 
+        AirTerminalDualDuctVAV,
         AirTerminalSingleDuctConstantVolumeReheat,
-        AirTerminalSingleDuctConstantVolumeNoReheat, 
-        AirTerminalSingleDuctVAVReheat, 
-        AirTerminalSingleDuctVAVNoReheat, 
+        AirTerminalSingleDuctConstantVolumeNoReheat,
+        AirTerminalSingleDuctVAVReheat,
+        AirTerminalSingleDuctVAVNoReheat,
         AirTerminalSingleDuctSeriesPIUReheat,
-        AirTerminalSingleDuctParallelPIUReheat, 
+        AirTerminalSingleDuctParallelPIUReheat,
         AirTerminalSingleDuctCAVFourPipeInduction,
         AirTerminalSingleDuctVAVReheatVariableSpeedFan,
         AirTerminalSingleDuctVAVHeatAndCoolReheat,
-        AirTerminalSingleDuctVAVHeatAndCoolNoReheat, 
-        AirTerminalSingleDuctConstantVolumeCooledBeam, 
-        AirTerminalDualDuctVAVOutdoorAir, 
-        AirLoopHVACReturnAir, 
+        AirTerminalSingleDuctVAVHeatAndCoolNoReheat,
+        AirTerminalSingleDuctConstantVolumeCooledBeam,
+        AirTerminalDualDuctVAVOutdoorAir,
+        AirLoopHVACReturnAir,
         Num
     };
 

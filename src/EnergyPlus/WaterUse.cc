@@ -501,8 +501,8 @@ namespace WaterUse {
 
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(8)) && (state.dataIPShortCut->cAlphaArgs(8) != "NONE")) {
                     waterConnection.HeatRecovery = true;
-                    waterConnection.HeatRecoveryHX = static_cast<HeatRecovHX>(
-                        getEnumValue(HeatRecoverHXNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+                    waterConnection.HeatRecoveryHX =
+                        static_cast<HeatRecovHX>(getEnumValue(HeatRecoverHXNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
                     if (waterConnection.HeatRecoveryHX == HeatRecovHX::Invalid) {
                         ShowSevereError(state,
                                         format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));

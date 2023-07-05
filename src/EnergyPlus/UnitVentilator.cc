@@ -376,7 +376,8 @@ namespace UnitVentilator {
             if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide || unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 unitVent.ATMixerExists = true;
             }
-            unitVent.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::UnitVentilator, unitVent.Name);
+            unitVent.ZonePtr =
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::UnitVentilator, unitVent.Name);
             if (unitVent.ZonePtr == 0) {
                 ErrorsFound = true;
             }

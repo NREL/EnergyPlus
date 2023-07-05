@@ -612,12 +612,10 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
                 DataZoneEquipment::ZoneEquipType equipType = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
                 if (equipType == DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal ||
                     equipType == DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator ||
-                    equipType == DataZoneEquipment::ZoneEquipType::FourPipeFanCoil ||
-                    equipType == DataZoneEquipment::ZoneEquipType::OutdoorAirUnit ||
+                    equipType == DataZoneEquipment::ZoneEquipType::FourPipeFanCoil || equipType == DataZoneEquipment::ZoneEquipType::OutdoorAirUnit ||
                     equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
                     equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump ||
-                    equipType == DataZoneEquipment::ZoneEquipType::UnitHeater ||
-                    equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
+                    equipType == DataZoneEquipment::ZoneEquipType::UnitHeater || equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
                     equipType == DataZoneEquipment::ZoneEquipType::VentilatedSlab ||
                     equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir ||
                     equipType == DataZoneEquipment::ZoneEquipType::WindowAirConditioner ||
@@ -633,7 +631,6 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
                         c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
                         c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
                     }
-                
                 }
             }
         }
@@ -668,8 +665,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                         equipType == DataZoneEquipment::ZoneEquipType::OutdoorAirUnit ||
                         equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
                         equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump ||
-                        equipType == DataZoneEquipment::ZoneEquipType::UnitHeater ||
-                        equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
+                        equipType == DataZoneEquipment::ZoneEquipType::UnitHeater || equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
                         equipType == DataZoneEquipment::ZoneEquipType::VentilatedSlab ||
                         equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir ||
                         equipType == DataZoneEquipment::ZoneEquipType::WindowAirConditioner ||
@@ -685,8 +681,8 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                         }
                     }
                 } // for (equipLoop)
-            } // if (zoneEquipList.numOfEquipTypes > 0)
-        } // if (c->ZoneEqNum > 0)
+            }     // if (zoneEquipList.numOfEquipTypes > 0)
+        }         // if (c->ZoneEqNum > 0)
 
         if (c->airloopNum > 0 && c->zoneEqNum == 0) {
             c->coilLocation = "AirLoop";

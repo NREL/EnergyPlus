@@ -1162,8 +1162,7 @@ namespace HeatBalanceManager {
             } else {
                 if (NumAlpha > 2) {
                     {
-                        int FlowTypeNum =
-                            getEnumValue(DataHeatBalance::InfiltrationZoneTypeNamesUC, UtilityRoutines::makeUPPER(AlphaName(3)));
+                        int FlowTypeNum = getEnumValue(DataHeatBalance::InfiltrationZoneTypeNamesUC, UtilityRoutines::makeUPPER(AlphaName(3)));
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = static_cast<DataHeatBalance::InfiltrationZoneType>(FlowTypeNum);
                         AlphaName(3) = DataHeatBalance::InfiltrationZoneTypeNamesCC[FlowTypeNum];
                         if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Invalid) {

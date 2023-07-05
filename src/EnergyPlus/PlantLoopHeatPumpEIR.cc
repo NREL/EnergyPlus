@@ -2029,8 +2029,7 @@ void EIRFuelFiredHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
             thisPLHP.oaTempCurveInputVar = static_cast<OATempCurveVar>(getEnumValue(OATempCurveVarNamesUC, oaTempCurveInputVar));
 
             // A10 water_temperature_curve_input_variable
-            std::string waterTempCurveInputVar =
-                UtilityRoutines::makeUPPER(fields.at("water_temperature_curve_input_variable").get<std::string>());
+            std::string waterTempCurveInputVar = UtilityRoutines::makeUPPER(fields.at("water_temperature_curve_input_variable").get<std::string>());
             thisPLHP.waterTempCurveInputVar = static_cast<WaterTempCurveVar>(getEnumValue(WaterTempCurveVarNamesUC, waterTempCurveInputVar));
 
             // A11 normalized_capacity_function_of_temperature_curve_name

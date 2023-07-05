@@ -605,14 +605,14 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                nightCycleMgr.nightCycleControlType = static_cast<NightCycleControlType>(
-                    getEnumValue(NightCycleControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
+                nightCycleMgr.nightCycleControlType =
+                    static_cast<NightCycleControlType>(getEnumValue(NightCycleControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
 
                 assert(nightCycleMgr.nightCycleControlType != NightCycleControlType::Invalid);
 
                 // Cycling Run Time Control Type
-                nightCycleMgr.cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(
-                    getEnumValue(CyclingRunTimeControlNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(5))));
+                nightCycleMgr.cyclingRunTimeControl =
+                    static_cast<CyclingRunTimeControl>(getEnumValue(CyclingRunTimeControlNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(5))));
 
                 assert(nightCycleMgr.cyclingRunTimeControl != CyclingRunTimeControl::Invalid);
 
@@ -808,8 +808,8 @@ namespace SystemAvailabilityManager {
 
                 optimumStartMgr.MaxOptStartTime = rNumericArgs(1);
 
-                optimumStartMgr.optimumStartControlType = static_cast<OptimumStartControlType>(
-                    getEnumValue(OptimumStartControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
+                optimumStartMgr.optimumStartControlType =
+                    static_cast<OptimumStartControlType>(getEnumValue(OptimumStartControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
 
                 if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::Invalid) {
                     optimumStartMgr.optimumStartControlType = OptimumStartControlType::ControlZone;

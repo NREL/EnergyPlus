@@ -276,8 +276,7 @@ namespace EvaporativeFluidCoolers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(6) || AlphArray(6).empty()) {
                 thisEFC.capacityControl = CapacityControl::FanCycling; // FanCycling
             } else {
-                thisEFC.capacityControl =
-                    static_cast<CapacityControl>(getEnumValue(controlNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
+                thisEFC.capacityControl = static_cast<CapacityControl>(getEnumValue(controlNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
                 if (thisEFC.capacityControl == CapacityControl::Invalid) {
                     thisEFC.capacityControl = CapacityControl::FanCycling;
                     ShowWarningError(state,

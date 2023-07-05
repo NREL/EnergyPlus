@@ -319,8 +319,8 @@ void GetPumpInput(EnergyPlusData &state)
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
@@ -407,8 +407,8 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.HasVFD = false;
         } else {
             thisPump.HasVFD = true;
-            thisPump.VFD.VFDControlType = static_cast<ControlTypeVFD>(
-                getEnumValue(controlTypeVFDNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(7))));
+            thisPump.VFD.VFDControlType =
+                static_cast<ControlTypeVFD>(getEnumValue(controlTypeVFDNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(7))));
             switch (thisPump.VFD.VFDControlType) {
             case ControlTypeVFD::VFDManual: {
                 thisPump.VFD.ManualRPMSchedIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(8));
@@ -587,8 +587,8 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.Energy = 0.0;
         thisPump.Power = 0.0;
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
@@ -875,8 +875,8 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
@@ -1021,8 +1021,8 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,

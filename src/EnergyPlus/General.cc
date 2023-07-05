@@ -1236,8 +1236,7 @@ void ScanForReports(EnergyPlusData &state,
             state.dataRuntimeLang->OutputEMSActuatorAvailSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSActuatorAvailFull = (CheckAvailRpt == AvailRpt::Verbose);
 
-            CheckAvailRpt =
-                static_cast<AvailRpt>(getEnumValue(AvailRptNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
+            CheckAvailRpt = static_cast<AvailRpt>(getEnumValue(AvailRptNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             state.dataRuntimeLang->OutputEMSInternalVarsSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSInternalVarsFull = (CheckAvailRpt == AvailRpt::Verbose);
 
@@ -1254,8 +1253,7 @@ void ScanForReports(EnergyPlusData &state,
     // Process the Scan Request
     DoReport = false;
 
-    ReportName rptName =
-        static_cast<ReportName>(getEnumValue(ReportNamesUC, UtilityRoutines::makeUPPER(UtilityRoutines::makeUPPER(reportName))));
+    ReportName rptName = static_cast<ReportName>(getEnumValue(ReportNamesUC, UtilityRoutines::makeUPPER(UtilityRoutines::makeUPPER(reportName))));
     switch (rptName) {
     case ReportName::Constructions: {
         if (present(ReportKey)) {

@@ -129,15 +129,14 @@ constexpr std::array<std::string_view, static_cast<int>(AirflowSpecAlt::Num)> ai
 constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::VentilationType::Num)> ventilationTypeNamesUC = {
     "NATURAL", "INTAKE", "EXHAUST", "BALANCED"};
 
-constexpr std::array<std::string_view, static_cast<int>(RoomAir::RoomAirModel::Num)> roomAirModelNamesUC = {
-    "USERDEFINED",
-    "MIXING",
-    "ONENODEDISPLACEMENTVENTILATION",
-    "THREENODEDISPLACEMENTVENTILATION",
-    "CROSSVENTILATION",
-    "UNDERFLOORAIRDISTRIBUTIONINTERIOR",
-    "UNDERFLOORAIRDISTRIBUTIONEXTERIOR",
-    "AIRFLOWNETWORK"};
+constexpr std::array<std::string_view, static_cast<int>(RoomAir::RoomAirModel::Num)> roomAirModelNamesUC = {"USERDEFINED",
+                                                                                                            "MIXING",
+                                                                                                            "ONENODEDISPLACEMENTVENTILATION",
+                                                                                                            "THREENODEDISPLACEMENTVENTILATION",
+                                                                                                            "CROSSVENTILATION",
+                                                                                                            "UNDERFLOORAIRDISTRIBUTIONINTERIOR",
+                                                                                                            "UNDERFLOORAIRDISTRIBUTIONEXTERIOR",
+                                                                                                            "AIRFLOWNETWORK"};
 
 constexpr std::array<std::string_view, static_cast<int>(RoomAir::CouplingScheme::Num)> couplingSchemeNamesUC = {"DIRECT", "INDIRECT"};
 
@@ -486,7 +485,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         {
             thisZoneAirBalance.BalanceMethod = static_cast<DataHeatBalance::AirBalance>(
                 getEnumValue(DataHeatBalance::AirBalanceTypeNamesUC,
-                                    UtilityRoutines::makeUPPER(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
+                             UtilityRoutines::makeUPPER(cAlphaArgs(3)))); // Air balance method type character input-->convert to enum
             if (thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Invalid) {
                 thisZoneAirBalance.BalanceMethod = DataHeatBalance::AirBalance::None;
                 ShowWarningError(state,
@@ -746,8 +745,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
                 // Set space flow fractions
                 // Infiltration equipment design level calculation method.
-                AirflowSpecAlt flow =
-                    static_cast<AirflowSpecAlt>(getEnumValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
+                AirflowSpecAlt flow = static_cast<AirflowSpecAlt>(getEnumValue(airflowAltNamesUC, cAlphaArgs(4))); // NOLINT(modernize-use-auto)
                 switch (flow) {
                 case AirflowSpecAlt::Flow:
                 case AirflowSpecAlt::FlowPerZone:
@@ -1529,8 +1527,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 if (cAlphaArgs(5).empty()) {
                     thisVentilation.FanType = DataHeatBalance::VentilationType::Natural;
                 } else {
-                    thisVentilation.FanType =
-                        static_cast<DataHeatBalance::VentilationType>(getEnumValue(ventilationTypeNamesUC, cAlphaArgs(5)));
+                    thisVentilation.FanType = static_cast<DataHeatBalance::VentilationType>(getEnumValue(ventilationTypeNamesUC, cAlphaArgs(5)));
                     if (thisVentilation.FanType == DataHeatBalance::VentilationType::Invalid) {
                         ShowSevereError(state,
                                         format(R"({}{}="{}". invalid {}="{}".)",
@@ -4604,9 +4601,9 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
                                          state.dataIPShortCut->cAlphaArgs(2),
                                          cCurrentModuleObject,
                                          roomAirModelNamesUC[(int)state.dataRoomAir->AirModel(ZoneNum).AirModel]));
-                ShowContinueError(state,
-                                  format("Air Model Type for zone already set to {}",
-                                         roomAirModelNamesUC[(int)state.dataRoomAir->AirModel(ZoneNum).AirModel]));
+                ShowContinueError(
+                    state,
+                    format("Air Model Type for zone already set to {}", roomAirModelNamesUC[(int)state.dataRoomAir->AirModel(ZoneNum).AirModel]));
                 ShowContinueError(state, format("Trying to overwrite with model type = {}", state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
             }
@@ -4614,7 +4611,7 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
 
             // state.dataRoomAir->AirModel(ZoneNum).AirModelName = state.dataIPShortCut->cAlphaArgs(1);
             state.dataRoomAir->AirModel(ZoneNum).AirModel =
-                    static_cast<RoomAir::RoomAirModel>(getEnumValue(roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3))); // is this arg1 or arg3?
+                static_cast<RoomAir::RoomAirModel>(getEnumValue(roomAirModelNamesUC, state.dataIPShortCut->cAlphaArgs(3))); // is this arg1 or arg3?
             switch (state.dataRoomAir->AirModel(ZoneNum).AirModel) {
             case RoomAir::RoomAirModel::Mixing:
                 // nothing to do here actually
@@ -4763,14 +4760,17 @@ void GetRoomAirModelParameters(EnergyPlusData &state, bool &errFlag) // True if 
     static constexpr std::string_view RoomAirHeader("! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined\n");
     print(state.files.eio, RoomAirHeader);
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        static constexpr std::array<std::string_view, (int)RoomAir::RoomAirModel::Num> roomAirModelStrings = {
-            "UserDefined", "Mixing/Well-Stirred",
-            "OneNodeDisplacementVentilation", "ThreeNodeDisplacementVentilation",
-            "CrossVentilation",
-            "UnderFloorAirDistributionInterior", "UnderFloorAirDistributionExterior",
-            "AirflowNetwork"};
-        
-        print(state.files.eio, "RoomAir Model,{},{}\n",
+        static constexpr std::array<std::string_view, (int)RoomAir::RoomAirModel::Num> roomAirModelStrings = {"UserDefined",
+                                                                                                              "Mixing/Well-Stirred",
+                                                                                                              "OneNodeDisplacementVentilation",
+                                                                                                              "ThreeNodeDisplacementVentilation",
+                                                                                                              "CrossVentilation",
+                                                                                                              "UnderFloorAirDistributionInterior",
+                                                                                                              "UnderFloorAirDistributionExterior",
+                                                                                                              "AirflowNetwork"};
+
+        print(state.files.eio,
+              "RoomAir Model,{},{}\n",
               state.dataHeatBal->Zone(ZoneNum).Name,
               roomAirModelStrings[(int)state.dataRoomAir->AirModel(ZoneNum).AirModel]);
     }

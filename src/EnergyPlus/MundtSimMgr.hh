@@ -69,11 +69,11 @@ namespace RoomAir {
     struct DefineLinearModelNode
     {
         // Members
-        std::string AirNodeName = "";                 // Name of air nodes
+        std::string AirNodeName = "";                                   // Name of air nodes
         RoomAir::AirNodeType ClassType = RoomAir::AirNodeType::Invalid; // Type of air nodes
-        Real64 Height = 0.0;                           // Z coordinates [m] node's Control Vol. center
-        Real64 Temp = 0.0;                             // Surface temperature BC
-        Array1D_bool SurfMask;                   // Limit of 60 surfaces at current sizing
+        Real64 Height = 0.0;                                            // Z coordinates [m] node's Control Vol. center
+        Real64 Temp = 0.0;                                              // Surface temperature BC
+        Array1D_bool SurfMask;                                          // Limit of 60 surfaces at current sizing
     };
 
     struct DefineSurfaceSettings
@@ -108,8 +108,8 @@ namespace RoomAir {
     //*****************************************************************************************
 
     void SetupDispVent1Node(EnergyPlusData &state,
-                         int ZoneNum,      // index number for the specified zone
-                         bool &ErrorsFound // true if problems setting up model
+                            int ZoneNum,      // index number for the specified zone
+                            bool &ErrorsFound // true if problems setting up model
     );
 
     //*****************************************************************************************

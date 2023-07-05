@@ -1677,8 +1677,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
 
         // setup program flow control integers.
-        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(getEnumValue(
-            controlTypeNameUC, UtilityRoutines::makeUPPER(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(
+            getEnumValue(controlTypeNameUC, UtilityRoutines::makeUPPER(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
         if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));

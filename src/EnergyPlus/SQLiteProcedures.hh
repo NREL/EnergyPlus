@@ -971,9 +971,8 @@ private:
                      std::shared_ptr<sqlite3> const &db,
                      int const roomAirModelNumber,
                      RoomAir::AirModelData const &roomAirModelData)
-                : SQLiteData(errorStream, db), number(roomAirModelNumber), airModelName(roomAirModelData.Name),
-              airModel(roomAirModelData.AirModel), tempCoupleScheme(roomAirModelData.TempCoupleScheme),
-              simAirModel(roomAirModelData.SimAirModel)
+            : SQLiteData(errorStream, db), number(roomAirModelNumber), airModelName(roomAirModelData.Name), airModel(roomAirModelData.AirModel),
+              tempCoupleScheme(roomAirModelData.TempCoupleScheme), simAirModel(roomAirModelData.SimAirModel)
         {
         }
 

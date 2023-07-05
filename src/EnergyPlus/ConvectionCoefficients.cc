@@ -855,8 +855,7 @@ void GetUserConvCoeffs(EnergyPlusData &state)
         extConvUserCurve.Name = ipsc->cAlphaArgs(1);
 
         ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, extConvUserCurve.Name};
-        extConvUserCurve.windSpeedType =
-            static_cast<RefWind>(getEnumValue(RefWindNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
+        extConvUserCurve.windSpeedType = static_cast<RefWind>(getEnumValue(RefWindNamesUC, UtilityRoutines::makeUPPER(ipsc->cAlphaArgs(2))));
         if (extConvUserCurve.windSpeedType == RefWind::Invalid) {
             ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
             ErrorsFound = true;

@@ -3196,13 +3196,12 @@ namespace InternalHeatGains {
                         }
 
                         // Environmental class
-                        thisZoneITEq.Class =
-                            static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(10))));
+                        thisZoneITEq.Class = static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(10))));
                         ErrorsFound = ErrorsFound || (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
-                        thisZoneITEq.AirConnectionType = static_cast<ITEInletConnection>(
-                            getEnumValue(ITEInletConnectionNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(11))));
+                        thisZoneITEq.AirConnectionType =
+                            static_cast<ITEInletConnection>(getEnumValue(ITEInletConnectionNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(11))));
                         if (thisZoneITEq.AirConnectionType == ITEInletConnection::RoomAirModel) {
                             // ZoneITEq(Loop).AirConnectionType = ITEInletConnection::RoomAirModel;
                             ShowWarningError(state,

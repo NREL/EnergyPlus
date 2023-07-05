@@ -1660,13 +1660,12 @@ void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, s
     ShowContinueError(state, format("{} = {}, invalid key", fieldName, fieldVal));
 }
 
-void ShowSevereEmptyField(EnergyPlusData &state, ErrorObjectHeader const &eoh,
-                          std::string_view fieldName,
-                          std::string_view depFieldName,
-                          std::string_view depFieldVal)
+void ShowSevereEmptyField(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view depFieldName, std::string_view depFieldVal)
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
-    ShowContinueError(state, format("{} cannot be empty{}.", fieldName, depFieldName.empty() ? "" : format (" when {} = {}", depFieldName, depFieldVal)));
+    ShowContinueError(state,
+                      format("{} cannot be empty{}.", fieldName, depFieldName.empty() ? "" : format(" when {} = {}", depFieldName, depFieldVal)));
 }
 
 } // namespace EnergyPlus

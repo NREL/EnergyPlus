@@ -2221,7 +2221,7 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
             for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                 DataLoopNode::ConnectionObjectType TypeOfComp = static_cast<DataLoopNode::ConnectionObjectType>(
                     EnergyPlus::getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                    state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf));
+                                             state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf));
                 std::string &NameOfComp = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name;
                 // Get complete list of components for complex branches
                 if (BranchNodeConnections::IsParentObject(state, TypeOfComp, NameOfComp)) {
@@ -2277,10 +2277,9 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
 
                 // check for 'grandchildren'
                 for (SubCompNum = 1; SubCompNum <= NumChildren; ++SubCompNum) {
-                    DataLoopNode::ConnectionObjectType TypeOfSubComp =
-                        static_cast<DataLoopNode::ConnectionObjectType>(EnergyPlus::getEnumValue(
-                            BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).TypeOf));
+                    DataLoopNode::ConnectionObjectType TypeOfSubComp = static_cast<DataLoopNode::ConnectionObjectType>(EnergyPlus::getEnumValue(
+                        BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                        state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).TypeOf));
                     std::string &NameOfSubComp =
                         state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).SubComp(SubCompNum).Name;
                     if (BranchNodeConnections::IsParentObject(state, TypeOfSubComp, NameOfSubComp)) {
@@ -4170,7 +4169,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += 0.0;
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump:
             case DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner:
             case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir: {
@@ -4189,7 +4188,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += (ZFAUFlowRate) * (ZFAUEnthMixedAir - ZFAUEnthReturnAir) * TimeStepSysSec; //*KJperJ
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: {
                 int OutAirNode = FanCoilUnits::GetFanCoilOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
@@ -4207,7 +4206,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += 0.0;
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::UnitVentilator: {
                 int OutAirNode = UnitVentilator::GetUnitVentilatorOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
@@ -4225,7 +4224,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += 0.0;
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::PurchasedAir: {
                 ZFAUOutAirFlow += PurchasedAirManager::GetPurchasedAirOutAirMassFlow(state, thisEquipIndex);
                 int ZoneInletAirNode = PurchasedAirManager::GetPurchasedAirZoneInletAirNode(state, thisEquipIndex);
@@ -4242,7 +4241,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += 0.0;
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: {
                 int OutAirNode = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
@@ -4260,7 +4259,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += 0.0;
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::UnitarySystem: {
                 // add accounting for OA when unitary system is used as zone equipment
             } break;
@@ -4281,7 +4280,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += 0.0;
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler: {
                 int OutAirNode = HybridUnitaryAirConditioners::GetHybridUnitaryACOutAirNode(state, thisEquipIndex);
                 if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
@@ -4300,7 +4299,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
                     ZFAUZoneVentLoad += 0.0;
                 }
             } break;
-                    
+
             case DataZoneEquipment::ZoneEquipType::UnitHeater:
             case DataZoneEquipment::ZoneEquipType::VentilatedSlab:
                 //    ZoneHVAC:EvaporativeCoolerUnit ?????
@@ -4324,7 +4323,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
             case DataZoneEquipment::ZoneEquipType::CoolingPanel: {
                 // do nothing, OA not included
             } break;
-                    
+
             default: {
                 ShowFatalError(state,
                                "ReportMaxVentilationLoads: Developer must either create accounting for OA or include in final else if "

@@ -94,58 +94,58 @@ Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponen
                                                      "ZoneHVAC:EvaporativeCoolerUnit",
                                                      "ZoneHVAC:HybridUnitaryHVAC"});
 
-constexpr std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zoneEquipTypeNamesUC =
-    {"DUMMY", // DUMMY,
-     
-     "ZONEHVAC:FOURPIPEFANCOIL", // FanCoilFourPipe
-     "ZONEHVAC:PACKAGEDTERMINALHEATPUMP", //   PackagedTerminalHeatPump
-     "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER", //  PackagedTerminalAirConditioner
-     "ZONEHVAC:WATERTOAIRHEATPUMP", //   PackagedTerminalHeatPumpWaterToAir
-     "ZONEHVAC:WINDOWAIRCONDITIONER", //  WindowAirConditioner
-     "ZONEHVAC:UNITHEATER", //  UnitHeater
-     "ZONEHVAC:UNITVENTILATOR", //  UnitVentilator
-     "ZONEHVAC:ENERGYRECOVERYVENTILATOR", // EnergyRecoveryVentilator
-     "ZONEHVAC:VENTILATEDSLAB", // VentilatedSlab
-     "ZONEHVAC:OUTDOORAIRUNIT", // OutdoorAirUnit
-     "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW", //  VariableRefrigerantFlowTerminal
-     "ZONEHVAC:IDEALLOADSAIRSYSTEM", // IdealLoadsAirSystem
-     "ZONEHVAC:EVAPORATIVECOOLERUNIT", // EvaporativeCooler
-     "ZONEHVAC:HYBRIDUNITARYHVAC",  // HybridEvaporativeCooler,
-     
-     // last zone equipment type to use zone availability manager. The above list must not change or
-     // NumValidSysAvailZoneComponents must also change.
-     
-     "ZONEHVAC:AIRDISTRIBUTIONUNIT", // AirDistributionUnit
-     "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", // BaseboardWaterConvective
-     "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC", // BaseboardElectricConvective
-     "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", // BaseboardSteam
-     "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", // BaseboardWater
-     "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC", // BaseboardElectric
-     "ZONEHVAC:HIGHTEMPERATURERADIANT", // HighTempRadiant
-     "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW", //  LowTempRadiant
-     "FAN:ZONEEXHAUST", // ExhaustFan
-     "HEATEXCHANGER:AIRTOAIR:FLATPLATE", // HeatExchanger
-     "WATERHEATER:HEATPUMP:PUMPEDCONDENSER", //  HeatPumpWaterHeater
-     "ZONEHVAC:DEHUMIDIFIER:DX", //  DXDehumidifier
-     "ZONEHVAC:REFRIGERATIONCHILLERSET", // RefrigerationAirChillerSet
-     "ZONEHVAC:FORCEDAIR:USERDEFINED", // UserDefinedVACForcedAir
-     "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER", // CoolingPanel
-     "AIRLOOPHVAC:UNITARYSYSTEM", // UnitarySystem
-     "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME", // AirTerminalDualDuctConstantVolume
-     "AIRTERMINAL:DUALDUCT:VAV", // AirTerminalDualDuctVAV
-     "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT", // AirTerminalSingleDuctConstantVolumeReheat
-     "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT", // AirTerminalSingleDuctConstantVolumeNoReheat 
-     "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT", // AirTerminalSingleDuctVAVReheat 
-     "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT", // AirTerminalSingleDuctVAVNoReheat 
-     "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", // AirTerminalSingleDuctSeriesPIUReheat
-     "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", // AirTerminalSingleDuctParallelPIUReheat
-     "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION", // AirTerminalSingleDuctCAVFourPipeInduction
-     "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN", // AirTerminalSingleDuctVAVReheatVariableSpeedFan
-     "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT", // AirTerminalSingleDuctVAVHeatAndCoolReheat
-     "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT", // AirTerminalSingleDuctVAVHeatAndCoolNoReheat 
-     "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM", // AirTerminalSingleDuctConstantVolumeCooledBeam 
-     "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR", // AirTerminalDualDuctVAVOutdoorAir 
-     "AIRLOOPHVACRETURNAIR" // AirLoopHVACReturnAir 
+constexpr std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zoneEquipTypeNamesUC = {
+    "DUMMY", // DUMMY,
+
+    "ZONEHVAC:FOURPIPEFANCOIL",                      // FanCoilFourPipe
+    "ZONEHVAC:PACKAGEDTERMINALHEATPUMP",             //   PackagedTerminalHeatPump
+    "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",       //  PackagedTerminalAirConditioner
+    "ZONEHVAC:WATERTOAIRHEATPUMP",                   //   PackagedTerminalHeatPumpWaterToAir
+    "ZONEHVAC:WINDOWAIRCONDITIONER",                 //  WindowAirConditioner
+    "ZONEHVAC:UNITHEATER",                           //  UnitHeater
+    "ZONEHVAC:UNITVENTILATOR",                       //  UnitVentilator
+    "ZONEHVAC:ENERGYRECOVERYVENTILATOR",             // EnergyRecoveryVentilator
+    "ZONEHVAC:VENTILATEDSLAB",                       // VentilatedSlab
+    "ZONEHVAC:OUTDOORAIRUNIT",                       // OutdoorAirUnit
+    "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW", //  VariableRefrigerantFlowTerminal
+    "ZONEHVAC:IDEALLOADSAIRSYSTEM",                  // IdealLoadsAirSystem
+    "ZONEHVAC:EVAPORATIVECOOLERUNIT",                // EvaporativeCooler
+    "ZONEHVAC:HYBRIDUNITARYHVAC",                    // HybridEvaporativeCooler,
+
+    // last zone equipment type to use zone availability manager. The above list must not change or
+    // NumValidSysAvailZoneComponents must also change.
+
+    "ZONEHVAC:AIRDISTRIBUTIONUNIT",                            // AirDistributionUnit
+    "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",                     // BaseboardWaterConvective
+    "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",                  // BaseboardElectricConvective
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",              // BaseboardSteam
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",              // BaseboardWater
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",           // BaseboardElectric
+    "ZONEHVAC:HIGHTEMPERATURERADIANT",                         // HighTempRadiant
+    "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",             //  LowTempRadiant
+    "FAN:ZONEEXHAUST",                                         // ExhaustFan
+    "HEATEXCHANGER:AIRTOAIR:FLATPLATE",                        // HeatExchanger
+    "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",                    //  HeatPumpWaterHeater
+    "ZONEHVAC:DEHUMIDIFIER:DX",                                //  DXDehumidifier
+    "ZONEHVAC:REFRIGERATIONCHILLERSET",                        // RefrigerationAirChillerSet
+    "ZONEHVAC:FORCEDAIR:USERDEFINED",                          // UserDefinedVACForcedAir
+    "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",           // CoolingPanel
+    "AIRLOOPHVAC:UNITARYSYSTEM",                               // UnitarySystem
+    "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",                     // AirTerminalDualDuctConstantVolume
+    "AIRTERMINAL:DUALDUCT:VAV",                                // AirTerminalDualDuctVAV
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",            // AirTerminalSingleDuctConstantVolumeReheat
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT",          // AirTerminalSingleDuctConstantVolumeNoReheat
+    "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",                       // AirTerminalSingleDuctVAVReheat
+    "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",                     // AirTerminalSingleDuctVAVNoReheat
+    "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",                 // AirTerminalSingleDuctSeriesPIUReheat
+    "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",               // AirTerminalSingleDuctParallelPIUReheat
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION", // AirTerminalSingleDuctCAVFourPipeInduction
+    "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",      // AirTerminalSingleDuctVAVReheatVariableSpeedFan
+    "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",           // AirTerminalSingleDuctVAVHeatAndCoolReheat
+    "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",         // AirTerminalSingleDuctVAVHeatAndCoolNoReheat
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",        // AirTerminalSingleDuctConstantVolumeCooledBeam
+    "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR",                     // AirTerminalDualDuctVAVOutdoorAir
+    "AIRLOOPHVACRETURNAIR"                                     // AirLoopHVACReturnAir
 };
 
 static constexpr std::array<std::string_view, static_cast<int>(LoadDist::Num)> LoadDistNamesUC = {
@@ -414,8 +414,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             thisZoneEquipList.Name = thisZoneEquipConfig.EquipListName;
 
             std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
-            thisZoneEquipList.LoadDistScheme = static_cast<DataZoneEquipment::LoadDist>(
-                getEnumValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::makeUPPER(loadDistName)));
+            thisZoneEquipList.LoadDistScheme =
+                static_cast<DataZoneEquipment::LoadDist>(getEnumValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::makeUPPER(loadDistName)));
             if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
                 ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
                 ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));

@@ -263,12 +263,10 @@ namespace RoomAir {
                         AirNodeFoundFlag = false;
                         for (AirNodeNum = AirNodeBeginNum; AirNodeNum <= state.dataRoomAir->TotNumOfAirNodes; ++AirNodeNum) {
                             if (UtilityRoutines::SameString(state.dataRoomAir->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
-                                state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType =
-                                    state.dataRoomAir->AirNode(AirNodeNum).ClassType;
+                                state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType = state.dataRoomAir->AirNode(AirNodeNum).ClassType;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName = state.dataRoomAir->AirNode(AirNodeNum).Name;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Height = state.dataRoomAir->AirNode(AirNodeNum).Height;
-                                state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).SurfMask =
-                                    state.dataRoomAir->AirNode(AirNodeNum).SurfMask;
+                                state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).SurfMask = state.dataRoomAir->AirNode(AirNodeNum).SurfMask;
                                 SetupOutputVariable(state,
                                                     "Room Air Node Air Temperature",
                                                     OutputProcessor::Unit::C,
@@ -427,8 +425,8 @@ namespace RoomAir {
     //*****************************************************************************************
 
     void SetupDispVent1Node(EnergyPlusData &state,
-                         int const ZoneNum, // index number for the specified zone
-                         bool &ErrorsFound  // true if problems setting up model
+                            int const ZoneNum, // index number for the specified zone
+                            bool &ErrorsFound  // true if problems setting up model
     )
     {
 

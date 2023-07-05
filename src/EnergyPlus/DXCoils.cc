@@ -1727,17 +1727,17 @@ void GetDXCoils(EnergyPlusData &state)
                         if (lAlphaBlanks2(7)) {
                             thisDXCoil.CondenserInletNodeNum(PerfModeNum) = 0;
                         } else {
-                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) = GetOnlySingleNode(
-                                state,
-                                Alphas2(7),
-                                ErrorsFound,
-                                (DataLoopNode::ConnectionObjectType)getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                                        UtilityRoutines::makeUPPER(PerfObjectType)),
-                                PerfObjectName,
-                                DataLoopNode::NodeFluidType::Air,
-                                DataLoopNode::ConnectionType::OutsideAirReference,
-                                NodeInputManager::CompFluidStream::Primary,
-                                ObjectIsNotParent);
+                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) =
+                                GetOnlySingleNode(state,
+                                                  Alphas2(7),
+                                                  ErrorsFound,
+                                                  (DataLoopNode::ConnectionObjectType)getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                                                                                                   UtilityRoutines::makeUPPER(PerfObjectType)),
+                                                  PerfObjectName,
+                                                  DataLoopNode::NodeFluidType::Air,
+                                                  DataLoopNode::ConnectionType::OutsideAirReference,
+                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  ObjectIsNotParent);
                             if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(PerfModeNum))) {
                                 ShowWarningError(state, format("{}{}=\"{}\":", RoutineName, PerfObjectType, PerfObjectName));
                                 ShowContinueError(state, format("may not be valid {}=\"{}\".", cAlphaFields2(7), Alphas2(7)));

@@ -2207,8 +2207,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     case GeneratorType::PVWatts: {
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
-        int ObjNum =
-            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::makeUPPER(objectName));
+        int ObjNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::makeUPPER(objectName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
             ShowFatalError(state, format("Cannot find Generator:PVWatts {}", objectName));
@@ -2263,8 +2262,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                 // Except you need GetPVInput to have run already etc
                 // Note: you can't use state.dataIPShortCut->cAlphaArgs etc or it'll override what will still need to be processed in
                 // ElectPowerLoadCenter::ElectPowerLoadCenter after this function is called
-                int PVNum =
-                    state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::makeUPPER(objectName));
+                int PVNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::makeUPPER(objectName));
                 int NumAlphas; // Number of PV Array parameter alpha names being passed
                 int NumNums;   // Number of PV Array numeric parameters are being passed
                 int IOStat;

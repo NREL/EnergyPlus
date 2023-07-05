@@ -610,8 +610,8 @@ namespace VentilatedSlab {
             }
 
             // Process the temperature control type
-            ventSlab.controlType = static_cast<ControlType>(
-                getEnumValue(ControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+            ventSlab.controlType =
+                static_cast<ControlType>(getEnumValue(ControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
 
             if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(

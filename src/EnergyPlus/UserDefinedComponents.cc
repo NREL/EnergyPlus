@@ -653,8 +653,8 @@ namespace UserDefinedComponents {
 
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
-                                static_cast<DataPlant::LoopFlowStatus>(getEnumValue(
-                                    DataPlant::LoopFlowStatusTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(aArgCount + 3))));
+                                static_cast<DataPlant::LoopFlowStatus>(
+                                    getEnumValue(DataPlant::LoopFlowStatusTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(aArgCount + 3))));
                         }
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection

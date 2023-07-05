@@ -1139,7 +1139,8 @@ void InitStandAloneERV(EnergyPlusData &state,
     }
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
-        auto &availMgr = state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator).ZoneCompAvailMgrs(StandAloneERVNum);
+        auto &availMgr =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator).ZoneCompAvailMgrs(StandAloneERVNum);
         if (state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;

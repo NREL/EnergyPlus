@@ -2116,8 +2116,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         thisVrfSys.MaxOATCCHeater = rNumericArgs(19);
 
         if (!lAlphaFieldBlanks(31)) {
-            thisVrfSys.DefrostStrategy =
-                static_cast<StandardRatings::DefrostStrat>(getEnumValue(StandardRatings::DefrostStratUC, cAlphaArgs(31)));
+            thisVrfSys.DefrostStrategy = static_cast<StandardRatings::DefrostStrat>(getEnumValue(StandardRatings::DefrostStratUC, cAlphaArgs(31)));
             if (thisVrfSys.DefrostStrategy == StandardRatings::DefrostStrat::Invalid) {
                 ShowSevereError(state,
                                 format("{}, \"{}\" {} not found: {}", cCurrentModuleObject, thisVrfSys.Name, cAlphaFieldNames(31), cAlphaArgs(31)));
@@ -5663,7 +5662,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     }
 
     if (allocated(state.dataHVACGlobal->ZoneComp)) {
-        auto &availMgr = state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal).ZoneCompAvailMgrs(VRFTUNum);
+        auto &availMgr =
+            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal).ZoneCompAvailMgrs(VRFTUNum);
         if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;

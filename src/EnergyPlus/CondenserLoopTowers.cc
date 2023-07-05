@@ -457,8 +457,7 @@ namespace CondenserLoopTowers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
                 tower.CapacityControl = CapacityCtrl::FanCycling; // FanCycling
             } else {
-                tower.CapacityControl =
-                    static_cast<CapacityCtrl>(getEnumValue(CapacityCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
+                tower.CapacityControl = static_cast<CapacityCtrl>(getEnumValue(CapacityCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
                 if (tower.CapacityControl == CapacityCtrl::Invalid) {
                     tower.CapacityControl = CapacityCtrl::FanCycling;
                     ShowWarningError(state,
