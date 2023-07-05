@@ -372,14 +372,6 @@ private: // data
         Num
     };
 
-    enum class BatteryEnergyConservationType
-    {
-        Invalid = -1,
-        Basic,
-        CurrentAndEnergy,
-        Num
-    };
-
     std::string name_;               // name of this electrical storage module
     Real64 storedPower_;             // [W]
     Real64 storedEnergy_;            // [J]
@@ -456,22 +448,16 @@ private: // data
     std::vector<Real64> nmb0_;
     std::vector<Real64> oneNmb0_;
     // report
-    Real64 electEnergyinStorage_;                   // [J] state of charge
-    Real64 thermLossRate_;                          // [W]
-    Real64 thermLossEnergy_;                        // [J]
-    int storageMode_;                               // [ ] mode of operation 0 for idle, 1 for discharging, 2 for charging
-    Real64 absoluteSOC_;                            // [Ah] total state of charge
-    Real64 fractionSOC_;                            // [ ] fractional state of charge
-    Real64 batteryCurrent_;                         // [A] total current
-    Real64 batteryVoltage_;                         // [V] total voltage
-    Real64 batteryDamage_;                          // [ ] fractional battery damage
-    Real64 batteryTemperature_;                     // [C] battery temperature (only used in Li-ion batteries)
-    Real64 changeSOC_ = 0.0;                        // [Ah] change from one system time step to the next in the total state of change
-    Real64 currentEnergyStored_ = 0.0;              // [J] current energy stored in battery (kinetic model only)
-    Real64 lastEnergyStored_ = 0.0;                 // [J] last energy stored in battery (kinetic model only)
-    Real64 changeEnergyStored_ = 0.0;               // [J] change in energy stored in battery (kinetic model only)
-    BatteryEnergyConservationType conserveBattery_; // For kinetic model only, when Basic only conserves Ah, when CurrentAndEnergy conserves Ah and J
-    Real64 initialEnergyStored_ = 0.0;              // [J] user defined level of energy stored in one battery (for kinetic model only)
+    Real64 electEnergyinStorage_; // [J] state of charge
+    Real64 thermLossRate_;        // [W]
+    Real64 thermLossEnergy_;      // [J]
+    int storageMode_;             // [ ] mode of operation 0 for idle, 1 for discharging, 2 for charging
+    Real64 absoluteSOC_;          // [Ah] total state of charge
+    Real64 fractionSOC_;          // [ ] fractional state of charge
+    Real64 batteryCurrent_;       // [A] total current
+    Real64 batteryVoltage_;       // [V] total voltage
+    Real64 batteryDamage_;        // [ ] fractional battery damage
+    Real64 batteryTemperature_;   // [C] battery temperature (only used in Li-ion batteries)
 
 }; // ElectricStorage
 
@@ -846,21 +832,6 @@ private:                      // data
 void createFacilityElectricPowerServiceObject(const EnergyPlusData &state);
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound);
-
-void checkKineticBatteryModelStored(EnergyPlusData &state,
-                                    Real64 &drawnEnergy,
-                                    Real64 const lastEnergyStored,
-                                    Real64 &drawnPower,
-                                    Real64 &currentEnergyStored,
-                                    Real64 &changeEnergyStored,
-                                    Real64 &absoluteSOC,
-                                    Real64 &changeSOC,
-                                    Real64 const lastTimeStepAvailable,
-                                    Real64 const lastTimeStepBound,
-                                    int const numBattery,
-                                    Real64 &fractionSOC,
-                                    Real64 &thisTimeStepAvailable,
-                                    Real64 &thisTimeStepBound);
 
 struct ElectPwrSvcMgrData : BaseGlobalStruct
 {

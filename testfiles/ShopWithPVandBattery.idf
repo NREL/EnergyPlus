@@ -5062,9 +5062,7 @@
     1,                       !- Module Charge Rate Limit
     Yes,                     !- Battery Life Calculation
     5,                       !- Number of Cycle Bins
-    Doubleexponential,       !- Battery Life Curve Name
-    Basic,                   !- Battery Conservation Method
-    400000000;               !- Initial Energy Stored in Battery {J}
+    Doubleexponential;       !- Battery Life Curve Name
 
   Curve:RectangularHyperbola2,
     charging,                !- Name

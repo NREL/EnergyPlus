@@ -1262,14 +1262,6 @@ This field specifies the name of a double exponential decay curve (ref: \hyperre
 {C_F} = {C_1} + {C_2}{e^{{C_3}R}} + {C_4}{e^{{C_5}R}}
 \end{equation}
 
-\paragraph{Field: Battery Conservation Method}\label{field-battery-conservation-method}
-
-This field specifies how the amount of energy stored will be managed.  There are two options: Basic and EnergyAndCurrent.  In the Basic option which is the default, the battery only controls the remaining storage in amp-hours.  Due to potential differences in the charging and discharging curves as well as potentially differing rates of charging and discharging, it is possible for this model to conserve storage in amp-hours but not conserve energy stored in Joules.  As a result, it is possible to run a simulation where the amp-hours are conserved but the total energy in Joules discharged from the battery exceeds the sum of the charged energy and the initial energy state.  The Basic option ignores this situation and simply controls amp-hours.  To avoid such a situation where energy in Joules is not conserved, the EnergyAndCurrent option controls both the stored amp-hours and Joules.  If either drops to zero, then both are zeroed out.  This conserves both amp-hours and Joules and avoids a violation of the conservation of energy.
-
-\paragraph{Field: Initial Energy Stored in Battery}\label{field-initial-energy-stored-in-battery}
-
-When the Battery Conservation Method (see previous input field) is set to CurrentAndEnergy by the user, an initial amount of storage in Joules is required in order to monitor both the amp-hours and the Joules stored in the battery at the beginning of the simulation.  Users must enter a value for this field that corresponds to the storage in amp-hours as defined by the maximum amount of storage, fractional state of storage, and number of batteries in fields shown above.  Note that the storage represented by this input is the total of all of the batteries in Joules.  If the user has set the Battery Conservation Method to Basic (or left that field blank), this field for initial energy stored in the battery is ignored and not used.
-
 An example input of the ElectricLoadCenter:Storage: Battery input is:
 
 \begin{lstlisting}
@@ -1295,9 +1287,7 @@ ElectricLoadCenter:Storage:Battery,
   1,                     !- Module Charge Rate Limit {1/hr}
   Yes,                   !- Battery Life Calculation
   10,                    !- Number of Cycle Bins
-  BatteryCycleCurve,     !- Battery Cycle Life Curve Name
-  EnergyAndCurrent,      !- Battery Conservation Method
-  4000000;               !- Initial Energy Stored in Battery {J}
+  BatteryCycleCurve;     !- Battery Cycle Life Curve Name
 
   Curve:RectangularHyperbola2,
   BatteryChargeCurve,    !- Name
@@ -1337,9 +1327,7 @@ ElectricLoadCenter:Storage:Battery,
   HVAC,Average, Electric Storage Operating Mode Index {[]}
 \item
   HVAC,Average,Electric Storage Charge State{[}Ah{]}  
-\item
-  HVAC,Average,Electric Storage Battery Charge State Change {[}Ah{]}
-\item
+\\item
   HVAC,Average, Electric Storage Charge Fraction {[]}
 \item
   HVAC,Average,Electric Storage Charge Power{[}W{]}
@@ -1349,10 +1337,6 @@ ElectricLoadCenter:Storage:Battery,
   HVAC,Average,Electric Storage Discharge Power{[}W{]}
 \item
   HVAC,Sum,Electric Storage Discharge Energy {[}J{]}
-\item
-  HVAC,Sum,Electric Storage Battery Charge State Energy {[}J{]}
-\item
-  HVAC,Sum,Electric Storage Battery Charge State Energy Change {[}J{]}
 \item
   HVAC,Average,Electric Storage Total Current{[}A{]}
 \item
@@ -1375,10 +1359,6 @@ This output reports the battery mode of operation: 0 for idle; 1 for discharging
 
 The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module.
 
-\paragraph{Electric Storage Battery Charge State Change {[}Ah{]}}\label{electric-storage-battery-charge-state-change-ah}
-
-The state change of charge reports the amount of change in the charge stored in the battery at a point of time. This change is from the previous time step and like the charge state is for an individual battery.
-
 \paragraph{Electric Storage Charge Fraction {[]}}\label{electric-storage-charge-fraction}
 
 This output is the ratio between the electrical storage state of charge and the maximum capacity.
@@ -1398,14 +1378,6 @@ This output is the total electricity energy decremented from electricity product
 \paragraph{Electric Storage Discharge Energy {[}J{]}}\label{electric-storage-discharge-energy-j-1}
 
 These outputs are total electricity power or energy drawn from the battery. This is the rate or amount of discharging. The energy from storage output variable is also a meter associated with the resource type ElectricityProduced that increases the metered electricity production to account for power that has come back out of storage.
-
-\paragraph{Electric Storage Battery Charge State Energy {[}J{]}}\label{electric-storage-battery-charge-state-energy-j}
-
-This output reports the current amount of energy stored in the battery system at the end of the current time step in Joules.  When the Battery Conservation Method is set to Basic, this number could report as negative giving an indication that more energy has been discharged from the battery than was used to charge the battery.  Negative numbers for this output result from differences in the charging and discharging voltage.  To avoid negative energy storage, the user can set the Battery Conservation Method to CurrentAndEnergy which avoids negative numbers for either the storage in Ah or J.
-
-\paragraph{Electric Storage Battery Charge State Energy Change {[}J{]}}\label{electric-storage-battery-charge-state-energy-change-j}
-
-This output reports the change in the amount of energy stored in the battery system from the end of the previous time step to at the end of the current time step in Joules.  Positive numbers indicate charging while negative numers denote discharging during a particular time step.
 
 \paragraph{Electric Storage Total Current {[}A{]}}\label{electric-storage-total-current-a}
 
