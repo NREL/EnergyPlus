@@ -215,7 +215,6 @@ set(SRC
     DataSystemVariables.cc
     DataSystemVariables.hh
     DataTimings.hh
-    DataUCSDSharedData.hh
     DataVectorTypes.hh
     DataViewFactorInformation.hh
     DataWater.hh
