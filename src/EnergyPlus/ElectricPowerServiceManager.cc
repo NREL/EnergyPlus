@@ -3512,11 +3512,11 @@ ElectricStorage::ElectricStorage( // main constructor
                 }
             }
 
-            // if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "CurrentAndEnergy")) {
-            conserveBattery_ = BatteryEnergyConservationType::CurrentAndEnergy;
-            // } else {
-            //     conserveBattery_ = BatteryEnergyConservationType::Basic;
-            // }
+            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "CurrentAndEnergy")) {
+                conserveBattery_ = BatteryEnergyConservationType::CurrentAndEnergy;
+            } else {
+                conserveBattery_ = BatteryEnergyConservationType::Basic;
+            }
 
             parallelNum_ = state.dataIPShortCut->rNumericArgs(2);
             seriesNum_ = state.dataIPShortCut->rNumericArgs(3);
@@ -3532,8 +3532,7 @@ ElectricStorage::ElectricStorage( // main constructor
             cutoffV_ = state.dataIPShortCut->rNumericArgs(12);
             maxChargeRate_ = state.dataIPShortCut->rNumericArgs(13);
             // The next parameter is only used for the CurrentAndEnergy conservation strategy
-            // if (conserveBattery_ == BatteryEnergyConservationType::CurrentAndEnergy) initialEnergyStored_ = state.dataIPShortCut->rNumericArgs(14);
-            initialEnergyStored_ = 0.0;
+            if (conserveBattery_ == BatteryEnergyConservationType::CurrentAndEnergy) initialEnergyStored_ = state.dataIPShortCut->rNumericArgs(14);
 
             break;
         }
@@ -4586,20 +4585,20 @@ bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,
     return (!exceedIterationLimit);
 }
 
-void ElectricStorage::checkKineticBatteryModelStored(EnergyPlusData &state,
-                                                     Real64 &drawnEnergy,
-                                                     Real64 &lastEnergyStored,
-                                                     Real64 &drawnPower,
-                                                     Real64 &currentEnergyStored,
-                                                     Real64 &changeEnergyStored,
-                                                     Real64 &absoluteSOC,
-                                                     Real64 &changeSOC,
-                                                     Real64 const lastTimeStepAvailable,
-                                                     Real64 const lastTimeStepBound,
-                                                     int const numBattery,
-                                                     Real64 &fractionSOC,
-                                                     Real64 &thisTimeStepAvailable,
-                                                     Real64 &thisTimeStepBound)
+void checkKineticBatteryModelStored(EnergyPlusData &state,
+                                    Real64 &drawnEnergy,
+                                    Real64 const lastEnergyStored,
+                                    Real64 &drawnPower,
+                                    Real64 &currentEnergyStored,
+                                    Real64 &changeEnergyStored,
+                                    Real64 &absoluteSOC,
+                                    Real64 &changeSOC,
+                                    Real64 const lastTimeStepAvailable,
+                                    Real64 const lastTimeStepBound,
+                                    int const numBattery,
+                                    Real64 &fractionSOC,
+                                    Real64 &thisTimeStepAvailable,
+                                    Real64 &thisTimeStepBound)
 {
     if (drawnEnergy > lastEnergyStored) {
         drawnEnergy = max(0.0, lastEnergyStored); // just in case lastEnergyStored_ is negative (shouldn't be)
@@ -4609,7 +4608,7 @@ void ElectricStorage::checkKineticBatteryModelStored(EnergyPlusData &state,
         currentEnergyStored = lastEnergyStored + changeEnergyStored;
     }
     if (currentEnergyStored <= 0.0 || absoluteSOC <= 0.0) { // if either one of these is less than zero, zero them both out
-        changeEnergyStored = lastEnergyStored;
+        changeEnergyStored = -lastEnergyStored;
         currentEnergyStored = 0.0;
         changeSOC = -1.0 * (lastTimeStepAvailable + lastTimeStepBound) * numBattery;
         absoluteSOC = 0.0;

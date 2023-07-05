@@ -1154,7 +1154,7 @@ The kinetic battery model assumes that part of the battery's energy storage capa
 
 Each individual battery module is modeled as a voltage source in series with an electrical resistance. KiBaM assumes that the internal resistance is constant and the open circuit voltage varies with the electric current, the state of charge and the operation mode (charging or discharging). For an individual battery module, the open circuit voltage at any time is correlated to the voltage at fully charged/discharged state and three other regression coefficients. These regression coefficients are usually obtained via curve fitting based on battery test data.
 
-The object offers user the option to perform battery life calculation. If battery life is modeled, the user needs to provide a group of coefficients for the correlation between the number of cycles for battery failure and the corresponding cycle range. More detailed information can be found from the Engineering Reference.
+The object offers users the option to perform battery life calculation. If battery life is modeled, the user needs to provide a group of coefficients for the correlation between the number of cycles for battery failure and the corresponding cycle range. More detailed information can be found from the Engineering Reference.
 
 \subsubsection{Inputs}
 
@@ -1184,7 +1184,7 @@ This field defines the number of modules connected in series in the battery bank
 
 \paragraph{Field: Maximum Module Capacity}\label{field-maximum-module-capacity}
 
-This field indicates the maximum capacity of one battery module. It is evaluated as the total Amp-hours available when a full battery is discharged at infinitesimal current. This capacity is for an individual battery module, not for the whole battery bank. The maximum capacity can be found from manufacture s data or derived from test data by curve fitting.
+This field indicates the maximum capacity of one battery module. It is evaluated as the total Amp-hours available when a full battery is discharged at infinitesimal current. This capacity is for an individual battery module, not for the whole battery bank. The maximum capacity can be found from manufacture's data or derived from test data by curve fitting.
 
 \paragraph{Field: Initial Fractional State of Charge}\label{field-initial-fractional-state-of-charge}
 
@@ -1262,62 +1262,72 @@ This field specifies the name of a double exponential decay curve (ref: \hyperre
 {C_F} = {C_1} + {C_2}{e^{{C_3}R}} + {C_4}{e^{{C_5}R}}
 \end{equation}
 
+\paragraph{Field: Battery Conservation Method}\label{field-battery-conservation-method}
+
+This field specifies how the amount of energy stored will be managed.  There are two options: Basic and EnergyAndCurrent.  In the Basic option which is the default, the battery only controls the remaining storage in amp-hours.  Due to potential differences in the charging and discharging curves as well as potentially differing rates of charging and discharging, it is possible for this model to conserve storage in amp-hours but not conserve energy stored in Joules.  As a result, it is possible to run a simulation where the amp-hours are conserved but the total energy in Joules discharged from the battery exceeds the sum of the charged energy and the initial energy state.  The Basic option ignores this situation and simply controls amp-hours.  To avoid such a situation where energy in Joules is not conserved, the EnergyAndCurrent option controls both the stored amp-hours and Joules.  If either drops to zero, then both are zeroed out.  This conserves both amp-hours and Joules and avoids a violation of the conservation of energy.
+
+\paragraph{Field: Initial Energy Stored in Battery}\label{field-initial-energy-stored-in-battery}
+
+When the Battery Conservation Method (see previous input field) is set to CurrentAndEnergy by the user, an initial amount of storage in Joules is required in order to monitor both the amp-hours and the Joules stored in the battery at the beginning of the simulation.  Users must enter a value for this field that corresponds to the storage in amp-hours as defined by the maximum amount of storage, fractional state of storage, and number of batteries in fields shown above.  Note that the storage represented by this input is the total of all of the batteries in Joules.  If the user has set the Battery Conservation Method to Basic (or left that field blank), this field for initial energy stored in the battery is ignored and not used.
+
 An example input of the ElectricLoadCenter:Storage: Battery input is:
 
 \begin{lstlisting}
 
 ElectricLoadCenter:Storage:Battery,
-  Lead Acid Battery A,   !-Name
-  Always On,                       !- Availability Schedule Name
-  ,                                         !- Zone Name
-  ,                                         !-Radiative Fraction
-  1,                                       !- Number of Battery Modules in Parallel
-  1,                                       !- Number of Battery Modules in Series
-  86.1,                                 !- Maximum Module Capacity {Ah}
-  1.0,                                   !- Initial Fractional State of Charge
-  0.3747,                             !- Fraction of Available Charge Capacity
-  0.5874,                             !- Change Rate from Bound Charge to Available Charge {hr$^{-1}$}
-  12.60,                               !- Fully Charged Module Open Circuit Voltage {V}
-  12.37,                               !- Fully Discharged Module Open Circuit Voltage {V}
-  BatteryChargeCurve,     !- Voltage Change Curve Name for Charging
-  BatteryDischargeCurve,!- Voltage Change Curve Name for Discharging
-  0.0538,                             !- Module Internal Electrical Resistance {Ohm}
-  100,                                   !- Maximum Module Discharging Current {A}
-  10.2,                                 !- Module Cut-off Voltage {V}
-  1,                                       !- Module Charge Rate Limit {1/hr}
-  Yes,                                   !- Battery Life Calculation
-  10,                                   !- Number of Cycle Bins
-  BatteryCycleCurve;       !- Battery Cycle Life Curve Name
+  Lead Acid Battery A,   !- Name
+  Always On,             !- Availability Schedule Name
+  ,                      !- Zone Name
+  ,                      !- Radiative Fraction
+  1,                     !- Number of Battery Modules in Parallel
+  1,                     !- Number of Battery Modules in Series
+  86.1,                  !- Maximum Module Capacity {Ah}
+  1.0,                   !- Initial Fractional State of Charge
+  0.3747,                !- Fraction of Available Charge Capacity
+  0.5874,                !- Change Rate from Bound Charge to Available Charge {hr$^{-1}$}
+  12.60,                 !- Fully Charged Module Open Circuit Voltage {V}
+  12.37,                 !- Fully Discharged Module Open Circuit Voltage {V}
+  BatteryChargeCurve,    !- Voltage Change Curve Name for Charging
+  BatteryDischargeCurve, !- Voltage Change Curve Name for Discharging
+  0.0538,                !- Module Internal Electrical Resistance {Ohm}
+  100,                   !- Maximum Module Discharging Current {A}
+  10.2,                  !- Module Cut-off Voltage {V}
+  1,                     !- Module Charge Rate Limit {1/hr}
+  Yes,                   !- Battery Life Calculation
+  10,                    !- Number of Cycle Bins
+  BatteryCycleCurve,     !- Battery Cycle Life Curve Name
+  EnergyAndCurrent,      !- Battery Conservation Method
+  4000000;               !- Initial Energy Stored in Battery {J}
 
   Curve:RectangularHyperbola2,
-  BatteryChargeCurve,     !- Name
-  -0.2765,                           !- Coefficient1 C1
-  -93.27,                             !- Coefficient2 C2
-  0.0068,                             !- Coefficient3 C3
-  0,                                       !- Minimum Value of x
-  1.0,                                   !- Maximum Value of x
-  -100,                                 !- Minimum Curve Output
-  100;                                   !- Maximum Curve Output
+  BatteryChargeCurve,    !- Name
+  -0.2765,               !- Coefficient1 C1
+  -93.27,                !- Coefficient2 C2
+  0.0068,                !- Coefficient3 C3
+  0,                     !- Minimum Value of x
+  1.0,                   !- Maximum Value of x
+  -100,                  !- Minimum Curve Output
+  100;                   !- Maximum Curve Output
 
   Curve:RectangularHyperbola2,
-  BatteryDischargeCurve,     !- Name
-  0.0899,                                   !- Coefficient1 C1
-  -98.24,                                   !- Coefficient2 C2
-  -0.0082,                                 !- Coefficient3 C3
-  0,                                             !- Minimum Value of x
-  1.0,                                         !- Maximum Value of x
-  -100,                                       !- Minimum Curve Output
-  100;                                         !- Maximum Curve Output
+  BatteryDischargeCurve, !- Name
+  0.0899,                !- Coefficient1 C1
+  -98.24,                !- Coefficient2 C2
+  -0.0082,               !- Coefficient3 C3
+  0,                     !- Minimum Value of x
+  1.0,                   !- Maximum Value of x
+  -100,                  !- Minimum Curve Output
+  100;                   !- Maximum Curve Output
 
   Curve:DoubleExponentialDecay,
-  BatteryCycleCurve,         !- Name
-  1380,                                   !- Coefficient1 C1
-  6834,                                   !- Coefficient2 C2
-  -8.75,                                 !- Coefficient3 C3
-  6747,                                   !- Coefficient4 C4
-  -6.22,                                 !- Coefficient5 C5
-  0,                                         !- Minimum Value of x
-  1.0;                                     !- Maximum Value of x
+  BatteryCycleCurve,     !- Name
+  1380,                  !- Coefficient1 C1
+  6834,                  !- Coefficient2 C2
+  -8.75,                 !- Coefficient3 C3
+  6747,                  !- Coefficient4 C4
+  -6.22,                 !- Coefficient5 C5
+  0,                     !- Minimum Value of x
+  1.0;                   !- Maximum Value of x
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{electricloadcenter-storagebattery-outputs}
@@ -1326,7 +1336,9 @@ ElectricLoadCenter:Storage:Battery,
 \item
   HVAC,Average, Electric Storage Operating Mode Index {[]}
 \item
-  HVAC,Average,Electric Storage Charge State{[}Ah{]}
+  HVAC,Average,Electric Storage Charge State{[}Ah{]}  
+\item
+  HVAC,Average,Electric Storage Battery Charge State Change {[}Ah{]}
 \item
   HVAC,Average, Electric Storage Charge Fraction {[]}
 \item
@@ -1337,6 +1349,10 @@ ElectricLoadCenter:Storage:Battery,
   HVAC,Average,Electric Storage Discharge Power{[}W{]}
 \item
   HVAC,Sum,Electric Storage Discharge Energy {[}J{]}
+\item
+  HVAC,Sum,Electric Storage Battery Charge State Energy {[}J{]}
+\item
+  HVAC,Sum,Electric Storage Battery Charge State Energy Change {[}J{]}
 \item
   HVAC,Average,Electric Storage Total Current{[}A{]}
 \item
@@ -1357,7 +1373,11 @@ This output reports the battery mode of operation: 0 for idle; 1 for discharging
 
 \paragraph{Electric Storage Charge State {[}Ah{]}}\label{electric-storage-charge-state-ah}
 
-The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module
+The state of charge is expressed as the amount of charge stored in the battery at a point of time. It has the same unit as the maximum capacity. This value is given for an individual battery module.
+
+\paragraph{Electric Storage Battery Charge State Change {[}Ah{]}}\label{electric-storage-battery-charge-state-change-ah}
+
+The state change of charge reports the amount of change in the charge stored in the battery at a point of time. This change is from the previous time step and like the charge state is for an individual battery.
 
 \paragraph{Electric Storage Charge Fraction {[]}}\label{electric-storage-charge-fraction}
 
@@ -1378,6 +1398,14 @@ This output is the total electricity energy decremented from electricity product
 \paragraph{Electric Storage Discharge Energy {[}J{]}}\label{electric-storage-discharge-energy-j-1}
 
 These outputs are total electricity power or energy drawn from the battery. This is the rate or amount of discharging. The energy from storage output variable is also a meter associated with the resource type ElectricityProduced that increases the metered electricity production to account for power that has come back out of storage.
+
+\paragraph{Electric Storage Battery Charge State Energy {[}J{]}}\label{electric-storage-battery-charge-state-energy-j}
+
+This output reports the current amount of energy stored in the battery system at the end of the current time step in Joules.  When the Battery Conservation Method is set to Basic, this number could report as negative giving an indication that more energy has been discharged from the battery than was used to charge the battery.  Negative numbers for this output result from differences in the charging and discharging voltage.  To avoid negative energy storage, the user can set the Battery Conservation Method to CurrentAndEnergy which avoids negative numbers for either the storage in Ah or J.
+
+\paragraph{Electric Storage Battery Charge State Energy Change {[}J{]}}\label{electric-storage-battery-charge-state-energy-change-j}
+
+This output reports the change in the amount of energy stored in the battery system from the end of the previous time step to at the end of the current time step in Joules.  Positive numbers indicate charging while negative numers denote discharging during a particular time step.
 
 \paragraph{Electric Storage Total Current {[}A{]}}\label{electric-storage-total-current-a}
 

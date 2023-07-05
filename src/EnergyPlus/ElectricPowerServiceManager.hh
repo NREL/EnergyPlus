@@ -312,21 +312,6 @@ public: // methods
                                              Real64 const E0c,
                                              Real64 const InternalR);
 
-    void checkKineticBatteryModelStored(EnergyPlusData &state,
-                                        Real64 &drawnEnergy,
-                                        Real64 &lastEnergyStored,
-                                        Real64 &drawnPower,
-                                        Real64 &currentEnergyStored,
-                                        Real64 &changeEnergyStored,
-                                        Real64 &absoluteSOC,
-                                        Real64 &changeSOC,
-                                        Real64 const lastTimeStepAvailable,
-                                        Real64 const lastTimeStepBound,
-                                        int const numBattery,
-                                        Real64 &fractionSOC,
-                                        Real64 &thisTimeStepAvailable,
-                                        Real64 &thisTimeStepBound);
-
     std::string const &name() const;
 
 private:                            // methods
@@ -860,6 +845,21 @@ private:                      // data
 void createFacilityElectricPowerServiceObject(const EnergyPlusData &state);
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound);
+
+void checkKineticBatteryModelStored(EnergyPlusData &state,
+                                    Real64 &drawnEnergy,
+                                    Real64 const lastEnergyStored,
+                                    Real64 &drawnPower,
+                                    Real64 &currentEnergyStored,
+                                    Real64 &changeEnergyStored,
+                                    Real64 &absoluteSOC,
+                                    Real64 &changeSOC,
+                                    Real64 const lastTimeStepAvailable,
+                                    Real64 const lastTimeStepBound,
+                                    int const numBattery,
+                                    Real64 &fractionSOC,
+                                    Real64 &thisTimeStepAvailable,
+                                    Real64 &thisTimeStepBound);
 
 struct ElectPwrSvcMgrData : BaseGlobalStruct
 {
