@@ -851,6 +851,14 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
+
+    SetupOutputVariable(state,
+                        reportVarPrefix + "Heat Exchanger UA Value",
+                        OutputProcessor::Unit::None,
+                        this->UA,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->Name);
 }
 
 void HeatExchangerStruct::initialize(EnergyPlusData &state)
@@ -889,10 +897,10 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
         } else if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
             RoutineNameNoColon = "InitSteamToWaterHeatExchanger";
             Real64 SatTemp = FluidProperties::GetSatTemperatureRefrig(state,
-                                                                                state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                                DataEnvironment::StdPressureSeaLevel,
-                                                                                state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                                RoutineNameNoColon);
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                      DataEnvironment::StdPressureSeaLevel,
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                      RoutineNameNoColon);
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp = SatTemp;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Press = DataEnvironment::StdPressureSeaLevel;
             Real64 rhoSteam = FluidProperties::GetSatDensityRefrig(state,
@@ -903,11 +911,11 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                                                    RoutineNameNoColon);
 
             Real64 InitSteamH = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                          state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                          state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
-                                                                          1.0,
-                                                                          state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                          RoutineNameNoColon);
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
+                                                                      state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp,
+                                                                      1.0,
+                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
+                                                                      RoutineNameNoColon);
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Enthalpy = InitSteamH;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Quality = 1.0;
             state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).HumRat = 0.0;
@@ -985,8 +993,8 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     if (this->Type == DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg) {
         RoutineName = "SizeSteamToWaterHeatExchanger";
         CurrentModuleObject = "HeatExchanger:SteamToWater";
-        std::string LoopDemand = "Steam ";
-        std::string LoopSupply = "Water ";
+        LoopDemand = "Steam ";
+        LoopSupply = "Water ";
     }
 
     // first deal with Loop Supply Side
@@ -1041,7 +1049,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
                                                                         Constant::InitConvTemp,
                                                                         state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                         RoutineName);
-                Real64 tmpDesCap = rhoWater * tmpSupSideDesignVolFlowRate * CpWater * state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT;
+                Real64 tmpDesCap = rhoWater * tmpSupSideDesignVolFlowRate * CpWater * state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT; // TODO: Debug and check the real value of DelT
 
                 Real64 TempSteamIn = FluidProperties::GetSatTemperatureRefrig(state,
                                                                               state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
@@ -2556,38 +2564,11 @@ void HeatExchangerStruct::findSteamLoopFlow(EnergyPlusData &state, Real64 Target
 
     static constexpr std::string_view RoutineName("findSteamLoopFlow");
 
-    Real64 WaterInletTemp = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).Temp;
-    Real64 SteamInletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
     Real64 WaterMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
-    Real64 WaterInletCp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                 state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
-                                                                 WaterInletTemp,
-                                                                 state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
-                                                                 RoutineName);
-
-    Real64 TargetHeatTransferRate = WaterMdot * WaterInletCp * (TargetWaterLoopLeavingTemp - WaterInletTemp);
-
-    Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                  state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                  SteamInletTemp,
-                                                                  1.0,
-                                                                  state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                  RoutineName);
-    Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                   state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                   SteamInletTemp,
-                                                                   0.0,
-                                                                   state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                   RoutineName);
-    Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-    Real64 CpWaterSubcool = FluidProperties::GetSatSpecificHeatRefrig(state,
-                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
-                                                                      SteamInletTemp,
-                                                                      0.0,
-                                                                      state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
-                                                                      RoutineName);
-    Real64 TargetSteamMdot = std::abs(TargetHeatTransferRate) / (LatentHeatSteam + CpWaterSubcool * this->DegOfSubcooling);
-
+    this->calculateSteamToWaterHX(state, WaterMdot);
+    TargetWaterLoopLeavingTemp = this->SupplySideLoop.OutletTemp;
+    Real64 TargetSteamMdot = this->DemandSideLoop.InletMassFlowRate;
+ 
     // mass flow rate of steam
     PlantUtilities::SetComponentFlowRate(
         state, TargetSteamMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
