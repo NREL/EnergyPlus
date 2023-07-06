@@ -227,7 +227,7 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         if (tariff(iInObj).reportMeterIndx != 0) {
 
             std::string const &SELECT_CASE_var(
-                UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
+                UtilityRoutines::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType));
 
             // Various types of electricity meters
             if (SELECT_CASE_var == "ELECTRICITY") {
@@ -664,9 +664,9 @@ void GetInputEconomicsTariff(EnergyPlusData &state, bool &ErrorsFound) // true i
         }
         // associate the resource number with each tariff
         if (tariff(iInObj).reportMeterIndx >= 1) {
-            tariff(iInObj).resource = static_cast<Constant::eResource>(getEnumerationValue(
-                Constant::eResourceNamesUC,
-                UtilityRoutines::MakeUPPERCase(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
+            tariff(iInObj).resource = static_cast<Constant::eResource>(
+                getEnumValue(Constant::eResourceNamesUC,
+                             UtilityRoutines::makeUPPER(state.dataOutputProcessor->EnergyMeters(tariff(iInObj).reportMeterIndx).ResourceType)));
         }
     }
 }
