@@ -791,11 +791,13 @@ void ManageSizing(EnergyPlusData &state)
             std::string coolPeakDDDate;
             int coolPeakDD = 0;
             Real64 coolCap = 0.;
+            int timeStepIndexAtPeakCoolLoad = 0;
             if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::SensibleCooling) {
                 coolPeakLoadKind = "Sensible";
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).SensCoolCap;
+                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtSensCoolPk(coolPeakDD);
             } else if (FinalSysSizing(AirLoopNum).coolingPeakLoad == DataSizing::PeakLoad::TotalCooling) {
                 if (FinalSysSizing(AirLoopNum).loadSizingType == DataSizing::LoadSizing::Latent && state.dataHeatBal->DoLatentSizing) {
                     coolPeakLoadKind = "Total Based on Latent";
@@ -805,6 +807,7 @@ void ManageSizing(EnergyPlusData &state)
                 coolPeakDDDate = SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate;
                 coolPeakDD = SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD;
                 coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
+                if (coolPeakDD > 0) timeStepIndexAtPeakCoolLoad = SysSizPeakDDNum(AirLoopNum).TimeStepAtTotCoolPk(coolPeakDD);
             }
             if (coolPeakDD > 0) {
                 ReportSysSizing(state,
@@ -816,7 +819,7 @@ void ManageSizing(EnergyPlusData &state)
                                 FinalSysSizing(AirLoopNum).DesCoolVolFlow,
                                 FinalSysSizing(AirLoopNum).CoolDesDay,
                                 coolPeakDDDate,
-                                SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(coolPeakDD));
+                                timeStepIndexAtPeakCoolLoad);
             } else {
                 ReportSysSizing(state,
                                 curName,
@@ -2380,7 +2383,7 @@ void GetOARequirements(EnergyPlusData &state)
                 auto const &objectFields = instance.value();
                 auto &thisOAReq = state.dataSize->OARequirements(oaIndex);
                 ip->markObjectAsUsed(cCurrentModuleObject2, instance.key());
-                std::string thisOAReqName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string thisOAReqName = UtilityRoutines::makeUPPER(instance.key());
 
                 if (UtilityRoutines::FindItemInList(thisOAReqName, state.dataSize->OARequirements) > 0) {
                     ShowSevereError(
@@ -2477,8 +2480,7 @@ void ProcessInputOARequirements(EnergyPlusData &state,
     auto &thisOARequirements(state.dataSize->OARequirements(OAIndex));
 
     if (NumAlphas > 1) {
-        thisOARequirements.OAFlowMethod =
-            static_cast<OAFlowCalcMethod>(getEnumerationValue(OAFlowCalcMethodNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(2))));
+        thisOARequirements.OAFlowMethod = static_cast<OAFlowCalcMethod>(getEnumValue(OAFlowCalcMethodNamesUC, UtilityRoutines::makeUPPER(Alphas(2))));
         if (thisOARequirements.OAFlowMethod == OAFlowCalcMethod::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->OARequirements(OAIndex).Name));
             ShowContinueError(state, format("...Invalid {}=\"{}\",", cAlphaFields(2), Alphas(2)));
@@ -3396,10 +3398,10 @@ void GetZoneSizingInput(EnergyPlusData &state)
                 constexpr static std::array<std::string_view, static_cast<int>(DataSizing::AirflowSizingMethod::Num)> AirflowSizingMethodNamesUC = {
                     "DESIGNDAY", "FLOW/ZONE", "DESIGNDAYWITHLIMIT"};
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod = static_cast<AirflowSizingMethod>(
-                    getEnumerationValue(AirflowSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+                    getEnumValue(AirflowSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
                 assert(state.dataSize->ZoneSizingInput(ZoneSizIndex).CoolAirDesMethod != AirflowSizingMethod::Invalid);
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod = static_cast<AirflowSizingMethod>(
-                    getEnumerationValue(AirflowSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
+                    getEnumValue(AirflowSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
                 assert(state.dataSize->ZoneSizingInput(ZoneSizIndex).HeatAirDesMethod != AirflowSizingMethod::Invalid);
 
                 BooleanSwitch accountForDOAS = getYesNoValue(state.dataIPShortCut->cAlphaArgs(8));
@@ -3409,7 +3411,7 @@ void GetZoneSizingInput(EnergyPlusData &state)
                     constexpr static std::array<std::string_view, static_cast<int>(DataSizing::DOASControl::Num)> DOASControlNamesUC = {
                         "NEUTRALSUPPLYAIR", "NEUTRALDEHUMIDIFIEDSUPPLYAIR", "COLDSUPPLYAIR"};
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASControlStrategy = static_cast<DataSizing::DOASControl>(
-                        getEnumerationValue(DOASControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+                        getEnumValue(DOASControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
 
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint = state.dataIPShortCut->rNumericArgs(17);
                     state.dataSize->ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = state.dataIPShortCut->rNumericArgs(18);
@@ -3420,8 +3422,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
-                zoneSizingIndex.zoneSizingMethod = static_cast<DataSizing::ZoneSizing>(
-                    getEnumerationValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+                zoneSizingIndex.zoneSizingMethod =
+                    static_cast<DataSizing::ZoneSizing>(getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {
                     zoneSizingIndex.zoneLatentSizing = true;
                     state.dataHeatBal->DoLatentSizing = true;
@@ -3700,7 +3702,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
         constexpr std::array<std::string_view, static_cast<int>(DataSizing::LoadSizing::Num)> LoadSizingNamesUC{
             "SENSIBLE", "LATENT", "TOTAL", "VENTILATIONREQUIREMENT"};
         SysSizInput(SysSizIndex).loadSizingType = static_cast<DataSizing::LoadSizing>(
-            getEnumerationValue(LoadSizingNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum))));
+            getEnumValue(LoadSizingNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(iLoadTypeSizeAlphaNum))));
 
         // assign PeakLoad based on LoadSizing for now
         if (SysSizInput(SysSizIndex).loadSizingType == DataSizing::LoadSizing::Sensible) {
@@ -3714,7 +3716,7 @@ void GetSystemSizingInput(EnergyPlusData &state)
         // set the CoolCapControl input
         constexpr std::array<std::string_view, static_cast<int>(CapacityControl::Num)> CapacityControlNamesUC{"VAV", "BYPASS", "VT", "ONOFF"};
         SysSizInput(SysSizIndex).CoolCapControl = static_cast<CapacityControl>(
-            getEnumerationValue(CapacityControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum))));
+            getEnumValue(CapacityControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(iCoolCapControlAlphaNum))));
 
         {
             std::string const &sizingOption = state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum);
@@ -4258,8 +4260,8 @@ void GetPlantSizingInput(EnergyPlusData &state)
 
         constexpr static std::array<std::string_view, static_cast<int>(DataSizing::TypeOfPlantLoop::Num)> TypeOfPlantLoopNamesUC = {
             "HEATING", "COOLING", "CONDENSER", "STEAM"};
-        state.dataSize->PlantSizData(PltSizIndex).LoopType = static_cast<TypeOfPlantLoop>(
-            getEnumerationValue(TypeOfPlantLoopNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+        state.dataSize->PlantSizData(PltSizIndex).LoopType =
+            static_cast<TypeOfPlantLoop>(getEnumValue(TypeOfPlantLoopNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
         assert(state.dataSize->PlantSizData(PltSizIndex).LoopType != TypeOfPlantLoop::Invalid);
 
         if (NumAlphas > 2) {
@@ -4477,7 +4479,7 @@ void ReportSysSizing(EnergyPlusData &state,
     if (state.dataSizingManager->ReportSysSizingMyOneTimeFlag) {
         print(state.files.eio,
               "{}\n",
-              "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
+              "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity [W], Calc Des Air "
               "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
         state.dataSizingManager->ReportSysSizingMyOneTimeFlag = false;
     }

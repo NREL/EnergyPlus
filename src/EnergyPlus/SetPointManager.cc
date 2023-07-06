@@ -1677,8 +1677,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType = cAlphaArgs(2);
 
         // setup program flow control integers.
-        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(getEnumerationValue(
-            controlTypeNameUC, UtilityRoutines::MakeUPPERCase(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
+        state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode = static_cast<CtrlVarType>(
+            getEnumValue(controlTypeNameUC, UtilityRoutines::makeUPPER(state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ctrlVarType)));
         if (state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).CtrlTypeMode == CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -1872,7 +1872,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MaxTemp)]) {
+        if (UtilityRoutines::makeUPPER(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MaxTemp)]) {
             state.dataSetPointManager->WarmestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MaxTemp;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -1972,7 +1972,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                      state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).MinSetTemp));
         }
 
-        if (UtilityRoutines::MakeUPPERCase(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MinTemp)]) {
+        if (UtilityRoutines::makeUPPER(cAlphaArgs(4)) == controlTypeNameUC[static_cast<int>(CtrlVarType::MinTemp)]) {
             state.dataSetPointManager->ColdestSetPtMgr(SetPtMgrNum).Strategy = SupplyFlowTempStrategy::MinTemp;
         } else {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
@@ -2084,7 +2084,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy =
-            static_cast<ControlStrategy>(getEnumerationValue(strategyNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+            static_cast<ControlStrategy>(getEnumValue(strategyNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
         if (state.dataSetPointManager->WarmestSetPtMgrTempFlow(SetPtMgrNum).Strategy == ControlStrategy::Invalid) {
             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
             ShowContinueError(state, format("..invalid {}=\"{}\".", cAlphaFieldNames(4), cAlphaArgs(4)));
@@ -3813,7 +3813,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         setpointManager.Name = cAlphaArgs(1);
         setpointManager.ctrlVarType = cAlphaArgs(2);
 
-        int typeNum = getEnumerationValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
+        int typeNum = getEnumValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
         setpointManager.CtrlTypeMode = static_cast<SetPointManager::CtrlVarType>(typeNum);
         if (setpointManager.CtrlTypeMode == SetPointManager::CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
@@ -3935,7 +3935,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         setpointManager.Name = cAlphaArgs(1);
         setpointManager.ctrlVarType = cAlphaArgs(2);
 
-        int typeNum = getEnumerationValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
+        int typeNum = getEnumValue(SetPointManager::controlTypeNameUC, cAlphaArgs(2));
         setpointManager.CtrlTypeMode = static_cast<SetPointManager::CtrlVarType>(typeNum);
         if (setpointManager.CtrlTypeMode == SetPointManager::CtrlVarType::Invalid) {
             // should not come here if idd type choice and key list is working
@@ -8363,7 +8363,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     Array1D<OutputProcessor::VariableType> VarTypes;   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
-    std::map<int, Constant::eResource> ResourceTypes;  // ResourceTypes for each variable
+    Array1D<Constant::eResource> ResourceTypes;        // ResourceTypes for each variable
     Array1D_string EndUses;                            // EndUses for each variable
     Array1D_string Groups;                             // Groups for each variable
     Array1D_string Names;                              // Variable Names for each variable
@@ -8389,11 +8389,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     VarTypes.allocate(NumVariables);
     IndexTypes.allocate(NumVariables);
     unitsForVar.allocate(NumVariables);
-
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::eResource>(varN, Constant::eResource::Invalid));
-    }
-
+    ResourceTypes.allocate(NumVariables);
     EndUses.allocate(NumVariables);
     Groups.allocate(NumVariables);
     Names.allocate(NumVariables);
@@ -8411,12 +8407,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     VarTypes.allocate(NumVariables);
     IndexTypes.allocate(NumVariables);
     unitsForVar.allocate(NumVariables);
-
-    ResourceTypes.clear();
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::eResource>(varN, Constant::eResource::Invalid));
-    }
-
+    ResourceTypes.allocate(NumVariables);
     EndUses.allocate(NumVariables);
     Groups.allocate(NumVariables);
     Names.allocate(NumVariables);
@@ -8442,12 +8433,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
         unitsForVar.allocate(NumVariables);
-
-        ResourceTypes.clear();
-        for (int varN = 1; varN <= NumVariables; ++varN) {
-            ResourceTypes.insert(std::pair<int, Constant::eResource>(varN, Constant::eResource::Invalid));
-        }
-
+        ResourceTypes.allocate(NumVariables);
         EndUses.allocate(NumVariables);
         Groups.allocate(NumVariables);
         Names.allocate(NumVariables);
@@ -8465,12 +8451,7 @@ void DefineIdealCondEntSetPointManager::SetupMeteredVarsForSetPt(EnergyPlusData 
     VarTypes.allocate(NumVariables);
     IndexTypes.allocate(NumVariables);
     unitsForVar.allocate(NumVariables);
-
-    ResourceTypes.clear();
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::eResource>(varN, Constant::eResource::Invalid));
-    }
-
+    ResourceTypes.allocate(NumVariables);
     EndUses.allocate(NumVariables);
     Groups.allocate(NumVariables);
     Names.allocate(NumVariables);

@@ -59,14 +59,27 @@ import json
 import sys
 from os import path
 
-
+print("Generating the epJSON schema!", file=sys.stderr)
 source_dir_path = sys.argv[1]
 data = idd_parser.Data()
-with open(path.join(source_dir_path, 'idd', 'Energy+.idd.in'), 'r') as f:
-    data.file = f.read()
+idd_path = path.join(source_dir_path, 'Energy+.idd')
+if path.exists(idd_path):
+    with open(idd_path, 'r') as f:
+        data.file = f.read()
+else:
+    # this script is also used in the sphinx documentation, which doesn't do a CMake configuration run
+    # so the runtime/Products/Energy+.idd file is not generated.  The script is just executed on the raw
+    # Energy+.idd.in file in the idd folder.  So try to find the .in file if we couldn't find the
+    # generated idd file.
+    idd_in_path = path.join(source_dir_path, 'Energy+.idd.in')
+    if path.exists(idd_in_path):
+        with open(idd_in_path, 'r') as f:
+            data.file = f.read()
+    else:
+        print(f"Could not find E+ IDD, looked for both: {idd_path} and {idd_in_path}.  Aborting")
+        sys.exit(1)
 
 idd_parser.parse_idd(data)
-modify_schema.change_version(data.schema)
 modify_schema.change_schedule_compact(data.schema)
 modify_schema.change_utility_cost(data.schema)
 modify_schema.change_special_cased_enums(data.schema)
@@ -75,5 +88,5 @@ modify_schema.change_extensions_name(data.schema)
 modify_schema.change_89_release_issues(data.schema)
 modify_schema.add_explicit_extensible_bounds(data.schema)
 
-with open(path.join(source_dir_path, 'idd', 'Energy+.schema.epJSON.in'), 'w') as f2:
+with open(path.join(source_dir_path, 'Energy+.schema.epJSON'), 'w') as f2:
     f2.write(json.dumps(data.schema, indent=4))
