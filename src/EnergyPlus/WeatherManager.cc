@@ -2765,7 +2765,16 @@ namespace WeatherManager {
             for (int hour = 1; hour <= 24; ++hour) {
                 for (int CurTimeStep = 1; CurTimeStep <= state.dataWeatherManager->NumIntervalsPerHour; ++CurTimeStep) {
                     auto WeatherDataLine = state.files.inputWeatherFile.readLine();
-                    if (!WeatherDataLine.good) WeatherDataLine.data.clear();
+                    // EOL at end of EPW:
+                    //  * Yes (common case)
+                    //      * last actual line is read, line not empty, eof=false, good=true.
+                    //      * Then it tries to read one more, line is empty, eof=true, good=false
+                    //  * No (#10064):
+                    //      * last actual line read, line not empty, eof=true, good=false
+                    //      * If you try to read one more, it returns the same
+                    if (!WeatherDataLine.eof && !WeatherDataLine.good) {
+                        WeatherDataLine.data.clear();
+                    }
                     if (WeatherDataLine.data.empty()) {
                         if (hour == 1) {
                             WeatherDataLine.eof = true;
@@ -2774,7 +2783,7 @@ namespace WeatherManager {
                             WeatherDataLine.good = false;
                         }
                     }
-                    if (WeatherDataLine.good) {
+                    if (!WeatherDataLine.data.empty()) {
                         bool ErrorFound;
                         InterpretWeatherDataLine(state,
                                                  WeatherDataLine.data,
