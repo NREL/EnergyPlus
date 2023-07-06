@@ -6755,24 +6755,24 @@ namespace UnitarySystems {
                 case DataHVACGlobals::CoilDX_MultiSpeedCooling:
                 case DataHVACGlobals::Coil_CoolingWaterToAirHPSimple:
                 case DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit: {
-                     this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
-                     this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
-                     this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
-                     this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling + 1);
-                     if (state.dataGlobal->DoCoilDirectSolutions && this->m_NumOfSpeedCooling > this->m_NumOfSpeedHeating) {
+                    this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
+                    this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+                    this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+                    this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling + 1);
+                    if (state.dataGlobal->DoCoilDirectSolutions && this->m_NumOfSpeedCooling > this->m_NumOfSpeedHeating) {
                         this->FullOutput.resize(this->m_NumOfSpeedCooling + 1);
                         DXCoils::DisableLatentDegradation(state, this->m_CoolingCoilIndex);
                     }
-                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple && this->m_NumOfSpeedCooling > 1) {
+                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple && this->m_NumOfSpeedCooling > 1) {
                         this->m_MultiOrVarSpeedCoolCoil = true;
                         this->m_DiscreteSpeedCoolingCoil = true;
                     }
-                     for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
+                    for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
                         this->m_CoolMassFlowRate[i] = 0.0;
                         this->m_CoolVolumeFlowRate[i] = 0.0;
                         this->m_MSCoolingSpeedRatio[i] = 1.0;
                     }
-                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
                         std::string MultispeedType = "UnitarySystemPerformance:Multispeed";
                         if (this->m_DesignSpecMSHPIndex == -1) {
                             std::string MultispeedType = "Fan:SystemModel";
