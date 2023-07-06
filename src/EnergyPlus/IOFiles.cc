@@ -98,9 +98,10 @@ InputFile::ReadResult<std::string> InputFile::readLine() noexcept
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
-        return {std::move(line), is->eof(), is->good()};
+        // Use operator bool, see ReadResult::good() docstring
+        return {std::move(line), is->eof(), bool(is)};
     } else {
-        return {"", is->eof(), is->good()};
+        return {"", is->eof(), false};
     }
 }
 
