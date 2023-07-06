@@ -50,10 +50,10 @@
 #include "Data/EnergyPlusData.hh"
 #include "DataStringGlobals.hh"
 #include "FileSystem.hh"
-#include "InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "InputProcessing/InputProcessor.hh"
 #include "ResultsFramework.hh"
 #include "UtilityRoutines.hh"
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <algorithm>
 #include <fmt/format.h>
@@ -326,7 +326,7 @@ void IOFiles::OutputControl::getInput(EnergyPlusData &state)
             auto found = fields.find(field_name);
             if (found != fields.end()) {
                 input = found.value().get<std::string>();
-                input = UtilityRoutines::MakeUPPERCase(input);
+                input = UtilityRoutines::makeUPPER(input);
             } else {
                 state.dataInputProcessing->inputProcessor->getDefaultValue(state, "OutputControl:Files", field_name, input);
             }
