@@ -3846,7 +3846,7 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
 void checkChargeDischargeVoltageCurves(
     EnergyPlusData &state, std::string const nameBatt, Real64 const E0c, Real64 const E0d, int const chargeIndex, int const dischargeIndex)
 {
-    int const numChecks = 50; // number of divisions from 0 to 1 for fraction charged/discharged
+    int constexpr numChecks = 50; // number of divisions from 0 to 1 for fraction charged/discharged
 
     // Fix for Defect #8817.  When the charging curve results in a lower voltage than the discharging curve, the battery
     // will give the appearance that the energy in Joules being removed from the battery exceeds what was stored.  This
@@ -3861,7 +3861,8 @@ void checkChargeDischargeVoltageCurves(
             numErrors += 1;
             if (numErrors <= 10) {
                 ShowWarningMessage(state, format("Kinetic Battery Model: {} has a charging/discharging voltage curve conflict.", nameBatt));
-                ShowContinueError(state, "Discharging voltage is higher than charging voltage which can lead to an imbalance in the stored energy.");
+                ShowContinueError(
+                    state, "Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.");
                 ShowContinueError(state,
                                   format("Discharging voltage = {:.3R} V; charging voltage = {:.3R} V; charged fraction = {:.3R}",
                                          dischargeVoltage,
@@ -3869,6 +3870,7 @@ void checkChargeDischargeVoltageCurves(
                                          xfc));
                 ShowContinueError(state,
                                   "Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.");
+                ShowContinueError(state, "Also check the charging and discharging energy outputs to find any discrepancies.");
             } else if (numErrors <= 20) {
                 ShowWarningMessage(state, format("Kinetic Battery Model: {} has more charging/discharging voltage curve conflicts.", nameBatt));
             }
