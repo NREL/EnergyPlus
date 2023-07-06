@@ -45,67 +45,24 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DataUCSDSharedData_hh_INCLUDED
-#define DataUCSDSharedData_hh_INCLUDED
+#ifndef InputProcessing_EmbeddedEpJSONSchema_HH
+#define InputProcessing_EmbeddedEpJSONSchema_HH
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
-// EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include <GSL/span.h>
+#include <cstddef>
+#include <cstdint>
+#include <string_view>
+#include <utility>
 
 namespace EnergyPlus {
 
-struct UCSDSharedData : BaseGlobalStruct
-{
-    // The Eplus surface numbers will be stored in the arrays Apos according to the
-    // type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
-    // for each zone it has 2 positions: the start and end positions in the Apos_Wall array
-    // for that specific zone.
-    Array1D_int APos_Wall;
-    Array1D_int APos_Floor;
-    Array1D_int APos_Ceiling;
-    Array1D_int PosZ_Wall;
-    Array1D_int PosZ_Floor;
-    Array1D_int PosZ_Ceiling;
-    Array1D_int APos_Window;
-    Array1D_int APos_Door;
-    Array1D_int APos_Internal;
-    Array1D_int PosZ_Window;
-    Array1D_int PosZ_Door;
-    Array1D_int PosZ_Internal;
-    // Convection coefficients for the various surfaces
-    Array1D<Real64> HCeiling;
-    Array1D<Real64> HWall;
-    Array1D<Real64> HFloor;
-    Array1D<Real64> HInternal;
-    Array1D<Real64> HWindow;
-    Array1D<Real64> HDoor;
-    void clear_state() override
-    {
-        this->APos_Wall.clear();
-        this->APos_Floor.clear();
-        this->APos_Ceiling.clear();
-        this->PosZ_Wall.clear();
-        this->PosZ_Floor.clear();
-        this->PosZ_Ceiling.clear();
-        this->APos_Window.clear();
-        this->APos_Door.clear();
-        this->APos_Internal.clear();
-        this->PosZ_Window.clear();
-        this->PosZ_Door.clear();
-        this->PosZ_Internal.clear();
-        // Convection coeficients for the various surfaces
-        this->HCeiling.clear();
-        this->HWall.clear();
-        this->HFloor.clear();
-        this->HInternal.clear();
-        this->HWindow.clear();
-        this->HDoor.clear();
-    }
-};
+namespace EmbeddedEpJSONSchema {
 
-} // namespace EnergyPlus
+const gsl::span<const std::uint8_t> embeddedEpJSONSchema();
 
-#endif
+const std::string_view embeddedEpJSONSchemaView();
+}  // namespace EmbeddedEpJSONSchema
+
+}  // namespace EnergyPlus
+
+#endif  // InputProcessing_EmbeddedEpJSONSchema_HH

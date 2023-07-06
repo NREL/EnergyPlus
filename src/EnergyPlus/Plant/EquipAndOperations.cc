@@ -295,7 +295,7 @@ namespace DataPlant {
                     auto &this_equip(this->CoolingOnlyEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
+                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -383,7 +383,7 @@ namespace DataPlant {
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
                     Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
+                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -474,7 +474,7 @@ namespace DataPlant {
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
                     Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
+                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -563,7 +563,7 @@ namespace DataPlant {
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
                     Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumerationValue(PlantEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(this_equip.TypeOf)));
+                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -678,9 +678,9 @@ namespace DataPlant {
         // process dedicated heat recovery water to water heatpumps to control
         if (this->PlantOps.DedicatedHR_ChWRetControl_Input && this->PlantOps.DedicatedHR_HWRetControl_Input) {
             for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
-                std::string const thisPLHPName = UtilityRoutines::MakeUPPERCase(thisHP.name);
+                std::string const thisPLHPName = UtilityRoutines::makeUPPER(thisHP.name);
                 // find cooling side heat pump
-                std::string const targetDedHRCoolName = UtilityRoutines::MakeUPPERCase(this->DedicatedHR_ChWRetControl_Name);
+                std::string const targetDedHRCoolName = UtilityRoutines::makeUPPER(this->DedicatedHR_ChWRetControl_Name);
                 if (thisPLHPName == targetDedHRCoolName) {  // found it
                     this->DedicatedHR_CoolingPLHP = thisHP; // store pointer to cooling side of heat pump
                     founditCooling = true;
@@ -727,7 +727,7 @@ namespace DataPlant {
                 }
 
                 // find heating side heat pump
-                std::string const targetDedHRHeatName = UtilityRoutines::MakeUPPERCase(this->DedicatedHR_HWRetControl_Name);
+                std::string const targetDedHRHeatName = UtilityRoutines::makeUPPER(this->DedicatedHR_HWRetControl_Name);
                 if (thisPLHPName == targetDedHRHeatName) {  // found it
                     this->DedicatedHR_HeatingPLHP = thisHP; // store pointer to heating side of heat pump
                     founditHeating = true;

@@ -58,13 +58,13 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace DisplacementVentMgr {
+namespace RoomAir {
 
-    void ManageUCSDDVModel(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
+    void ManageDispVent3Node(EnergyPlusData &state, int ZoneNum); // index number for the specified zone
 
-    void InitUCSDDV(EnergyPlusData &state, int ZoneNum);
+    void InitDispVent3Node(EnergyPlusData &state, int ZoneNum);
 
-    void HcUCSDDV(EnergyPlusData &state, int ZoneNum, Real64 FractionHeight);
+    void HcDispVent3Node(EnergyPlusData &state, int ZoneNum, Real64 FractionHeight);
 
     Real64 calculateThirdOrderFloorTemperature(Real64 temperatureHistoryTerm,
                                                Real64 HAT_floor,
@@ -76,7 +76,7 @@ namespace DisplacementVentMgr {
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
 
-    void CalcUCSDDV(EnergyPlusData &state, int ZoneNum); // Which Zonenum
+    void CalcDispVent3Node(EnergyPlusData &state, int ZoneNum); // Which Zonenum
 
     static constexpr std::array<DataHeatBalance::IntGainType, 30> IntGainTypesOccupied = {
         DataHeatBalance::IntGainType::People,
@@ -113,7 +113,7 @@ namespace DisplacementVentMgr {
     static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                                                                              DataHeatBalance::IntGainType::Lights};
 
-} // namespace DisplacementVentMgr
+} // namespace RoomAir
 
 struct DisplacementVentMgrData : BaseGlobalStruct
 {
