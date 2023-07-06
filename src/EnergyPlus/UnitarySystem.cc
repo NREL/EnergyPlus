@@ -6704,11 +6704,12 @@ namespace UnitarySystems {
 
                 this->m_NoLoadAirFlowRateRatio = this->m_CompPointerMSHP->noLoadAirFlowRateRatio;
 
-                if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
-                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingElectric_MultiStage ||
-                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
-                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
-                    this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
+                switch (this->m_HeatingCoilType_Num) {
+                case DataHVACGlobals::CoilDX_MultiSpeedHeating:
+                case DataHVACGlobals::Coil_HeatingElectric_MultiStage:
+                case DataHVACGlobals::Coil_HeatingGas_MultiStage:
+                case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple:
+                case DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit: {
                     this->m_NumOfSpeedHeating = this->m_CompPointerMSHP->numOfSpeedHeating;
                     this->m_HeatMassFlowRate.resize(this->m_NumOfSpeedHeating + 1);
                     this->m_HeatVolumeFlowRate.resize(this->m_NumOfSpeedHeating + 1);
@@ -6748,29 +6749,30 @@ namespace UnitarySystems {
                             ShowContinueError(state, format("... The number of heating coil speeds in the {} will be used.", MultispeedType));
                         }
                     }
+                } break;
                 }
-
-                if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
-                    this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple ||
-                    this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
-                    this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
-                    this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
-                    this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
-                    this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling + 1);
-                    if (state.dataGlobal->DoCoilDirectSolutions && this->m_NumOfSpeedCooling > this->m_NumOfSpeedHeating) {
+                switch (this->m_CoolingCoilType_Num) {
+                case DataHVACGlobals::CoilDX_MultiSpeedCooling:
+                case DataHVACGlobals::Coil_CoolingWaterToAirHPSimple:
+                case DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit: {
+                     this->m_NumOfSpeedCooling = this->m_CompPointerMSHP->numOfSpeedCooling;
+                     this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+                     this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
+                     this->m_MSCoolingSpeedRatio.resize(this->m_NumOfSpeedCooling + 1);
+                     if (state.dataGlobal->DoCoilDirectSolutions && this->m_NumOfSpeedCooling > this->m_NumOfSpeedHeating) {
                         this->FullOutput.resize(this->m_NumOfSpeedCooling + 1);
                         DXCoils::DisableLatentDegradation(state, this->m_CoolingCoilIndex);
                     }
-                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple && this->m_NumOfSpeedCooling > 1) {
+                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple && this->m_NumOfSpeedCooling > 1) {
                         this->m_MultiOrVarSpeedCoolCoil = true;
                         this->m_DiscreteSpeedCoolingCoil = true;
                     }
-                    for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
+                     for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
                         this->m_CoolMassFlowRate[i] = 0.0;
                         this->m_CoolVolumeFlowRate[i] = 0.0;
                         this->m_MSCoolingSpeedRatio[i] = 1.0;
                     }
-                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
                         std::string MultispeedType = "UnitarySystemPerformance:Multispeed";
                         if (this->m_DesignSpecMSHPIndex == -1) {
                             std::string MultispeedType = "Fan:SystemModel";
@@ -6793,6 +6795,7 @@ namespace UnitarySystems {
                             ShowContinueError(state, format("... The number of Cooling coil speeds in the {} will be used.", MultispeedType));
                         }
                     }
+                } break;
                 }
             } else {
                 ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
@@ -17382,7 +17385,6 @@ namespace UnitarySystems {
     void setupAllOutputVars(EnergyPlusData &state, int const numAllSystemTypes)
     {
         // setup reports only once
-        if (state.dataUnitarySystems->reportVariablesAreSetup) return;
         // all report variable are set up here after all systems are allocated.
         // UnitarySystem now models other equipment types, any new reports may be setup here.
         if (numAllSystemTypes == state.dataUnitarySystems->numUnitarySystems) {
@@ -18289,7 +18291,6 @@ namespace UnitarySystems {
                             "is working as expected.");
             ShowFatalError(state, "setupAllOutputVar: Developer error. Conflict in number of UnitarySystems.");
         }
-        state.dataUnitarySystems->reportVariablesAreSetup = true;
     }
 
     void isWaterCoilHeatRecoveryType(EnergyPlusData const &state, int const waterCoilNodeNum, bool &nodeNotFound)
