@@ -8117,7 +8117,7 @@ void CalcEQLOpticalProperty(EnergyPlusData &state,
     // Uses the net radiation method developed for ASHWAT fenestration
     // model (ASHRAE RP-1311) by John Wright, the University of WaterLoo
 
-    using DaylightingManager::ProfileAngle;
+    using Dayltg::ProfileAngle;
 
     // Argument array dimensioning
     CFSAbs.dim(2, CFSMAXNL + 1);
