@@ -65,13 +65,13 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
-#include <EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <fmt/os.h>
 #include <milo/dtoa.h>
