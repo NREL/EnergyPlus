@@ -260,7 +260,6 @@ protected:
     // if it makes sense for the unit test to continue after returning from function.
     // This will add the required objects if not specified: Version, Building, GlobalGeometryRules
     // Will return false if no errors found and true if errors found
-    bool process_idf(std::string const &idf_snippet, bool use_assertions = true);
     bool process_idf(std::string_view const idf_snippet, bool use_assertions = true);
 
     // Opens output files as stringstreams

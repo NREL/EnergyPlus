@@ -199,14 +199,6 @@ def get_schema_object(schema, object_key):
     raise KeyError(R'The patternProperties value is not a valid choice (".*", "^.*\S.*$")')
 
 
-def change_version(schema):
-    schema["epJSON_schema_version"] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}"
-    schema["epJSON_schema_build"] = "${CMAKE_VERSION_BUILD}"
-    loc = get_schema_object(schema, 'Version')['properties']['version_identifier']
-    loc['default'] = "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"
-    loc['type'] = "string"
-
-
 def change_schedule_compact(schema):
     loc = get_schema_object(schema, 'Schedule:Compact')['properties']['extensions']['items']['properties']['field']
     loc.pop('type')
