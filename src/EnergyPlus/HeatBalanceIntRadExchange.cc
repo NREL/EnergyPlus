@@ -1121,7 +1121,7 @@ namespace HeatBalanceIntRadExchange {
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
             std::string const thisSpaceOrSpaceListName =
-                UtilityRoutines::MakeUPPERCase(fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>());
+                UtilityRoutines::makeUPPER(fields.at("zone_or_zonelist_or_space_or_spacelist_name").get<std::string>());
             // do not mark object as used here - let GetInputViewFactorsbyName do that
 
             // Look for matching radiant enclosure name (solar enclosures have the same names)
