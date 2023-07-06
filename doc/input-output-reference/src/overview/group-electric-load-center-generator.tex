@@ -1216,7 +1216,11 @@ The curve has the following form:
 \Delta E = ({C_1}*X)/({C_2} + X) + {C_3}*X
 \end{equation}
 
-where X is the battery charge divided by the maximum capacity at a given current. More details can be found from the Engineering Reference.
+where X is the battery charge divided by the maximum capacity at a given current.
+
+Note that a check is made when the input is retrieved to look at the voltage when charging and discharging (see next field). The voltage during charging at a particular battery charge should be higher for charging.  If not, it would potentially lead to results that show more energy being discharged by the battery than was charged. Warning messages are produced to alert the user of this situation so that curves can be analyzed and corrected as needed.
+
+More details on the kinetic battery as well as the charging and discharging algorithm can be found from the Engineering Reference.
 
 \paragraph{Field: Voltage Change Curve Name for Discharging}\label{field-voltage-change-curve-name-for-discharging}
 
@@ -1228,7 +1232,11 @@ The curve has the following form:
 \Delta E = ({C_1}*X)/({C_2} + X) + {C_3}*X
 \end{equation}
 
-where X is the removed charge divided by the maximum capacity at a given current. More details can be found from the Engineering Reference.
+where X is the removed charge divided by the maximum capacity at a given current.
+
+Note that a check is made when the input is retrieved to look at the voltage when charging (see previous field) and discharging. The voltage during charging at a particular battery charge should be higher for charging.  If not, it would potentially lead to results that show more energy being discharged by the battery than was charged. Warning messages are produced to alert the user of this situation so that curves can be analyzed and corrected as needed.
+
+More details on the kinetic battery as well as the charging and discharging algorithm can be found from the Engineering Reference.
 
 \paragraph{Field: Module Internal Electrical Resistance}\label{field-module-internal-electrical-resistance}
 
