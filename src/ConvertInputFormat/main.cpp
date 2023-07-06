@@ -53,9 +53,9 @@
 
 #include "EnergyPlus/DataStringGlobals.hh"
 #include "EnergyPlus/FileSystem.hh"
-#include "EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh"
 #include "EnergyPlus/InputProcessing/IdfParser.hh"
 #include "EnergyPlus/InputProcessing/InputValidation.hh"
+#include <embedded/EmbeddedEpJSONSchema.hh>
 #include <ezOptionParser.hpp>
 #include <nlohmann/json.hpp>
 
@@ -72,7 +72,7 @@ enum class OutputTypes
     BSON
 };
 
-template <typename... Args> void displayMessage(std::string_view str_format, Args &&... args)
+template <typename... Args> void displayMessage(std::string_view str_format, Args &&...args)
 {
     fmt::print(std::cout, str_format, args...);
     std::cout.write("\n", 1);

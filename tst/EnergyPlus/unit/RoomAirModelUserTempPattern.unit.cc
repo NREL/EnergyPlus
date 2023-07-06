@@ -56,7 +56,7 @@
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::RoomAirModelUserTempPattern;
+using namespace EnergyPlus::RoomAir;
 
 TEST_F(EnergyPlusFixture, RoomAirModelUserTempPattern_OutdoorDryBulbGradTest)
 {

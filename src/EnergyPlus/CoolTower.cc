@@ -233,7 +233,7 @@ namespace CoolTower {
 
             {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType =
-                    static_cast<FlowCtrl>(getEnumerationValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
+                    static_cast<FlowCtrl>(getEnumValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::Invalid) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=\"{}\".",
