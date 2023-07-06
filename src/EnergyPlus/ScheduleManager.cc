@@ -633,7 +633,7 @@ namespace ScheduleManager {
             }
             if (NumAlphas >= 3) {
                 if (!lAlphaBlanks(3)) {
-                    state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType = getEnumerationValue(scheduleTypeLimitUnitTypes, Alphas(3)) + 1;
+                    state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType = getEnumValue(scheduleTypeLimitUnitTypes, Alphas(3)) + 1;
                     if (state.dataScheduleMgr->ScheduleType(LoopIndex).UnitType == 0) {
                         ShowWarningError(
                             state,
@@ -817,7 +817,7 @@ namespace ScheduleManager {
 
             // Depending on value of "Interpolate" field, the value for each time step in each hour gets processed:
             state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated =
-                static_cast<ScheduleInterpolation>(getEnumerationValue(interpolationTypesUC, Alphas(3)));
+                static_cast<ScheduleInterpolation>(getEnumValue(interpolationTypesUC, Alphas(3)));
             if (state.dataScheduleMgr->DaySchedule(Count).IntervalInterpolated == ScheduleInterpolation::Invalid) {
                 ShowSevereError(
                     state,
@@ -2326,7 +2326,7 @@ namespace ScheduleManager {
 
                 // IDD only allows Hourly or Timestep as valid values on the required field, anything else should be an error in the input processor
                 OutputReportLevel reportLevel =
-                    static_cast<OutputReportLevel>(getEnumerationValue(outputScheduleReportLevelNamesUC, Alphas(1))); // NOLINT(modernize-use-auto)
+                    static_cast<OutputReportLevel>(getEnumValue(outputScheduleReportLevelNamesUC, Alphas(1))); // NOLINT(modernize-use-auto)
                 if (reportLevel == OutputReportLevel::Invalid) {
                     ShowWarningError(state, format("{}Report for Schedules should specify \"HOURLY\" or \"TIMESTEP\" (\"DETAILED\")", RoutineName));
                     ShowContinueError(state, "HOURLY report will be done");

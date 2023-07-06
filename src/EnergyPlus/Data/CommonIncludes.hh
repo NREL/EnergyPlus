@@ -122,7 +122,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
-#include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
