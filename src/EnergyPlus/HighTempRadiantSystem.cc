@@ -287,7 +287,7 @@ namespace HighTempRadiantSystem {
 
             // Determine High Temp Radiant heating design capacity sizing method
             highTempRadSys.HeatingCapMethod = static_cast<DataSizing::DesignSizingType>(
-                getEnumerationValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+                getEnumValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
             if (highTempRadSys.HeatingCapMethod == DataSizing::DesignSizingType::HeatingDesignCapacity) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatDesignCapacityNumericNum)) {
                     highTempRadSys.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatDesignCapacityNumericNum);
@@ -369,7 +369,7 @@ namespace HighTempRadiantSystem {
             }
 
             highTempRadSys.HeaterType =
-                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+                static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
 
             if (highTempRadSys.HeaterType == Constant::eResource::NaturalGas) {
                 highTempRadSys.CombustionEffic = state.dataIPShortCut->rNumericArgs(4);
@@ -447,7 +447,7 @@ namespace HighTempRadiantSystem {
             }
 
             // Process the temperature control type
-            highTempRadSys.ControlType = static_cast<RadControlType>(getEnumerationValue(radControlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
+            highTempRadSys.ControlType = static_cast<RadControlType>(getEnumValue(radControlTypeNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
 
             highTempRadSys.ThrottlRange = state.dataIPShortCut->rNumericArgs(8);
             if (highTempRadSys.ThrottlRange < MinThrottlingRange) {
