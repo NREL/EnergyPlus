@@ -45,7 +45,40 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// EnergyPlus Headers
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
+
+// C++ Headers
+#include <algorithm>
+#include <iterator>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
+#ifdef _WIN32
+// EnergyPlus Headers
+#include <EnergyPlus/CommandLineStringUtilities.hh>
+#include <fmt/xchar.h>
+
+int wmain(int argc, wchar_t *wargv[])
+{
+    for (int i = 0; i < argc; ++i) {
+        fmt::print(L"wargv[{}] = {}\n", i, wargv[i]);
+    }
+    std::vector<std::wstring> wargs(wargv, std::next(wargv, static_cast<std::ptrdiff_t>(argc)));
+    std::vector<std::string> args;
+    args.reserve(wargs.size());
+    std::transform(wargs.cbegin(), wargs.cend(), std::back_inserter(args), [](const std::wstring &ws) { return CLI::narrow(ws); });
+    for (const auto &wstr : wargs) {
+        fmt::print(L"wargs={}\n", wstr);
+    }
+    fmt::print("args={}\n", args);
+
+    return EnergyPlusPgm(args);
+}
+#else
 
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
 #include <EnergyPlus/fenv_missing.h>
@@ -56,6 +89,8 @@ int main(int argc, const char *argv[])
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
-
-    return EnergyPlusPgm(argc, argv);
+    std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
+    fmt::print("args={}\n", args);
+    return EnergyPlusPgm(std::move(args));
 }
+#endif

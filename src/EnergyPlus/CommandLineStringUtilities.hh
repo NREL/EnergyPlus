@@ -1,4 +1,3 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,35 +44,50 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusPgm_hh_INCLUDED
-#define EnergyPlusPgm_hh_INCLUDED
-
-#include <EnergyPlus/api/EnergyPlusAPI.h>
-
-// C++ Headers
+#include <codecvt>
+#include <filesystem>
+#include <locale>
 #include <string>
-#include <vector>
 
-namespace EnergyPlus {
-struct EnergyPlusData;
+namespace CLI {
+namespace detail {
+    inline std::string narrow_impl(const wchar_t *str, std::size_t str_size)
+    {
+#ifdef _WIN32
+        return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().to_bytes(str, str + str_size);
+#else
+        return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(str, str + str_size);
+#endif
+    }
+} // namespace detail
+
+inline std::string narrow(const wchar_t *str)
+{
+    return detail::narrow_impl(str, std::wcslen(str));
 }
 
-// Functions
+inline std::string narrow(const std::wstring &str)
+{
+    return detail::narrow_impl(str.data(), str.size());
+}
 
-std::string CreateCurrentDateTimeString();
+inline std::wstring widen(const std::string &str)
+{
+#ifdef _WIN32
+    return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(str.data(), str.data() + str.size());
+#else
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(str.data(), str.data() + str.size());
+#endif // _WIN32
+}
 
-int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath);
-
-int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state);
-
-int ENERGYPLUSLIB_API EnergyPlusPgm(const std::vector<std::string> &args, std::string const &filepath = std::string());
-
-int ENERGYPLUSLIB_API RunEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const &filepath = std::string());
-
-int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, const std::vector<std::string> &args);
-
-void ENERGYPLUSLIB_API StoreProgressCallback(EnergyPlus::EnergyPlusData &state, void (*f)(int const));
-
-void ENERGYPLUSLIB_API StoreMessageCallback(EnergyPlus::EnergyPlusData &state, void (*f)(std::string const &));
-
-#endif
+inline std::filesystem::path to_path(const std::string &str)
+{
+    return {
+#ifdef _WIN32
+        widen(str)
+#else
+        str
+#endif // _WIN32
+    };
+}
+} // namespace CLI

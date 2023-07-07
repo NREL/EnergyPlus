@@ -61,13 +61,15 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <EnergyPlus/CommandLineStringUtilities.hh>
+
 namespace EnergyPlus {
 
 namespace CommandLineInterface {
 
     using namespace ez;
 
-    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
+    int ProcessArgs(EnergyPlusData &state, const std::vector<std::string> &args)
     {
         typedef std::string::size_type size_type;
 
@@ -75,11 +77,10 @@ namespace CommandLineInterface {
         // and expand multiple short options into separate arguments
         std::vector<std::string> arguments;
 
-        for (int i = 0; i < argc; ++i) {
+        std::string const dash("-");
 
-            std::string inputArg(argv[i]);
+        for (const auto &inputArg : args) {
 
-            std::string const dash("-");
             size_type const doubleDashPosition = inputArg.find("--");
             size_type const equalsPosition = inputArg.find("=");
 
@@ -94,23 +95,6 @@ namespace CommandLineInterface {
                 arguments.push_back(inputArg);
             }
         }
-
-        // Fix This is problematic for a few reasons:
-        //  Using ezOptionParser with a raw C-string interface is asking for trouble: Find something taking std::string if possible
-        //  Passing out pointers returned by c_str() is bad form:
-        //   They are pointers to internally-managed memory in std::string
-        //   They are invalid as soon as the string goes out of scope or is modified
-        //   In this case the strings may be in scope and unmodified until parse is done but this is red flag usage
-        // convert to vector of C strings for option parser
-        std::vector<const char *> cStrArgs;
-        cStrArgs.reserve(arguments.size());
-        for (size_type i = 0; i < arguments.size(); ++i) {
-            cStrArgs.push_back(arguments[i].c_str());
-        }
-
-        size_type const argCount = cStrArgs.size();
-
-        bool const legacyMode = (argCount == 1);
 
         // Define options
         ezOptionParser opt;
@@ -160,10 +144,27 @@ namespace CommandLineInterface {
 
         opt.example = "energyplus -w weather.epw -r input.idf";
 
-        std::string errorFollowUp = "Type 'energyplus --help' for usage.";
+        const std::string errorFollowUp = "Type 'energyplus --help' for usage.";
+
+        // Fix This is problematic for a few reasons:
+        //  Using ezOptionParser with a raw C-string interface is asking for trouble: Find something taking std::string if possible
+        //  Passing out pointers returned by c_str() is bad form:
+        //   They are pointers to internally-managed memory in std::string
+        //   They are invalid as soon as the string goes out of scope or is modified
+        //   In this case the strings may be in scope and unmodified until parse is done but this is red flag usage
+        // convert to vector of C strings for option parser
+        std::vector<const char *> cStrArgs;
+        cStrArgs.reserve(arguments.size());
+        for (const auto &argument : arguments) {
+            cStrArgs.push_back(argument.c_str());
+        }
+
+        size_type const argCount = arguments.size();
+
+        bool const legacyMode = (argCount == 1);
 
         // Parse arguments
-        opt.parse(argCount, &cStrArgs[0]);
+        opt.parse(static_cast<int>(argCount), cStrArgs.data());
 
         // print arguments parsed (useful for debugging)
         //        std::string pretty;
@@ -183,14 +184,14 @@ namespace CommandLineInterface {
         {
             std::string inputWeatherFileName;
             opt.get("-w")->getString(inputWeatherFileName);
-            state.files.inputWeatherFilePath.filePath = fs::path{inputWeatherFileName};
+            state.files.inputWeatherFilePath.filePath = CLI::to_path(inputWeatherFileName);
         }
 
         {
             // TODO: should this be in IOFiles as an InputFile?
             std::string inputIddFileName;
             opt.get("-i")->getString(inputIddFileName);
-            state.dataStrGlobals->inputIddFilePath = fs::path{inputIddFileName};
+            state.dataStrGlobals->inputIddFilePath = CLI::to_path(inputIddFileName);
         }
 
         if (!opt.isSet("-i") && !legacyMode) {
@@ -200,7 +201,7 @@ namespace CommandLineInterface {
         {
             std::string outDirPathName;
             opt.get("-d")->getString(outDirPathName);
-            state.dataStrGlobals->outDirPath = fs::path{outDirPathName};
+            state.dataStrGlobals->outDirPath = CLI::to_path(outDirPathName);
         }
 
         state.dataGlobal->runReadVars = opt.isSet("-r");
@@ -249,7 +250,7 @@ namespace CommandLineInterface {
         }
 
         if (opt.lastArgs.size() == 1) {
-            state.dataStrGlobals->inputFilePath = fs::path{*opt.lastArgs[0]};
+            state.dataStrGlobals->inputFilePath = CLI::to_path(*opt.lastArgs[0]);
         } else if (opt.lastArgs.empty()) {
             state.dataStrGlobals->inputFilePath = "in.idf";
         }
