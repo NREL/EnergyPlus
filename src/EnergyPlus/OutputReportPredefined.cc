@@ -1341,22 +1341,16 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int sigDigitCount;
-        std::string stringEntry;
-
         incrementTableEntry(state);
+        int sigDigitCount = 2;
         // check for number of significant digits
         if (present(numSigDigits)) {
             if ((numSigDigits <= 9) && (numSigDigits >= 0)) {
                 sigDigitCount = numSigDigits;
-            } else {
-                sigDigitCount = 2;
             }
-        } else {
-            sigDigitCount = 2;
         }
 
-        if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
+        if (std::abs(tableEntryReal) < 1e8) { // change from 1e10 for more robust entry writing
             // something changed in FMT 7.x and "{:#12.{}F}" now outputs 13. So changing it to 11.{}F to maintain existing functionality. Likely
             // related to https://github.com/fmtlib/fmt/issues/1893
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
