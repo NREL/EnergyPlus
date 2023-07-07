@@ -3853,7 +3853,6 @@ void checkChargeDischargeVoltageCurves(
     // Fix for Defect #8817.  When the charging curve results in a lower voltage than the discharging curve, the battery
     // will give the appearance that the energy in Joules being removed from the battery exceeds what was stored.  This
     // checks to make sure that voltage for charging is always higher than discharging at the same fraction charged.
-    int numErrors = 0;
     for (int loop = 1; loop <= numChecks + 1; ++loop) {
         Real64 xfc = float(loop - 1) / float(numChecks);                               // = q0/qmax
         Real64 xfd = 1.0 - xfc;                                                        // = (qmax-q0)/qmax = 1 - xfc
