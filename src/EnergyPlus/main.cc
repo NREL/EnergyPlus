@@ -48,50 +48,21 @@
 // EnergyPlus Headers
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 
-// C++ Headers
-#include <algorithm>
-#include <iterator>
-#include <string>
-#include <vector>
-
-#include <fmt/format.h>
-#include <fmt/ranges.h>
-
-#ifdef _WIN32
-// EnergyPlus Headers
-#include <EnergyPlus/CommandLineStringUtilities.hh>
-#include <fmt/xchar.h>
-
-int wmain(int argc, wchar_t *wargv[])
-{
-    for (int i = 0; i < argc; ++i) {
-        fmt::print(L"wargv[{}] = {}\n", i, wargv[i]);
-    }
-    std::vector<std::wstring> wargs(wargv, std::next(wargv, static_cast<std::ptrdiff_t>(argc)));
-    std::vector<std::string> args;
-    args.reserve(wargs.size());
-    std::transform(wargs.cbegin(), wargs.cend(), std::back_inserter(args), [](const std::wstring &ws) { return CLI::narrow(ws); });
-    int i = 0;
-    for (const auto &wstr : wargs) {
-        fmt::print(L"wargs[{}] = {}\n", i++, wstr);
-    }
-    fmt::print("args={}\n", args);
-
-    return EnergyPlusPgm(args);
-}
-#else
+#include <CLI/CLI11.hpp>
 
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
 #include <EnergyPlus/fenv_missing.h>
 #endif
 
-int main(int argc, const char *argv[])
+int main()
 {
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
-    std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
-    fmt::print("args={}\n", args);
+
+    int const argc = CLI::argc();
+    const char *const *argv = CLI::argv();
+
+    const std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
     return EnergyPlusPgm(args);
 }
-#endif
