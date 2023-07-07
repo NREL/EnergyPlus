@@ -71,8 +71,9 @@ int wmain(int argc, wchar_t *wargv[])
     std::vector<std::string> args;
     args.reserve(wargs.size());
     std::transform(wargs.cbegin(), wargs.cend(), std::back_inserter(args), [](const std::wstring &ws) { return CLI::narrow(ws); });
+    int i = 0;
     for (const auto &wstr : wargs) {
-        fmt::print(L"wargs={}\n", wstr);
+        fmt::print(L"wargs[{}] = {}\n", i++, wstr);
     }
     fmt::print("args={}\n", args);
 
@@ -91,6 +92,6 @@ int main(int argc, const char *argv[])
 #endif
     std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
     fmt::print("args={}\n", args);
-    return EnergyPlusPgm(std::move(args));
+    return EnergyPlusPgm(args);
 }
 #endif
