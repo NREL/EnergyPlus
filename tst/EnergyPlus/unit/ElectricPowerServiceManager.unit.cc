@@ -1233,7 +1233,6 @@ TEST_F(EnergyPlusFixture, Battery_checkUserEfficiencyInputTest)
 
 TEST_F(EnergyPlusFixture, Battery_checkChargeDischargeVoltageCurves)
 {
-    std::string battName;
     Real64 e0c;
     Real64 e0d;
     int chaCurveIndex;
@@ -1300,7 +1299,7 @@ TEST_F(EnergyPlusFixture, Battery_checkChargeDischargeVoltageCurves)
     chaCurveIndex = 1;
     disCurveIndex = 2;
 
-    checkChargeDischargeVoltageCurves(*state, "Test 1", e0c, e0d, chaCurveIndex, disCurveIndex);
+    checkChargeDischargeVoltageCurves(*state, "Battery for Test 1", e0c, e0d, chaCurveIndex, disCurveIndex);
 
     EXPECT_TRUE(compare_err_stream(""));
 
@@ -1310,68 +1309,24 @@ TEST_F(EnergyPlusFixture, Battery_checkChargeDischargeVoltageCurves)
     chaCurveIndex = 3;
     disCurveIndex = 4;
 
-    checkChargeDischargeVoltageCurves(*state, "Test 2", e0c, e0d, chaCurveIndex, disCurveIndex);
+    checkChargeDischargeVoltageCurves(*state, "Battery for Test 2", e0c, e0d, chaCurveIndex, disCurveIndex);
 
-    std::string const error_string2 = delimited_string(
-        {"   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.591 V; charging voltage = 12.400 V; charged fraction = 0.000",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.591 V; charging voltage = 12.400 V; charged fraction = 2.000E-002",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.591 V; charging voltage = 12.400 V; charged fraction = 4.000E-002",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.591 V; charging voltage = 12.401 V; charged fraction = 6.000E-002",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.592 V; charging voltage = 12.401 V; charged fraction = 8.000E-002",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.592 V; charging voltage = 12.401 V; charged fraction = 0.100",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.592 V; charging voltage = 12.401 V; charged fraction = 0.120",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.592 V; charging voltage = 12.401 V; charged fraction = 0.140",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.592 V; charging voltage = 12.402 V; charged fraction = 0.160",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has a charging/discharging voltage curve conflict.",
-         "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
-         "   **   ~~~   ** Discharging voltage = 12.593 V; charging voltage = 12.402 V; charged fraction = 0.180",
-         "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
-         "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts.",
-         "   ** Warning ** Kinetic Battery Model: Test 2 has more charging/discharging voltage curve conflicts."});
+    std::string const error_string2 = delimited_string({
+        "   ** Warning ** Kinetic Battery Model: Battery for Test 2 has a charging/discharging voltage curve conflict.",
+        "   **   ~~~   ** Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.",
+        "   **   ~~~   ** Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.",
+        "   **   ~~~   ** Also check the charging and discharging energy outputs to find any discrepancies.",
+        "   **   ~~~   ** Charged fraction = 0.0, Charging voltage = 12.400 V, Discharging voltage = 12.591 V",
+        "   **   ~~~   ** Charged fraction = 0.1, Charging voltage = 12.401 V, Discharging voltage = 12.592 V",
+        "   **   ~~~   ** Charged fraction = 0.2, Charging voltage = 12.402 V, Discharging voltage = 12.593 V",
+        "   **   ~~~   ** Charged fraction = 0.3, Charging voltage = 12.403 V, Discharging voltage = 12.594 V",
+        "   **   ~~~   ** Charged fraction = 0.4, Charging voltage = 12.404 V, Discharging voltage = 12.595 V",
+        "   **   ~~~   ** Charged fraction = 0.5, Charging voltage = 12.405 V, Discharging voltage = 12.595 V",
+        "   **   ~~~   ** Charged fraction = 0.6, Charging voltage = 12.406 V, Discharging voltage = 12.596 V",
+        "   **   ~~~   ** Charged fraction = 0.7, Charging voltage = 12.407 V, Discharging voltage = 12.597 V",
+        "   **   ~~~   ** Charged fraction = 0.8, Charging voltage = 12.408 V, Discharging voltage = 12.598 V",
+        "   **   ~~~   ** Charged fraction = 0.9, Charging voltage = 12.409 V, Discharging voltage = 12.599 V",
+        "   **   ~~~   ** Charged fraction = 1.0, Charging voltage = 12.410 V, Discharging voltage = 12.600 V",
+    });
     EXPECT_TRUE(compare_err_stream(error_string2, true));
 }
