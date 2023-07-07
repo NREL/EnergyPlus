@@ -1881,6 +1881,32 @@ namespace HeatingCoils {
                                                  state.dataOutRptPredefined->pdchHeatCoilSupHeatHighShutoffTemp,
                                                  heatingCoil.Name,
                                                  heatingCoil.DesiredOutletTemp); // no Super heating high shut off temp defined?
+
+        // std 229 Coil Connections New table
+        //int pdchCoilName_CCs = 0;
+        //int pdchCoilType_CCs = 0;
+        //int pdchCoilLoc_CCs = 0;
+        //int pdchCoilHVACType_CCs = 0;
+        //int pdchCoilHVACName_CCs = 0;
+        //int pdchCoilSupFanName_CCs = 0;
+        //int pdchCoilSupFanType_CCs = 0;
+        //int pdchCoilPlantName_CCs = 0;                 // Plant Name for Coil*
+        //int pdchCoilAirloopName_CCs = 0;               // Airloop Name
+        //int pdchCoilAirloopBranchName_CCs = 0;         // Airloop Branch Name
+        //int pdchCoilLocCountOnAirloopBranch_CCs = 0;   // Location count on Airloop Branch
+        //int pdchCoilPlantloopName_CCs = 0;             // Plant Loop Name
+        //int pdchCoilPlantBranchName_CCs = 0;           // Plant Branch Name
+        //int pdchCoilLocCountOnPlantloopBranch_CCs = 0; // Location count on Plantloop Branch
+        
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilName_CCs, heatingCoil.Name, heatingCoil.Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchCoilType_CCs,
+            heatingCoil.Name,
+            DataHVACGlobals::coilTypeNamesUC[heatingCoil.HCoilType_Num -
+                                             1]); // if cannot do this way, then need to add this line to the case branches above
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLoc_CCs, heatingCoil.Name,
+                                                 heatingCoil.Name); // PH
     }
 
     void CalcElectricHeatingCoil(EnergyPlusData &state,
