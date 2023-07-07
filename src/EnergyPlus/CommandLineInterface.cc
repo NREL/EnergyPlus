@@ -61,8 +61,6 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-#include <EnergyPlus/CommandLineStringUtilities.hh>
-
 namespace EnergyPlus {
 
 namespace CommandLineInterface {
@@ -94,15 +92,19 @@ namespace CommandLineInterface {
             }
         }
 
+        // erase the first element, which is the name of the program
+        const std::string programName = std::move(arguments.front());
+        arguments.erase(arguments.begin());
+
         size_type const argCount = arguments.size();
-        bool const legacyMode = (argCount == 1);
+        bool const legacyMode = (argCount == 0);
 
         // Set path of EnergyPlus program path (if we aren't overriding it)
         if (!state.dataGlobal->installRootOverride) {
             state.dataStrGlobals->exeDirectoryPath = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
         }
 
-        CLI::App app{"energyplus"};
+        CLI::App app{"energyplus", programName};
         // opt.add("", false, 0, 0, "Display version information", "-v", "--version");
         app.set_version_flag("--version", EnergyPlus::DataStringGlobals::VerString);
 
@@ -117,18 +119,18 @@ Built on Platform: {}
                                                     state.dataStrGlobals->VerStringVar,
                                                     PluginManagement::pythonStringForUsage(state),
                                                     DataStringGlobals::BuildPlatformString);
+        app.description(description);
 
         // opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
-        app.add_flag("-a,--annual", state.dataGlobal->AnnualSimulation, "Force annual simulation");
+        auto *annaualOpt = app.add_flag("-a,--annual", state.dataGlobal->AnnualSimulation, "Force annual simulation");
+        // opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
+        app.add_flag("-D,--design-day", state.dataGlobal->DDOnlySimulation, "Force design-day-only simulation")->excludes(annaualOpt);
 
         // opt.add("", 0, 1, 0, "Output directory path (default: current directory)", "-d", "--output-directory");
         app.add_option("-d,--output-directory", state.dataStrGlobals->outDirPath, "Output directory path (default: current directory)")
             ->option_text("DIR")
             ->required(false);
         // ->check(CLI::ExistingDirectory) // We don't require it to exist, we make it if needed
-
-        // opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
-        app.add_flag("-D,--design-day", state.dataGlobal->DDOnlySimulation, "Force design-day-only simulation");
 
         // opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
         if (legacyMode) {
@@ -175,7 +177,7 @@ Built on Platform: {}
    L: Legacy (e.g., eplustbl.csv)
    C: Capital (e.g., eplusTable.csv)
    D: Dash (e.g., eplus-table.csv))help";
-        app.add_option("-s,--output-suffix", state.dataGlobal->outputEpJSONConversion, suffixHelp)
+        app.add_option("-s,--output-suffix", suffixType, suffixHelp)
             ->option_text("SUFFIX")
             ->required(false)
             ->check(CLI::IsMember({"L", "C", "D"}, CLI::ignore_case));
@@ -187,12 +189,14 @@ Built on Platform: {}
                        state.dataGlobal->numThread,
                        "Multi-thread with N threads; 1 thread with no arg. (Currently only for G-Function generation)")
             ->option_text("N")
+            // ->check(CLI::Range(1, MAX_N)  // Tempted to just do that... much simpler
+            // ->check(CLI::Number)
             ->transform([MAX_N, &state](std::string input) -> std::string {
                 int number_of_threads = -1;
                 bool const converted = CLI::detail::lexical_cast(input, number_of_threads);
                 if (!converted) {
                     // CLI::ValidationError
-                    return std::string{};
+                    return fmt::format("Argument should be an integer, not '{}'", input);
                 }
                 if (number_of_threads <= 0) {
                     DisplayString(state, "Invalid value for -j arg. Defaulting to 1.");
@@ -203,7 +207,7 @@ Built on Platform: {}
                                   fmt::format("Invalid value for -j arg. Value exceeds num available. Defaulting to num available. -j {}", MAX_N));
                     return std::to_string(MAX_N);
                 }
-                return std::string{};
+                return input;
             });
 
         // if (state.dataGlobal->numThread == 0) {
@@ -242,16 +246,58 @@ Built on Platform: {}
             // app.parse(argc, argv);
             // CLI11 when passing argc, argv creates a vector<string> but **in reverse** order:
             // https://github.com/CLIUtils/CLI11/blob/291c58789c031208f08f4f261a858b5b7083e8e2/include/CLI/impl/App_inl.hpp#L476-L488
-            std::reverse(args.begin(), args.end());
-            app.parse(args);
-        } catch (const CLI::ParseError &e) {
+            std::reverse(arguments.begin(), arguments.end());
+            app.parse(arguments);
+        } catch (const CLI::Success &e) {
+            int const return_code = app.exit(e);
             if (eplusRunningViaAPI) {
-                DisplayString(state, fmt::format("{}: {}", e.get_name(), e.what()));
+                return static_cast<int>(ReturnCodes::SuccessButHelper);
+            } else {
+                exit(return_code);
+            }
+        } catch (const CLI::ParseError &e) {
+            int const return_code = app.exit(e);
+            if (eplusRunningViaAPI) {
                 return static_cast<int>(ReturnCodes::Failure);
             } else {
-                return app.exit(e);
+                exit(return_code);
             }
         }
+
+        fmt::print(stderr,
+                   R"debug(
+state.dataGlobal->AnnualSimulation = {},
+state.dataGlobal->DDOnlySimulation = {},
+state.dataStrGlobals->outDirPath = '{}',
+state.dataStrGlobals->inputIddFilePath= '{}',
+
+runEPMacro = {},
+prefixOutName = {},
+
+state.dataGlobal->runReadVars={},
+state.dataGlobal->outputEpJSONConversion={},
+state.dataGlobal->outputEpJSONConversionOnly={},
+
+suffixType={},
+
+state.dataGlobal->numThread={},
+state.files.inputWeatherFilePath.filePath='{}',
+state.dataStrGlobals->inputFilePath='{}',
+)debug",
+                   state.dataGlobal->AnnualSimulation,
+                   state.dataGlobal->DDOnlySimulation,
+                   state.dataStrGlobals->outDirPath.generic_string(),
+                   state.dataStrGlobals->inputIddFilePath.generic_string(),
+
+                   runEPMacro,
+                   prefixOutName,
+                   state.dataGlobal->runReadVars,
+                   state.dataGlobal->outputEpJSONConversion,
+                   state.dataGlobal->outputEpJSONConversionOnly,
+                   suffixType,
+                   state.dataGlobal->numThread,
+                   state.files.inputWeatherFilePath.filePath,
+                   state.dataStrGlobals->inputFilePath);
 
         // Convert all paths to native paths
         state.dataStrGlobals->inputFilePath = FileSystem::makeNativePath(state.dataStrGlobals->inputFilePath);
@@ -284,7 +330,8 @@ Built on Platform: {}
                 DisplayString(state, "BSON input format is experimental and unsupported.");
                 break;
             default:
-                DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
+                DisplayString(state,
+                              fmt::format("ERROR: Input file must have IDF, IMF, or epJSON extension: {}", state.dataStrGlobals->inputFilePath));
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
@@ -476,17 +523,6 @@ Built on Platform: {}
         outputExpidfFilePath = composePath(normalSuffix + ".expidf");
         outputExperrFilePath = composePath(normalSuffix + ".experr");
 
-        // Error for cases where both design-day and annual simulation switches are set
-        if (state.dataGlobal->DDOnlySimulation && state.dataGlobal->AnnualSimulation) {
-            DisplayString(state, "ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
-            DisplayString(state, errorFollowUp);
-            if (eplusRunningViaAPI) {
-                return static_cast<int>(ReturnCodes::Failure);
-            } else {
-                exit(EXIT_FAILURE);
-            }
-        }
-
         // Read path from INI file if it exists
 
         // Check for IDD and IDF files
@@ -529,7 +565,7 @@ Built on Platform: {}
             }
         }
 
-        if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
+        if (!state.dataGlobal->DDOnlySimulation) {
             if (!FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
                 DisplayString(
                     state,

@@ -499,7 +499,11 @@ Select one (case insensitive):
     app.footer("Example: ConvertInputFormat in.idf");
 
     // We are not modifying argc/argv, so we defer to CLI11 to find the argc/argv instead. It'll use GetCommandLineW & CommandLineToArgvW on windows
-    CLI11_PARSE(app);
+    try {
+        app.parse();
+    } catch (const CLI::ParseError &e) {
+        return app.exit(e);
+    }
 
     const bool convertHVACTemplate = !noConvertHVACTemplate;
 

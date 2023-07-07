@@ -49,6 +49,8 @@
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 
 #include <CLI/CLI11.hpp>
+#include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
 #include <EnergyPlus/fenv_missing.h>
@@ -64,5 +66,6 @@ int main()
     const char *const *argv = CLI::argv();
 
     const std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
+    // fmt::print("args={}\n", args);
     return EnergyPlusPgm(args);
 }
