@@ -83,7 +83,7 @@ namespace OutputProcessor {
         Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-        std::map<int, Constant::eResource> ResourceTypes;                // ResourceTypes for each variable
+        Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
         Array1D_string EndUses(NumVariables);                            // EndUses for each variable
         Array1D_string Groups(NumVariables);                             // Groups for each variable
         Array1D_string Names(NumVariables);                              // Variable Names for each variable
@@ -93,10 +93,6 @@ namespace OutputProcessor {
         std::string NameOfComp = "FC-5-1B";
 
         int NumFound;
-
-        for (int varN = 1; varN <= NumVariables; ++varN) {
-            ResourceTypes.insert(std::pair<int, Constant::eResource>(varN, Constant::eResource::Invalid));
-        }
 
         GetMeteredVariables(
             *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);

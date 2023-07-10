@@ -462,7 +462,6 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
 {
     // Test for #8921
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string const idf_objects = delimited_string({
@@ -539,7 +538,6 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
         R"(SELECT DISTINCT(ColumnName) FROM TabularDataWithStrings
              WHERE ReportName LIKE "ANNUAL EXAMPLE%")",
         "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // 17 agg types for the same variable requested above + the {TIMESTAMP} ones (but distinct, so counts as 1)
     // + the BIN A TO BIN J ones
@@ -550,7 +548,6 @@ TEST_F(SQLiteFixture, OutputReportTabularAnnual_CurlyBraces)
              WHERE ReportName LIKE "ANNUAL EXAMPLE%"
              AND ColumnName LIKE "%{%" AND ColumnName NOT LIKE "%}%")",
         "TabularDataWithStrings");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 
     // Should be none!
     for (auto &col : missingBracesHeaders) {

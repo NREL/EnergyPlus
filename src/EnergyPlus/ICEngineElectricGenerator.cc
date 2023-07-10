@@ -292,8 +292,8 @@ namespace ICEngineElectricGenerator {
 
             // Validate fuel type input
             state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType =
-                static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, AlphArray(10)));
-            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == Constant::eResource::Invalid) {
+                static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, AlphArray(10)));
+            if (state.dataICEngElectGen->ICEngineGenerator(genNum).FuelType == Constant::eFuel::Invalid) {
                 ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
                 ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
@@ -309,7 +309,7 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::setupOutputVars(EnergyPlusData &state)
     {
-        std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
+        std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
         SetupOutputVariable(state,
                             "Generator Produced AC Electricity Rate",
                             OutputProcessor::Unit::W,

@@ -226,11 +226,11 @@ namespace HeatRecovery {
         // Uses InputProcessor "Get" routines to obtain data.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumAlphas;                                               // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                                              // Number of Numbers for each GetObjectItem call
-        int IOStatus;                                                // Used in GetObjectItem
-        bool ErrorsFound(false);                                     // Set to true if errors in input, fatal at end of routine
-        constexpr const char *RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
+        int NumAlphas;                                                     // Number of Alphas for each GetObjectItem call
+        int NumNumbers;                                                    // Number of Numbers for each GetObjectItem call
+        int IOStatus;                                                      // Used in GetObjectItem
+        bool ErrorsFound(false);                                           // Set to true if errors in input, fatal at end of routine
+        constexpr std::string_view RoutineName = "GetHeatRecoveryInput: "; // include trailing blank space
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
         int NumAirToAirPlateExchs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
@@ -268,7 +268,6 @@ namespace HeatRecovery {
             int const ExchNum = ExchIndex;
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             thisExchanger.NumericFieldNames.allocate(NumNumbers);
-            thisExchanger.NumericFieldNames = "";
             thisExchanger.NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -299,7 +298,7 @@ namespace HeatRecovery {
 
             constexpr std::array<std::string_view, static_cast<int>(HXConfiguration::Num)> hxConfigurationNamesUC = {
                 "COUNTERFLOW", "PARALLELFLOW", "CROSSFLOWBOTHUNMIXED", "CROSS_FLOW_OTHER_NOT_USED"};
-            thisExchanger.FlowArr = static_cast<HXConfiguration>(getEnumerationValue(hxConfigurationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
+            thisExchanger.FlowArr = static_cast<HXConfiguration>(getEnumValue(hxConfigurationNamesUC, state.dataIPShortCut->cAlphaArgs(3)));
             if (thisExchanger.FlowArr == HXConfiguration::Invalid) {
                 ShowSevereError(state, format("{}: incorrect flow arrangement: {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(3)));
                 ErrorsFound = true;
@@ -386,7 +385,6 @@ namespace HeatRecovery {
             int const ExchNum = ExchIndex + NumAirToAirPlateExchs;
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             thisExchanger.NumericFieldNames.allocate(NumNumbers);
-            thisExchanger.NumericFieldNames = "";
             thisExchanger.NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -511,8 +509,7 @@ namespace HeatRecovery {
             }
 
             // Added additional inputs for frost control
-            thisExchanger.FrostControlType =
-                static_cast<FrostControlOption>(getEnumerationValue(frostControlNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
+            thisExchanger.FrostControlType = static_cast<FrostControlOption>(getEnumValue(frostControlNamesUC, state.dataIPShortCut->cAlphaArgs(9)));
             if (thisExchanger.FrostControlType == FrostControlOption::Invalid) {
                 ShowSevereError(state, format("Invalid Frost Control method for {} =  {}", thisExchanger.Name, state.dataIPShortCut->cAlphaArgs(9)));
                 ErrorsFound = true;
@@ -560,7 +557,6 @@ namespace HeatRecovery {
             int const ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             thisExchanger.NumericFieldNames.allocate(NumNumbers);
-            thisExchanger.NumericFieldNames = "";
             thisExchanger.NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
             GlobalNames::VerifyUniqueInterObjectName(state,
@@ -675,7 +671,6 @@ namespace HeatRecovery {
             int const PerfDataNum = PerfDataIndex;
             auto &thisPerfData = state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum);
             thisPerfData.NumericFieldNames.allocate(NumNumbers);
-            thisPerfData.NumericFieldNames = "";
             thisPerfData.NumericFieldNames = state.dataIPShortCut->cNumericFieldNames;
 
             thisPerfData.Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -1244,11 +1239,9 @@ namespace HeatRecovery {
             this->MySizeFlag = false;
         }
 
-        bool FatalError = false;
-        bool LocalWarningError = false;
-
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->myEnvrnFlag) {
+            bool FatalError = false;
             // I believe that all of these initializations should be taking place at the SCFM conditions
             RhoAir = state.dataEnvrn->StdRhoAir;
             //    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
@@ -1474,6 +1467,7 @@ namespace HeatRecovery {
                                                   "...use a Setpoint Manager to establish a setpoint at the process air outlet node of the "
                                                   "desiccant Heat Exchanger if control is desired.");
                             } else {
+                                bool LocalWarningError = false;
                                 // need call to EMS to check node
                                 CheckIfNodeSetPointManagedByEMS(
                                     state, this->SecOutletNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalWarningError);
@@ -1560,7 +1554,7 @@ namespace HeatRecovery {
         // Obtains flow rates from the system or OA system sizing arrays
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr const char *RoutineName("SizeHeatRecovery");
+        std::string_view RoutineName = "SizeHeatRecovery";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string SizingString; // input field sizing description
@@ -1933,10 +1927,9 @@ namespace HeatRecovery {
         Real64 AirSidePLR;
 
         // Initialize local variables
-        bool UnitOn = true;            // unit on flag
-        bool FrostControlFlag = false; // unit is in frost control mode when TRUE
-        Real64 QSensTrans = 0.0;       // sensible heat transferred by the heat exchanger [W]
-        Real64 QTotTrans = 0.0;        // total heat (sensible + latent) transferred by the heat exchanger [W]
+        bool UnitOn = true;      // unit on flag
+        Real64 QSensTrans = 0.0; // sensible heat transferred by the heat exchanger [W]
+        Real64 QTotTrans = 0.0;  // total heat (sensible + latent) transferred by the heat exchanger [W]
 
         this->DefrostFraction = 0.0;
         this->SensEffectiveness = 0.0;
@@ -1979,6 +1972,7 @@ namespace HeatRecovery {
         if (this->NomSupAirVolFlow == 0.0) UnitOn = false;
 
         if (UnitOn) {
+            bool FrostControlFlag = false; // unit is in frost control mode when TRUE
             // Unit is on.
             if (present(HXPartLoadRatio) && FanOpMode == DataHVACGlobals::CycFanCycCoil) {
                 if (HXPartLoadRatio > 0) {
@@ -2148,7 +2142,7 @@ namespace HeatRecovery {
             //   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
             if (this->ControlToTemperatureSetPoint) {
                 if ((this->SupInTemp - this->SupOutTemp) != 0.0) {
-                    if ((this->SupInTemp < HXTempSetPoint && this->SupOutTemp > HXTempSetPoint) ||
+                    if ((this->SupOutTemp > HXTempSetPoint && this->SupInTemp < HXTempSetPoint) ||
                         (this->SupInTemp > HXTempSetPoint && this->SupOutTemp < HXTempSetPoint)) {
                         ControlFraction = max(0.0, min(1.0, std::abs((this->SupInTemp - HXTempSetPoint) / (this->SupInTemp - this->SupOutTemp))));
                     } else if ((this->SupInTemp < this->SupOutTemp && this->SupOutTemp < HXTempSetPoint) ||
@@ -2448,16 +2442,9 @@ namespace HeatRecovery {
         Real64 MinHumRatNeeded;         // minimum humidity ratio setpoint for balanced desiccant HX [kg/kg]
         Real64 HXPartLoadRatio;         // local heat exchanger part-load ratio
         Real64 TestSaturationEnthalpy;  // enthalpy used to test for regeneration outlet condition over saturation curve (J/kg)
-        constexpr const char *ThisSubTSat("CalcDesiccantBalancedHeatExch:   TSat");
-        constexpr const char *ThisSubTSatFullLoadOutTemp("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp");
-        constexpr const char *ThisSubTSatFullLoadOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat");
-        constexpr const char *ThisSubSecOutHumRat("CalcDesiccantBalancedHeatExch:   SecOutHumRat");
-        constexpr const char *ThisSubTestSatSec("CalcDesiccantBalancedHeatExch:   TestSatSec");
-        constexpr const char *ThisSubTSatSecOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat");
-
-        Real64 AverageMassFlowRate; // average of supply (regen) and secondary (process) mass flow rates [kg/s]
-        bool EconomizerActiveFlag;  // local representing the economizer status when PRESENT
-        bool HighHumCtrlActiveFlag; // local representing high humidity control when PRESENT
+        Real64 AverageMassFlowRate;     // average of supply (regen) and secondary (process) mass flow rates [kg/s]
+        bool EconomizerActiveFlag;      // local representing the economizer status when PRESENT
+        bool HighHumCtrlActiveFlag;     // local representing high humidity control when PRESENT
 
         // Initialize local variables
         UnitOn = true;
@@ -2498,6 +2485,9 @@ namespace HeatRecovery {
         if ((EconomizerActiveFlag || HighHumCtrlActiveFlag) && this->EconoLockOut) UnitOn = false;
 
         if (UnitOn) {
+            constexpr std::string_view ThisSubTSat = "CalcDesiccantBalancedHeatExch:   TSat";
+            constexpr std::string_view ThisSubSecOutHumRat = "CalcDesiccantBalancedHeatExch:   SecOutHumRat";
+            constexpr std::string_view ThisSubTestSatSec = "CalcDesiccantBalancedHeatExch:   TestSatSec";
             Real64 local_SupInMassFlow; // Supply side HX mass flow rate
             Real64 local_SecInMassFlow; // Secondary side HX mass flow rate
 
@@ -2520,7 +2510,7 @@ namespace HeatRecovery {
             // Check for balanced flow condition
             this->CheckForBalancedFlow(state, local_SecInMassFlow, local_SupInMassFlow, FirstHVACIteration);
 
-            auto &perf = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex);
+            auto const &perf = state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex);
 
             T_ProcInTemp = state.dataHeatRecovery->FullLoadOutAirTemp;
             T_ProcInHumRat = state.dataHeatRecovery->FullLoadOutAirHumRat;
@@ -2582,6 +2572,8 @@ namespace HeatRecovery {
             //     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
             TestSaturationEnthalpy = Psychrometrics::PsyHFnTdbW(FullLoadSupOutTemp, FullLoadSupOutHumRat);
             if (Psychrometrics::PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSat) > FullLoadSupOutTemp) {
+                constexpr std::string_view ThisSubTSatFullLoadOutTemp = "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp";
+                constexpr std::string_view ThisSubTSatFullLoadOutHumRat = "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat";
                 FullLoadSupOutTemp =
                     Psychrometrics::PsyTsatFnHPb(state, TestSaturationEnthalpy, state.dataEnvrn->OutBaroPress, ThisSubTSatFullLoadOutTemp);
                 FullLoadSupOutHumRat = Psychrometrics::PsyWFnTdbH(state, FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat);
@@ -2663,6 +2655,7 @@ namespace HeatRecovery {
             // although this may occur during warmup. This check is included here for consistency.
             TempSecOutSat = Psychrometrics::PsyTsatFnHPb(state, this->SecOutEnth, state.dataEnvrn->OutBaroPress, ThisSubTestSatSec);
             if (TempSecOutSat > this->SecOutTemp) {
+                constexpr std::string_view ThisSubTSatSecOutHumRat = "CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat";
                 this->SecOutTemp = TempSecOutSat;
                 this->SecOutHumRat = Psychrometrics::PsyWFnTdbH(state, this->SecOutTemp, this->SecOutEnth, ThisSubTSatSecOutHumRat);
             }

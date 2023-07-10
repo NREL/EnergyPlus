@@ -462,7 +462,7 @@ namespace OutputProcessor {
 
         ReportingFrequency ReportFreq(ReportingFrequency::Hourly); // Default
         // TODO: I think it's supposed to be upper case already, but tests aren't doing that at least...
-        const std::string FreqStringUpper = UtilityRoutines::MakeUPPERCase(FreqString);
+        const std::string FreqStringUpper = UtilityRoutines::makeUPPER(FreqString);
         std::string::size_type const LenString = min(len(FreqString), static_cast<std::string::size_type>(4u));
 
         if (LenString < 4u) {
@@ -914,7 +914,7 @@ namespace OutputProcessor {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            namesOfMeterCustom.emplace(UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1)));
+            namesOfMeterCustom.emplace(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(1)));
         }
 
         for (Loop = 1; Loop <= NumCustomMeters; ++Loop) {
@@ -949,7 +949,7 @@ namespace OutputProcessor {
             // check if any fields reference another Meter:Custom
             int found = 0;
             for (fldIndex = 4; fldIndex <= NumAlpha; fldIndex += 2) {
-                if (namesOfMeterCustom.find(UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(fldIndex))) != namesOfMeterCustom.end()) {
+                if (namesOfMeterCustom.find(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(fldIndex))) != namesOfMeterCustom.end()) {
                     found = fldIndex;
                     break;
                 }
@@ -1006,7 +1006,7 @@ namespace OutputProcessor {
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
                     GetStandardMeterResourceType(state,
                                                  op->EnergyMeters(op->NumEnergyMeters).ResourceType,
-                                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2)),
+                                                 UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)),
                                                  errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("..on {}=\"{}\".", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1261,7 +1261,7 @@ namespace OutputProcessor {
                     // Can't use resource type in AddMeter cause it will confuse it with other meters.  So, now:
                     GetStandardMeterResourceType(state,
                                                  op->EnergyMeters(op->NumEnergyMeters).ResourceType,
-                                                 UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2)),
+                                                 UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2)),
                                                  errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("..on {}=\"{}\".", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1445,9 +1445,9 @@ namespace OutputProcessor {
         // the standard resource type.
 
         ErrorsFound = false;
-        std::string const meterType = UtilityRoutines::MakeUPPERCase(UserInputResourceType);
+        std::string const meterType = UtilityRoutines::makeUPPER(UserInputResourceType);
 
-        int eMeterResource = getEnumerationValue(Constant::eResourceNamesUC, meterType);
+        int eMeterResource = getEnumValue(Constant::eResourceNamesUC, meterType);
 
         if (eMeterResource == static_cast<int>(Constant::eResource::Invalid)) {
             ShowSevereError(state, format("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered={}", UserInputResourceType));
@@ -1753,7 +1753,7 @@ namespace OutputProcessor {
         auto &op = state.dataOutputProcessor;
 
         // Basic ResourceType Meters
-        GetStandardMeterResourceType(state, ResourceType, UtilityRoutines::MakeUPPERCase(ResourceType), LocalErrorsFound);
+        GetStandardMeterResourceType(state, ResourceType, UtilityRoutines::makeUPPER(ResourceType), LocalErrorsFound);
 
         if (!LocalErrorsFound) {
             if (op->NumEnergyMeters > 0) {
@@ -2068,7 +2068,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         ErrorsFound = false;
-        std::string UC_ResourceType = UtilityRoutines::MakeUPPERCase(ResourceType);
+        std::string UC_ResourceType = UtilityRoutines::makeUPPER(ResourceType);
 
         CodeForIPUnits = RT_IPUnits::OtherJ;
         if (has(UC_ResourceType, "ELEC")) {
@@ -4234,7 +4234,7 @@ namespace OutputProcessor {
     OutputProcessor::Unit unitStringToEnum(std::string const &unitIn)
     {
         // J.Glazer - August/September 2017
-        std::string unitUpper = UtilityRoutines::MakeUPPERCase(unitIn);
+        std::string unitUpper = UtilityRoutines::makeUPPER(unitIn);
         if (unitUpper == "J") {
             return OutputProcessor::Unit::J;
         } else if (unitUpper == "DELTAC") {
@@ -4438,7 +4438,7 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 EndUseSub = "";
                 if (!EndUseKey.empty()) {
-                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(std::string{EndUseKey})) !=
+                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::makeUPPER(std::string{EndUseKey})) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }
@@ -4488,9 +4488,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisRvar.storeType = VariableType;
         thisRvar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisRvar.VarNameOnly = VarName;
-        thisRvar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
-        thisRvar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisRvar.VarName);
-        thisRvar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
+        thisRvar.VarNameOnlyUC = UtilityRoutines::makeUPPER(VarName);
+        thisRvar.VarNameUC = UtilityRoutines::makeUPPER(thisRvar.VarName);
+        thisRvar.KeyNameOnlyUC = UtilityRoutines::makeUPPER(KeyedValue);
         thisRvar.units = VariableUnit;
         if (VariableUnit == OutputProcessor::Unit::customEMS) {
             thisRvar.unitNameCustomEMS = customUnitName;
@@ -4667,9 +4667,9 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisIVar.storeType = VariableType;
         thisIVar.VarName = fmt::format("{}:{}", KeyedValue, VarName);
         thisIVar.VarNameOnly = VarName;
-        thisIVar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
-        thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
-        thisIVar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
+        thisIVar.VarNameOnlyUC = UtilityRoutines::makeUPPER(VarName);
+        thisIVar.VarNameUC = UtilityRoutines::makeUPPER(thisIVar.VarName);
+        thisIVar.KeyNameOnlyUC = UtilityRoutines::makeUPPER(KeyedValue);
         thisIVar.units = VariableUnit;
         AssignReportNumber(state, op->CurrentReportNumber);
         std::string const IDOut = fmt::to_string(op->CurrentReportNumber);
@@ -6202,7 +6202,7 @@ int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
         state.dataOutputProcessor->NumValidMeters = op->NumEnergyMeters;
         state.dataOutputProcessor->ValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
         for (Found = 1; Found <= state.dataOutputProcessor->NumValidMeters; ++Found) {
-            state.dataOutputProcessor->ValidMeterNames(Found) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(Found).Name);
+            state.dataOutputProcessor->ValidMeterNames(Found) = UtilityRoutines::makeUPPER(op->EnergyMeters(Found).Name);
         }
         state.dataOutputProcessor->iValidMeterNames.allocate(state.dataOutputProcessor->NumValidMeters);
         SetupAndSort(state.dataOutputProcessor->ValidMeterNames, state.dataOutputProcessor->iValidMeterNames);
@@ -6706,7 +6706,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         std::map<int, Constant::eResource> &ResourceTypes,     // ResourceTypes for each variable
+                         Array1D<Constant::eResource> &ResourceTypes,           // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -6752,15 +6752,15 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
+            ResourceTypes(NumVariables) = static_cast<Constant::eResource>(
+                getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
 
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).EndUse.empty()) {
-                    EndUses(NumVariables) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).EndUse);
+                    EndUses(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).EndUse);
                     break;
                 }
             }
@@ -6768,7 +6768,7 @@ void GetMeteredVariables(EnergyPlusData &state,
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).Group.empty()) {
-                    Groups(NumVariables) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).Group);
+                    Groups(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).Group);
                     break;
                 }
             }
@@ -6789,7 +6789,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         std::map<int, Constant::eResource> &ResourceTypes,     // ResourceTypes for each variable
+                         Array1D<Constant::eResource> &ResourceTypes,           // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -6835,14 +6835,14 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = static_cast<Constant::eResource>(
-                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
+            ResourceTypes(NumVariables) = static_cast<Constant::eResource>(
+                getEnumValue(Constant::eResourceNamesUC, UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).EndUse.empty()) {
-                    EndUses(NumVariables) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).EndUse);
+                    EndUses(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).EndUse);
                     break;
                 }
             }
@@ -6850,7 +6850,7 @@ void GetMeteredVariables(EnergyPlusData &state,
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
                 MeterPtr = op->VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
                 if (!op->EnergyMeters(MeterPtr).Group.empty()) {
-                    Groups(NumVariables) = UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).Group);
+                    Groups(NumVariables) = UtilityRoutines::makeUPPER(op->EnergyMeters(MeterPtr).Group);
                     break;
                 }
             }
@@ -6935,7 +6935,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         op->numVarNames = op->NumVariablesForOutput;
         op->varNames.allocate(op->numVarNames);
         for (Loop = 1; Loop <= op->NumVariablesForOutput; ++Loop) {
-            op->varNames(Loop) = UtilityRoutines::MakeUPPERCase(op->DDVariableTypes(Loop).VarNameOnly);
+            op->varNames(Loop) = UtilityRoutines::makeUPPER(op->DDVariableTypes(Loop).VarNameOnly);
         }
         op->ivarNames.allocate(op->numVarNames);
         SetupAndSort(op->varNames, op->ivarNames);
@@ -6946,7 +6946,7 @@ void GetVariableKeyCountandType(EnergyPlusData &state,
         op->numVarNames = op->NumVariablesForOutput;
         op->varNames.allocate(op->numVarNames);
         for (Loop = 1; Loop <= op->NumVariablesForOutput; ++Loop) {
-            op->varNames(Loop) = UtilityRoutines::MakeUPPERCase(op->DDVariableTypes(Loop).VarNameOnly);
+            op->varNames(Loop) = UtilityRoutines::makeUPPER(op->DDVariableTypes(Loop).VarNameOnly);
         }
         op->ivarNames.allocate(op->numVarNames);
         SetupAndSort(op->varNames, op->ivarNames);
@@ -7105,7 +7105,7 @@ void GetVariableKeys(EnergyPlusData &state,
     Duplicate = false;
     maxKeyNames = size(keyNames);
     maxkeyVarIndexes = size(keyVarIndexes);
-    varNameUpper = UtilityRoutines::MakeUPPERCase(varName);
+    varNameUpper = UtilityRoutines::makeUPPER(varName);
     auto &op = state.dataOutputProcessor;
 
     // Select based on variable type:  integer, real, or meter
