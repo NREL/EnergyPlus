@@ -7625,7 +7625,7 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                 // the building itself, is considered in determining whether sun hits the ground point.
                 // Otherwise this shading is ignored and the sun always hits the ground point.
                 SunObstructionMult = 1.0;
-                if (state.dataSurface->CalcSolRefl && ObTransM[IPH][ITH] > 1.e-6) {
+                if (state.dataSurface->CalcSolRefl && ObTransM[IPH][ITH] > 1.e-6 && ISunPos == 1) {
                     // Sun reaches ground point if vector from this point to the sun is unobstructed
                     hitObs = false;
                     for (int ObsSurfNum : state.dataSurface->AllShadowPossObstrSurfaceList) {
