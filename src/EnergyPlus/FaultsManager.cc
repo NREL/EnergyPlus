@@ -484,8 +484,7 @@ namespace FaultsManager {
 
             // Chiller check
             int ChillerNum;
-            ChillerType ChillerTypeCheck =
-                static_cast<ChillerType>(getEnumerationValue(ChillerTypeNamesUC, Util::MakeUPPERCase(faultsChillerFouling.ChillerType)));
+            ChillerType ChillerTypeCheck = static_cast<ChillerType>(getEnumValue(ChillerTypeNamesUC, Util::makeUPPER(faultsChillerFouling.ChillerType)));
             switch (ChillerTypeCheck) {
             case ChillerType::ChillerElectric: {
                 // Check whether the chiller name and chiller type match each other
@@ -854,8 +853,7 @@ namespace FaultsManager {
             }
 
             // Coil check and link
-            CoilType CoilTypeCheck =
-                static_cast<CoilType>(getEnumerationValue(CoilTypeNamesUC, Util::MakeUPPERCase(faultsCoilSATFouling.CoilType)));
+            CoilType CoilTypeCheck = static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, Util::makeUPPER(faultsCoilSATFouling.CoilType)));
             switch (CoilTypeCheck) {
             case CoilType::CoilHeatingElectric:
             case CoilType::CoilHeatingFuel:
@@ -1315,8 +1313,7 @@ namespace FaultsManager {
 
             // Chiller check
             int ChillerNum;
-            ChillerType ChillerTypeCheck =
-                static_cast<ChillerType>(getEnumerationValue(ChillerTypeNamesUC, Util::MakeUPPERCase(faultsChillerSWT.ChillerType)));
+            ChillerType ChillerTypeCheck = static_cast<ChillerType>(getEnumValue(ChillerTypeNamesUC, Util::makeUPPER(faultsChillerSWT.ChillerType)));
             switch (ChillerTypeCheck) {
             case ChillerType::ChillerElectric: {
                 // Check whether the chiller name and chiller type match each other
@@ -1772,8 +1769,7 @@ namespace FaultsManager {
                 }
             }
 
-            faultsFoulCoil.FoulingInputMethod =
-                static_cast<FouledCoil>(getEnumerationValue(FouledCoilNamesUC, Util::MakeUPPERCase(cAlphaArgs(5))));
+            faultsFoulCoil.FoulingInputMethod = static_cast<FouledCoil>(getEnumValue(FouledCoilNamesUC, Util::makeUPPER(cAlphaArgs(5))));
             if (faultsFoulCoil.FoulingInputMethod == FouledCoil::Invalid) {
                 faultsFoulCoil.FoulingInputMethod = FouledCoil::UARated;
             }
@@ -1958,7 +1954,7 @@ namespace FaultsManager {
                         format("{} = \"{}\" invalid {} = \"{}\" blank.", cFaultCurrentObject, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
                     state.dataFaultsMgr->ErrorsFound = true;
                 } else {
-                    if (Util::MakeUPPERCase(cAlphaArgs(4)) == "CONTROLLER:OUTDOORAIR") {
+                    if (Util::makeUPPER(cAlphaArgs(4)) == "CONTROLLER:OUTDOORAIR") {
                         state.dataFaultsMgr->FaultsEconomizer(j).ControllerTypeEnum = iController_AirEconomizer;
 
                         // CASE ...

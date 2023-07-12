@@ -82,10 +82,10 @@ int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const 
         state.dataCoilCooingDX->coilCoolingDXGetInputFlag = false;
     }
     int handle = -1;
-    std::string coilNameUpper = Util::MakeUPPERCase(coilName);
+    std::string coilNameUpper = Util::makeUPPER(coilName);
     for (auto const &thisCoil : state.dataCoilCooingDX->coilCoolingDXs) {
         handle++;
-        if (coilNameUpper == Util::MakeUPPERCase(thisCoil.name)) {
+        if (coilNameUpper == Util::makeUPPER(thisCoil.name)) {
             return handle;
         }
     }

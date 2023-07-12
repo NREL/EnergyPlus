@@ -836,8 +836,6 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From Util::MakeUPPERCase( function by Linda K. Lawrie
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This function returns a representation of the InputString with blanks replaced with underscores.

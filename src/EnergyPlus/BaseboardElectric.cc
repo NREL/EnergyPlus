@@ -216,7 +216,7 @@ namespace BaseboardElectric {
                 ++BaseboardNum;
                 auto &thisBaseboard = baseboard->baseboards(BaseboardNum);
                 thisBaseboard.EquipName = state.dataIPShortCut->cAlphaArgs(1);                  // name of this baseboard
-                thisBaseboard.EquipType = Util::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
+                thisBaseboard.EquipType = Util::makeUPPER(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     thisBaseboard.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -330,7 +330,7 @@ namespace BaseboardElectric {
                 }
 
                 thisBaseboard.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
-                    state, DataZoneEquipment::ZoneEquip::BBElectricConvective, thisBaseboard.EquipName);
+                    state, DataZoneEquipment::ZoneEquipType::BaseboardConvectiveElectric, thisBaseboard.EquipName);
             }
 
             if (ErrorsFound) {

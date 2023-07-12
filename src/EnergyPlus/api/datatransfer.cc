@@ -249,8 +249,8 @@ void freeObjectNames(const char **objectNames, unsigned int arraySize)
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string UCsurfName = EnergyPlus::Util::MakeUPPERCase(surfName);
-    std::string UCmatName = EnergyPlus::Util::MakeUPPERCase(matName);
+    std::string UCsurfName = EnergyPlus::Util::makeUPPER(surfName);
+    std::string UCmatName = EnergyPlus::Util::makeUPPER(matName);
     return EnergyPlus::HeatBalFiniteDiffManager::numNodesInMaterialLayer(*thisState, UCsurfName, UCmatName);
 }
 
@@ -278,8 +278,8 @@ int getVariableHandle(EnergyPlusState state, const char *type, const char *key)
     // In this function, it is as simple as looping over both types and continuing to increment
     // the handle carefully.  In the getValue function it is just a matter of checking array sizes.
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string const typeUC = EnergyPlus::Util::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::Util::MakeUPPERCase(key);
+    std::string const typeUC = EnergyPlus::Util::makeUPPER(type);
+    std::string const keyUC = EnergyPlus::Util::makeUPPER(key);
     int handle = -1; // initialize to -1 as a flag
     if (thisState->dataOutputProcessor->RVariableTypes.allocated()) {
         handle = 0; // initialize to 0 to get a 1 based Array1D index
@@ -347,7 +347,7 @@ Real64 getVariableValue(EnergyPlusState state, const int handle)
 int getMeterHandle(EnergyPlusState state, const char *meterName)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    std::string const meterNameUC = EnergyPlus::Util::MakeUPPERCase(meterName);
+    std::string const meterNameUC = EnergyPlus::Util::makeUPPER(meterName);
     int i = EnergyPlus::GetMeterIndex(*thisState, meterNameUC);
     if (i == 0) {
         // inside E+, zero is meaningful, but through the API, I want to use negative one as a signal of a bad lookup
@@ -381,16 +381,16 @@ Real64 getMeterValue(EnergyPlusState state, int handle)
 int getActuatorHandle(EnergyPlusState state, const char *componentType, const char *controlType, const char *uniqueKey)
 {
     int handle = 0;
-    std::string const typeUC = EnergyPlus::Util::MakeUPPERCase(componentType);
-    std::string const keyUC = EnergyPlus::Util::MakeUPPERCase(uniqueKey);
-    std::string const controlUC = EnergyPlus::Util::MakeUPPERCase(controlType);
+    std::string const typeUC = EnergyPlus::Util::makeUPPER(componentType);
+    std::string const keyUC = EnergyPlus::Util::makeUPPER(uniqueKey);
+    std::string const controlUC = EnergyPlus::Util::makeUPPER(controlType);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (int ActuatorLoop = 1; ActuatorLoop <= thisState->dataRuntimeLang->numEMSActuatorsAvailable; ++ActuatorLoop) {
         auto &availActuator = thisState->dataRuntimeLang->EMSActuatorAvailable(ActuatorLoop);
         handle++;
-        std::string const actuatorTypeUC = EnergyPlus::Util::MakeUPPERCase(availActuator.ComponentTypeName);
-        std::string const actuatorIDUC = EnergyPlus::Util::MakeUPPERCase(availActuator.UniqueIDName);
-        std::string const actuatorControlUC = EnergyPlus::Util::MakeUPPERCase(availActuator.ControlTypeName);
+        std::string const actuatorTypeUC = EnergyPlus::Util::makeUPPER(availActuator.ComponentTypeName);
+        std::string const actuatorIDUC = EnergyPlus::Util::makeUPPER(availActuator.UniqueIDName);
+        std::string const actuatorControlUC = EnergyPlus::Util::makeUPPER(availActuator.ControlTypeName);
         if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
 
             if (availActuator.handleCount > 0) {
@@ -517,13 +517,13 @@ Real64 getActuatorValue(EnergyPlusState state, const int handle)
 int getInternalVariableHandle(EnergyPlusState state, const char *type, const char *key)
 {
     int handle = 0;
-    std::string const typeUC = EnergyPlus::Util::MakeUPPERCase(type);
-    std::string const keyUC = EnergyPlus::Util::MakeUPPERCase(key);
+    std::string const typeUC = EnergyPlus::Util::makeUPPER(type);
+    std::string const keyUC = EnergyPlus::Util::makeUPPER(key);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) { // TODO: this should stop at numEMSInternalVarsAvailable
         handle++;
-        std::string const variableTypeUC = EnergyPlus::Util::MakeUPPERCase(availVariable.DataTypeName);
-        std::string const variableIDUC = EnergyPlus::Util::MakeUPPERCase(availVariable.UniqueIDName);
+        std::string const variableTypeUC = EnergyPlus::Util::makeUPPER(availVariable.DataTypeName);
+        std::string const variableIDUC = EnergyPlus::Util::makeUPPER(availVariable.UniqueIDName);
         if (typeUC == variableTypeUC && keyUC == variableIDUC) {
             return handle;
         }
@@ -907,11 +907,11 @@ int kindOfSim(EnergyPlusState state)
 int getConstructionHandle(EnergyPlusState state, const char *constructionName)
 {
     int handle = 0;
-    std::string const nameUC = EnergyPlus::Util::MakeUPPERCase(constructionName);
+    std::string const nameUC = EnergyPlus::Util::makeUPPER(constructionName);
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     for (auto const &construct : thisState->dataConstruction->Construct) {
         handle++;
-        std::string const thisNameUC = EnergyPlus::Util::MakeUPPERCase(construct.Name);
+        std::string const thisNameUC = EnergyPlus::Util::makeUPPER(construct.Name);
         if (nameUC == thisNameUC) {
             return handle;
         }

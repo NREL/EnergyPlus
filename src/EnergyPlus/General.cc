@@ -1132,8 +1132,7 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            ReportType checkReportType =
-                static_cast<ReportType>(getEnumerationValue(ReportTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+            ReportType checkReportType = static_cast<ReportType>(getEnumValue(ReportTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
 
             switch (checkReportType) {
             case ReportType::DXF: {
@@ -1231,18 +1230,16 @@ void ScanForReports(EnergyPlusData &state,
 
             state.dataGeneral->EMSoutput = true;
 
-            AvailRpt CheckAvailRpt =
-                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+            AvailRpt CheckAvailRpt = static_cast<AvailRpt>(getEnumValue(AvailRptNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
             state.dataRuntimeLang->OutputEMSActuatorAvailSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSActuatorAvailFull = (CheckAvailRpt == AvailRpt::Verbose);
 
-            CheckAvailRpt =
-                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            CheckAvailRpt = static_cast<AvailRpt>(getEnumValue(AvailRptNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             state.dataRuntimeLang->OutputEMSInternalVarsSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSInternalVarsFull = (CheckAvailRpt == AvailRpt::Verbose);
 
             ERLdebugOutputLevel CheckERLlevel = static_cast<ERLdebugOutputLevel>(
-                getEnumerationValue(ERLdebugOutputLevelNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+                getEnumValue(ERLdebugOutputLevelNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
             state.dataRuntimeLang->OutputEMSErrors =
                 (CheckERLlevel == ERLdebugOutputLevel::ErrorsOnly || CheckERLlevel == ERLdebugOutputLevel::Verbose);
             state.dataRuntimeLang->OutputFullEMSTrace = (CheckERLlevel == ERLdebugOutputLevel::Verbose);
@@ -1254,8 +1251,7 @@ void ScanForReports(EnergyPlusData &state,
     // Process the Scan Request
     DoReport = false;
 
-    ReportName rptName =
-        static_cast<ReportName>(getEnumerationValue(ReportNamesUC, Util::MakeUPPERCase(Util::MakeUPPERCase(reportName))));
+    ReportName rptName = static_cast<ReportName>(getEnumValue(ReportNamesUC, Util::makeUPPER(Util::makeUPPER(reportName))));
     switch (rptName) {
     case ReportName::Constructions: {
         if (present(ReportKey)) {
@@ -1276,7 +1272,7 @@ void ScanForReports(EnergyPlusData &state,
         //      IF (PRESENT(Option1)) Option1=SchRptOption
     } break;
     case ReportName::Surfaces: {
-        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, Util::MakeUPPERCase(ReportKey())));
+        RptKey rptKey = static_cast<RptKey>(getEnumValue(RptKeyNamesUC, Util::makeUPPER(ReportKey())));
         switch (rptKey) { // Autodesk:OPTIONAL ReportKey used without PRESENT check
         case RptKey::Costinfo: {
             DoReport = state.dataGeneral->CostInfo;

@@ -515,7 +515,7 @@ namespace Util {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    inline std::string MakeUPPERCase(std::string_view const InputString) // Input String
+    inline std::string makeUPPER(std::string_view const InputString) // Input String
     {
 
         // FUNCTION INFORMATION:
@@ -699,7 +699,7 @@ namespace Util {
 
 } // namespace Util
 
-constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
+constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
         if (sList[i] == s) return i;
@@ -710,7 +710,7 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
     constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
-    return static_cast<BooleanSwitch>(getEnumerationValue(yesNo, s));
+    return static_cast<BooleanSwitch>(getEnumValue(yesNo, s));
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct

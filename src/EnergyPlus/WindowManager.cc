@@ -7937,7 +7937,7 @@ namespace WindowManager {
                     state.dataMaterial->Screens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(thisMaterial->Trans);
 
                     state.dataMaterial->Screens(ScreenNum).screenBeamReflectanceModel = static_cast<Material::ScreenBeamReflectanceModel>(
-                        getEnumerationValue(ScreenBeamReflectanceModelNamesUC, Util::MakeUPPERCase(thisMaterial->ReflectanceModeling)));
+                        getEnumValue(ScreenBeamReflectanceModelNamesUC, Util::makeUPPER(thisMaterial->ReflectanceModeling)));
 
                     // Reflectance of screen material only
                     state.dataMaterial->Screens(ScreenNum).ReflectCylinder = thisMaterial->ReflectShade / (1 - thisMaterial->Trans);

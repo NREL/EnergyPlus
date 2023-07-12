@@ -605,14 +605,13 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                nightCycleMgr.nightCycleControlType = static_cast<NightCycleControlType>(
-                    getEnumerationValue(NightCycleControlTypeNamesUC, Util::MakeUPPERCase(cAlphaArgs(4))));
-
+                nightCycleMgr.nightCycleControlType =
+                    static_cast<NightCycleControlType>(getEnumValue(NightCycleControlTypeNamesUC, Util::makeUPPER(cAlphaArgs(4))));
                 assert(nightCycleMgr.nightCycleControlType != NightCycleControlType::Invalid);
 
                 // Cycling Run Time Control Type
-                nightCycleMgr.cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(
-                    getEnumerationValue(CyclingRunTimeControlNamesUC, Util::MakeUPPERCase(cAlphaArgs(5))));
+                nightCycleMgr.cyclingRunTimeControl =
+                    static_cast<CyclingRunTimeControl>(getEnumValue(CyclingRunTimeControlNamesUC, Util::makeUPPER(cAlphaArgs(5))));
 
                 assert(nightCycleMgr.cyclingRunTimeControl != CyclingRunTimeControl::Invalid);
 
@@ -807,9 +806,8 @@ namespace SystemAvailabilityManager {
                 }
 
                 optimumStartMgr.MaxOptStartTime = rNumericArgs(1);
-
-                optimumStartMgr.optimumStartControlType = static_cast<OptimumStartControlType>(
-                    getEnumerationValue(OptimumStartControlTypeNamesUC, Util::MakeUPPERCase(cAlphaArgs(4))));
+                optimumStartMgr.optimumStartControlType =
+                    static_cast<OptimumStartControlType>(getEnumValue(OptimumStartControlTypeNamesUC, Util::makeUPPER(cAlphaArgs(4))));
 
                 if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::Invalid) {
                     optimumStartMgr.optimumStartControlType = OptimumStartControlType::ControlZone;
@@ -848,7 +846,7 @@ namespace SystemAvailabilityManager {
                 }
 
                 optimumStartMgr.controlAlgorithm =
-                    static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, Util::MakeUPPERCase(cAlphaArgs(7))));
+                    static_cast<ControlAlgorithm>(getEnumValue(ControlAlgorithmNamesUC, Util::makeUPPER(cAlphaArgs(7))));
 
                 assert(optimumStartMgr.controlAlgorithm != ControlAlgorithm::Invalid);
 
@@ -1319,7 +1317,7 @@ namespace SystemAvailabilityManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
                 auto const &objectFields = instance.value();
-                std::string const thisObjectName = Util::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = Util::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 auto &mgrList = state.dataSystemAvailabilityManager->ListData(Item);
                 mgrList.Name = thisObjectName;
@@ -1345,7 +1343,7 @@ namespace SystemAvailabilityManager {
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
                         mgrList.AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
-                            getEnumerationValue(SystemAvailabilityTypeNamesUC, Util::MakeUPPERCase(availManagerObjType)));
+                            getEnumValue(SystemAvailabilityTypeNamesUC, Util::makeUPPER(availManagerObjType)));
                         if (mgrList.AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
                             mgrList.AvailManagerType(listItem) = DataPlant::SystemAvailabilityType::Invalid;
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists

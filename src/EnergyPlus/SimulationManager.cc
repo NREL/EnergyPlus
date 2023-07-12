@@ -1075,15 +1075,15 @@ namespace SimulationManager {
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     state.dataGlobal->DoCoilDirectSolutions =
-                        Util::MakeUPPERCase(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
+                        Util::makeUPPER(fields.at("use_coil_direct_solutions").get<std::string>()) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     state.dataHeatBalIntRadExchg->CarrollMethod =
-                        Util::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
+                        Util::makeUPPER(fields.at("zone_radiant_exchange_algorithm").get<std::string>()) == "CARROLLMRT";
                 }
                 if (fields.find("use_representative_surfaces_for_calculations") != fields.end()) {
                     state.dataSurface->UseRepresentativeSurfaceCalculations =
-                        Util::MakeUPPERCase(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
+                        Util::makeUPPER(fields.at("use_representative_surfaces_for_calculations").get<std::string>()) == "YES";
                 }
                 bool overrideTimestep(false);
                 bool overrideZoneAirHeatBalAlg(false);
@@ -1095,7 +1095,7 @@ namespace SimulationManager {
                 bool overridePsychTsatFnPb(false);
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
-                    overrideModeValue = Util::MakeUPPERCase(fields.at("override_mode").get<std::string>());
+                    overrideModeValue = Util::makeUPPER(fields.at("override_mode").get<std::string>());
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     } else if (overrideModeValue == "MODE01") {
@@ -2578,7 +2578,7 @@ namespace SimulationManager {
                     print(state.files.bnd,
                           "   Zone Equipment Component,{},{},{},{},{},{}\n",
                           Count1,
-                          state.dataZoneEquip->ZoneEquipList(Count).EquipType(Count1),
+                          state.dataZoneEquip->ZoneEquipList(Count).EquipTypeName(Count1),
                           state.dataZoneEquip->ZoneEquipList(Count).EquipName(Count1),
                           state.dataZoneEquip->ZoneEquipConfig(Count).ZoneName,
                           state.dataZoneEquip->ZoneEquipList(Count).CoolingPriority(Count1),

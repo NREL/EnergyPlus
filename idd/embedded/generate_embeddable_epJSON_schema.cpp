@@ -1,3 +1,26 @@
+#include <cstdint>  // std::uint8_t
+#include <fstream>  // std::ifstream
+#include <vector>   // std::vector
+#ifndef __cppcheck__
+#  if __has_include(<filesystem>)
+#    include <filesystem>
+namespace fs = std::filesystem;
+#  elif __has_include(<experimental/filesystem>)
+#    include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#  else
+// cppcheck-suppress preprocessorErrorDirective
+#    error "no filesystem support"
+#  endif
+#endif
+
+#include <fmt/format.h>       // fmt::print
+#include <fmt/os.h>           // fmt::output_file, fmt::file
+#include <nlohmann/json.hpp>  // json
+
+using json = nlohmann::json;
+
+static constexpr auto header = R"cpp(
 // EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
@@ -45,23 +68,72 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef InputProcessing_EmbeddedEpJSONSchema_HH
-#define InputProcessing_EmbeddedEpJSONSchema_HH
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
-#include <GSL/span.h>
-#include <cstddef>
-#include <cstdint>
-#include <utility>
+#include <array>
 
 namespace EnergyPlus {
 
 namespace EmbeddedEpJSONSchema {
 
-    const gsl::span<const std::uint8_t> embeddedEpJSONSchema();
+    // clang-format off
+)cpp";
 
-    const std::string_view embeddedEpJSONSchemaView();
+static constexpr auto footer = R"cpp(
+    // clang-format on
+
+    const gsl::span<const std::uint8_t> embeddedEpJSONSchema()
+    {
+        return gsl::span<const std::uint8_t>(embeddedSchema);
+    }
+
+    const std::string_view embeddedEpJSONSchemaView()
+    {
+        static const std::string str(embeddedSchema.begin(), embeddedSchema.end());
+        return str;
+    }
+
 } // namespace EmbeddedEpJSONSchema
 
 } // namespace EnergyPlus
+)cpp";
 
-#endif // InputProcessing_EmbeddedEpJSONSchema_HH
+int main(int argc, char const* argv[]) {
+  if (argc != 3) {
+    fmt::print(stderr, "usage: ./generate_embeddable_schema path/to/Energy+.schema.epJSON path/to/EmbeddedEpJSONSchema.cc\n");
+    return 1;
+  }
+
+  fmt::print(stderr, "Generating the **embedded** epJSON schema\n");
+
+  std::ifstream schema_stream(argv[1], std::ifstream::in);
+  if (!schema_stream.is_open()) {
+    fmt::print("schema file path {} not found\n", argv[1]);
+    return 1;
+  }
+  auto const input_json = json::parse(schema_stream);
+  std::vector<std::uint8_t> const v_cbor = json::to_cbor(input_json);
+
+  const fs::path outFilePath(argv[2]);
+  const auto outFileDir = outFilePath.parent_path();
+  if (!fs::is_directory(outFileDir)) {
+    fmt::print(stderr, "Output Directory does not exist: {}\n", outFileDir.generic_string());
+    fs::create_directory(outFileDir);
+  }
+
+  auto outfile = fmt::output_file(argv[2], fmt::file::WRONLY | fmt::file::CREATE | fmt::file::TRUNC);
+  outfile.print("{}", header);
+
+  outfile.print("    static constexpr std::array< std::uint8_t, {} > embeddedSchema = {{{{\n", v_cbor.size());
+
+  for (size_t i = 0; i < v_cbor.size(); ++i) {
+    outfile.print("{:#04x},", v_cbor[i]);  // Format the std::uint8_t as hex
+    if (i % 40 == 0 && i != 0) {
+      outfile.print("\n");
+    }
+  }
+  outfile.print("}}}};\n");
+  outfile.print("{}", footer);
+
+  return 0;
+}

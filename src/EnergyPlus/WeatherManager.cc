@@ -2511,7 +2511,9 @@ namespace Weather {
                 for (int CurTimeStep = 1; CurTimeStep <= state.dataWeather->NumIntervalsPerHour; ++CurTimeStep) {
                     state.dataWeather->wvarsHrTsTomorrow(CurTimeStep, hour) = WeatherVars();
                     auto WeatherDataLine = state.files.inputWeatherFile.readLine();
-                    if (!WeatherDataLine.good) WeatherDataLine.data.clear();
+                    if (!WeatherDataLine.good) {
+                        WeatherDataLine.data.clear();
+                    }
                     if (WeatherDataLine.data.empty()) {
                         if (hour == 1) {
                             WeatherDataLine.eof = true;
@@ -4710,7 +4712,7 @@ namespace Weather {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            std::string newName = Util::makeUPPER(ipsc->cAlphaArgs(1));
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
             // A1, \field Name
             if (std::find_if(state.dataWeather->ReportPeriodInput.begin(), state.dataWeather->ReportPeriodInput.end(),
@@ -4856,7 +4858,7 @@ namespace Weather {
                                                                      ipsc->cNumericFieldNames);
 
             // A1, \field Name
-            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            std::string newName = Util::makeUPPER(ipsc->cAlphaArgs(1));
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
             
             if (std::find_if(state.dataWeather->RunPeriodInput.begin(), state.dataWeather->RunPeriodInput.end(),
@@ -4925,14 +4927,22 @@ namespace Weather {
 
             // A2 , \field Day of Week for Start Day
             bool inputWeekday = false;
-            if (ipsc->lAlphaFieldBlanks(2)) {
+            if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) { // Have input
+                int dayType = getEnumValue(ScheduleManager::dayTypeNamesUC, state.dataIPShortCut->cAlphaArgs(2));
+                if (dayType < 1) {
+                    ShowWarningError(state,
+                                     format("{}: object={}{} invalid (Day of Week) [{}] for Start is not valid, Sunday will be used.",
+                                            state.dataIPShortCut->cCurrentModuleObject,
+                                            state.dataWeather->RunPeriodInput(i).title,
+                                            state.dataIPShortCut->cAlphaFieldNames(2),
+                                            state.dataIPShortCut->cAlphaArgs(2)));
+                    runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
+                } else {
+                    runPeriodInput.startWeekDay = static_cast<ScheduleManager::DayType>(dayType);
+                    inputWeekday = true;
+                }
+            } else { // No input, set the default as Sunday. This may get overriden below
                 runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
-
-            } else if ((runPeriodInput.startWeekDay = static_cast<ScheduleManager::DayType>(getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2)))) == ScheduleManager::DayType::Invalid) {
-                ShowWarningInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2), "Sunday");
-                runPeriodInput.startWeekDay = ScheduleManager::DayType::Sunday;
-            } else {
-                inputWeekday = true;
             }
 
             // Validate the dates now that the weekday field has been looked at
@@ -5131,7 +5141,7 @@ namespace Weather {
             BooleanSwitch b;
             if (ipsc->lAlphaFieldBlanks(3)) {
                 runPeriodInput.useHolidays = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useHolidays = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
@@ -5141,7 +5151,7 @@ namespace Weather {
             // A4,  \field Use Weather File Daylight Saving Period
             if (ipsc->lAlphaFieldBlanks(4)) {
                 runPeriodInput.useDST = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useDST = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
@@ -5151,7 +5161,7 @@ namespace Weather {
             // A5,  \field Apply Weekend Holiday Rule
             if (ipsc->lAlphaFieldBlanks(5)) { 
                 runPeriodInput.applyWeekendRule = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.applyWeekendRule = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
@@ -5161,7 +5171,7 @@ namespace Weather {
             // A6,  \field Use Weather File Rain Indicators
             if (ipsc->lAlphaFieldBlanks(6)) {
                 runPeriodInput.useRain = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(6)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(6)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useRain = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(6), ipsc->cAlphaArgs(6));
@@ -5171,7 +5181,7 @@ namespace Weather {
             // A7,  \field Use Weather File Snow Indicators
             if (ipsc->lAlphaFieldBlanks(7)) {
                 runPeriodInput.useSnow = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7));
@@ -5181,7 +5191,7 @@ namespace Weather {
             // A8,  \field Treat Weather as Actual
             if (ipsc->lAlphaFieldBlanks(8)) {
                 runPeriodInput.actualWeather = false;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
                 runPeriodInput.actualWeather = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8));
@@ -5267,7 +5277,7 @@ namespace Weather {
                                                                      ipsc->cNumericFieldNames);
 
 
-            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            std::string newName = Util::makeUPPER(ipsc->cAlphaArgs(1));
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
             if (std::find_if(state.dataWeather->RunPeriodDesignInput.begin(), state.dataWeather->RunPeriodDesignInput.end(),
                              [&newName](RunPeriodData const &rpd) { return newName == rpd.title; } ) != state.dataWeather->RunPeriodDesignInput.end()) { 
@@ -5319,7 +5329,7 @@ namespace Weather {
             if (ipsc->lAlphaFieldBlanks(2)) {
                 runPerDesInput.dayOfWeek = (int)ScheduleManager::DayType::Monday; // Defaults to Monday
             } else {
-                runPerDesInput.dayOfWeek = getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
+                runPerDesInput.dayOfWeek = getEnumValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
                 if (runPerDesInput.dayOfWeek < 1 || runPerDesInput.dayOfWeek == 8) {
                     ShowWarningError(state,
                                      format("{}: object={} {} invalid (Day of Week) [{} for Start is not Valid, Monday will be Used.",
@@ -5331,7 +5341,7 @@ namespace Weather {
             BooleanSwitch b;
             if (ipsc->lAlphaFieldBlanks(3)) {
                 runPerDesInput.useDST = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(3)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useDST = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
@@ -5340,7 +5350,7 @@ namespace Weather {
 
             if (ipsc->lAlphaFieldBlanks(4)) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
@@ -5384,7 +5394,7 @@ namespace Weather {
                                                                      ipsc->lAlphaFieldBlanks,
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
-            std::string newName = Util::MakeUPPERCase(ipsc->cAlphaArgs(1));
+            std::string newName = Util::makeUPPER(ipsc->cAlphaArgs(1));
 
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, newName};
             if (std::find_if(state.dataWeather->RunPeriodDesignInput.begin(), state.dataWeather->RunPeriodDesignInput.end(),
@@ -5440,7 +5450,7 @@ namespace Weather {
             if (ipsc->lAlphaFieldBlanks(3)) {
                 runPerDesInput.dayOfWeek = (int)ScheduleManager::DayType::Monday; // Defaults to Monday
             } else {
-                runPerDesInput.dayOfWeek = getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(3));
+                runPerDesInput.dayOfWeek = getEnumValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(3));
                 if (runPerDesInput.dayOfWeek < (int)ScheduleManager::DayType::Sunday ||
                     runPerDesInput.dayOfWeek == (int)ScheduleManager::DayType::Holiday) {
                     // Sunday-Saturday, SummerDesignDay, WinterDesignDay, CustomDay1, and CustomDay2 are all valid. Holiday is not valid.
@@ -5452,7 +5462,7 @@ namespace Weather {
             BooleanSwitch b; 
             if (ipsc->lAlphaFieldBlanks(4)) {
                 runPerDesInput.useDST = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                  runPerDesInput.useDST = static_cast<bool>(b);
             } else {
                  ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
@@ -5461,7 +5471,7 @@ namespace Weather {
                         
             if (ipsc->lAlphaFieldBlanks(5)) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = true;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(5)))) != BooleanSwitch::Invalid) {
                 runPerDesInput.useRain = runPerDesInput.useSnow = static_cast<bool>(b);
             } else {
                 ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(5), ipsc->cAlphaArgs(5));
@@ -5580,7 +5590,7 @@ namespace Weather {
                 ErrorsFound = true;
             }
 
-            int DayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, AlphArray(3));
+            int DayType = getEnumValue(ScheduleManager::dayTypeNamesUC, AlphArray(3));
             if (DayType == 0) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(3), AlphArray(3));
                 ErrorsFound = true;
@@ -5888,7 +5898,7 @@ namespace Weather {
 
             if (ipsc->lAlphaFieldBlanks(7)) {
                 desDayInput.RainInd = 0;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(7)))) != BooleanSwitch::Invalid) {
                 desDayInput.RainInd = (int)b;
             } else {
                 ShowWarningInvalidBool(state, eoh, ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7), "No");
@@ -5898,7 +5908,7 @@ namespace Weather {
             //   A8,  \field Snow Indicator
             if (ipsc->lAlphaFieldBlanks(8)) {
                 desDayInput.SnowInd = 0;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(8)))) != BooleanSwitch::Invalid) {
                 desDayInput.SnowInd = (int)b;
             } else {
                 ShowWarningInvalidBool(state, eoh, ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8), "No");
@@ -5910,7 +5920,7 @@ namespace Weather {
             if (ipsc->lAlphaFieldBlanks(3)) {
                 desDayInput.dryBulbRangeType = DesDayDryBulbRangeType::Default;
             } else if ((desDayInput.dryBulbRangeType =
-                        static_cast<DesDayDryBulbRangeType>(getEnumerationValue(DesDayDryBulbRangeTypeNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(3))))) != DesDayDryBulbRangeType::Invalid) {
+                        static_cast<DesDayDryBulbRangeType>(getEnumValue(DesDayDryBulbRangeTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(3))))) != DesDayDryBulbRangeType::Invalid) {
             } else {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
@@ -6032,7 +6042,7 @@ namespace Weather {
             } 
             
             //   A5,  \field Humidity Condition Type
-            desDayInput.HumIndType = static_cast<DesDayHumIndType>(getEnumerationValue(DesDayHumIndTypeNamesUC, Util::MakeUPPERCase(ipsc->cAlphaArgs(5))));
+            desDayInput.HumIndType = static_cast<DesDayHumIndType>(getEnumValue(DesDayHumIndTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(5))));
             
             switch (desDayInput.HumIndType) {
             case DesDayHumIndType::WetBulb: {
@@ -6249,8 +6259,8 @@ namespace Weather {
             //   A10, \field Solar Model Indicator
             if (ipsc->lAlphaFieldBlanks(10)) {
                 desDayInput.solarModel = DesDaySolarModel::ASHRAE_ClearSky;
-            } else if ((desDayInput.solarModel = static_cast<DesDaySolarModel>(getEnumerationValue(DesDaySolarModelNamesUC,
-                                                                                                   Util::MakeUPPERCase(ipsc->cAlphaArgs(10))))) != DesDaySolarModel::Invalid) {
+            } else if ((desDayInput.solarModel = static_cast<DesDaySolarModel>(getEnumValue(DesDaySolarModelNamesUC,
+                                                                                            Util::makeUPPER(ipsc->cAlphaArgs(10))))) != DesDaySolarModel::Invalid) {
             } else { 
                 ShowWarningInvalidKey(state, eoh, ipsc->cAlphaFieldNames(10), ipsc->cAlphaArgs(10), "ASHRAE ClearSky");
                 desDayInput.solarModel = DesDaySolarModel::ASHRAE_ClearSky;
@@ -6373,7 +6383,7 @@ namespace Weather {
             //   A9,  \field Daylight Saving Time Indicator
             if (ipsc->lAlphaFieldBlanks(9)) {
                 desDayInput.DSTIndicator = 0;
-            } else if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(9)))) != BooleanSwitch::Invalid) {
+            } else if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(9)))) != BooleanSwitch::Invalid) {
                 desDayInput.DSTIndicator = (int)b;
             } else {
                 ShowWarningInvalidBool(state, eoh, ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9), "No");
@@ -6381,7 +6391,7 @@ namespace Weather {
             }
 
             //   A2,  \field Day Type
-            desDayInput.DayType = getEnumerationValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
+            desDayInput.DayType = getEnumValue(ScheduleManager::dayTypeNamesUC, ipsc->cAlphaArgs(2));
             if (desDayInput.DayType <= 0) {
                 ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFound = true;
@@ -6580,7 +6590,7 @@ namespace Weather {
             // Validate Calculation Type.
             std::string units;
             OutputProcessor::Unit unitType;
-            wpSkyTemp.skyTempModel = static_cast<SkyTempModel>(getEnumerationValue(Weather::SkyTempModelNamesUC, ipsc->cAlphaArgs(2)));
+            wpSkyTemp.skyTempModel = static_cast<SkyTempModel>(getEnumValue(Weather::SkyTempModelNamesUC, ipsc->cAlphaArgs(2)));
 
             switch (wpSkyTemp.skyTempModel) {
             case SkyTempModel::ScheduleValue: {
@@ -6647,7 +6657,7 @@ namespace Weather {
 
             BooleanSwitch b;
             if (!wpSkyTemp.IsSchedule && !ipsc->lAlphaFieldBlanks(4)) {
-                if ((b = getYesNoValue(Util::MakeUPPERCase(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
+                if ((b = getYesNoValue(Util::makeUPPER(ipsc->cAlphaArgs(4)))) != BooleanSwitch::Invalid) {
                     wpSkyTemp.UseWeatherFileHorizontalIR = static_cast<bool>(b);
                 } else {
                     ShowSevereInvalidBool(state, eoh, ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4));
@@ -6853,7 +6863,7 @@ namespace Weather {
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ""};
             
             state.dataWeather->WaterMainsTempsMethod =
-                static_cast<Weather::WaterMainsTempCalcMethod>(getEnumerationValue(waterMainsCalcMethodNamesUC, AlphArray(1)));
+                static_cast<Weather::WaterMainsTempCalcMethod>(getEnumValue(waterMainsCalcMethodNamesUC, AlphArray(1)));
 
             switch (state.dataWeather->WaterMainsTempsMethod) {
             case WaterMainsTempCalcMethod::Schedule: {
@@ -7474,7 +7484,7 @@ namespace Weather {
             for (int i = 1; i <= state.dataWeather->NumEPWTypExtSets; ++i) {
                 auto &typicalExtPer = state.dataWeather->TypicalExtremePeriods(i);
                 // JulianDay (Month,Day,LeapYearValue)
-                std::string const ExtremePeriodTitle = Util::MakeUPPERCase(typicalExtPer.ShortTitle);
+                std::string const ExtremePeriodTitle = Util::makeUPPER(typicalExtPer.ShortTitle);
                 if (ExtremePeriodTitle == "SUMMER") {
                     if (Util::SameString(typicalExtPer.TEType, "EXTREME")) {
                         typicalExtPer.MatchValue = "SummerExtreme";
@@ -7800,7 +7810,7 @@ namespace Weather {
                         if (CurCount <= state.dataWeather->NumDataPeriods) {
                             auto &dataPeriod = state.dataWeather->DataPeriods(CurCount);
                             dataPeriod.DayOfWeek = Line.substr(0, Pos);
-                            dataPeriod.WeekDay = getEnumerationValue(ScheduleManager::dayTypeNamesUC, dataPeriod.DayOfWeek);
+                            dataPeriod.WeekDay = getEnumValue(ScheduleManager::dayTypeNamesUC, dataPeriod.DayOfWeek);
                             if (dataPeriod.WeekDay < 1 || dataPeriod.WeekDay > 7) {
                                 ShowSevereError(state,
                                                 fmt::format("Weather File -- Invalid Start Day of Week for Data Period #{}, Invalid day={}",
@@ -8456,7 +8466,7 @@ namespace Weather {
                         std::string::size_type pos = index(epwLine.data, ',');
                         epwLine.data.erase(0, pos + 1);
                         pos = index(epwLine.data, ',');
-                        std::string LeapYear = Util::MakeUPPERCase(epwLine.data.substr(0, pos));
+                        std::string LeapYear = Util::makeUPPER(epwLine.data.substr(0, pos));
                         if (LeapYear[0] == 'Y') {
                             epwHasLeapYear = true;
                         }

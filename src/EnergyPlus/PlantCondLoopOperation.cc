@@ -1395,7 +1395,7 @@ void FindCompSPInput(EnergyPlusData &state,
     SchemeNameFound = true;
 
     DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::MakeUPPERCase(CurrentModuleObject)));
+        getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::makeUPPER(CurrentModuleObject)));
 
     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
         LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
@@ -2064,7 +2064,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     for (int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum) {
                         auto &this_equip = this_equip_list.Comp(EquipNum);
                         Type = static_cast<DataPlant::PlantEquipmentType>(
-                            getEnumerationValue(PlantEquipTypeNamesUC, Util::MakeUPPERCase(this_equip.TypeOf)));
+                            getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                         errFlag1 = false;
                         PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, plantLoc, errFlag1, _, _, NumSearchResults, _, LoopNum);
 

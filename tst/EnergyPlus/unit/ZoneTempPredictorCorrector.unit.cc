@@ -94,7 +94,7 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
-using namespace EnergyPlus::DataRoomAirModel;
+using namespace EnergyPlus::RoomAir;
 using namespace EnergyPlus::HybridModel;
 using namespace SimulationManager;
 
@@ -151,7 +151,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 
     state->dataHeatBal->ZoneAirSolutionAlgo = DataHeatBalance::SolutionAlgo::EulerMethod;
 
-    state->dataRoomAirMod->AirModel.allocate(1);
+    state->dataRoomAir->AirModel.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
     // Case 1 - All flows at the same humrat

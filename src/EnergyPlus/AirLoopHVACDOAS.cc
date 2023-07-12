@@ -225,8 +225,8 @@ namespace AirLoopHVACDOAS {
                 ++AirLoopMixerNum;
                 AirLoopMixer thisMixer;
 
-                thisMixer.name = Util::MakeUPPERCase(thisObjectName);
-                thisMixer.OutletNodeName = Util::MakeUPPERCase(fields.at("outlet_node_name").get<std::string>());
+                thisMixer.name = Util::makeUPPER(thisObjectName);
+                thisMixer.OutletNodeName = Util::makeUPPER(fields.at("outlet_node_name").get<std::string>());
                 thisMixer.m_AirLoopMixer_Num = AirLoopMixerNum - 1;
                 thisMixer.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
                                                                               thisMixer.OutletNodeName,
@@ -245,7 +245,7 @@ namespace AirLoopHVACDOAS {
                     int num = 0;
                     for (auto const &NodeDOASName : NodeArray) {
                         num += 1;
-                        std::string name = Util::MakeUPPERCase(NodeDOASName.at("inlet_node_name").get<std::string>());
+                        std::string name = Util::makeUPPER(NodeDOASName.at("inlet_node_name").get<std::string>());
                         int NodeNum = Util::FindItemInList(name, state.dataLoopNodes->NodeID);
                         if (NodeNum > 0 && num <= thisMixer.numOfInletNodes) {
                             thisMixer.InletNodeName.push_back(name);
@@ -380,8 +380,8 @@ namespace AirLoopHVACDOAS {
                 ++AirLoopSplitterNum;
                 AirLoopSplitter thisSplitter;
 
-                thisSplitter.name = Util::MakeUPPERCase(thisObjectName);
-                thisSplitter.InletNodeName = Util::MakeUPPERCase(fields.at("inlet_node_name").get<std::string>());
+                thisSplitter.name = Util::makeUPPER(thisObjectName);
+                thisSplitter.InletNodeName = Util::makeUPPER(fields.at("inlet_node_name").get<std::string>());
                 thisSplitter.m_AirLoopSplitter_Num = AirLoopSplitterNum - 1;
 
                 auto NodeNames = fields.find("nodes");
@@ -391,7 +391,8 @@ namespace AirLoopHVACDOAS {
                     int num = 0;
                     for (auto const &NodeDOASName : NodeArray) {
                         num += 1;
-                        std::string name = Util::MakeUPPERCase(NodeDOASName.at("outlet_node_name").get<std::string>());
+
+                        std::string name = Util::makeUPPER(NodeDOASName.at("outlet_node_name").get<std::string>());
                         int NodeNum = Util::FindItemInList(name, state.dataLoopNodes->NodeID);
                         if (NodeNum > 0 && num <= thisSplitter.numOfOutletNodes) {
                             thisSplitter.OutletNodeName.push_back(name);
@@ -431,10 +432,11 @@ namespace AirLoopHVACDOAS {
                 ++AirLoopDOASNum;
                 AirLoopDOAS thisDOAS;
 
-                thisDOAS.Name = Util::MakeUPPERCase(thisObjectName);
+                thisDOAS.Name = Util::makeUPPER(thisObjectName);
                 // get OA and avail num
-                thisDOAS.OASystemName = Util::MakeUPPERCase(fields.at("airloophvac_outdoorairsystem_name").get<std::string>());
+                thisDOAS.OASystemName = Util::makeUPPER(fields.at("airloophvac_outdoorairsystem_name").get<std::string>());
                 thisDOAS.m_OASystemNum = Util::FindItemInList(thisDOAS.OASystemName, state.dataAirLoop->OutsideAirSys);
+
                 if (thisDOAS.m_OASystemNum == 0) {
                     cFieldName = "AirLoopHVAC:OutdoorAirSystem Name";
                     ShowSevereError(state,
@@ -466,8 +468,8 @@ namespace AirLoopHVACDOAS {
                     bool InletNodeErrFlag = false;
                     bool OutletNodeErrFlag = false;
 
-                    const std::string typeNameUC = Util::MakeUPPERCase(thisOutsideAirSys.ComponentType(CompNum));
-                    ValidEquipListType foundType = static_cast<ValidEquipListType>(getEnumerationValue(validEquipNamesUC, typeNameUC));
+                    const std::string typeNameUC = Util::makeUPPER(thisOutsideAirSys.ComponentType(CompNum));
+                    ValidEquipListType foundType = static_cast<ValidEquipListType>(getEnumValue(validEquipNamesUC, typeNameUC));
 
                     switch (foundType) {
                     case ValidEquipListType::OutdoorAirMixer:
@@ -713,7 +715,7 @@ namespace AirLoopHVACDOAS {
                     thisDOAS.m_HeatExchangerFlag = true;
                 }
 
-                thisDOAS.AvailManagerSchedName = Util::MakeUPPERCase(fields.at("availability_schedule_name").get<std::string>());
+                thisDOAS.AvailManagerSchedName = Util::makeUPPER(fields.at("availability_schedule_name").get<std::string>());
                 thisDOAS.m_AvailManagerSchedPtr = ScheduleManager::GetScheduleIndex(state, thisDOAS.AvailManagerSchedName);
                 if (thisDOAS.m_AvailManagerSchedPtr == 0) {
                     cFieldName = "Availability Schedule Name";
@@ -723,7 +725,7 @@ namespace AirLoopHVACDOAS {
                     errorsFound = true;
                 }
 
-                thisDOAS.AirLoopMixerName = Util::MakeUPPERCase(fields.at("airloophvac_mixer_name").get<std::string>()); //
+                thisDOAS.AirLoopMixerName = Util::makeUPPER(fields.at("airloophvac_mixer_name").get<std::string>()); //
                 thisDOAS.m_AirLoopMixerIndex = getAirLoopMixerIndex(state, thisDOAS.AirLoopMixerName);
                 if (thisDOAS.m_AirLoopMixerIndex < 0) {
                     cFieldName = "AirLoopHVAC:Mixer Name";
@@ -733,7 +735,7 @@ namespace AirLoopHVACDOAS {
                 }
                 AirLoopMixer thisAirLoopMixer;
                 thisDOAS.m_CompPointerAirLoopMixer = thisAirLoopMixer.factory(state, thisDOAS.m_AirLoopMixerIndex, thisDOAS.AirLoopMixerName);
-                thisDOAS.AirLoopSplitterName = Util::MakeUPPERCase(fields.at("airloophvac_splitter_name").get<std::string>()); //
+                thisDOAS.AirLoopSplitterName = Util::makeUPPER(fields.at("airloophvac_splitter_name").get<std::string>()); //
                 thisDOAS.m_AirLoopSplitterIndex = getAirLoopSplitterIndex(state, thisDOAS.AirLoopSplitterName);
                 if (thisDOAS.m_AirLoopSplitterIndex < 0) {
                     cFieldName = "AirLoopHVAC:Splitter Name";
@@ -766,8 +768,9 @@ namespace AirLoopHVACDOAS {
                     auto const &AirLoopArray = AirLoopNames.value();
                     int num = 0;
                     for (auto const &AirLoopHVACName : AirLoopArray) {
-                        std::string name = Util::MakeUPPERCase(AirLoopHVACName.at("airloophvac_name").get<std::string>());
+                        std::string name = Util::makeUPPER(AirLoopHVACName.at("airloophvac_name").get<std::string>());
                         int LoopNum = Util::FindItemInList(name, state.dataAirSystemsData->PrimaryAirSystems);
+
                         num += 1;
                         if (LoopNum > 0 && num <= thisDOAS.NumOfAirLoops) {
                             thisDOAS.AirLoopName.push_back(name);

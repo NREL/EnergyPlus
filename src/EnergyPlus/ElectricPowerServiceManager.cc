@@ -779,7 +779,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             errorsFound = true;
         }
 
-        demandMeterName_ = Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5));
+        demandMeterName_ = Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5));
         // meters may not be "loaded" yet, defered check to later subroutine
 
         if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrent")) {
@@ -2182,7 +2182,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     name = objectName;
 
-    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypeNamesUC, Util::MakeUPPERCase(objectType)));
+    generatorType = static_cast<GeneratorType>(getEnumValue(GeneratorTypeNamesUC, Util::makeUPPER(objectType)));
     switch (generatorType) {
     case GeneratorType::ICEngine: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
@@ -2207,8 +2207,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     case GeneratorType::PVWatts: {
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
-        int ObjNum =
-            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", Util::MakeUPPERCase(objectName));
+        int ObjNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", Util::makeUPPER(objectName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
             ShowFatalError(state, format("Cannot find Generator:PVWatts {}", objectName));
@@ -2263,8 +2262,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                 // Except you need GetPVInput to have run already etc
                 // Note: you can't use state.dataIPShortCut->cAlphaArgs etc or it'll override what will still need to be processed in
                 // ElectPowerLoadCenter::ElectPowerLoadCenter after this function is called
-                int PVNum =
-                    state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, Util::MakeUPPERCase(objectName));
+                int PVNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, Util::makeUPPER(objectName));
                 int NumAlphas; // Number of PV Array parameter alpha names being passed
                 int NumNums;   // Number of PV Array numeric parameters are being passed
                 int IOStat;
@@ -4814,7 +4812,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
 
             // Meter check deferred because they may have not been "loaded" yet,
             for (int loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
-                wiredMeterNames_[loopCount] = Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
+                wiredMeterNames_[loopCount] = Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
                 // Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
                 if (Util::SameString(wiredMeterNames_[loopCount], "Electricity:Facility") ||
                     Util::SameString(wiredMeterNames_[loopCount], "Electricity:HVAC")) {

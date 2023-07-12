@@ -484,19 +484,19 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetMonthNumber)
 {
-    EXPECT_EQ(0, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("January")));
-    EXPECT_EQ(1, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("February")));
-    EXPECT_EQ(2, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("March")));
-    EXPECT_EQ(3, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("April")));
-    EXPECT_EQ(4, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("May")));
-    EXPECT_EQ(5, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("June")));
-    EXPECT_EQ(6, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("July")));
-    EXPECT_EQ(7, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("August")));
-    EXPECT_EQ(8, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("September")));
-    EXPECT_EQ(9, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("October")));
-    EXPECT_EQ(10, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("November")));
-    EXPECT_EQ(11, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("December")));
-    EXPECT_EQ(-1, getEnumerationValue(Util::MonthNamesUC, Util::MakeUPPERCase("Hexember")));
+    EXPECT_EQ(0, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("January")));
+    EXPECT_EQ(1, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("February")));
+    EXPECT_EQ(2, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("March")));
+    EXPECT_EQ(3, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("April")));
+    EXPECT_EQ(4, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("May")));
+    EXPECT_EQ(5, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("June")));
+    EXPECT_EQ(6, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("July")));
+    EXPECT_EQ(7, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("August")));
+    EXPECT_EQ(8, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("September")));
+    EXPECT_EQ(9, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("October")));
+    EXPECT_EQ(10, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("November")));
+    EXPECT_EQ(11, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("December")));
+    EXPECT_EQ(-1, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("Hexember")));
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)

@@ -245,7 +245,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &objectFields = instance.value();
-            std::string const &thisObjectName = Util::MakeUPPERCase(instance.key());
+            std::string const &thisObjectName = Util::makeUPPER(instance.key());
             ip->markObjectAsUsed(state.dataHeatBalMgr->CurrentModuleObject, instance.key());
             std::string materialName = thisObjectName;
 
@@ -268,9 +268,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             thisMaterial->Name = materialName;
 
             std::string roughness = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "roughness");
-            thisMaterial->Roughness =
-                static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, Util::MakeUPPERCase(roughness)));
-
+            thisMaterial->Roughness = static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, Util::makeUPPER(roughness)));
             thisMaterial->Thickness = ip->getRealFieldValue(objectFields, objectSchemaProps, "thickness");
             thisMaterial->Conductivity = ip->getRealFieldValue(objectFields, objectSchemaProps, "conductivity");
             thisMaterial->Density = ip->getRealFieldValue(objectFields, objectSchemaProps, "density");
@@ -346,8 +344,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->group = Group::Regular;
         thisMaterial->Name = MaterialNames(1);
 
-        thisMaterial->Roughness =
-            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, Util::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->Roughness = static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, Util::makeUPPER(MaterialNames(2))));
 
         thisMaterial->Resistance = MaterialProps(1);
         thisMaterial->ROnly = true;
@@ -1173,8 +1170,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, Util::MakeUPPERCase(MaterialNames(2))));
-
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(MaterialNames(2))));
         thisMaterial->Roughness = SurfaceRoughness::MediumRough;
 
         thisMaterial->Thickness = MaterialProps(1);
@@ -1280,7 +1276,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         thisMaterial->Name = MaterialNames(1);
         thisMaterial->NumberOfGasesInMixture = 1;
-        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumerationValue(GasTypeUC, Util::MakeUPPERCase(MaterialNames(2))));
+        thisMaterial->gasTypes(1) = static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(MaterialNames(2))));
 
         thisMaterial->Roughness = SurfaceRoughness::MediumRough;
 
@@ -1300,8 +1296,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
             // Get gap vent type
-            thisMaterial->gapVentType =
-                static_cast<GapVentType>(getEnumerationValue(GapVentTypeUC, Util::MakeUPPERCase(MaterialNames(3))));
+            thisMaterial->gapVentType = static_cast<GapVentType>(getEnumValue(GapVentTypeUC, Util::makeUPPER(MaterialNames(3))));
         }
 
         if (gasType == GasType::Custom) {
@@ -1385,7 +1380,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->NumberOfGasesInMixture = NumGases;
         for (NumGas = 1; NumGas <= NumGases; ++NumGas) {
             thisMaterial->gasTypes(NumGas) =
-                static_cast<GasType>(getEnumerationValue(GasTypeUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
+                static_cast<GasType>(getEnumValue(GasTypeUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(1 + NumGas))));
         }
 
         thisMaterial->Roughness = SurfaceRoughness::MediumRough; // Unused
@@ -2394,8 +2389,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         //  MaximizeSolar or BlockBeamSolar
         thisMaterial->slatAngleType = SlatAngleType::FixedSlatAngle;
         if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-            thisMaterial->slatAngleType =
-                static_cast<SlatAngleType>(getEnumerationValue(SlatAngleTypeUC, Util::MakeUPPERCase(MaterialNames(3))));
+            thisMaterial->slatAngleType = static_cast<SlatAngleType>(getEnumValue(SlatAngleTypeUC, Util::makeUPPER(MaterialNames(3))));
         }
         if (thisMaterial->SlatWidth < thisMaterial->SlatSeparation) {
             ShowWarningError(state, format("{}=\"{}\", Slat Seperation/Width", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
@@ -2524,8 +2518,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->Name = MaterialNames(1);
         // need to treat the A2 with is just the name of the soil(it is
         // not important)
-        thisMaterial->Roughness =
-            static_cast<SurfaceRoughness>(getEnumerationValue(SurfaceRoughnessUC, Util::MakeUPPERCase(MaterialNames(3))));
+        thisMaterial->Roughness = static_cast<SurfaceRoughness>(getEnumValue(SurfaceRoughnessUC, Util::makeUPPER(MaterialNames(3))));
         if (Util::SameString(MaterialNames(4), "Simple")) {
             thisMaterial->EcoRoofCalculationMethod = 1;
         } else if (Util::SameString(MaterialNames(4), "Advanced") || state.dataIPShortCut->lAlphaFieldBlanks(4)) {
@@ -2843,8 +2836,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
         }
 
         thisMaterial->absorpVarCtrlSignal = VariableAbsCtrlSignal::SurfaceTemperature; // default value
-        thisMaterial->absorpVarCtrlSignal =
-            static_cast<VariableAbsCtrlSignal>(getEnumerationValue(VariableAbsCtrlSignalUC, Util::MakeUPPERCase(alphas(3))));
+        thisMaterial->absorpVarCtrlSignal = static_cast<VariableAbsCtrlSignal>(getEnumValue(VariableAbsCtrlSignalUC, Util::makeUPPER(alphas(3))));
         //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
         thisMaterial->absorpThermalVarFuncIdx = Curve::GetCurveIndex(state, alphas(4));
         thisMaterial->absorpThermalVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));

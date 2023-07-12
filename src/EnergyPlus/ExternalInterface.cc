@@ -363,7 +363,7 @@ void ParseString(std::string const &str, // The string, with all elements separa
         } else { // Use rest of string
             iEnd = lenStr;
         }
-        ele(i) = Util::MakeUPPERCase(str.substr(iSta, iEnd - iSta - 1));
+        ele(i) = Util::makeUPPER(str.substr(iSta, iEnd - iSta - 1));
     }
 }
 

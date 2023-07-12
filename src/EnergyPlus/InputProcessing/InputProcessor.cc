@@ -65,13 +65,13 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
-#include <EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <embedded/EmbeddedEpJSONSchema.hh>
 
 #include <fmt/os.h>
 #include <milo/dtoa.h>
@@ -144,7 +144,7 @@ json const &InputProcessor::getFields(EnergyPlusData &state, std::string const &
     if (it2 == objs.end()) {
         // HACK: this is not ideal and should be removed once everything is case sensitive internally
         for (auto it3 = objs.begin(); it3 != objs.end(); ++it3) {
-            if (Util::MakeUPPERCase(it3.key()) == objectName) {
+            if (Util::makeUPPER(it3.key()) == objectName) {
                 return it3.value();
             }
         }
@@ -556,7 +556,7 @@ bool InputProcessor::findDefault(std::string &default_value, json const &schema_
             default_value = s;
         }
         if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-            default_value = Util::MakeUPPERCase(default_value);
+            default_value = Util::makeUPPER(default_value);
         }
         return true;
     }
@@ -736,7 +736,7 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
         output.second = false;
     }
     if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-        output.first = Util::MakeUPPERCase(output.first);
+        output.first = Util::makeUPPER(output.first);
     }
     return output;
 }
@@ -1041,7 +1041,7 @@ void InputProcessor::getObjectItem(EnergyPlusData &state,
             if (name_iter.find("retaincase") != name_iter.end()) {
                 Alphas(alpha_index) = objectInfo.objectName;
             } else {
-                Alphas(alpha_index) = Util::MakeUPPERCase(objectInfo.objectName);
+                Alphas(alpha_index) = Util::makeUPPER(objectInfo.objectName);
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
@@ -1224,9 +1224,9 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = Util::MakeUPPERCase(ObjName);
+    std::string const upperObjName = Util::makeUPPER(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
-        if (Util::MakeUPPERCase(it.key()) == upperObjName) {
+        if (Util::makeUPPER(it.key()) == upperObjName) {
             found = true;
             break;
         }
@@ -1262,11 +1262,11 @@ int InputProcessor::getObjectItemNum(EnergyPlusData &state,
 
     int object_item_num = 1;
     bool found = false;
-    std::string const upperObjName = Util::MakeUPPERCase(ObjName);
+    std::string const upperObjName = Util::makeUPPER(ObjName);
     for (auto it = obj->begin(); it != obj->end(); ++it) {
         auto it2 = it.value().find(NameTypeVal);
 
-        if ((it2 != it.value().end()) && (Util::MakeUPPERCase(it2.value().get<std::string>()) == upperObjName)) {
+        if ((it2 != it.value().end()) && (Util::makeUPPER(it2.value().get<std::string>()) == upperObjName)) {
             found = true;
             break;
         }
@@ -1968,7 +1968,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
             json const &fields = obj.value();
             for (auto const &extensions : fields[extension_key]) {
                 try {
-                    std::string const report_name = Util::MakeUPPERCase(extensions.at("report_name").get<std::string>());
+                    std::string const report_name = Util::makeUPPER(extensions.at("report_name").get<std::string>());
                     if (report_name == "ALLMONTHLY" || report_name == "ALLSUMMARYANDMONTHLY") {
                         for (int i = 1; i <= DataOutputs::NumMonthlyReports; ++i) {
                             addVariablesForMonthlyReport(state, DataOutputs::MonthlyNamedReports(i));

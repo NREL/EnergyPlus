@@ -898,7 +898,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         for (int CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum) {
             // Json will catch any object types that are not the correct key choice of Controller:OutdoorAir or Controller:WaterCoil
             thisControllerList.ControllerType(CompNum) =
-                static_cast<ControllerKind>(getEnumerationValue(ControllerKindNamesUC, Util::MakeUPPERCase(AlphArray(AlphaNum))));
+                static_cast<ControllerKind>(getEnumValue(ControllerKindNamesUC, Util::makeUPPER(AlphArray(AlphaNum))));
             thisControllerList.ControllerName(CompNum) = AlphArray(AlphaNum + 1);
             // loop over all previous controller lists to check if this controllers is also present on previous controllers
             for (int previousListNum = 1; previousListNum < Item; ++previousListNum) {
@@ -1010,7 +1010,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                     OASys.ControllerName(InListNum) = AlphArray(InListNum * 2 + 1);
                     OASys.ControllerType(InListNum) = AlphArray(InListNum * 2);
                     OASys.controllerTypeEnum(InListNum) =
-                        static_cast<DataAirLoop::ControllerKind>(getEnumerationValue(ControllerKindNamesUC, OASys.ControllerType(InListNum)));
+                        static_cast<DataAirLoop::ControllerKind>(getEnumValue(ControllerKindNamesUC, OASys.ControllerType(InListNum)));
                     // only count Controller:OutdoorAir types as valid simple controllers
                     if (OASys.controllerTypeEnum(InListNum) != DataAirLoop::ControllerKind::OutdoorAir) {
                         ++NumSimpControllers;
@@ -1041,8 +1041,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
         auto &OASys = state.dataAirLoop->OutsideAirSys(OASysNum);
         for (int CompNum = 1; CompNum <= OASys.NumComponents; ++CompNum) {
-            OASys.ComponentTypeEnum(CompNum) =
-                static_cast<SimAirServingZones::CompType>(getEnumerationValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
+            OASys.ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(getEnumValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
             if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OASys.ComponentName(CompNum)));
@@ -1289,7 +1288,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
             // System outdoor air method
             thisVentilationMechanical.SystemOAMethod =
-                static_cast<DataSizing::SysOAMethod>(getEnumerationValue(SOAMNamesUC, Util::MakeUPPERCase(AlphArray(4))));
+                static_cast<DataSizing::SysOAMethod>(getEnumValue(SOAMNamesUC, Util::makeUPPER(AlphArray(4))));
 
             if (thisVentilationMechanical.SystemOAMethod == DataSizing::SysOAMethod::IAQP ||
                 thisVentilationMechanical.SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlSchOcc ||
@@ -1633,7 +1632,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                             for (int EquipListNum = 1; EquipListNum <= state.dataZoneEquip->NumOfZoneEquipLists; ++EquipListNum) {
                                 if (EquipListNum == EquipListIndex) {
                                     for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
-                                        if (Util::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipType(EquipNum),
+                                        if (Util::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipTypeName(EquipNum),
                                                                         "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
                                             for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                                                 if (Util::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipName(EquipNum),

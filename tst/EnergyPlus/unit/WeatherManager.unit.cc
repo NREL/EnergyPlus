@@ -2445,3 +2445,66 @@ TEST_F(EnergyPlusFixture, DisplayWeatherMissingDataWarnings_TMYx)
         // Liquid Precipitation Quantity is not read
     }
 }
+
+TEST_F(EnergyPlusFixture, EPW_no_eol_at_end_of_file)
+{
+    // Test for #10064 - When the EPW does not have an EOL at the end of the file
+
+    std::string const idf_objects = delimited_string({
+        "Timestep,4;"
+
+        "SimulationControl,",
+        "  Yes,                     !- Do Zone Sizing Calculation",
+        "  Yes,                     !- Do System Sizing Calculation",
+        "  No,                      !- Do Plant Sizing Calculation",
+        "  No,                      !- Run Simulation for Sizing Periods",
+        "  Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "RunPeriod,",
+        "  January,                 !- Name",
+        "  12,                      !- Begin Month",
+        "  31,                      !- Begin Day of Month",
+        "  ,                        !- Begin Year",
+        "  12,                      !- End Month",
+        "  31,                      !- End Day of Month",
+        "  ,                        !- End Year",
+        "  Tuesday,                 !- Day of Week for Start Day",
+        "  Yes,                     !- Use Weather File Holidays and Special Days",
+        "  Yes,                     !- Use Weather File Daylight Saving Period",
+        "  No,                      !- Apply Weekend Holiday Rule",
+        "  Yes,                     !- Use Weather File Rain Indicators",
+        "  Yes,                     !- Use Weather File Snow Indicators",
+        "  No,                      !-Treat Weather as Actual",
+        "  Hour1;                   !-First Hour Interpolation Starting Values",
+
+        "Site:Location,",
+        "  CHICAGO_IL_USA TMY3-725300,  !- Name",
+        "  41.98,                   !- Latitude {deg}",
+        "  -87.92,                  !- Longitude {deg}",
+        "  -6.00,                   !- Time Zone {hr}",
+        "  201.00;                  !- Elevation {m}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // We do have an EPW
+    state->dataWeather->WeatherFileExists = true;
+    // This is USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw, and did `truncate -s -1 chicago_no_eol_at_end_of_file.epw`
+    state->files.inputWeatherFilePath.filePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/chicago_no_eol_at_end_of_file.epw";
+
+    state->dataGlobal->BeginSimFlag = false;
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataWeather->LocationGathered = false;
+    state->dataGlobal->DoWeathSim = true;
+
+    bool Available = false;
+    bool ErrorsFound = false;
+    Weather::GetNextEnvironment(*state, Available, ErrorsFound); // Does not throw
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream("", true));
+    EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
+    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+
+    EXPECT_NO_THROW(Weather::ReadWeatherForDay(*state, 1, 1, true));
+    EXPECT_TRUE(compare_err_stream("", true));
+}

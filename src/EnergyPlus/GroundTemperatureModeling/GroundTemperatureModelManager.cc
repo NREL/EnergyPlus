@@ -96,7 +96,7 @@ namespace GroundTemperatureManager {
         // Called by objects requiring ground temperature models. Determines type and calls appropriate factory method.
 
         // Set object type
-        GroundTempObjType objectType = static_cast<GroundTempObjType>(getEnumerationValue(groundTempModelNamesUC, Util::MakeUPPERCase(objectType_str)));
+        GroundTempObjType objectType = static_cast<GroundTempObjType>(getEnumValue(groundTempModelNamesUC, Util::makeUPPER(objectType_str)));
 
         assert(objectType != GroundTempObjType::Invalid);
 

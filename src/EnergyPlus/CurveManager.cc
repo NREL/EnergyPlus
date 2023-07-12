@@ -2269,7 +2269,7 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
-                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(Util::MakeUPPERCase(thisObjectName), fields);
+                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(Util::makeUPPER(thisObjectName), fields);
             }
         }
 
@@ -2285,13 +2285,13 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
-                std::string varListName = Util::MakeUPPERCase(thisObjectName);
+                std::string varListName = Util::makeUPPER(thisObjectName);
 
                 std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto &indVar : fields.at("independent_variables")) {
-                    std::string indVarName = Util::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
+                    std::string indVarName = Util::makeUPPER(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     Btwxt::setMessageCallback(BtwxtMessageCallback, &callbackPair);
@@ -2404,7 +2404,7 @@ namespace Curve {
                     }
                 }
                 // Add grid to btwxtManager
-                state.dataCurveManager->btwxtManager.addGrid(Util::MakeUPPERCase(thisObjectName), Btwxt::GriddedData(gridAxes));
+                state.dataCurveManager->btwxtManager.addGrid(Util::makeUPPER(thisObjectName), Btwxt::GriddedData(gridAxes));
             }
         }
 
@@ -2419,10 +2419,10 @@ namespace Curve {
                 ++CurveNum;
                 Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-                thisCurve->Name = Util::MakeUPPERCase(thisObjectName);
+                thisCurve->Name = Util::makeUPPER(thisObjectName);
                 thisCurve->interpolationType = InterpType::BtwxtMethod;
 
-                std::string indVarListName = Util::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
+                std::string indVarListName = Util::makeUPPER(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = format("Table:Lookup \"{}\"", thisCurve->Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2963,7 +2963,7 @@ namespace Curve {
         if (InInputType.empty()) {
             return true; // if not used it is valid
         }
-        CurveInputType found = static_cast<CurveInputType>(getEnumerationValue(inputTypes, Util::MakeUPPERCase(InInputType)));
+        CurveInputType found = static_cast<CurveInputType>(getEnumValue(inputTypes, Util::makeUPPER(InInputType)));
         return found != CurveInputType::Invalid;
     }
 
@@ -2991,7 +2991,7 @@ namespace Curve {
         };
         constexpr std::array<std::string_view, static_cast<int>(CurveOutputType::Num)> outputTypes = {
             "DIMENSIONLESS", "PRESSURE", "TEMPERATURE", "CAPACITY", "POWER"};
-        CurveOutputType found = static_cast<CurveOutputType>(getEnumerationValue(outputTypes, Util::MakeUPPERCase(InOutputType)));
+        CurveOutputType found = static_cast<CurveOutputType>(getEnumValue(outputTypes, Util::makeUPPER(InOutputType)));
         return found != CurveOutputType::Invalid;
     }
 

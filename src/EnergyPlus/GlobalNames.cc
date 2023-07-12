@@ -155,7 +155,7 @@ void VerifyUniqueChillerName(
         ShowContinueError(state, format("...Current entry is Chiller Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->ChillerNames.emplace(NameToVerify, Util::MakeUPPERCase(TypeToVerify));
+        state.dataGlobalNames->ChillerNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumChillers = static_cast<int>(state.dataGlobalNames->ChillerNames.size());
     }
 }
@@ -183,7 +183,7 @@ void VerifyUniqueBaseboardName(EnergyPlusData &state,
         ShowContinueError(state, format("...Current entry is Baseboard Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, Util::MakeUPPERCase(TypeToVerify));
+        state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumBaseboards = static_cast<int>(state.dataGlobalNames->BaseboardNames.size());
     }
 }
@@ -208,7 +208,7 @@ void VerifyUniqueBoilerName(
         ShowContinueError(state, format("...Current entry is Boiler Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->BoilerNames.emplace(NameToVerify, Util::MakeUPPERCase(TypeToVerify));
+        state.dataGlobalNames->BoilerNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumBoilers = static_cast<int>(state.dataGlobalNames->BoilerNames.size());
     }
 }
@@ -240,7 +240,7 @@ void VerifyUniqueCoilName(
         ShowContinueError(state, format("...Current entry is Coil Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->CoilNames.emplace(NameToVerify, Util::MakeUPPERCase(TypeToVerify));
+        state.dataGlobalNames->CoilNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumCoils = static_cast<int>(state.dataGlobalNames->CoilNames.size());
     }
 }
@@ -254,7 +254,7 @@ void VerifyUniqueADUName(
         ShowContinueError(state, format("...Current entry is Air Distribution Unit Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->aDUNames.emplace(NameToVerify, Util::MakeUPPERCase(TypeToVerify));
+        state.dataGlobalNames->aDUNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->numAirDistUnits = static_cast<int>(state.dataGlobalNames->aDUNames.size());
     }
 }

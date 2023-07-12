@@ -1814,7 +1814,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
 
-    int constrNum = Util::FindItemInList(Util::MakeUPPERCase("Grouped Air Boundary"), state->dataConstruction->Construct);
+    int constrNum = Util::FindItemInList(Util::makeUPPER("Grouped Air Boundary"), state->dataConstruction->Construct);
     EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Grouped Air Boundary"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
@@ -1825,7 +1825,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_EQ(state->dataHeatBal->NominalRforNominalUCalculation(constrNum), 0.0);
 
     constrNum =
-        Util::FindItemInList(Util::MakeUPPERCase("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
+        Util::FindItemInList(Util::makeUPPER("Air Boundary with Good Mixing Schedule"), state->dataConstruction->Construct);
     EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);
@@ -1876,7 +1876,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     EXPECT_EQ(state->dataHeatBal->TotConstructs, 1);
 
     int constrNum =
-        Util::FindItemInList(Util::MakeUPPERCase("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
+        Util::FindItemInList(Util::makeUPPER("Air Boundary with Bad Mixing Schedule"), state->dataConstruction->Construct);
     EXPECT_TRUE(Util::SameString(state->dataConstruction->Construct(constrNum).Name, "Air Boundary with Bad Mixing Schedule"));
     EXPECT_TRUE(state->dataConstruction->Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(state->dataConstruction->Construct(constrNum).IsUsedCTF);

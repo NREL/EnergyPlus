@@ -327,7 +327,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) state.dataIPShortCut->cAlphaArgs(5) = "ZONE";
 
         PipeIndoorBoundaryType indoorType =
-            static_cast<PipeIndoorBoundaryType>(getEnumerationValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+            static_cast<PipeIndoorBoundaryType>(getEnumValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;

@@ -506,17 +506,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
     state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 1"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 1"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
     state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -608,17 +608,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
     state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
     state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -707,17 +707,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
     state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 1"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 1"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
     state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Zone 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Zone 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
@@ -809,17 +809,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
     state->dataViewFactor->EnclSolInfo.allocate(3);
     state->dataViewFactor->EnclRadInfo(1).Name = "Enclosure 1";
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 2"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(1).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).Name = "Enclosure 2";
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 4"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(2).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 5"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
     state->dataViewFactor->EnclRadInfo(3).Name = "Space 3";
     state->dataViewFactor->EnclRadInfo(3).spaceNums.push_back(
-        Util::FindItemInList(Util::MakeUPPERCase("Space 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
+        Util::FindItemInList(Util::makeUPPER("Space 3"), state->dataHeatBal->space, state->dataGlobal->numSpaces));
 
     ErrorsFound = false;
     HeatBalanceIntRadExchange::AlignInputViewFactors(*state, "ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);

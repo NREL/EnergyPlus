@@ -5740,13 +5740,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
 
     // Check surface order
-    int Zone1Surface1 = Util::FindItemInList(Util::MakeUPPERCase("Zone1-Surface1"), state->dataSurface->Surface);
-    int Zone1Surface2 = Util::FindItemInList(Util::MakeUPPERCase("Zone1-Surface2"), state->dataSurface->Surface);
-    int Zone2Surface1 = Util::FindItemInList(Util::MakeUPPERCase("Zone2-Surface1"), state->dataSurface->Surface);
-    int Zone3Surface1 = Util::FindItemInList(Util::MakeUPPERCase("Zone3-Surface1"), state->dataSurface->Surface);
-    int Zone1Floor = Util::FindItemInList(Util::MakeUPPERCase("Zone1-Floor"), state->dataSurface->Surface);
-    int Zone2Floor = Util::FindItemInList(Util::MakeUPPERCase("Zone2-Floor"), state->dataSurface->Surface);
-    int Zone3Floor = Util::FindItemInList(Util::MakeUPPERCase("Zone3-Floor"), state->dataSurface->Surface);
+    int Zone1Surface1 = Util::FindItemInList(Util::makeUPPER("Zone1-Surface1"), state->dataSurface->Surface);
+    int Zone1Surface2 = Util::FindItemInList(Util::makeUPPER("Zone1-Surface2"), state->dataSurface->Surface);
+    int Zone2Surface1 = Util::FindItemInList(Util::makeUPPER("Zone2-Surface1"), state->dataSurface->Surface);
+    int Zone3Surface1 = Util::FindItemInList(Util::makeUPPER("Zone3-Surface1"), state->dataSurface->Surface);
+    int Zone1Floor = Util::FindItemInList(Util::makeUPPER("Zone1-Floor"), state->dataSurface->Surface);
+    int Zone2Floor = Util::FindItemInList(Util::makeUPPER("Zone2-Floor"), state->dataSurface->Surface);
+    int Zone3Floor = Util::FindItemInList(Util::makeUPPER("Zone3-Floor"), state->dataSurface->Surface);
 
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst, Zone1Surface2);     // air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
@@ -8644,17 +8644,17 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     // Simulation Order (1-based):
     //  SHADING SURFACES:
     int siteShadeShadeFlatShadeSurface =
-        Util::FindItemInList(Util::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int mirSiteShadeFlatShadeSurface =
-        Util::FindItemInList("Mir-" + Util::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList("Mir-" + Util::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int buildingShadeTiltedShadeSurface =
-        Util::FindItemInList(Util::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::makeUPPER("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int mirBuildingShadeTiltedShadeSurface =
-        Util::FindItemInList("Mir-" + Util::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
+        Util::FindItemInList("Mir-" + Util::makeUPPER("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int zoneShadeLivingSouthShade001 =
-        Util::FindItemInList(Util::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::makeUPPER("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     int mirZoneShadeLivingSouthShade001 =
-        Util::FindItemInList("Mir-" + Util::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
+        Util::FindItemInList("Mir-" + Util::makeUPPER("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     EXPECT_EQ(siteShadeShadeFlatShadeSurface, 1);
     EXPECT_EQ(mirSiteShadeFlatShadeSurface, 2);
     EXPECT_EQ(buildingShadeTiltedShadeSurface, 3);
@@ -8663,20 +8663,20 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(mirZoneShadeLivingSouthShade001, 6);
 
     //  LIVING ZONE:
-    int wallLivingNorth = Util::FindItemInList(Util::MakeUPPERCase("Living:North"), state->dataSurface->Surface);
-    int wallLivingEast = Util::FindItemInList(Util::MakeUPPERCase("Living:East"), state->dataSurface->Surface);
-    int wallLivingSouth = Util::FindItemInList(Util::MakeUPPERCase("Living:South"), state->dataSurface->Surface);
-    int wallLivingWest = Util::FindItemInList(Util::MakeUPPERCase("Living:West"), state->dataSurface->Surface);
-    int wallLivingInterior = Util::FindItemInList(Util::MakeUPPERCase("Living:Interior"), state->dataSurface->Surface);
-    int floorLivingFloor = Util::FindItemInList(Util::MakeUPPERCase("Living:Floor"), state->dataSurface->Surface);
-    int ceilingLivingCeiling = Util::FindItemInList(Util::MakeUPPERCase("Living:Ceiling"), state->dataSurface->Surface);
-    int doorWestDoor = Util::FindItemInList(Util::MakeUPPERCase("WestDoor"), state->dataSurface->Surface);
+    int wallLivingNorth = Util::FindItemInList(Util::makeUPPER("Living:North"), state->dataSurface->Surface);
+    int wallLivingEast = Util::FindItemInList(Util::makeUPPER("Living:East"), state->dataSurface->Surface);
+    int wallLivingSouth = Util::FindItemInList(Util::makeUPPER("Living:South"), state->dataSurface->Surface);
+    int wallLivingWest = Util::FindItemInList(Util::makeUPPER("Living:West"), state->dataSurface->Surface);
+    int wallLivingInterior = Util::FindItemInList(Util::makeUPPER("Living:Interior"), state->dataSurface->Surface);
+    int floorLivingFloor = Util::FindItemInList(Util::makeUPPER("Living:Floor"), state->dataSurface->Surface);
+    int ceilingLivingCeiling = Util::FindItemInList(Util::makeUPPER("Living:Ceiling"), state->dataSurface->Surface);
+    int doorWestDoor = Util::FindItemInList(Util::makeUPPER("WestDoor"), state->dataSurface->Surface);
     int windowTubularDaylightingDiffuser1 =
-        Util::FindItemInList(Util::MakeUPPERCase("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
-    int windowNorthWindow = Util::FindItemInList(Util::MakeUPPERCase("NorthWindow"), state->dataSurface->Surface);
-    int windowEastWindow = Util::FindItemInList(Util::MakeUPPERCase("EastWindow"), state->dataSurface->Surface);
-    int windowSouthWindow = Util::FindItemInList(Util::MakeUPPERCase("SouthWindow"), state->dataSurface->Surface);
-    int windowWestWindow = Util::FindItemInList(Util::MakeUPPERCase("WestWindow"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::makeUPPER("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
+    int windowNorthWindow = Util::FindItemInList(Util::makeUPPER("NorthWindow"), state->dataSurface->Surface);
+    int windowEastWindow = Util::FindItemInList(Util::makeUPPER("EastWindow"), state->dataSurface->Surface);
+    int windowSouthWindow = Util::FindItemInList(Util::makeUPPER("SouthWindow"), state->dataSurface->Surface);
+    int windowWestWindow = Util::FindItemInList(Util::makeUPPER("WestWindow"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallLivingNorth, 7);
     EXPECT_EQ(wallLivingEast, 8);
@@ -8699,13 +8699,13 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(state->dataHeatBal->space(1).WindowSurfaceLast, 19);
 
     //  GARAGE ZONE:
-    int wallGarageInterior = Util::FindItemInList(Util::MakeUPPERCase("Garage:Interior"), state->dataSurface->Surface);
-    int wallGarageEast = Util::FindItemInList(Util::MakeUPPERCase("Garage:EastWall"), state->dataSurface->Surface);
-    int wallGarageWest = Util::FindItemInList(Util::MakeUPPERCase("Garage:WestWall"), state->dataSurface->Surface);
-    int wallGarageFrontDoor = Util::FindItemInList(Util::MakeUPPERCase("Garage:FrontDoor"), state->dataSurface->Surface);
-    int floorGarageFloor = Util::FindItemInList(Util::MakeUPPERCase("Garage:Floor"), state->dataSurface->Surface);
-    int ceilingGarageInterior = Util::FindItemInList(Util::MakeUPPERCase("Garage:Ceiling"), state->dataSurface->Surface);
-    int intmassEVChargingStation = Util::FindItemInList(Util::MakeUPPERCase("EVChargingStation"), state->dataSurface->Surface);
+    int wallGarageInterior = Util::FindItemInList(Util::makeUPPER("Garage:Interior"), state->dataSurface->Surface);
+    int wallGarageEast = Util::FindItemInList(Util::makeUPPER("Garage:EastWall"), state->dataSurface->Surface);
+    int wallGarageWest = Util::FindItemInList(Util::makeUPPER("Garage:WestWall"), state->dataSurface->Surface);
+    int wallGarageFrontDoor = Util::FindItemInList(Util::makeUPPER("Garage:FrontDoor"), state->dataSurface->Surface);
+    int floorGarageFloor = Util::FindItemInList(Util::makeUPPER("Garage:Floor"), state->dataSurface->Surface);
+    int ceilingGarageInterior = Util::FindItemInList(Util::makeUPPER("Garage:Ceiling"), state->dataSurface->Surface);
+    int intmassEVChargingStation = Util::FindItemInList(Util::makeUPPER("EVChargingStation"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallGarageInterior, 20);
     EXPECT_EQ(wallGarageEast, 21);
@@ -8722,21 +8722,21 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(state->dataHeatBal->space(2).WindowSurfaceLast, -1);
 
     //  ATTIC ZONE:
-    int wallEastGable = Util::FindItemInList(Util::MakeUPPERCase("EastGable"), state->dataSurface->Surface);
-    int wallWestGable = Util::FindItemInList(Util::MakeUPPERCase("WestGable"), state->dataSurface->Surface);
-    int wallNorthGable = Util::FindItemInList(Util::MakeUPPERCase("NorthGable"), state->dataSurface->Surface);
-    int floorAtticLivingFloor = Util::FindItemInList(Util::MakeUPPERCase("Attic:LivingFloor"), state->dataSurface->Surface);
-    int floorAtticGarageFloor = Util::FindItemInList(Util::MakeUPPERCase("Attic:GarageFloor"), state->dataSurface->Surface);
-    int roofNorthRoof1 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof1"), state->dataSurface->Surface);
-    int roofSouthRoof = Util::FindItemInList(Util::MakeUPPERCase("SouthRoof"), state->dataSurface->Surface);
-    int roofNorthRoof2 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof2"), state->dataSurface->Surface);
-    int roofNorthRoof3 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof3"), state->dataSurface->Surface);
-    int roofNorthRoof4 = Util::FindItemInList(Util::MakeUPPERCase("NorthRoof4"), state->dataSurface->Surface);
-    int roofEastRoof = Util::FindItemInList(Util::MakeUPPERCase("EastRoof"), state->dataSurface->Surface);
-    int roofWestRoof = Util::FindItemInList(Util::MakeUPPERCase("WestRoof"), state->dataSurface->Surface);
+    int wallEastGable = Util::FindItemInList(Util::makeUPPER("EastGable"), state->dataSurface->Surface);
+    int wallWestGable = Util::FindItemInList(Util::makeUPPER("WestGable"), state->dataSurface->Surface);
+    int wallNorthGable = Util::FindItemInList(Util::makeUPPER("NorthGable"), state->dataSurface->Surface);
+    int floorAtticLivingFloor = Util::FindItemInList(Util::makeUPPER("Attic:LivingFloor"), state->dataSurface->Surface);
+    int floorAtticGarageFloor = Util::FindItemInList(Util::makeUPPER("Attic:GarageFloor"), state->dataSurface->Surface);
+    int roofNorthRoof1 = Util::FindItemInList(Util::makeUPPER("NorthRoof1"), state->dataSurface->Surface);
+    int roofSouthRoof = Util::FindItemInList(Util::makeUPPER("SouthRoof"), state->dataSurface->Surface);
+    int roofNorthRoof2 = Util::FindItemInList(Util::makeUPPER("NorthRoof2"), state->dataSurface->Surface);
+    int roofNorthRoof3 = Util::FindItemInList(Util::makeUPPER("NorthRoof3"), state->dataSurface->Surface);
+    int roofNorthRoof4 = Util::FindItemInList(Util::makeUPPER("NorthRoof4"), state->dataSurface->Surface);
+    int roofEastRoof = Util::FindItemInList(Util::makeUPPER("EastRoof"), state->dataSurface->Surface);
+    int roofWestRoof = Util::FindItemInList(Util::makeUPPER("WestRoof"), state->dataSurface->Surface);
     int nonwindowTubularDaylightingDome1 =
-        Util::FindItemInList(Util::MakeUPPERCase("TubularDaylightingDome1"), state->dataSurface->Surface);
-    int windowAtticSkylight = Util::FindItemInList(Util::MakeUPPERCase("AtticSkylight"), state->dataSurface->Surface);
+        Util::FindItemInList(Util::makeUPPER("TubularDaylightingDome1"), state->dataSurface->Surface);
+    int windowAtticSkylight = Util::FindItemInList(Util::makeUPPER("AtticSkylight"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallEastGable, 27);
     EXPECT_EQ(wallWestGable, 28);
@@ -11074,7 +11074,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleChecks)
     static constexpr std::array<bool, 8> isTransparent{false, true, false, false, false, true, false, false};
 
     for (int surf = 0; surf < 8; ++surf) {
-        int surfNum = Util::FindItemInList(Util::MakeUPPERCase(surfacenames[surf]), state->dataSurface->Surface);
+        int surfNum = Util::FindItemInList(Util::makeUPPER(surfacenames[surf]), state->dataSurface->Surface);
         EXPECT_EQ(state->dataSurface->Surface(surfNum).IsTransparent, isTransparent[surf]);
     }
     EXPECT_TRUE(state->dataSolarShading->anyScheduledShadingSurface);
@@ -11330,4 +11330,68 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleOutOfRange)
 
     compare_err_stream(error_string);
     // compare_err_stream( "" ); // just for debugging
+}
+
+TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Test)
+{
+    // Unit Test for Pull Request 9905 that fixes a few potential problems described Issue 9893
+    SurfaceData BaseSurface;
+    SurfaceData SubSurface;
+    bool surfaceError;
+
+    // Test Base surf and subsurf normal vectors assignment
+    surfaceError = false;
+
+    BaseSurface.Vertex.dimension(4);
+
+    BaseSurface.Vertex = {
+        DataVectorTypes::Vector(0, 0, 0), DataVectorTypes::Vector(1, 0, 0), DataVectorTypes::Vector(1, 1, 0), DataVectorTypes::Vector(0, 1, 0)};
+    Vectors::CreateNewellSurfaceNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size(), BaseSurface.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
+                                     BaseSurface.Azimuth,
+                                     BaseSurface.Tilt,
+                                     BaseSurface.lcsx,
+                                     BaseSurface.lcsy,
+                                     BaseSurface.lcsz,
+                                     BaseSurface.NewellSurfaceNormalVector);
+
+    SubSurface.Vertex.dimension(4);
+
+    SubSurface.Vertex = {DataVectorTypes::Vector(0, 0, 0),
+                         DataVectorTypes::Vector(1, 0, 0),
+                         DataVectorTypes::Vector(1, 1, 0.0003),
+                         DataVectorTypes::Vector(0, 1, 0.0003)};
+    Vectors::CreateNewellSurfaceNormalVector(SubSurface.Vertex, SubSurface.Vertex.size(), SubSurface.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
+                                     SubSurface.Azimuth,
+                                     SubSurface.Tilt,
+                                     SubSurface.lcsx,
+                                     SubSurface.lcsy,
+                                     SubSurface.lcsz,
+                                     SubSurface.NewellSurfaceNormalVector);
+
+    bool sameSurfNormal(false);
+
+    // This is the sameSurfNormal test used in checkSubSurfAzTiltNorm()
+    Vectors::CompareTwoVectors(BaseSurface.NewellSurfaceNormalVector, SubSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+
+    // The surface normals are not exactly the same
+    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.y - SubSurface.NewellSurfaceNormalVector.y), 1e-5);
+    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.z - SubSurface.NewellSurfaceNormalVector.z), 1e-10);
+
+    // But should pass the sameSurfNormal test
+    EXPECT_TRUE(sameSurfNormal);
+
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
+
+    // These should pass
+    EXPECT_FALSE(surfaceError);
+    EXPECT_FALSE(has_err_output());
+
+    // Without the fix in PR 9905 the following would fail since they are not assigned to be exactly the same
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.z, SubSurface.lcsz.z);
+    // The following two lines might pass in the original code, but probably not a consistent outcome
+    // In the new code (after PR 9905 fix, they should be consistently passing the tests
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.y, SubSurface.lcsz.y);
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.x, SubSurface.lcsz.x);
 }

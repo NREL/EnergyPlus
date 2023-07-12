@@ -422,7 +422,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
         } else {
             Remainder = stripped(Line.substr(Pos + 1));
         }
-        //    Keyword = Util::MakeUPPERCase(Line(1:Pos-1))
+        //    Keyword = Util::makeUPPER(Line(1:Pos-1))
         Keyword = Line.substr(0, Pos);
 
         // the functionality in each block of this parser structure is so different that a regular IF block seems reasonable
@@ -467,8 +467,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             } else {
                 Pos = scan(Remainder, ' ');
                 if (Pos == std::string::npos) Pos = Remainder.length();
-                Variable =
-                    Util::MakeUPPERCase(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
+                Variable = Util::makeUPPER(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
                 StackNum2 = Util::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
                 if (StackNum2 == 0) {
                     AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
@@ -3850,7 +3849,7 @@ int FindEMSVariable(EnergyPlusData &state,
     int TrendVarNum;
 
     Found = false;
-    std::string const UppercaseName = Util::MakeUPPERCase(VariableName);
+    std::string const UppercaseName = Util::makeUPPER(VariableName);
 
     // check in ErlVariables
     for (VariableNum = 1; VariableNum <= state.dataRuntimeLang->NumErlVariables; ++VariableNum) {
@@ -3904,7 +3903,7 @@ int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int c
 
         // Add the new variable
         VariableNum = state.dataRuntimeLang->NumErlVariables;
-        state.dataRuntimeLang->ErlVariable(VariableNum).Name = Util::MakeUPPERCase(VariableName);
+        state.dataRuntimeLang->ErlVariable(VariableNum).Name = Util::makeUPPER(VariableName);
         state.dataRuntimeLang->ErlVariable(VariableNum).StackNum = StackNum;
         state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type = Value::Number; // ErlVariable values are numbers
     }

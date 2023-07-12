@@ -486,7 +486,7 @@ namespace VentilatedSlab {
             ventSlab.OutAirVolFlow = state.dataIPShortCut->rNumericArgs(3);
 
             ventSlab.outsideAirControlType = static_cast<OutsideAirControlType>(
-                getEnumerationValue(OutsideAirControlTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+                getEnumValue(OutsideAirControlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
             switch (ventSlab.outsideAirControlType) {
             case OutsideAirControlType::VariablePercent: {
@@ -564,7 +564,7 @@ namespace VentilatedSlab {
 
             // System Configuration:
             ventSlab.SysConfg = static_cast<VentilatedSlabConfig>(
-                getEnumerationValue(VentilatedSlabConfigNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+                getEnumValue(VentilatedSlabConfigNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
 
             if (ventSlab.SysConfg == VentilatedSlabConfig::Invalid) {
                 ShowSevereError(
@@ -610,8 +610,8 @@ namespace VentilatedSlab {
             }
 
             // Process the temperature control type
-            ventSlab.controlType = static_cast<ControlType>(
-                getEnumerationValue(ControlTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+            ventSlab.controlType =
+                static_cast<ControlType>(getEnumValue(ControlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
 
             if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(
@@ -987,7 +987,7 @@ namespace VentilatedSlab {
             // Coil options assign
 
             ventSlab.coilOption =
-                static_cast<CoilType>(getEnumerationValue(CoilTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(26))));
+                static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(26))));
 
             if (ventSlab.coilOption == CoilType::Invalid) {
                 ShowSevereError(
@@ -1016,7 +1016,7 @@ namespace VentilatedSlab {
                     errFlag = false;
 
                     ventSlab.hCoilType = static_cast<HeatingCoilType>(
-                        getEnumerationValue(HeatingCoilTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(27))));
+                        getEnumValue(HeatingCoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(27))));
 
                     switch (ventSlab.hCoilType) {
 
@@ -1132,8 +1132,7 @@ namespace VentilatedSlab {
                     errFlag = false;
 
                     ventSlab.cCoilType = static_cast<CoolingCoilType>(
-                        getEnumerationValue(CoolingCoilTypeNamesUC, Util::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(30))));
-
+                        getEnumValue(CoolingCoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(30))));
                     switch (ventSlab.cCoilType) {
                     case CoolingCoilType::WaterCooling: {
                         ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
@@ -1561,12 +1560,13 @@ namespace VentilatedSlab {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::VentilatedSlab).ZoneCompAvailMgrs(Item);
             if (state.dataVentilatedSlab->MyZoneEqFlag(Item)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).AvailManagerListName = ventSlab.AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).ZoneNum = VentSlabZoneNum;
+                availMgr.AvailManagerListName = ventSlab.AvailManagerListName;
+                availMgr.ZoneNum = VentSlabZoneNum;
                 state.dataVentilatedSlab->MyZoneEqFlag(Item) = false;
             }
-            ventSlab.AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::VentilatedSlab).ZoneCompAvailMgrs(Item).AvailStatus;
+            ventSlab.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataVentilatedSlab->MyPlantScanFlag(Item) && allocated(state.dataPlnt->PlantLoop)) {

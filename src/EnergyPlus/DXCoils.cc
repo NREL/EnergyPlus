@@ -1727,17 +1727,17 @@ void GetDXCoils(EnergyPlusData &state)
                         if (lAlphaBlanks2(7)) {
                             thisDXCoil.CondenserInletNodeNum(PerfModeNum) = 0;
                         } else {
-                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) = GetOnlySingleNode(
-                                state,
-                                Alphas2(7),
-                                ErrorsFound,
-                                (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                                        Util::MakeUPPERCase(PerfObjectType)),
-                                PerfObjectName,
-                                DataLoopNode::NodeFluidType::Air,
-                                DataLoopNode::ConnectionType::OutsideAirReference,
-                                NodeInputManager::CompFluidStream::Primary,
-                                ObjectIsNotParent);
+                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) =
+                                GetOnlySingleNode(state,
+                                                  Alphas2(7),
+                                                  ErrorsFound,
+                                                  (DataLoopNode::ConnectionObjectType)getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                                                                                                   Util::makeUPPER(PerfObjectType)),
+                                                  PerfObjectName,
+                                                  DataLoopNode::NodeFluidType::Air,
+                                                  DataLoopNode::ConnectionType::OutsideAirReference,
+                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  ObjectIsNotParent);
                             if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(PerfModeNum))) {
                                 ShowWarningError(state, format("{}{}=\"{}\":", RoutineName, PerfObjectType, PerfObjectName));
                                 ShowContinueError(state, format("may not be valid {}=\"{}\".", cAlphaFields2(7), Alphas2(7)));
@@ -4017,7 +4017,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A12; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Alphas(12)));
+        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Alphas(12)));
 
         thisDXCoil.NumOfSpeeds = Numbers(6); // Number of speeds
         if (thisDXCoil.NumOfSpeeds < 2) {
@@ -4521,7 +4521,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A9; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Alphas(9)));
+        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Alphas(9)));
 
         thisDXCoil.RegionNum = Numbers(8);   // Region Number for HSPF Calc
         thisDXCoil.NumOfSpeeds = Numbers(9); // Number of speeds
@@ -15504,7 +15504,7 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
     DXCoolingCoilIndex = 0;
 
     DataLoopNode::ConnectionObjectType HeatingCoilTypeNum = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::MakeUPPERCase(HeatingCoilType)));
+        getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::makeUPPER(HeatingCoilType)));
 
     DataLoopNode::ConnectionObjectType CompSetsParentType; // Parent object type which uses DX heating coil pass into this function
     std::string CompSetsParentName;
