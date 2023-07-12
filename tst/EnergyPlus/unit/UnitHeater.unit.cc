@@ -1350,8 +1350,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataGlobal->DoingSizing = true;
 
-    state->dataHVACGlobal->ZoneCompTurnFansOn = true;
-    state->dataHVACGlobal->ZoneCompTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);

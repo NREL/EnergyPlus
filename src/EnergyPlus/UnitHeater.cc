@@ -762,8 +762,6 @@ namespace UnitHeater {
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
@@ -934,8 +932,9 @@ namespace UnitHeater {
 
         state.dataUnitHeaters->SetMassFlowRateToZero = false;
         if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) > 0) {
-            if ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) &&
-                !ZoneCompTurnFansOff) {
+            if ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) > 0 ||
+                 state.dataHVACGlobal->TurnFansOn) &&
+                !state.dataHVACGlobal->TurnFansOff) {
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOffNoHeating &&
                     ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP < SmallLoad) ||
                      (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)))) {
@@ -1498,8 +1497,6 @@ namespace UnitHeater {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::FanType_SimpleOnOff;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -1544,8 +1541,9 @@ namespace UnitHeater {
         if (OpMode != CycFanCycCoil) {
 
             if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) <= 0 ||
-                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) ||
-                 ZoneCompTurnFansOff)) {
+                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 &&
+                  !state.dataHVACGlobal->TurnFansOn) ||
+                 state.dataHVACGlobal->TurnFansOff)) {
                 // Case 1: OFF-->unit schedule says that it it not available
                 //         OR child fan in not available OR child fan not being cycled ON by sys avail manager
                 //         OR child fan being forced OFF by sys avail manager
@@ -1686,8 +1684,9 @@ namespace UnitHeater {
         } else { // OnOff fan and cycling
             if ((state.dataUnitHeaters->QZnReq < SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
                 GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) <= 0 ||
-                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) ||
-                 ZoneCompTurnFansOff)) {
+                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 &&
+                  !state.dataHVACGlobal->TurnFansOn) ||
+                 state.dataHVACGlobal->TurnFansOff)) {
                 // Case 1: OFF-->unit schedule says that it it not available
                 //         OR child fan in not available OR child fan not being cycled ON by sys avail manager
                 //         OR child fan being forced OFF by sys avail manager
@@ -1765,11 +1764,11 @@ namespace UnitHeater {
     }
 
     void CalcUnitHeaterComponents(EnergyPlusData &state,
-                                  int const UnitHeatNum,                          // Unit index in unit heater array
-                                  bool const FirstHVACIteration,                  // flag for 1st HVAV iteration in the time step
-                                  Real64 &LoadMet,                                // load met by unit (watts)
-                                  ObjexxFCL::Optional_int_const OpMode,           // fan operating mode
-                                  ObjexxFCL::Optional<Real64 const> PartLoadRatio // part-load ratio
+                                  int const UnitHeatNum,         // Unit index in unit heater array
+                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
+                                  Real64 &LoadMet,               // load met by unit (watts)
+                                  int const OpMode,              // fan operating mode
+                                  Real64 const PartLoadRatio     // part-load ratio
     )
     {
 
@@ -1790,50 +1789,33 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleOnOff;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AirMassFlow;  // total mass flow through the unit
-        Real64 CpAirZn;      // specific heat of dry air at zone conditions (zone conditions same as unit inlet)
-        int HCoilInAirNode;  // inlet node number for fan exit/coil inlet
-        int InletNode;       // unit air inlet node
-        int OutletNode;      // unit air outlet node
-        Real64 QCoilReq;     // Heat addition required from an electric/gas heating coil
-        Real64 mdot;         // local temporary for fluid mass flow rate
-        int FanOpMode;       // Fan operting mode or fan type
-        Real64 PartLoadFrac; // part-load ratio
+        Real64 AirMassFlow; // total mass flow through the unit
+        Real64 CpAirZn;     // specific heat of dry air at zone conditions (zone conditions same as unit inlet)
+        int HCoilInAirNode; // inlet node number for fan exit/coil inlet
+        int InletNode;      // unit air inlet node
+        int OutletNode;     // unit air outlet node
+        Real64 QCoilReq;    // Heat addition required from an electric/gas heating coil
+        Real64 mdot;        // local temporary for fluid mass flow rate
 
         InletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
         OutletNode = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
         QCoilReq = 0.0;
 
-        if (present(PartLoadRatio)) {
-            PartLoadFrac = PartLoadRatio;
-        } else {
-            PartLoadFrac = 1.0;
-        }
-        if (present(OpMode)) {
-            FanOpMode = OpMode;
-        } else {
-            FanOpMode = ContFanCycCoil;
-        }
-        if (FanOpMode != CycFanCycCoil) {
+        if (OpMode != CycFanCycCoil) {
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index,
-                                            _,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, _);
             }
 
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
@@ -1898,7 +1880,7 @@ namespace UnitHeater {
 
         } else { // OnOff fan cycling
 
-            state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateMax * PartLoadFrac;
+            state.dataLoopNodes->Node(InletNode).MassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRateMax * PartLoadRatio;
             AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             // Set the fan inlet node maximum available mass flow rates for cycling fans
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
@@ -1909,12 +1891,9 @@ namespace UnitHeater {
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index,
-                                            _,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, _);
             }
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
 
@@ -1930,7 +1909,7 @@ namespace UnitHeater {
                         state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                             (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
                                                              state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadFrac;
+                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadRatio;
                 }
                 if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
                 SetComponentFlowRate(state,
@@ -1943,8 +1922,8 @@ namespace UnitHeater {
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
                                             QCoilReq,
-                                            FanOpMode,
-                                            PartLoadFrac);
+                                            OpMode,
+                                            PartLoadRatio);
                 break;
             }
             case HCoilType::SteamCoil: {
@@ -1958,7 +1937,7 @@ namespace UnitHeater {
                         state.dataUnitHeaters->QZnReq - state.dataLoopNodes->Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                             (state.dataLoopNodes->Node(HCoilInAirNode).Temp -
                                                              state.dataLoopNodes->Node(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode).Temp);
-                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadFrac;
+                    mdot = state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadRatio;
                 }
                 if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
                 SetComponentFlowRate(state,
@@ -1972,8 +1951,8 @@ namespace UnitHeater {
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
                                             QCoilReq,
                                             _,
-                                            FanOpMode,
-                                            PartLoadFrac);
+                                            OpMode,
+                                            PartLoadRatio);
                 break;
             }
             case HCoilType::Electric:
@@ -1997,8 +1976,8 @@ namespace UnitHeater {
                                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoil_Index,
                                               _,
                                               _,
-                                              FanOpMode,
-                                              PartLoadFrac);
+                                              OpMode,
+                                              PartLoadRatio);
                 break;
             }
             default:

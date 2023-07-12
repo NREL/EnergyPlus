@@ -409,10 +409,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -421,10 +421,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -447,10 +447,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
@@ -591,10 +591,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -603,10 +603,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -615,10 +615,10 @@ namespace WaterToAirHeatPump {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatPump.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms

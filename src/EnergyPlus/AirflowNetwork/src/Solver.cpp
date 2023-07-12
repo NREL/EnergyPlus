@@ -1777,7 +1777,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 OccupantVentilationControl(i).Name = Alphas(1); // Name of object
                 OccupantVentilationControl(i).MinOpeningTime = Numbers(1);
                 if (OccupantVentilationControl(i).MinOpeningTime < 0.0) {
@@ -2317,7 +2316,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 MultizoneZoneData(i).ZoneName = Alphas(1);                          // Name of Associated EnergyPlus Thermal Zone
                 if (!lAlphaBlanks(2)) MultizoneZoneData(i).VentControl = Alphas(2); // Ventilation Control Mode: "Temperature", "Enthalpy",
                 // "ASHRAE55ADAPTIVE", "CEN15251AdaptiveComfort,
@@ -2564,7 +2562,6 @@ namespace AirflowNetwork {
                                                                                lAlphaBlanks,
                                                                                cAlphaFields,
                                                                                cNumericFields);
-                    UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                     MultizoneExternalNodeData(i).Name = Alphas(1);    // Name of external node
                     MultizoneExternalNodeData(i).height = Numbers(1); // Nodal height
                     if (UtilityRoutines::SameString(simulation_control.HeightOption, "ExternalNode") && lNumericBlanks(1)) {
@@ -2616,7 +2613,6 @@ namespace AirflowNetwork {
                                                                                    lAlphaBlanks,
                                                                                    cAlphaFields,
                                                                                    cNumericFields);
-                        UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                         // HACK: Need to verify name is unique between "OutdoorAir:Node" and "AirflowNetwork:MultiZone:ExternalNode"
 
                         if (NumAlphas > 5 && !lAlphaBlanks(6)) { // Wind pressure curve
@@ -2694,7 +2690,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 MultizoneSurfaceData(i).SurfName = Alphas(1);    // Name of Associated EnergyPlus surface
                 MultizoneSurfaceData(i).OpeningName = Alphas(2); // Name of crack or opening component,
                 // either simple or detailed large opening, or crack
@@ -3621,7 +3616,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 IntraZoneNodeData(i).Name = Alphas(1);         // Name of node
                 IntraZoneNodeData(i).RAFNNodeName = Alphas(2); // Name of RoomAir node
                 IntraZoneNodeData(i).Height = Numbers(1);      // Nodal height
@@ -3698,7 +3692,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 IntraZoneLinkageData(i).Name = Alphas(1); // Name of linkage
                 IntraZoneLinkageData(i).NodeNames[0] = Alphas(2);
                 IntraZoneLinkageData(i).NodeHeights[0] = 0.0;
@@ -3929,7 +3922,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 DisSysNodeData(i).Name = Alphas(1);      // Name of node
                 DisSysNodeData(i).EPlusName = Alphas(2); // Name of associated EnergyPlus node
                 DisSysNodeData(i).EPlusType = Alphas(3); // Name of associated EnergyPlus type
@@ -3996,7 +3988,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
                 auto &this_VF_object(AirflowNetworkLinkageViewFactorData(i));
 
@@ -4109,7 +4100,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 PressureControllerData(i).Name = Alphas(1);     // Object Name
                 PressureControllerData(i).ZoneName = Alphas(2); // Zone name
                 PressureControllerData(i).ZoneNum = UtilityRoutines::FindItemInList(Alphas(2), Zone);
@@ -4867,7 +4857,6 @@ namespace AirflowNetwork {
                                                                            lAlphaBlanks,
                                                                            cAlphaFields,
                                                                            cNumericFields);
-                UtilityRoutines::IsNameEmpty(m_state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 AirflowNetworkLinkageData(count).Name = Alphas(1);
                 AirflowNetworkLinkageData(count).NodeNames[0] = Alphas(2);
                 AirflowNetworkLinkageData(count).NodeHeights[0] = 0.0;
@@ -6792,7 +6781,7 @@ namespace AirflowNetwork {
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
-        Btwxt::setMessageCallback(Curve::BtwxtMessageCallback, &callbackPair);
+        state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
 
         int CurveNum = static_cast<int>(state.dataCurveManager->PerfCurve.size()) + 1;
         state.dataCurveManager->PerfCurve.push_back(new Curve::Curve());
@@ -6954,9 +6943,9 @@ namespace AirflowNetwork {
 
         std::vector<Real64> dirs30 = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360};
         std::vector<Btwxt::GridAxis> dirs30Axes;
-        dirs30Axes.emplace_back(dirs30, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
+        dirs30Axes.emplace_back(dirs30, "", Btwxt::Method::linear, Btwxt::Method::linear, std::pair<double, double>{0.0, 360.0});
 
-        auto dirs30GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
+        auto dirs30GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("30 Degree Increments", dirs30Axes);
 
         if (AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
             // Create the array of wind directions
@@ -7098,9 +7087,9 @@ namespace AirflowNetwork {
                                           190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360};
 
             std::vector<Btwxt::GridAxis> dirs10Axes;
-            dirs10Axes.emplace_back(dirs10, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
+            dirs10Axes.emplace_back(dirs10, "", Btwxt::Method::linear, Btwxt::Method::linear, std::pair<double, double>{0.0, 360.0});
 
-            auto dirs10GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
+            auto dirs10GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("10 Degree Increments", dirs10Axes);
 
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity

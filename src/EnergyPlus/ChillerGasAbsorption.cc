@@ -61,6 +61,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -318,7 +319,6 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
         // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
         GlobalNames::VerifyUniqueChillerName(
@@ -514,9 +514,9 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(17);
 
         // Validate fuel type input
-        bool FuelTypeError(false);
-        UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
-        if (FuelTypeError) {
+        thisChiller.FuelType =
+            static_cast<Constant::eResource>(getEnumerationValue(Constant::eResourceNamesUC, state.dataIPShortCut->cAlphaArgs(17)));
+        if (thisChiller.FuelType == Constant::eResource::Invalid) {
             ShowSevereError(state, format("{}=\"{}\", invalid value", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17)));
             ShowContinueError(
@@ -532,6 +532,8 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 
 void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
 {
+    std::string_view const sFuelType = Constant::eResourceNames[static_cast<int>(this->FuelType)];
+
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Cooling Rate",
                         OutputProcessor::Unit::W,
@@ -546,10 +548,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -566,10 +568,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "BOILERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -586,14 +588,14 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
-                        "Chiller Heater " + this->FuelType + " Rate",
+                        format("Chiller Heater {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->FuelUseRate,
                         OutputProcessor::SOVTimeStepType::System,
@@ -601,7 +603,7 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         this->Name);
     // Do not include this on meters, this would duplicate the cool fuel and heat fuel
     SetupOutputVariable(state,
-                        "Chiller Heater " + this->FuelType + " Energy",
+                        format("Chiller Heater {} Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->FuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
@@ -609,23 +611,23 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Chiller Heater Cooling " + this->FuelType + " Rate",
+                        format("Chiller Heater Cooling {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->CoolFuelUseRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        "Chiller Heater Cooling " + this->FuelType + " Energy",
+                        format("Chiller Heater Cooling {} Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->CoolFuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
-                        this->FuelType,
+                        {},
+                        sFuelType,
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -637,23 +639,23 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Chiller Heater Heating " + this->FuelType + " Rate",
+                        format("Chiller Heater Heating {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->HeatFuelUseRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        "Chiller Heater Heating " + this->FuelType + " Energy",
+                        format("Chiller Heater Heating {} Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->HeatFuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
-                        this->FuelType,
+                        {},
+                        sFuelType,
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -686,10 +688,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "Cooling",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -706,10 +708,10 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "Electricity",
                         "Heating",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,

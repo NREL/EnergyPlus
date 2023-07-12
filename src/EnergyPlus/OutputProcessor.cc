@@ -398,7 +398,7 @@ namespace OutputProcessor {
         }
     }
 
-    ReportingFrequency determineFrequency(EnergyPlusData &state, const std::string &FreqString)
+    ReportingFrequency determineFrequency(EnergyPlusData &state, const std::string_view FreqString)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1437,7 +1437,7 @@ namespace OutputProcessor {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2006
-        //       MODIFIED       na
+        //       MODIFIED       Dareum Nam, April 2023, revised the function by using enumaration value
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -1445,158 +1445,17 @@ namespace OutputProcessor {
         // the standard resource type.
 
         ErrorsFound = false;
+        std::string const meterType = UtilityRoutines::MakeUPPERCase(UserInputResourceType);
 
-        // Basic ResourceType for Meters
-        {
-            std::string const &meterType = UserInputResourceType;
+        int eMeterResource = getEnumerationValue(Constant::eResourceNamesUC, meterType);
 
-            if (meterType == "ELECTRICITY") {
-                OutResourceType = "Electricity";
-
-            } else if (meterType == "NATURALGAS") {
-                OutResourceType = "NaturalGas";
-
-            } else if (meterType == "GASOLINE") {
-                OutResourceType = "Gasoline";
-
-            } else if (meterType == "DIESEL") {
-                OutResourceType = "Diesel";
-
-            } else if (meterType == "COAL") {
-                OutResourceType = "Coal";
-
-            } else if (meterType == "FUELOILNO1") {
-                OutResourceType = "FuelOilNo1";
-
-            } else if (meterType == "FUELOILNO2") {
-                OutResourceType = "FuelOilNo2";
-
-            } else if (meterType == "PROPANE") {
-                OutResourceType = "Propane";
-
-            } else if (meterType == "WATER" || meterType == "H2O") {
-                OutResourceType = "Water"; // this is water "use"
-
-            } else if (meterType == "ONSITEWATER" || meterType == "WATERPRODUCED" || meterType == "ONSITE WATER") {
-                OutResourceType = "OnSiteWater"; // these are for supply record keeping
-
-            } else if (meterType == "MAINSWATER" || meterType == "WATERSUPPLY") {
-                OutResourceType = "MainsWater"; // record keeping
-
-            } else if (meterType == "RAINWATER" || meterType == "PRECIPITATION") {
-                OutResourceType = "RainWater"; // record keeping
-
-            } else if (meterType == "WELLWATER" || meterType == "GROUNDWATER") {
-                OutResourceType = "WellWater"; // record keeping
-
-            } else if (meterType == "CONDENSATE") {
-                OutResourceType = "Condensate"; // record keeping
-
-            } else if (meterType == "ENERGYTRANSFER" || meterType == "ENERGYXFER" || meterType == "XFER") {
-                OutResourceType = "EnergyTransfer";
-
-            } else if (meterType == "STEAM") {
-                OutResourceType = "Steam";
-
-            } else if (meterType == "DISTRICTCOOLING") {
-                OutResourceType = "DistrictCooling";
-
-            } else if (meterType == "DISTRICTHEATING") {
-                OutResourceType = "DistrictHeating";
-
-            } else if (meterType == "ELECTRICITYPRODUCED") {
-                OutResourceType = "ElectricityProduced";
-
-            } else if (meterType == "ELECTRICITYPURCHASED") {
-                OutResourceType = "ElectricityPurchased";
-
-            } else if (meterType == "ELECTRICITYSURPLUSSOLD") {
-                OutResourceType = "ElectricitySurplusSold";
-
-            } else if (meterType == "ELECTRICITYNET") {
-                OutResourceType = "ElectricityNet";
-
-            } else if (meterType == "SOLARWATER") {
-                OutResourceType = "SolarWater";
-
-            } else if (meterType == "SOLARAIR") {
-                OutResourceType = "SolarAir";
-
-            } else if (meterType == "SO2") {
-                OutResourceType = "SO2";
-
-            } else if (meterType == "NOX") {
-                OutResourceType = "NOx";
-
-            } else if (meterType == "N2O") {
-                OutResourceType = "N2O";
-
-            } else if (meterType == "PM") {
-                OutResourceType = "PM";
-
-            } else if (meterType == "PM2.5") {
-                OutResourceType = "PM2.5";
-
-            } else if (meterType == "PM10") {
-                OutResourceType = "PM10";
-
-            } else if (meterType == "CO") {
-                OutResourceType = "CO";
-
-            } else if (meterType == "CO2") {
-                OutResourceType = "CO2";
-
-            } else if (meterType == "CH4") {
-                OutResourceType = "CH4";
-
-            } else if (meterType == "NH3") {
-                OutResourceType = "NH3";
-
-            } else if (meterType == "NMVOC") {
-                OutResourceType = "NMVOC";
-
-            } else if (meterType == "HG") {
-                OutResourceType = "Hg";
-
-            } else if (meterType == "PB") {
-                OutResourceType = "Pb";
-
-            } else if (meterType == "NUCLEAR HIGH") {
-                OutResourceType = "Nuclear High";
-
-            } else if (meterType == "NUCLEAR LOW") {
-                OutResourceType = "Nuclear Low";
-
-            } else if (meterType == "WATERENVIRONMENTALFACTORS") {
-                OutResourceType = "WaterEnvironmentalFactors";
-
-            } else if (meterType == "CARBON EQUIVALENT") {
-                OutResourceType = "Carbon Equivalent";
-
-            } else if (meterType == "SOURCE") {
-                OutResourceType = "Source";
-
-            } else if (meterType == "PLANTLOOPHEATINGDEMAND") {
-                OutResourceType = "PlantLoopHeatingDemand";
-
-            } else if (meterType == "PLANTLOOPCOOLINGDEMAND") {
-                OutResourceType = "PlantLoopCoolingDemand";
-
-            } else if (meterType == "GENERIC") { // only used by custom meters
-                OutResourceType = "Generic";
-
-            } else if (meterType == "OTHERFUEL1") { // other fuel type (defined by user)
-                OutResourceType = "OtherFuel1";
-
-            } else if (meterType == "OTHERFUEL2") { // other fuel type (defined by user)
-                OutResourceType = "OtherFuel2";
-
-            } else {
-                ShowSevereError(state,
-                                format("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered={}", UserInputResourceType));
-                ErrorsFound = true;
-            }
+        if (eMeterResource == static_cast<int>(Constant::eResource::Invalid)) {
+            ShowSevereError(state, format("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered={}", UserInputResourceType));
+            ErrorsFound = true;
+            return;
         }
+
+        OutResourceType = Constant::eResourceNames[eMeterResource];
     }
 
     void AddMeter(EnergyPlusData &state,
@@ -4488,17 +4347,17 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq,            // Internal use -- causes reporting at this frequency
-                         ObjexxFCL::Optional_string_const ResourceTypeKey,       // Meter Resource Type (Electricity, Gas, etc)
-                         ObjexxFCL::Optional_string_const EndUseKey,             // Meter End Use Key (Lights, Heating, Cooling, etc)
-                         ObjexxFCL::Optional_string_const EndUseSubKey,          // Meter End Use Sub Key (General Lights, Task Lights, etc)
-                         ObjexxFCL::Optional_string_const GroupKey,              // Meter Super Group Key (Building, System, Plant)
-                         ObjexxFCL::Optional_string_const ZoneKey,               // Meter Zone Key (zone name)
-                         ObjexxFCL::Optional_int_const ZoneMult,                 // Zone Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const ZoneListMult,             // Zone List Multiplier, defaults to 1
-                         ObjexxFCL::Optional_int_const indexGroupKey,            // Group identifier for SQL output
-                         ObjexxFCL::Optional_string_const customUnitName,        // the custom name for the units from EMS definition of units
-                         ObjexxFCL::Optional_string_const SpaceType              // Space type (applicable for Building group only)
+                         std::string_view const ReportFreq,                      // Internal use -- causes reporting at this frequency
+                         std::string_view const ResourceTypeKey,                 // Meter Resource Type (Electricity, Gas, etc)
+                         std::string_view const EndUseKey,                       // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey,                    // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         std::string_view const GroupKey,                        // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey,                         // Meter Zone Key (zone name)
+                         int const ZoneMult,                                     // Zone Multiplier, defaults to 1
+                         int const ZoneListMult,                                 // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey,                                // Group identifier for SQL output
+                         std::string_view const customUnitName,                  // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType                        // Space type (applicable for Building group only)
 )
 {
 
@@ -4531,7 +4390,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     std::string Group;        // Will hold value of GroupKey
     std::string zoneName;     // Will hold value of ZoneKey
     std::string spaceType;    // Will hold value of SpaceType
-    int localIndexGroupKey;
     auto &op = state.dataOutputProcessor;
 
     if (!op->OutputInitialized) InitializeOutput(state);
@@ -4548,7 +4406,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // If ReportFreq present, overrides input
-    if (present(ReportFreq)) {
+    if (!ReportFreq.empty()) {
         RepFreq = determineFrequency(state, ReportFreq);
         op->NumExtraVars = 1;
         op->ReportList = 0;
@@ -4564,43 +4422,43 @@ void SetupOutputVariable(EnergyPlusData &state,
 
         if (Loop == 1) {
             OnMeter = false;
-            if (present(ResourceTypeKey)) {
+            if (!ResourceTypeKey.empty()) {
                 ResourceType = ResourceTypeKey;
                 OnMeter = true;
             } else {
                 ResourceType = "";
             }
-            if (present(EndUseKey)) {
+            if (!EndUseKey.empty()) {
                 EndUse = EndUseKey;
                 OnMeter = true;
             } else {
                 EndUse = "";
             }
-            if (present(EndUseSubKey)) {
+            if (!EndUseSubKey.empty()) {
                 EndUseSub = EndUseSubKey;
                 OnMeter = true;
             } else {
                 EndUseSub = "";
-                if (present(EndUseKey)) {
+                if (!EndUseKey.empty()) {
                     if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(std::string{EndUseKey})) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }
                 }
             }
-            if (present(GroupKey)) {
+            if (!GroupKey.empty()) {
                 Group = GroupKey;
                 OnMeter = true;
             } else {
                 Group = "";
             }
-            if (present(ZoneKey)) {
+            if (!ZoneKey.empty()) {
                 zoneName = ZoneKey;
                 OnMeter = true;
             } else {
                 zoneName = "";
             }
-            if (present(SpaceType)) {
+            if (!SpaceType.empty()) {
                 spaceType = SpaceType;
                 OnMeter = true;
             } else {
@@ -4611,11 +4469,7 @@ void SetupOutputVariable(EnergyPlusData &state,
         TimeStepType = ValidateTimeStepType(state, TimeStepTypeKey);
         VariableType = validateVariableType(state, VariableTypeKey);
 
-        if (present(customUnitName)) {
-            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit, customUnitName);
-        } else {
-            AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit);
-        }
+        AddToOutputVariableList(state, VarName, TimeStepType, VariableType, VariableType::Real, VariableUnit, customUnitName);
         ++op->NumTotalRVariable;
 
         if (!OnMeter && !ThisOneOnTheList) continue;
@@ -4623,8 +4477,8 @@ void SetupOutputVariable(EnergyPlusData &state,
         ++op->NumOfRVariable;
         if (Loop == 1 && VariableType == StoreType::Summed) {
             ++op->NumOfRVariable_Sum;
-            if (present(ResourceTypeKey)) {
-                if (!ResourceTypeKey().empty()) ++op->NumOfRVariable_Meter;
+            if (!ResourceTypeKey.empty()) {
+                ++op->NumOfRVariable_Meter;
             }
         }
         if (op->NumOfRVariable > op->MaxRVariable) {
@@ -4664,12 +4518,8 @@ void SetupOutputVariable(EnergyPlusData &state,
         thisVarPtr.frequency = ReportingFrequency::Hourly;
         thisVarPtr.SchedPtr = 0;
         thisVarPtr.MeterArrayPtr = 0;
-        thisVarPtr.ZoneMult = 1;
-        thisVarPtr.ZoneListMult = 1;
-        if (present(ZoneMult) && present(ZoneListMult)) {
-            thisVarPtr.ZoneMult = ZoneMult;
-            thisVarPtr.ZoneListMult = ZoneListMult;
-        }
+        thisVarPtr.ZoneMult = ZoneMult;
+        thisVarPtr.ZoneListMult = ZoneListMult;
 
         if (Loop == 1) {
             if (OnMeter) {
@@ -4702,18 +4552,12 @@ void SetupOutputVariable(EnergyPlusData &state,
         }
 
         if (thisVarPtr.Report) {
-            if (present(indexGroupKey)) {
-                localIndexGroupKey = indexGroupKey;
-            } else {
-                localIndexGroupKey = -999; // Unknown Group
-            }
-
             if (thisVarPtr.SchedPtr != 0) {
                 WriteReportVariableDictionaryItem(state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
@@ -4727,7 +4571,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
@@ -4747,8 +4591,8 @@ void SetupOutputVariable(EnergyPlusData &state,
                          OutputProcessor::SOVTimeStepType const TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
                          OutputProcessor::SOVStoreType const VariableTypeKey,    // State, Average=1, NonState, Sum=2
                          std::string_view const KeyedValue,                      // Associated Key for this variable
-                         ObjexxFCL::Optional_string_const ReportFreq,            // Internal use -- causes reporting at this freqency
-                         ObjexxFCL::Optional_int_const indexGroupKey             // Group identifier for SQL output
+                         std::string_view const ReportFreq,                      // Internal use -- causes reporting at this freqency
+                         int const indexGroupKey                                 // Group identifier for SQL output
 )
 {
 
@@ -4772,7 +4616,6 @@ void SetupOutputVariable(EnergyPlusData &state,
     int CV;
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
-    int localIndexGroupKey;
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
     auto &op = state.dataOutputProcessor;
@@ -4791,7 +4634,7 @@ void SetupOutputVariable(EnergyPlusData &state,
     }
 
     // If ReportFreq present, overrides input
-    if (present(ReportFreq)) {
+    if (!ReportFreq.empty()) {
         RepFreq = determineFrequency(state, ReportFreq);
         op->NumExtraVars = 1;
         op->ReportList = 0;
@@ -4865,18 +4708,13 @@ void SetupOutputVariable(EnergyPlusData &state,
         }
 
         if (thisVarPtr.Report) {
-            if (present(indexGroupKey)) {
-                localIndexGroupKey = indexGroupKey;
-            } else {
-                localIndexGroupKey = -999; // Unknown Group
-            }
 
             if (thisVarPtr.SchedPtr != 0) {
                 WriteReportVariableDictionaryItem(state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
@@ -4889,7 +4727,7 @@ void SetupOutputVariable(EnergyPlusData &state,
                                                   thisVarPtr.frequency,
                                                   thisVarPtr.storeType,
                                                   thisVarPtr.ReportID,
-                                                  localIndexGroupKey,
+                                                  indexGroupKey,
                                                   std::string(sovTimeStepTypeStrings[(int)TimeStepTypeKey]),
                                                   thisVarPtr.ReportIDChr,
                                                   KeyedValue,
@@ -6870,7 +6708,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         std::map<int, Constant::ResourceType> &ResourceTypes,  // ResourceTypes for each variable
+                         std::map<int, Constant::eResource> &ResourceTypes,     // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -6916,7 +6754,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = Constant::AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType));
+            ResourceTypes.at(NumVariables) = static_cast<Constant::eResource>(
+                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
 
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
@@ -6952,7 +6791,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         std::map<int, Constant::ResourceType> &ResourceTypes,  // ResourceTypes for each variable
+                         std::map<int, Constant::eResource> &ResourceTypes,     // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -6998,7 +6837,8 @@ void GetMeteredVariables(EnergyPlusData &state,
             TimeStepTypes(NumVariables) = op->RVariableTypes(Loop).timeStepType;
             unitsForVar(NumVariables) = op->RVariableTypes(Loop).units;
 
-            ResourceTypes.at(NumVariables) = Constant::AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType));
+            ResourceTypes.at(NumVariables) = static_cast<Constant::eResource>(
+                getEnumerationValue(Constant::eResourceNamesUC, UtilityRoutines::MakeUPPERCase(op->EnergyMeters(MeterPtr).ResourceType)));
             Names(NumVariables) = op->RVariableTypes(Loop).VarNameUC;
 
             for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
@@ -7836,7 +7676,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
                              OutputProcessor::StoreType const StateType,
                              OutputProcessor::VariableType const VariableType,
                              OutputProcessor::Unit const unitsForVar,
-                             ObjexxFCL::Optional_string_const customUnitName // the custom name for the units from EMS definition of units
+                             std::string_view const customUnitName // the custom name for the units from EMS definition of units
 )
 {
 
@@ -7891,7 +7731,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
         op->DDVariableTypes(op->NumVariablesForOutput).variableType = VariableType;
         op->DDVariableTypes(op->NumVariablesForOutput).VarNameOnly = VarName;
         op->DDVariableTypes(op->NumVariablesForOutput).units = unitsForVar;
-        if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {
+        if (!customUnitName.empty() && unitsForVar == OutputProcessor::Unit::customEMS) {
             op->DDVariableTypes(op->NumVariablesForOutput).unitNameCustomEMS = customUnitName;
         }
     } else if (unitsForVar != op->DDVariableTypes(dup).units) { // not the same as first units
@@ -7914,7 +7754,7 @@ void AddToOutputVariableList(EnergyPlusData &state,
             op->DDVariableTypes(op->NumVariablesForOutput).variableType = VariableType;
             op->DDVariableTypes(op->NumVariablesForOutput).VarNameOnly = VarName;
             op->DDVariableTypes(op->NumVariablesForOutput).units = unitsForVar;
-            if (present(customUnitName) && unitsForVar == OutputProcessor::Unit::customEMS) {
+            if (!customUnitName.empty() && unitsForVar == OutputProcessor::Unit::customEMS) {
                 op->DDVariableTypes(op->NumVariablesForOutput).unitNameCustomEMS = customUnitName;
             }
             op->DDVariableTypes(dup).Next = op->NumVariablesForOutput;

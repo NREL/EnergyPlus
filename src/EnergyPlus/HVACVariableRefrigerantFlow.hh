@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -61,6 +62,7 @@
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -221,36 +223,35 @@ namespace HVACVariableRefrigerantFlow {
         Real64 DefrostConsumption;                        // energy used during defrost (J)
         Real64 MaxOATDefrost;                             // maximum outdoor air dry-bulb temp for defrost operation (C)
         // end variables used for Defrost
-        DataHeatBalance::RefrigCondenserType CondenserType; // condenser type, evap- or air-cooled
-        int CondenserNodeNum;                               // condenser inlet node number
-        bool SkipCondenserNodeNumCheck;                     // used to check for duplicate node names
-        int CondenserOutletNodeNum;                         // condenser outlet node number
-        Real64 WaterCondVolFlowRate;                        // water condenser volume flow rate (m3/s)
-        Real64 EvapCondEffectiveness;                       // evaporative condenser effectiveness
-        Real64 EvapCondAirVolFlowRate;                      // air volume flow rate through condenser (m3/s)
-        Real64 EvapCondPumpPower;                           // evaporative condenser water pump power (W)
-        int CoolCombRatioPTR;                               // index to cooling combination ratio curve pointer
-        int HeatCombRatioPTR;                               // index to heating combination ratio curve pointer
-        int OperatingMode;                                  // VRF Condenser operating mode, 0=off, 1=cooling, 2=heating, 3=HR
-        Real64 ElecPower;                                   // VRF Condenser power (W)
-        Real64 ElecCoolingPower;                            // VRF Condenser power in cooling mode (W)
-        Real64 ElecHeatingPower;                            // VRF Condenser power in heating mode (W)
-        Real64 CoolElecConsumption;                         // VRF Condenser cooling energy (J)
-        Real64 HeatElecConsumption;                         // VRF Condenser heating energy (J)
-        Real64 CrankCaseHeaterPower;                        // VRF Condenser crankcase heater power (W)
-        Real64 CrankCaseHeaterElecConsumption;              // VRF Condenser crankcase heater energy (J)
-        Real64 EvapCondPumpElecPower;                       // VRF Condenser evaporatively cooled condenser pump power (W)
-        Real64 EvapCondPumpElecConsumption;                 // VRF Condenser evaporatively cooled condenser pump elec consumption (J)
-        Real64 EvapWaterConsumpRate;                        // VRF Condenser evaporatively cooled condenser water consumption (m3/s)
-        int HRMaxTempLimitIndex = 0;                        // Warning message recurring error index
-        int CoolingMaxTempLimitIndex = 0;                   // Warning message recurring error index
-        int HeatingMaxTempLimitIndex = 0;                   // Warning message recurring error index
-        std::string FuelType;                               // Fuel type
-        Constant::ResourceType FuelTypeNum;                 // Fuel type number
-        Real64 SUMultiplier;                                // exponential timer for mode changes
-        Real64 TUCoolingLoad;                               // total TU cooling load for each VRF system
-        Real64 TUHeatingLoad;                               // total TU heating load for each VRF system
-        bool SwitchedMode;                                  // used to derate capacity/power when system changes operating mode
+        DataHeatBalance::RefrigCondenserType CondenserType;             // condenser type, evap- or air-cooled
+        int CondenserNodeNum;                                           // condenser inlet node number
+        bool SkipCondenserNodeNumCheck;                                 // used to check for duplicate node names
+        int CondenserOutletNodeNum;                                     // condenser outlet node number
+        Real64 WaterCondVolFlowRate;                                    // water condenser volume flow rate (m3/s)
+        Real64 EvapCondEffectiveness;                                   // evaporative condenser effectiveness
+        Real64 EvapCondAirVolFlowRate;                                  // air volume flow rate through condenser (m3/s)
+        Real64 EvapCondPumpPower;                                       // evaporative condenser water pump power (W)
+        int CoolCombRatioPTR;                                           // index to cooling combination ratio curve pointer
+        int HeatCombRatioPTR;                                           // index to heating combination ratio curve pointer
+        int OperatingMode;                                              // VRF Condenser operating mode, 0=off, 1=cooling, 2=heating, 3=HR
+        Real64 ElecPower;                                               // VRF Condenser power (W)
+        Real64 ElecCoolingPower;                                        // VRF Condenser power in cooling mode (W)
+        Real64 ElecHeatingPower;                                        // VRF Condenser power in heating mode (W)
+        Real64 CoolElecConsumption;                                     // VRF Condenser cooling energy (J)
+        Real64 HeatElecConsumption;                                     // VRF Condenser heating energy (J)
+        Real64 CrankCaseHeaterPower;                                    // VRF Condenser crankcase heater power (W)
+        Real64 CrankCaseHeaterElecConsumption;                          // VRF Condenser crankcase heater energy (J)
+        Real64 EvapCondPumpElecPower;                                   // VRF Condenser evaporatively cooled condenser pump power (W)
+        Real64 EvapCondPumpElecConsumption;                             // VRF Condenser evaporatively cooled condenser pump elec consumption (J)
+        Real64 EvapWaterConsumpRate;                                    // VRF Condenser evaporatively cooled condenser water consumption (m3/s)
+        int HRMaxTempLimitIndex = 0;                                    // Warning message recurring error index
+        int CoolingMaxTempLimitIndex = 0;                               // Warning message recurring error index
+        int HeatingMaxTempLimitIndex = 0;                               // Warning message recurring error index
+        Constant::eResource FuelTypeNum = Constant::eResource::Invalid; // Fuel type number
+        Real64 SUMultiplier;                                            // exponential timer for mode changes
+        Real64 TUCoolingLoad;                                           // total TU cooling load for each VRF system
+        Real64 TUHeatingLoad;                                           // total TU heating load for each VRF system
+        bool SwitchedMode;                                              // used to derate capacity/power when system changes operating mode
         // begin variables used for heat recovery mode
         Real64 OperatingCOP;            // Operating VRF heat pump COP (total TU capacity/total power)
         Real64 MinOATHeatRecovery;      // Minimum outdoor air temperature for heat recovery operation (C)
@@ -396,7 +397,7 @@ namespace HVACVariableRefrigerantFlow {
               CondenserOutletNodeNum(0), WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0),
               CoolCombRatioPTR(0), HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0),
               CoolElecConsumption(0.0), HeatElecConsumption(0.0), CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0),
-              EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), FuelTypeNum(Constant::ResourceType::None),
+              EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), FuelTypeNum(Constant::eResource::Invalid),
               SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0),
               MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0),
               HREIRFTCoolConst(1.1), HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0),
@@ -876,7 +877,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void InitVRF(EnergyPlusData &state, int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
-    void SetCompFlowRate(EnergyPlusData &state, int VRFTUNum, int VRFCond, ObjexxFCL::Optional_bool_const UseCurrentMode = _);
+    void SetCompFlowRate(EnergyPlusData &state, int VRFTUNum, int VRFCond, bool const UseCurrentMode = false);
 
     void SizeVRF(EnergyPlusData &state, int const VRFTUNum);
 

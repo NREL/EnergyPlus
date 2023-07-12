@@ -2684,7 +2684,7 @@ void GetZoneAirDistribution(EnergyPlusData &state)
                     state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchName = Alphas(2);
                     state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr = GetScheduleIndex(state, Alphas(2));
                     if (state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr > 0) {
-                        if (!CheckScheduleValueMinMax(state, state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, ">", 0.0)) {
+                        if (!CheckScheduleValueMinMax(state, state.dataSize->ZoneAirDistribution(ZADIndex).ZoneADEffSchPtr, false, 0.0)) {
                             ShowSevereError(
                                 state, format("{}{}=\"{}\",", RoutineName, CurrentModuleObject, state.dataSize->ZoneAirDistribution(ZADIndex).Name));
                             ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(2), Alphas(2)));
