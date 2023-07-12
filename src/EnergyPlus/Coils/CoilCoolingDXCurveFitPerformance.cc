@@ -67,7 +67,7 @@ using namespace EnergyPlus;
 void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state,
                                                                 const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
-    static constexpr std::string_view routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
+    static constexpr std::string_view routineName("CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec: ");
     bool errorsFound(false);
     this->original_input_specs = input_data;
     this->name = input_data.name;
