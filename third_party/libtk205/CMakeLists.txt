@@ -12,6 +12,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
+find_package(Git QUIET)
+
 include(CTest)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 

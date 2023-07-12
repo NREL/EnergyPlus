@@ -6,7 +6,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <courierr/courierr.h>
-#include <btwxt.h>
+#include <btwxt/btwxt.h>
 
 // ------------------------------------------------------------------------------------------------
 /// @class PerformanceMapBase performance_map_base.h
