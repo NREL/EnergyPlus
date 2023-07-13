@@ -55,6 +55,48 @@
 
 import re
 
+
+def _squiggle_context(data, problem_index, num_context_lines_around=5):
+    lines = data.file.splitlines()
+    guilty_line_index = 0
+    count = 0
+    squiggle_pos = None
+    for i, line in enumerate(lines):
+        count += len(line) + 1  # +1 for newline
+        if count > problem_index:
+            guilty_line_index = i
+            squiggle_pos = problem_index - (count - len(line)) + 2
+            break
+
+    start_line = max(guilty_line_index - num_context_lines_around, 0)
+    error_lines = lines[start_line : guilty_line_index + num_context_lines_around]
+    squiggly_line = " " * squiggle_pos + "^" + "~" * (40 - squiggle_pos)
+    error_lines.insert(guilty_line_index - start_line + 1, squiggly_line)
+    return "\n".join(error_lines)
+
+
+class IddParsingError(Exception):
+    def __init__(self, message, data, problem_index=None, num_context_lines_around=5):
+        """Constructor for an Exception with a context.
+
+        @param message (str): the message to be printed
+        @param: data (Data): for retrieving the context
+        @param: problem_index (Optional[int]): if not provided, assumes this is the current data.index
+        @param: num_context_lines_around (int): the number of lines to show before and after
+        """
+        if problem_index is None:
+            problem_index = data.index
+        message += "\nContext:\n" + _squiggle_context(
+            data=data, problem_index=problem_index, num_context_lines_around=num_context_lines_around
+        )
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
+class MissingSemiColonException(IddParsingError):
+    pass
+
+
 # Preston Shires
 
 # tokens
@@ -172,7 +214,7 @@ def parse_idd(data):
             obj_name = parse_string(data)
             if obj_name is None or obj_name == "":
                 return root
-            obj_data = parse_obj(data)
+            obj_data = parse_obj(data, obj_name=obj_name)
             root['properties'][obj_name] = {}
             root['properties'][obj_name]['patternProperties'] = {}
             root['properties'][obj_name]['group'] = current_group_name
@@ -224,7 +266,11 @@ def parse_idd(data):
     data.schema = root
 
 
-def parse_obj(data):
+def parse_obj(data, obj_name):
+    """Parse an object info.
+
+    @param obj_name (str): is used for reporting errors
+    """
     root = {'type': 'object', 'properties': {}, 'legacy_idd': {'field_info': {}, 'fields': [], 'alphas': { 'fields': [] }, 'numerics': { 'fields': [] } } }
     extensible_count = 0
     duplicate_field_count = 0
@@ -288,9 +334,13 @@ def parse_obj(data):
         elif token == TOKEN_OBSOLETE:
             next_token(data)
             if look_ahead(data) != TOKEN_STRING:
-                raise RuntimeError("expected string after /obsolete")
+                raise IddParsingError(
+                    message="In object '{obj_name}', expected string after /obsolete".format(
+                        obj_name=obj_name,
+                    ), data=data,
+                )
             if 'obsolete' in root:
-                raise RuntimeError("cannot have duplicate obsolete")
+                raise IddParsingError("cannot have duplicate obsolete")
             root['obsolete'] = parse_line(data)
 
         elif token == TOKEN_A or token == TOKEN_N:  # past all object level comments, should be field now
@@ -298,10 +348,16 @@ def parse_obj(data):
             eat_whitespace(data)
             field_number = data.file[data.index]
             data.index += 1
+            field_index = data.index
             field_number += str(int(parse_number(data)))
             comma_or_semicolon = look_ahead(data)
             if comma_or_semicolon != TOKEN_COMMA and comma_or_semicolon != TOKEN_SEMICOLON:
-                raise RuntimeError("No comma or semicolon after A field")
+                raise IddParsingError(
+                    message="In object '{obj_name}', No comma or semicolon after field {field_number}".format(
+                        obj_name=obj_name,
+                        field_number=field_number,
+                    ), data=data, problem_index=field_index,
+                )
             next_token(data)
             token = look_ahead(data)
 
@@ -383,6 +439,14 @@ def parse_obj(data):
 
             if comma_or_semicolon == TOKEN_SEMICOLON:
                 return root
+
+            if data.file[data.index:data.index+2] == '\n\n':
+                raise MissingSemiColonException(
+                    message="In object '{obj_name}', Missing semi-colon in field {field_number}".format(
+                        obj_name=obj_name,
+                        field_number=field_number
+                    ), data=data, problem_index=field_index,
+                )
 
 
 def parse_field(data, token):
