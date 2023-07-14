@@ -475,12 +475,11 @@ void GetControllerInput(EnergyPlusData &state)
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             controllerProps.ControllerName = AlphArray(1);
             controllerProps.ControllerType = CurrentModuleObject;
 
-            controllerProps.ControlVar = static_cast<EnergyPlus::HVACControllers::CtrlVarType>(getEnumerationValue(ctrlVarNamesUC, AlphArray(2)));
+            controllerProps.ControlVar = static_cast<EnergyPlus::HVACControllers::CtrlVarType>(getEnumValue(ctrlVarNamesUC, AlphArray(2)));
             if (controllerProps.ControlVar == HVACControllers::CtrlVarType::Invalid) {
                 ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, AlphArray(1)));
                 ShowSevereError(state,
@@ -490,7 +489,7 @@ void GetControllerInput(EnergyPlusData &state)
                 ErrorsFound = true;
             }
 
-            controllerProps.Action = static_cast<ControllerAction>(getEnumerationValue(actionNamesUC, AlphArray(3)));
+            controllerProps.Action = static_cast<ControllerAction>(getEnumValue(actionNamesUC, AlphArray(3)));
             if (controllerProps.Action == ControllerAction::Invalid) {
                 ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, AlphArray(1)));
                 ShowSevereError(state, format("...Invalid {}=\"{}{}", cAlphaFields(3), AlphArray(3), R"(", must be "Normal", "Reverse" or blank.)"));

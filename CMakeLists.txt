@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.17)
+
 # Use ccache if available, has to be before "project()"
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -8,8 +10,6 @@ endif()
 cmake_policy(SET CMP0048 NEW) # handling project_version_* variables
 
 project(EnergyPlus)
-
-cmake_minimum_required(VERSION 3.17)
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   cmake_policy(SET CMP0054 NEW) # CMake 3.1 added this policy
@@ -283,9 +283,6 @@ target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third
 target_include_directories(project_options INTERFACE "${kiva_BINARY_DIR}/src/libkiva")
 target_include_directories(project_options SYSTEM INTERFACE "${kiva_SOURCE_DIR}/vendor/boost-1.61.0/")
 
-add_subdirectory(scripts/dev/generate_embeddable_epJSON_schema)
-set_target_properties(generate_embeddable_epJSON_schema PROPERTIES FOLDER "Internal")
-
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP)
 target_include_directories(project_options INTERFACE ${PROJECT_SOURCE_DIR}/third_party/cpgfunctionEP/include)
 
@@ -298,15 +295,6 @@ endif()
 # E+ required libraries
 add_subdirectory(idd)
 
-execute_process(
-  COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}"
-  TIMEOUT 30
-  RESULT_VARIABLE generate_epJSON_schema_result)
-if(${generate_epJSON_schema_result} MATCHES ".*timeout.*")
-  message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
-endif()
-configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd")
-configure_file(idd/Energy+.schema.epJSON.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.schema.epJSON")
 configure_file(idd/BasementGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BasementGHT.idd")
 configure_file(idd/SlabGHT.idd "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SlabGHT.idd")
 
@@ -322,7 +310,6 @@ configure_file("workflows/transition.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/work
 # of course E+ itself
 add_subdirectory(src/EnergyPlus)
 set_target_properties(airflownetworklib PROPERTIES FOLDER "Internal")
-set_target_properties(GenerateEmbeddedEpJSONSchema PROPERTIES FOLDER "Internal")
 set_target_properties(energyplusparser PROPERTIES FOLDER "Internal")
 
 if(BUILD_TESTING)
@@ -371,9 +358,9 @@ if(BUILD_FORTRAN)
     PROJECT Transition
     CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS}
     NO_EXTERNAL_INSTALL)
-  file(COPY "idd/V23-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V23-2-0-Energy+.idd")
-  file(COPY "src/Transition/SupportFiles/Report Variables 23-1-0 to 23-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  file(COPY "${PREVIOUS_IDD}" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  configure_file(idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd")
+  file(COPY "src/Transition/SupportFiles/Report Variables ${PREV_RELEASE_MAJOR}-${PREV_RELEASE_MINOR}-${PREV_RELEASE_PATCH} to ${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   cmake_add_fortran_subdirectory(
     src/Basement
     PROJECT Basement

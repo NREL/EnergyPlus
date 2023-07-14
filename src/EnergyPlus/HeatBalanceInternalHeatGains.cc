@@ -119,26 +119,15 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     // devices are internal gains like people, lights, electric equipment
     // and HVAC components with skin loss models like thermal tanks, and power conditioning.
 
-    using namespace DataHeatBalance;
-
     int constexpr DeviceAllocInc(100);
 
-    int IntGainsNum;
-    bool FoundIntGainsType;
-    bool FoundDuplicate;
-    std::string UpperCaseObjectName;
-
-    // Object Data
-
-    FoundIntGainsType = false;
-    FoundDuplicate = false;
-    UpperCaseObjectName = UtilityRoutines::MakeUPPERCase(cComponentName);
+    bool FoundDuplicate = false;
+    std::string UpperCaseObjectName = UtilityRoutines::makeUPPER(cComponentName);
 
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
-    for (IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
+    for (int IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
         if ((thisIntGain.device(IntGainsNum).CompObjectType == DataHeatBalance::IntGainTypeNamesUC[static_cast<int>(IntGainCompType)]) &&
             (thisIntGain.device(IntGainsNum).CompType == IntGainCompType)) {
-            FoundIntGainsType = true;
             if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
                 FoundDuplicate = true;
                 break;

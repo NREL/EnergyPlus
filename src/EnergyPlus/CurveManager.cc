@@ -2276,7 +2276,7 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariable", thisObjectName);
-                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::MakeUPPERCase(thisObjectName), fields);
+                state.dataCurveManager->btwxtManager.independentVarRefs.emplace(UtilityRoutines::makeUPPER(thisObjectName), fields);
             }
         }
 
@@ -2292,13 +2292,13 @@ namespace Curve {
                 auto const &fields = instance.value();
                 std::string const &thisObjectName = instance.key();
                 state.dataInputProcessing->inputProcessor->markObjectAsUsed("Table:IndependentVariableList", thisObjectName);
-                std::string varListName = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                std::string varListName = UtilityRoutines::makeUPPER(thisObjectName);
 
                 std::vector<Btwxt::GridAxis> gridAxes;
 
                 // Loop through independent variables in list and add them to the grid
                 for (auto &indVar : fields.at("independent_variables")) {
-                    std::string indVarName = UtilityRoutines::MakeUPPERCase(indVar.at("independent_variable_name").get<std::string>());
+                    std::string indVarName = UtilityRoutines::makeUPPER(indVar.at("independent_variable_name").get<std::string>());
                     std::string contextString = format("Table:IndependentVariable \"{}\"", indVarName);
                     std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
                     state.dataCurveManager->btwxtManager.setLoggingContext(&callbackPair);
@@ -2411,7 +2411,8 @@ namespace Curve {
                     }
                 }
                 // Add grid to btwxtManager
-                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::MakeUPPERCase(thisObjectName), gridAxes);
+
+                state.dataCurveManager->btwxtManager.addGrid(UtilityRoutines::makeUPPER(thisObjectName), gridAxes);
             }
         }
 
@@ -2426,10 +2427,10 @@ namespace Curve {
                 ++CurveNum;
                 Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveNum);
 
-                thisCurve->Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisCurve->Name = UtilityRoutines::makeUPPER(thisObjectName);
                 thisCurve->interpolationType = InterpType::BtwxtMethod;
 
-                std::string indVarListName = UtilityRoutines::MakeUPPERCase(fields.at("independent_variable_list_name").get<std::string>());
+                std::string indVarListName = UtilityRoutines::makeUPPER(fields.at("independent_variable_list_name").get<std::string>());
 
                 std::string contextString = format("Table:Lookup \"{}\"", thisCurve->Name);
                 std::pair<EnergyPlusData *, std::string> callbackPair{&state, contextString};
@@ -2970,7 +2971,7 @@ namespace Curve {
         if (InInputType.empty()) {
             return true; // if not used it is valid
         }
-        CurveInputType found = static_cast<CurveInputType>(getEnumerationValue(inputTypes, UtilityRoutines::MakeUPPERCase(InInputType)));
+        CurveInputType found = static_cast<CurveInputType>(getEnumValue(inputTypes, UtilityRoutines::makeUPPER(InInputType)));
         return found != CurveInputType::Invalid;
     }
 
@@ -2998,13 +2999,13 @@ namespace Curve {
         };
         constexpr std::array<std::string_view, static_cast<int>(CurveOutputType::Num)> outputTypes = {
             "DIMENSIONLESS", "PRESSURE", "TEMPERATURE", "CAPACITY", "POWER"};
-        CurveOutputType found = static_cast<CurveOutputType>(getEnumerationValue(outputTypes, UtilityRoutines::MakeUPPERCase(InOutputType)));
+        CurveOutputType found = static_cast<CurveOutputType>(getEnumValue(outputTypes, UtilityRoutines::makeUPPER(InOutputType)));
         return found != CurveOutputType::Invalid;
     }
 
     bool CheckCurveDims(EnergyPlusData &state,
                         int const CurveIndex,
-                        std::vector<int> validDims,
+                        std::vector<int> const &validDims,
                         const std::string_view routineName,
                         std::string_view objectType,
                         std::string_view objectName,
@@ -3013,23 +3014,28 @@ namespace Curve {
         // Returns true if errors found
         Curve *thisCurve = state.dataCurveManager->PerfCurve(CurveIndex);
         int curveDim = thisCurve->numDims;
-        if (std::find(validDims.begin(), validDims.end(), curveDim) != validDims.end()) {
-            // Compatible
-            return false;
-        } else {
-            // Not compatible
-            ShowSevereError(state, fmt::format("{}{}=\"{}\"", routineName, objectType, objectName));
-            ShowContinueError(state, format("...Invalid curve for {}.", curveFieldText));
-            std::string validString = fmt::to_string(validDims[0]);
-            for (std::size_t i = 1; i < validDims.size(); i++) {
-                validString += format(" or {}", validDims[i]);
-            }
-            std::string plural1 = curveDim > 1 ? "s" : "";
-            std::string plural2 = validDims[validDims.size() - 1] > 1 ? "s" : "";
-            ShowContinueError(state, format("...Input curve=\"{}\" has {} dimension{}.", thisCurve->Name, curveDim, plural1));
-            ShowContinueError(state, format("...Curve type must have {} dimension{}.", validString, plural2));
-            return true;
-        }
+        if (std::find(validDims.begin(), validDims.end(), curveDim) != validDims.end()) return false;
+
+        ErrorObjectHeader eoh{routineName, objectType, objectName};
+        std::string validString = fmt::to_string(validDims[0]);
+        for (std::size_t i = 1; i < validDims.size(); i++)
+            validString += format(" or {}", validDims[i]);
+
+        ShowErrorCurveDims(state, eoh, curveFieldText, thisCurve->Name, validString, curveDim);
+        return true;
+    }
+
+    void ShowErrorCurveDims(EnergyPlusData &state,
+                            ErrorObjectHeader const &eoh,
+                            std::string_view fieldName,
+                            std::string_view curveName,
+                            std::string_view validDims,
+                            int dim)
+    {
+        ShowSevereError(state, fmt::format("{}{}=\"{}\"", eoh.routineName, eoh.objectType, eoh.objectName));
+        ShowContinueError(state, format("...Invalid curve for {}.", fieldName));
+        ShowContinueError(state, format("...Input curve=\"{}\" has dimension {}.", curveName, dim));
+        ShowContinueError(state, format("...Curve type must have dimension {}.", validDims));
     }
 
     std::string GetCurveName(EnergyPlusData &state, int const CurveIndex) // index of curve in curve array

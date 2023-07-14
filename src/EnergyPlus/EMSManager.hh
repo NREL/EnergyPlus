@@ -149,6 +149,8 @@ namespace EMSManager {
                                         int nodeNum, // index of node being checked.
                                         std::string const &varName);
 
+    bool isScheduleManaged(EnergyPlusData &state, int const scheduleNum);
+
     void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
 
     void SetupWindowShadingControlActuators(EnergyPlusData &state);
