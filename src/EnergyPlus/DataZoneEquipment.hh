@@ -105,42 +105,60 @@ namespace DataZoneEquipment {
 
     // Start zone equip objects
     // list units that are valid for zone system availability managers first
-    enum ZoneEquip
+    enum ZoneEquipType
     {
         Invalid = -1,
-        FanCoil4Pipe = 1,
-        PkgTermHPAirToAir,
-        PkgTermACAirToAir,
-        PkgTermHPWaterToAir,
-        WindowAC,
+        DUMMY,
+        FourPipeFanCoil,
+        PackagedTerminalHeatPump,
+        PackagedTerminalAirConditioner,
+        PackagedTerminalHeatPumpWaterToAir,
+        WindowAirConditioner,
         UnitHeater,
         UnitVentilator,
-        ERVStandAlone,
+        EnergyRecoveryVentilator,
         VentilatedSlab,
         OutdoorAirUnit,
-        VRFTerminalUnit,
+        VariableRefrigerantFlowTerminal,
         PurchasedAir,
-        ZoneEvaporativeCoolerUnit,
-        ZoneHybridEvaporativeCooler, // last zone equipment type to use zone availability manager. The above list must not change or
-                                     // NumValidSysAvailZoneComponents must also change.
-        AirDistUnit,
-        BBWaterConvective,
-        BBElectricConvective,
-        HiTempRadiant,
-        LoTempRadiant,
-        ZoneExhaustFan,
-        HeatXchngr,
-        HPWaterHeater,
-        BBWater,
-        ZoneDXDehumidifier,
-        BBSteam,
-        BBElectric,
-        RefrigerationAirChillerSet,
-        UserDefinedZoneHVACForcedAir,
+        EvaporativeCooler,
+        HybridEvaporativeCooler, // last zone equipment type to use zone availability manager. The above list must not change or
+                                 // NumValidSysAvailZoneComponents must also change.
+        AirDistributionUnit,
+        BaseboardConvectiveWater,
+        BaseboardConvectiveElectric,
+        BaseboardSteam,
+        BaseboardWater,
+        BaseboardElectric,
+        HighTemperatureRadiant,
+        LowTemperatureRadiant,
+        ExhaustFan,
+        HeatExchanger,
+        HeatPumpWaterHeater,
+        DehumidifierDX,
+        RefrigerationChillerSet,
+        UserDefinedHVACForcedAir,
         CoolingPanel,
-        ZoneUnitarySys,
+        UnitarySystem,
+        AirTerminalDualDuctConstantVolume,
+        AirTerminalDualDuctVAV,
+        AirTerminalSingleDuctConstantVolumeReheat,
+        AirTerminalSingleDuctConstantVolumeNoReheat,
+        AirTerminalSingleDuctVAVReheat,
+        AirTerminalSingleDuctVAVNoReheat,
+        AirTerminalSingleDuctSeriesPIUReheat,
+        AirTerminalSingleDuctParallelPIUReheat,
+        AirTerminalSingleDuctCAVFourPipeInduction,
+        AirTerminalSingleDuctVAVReheatVariableSpeedFan,
+        AirTerminalSingleDuctVAVHeatAndCoolReheat,
+        AirTerminalSingleDuctVAVHeatAndCoolNoReheat,
+        AirTerminalSingleDuctConstantVolumeCooledBeam,
+        AirTerminalDualDuctVAVOutdoorAir,
+        AirLoopHVACReturnAir,
         Num
     };
+
+    extern const std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zoneEquipTypeNamesUC;
 
     constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
@@ -383,8 +401,8 @@ namespace DataZoneEquipment {
         int NumOfEquipTypes;                        // Number of items on this list
         int NumAvailHeatEquip;                      // Number of pieces of equipment available for heating
         int NumAvailCoolEquip;                      // Number of pieces of equipment available for cooling
-        Array1D_string EquipType;                   // TODO: Convert this from string to enum and remove EquipTypeEnum below
-        Array1D<DataZoneEquipment::ZoneEquip> EquipTypeEnum;
+        Array1D_string EquipTypeName;               // TODO: Convert this from string to enum and remove EquipTypeEnum below
+        Array1D<DataZoneEquipment::ZoneEquipType> EquipType;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
         // SystemAvailManagers need to know the index of specific equipment (e.g., PTAC as 1,2,3)
@@ -494,7 +512,7 @@ namespace DataZoneEquipment {
                             std::string const &NodeName // Return air node name to match (may be blank)
     );
 
-    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquip const ZoneEquipTypeNum, std::string const &EquipmentName);
+    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquipType const ZoneEquipType, std::string const &EquipmentName);
 
     bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
 
