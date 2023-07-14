@@ -237,7 +237,7 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+            if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
@@ -273,7 +273,7 @@ namespace DElightManagerF {
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+            if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
                 int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 
@@ -489,7 +489,7 @@ namespace DElightManagerF {
                                 iHostedCFS = 0;
 
                                 // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                                for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                     // Does the current Opaque Bounding Surface host the current CFS object?
                                     if (surf.Name == cfs.surfName) {
@@ -836,7 +836,7 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
+        //       MODIFIED       From UtilityRoutines::makeUPPER( function by Linda K. Lawrie
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:

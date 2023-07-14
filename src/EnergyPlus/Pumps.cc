@@ -319,8 +319,8 @@ void GetPumpInput(EnergyPlusData &state)
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
@@ -407,8 +407,8 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.HasVFD = false;
         } else {
             thisPump.HasVFD = true;
-            thisPump.VFD.VFDControlType = static_cast<ControlTypeVFD>(
-                getEnumerationValue(controlTypeVFDNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(7))));
+            thisPump.VFD.VFDControlType =
+                static_cast<ControlTypeVFD>(getEnumValue(controlTypeVFDNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(7))));
             switch (thisPump.VFD.VFDControlType) {
             case ControlTypeVFD::VFDManual: {
                 thisPump.VFD.ManualRPMSchedIndex = GetScheduleIndex(state, thisInput->cAlphaArgs(8));
@@ -419,8 +419,8 @@ void GetPumpInput(EnergyPlusData &state)
                             "{}{}=\"{}\", At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
-                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, ">", 0.0) ||
-                           !CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, ">", 0.0)) {
+                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, false, 0.0) ||
+                           !CheckScheduleValueMinMax(state, thisPump.VFD.ManualRPMSchedIndex, false, 0.0)) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
@@ -445,8 +445,8 @@ void GetPumpInput(EnergyPlusData &state)
                             "{}{}=\"{}\", At least one scheduled VFD schedule input was invalid.", RoutineName, cCurrentModuleObject, thisPump.Name));
                     ShowContinueError(state, "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist.");
                     ErrorsFound = true;
-                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.MinRPMSchedIndex, ">", 0.0) ||
-                           !CheckScheduleValueMinMax(state, thisPump.VFD.MaxRPMSchedIndex, ">", 0.0)) {
+                } else if (!CheckScheduleValueMinMax(state, thisPump.VFD.MinRPMSchedIndex, false, 0.0) ||
+                           !CheckScheduleValueMinMax(state, thisPump.VFD.MaxRPMSchedIndex, false, 0.0)) {
                     ShowSevereError(
                         state,
                         format("{}{}=\"{}\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero.",
@@ -487,7 +487,7 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!thisInput->lAlphaFieldBlanks(14)) {
             thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(14))));
+                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(14))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -587,8 +587,8 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.Energy = 0.0;
         thisPump.Power = 0.0;
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(4)));
@@ -656,7 +656,7 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!thisInput->lAlphaFieldBlanks(8)) {
             thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -789,7 +789,7 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!thisInput->lAlphaFieldBlanks(6)) {
             thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(6))));
+                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(6))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -875,8 +875,8 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Invalid {}", RoutineName, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaFieldNames(5)));
@@ -935,7 +935,7 @@ void GetPumpInput(EnergyPlusData &state)
 
         if (!thisInput->lAlphaFieldBlanks(8)) {
             thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -1021,8 +1021,8 @@ void GetPumpInput(EnergyPlusData &state)
             thisPump.SequencingScheme = PumpBankControlSeq::SequentialScheme;
         }
 
-        thisPump.PumpControl = static_cast<PumpControlType>(
-            getEnumerationValue(pumpCtrlTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5))));
+        thisPump.PumpControl =
+            static_cast<PumpControlType>(getEnumValue(pumpCtrlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
         if (thisPump.PumpControl == PumpControlType::Invalid) {
             ShowWarningError(state,
@@ -1079,7 +1079,7 @@ void GetPumpInput(EnergyPlusData &state)
         }
         if (!thisInput->lAlphaFieldBlanks(8)) {
             thisPump.powerSizingMethod = static_cast<PowerSizingMethod>(
-                getEnumerationValue(powerSizingMethodNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+                getEnumValue(powerSizingMethodNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
             if (thisPump.powerSizingMethod == PowerSizingMethod::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}=\"{}\", sizing method type entered is invalid.  Use one of the key choice entries.",
@@ -1128,7 +1128,7 @@ void GetPumpInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Pumps",
                                 thisPump.EndUseSubcategoryName,
@@ -1187,7 +1187,7 @@ void GetPumpInput(EnergyPlusData &state)
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisPump.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Pumps",
                                 thisPump.EndUseSubcategoryName,

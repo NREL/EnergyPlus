@@ -159,14 +159,12 @@ Real64 OutWetBulbTempAt(EnergyPlusData &state, Real64 const Z) // Height above g
     return LocalOutWetBulbTemp;
 }
 
-Real64 WindSpeedAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)
+Real64 WindSpeedAt(const EnergyPlusData &state, Real64 const Z) // Height above ground (m)
 {
 
     // FUNCTION INFORMATION:
     //       AUTHOR         Peter Graham Ellis
     //       DATE WRITTEN   January 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // Calculates local wind speed at a given altitude.
@@ -178,22 +176,17 @@ Real64 WindSpeedAt(EnergyPlusData &state, Real64 const Z) // Height above ground
     // 2005 ASHRAE Fundamentals, Chapter 16, Equation 4.  (Different depending on terrain).
     // Terrain variables are set in HeatBalanceManager or entered by the user.
 
-    // Return value
-    Real64 LocalWindSpeed; // Return result for function (m/s)
-
     if (Z <= 0.0) {
-        LocalWindSpeed = 0.0;
+        return 0.0;
     } else if (state.dataEnvrn->SiteWindExp == 0.0) {
-        LocalWindSpeed = state.dataEnvrn->WindSpeed;
+        return state.dataEnvrn->WindSpeed;
     } else {
         //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
         //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
         //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-        LocalWindSpeed = state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff *
-                         std::pow(Z / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
+        return state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff *
+               std::pow(Z / state.dataEnvrn->SiteWindBLHeight, state.dataEnvrn->SiteWindExp);
     }
-
-    return LocalWindSpeed;
 }
 
 Real64 OutBaroPressAt(EnergyPlusData &state, Real64 const Z) // Height above ground (m)

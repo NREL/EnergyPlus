@@ -79,15 +79,10 @@ namespace EnergyPlus::General {
 // MODULE INFORMATION:
 //       AUTHOR         Fred Buhl, Linda Lawrie
 //       DATE WRITTEN   December 2001
-//       MODIFIED       na
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // contains routines (most likely numeric) that may be needed in several parts
 // of EnergyPlus
-
-// Using/Aliasing
-using DataHVACGlobals::Bisection;
 
 // MODULE PARAMETER DEFINITIONS
 static constexpr std::string_view BlankString;
@@ -157,7 +152,7 @@ constexpr std::array<std::string_view, static_cast<int>(RptKey::Num)> RptKeyName
     "COSTINFO", "DXF", "DXF:WIREFRAME", "VRML", "VERTICES", "DETAILS", "DETAILSWITHVERTICES", "LINES"};
 
 // A second version that does not require a payload -- use lambdas
-void SolveRoot(EnergyPlusData &state,
+void SolveRoot(const EnergyPlusData &state,
                Real64 Eps,   // required absolute accuracy
                int MaxIte,   // maximum number of allowed iterations
                int &Flag,    // integer storing exit status
@@ -325,22 +320,15 @@ void ProcessDateString(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   December 1999
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine will process a date from a string and determine
     // the proper month and day for that date string.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int FstNum{};
-    bool errFlag{};
-    int NumTokens{};
-    int TokenDay{};
-    int TokenMonth{};
-    int TokenWeekday{};
+    bool errFlag;
 
-    FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
+    int FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
     DateType = WeatherManager::DateType::Invalid;
     if (!errFlag) {
         // Entered single number, do inverse JDay
@@ -356,6 +344,10 @@ void ProcessDateString(EnergyPlusData &state,
             DateType = WeatherManager::DateType::LastDayInMonth;
         }
     } else {
+        int NumTokens = 0;
+        int TokenDay = 0;
+        int TokenMonth = 0;
+        int TokenWeekday = 0;
         // Error when processing as number, try x/x
         if (!present(PYear)) {
             DetermineDateTokens(state, String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound);
@@ -391,8 +383,6 @@ void DetermineDateTokens(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   August 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is invoked for date fields that appear to be strings (give
@@ -413,12 +403,7 @@ void DetermineDateTokens(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     std::string CurrentString = String;
-    int Loop{};
     Array1D_string Fields(3);
-    int NumField1{};
-    int NumField2{};
-    int NumField3{};
-    bool errFlag{};
     bool InternalError = false;
     bool WkDayInMonth = false;
 
@@ -430,7 +415,7 @@ void DetermineDateTokens(EnergyPlusData &state,
     if (present(TokenYear)) TokenYear = 0;
     // Take out separator characters, other extraneous stuff
 
-    for (Loop = 0; Loop < NumSingleChars; ++Loop) {
+    for (int Loop = 0; Loop < NumSingleChars; ++Loop) {
         size_t Pos = index(CurrentString, SingleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString[Pos] = ' ';
@@ -438,7 +423,7 @@ void DetermineDateTokens(EnergyPlusData &state,
         }
     }
 
-    for (Loop = 0; Loop < NumDoubleChars; ++Loop) {
+    for (int Loop = 0; Loop < NumDoubleChars; ++Loop) {
         size_t Pos = index(CurrentString, DoubleChars[Loop]);
         while (Pos != std::string::npos) {
             CurrentString.replace(Pos, 2, "  ");
@@ -452,7 +437,11 @@ void DetermineDateTokens(EnergyPlusData &state,
         ShowSevereError(state, format("Invalid date field={}", String));
         ErrorsFound = true;
     } else {
-        Loop = 0;
+        int Loop = 0;
+        bool errFlag = false;
+        int NumField1;
+        int NumField2;
+        int NumField3;
         while (Loop < 3) { // Max of 3 fields
             if (CurrentString == BlankString) break;
             size_t Pos = index(CurrentString, ' ');
@@ -587,8 +576,6 @@ void ValidateMonthDay(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   August 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine validates a potential Day, Month values, produces an error
@@ -597,10 +584,7 @@ void ValidateMonthDay(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::array<int, 12> EndMonthDay = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool InternalError;
-
-    InternalError = false;
+    bool InternalError = false;
     if (Month < 1 || Month > 12) InternalError = true;
     if (!InternalError) {
         if (Day < 1 || Day > EndMonthDay[Month - 1]) InternalError = true;
@@ -622,15 +606,11 @@ int OrdinalDay(int const Month,        // Month, 1..12
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September 1997
-    //       MODIFIED       na
     //       RE-ENGINEERED  from JDAYF in BLAST/IBLAST
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine returns the appropriate Julian Day value for the input
     // Month and Day.
-
-    // Return value
-    int JulianDay;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static constexpr std::array<int, 12> EndDayofMonth = {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
@@ -638,21 +618,19 @@ int OrdinalDay(int const Month,        // Month, 1..12
 
     if (Month == 1) {
         //                                       CASE 1: JANUARY
-        JulianDay = Day;
+        return Day;
 
     } else if (Month == 2) {
         //                                       CASE 2: FEBRUARY
-        JulianDay = Day + EndDayofMonth[0];
+        return Day + EndDayofMonth[0];
 
     } else if ((Month >= 3) && (Month <= 12)) {
         //                                       CASE 3: REMAINING MONTHS
-        JulianDay = Day + EndDayofMonth[Month - 2] + LeapYearValue;
+        return Day + EndDayofMonth[Month - 2] + LeapYearValue;
 
     } else {
-        JulianDay = 0;
+        return 0;
     }
-
-    return JulianDay;
 }
 
 void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
@@ -661,8 +639,6 @@ void InvOrdinalDay(int const Number, int &PMonth, int &PDay, int const LeapYr)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   December 1999
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine performs and inverse Julian Day
@@ -718,8 +694,6 @@ bool BetweenDates(int const TestDate,  // Date to test
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   June 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function returns true if the TestDate is between
@@ -733,14 +707,11 @@ bool BetweenDates(int const TestDate,  // Date to test
     // REFERENCES:
     // Adapted from BLAST BTWEEN function.
 
-    // Return value
-    bool BetweenDates;
-
-    BetweenDates = false; // Default case
+    bool BetweenDates = false; // Default case
 
     if (StartDate <= EndDate) { // Start Date <= End Date
         if (TestDate >= StartDate && TestDate <= EndDate) BetweenDates = true;
-    } else { // EndDate <= StartDate
+    } else { // EndDate < StartDate
         if (TestDate <= EndDate || TestDate >= StartDate) BetweenDates = true;
     }
 
@@ -753,37 +724,24 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   April 2003
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
-    // This function creates the current time interval of the system
-    // time step.
+    // This function creates the current time interval of the system time step.
 
     // Using/Aliasing
     Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
     Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
-    // Return value
-    std::string OutputString;
-
     Real64 constexpr FracToMin(60.0);
-
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    Real64 ActualTimeS; // Start of current interval (HVAC time step)
-    Real64 ActualTimeE; // End of current interval (HVAC time step)
-    int ActualTimeHrS;
-    //  INTEGER ActualTimeHrE
-    int ActualTimeMinS;
 
     //  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
     // CR6902  ActualTimeS=INT(CurrentTime-TimeStepZone)+SysTimeElapsed
     // [DC] TODO: Improve display accuracy up to fractional seconds using hh:mm:ss.0 format
-    ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
-    ActualTimeE = ActualTimeS + TimeStepSys;
-    ActualTimeHrS = int(ActualTimeS);
+    Real64 ActualTimeS = state.dataGlobal->CurrentTime - state.dataGlobal->TimeStepZone + SysTimeElapsed;
+    Real64 ActualTimeE = ActualTimeS + TimeStepSys;
+    int ActualTimeHrS = int(ActualTimeS);
     //  ActualTimeHrE=INT(ActualTimeE)
-    ActualTimeMinS = nint((ActualTimeS - ActualTimeHrS) * FracToMin);
+    int ActualTimeMinS = nint((ActualTimeS - ActualTimeHrS) * FracToMin);
 
     if (ActualTimeMinS == 60) {
         ++ActualTimeHrS;
@@ -797,13 +755,11 @@ std::string CreateSysTimeIntervalString(EnergyPlusData &state)
     if (TimeStmpE[3] == ' ') {
         TimeStmpE[3] = '0';
     }
-    OutputString = TimeStmpS + " - " + TimeStmpE;
-
-    return OutputString;
+    return TimeStmpS + " - " + TimeStmpE;
 }
 
 // returns the Julian date for the first, second, etc. day of week for a given month
-int nthDayOfWeekOfMonth(EnergyPlusData &state,
+int nthDayOfWeekOfMonth(const EnergyPlusData &state,
                         int const dayOfWeek,  // day of week (Sunday=1, Monday=2, ...)
                         int const nthTime,    // nth time the day of the week occurs (first monday, third tuesday, ..)
                         int const monthNumber // January = 1
@@ -812,13 +768,11 @@ int nthDayOfWeekOfMonth(EnergyPlusData &state,
     // J. Glazer - August 2017
     int firstDayOfMonth = OrdinalDay(monthNumber, 1, state.dataEnvrn->CurrentYearIsLeapYear);
     int dayOfWeekForFirstDay = (state.dataEnvrn->RunPeriodStartDayOfWeek + firstDayOfMonth - 1) % 7;
-    int jdatForNth;
     if (dayOfWeek >= dayOfWeekForFirstDay) {
-        jdatForNth = firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
+        return firstDayOfMonth + (dayOfWeek - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
     } else {
-        jdatForNth = firstDayOfMonth + ((dayOfWeek + 7) - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
+        return firstDayOfMonth + ((dayOfWeek + 7) - dayOfWeekForFirstDay) + 7 * (nthTime - 1);
     }
-    return jdatForNth;
 }
 
 Real64 SafeDivide(Real64 const a, Real64 const b)
@@ -826,18 +780,14 @@ Real64 SafeDivide(Real64 const a, Real64 const b)
 
     // returns a / b while preventing division by zero
 
-    // Return value
-    Real64 c;
-
     // Locals
     Real64 constexpr SMALL(1.E-10);
 
     if (std::abs(b) >= SMALL) {
-        c = a / b;
+        return a / b;
     } else {
-        c = a / sign(SMALL, b);
+        return a / sign(SMALL, b);
     }
-    return c;
 }
 
 void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed back to the calling routine
@@ -854,8 +804,6 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   March 2004
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Iterately solves for the value of X which satisfies Y(X)=0.
@@ -868,8 +816,6 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr small(1.e-9); // Small Number used to approximate zero
     Real64 constexpr Perturb(0.1); // Perturbation applied to X to initialize iteration
-
-    Real64 DY; // Linear fit result
 
     // Check for convergence by comparing change in X
     if (Iter != 1) {
@@ -894,7 +840,7 @@ void Iterate(Real64 &ResultX,  // ResultX is the final Iteration result passed b
     } else {
 
         // New guess calculated from LINEAR FIT of most recent two points
-        DY = Y0 - Y1;
+        Real64 DY = Y0 - Y1;
         if (std::abs(DY) < small) {
             DY = small;
         }
@@ -913,33 +859,21 @@ int FindNumberInList(int const WhichNumber, Array1A_int const ListOfItems, int c
     // FUNCTION INFORMATION:
     //       AUTHOR         Linda K. Lawrie
     //       DATE WRITTEN   September 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function looks up a number(integer) in a similar list of
-    // items and returns the index of the item in the list, if
-    // found.
-
-    // Return value
-    int FindNumberInList;
+    // items and returns the index of the item in the list, if found.
 
     // Argument array dimensioning
     ListOfItems.dim(_);
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Count;
-
-    FindNumberInList = 0;
-
-    for (Count = 1; Count <= NumItems; ++Count) {
+    for (int Count = 1; Count <= NumItems; ++Count) {
         if (WhichNumber == ListOfItems(Count)) {
-            FindNumberInList = Count;
-            break;
+            return Count;
         }
     }
 
-    return FindNumberInList;
+    return 0;
 }
 
 void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, hour, minute
@@ -953,8 +887,6 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine decodes the "packed" integer representation of
@@ -972,10 +904,7 @@ void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, ho
     static constexpr int DecDay(100 * 100);
     static constexpr int DecHr(100);
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int TmpItem;
-
-    TmpItem = Item;
+    int TmpItem = Item;
     Month = TmpItem / DecMon;
     TmpItem = (TmpItem - Month * DecMon);
     Day = TmpItem / DecDay;
@@ -995,8 +924,6 @@ void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, h
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine encodes the "packed" integer representation of
@@ -1018,8 +945,6 @@ std::string CreateTimeString(Real64 const Time) // Time in seconds
     // FUNCTION INFORMATION:
     //       AUTHOR         Dimitri Curtil
     //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This function creates the time stamp string from the time value specified in seconds.
@@ -1049,8 +974,6 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // FUNCTION INFORMATION:
     //       AUTHOR         Dimitri Curtil
     //       DATE WRITTEN   January 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS FUNCTION:
     // This subroutine decomposes a time value specified in seconds
@@ -1059,8 +982,8 @@ void ParseTime(Real64 const Time, // Time value in seconds
     // - seconds < 60
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int constexpr MinToSec(60);
-    int const HourToSec(MinToSec * 60);
+    int constexpr MinToSec = 60;
+    int constexpr HourToSec = 60 * 60;
 
     // Get number of hours
     // This might undershoot the actual number of hours. See DO WHILE loop.
@@ -1090,8 +1013,6 @@ void ScanForReports(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   March 2009
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine scans for the global "reports" settings, such as Variable Dictionary,
@@ -1101,21 +1022,17 @@ void ScanForReports(EnergyPlusData &state,
     // First time routine is called, all the viable combinations/settings for the reports are
     // stored in SAVEd variables.  Later callings will retrieve those.
 
-    // Using/Aliasing
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int NumReports;
-    int RepNum;
-    int NumNames;
-    int NumNumbers;
-    int IOStat;
-    auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
-
     if (state.dataGeneral->GetReportInput) {
 
+        int NumNames;
+        int NumNumbers;
+        int IOStat;
+        int RepNum;
+
+        auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
         cCurrentModuleObject = "Output:Surfaces:List";
 
-        NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        int NumReports = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         enum
         {
@@ -1216,7 +1133,7 @@ void ScanForReports(EnergyPlusData &state,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             ReportType checkReportType =
-                static_cast<ReportType>(getEnumerationValue(ReportTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+                static_cast<ReportType>(getEnumValue(ReportTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
 
             switch (checkReportType) {
             case ReportType::DXF: {
@@ -1315,17 +1232,16 @@ void ScanForReports(EnergyPlusData &state,
             state.dataGeneral->EMSoutput = true;
 
             AvailRpt CheckAvailRpt =
-                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+                static_cast<AvailRpt>(getEnumValue(AvailRptNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
             state.dataRuntimeLang->OutputEMSActuatorAvailSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSActuatorAvailFull = (CheckAvailRpt == AvailRpt::Verbose);
 
-            CheckAvailRpt =
-                static_cast<AvailRpt>(getEnumerationValue(AvailRptNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            CheckAvailRpt = static_cast<AvailRpt>(getEnumValue(AvailRptNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             state.dataRuntimeLang->OutputEMSInternalVarsSmall = (CheckAvailRpt == AvailRpt::NotByUniqueKeyNames);
             state.dataRuntimeLang->OutputEMSInternalVarsFull = (CheckAvailRpt == AvailRpt::Verbose);
 
             ERLdebugOutputLevel CheckERLlevel = static_cast<ERLdebugOutputLevel>(
-                getEnumerationValue(ERLdebugOutputLevelNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+                getEnumValue(ERLdebugOutputLevelNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
             state.dataRuntimeLang->OutputEMSErrors =
                 (CheckERLlevel == ERLdebugOutputLevel::ErrorsOnly || CheckERLlevel == ERLdebugOutputLevel::Verbose);
             state.dataRuntimeLang->OutputFullEMSTrace = (CheckERLlevel == ERLdebugOutputLevel::Verbose);
@@ -1337,8 +1253,7 @@ void ScanForReports(EnergyPlusData &state,
     // Process the Scan Request
     DoReport = false;
 
-    ReportName rptName =
-        static_cast<ReportName>(getEnumerationValue(ReportNamesUC, UtilityRoutines::MakeUPPERCase(UtilityRoutines::MakeUPPERCase(reportName))));
+    ReportName rptName = static_cast<ReportName>(getEnumValue(ReportNamesUC, UtilityRoutines::makeUPPER(UtilityRoutines::makeUPPER(reportName))));
     switch (rptName) {
     case ReportName::Constructions: {
         if (present(ReportKey)) {
@@ -1359,7 +1274,7 @@ void ScanForReports(EnergyPlusData &state,
         //      IF (PRESENT(Option1)) Option1=SchRptOption
     } break;
     case ReportName::Surfaces: {
-        RptKey rptKey = static_cast<RptKey>(getEnumerationValue(RptKeyNamesUC, UtilityRoutines::MakeUPPERCase(ReportKey())));
+        RptKey rptKey = static_cast<RptKey>(getEnumValue(RptKeyNamesUC, UtilityRoutines::makeUPPER(ReportKey())));
         switch (rptKey) { // Autodesk:OPTIONAL ReportKey used without PRESENT check
         case RptKey::Costinfo: {
             DoReport = state.dataGeneral->CostInfo;
@@ -1420,8 +1335,6 @@ void CheckCreatedZoneItemName(EnergyPlusData &state,
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   December 2012
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This routine checks "global" objects (that is, ones with ZoneList used in the name

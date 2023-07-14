@@ -94,37 +94,59 @@ Array1D_string const cValidSysAvailManagerCompTypes(NumValidSysAvailZoneComponen
                                                      "ZoneHVAC:EvaporativeCoolerUnit",
                                                      "ZoneHVAC:HybridUnitaryHVAC"});
 
-constexpr std::array<std::string_view, static_cast<int>(ZoneEquip::Num)> ZoneEquipTypeNamesUC = {"NONE",
-                                                                                                 "ZONEHVAC:FOURPIPEFANCOIL",
-                                                                                                 "ZONEHVAC:PACKAGEDTERMINALHEATPUMP",
-                                                                                                 "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",
-                                                                                                 "ZONEHVAC:WATERTOAIRHEATPUMP",
-                                                                                                 "ZONEHVAC:WINDOWAIRCONDITIONER",
-                                                                                                 "ZONEHVAC:UNITHEATER",
-                                                                                                 "ZONEHVAC:UNITVENTILATOR",
-                                                                                                 "ZONEHVAC:ENERGYRECOVERYVENTILATOR",
-                                                                                                 "ZONEHVAC:VENTILATEDSLAB",
-                                                                                                 "ZONEHVAC:OUTDOORAIRUNIT",
-                                                                                                 "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
-                                                                                                 "ZONEHVAC:IDEALLOADSAIRSYSTEM",
-                                                                                                 "ZONEHVAC:EVAPORATIVECOOLERUNIT",
-                                                                                                 "ZONEHVAC:HYBRIDUNITARYHVAC",
-                                                                                                 "ZONEHVAC:AIRDISTRIBUTIONUNIT",
-                                                                                                 "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
-                                                                                                 "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",
-                                                                                                 "ZONEHVAC:HIGHTEMPERATURERADIANT",
-                                                                                                 "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",
-                                                                                                 "FAN:ZONEEXHAUST",
-                                                                                                 "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
-                                                                                                 "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",
-                                                                                                 "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
-                                                                                                 "ZONEHVAC:DEHUMIDIFIER:DX",
-                                                                                                 "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
-                                                                                                 "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",
-                                                                                                 "ZONEHVAC:REFRIGERATIONCHILLERSET",
-                                                                                                 "ZONEHVAC:FORCEDAIR:USERDEFINED",
-                                                                                                 "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
-                                                                                                 "AIRLOOPHVAC:UNITARYSYSTEM"};
+constexpr std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zoneEquipTypeNamesUC = {
+    "DUMMY", // DUMMY,
+
+    "ZONEHVAC:FOURPIPEFANCOIL",                      // FanCoilFourPipe
+    "ZONEHVAC:PACKAGEDTERMINALHEATPUMP",             //   PackagedTerminalHeatPump
+    "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",       //  PackagedTerminalAirConditioner
+    "ZONEHVAC:WATERTOAIRHEATPUMP",                   //   PackagedTerminalHeatPumpWaterToAir
+    "ZONEHVAC:WINDOWAIRCONDITIONER",                 //  WindowAirConditioner
+    "ZONEHVAC:UNITHEATER",                           //  UnitHeater
+    "ZONEHVAC:UNITVENTILATOR",                       //  UnitVentilator
+    "ZONEHVAC:ENERGYRECOVERYVENTILATOR",             // EnergyRecoveryVentilator
+    "ZONEHVAC:VENTILATEDSLAB",                       // VentilatedSlab
+    "ZONEHVAC:OUTDOORAIRUNIT",                       // OutdoorAirUnit
+    "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW", //  VariableRefrigerantFlowTerminal
+    "ZONEHVAC:IDEALLOADSAIRSYSTEM",                  // IdealLoadsAirSystem
+    "ZONEHVAC:EVAPORATIVECOOLERUNIT",                // EvaporativeCooler
+    "ZONEHVAC:HYBRIDUNITARYHVAC",                    // HybridEvaporativeCooler,
+
+    // last zone equipment type to use zone availability manager. The above list must not change or
+    // NumValidSysAvailZoneComponents must also change.
+
+    "ZONEHVAC:AIRDISTRIBUTIONUNIT",                            // AirDistributionUnit
+    "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",                     // BaseboardWaterConvective
+    "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",                  // BaseboardElectricConvective
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",              // BaseboardSteam
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",              // BaseboardWater
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",           // BaseboardElectric
+    "ZONEHVAC:HIGHTEMPERATURERADIANT",                         // HighTempRadiant
+    "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",             //  LowTempRadiant
+    "FAN:ZONEEXHAUST",                                         // ExhaustFan
+    "HEATEXCHANGER:AIRTOAIR:FLATPLATE",                        // HeatExchanger
+    "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",                    //  HeatPumpWaterHeater
+    "ZONEHVAC:DEHUMIDIFIER:DX",                                //  DXDehumidifier
+    "ZONEHVAC:REFRIGERATIONCHILLERSET",                        // RefrigerationAirChillerSet
+    "ZONEHVAC:FORCEDAIR:USERDEFINED",                          // UserDefinedVACForcedAir
+    "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",           // CoolingPanel
+    "AIRLOOPHVAC:UNITARYSYSTEM",                               // UnitarySystem
+    "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",                     // AirTerminalDualDuctConstantVolume
+    "AIRTERMINAL:DUALDUCT:VAV",                                // AirTerminalDualDuctVAV
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",            // AirTerminalSingleDuctConstantVolumeReheat
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT",          // AirTerminalSingleDuctConstantVolumeNoReheat
+    "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",                       // AirTerminalSingleDuctVAVReheat
+    "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",                     // AirTerminalSingleDuctVAVNoReheat
+    "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",                 // AirTerminalSingleDuctSeriesPIUReheat
+    "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",               // AirTerminalSingleDuctParallelPIUReheat
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION", // AirTerminalSingleDuctCAVFourPipeInduction
+    "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",      // AirTerminalSingleDuctVAVReheatVariableSpeedFan
+    "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",           // AirTerminalSingleDuctVAVHeatAndCoolReheat
+    "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",         // AirTerminalSingleDuctVAVHeatAndCoolNoReheat
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",        // AirTerminalSingleDuctConstantVolumeCooledBeam
+    "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR",                     // AirTerminalDualDuctVAVOutdoorAir
+    "AIRLOOPHVACRETURNAIR"                                     // AirLoopHVACReturnAir
+};
 
 static constexpr std::array<std::string_view, static_cast<int>(LoadDist::Num)> LoadDistNamesUC = {
     "SEQUENTIALLOAD", "UNIFORMLOAD", "UNIFORMPLR", "SEQUENTIALUNIFORMPLR"};
@@ -392,8 +414,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             thisZoneEquipList.Name = thisZoneEquipConfig.EquipListName;
 
             std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
-            thisZoneEquipList.LoadDistScheme = static_cast<DataZoneEquipment::LoadDist>(
-                getEnumerationValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::MakeUPPERCase(loadDistName)));
+            thisZoneEquipList.LoadDistScheme =
+                static_cast<DataZoneEquipment::LoadDist>(getEnumValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::makeUPPER(loadDistName)));
             if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
                 ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
                 ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));
@@ -408,8 +430,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 // Increment overall count of equipment
                 overallEquipCount += thisZoneEquipList.NumOfEquipTypes;
 
+                thisZoneEquipList.EquipTypeName.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.EquipType.allocate(thisZoneEquipList.NumOfEquipTypes);
-                thisZoneEquipList.EquipTypeEnum.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.compPointer.resize(thisZoneEquipList.NumOfEquipTypes + 1);
                 thisZoneEquipList.EquipName.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.EquipIndex.allocate(thisZoneEquipList.NumOfEquipTypes);
@@ -420,8 +442,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 thisZoneEquipList.HeatingCapacity.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.SequentialCoolingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
                 thisZoneEquipList.SequentialHeatingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
-                thisZoneEquipList.EquipType = "";
-                thisZoneEquipList.EquipTypeEnum = DataZoneEquipment::ZoneEquip::Invalid;
+                thisZoneEquipList.EquipTypeName = "";
+                thisZoneEquipList.EquipType = DataZoneEquipment::ZoneEquipType::Invalid;
                 thisZoneEquipList.EquipName = "";
                 thisZoneEquipList.EquipIndex = 0;
                 thisZoneEquipList.CoolingPriority = 0;
@@ -437,13 +459,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 for (auto &extensibleInstance : extensiblesArray) {
                     ++ZoneEquipTypeNum;
 
-                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) =
+                    thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) =
                         ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_object_type");
                     thisZoneEquipList.EquipName(ZoneEquipTypeNum) =
                         ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_name");
 
                     ValidateComponent(state,
-                                      thisZoneEquipList.EquipType(ZoneEquipTypeNum),
+                                      thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum),
                                       thisZoneEquipList.EquipName(ZoneEquipTypeNum),
                                       IsNotOK,
                                       CurrentModuleObject);
@@ -520,13 +542,13 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                         ++thisZoneEquipList.NumAvailCoolEquip;
                     }
 
-                    thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = static_cast<ZoneEquip>(
-                        getEnumerationValue(ZoneEquipTypeNamesUC, UtilityRoutines::MakeUPPERCase(thisZoneEquipList.EquipType(ZoneEquipTypeNum))));
+                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) = static_cast<ZoneEquipType>(
+                        getEnumValue(zoneEquipTypeNamesUC, UtilityRoutines::makeUPPER(thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum))));
 
-                    if (thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::ZoneUnitarySys ||
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::PkgTermACAirToAir ||
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::PkgTermHPAirToAir ||
-                        thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::PkgTermHPWaterToAir) {
+                    if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::UnitarySystem ||
+                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalAirConditioner ||
+                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalHeatPump ||
+                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalHeatPumpWaterToAir) {
                         // loop index accesses correct pointer to equipment on this equipment list
                         // EquipIndex is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
                         thisZoneEquipList.compPointer[ZoneEquipTypeNum] = UnitarySystems::UnitarySys::factory(
@@ -534,12 +556,12 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                         thisZoneEquipList.EquipIndex(ZoneEquipTypeNum) = thisZoneEquipList.compPointer[ZoneEquipTypeNum]->getEquipIndex();
                     }
 
-                    if (thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) == ZoneEquip::Invalid) {
-                        if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ||
-                            thisZoneEquipList.EquipType(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
-                            thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = ZoneEquip::LoTempRadiant;
-                        } else if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-                            thisZoneEquipList.EquipTypeEnum(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquip::HPWaterHeater;
+                    if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::Invalid) {
+                        if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ||
+                            thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
+                            thisZoneEquipList.EquipType(ZoneEquipTypeNum) = ZoneEquipType::LowTemperatureRadiant;
+                        } else if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
+                            thisZoneEquipList.EquipType(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
                         } else {
                             ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
                             ShowContinueError(state, format("..Invalid Equipment Type = {}", thisZoneEquipList.EquipType(ZoneEquipTypeNum)));
@@ -815,7 +837,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->SupplyAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->SupplyAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -854,7 +875,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                 state.dataZoneEquip->SupplyAirPath(PathNum).SplitterIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).PlenumIndex(CompNum) = 0;
                 state.dataZoneEquip->SupplyAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    (AirLoopHVACZone)getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter));
+                    (AirLoopHVACZone)getEnumValue(AirLoopHVACTypeNamesUC, AlphArray(Counter));
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cAlphaFields(1), state.dataZoneEquip->SupplyAirPath(PathNum).Name));
                 ShowContinueError(state, format("Unhandled component type =\"{}\".", AlphArray(Counter)));
@@ -885,7 +906,6 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields); //  data for one zone
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, state.dataZoneEquip->GetZoneEquipmentDataErrorsFound);
         state.dataZoneEquip->ReturnAirPath(PathNum).Name = AlphArray(1);
         state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((double(NumAlphas) - 2.0) / 2.0);
 
@@ -924,7 +944,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                 }
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentTypeEnum(CompNum) =
-                    static_cast<AirLoopHVACZone>(getEnumerationValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
+                    static_cast<AirLoopHVACZone>(getEnumValue(AirLoopHVACTypeNamesUC, AlphArray(Counter)));
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cAlphaFields(1), state.dataZoneEquip->ReturnAirPath(PathNum).Name));
                 ShowContinueError(state, format("Unhandled component type =\"{}\".", AlphArray(Counter)));
@@ -944,31 +964,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     lAlphaBlanks.deallocate();
     lNumericBlanks.deallocate();
 
-    // setup zone equipment info for convection correlations
-    SetupZoneEquipmentForConvectionFlowRegime(state);
-
     if (state.dataZoneEquip->GetZoneEquipmentDataErrorsFound) {
         ShowFatalError(state, format("{}Errors found in getting Zone Equipment input.", RoutineName));
-    }
-}
-
-void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state)
-{
-
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Brent Griffith
-    //       DATE WRITTEN   Aug 2010
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // Decide a few one-time things for later
-    // determination of flow regime for convection
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneLoop;
-
-    for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
     }
 }
 
@@ -1000,7 +997,7 @@ bool CheckZoneEquipmentList(EnergyPlusData &state,
     for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {           // NumOfZoneEquipLists
         if (state.dataZoneEquip->ZoneEquipList(Loop).Name.empty()) continue; // dimensioned by NumOfZones.  Only valid ones have names.
         for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(Loop).NumOfEquipTypes; ++ListLoop) {
-            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipType(ListLoop), ComponentType)) continue;
+            if (!UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(Loop).EquipTypeName(ListLoop), ComponentType)) continue;
             if (ComponentName == "*") {
                 IsOnList = true;
                 CtrlZoneNumLocal = Loop;
@@ -1220,7 +1217,7 @@ void EquipList::getPrioritiesForInletNode(EnergyPlusData &state,
 {
     bool equipFound = false;
     for (int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum) {
-        if (this->EquipTypeEnum(equipNum) == DataZoneEquipment::ZoneEquip::AirDistUnit) {
+        if (this->EquipType(equipNum) == DataZoneEquipment::ZoneEquipType::AirDistributionUnit) {
             if (inletNodeNum == state.dataDefineEquipment->AirDistUnit(this->EquipIndex(equipNum)).OutletNodeNum) {
                 equipFound = true;
             }
@@ -1258,7 +1255,7 @@ Real64 EquipList::SequentialCoolingFraction(EnergyPlusData &state, const int equ
     return ScheduleManager::GetCurrentScheduleValue(state, SequentialCoolingFractionSchedPtr(equipNum));
 }
 
-int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquip const ZoneEquipTypeNum, std::string const &EquipmentName)
+int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquipType const zoneEquipType, std::string const &EquipmentName)
 {
     static constexpr std::string_view RoutineName("GetZoneEquipControlledZoneNum: ");
     int ControlZoneNum = 0;
@@ -1266,7 +1263,7 @@ int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::Zone
     for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
         for (int Num = 1; Num <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++Num) {
-            if (ZoneEquipTypeNum == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeEnum(Num) &&
+            if (zoneEquipType == state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num) &&
                 UtilityRoutines::SameString(EquipmentName, state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num))) {
                 return ControlZoneNum = CtrlZone;
             }
@@ -1275,7 +1272,7 @@ int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::Zone
     ShowSevereError(state,
                     fmt::format("{}{}=\"{}\" is not on any ZoneHVAC:Equipmentlist. It will not be simulated.",
                                 RoutineName,
-                                DataZoneEquipment::ZoneEquipTypeNamesUC[ZoneEquipTypeNum],
+                                zoneEquipTypeNamesUC[(int)zoneEquipType],
                                 EquipmentName));
     return ControlZoneNum;
 }

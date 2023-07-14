@@ -878,7 +878,7 @@ namespace InternalHeatGains {
                             }
 
                             if (!IHGAlphaFieldBlanks(10) || !IHGAlphas(10).empty()) {
-                                thisPeople.clothingType = static_cast<ClothingType>(getEnumerationValue(clothingTypeNamesUC, IHGAlphas(10)));
+                                thisPeople.clothingType = static_cast<ClothingType>(getEnumValue(clothingTypeNamesUC, IHGAlphas(10)));
                                 if (thisPeople.clothingType == ClothingType::Invalid) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  ={}",
@@ -3196,13 +3196,12 @@ namespace InternalHeatGains {
                         }
 
                         // Environmental class
-                        thisZoneITEq.Class =
-                            static_cast<ITEClass>(getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(10))));
+                        thisZoneITEq.Class = static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(10))));
                         ErrorsFound = ErrorsFound || (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
-                        thisZoneITEq.AirConnectionType = static_cast<ITEInletConnection>(
-                            getEnumerationValue(ITEInletConnectionNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(11))));
+                        thisZoneITEq.AirConnectionType =
+                            static_cast<ITEInletConnection>(getEnumValue(ITEInletConnectionNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(11))));
                         if (thisZoneITEq.AirConnectionType == ITEInletConnection::RoomAirModel) {
                             // ZoneITEq(Loop).AirConnectionType = ITEInletConnection::RoomAirModel;
                             ShowWarningError(state,
@@ -4161,7 +4160,7 @@ namespace InternalHeatGains {
             int counter = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
-                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(objectType, instance.key());
 
                 // For incoming idf, maintain object order
@@ -4777,7 +4776,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->Lights(lightsNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "InteriorLights",
                                 state.dataHeatBal->Lights(lightsNum).EndUseSubcategory,
@@ -4785,8 +4784,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->Lights(lightsNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                {},
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->Lights(lightsNum).spaceIndex).spaceType);
         }
 
@@ -4992,7 +4991,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneElectric(elecEqNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneElectric(elecEqNum).EndUseSubcategory,
@@ -5000,8 +4999,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneElectric(elecEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                {},
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneElectric(elecEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -5280,7 +5279,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneGas(gasEqNum).Name,
-                                _,
+                                {},
                                 "NaturalGas",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneGas(gasEqNum).EndUseSubcategory,
@@ -5288,8 +5287,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneGas(gasEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                {},
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneGas(gasEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -5571,7 +5570,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).Name,
-                                _,
+                                {},
                                 "DistrictHeating",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).EndUseSubcategory,
@@ -5579,8 +5578,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneHWEq(hwEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                {},
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneHWEq(hwEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -5860,7 +5859,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).Name,
-                                _,
+                                {},
                                 "DistrictHeating",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).EndUseSubcategory,
@@ -5868,8 +5867,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneSteamEq(stmEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                -999,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneSteamEq(stmEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -6151,7 +6150,7 @@ namespace InternalHeatGains {
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::Summed,
                                     state.dataHeatBal->ZoneOtherEq(othEqNum).Name,
-                                    _,
+                                    {},
                                     fuelTypeString,
                                     "InteriorEquipment",
                                     state.dataHeatBal->ZoneOtherEq(othEqNum).EndUseSubcategory,
@@ -6159,8 +6158,8 @@ namespace InternalHeatGains {
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).Name,
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).Multiplier,
                                     state.dataHeatBal->Zone(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr).ListMultiplier,
-                                    _,
-                                    _,
+                                    -999,
+                                    {},
                                     state.dataHeatBal->space(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex).spaceType);
             }
 
@@ -6479,7 +6478,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryCPU,
@@ -6487,8 +6486,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                -999,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -6498,7 +6497,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryFan,
@@ -6506,8 +6505,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                -999,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
             SetupOutputVariable(state,
                                 "ITE UPS Electricity Energy",
@@ -6516,7 +6515,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneITEq(itEqNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneITEq(itEqNum).EndUseSubcategoryUPS,
@@ -6524,8 +6523,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneITEq(itEqNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                -999,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneITEq(itEqNum).spaceIndex).spaceType);
             SetupOutputVariable(state,
                                 "ITE CPU Electricity Energy at Design Inlet Conditions",
@@ -6976,7 +6975,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneBBHeat(bbHeatNum).Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneBBHeat(bbHeatNum).EndUseSubcategory,
@@ -6984,8 +6983,8 @@ namespace InternalHeatGains {
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).Name,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(state.dataHeatBal->ZoneBBHeat(bbHeatNum).ZonePtr).ListMultiplier,
-                                _,
-                                _,
+                                -999,
+                                {},
                                 state.dataHeatBal->space(state.dataHeatBal->ZoneBBHeat(bbHeatNum).spaceIndex).spaceType);
 
             SetupOutputVariable(state,
@@ -7180,7 +7179,7 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DaylightingDevices::FigureTDDZoneGains;
+        using Dayltg::FigureTDDZoneGains;
         using FuelCellElectricGenerator::FigureFuelCellZoneGains;
         using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
         using OutputReportTabular::AllocateLoadComponentArrays;
@@ -7341,9 +7340,9 @@ namespace InternalHeatGains {
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
-                    if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                        if (state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
-                            airTemp = state.dataRoomAirMod->TCMF(NZ);
+                    if (state.dataRoomAir->anyNonMixingRoomAirModel) {
+                        if (state.dataRoomAir->IsZoneDispVent3Node(NZ) || state.dataRoomAir->IsZoneUFAD(NZ)) {
+                            airTemp = state.dataRoomAir->TCMF(NZ);
                         }
                     }
                     SensiblePeopleGain =
@@ -8763,24 +8762,13 @@ namespace InternalHeatGains {
         }
     }
 
-    void UpdateInternalGainValues(EnergyPlusData &state,
-                                  ObjexxFCL::Optional_bool_const SuppressRadiationUpdate,
-                                  ObjexxFCL::Optional_bool_const SumLatentGains)
+    void UpdateInternalGainValues(EnergyPlusData &state, bool const SuppressRadiationUpdate, bool const SumLatentGains)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   Dec. 2011
-        bool DoRadiationUpdate = true;
-        bool ReSumLatentGains = false;
-
-        if (present(SuppressRadiationUpdate)) {
-            if (SuppressRadiationUpdate) DoRadiationUpdate = false;
-        }
-
-        if (present(SumLatentGains)) {
-            if (SumLatentGains) ReSumLatentGains = true;
-        }
+        bool DoRadiationUpdate{!SuppressRadiationUpdate};
 
         // store pointer values to hold generic internal gain values constant for entire timestep
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
@@ -8800,7 +8788,7 @@ namespace InternalHeatGains {
                     *thisIntGain.device(Loop).PtrGenericContamGainRate * thisIntGain.device(Loop).spaceGainFrac;
             }
         }
-        if (ReSumLatentGains) {
+        if (SumLatentGains) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
                 auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
                 thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);

@@ -220,6 +220,21 @@ void SummarizeErrors(EnergyPlusData &state);
 
 void ShowRecurringErrors(EnergyPlusData &state);
 
+struct ErrorObjectHeader
+{
+    std::string_view routineName;
+    std::string_view objectType;
+    std::string_view objectName;
+};
+
+void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue);
+void ShowSevereEmptyField(EnergyPlusData &state,
+                          ErrorObjectHeader const &eoh,
+                          std::string_view fieldName,
+                          std::string_view depFieldName = {},
+                          std::string_view depFieldVal = {});
+
 namespace UtilityRoutines {
 
     static constexpr std::array<std::string_view, 12> MonthNamesCC{
@@ -465,7 +480,7 @@ namespace UtilityRoutines {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
-    inline std::string MakeUPPERCase(std::string_view const InputString) // Input String
+    inline std::string makeUPPER(std::string_view const InputString) // Input String
     {
 
         // FUNCTION INFORMATION:
@@ -647,20 +662,9 @@ namespace UtilityRoutines {
 
     void appendPerfLog(EnergyPlusData &state, std::string const &colHeader, std::string const &colValue, bool finalColumn = false);
 
-    bool ValidateFuelType(EnergyPlusData &state,
-                          std::string const &FuelTypeInput,
-                          std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound,
-                          bool AllowSteamAndDistrict = false);
-
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
-                                                   std::string &FuelTypeOutput,
-                                                   Constant::ResourceType &FuelTypeNum,
-                                                   bool &FuelTypeErrorsFound);
-
 } // namespace UtilityRoutines
 
-constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList, const std::string_view s)
+constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const std::string_view s)
 {
     for (unsigned int i = 0; i < sList.size(); ++i) {
         if (sList[i] == s) return i;
@@ -671,7 +675,7 @@ constexpr int getEnumerationValue(const gsl::span<const std::string_view> sList,
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
     constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
-    return static_cast<BooleanSwitch>(getEnumerationValue(yesNo, s));
+    return static_cast<BooleanSwitch>(getEnumValue(yesNo, s));
 }
 
 struct UtilityRoutinesData : BaseGlobalStruct

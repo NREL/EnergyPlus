@@ -123,7 +123,7 @@ namespace WaterToAirHeatPumpSimple {
                                DataHVACGlobals::CompressorOperation const CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
-                               ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
+                               Real64 const OnOffAirFlowRatio // ratio of comp on to comp off air flow rate
     )
     {
 
@@ -148,8 +148,7 @@ namespace WaterToAirHeatPumpSimple {
         // shut off after compressor cycle off  [s]
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int HPNum;                // The WatertoAirHP that you are currently loading input into
-        Real64 OnOffAirFlowRatio; // ratio of comp on to comp off air flow rate
+        int HPNum; // The WatertoAirHP that you are currently loading input into
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag) { // First time subroutine has been entered
@@ -183,12 +182,6 @@ namespace WaterToAirHeatPumpSimple {
         }
 
         auto &simpleWAHP(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
-
-        if (present(OnOffAirFlowRat)) {
-            OnOffAirFlowRatio = OnOffAirFlowRat;
-        } else {
-            OnOffAirFlowRatio = 1.0;
-        }
 
         if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
@@ -327,13 +320,15 @@ namespace WaterToAirHeatPumpSimple {
             simpleWAHP.WAHPType = WatertoAirHP::Cooling;
             simpleWAHP.WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
             simpleWAHP.RatedAirVolFlowRate = NumArray(1);
-            simpleWAHP.RatedWaterVolFlowRate = NumArray(2);
-            simpleWAHP.RatedCapCoolTotal = NumArray(3);
-            simpleWAHP.RatedCapCoolSens = NumArray(4);
-            simpleWAHP.RatedCOPCoolAtRatedCdts = NumArray(5);
-            simpleWAHP.RatedEntWaterTemp = NumArray(6);
-            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(7);
-            simpleWAHP.RatedEntAirWetbulbTemp = NumArray(8);
+            simpleWAHP.RatedEvapFanPowerPerVolFlowRate2017 = NumArray(2);
+            simpleWAHP.RatedEvapFanPowerPerVolFlowRate2023 = NumArray(3);
+            simpleWAHP.RatedWaterVolFlowRate = NumArray(4);
+            simpleWAHP.RatedCapCoolTotal = NumArray(5);
+            simpleWAHP.RatedCapCoolSens = NumArray(6);
+            simpleWAHP.RatedCOPCoolAtRatedCdts = NumArray(7);
+            simpleWAHP.RatedEntWaterTemp = NumArray(8);
+            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(9);
+            simpleWAHP.RatedEntAirWetbulbTemp = NumArray(10);
             simpleWAHP.TotalCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             simpleWAHP.SensCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(7));  // convert curve name to number
             simpleWAHP.CoolPowCurveIndex = Curve::GetCurveIndex(state, AlphArray(8));      // convert curve name to number
@@ -392,8 +387,8 @@ namespace WaterToAirHeatPumpSimple {
                                                      "Cooling Power Consumption Curve Name");
             }
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
-            simpleWAHP.Twet_Rated = NumArray(9);
-            simpleWAHP.Gamma_Rated = NumArray(10);
+            simpleWAHP.Twet_Rated = NumArray(11);
+            simpleWAHP.Gamma_Rated = NumArray(12);
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = simpleWAHP.Name;
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
@@ -446,10 +441,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Cooling",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
@@ -458,10 +453,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
@@ -484,10 +479,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "PLANTLOOPCOOLINGDEMAND",
                                 "COOLINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // create predefined report entries
@@ -619,10 +614,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "Electricity",
                                 "Heating",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
@@ -631,10 +626,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
@@ -643,10 +638,10 @@ namespace WaterToAirHeatPumpSimple {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 simpleWAHP.Name,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "HEATINGCOILS",
-                                _,
+                                {},
                                 "System");
 
             // create predefined report entries

@@ -209,18 +209,14 @@ namespace BaseboardElectric {
                 baseboard->baseboards(ConvElecBBNum).FieldNames = "";
                 baseboard->baseboards(ConvElecBBNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                    continue;
-                }
-
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
                 VerifyUniqueBaseboardName(
                     state, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1), ErrorsFound, format("{} Name", cCurrentModuleObject));
 
                 ++BaseboardNum;
                 auto &thisBaseboard = baseboard->baseboards(BaseboardNum);
-                thisBaseboard.EquipName = state.dataIPShortCut->cAlphaArgs(1);                  // name of this baseboard
-                thisBaseboard.EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
+                thisBaseboard.EquipName = state.dataIPShortCut->cAlphaArgs(1);              // name of this baseboard
+                thisBaseboard.EquipType = UtilityRoutines::makeUPPER(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = state.dataIPShortCut->cAlphaArgs(2);
                 if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     thisBaseboard.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -334,7 +330,7 @@ namespace BaseboardElectric {
                 }
 
                 thisBaseboard.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
-                    state, DataZoneEquipment::ZoneEquip::BBElectricConvective, thisBaseboard.EquipName);
+                    state, DataZoneEquipment::ZoneEquipType::BaseboardConvectiveElectric, thisBaseboard.EquipName);
             }
 
             if (ErrorsFound) {
@@ -355,10 +351,10 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -376,10 +372,10 @@ namespace BaseboardElectric {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipName,
-                                _,
+                                {},
                                 "Electricity",
                                 "HEATING",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -450,13 +446,13 @@ namespace BaseboardElectric {
             auto &ZoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
             auto &baseboard = state.dataBaseboardElectric->baseboards(BaseboardNum);
 
-            std::string CompType = baseboard.EquipType;
-            std::string CompName = baseboard.EquipName;
+            std::string_view const CompType = baseboard.EquipType;
+            std::string_view const CompName = baseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = baseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
             int FieldNum = 1;
-            std::string SizingString = baseboard.FieldNames(FieldNum) + " [W]";
+            std::string const SizingString = format("{} [W]", baseboard.FieldNames(FieldNum));
             int CapSizingMethod = baseboard.HeatingCapMethod;
             ZoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||

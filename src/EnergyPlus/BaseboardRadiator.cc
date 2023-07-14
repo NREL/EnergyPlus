@@ -225,13 +225,11 @@ namespace BaseboardRadiator {
         using namespace DataSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("GetBaseboardInput: "); // include trailing blank space
-        int constexpr iHeatCAPMAlphaNum(5);             // get input index to water baseboard Radiator system heating capacity sizing method
-        int constexpr iHeatDesignCapacityNumericNum(1); // get input index to water baseboard Radiator system electric heating capacity
-        int constexpr iHeatCapacityPerFloorAreaNumericNum(
-            2); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
-        int constexpr iHeatFracOfAutosizedCapacityNumericNum(
-            3); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autosized heating capacity
+        static constexpr std::string_view RoutineName = "GetBaseboardInput: "; // include trailing blank space
+        int constexpr iHeatCAPMAlphaNum = 5;                   // get input index to water baseboard Radiator system heating capacity sizing method
+        int constexpr iHeatDesignCapacityNumericNum = 1;       // get input index to water baseboard Radiator system electric heating capacity
+        int constexpr iHeatCapacityPerFloorAreaNumericNum = 2; // index to baseboard Radiator system electric heating capacity per floor area sizing
+        int constexpr iHeatFracOfAutosizedCapacityNumericNum = 3; //  index to baseboard heating capacity fraction of autosized heating capacity
 
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
 
@@ -266,10 +264,6 @@ namespace BaseboardRadiator {
                 auto &thisBaseboard = state.dataBaseboardRadiator->baseboards(ConvHWBaseboardNum);
                 thisBaseboard.FieldNames.allocate(NumNums);
                 thisBaseboard.FieldNames = state.dataIPShortCut->cNumericFieldNames;
-
-                if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                    continue;
-                }
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
                 VerifyUniqueBaseboardName(
@@ -422,8 +416,8 @@ namespace BaseboardRadiator {
                     thisBaseboard.Offset = 0.001;
                 }
 
-                thisBaseboard.ZonePtr =
-                    DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWaterConvective, thisBaseboard.EquipID);
+                thisBaseboard.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(
+                    state, DataZoneEquipment::ZoneEquipType::BaseboardConvectiveWater, thisBaseboard.EquipID);
             }
 
             if (ErrorsFound) {
@@ -443,10 +437,10 @@ namespace BaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
-                                _,
+                                {},
                                 "ENERGYTRANSFER",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -456,10 +450,10 @@ namespace BaseboardRadiator {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisBaseboard.EquipID,
-                                _,
+                                {},
                                 "PLANTLOOPHEATINGDEMAND",
                                 "BASEBOARD",
-                                _,
+                                {},
                                 "System");
 
             SetupOutputVariable(state,
@@ -530,7 +524,7 @@ namespace BaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
-        static constexpr std::string_view RoutineName("BaseboardRadiator:InitBaseboard");
+        static constexpr std::string_view RoutineName = "BaseboardRadiator:InitBaseboard";
 
         if (this->SetLoopIndexFlag && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
@@ -607,9 +601,9 @@ namespace BaseboardRadiator {
         // calculated by numerically inverting the baseboard calculation routine.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 constexpr Acc(0.0001); // Accuracy of result
-        int constexpr MaxIte(500);    // Maximum number of iterations
-        static std::string const RoutineName(cCMO_BBRadiator_Water + ":SizeBaseboard");
+        Real64 constexpr Acc = 0.0001; // Accuracy of result
+        int constexpr MaxIte = 500;    // Maximum number of iterations
+        static std::string const RoutineName = cCMO_BBRadiator_Water + ":SizeBaseboard";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DesCoilLoad(0.0);
@@ -647,13 +641,13 @@ namespace BaseboardRadiator {
                     }
                 } else {
                     CheckZoneSizing(state, cCMO_BBRadiator_Water, this->EquipID);
-                    std::string CompType = cCMO_BBRadiator_Water;
-                    std::string CompName = this->EquipID;
+                    std::string_view const CompType = cCMO_BBRadiator_Water;
+                    std::string_view const CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    std::string SizingString = this->FieldNames(FieldNum) + " [W]";
+                    std::string const SizingString = format("{} [W]", this->FieldNames(FieldNum));
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||
@@ -769,13 +763,13 @@ namespace BaseboardRadiator {
                                            RoutineName);
                     state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = rho * this->WaterVolFlowRateMax;
 
-                    std::string CompType = cCMO_BBRadiator_Water;
-                    std::string CompName = this->EquipID;
+                    std::string_view const CompType = cCMO_BBRadiator_Water;
+                    std::string_view const CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
                     int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                     int FieldNum = 1;
-                    std::string SizingString = this->FieldNames(FieldNum) + " [W]";
+                    std::string const SizingString = format("{} [W]", this->FieldNames(FieldNum));
                     int CapSizingMethod = this->HeatingCapMethod;
                     zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == DataSizing::HeatingDesignCapacity || CapSizingMethod == DataSizing::CapacityPerFloorArea ||

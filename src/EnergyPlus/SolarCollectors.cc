@@ -237,7 +237,7 @@ namespace SolarCollectors {
                 }
 
                 std::string_view const key = state.dataIPShortCut->cAlphaArgs(3);
-                state.dataSolarCollectors->Parameters(ParametersNum).TestType = static_cast<TestTypeEnum>(getEnumerationValue(testTypesUC, key));
+                state.dataSolarCollectors->Parameters(ParametersNum).TestType = static_cast<TestTypeEnum>(getEnumValue(testTypesUC, key));
                 if (state.dataSolarCollectors->Parameters(ParametersNum).TestType == TestTypeEnum::INVALID) {
                     ShowSevereError(state,
                                     format("{} = {}: {} is not supported for {}",
@@ -781,10 +781,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
         } else if (this->Type == DataPlant::PlantEquipmentType::SolarCollectorICS) {
 
@@ -843,10 +843,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -864,10 +864,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
 
             SetupOutputVariable(state,
@@ -885,10 +885,10 @@ namespace SolarCollectors {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
-                                _,
+                                {},
                                 "SolarWater",
                                 "HeatProduced",
-                                _,
+                                {},
                                 "Plant");
         }
     }

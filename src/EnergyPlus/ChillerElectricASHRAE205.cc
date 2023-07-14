@@ -58,6 +58,7 @@
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerElectricASHRAE205.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -95,25 +96,7 @@ constexpr std::array<std::string_view, static_cast<int>(AmbientTempIndicator::Nu
 };
 
 std::map<std::string, Btwxt::Method> InterpMethods = // NOLINT(cert-err58-cpp)
-    {{"LINEAR", Btwxt::Method::LINEAR}, {"CUBIC", Btwxt::Method::CUBIC}};
-
-void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr)
-{
-    std::pair<EnergyPlusData *, std::string> contextPair = *(std::pair<EnergyPlusData *, std::string> *)context_ptr;
-    std::string fullMessage = contextPair.second + ": " + message;
-    if (message_type == tk205::MsgSeverity::ERR_205) {
-        ShowSevereError(*contextPair.first, fullMessage);
-        ShowFatalError(*contextPair.first, "libtk205: Errors discovered, program terminates.");
-    } else {
-        if (message_type == tk205::MsgSeverity::WARN_205) {
-            ShowWarningError(*contextPair.first, fullMessage);
-        } else if (message_type == tk205::MsgSeverity::INFO_205) {
-            ShowMessage(*contextPair.first, fullMessage);
-        } else {
-            ShowMessage(*contextPair.first, fullMessage);
-        }
-    }
-}
+    {{"LINEAR", Btwxt::Method::linear}, {"CUBIC", Btwxt::Method::cubic}};
 
 void getChillerASHRAE205Input(EnergyPlusData &state)
 {
@@ -146,7 +129,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
 
         ++ChillerNum;
         auto &thisChiller = state.dataChillerElectricASHRAE205->Electric205Chiller(ChillerNum);
-        thisChiller.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+        thisChiller.Name = UtilityRoutines::makeUPPER(thisObjectName);
         ip->markObjectAsUsed(state.dataIPShortCut->cCurrentModuleObject, thisObjectName);
 
         std::string const rep_file_name = ip->getAlphaFieldValue(fields, objectSchemaProps, "representation_file_name");
@@ -160,16 +143,14 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
         std::pair<EnergyPlusData *, std::string> callbackPair{&state,
                                                               format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
-        tk205::set_error_handler(tk205ErrCallback, &callbackPair);
-        Btwxt::LOG_LEVEL = static_cast<int>(Btwxt::MsgLevel::MSG_WARN);
         thisChiller.Representation =
-            std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str()));
+            std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlus::Curve::EPlusLogging>()));
         if (nullptr == thisChiller.Representation) {
             ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
             ErrorsFound = true;
         }
         thisChiller.InterpolationType =
-            InterpMethods[UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
+            InterpMethods[UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
 
         const auto &compressorSequence = thisChiller.Representation->performance.performance_map_cooling.grid_variables.compressor_sequence_number;
         // minmax_element is sound but perhaps overkill; as sequence numbers are required by A205 to be in ascending order
@@ -260,7 +241,7 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
                                            "Condenser Water Nodes");
 
         thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(
-            getEnumerationValue(DataPlant::FlowModeNamesUC, ip->getAlphaFieldValue(fields, objectSchemaProps, "chiller_flow_mode")));
+            getEnumValue(DataPlant::FlowModeNamesUC, ip->getAlphaFieldValue(fields, objectSchemaProps, "chiller_flow_mode")));
 
         if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
             ShowSevereError(state, format("{}{}=\"{}\"", std::string{RoutineName}, state.dataIPShortCut->cCurrentModuleObject, thisObjectName));
@@ -294,8 +275,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             }
         }
 
-        thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumerationValue(
-            AmbientTempNamesUC, UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
+        thisChiller.AmbientTempType = static_cast<AmbientTempIndicator>(getEnumValue(
+            AmbientTempNamesUC, UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_indicator"))));
         switch (thisChiller.AmbientTempType) {
         case AmbientTempIndicator::Schedule: {
             std::string const ambient_temp_schedule = ip->getAlphaFieldValue(fields, objectSchemaProps, "ambient_temperature_schedule");
@@ -1015,7 +996,7 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ELECTRICITY",
                         "Cooling",
                         this->EndUseSubcategory,
@@ -1036,10 +1017,10 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "CHILLERS",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,
@@ -1081,10 +1062,10 @@ void ASHRAE205ChillerSpecs::setOutputVariables(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        _,
+                        {},
                         "ENERGYTRANSFER",
                         "HEATREJECTION",
-                        _,
+                        {},
                         "Plant");
 
     SetupOutputVariable(state,

@@ -168,7 +168,7 @@ namespace UnitarySystems {
 
     public:
         std::string name;
-        static DesignSpecMSHP *factory(EnergyPlusData &state, int object_type_of_num, std::string const objectName);
+        static DesignSpecMSHP *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
         int numOfSpeedHeating = 0;
         int numOfSpeedCooling = 0;
         Real64 noLoadAirFlowRateRatio = 1.0;
@@ -489,7 +489,7 @@ namespace UnitarySystems {
 
     public:
         // SZVAV variables
-        DataZoneEquipment::ZoneEquip ZoneEqType = DataZoneEquipment::ZoneEquip::Invalid;
+        DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::Invalid;
         SimAirServingZones::CompType AirloopEqType = SimAirServingZones::CompType::Invalid;
         int MaxIterIndex = 0;
         int RegulaFalsiFailedIndex = 0;
@@ -880,8 +880,8 @@ namespace UnitarySystems {
 
         static void allocateUnitarySys(EnergyPlusData &state);
 
-        static HVACSystemData *
-        factory(EnergyPlusData &state, int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
+        static HVACSystemData *factory(
+            EnergyPlusData &state, int const object_type_of_num, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         void calcUnitarySystemToLoad(EnergyPlusData &state,
                                      int const AirLoopNum,          // index to air loop

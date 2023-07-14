@@ -306,7 +306,7 @@ namespace UnitVentilator {
             cHeatingCoilType = "";
 
             {
-                unitVent.OAControlType = (OAControl)getEnumerationValue(OAControlNamesUC, Alphas(3));
+                unitVent.OAControlType = (OAControl)getEnumValue(OAControlNamesUC, Alphas(3));
                 switch (unitVent.OAControlType) {
                 case OAControl::VariablePercent:
                 case OAControl::FixedAmount: {
@@ -315,7 +315,7 @@ namespace UnitVentilator {
                         ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
                         ShowContinueError(state, format("not found: {}=\"{}\".", cAlphaFields(5), Alphas(5)));
                         ErrorsFound = true;
-                    } else if (!ScheduleManager::CheckScheduleValueMinMax(state, unitVent.MaxOASchedPtr, ">=0", 0.0, "<=", 1.0)) {
+                    } else if (!ScheduleManager::CheckScheduleValueMinMax(state, unitVent.MaxOASchedPtr, ">=", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
                         ShowContinueError(state, format("out of range [0,1]: {}=\"{}\".", cAlphaFields(5), Alphas(5)));
                         ErrorsFound = true;
@@ -376,7 +376,8 @@ namespace UnitVentilator {
             if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide || unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
                 unitVent.ATMixerExists = true;
             }
-            unitVent.ZonePtr = DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::UnitVentilator, unitVent.Name);
+            unitVent.ZonePtr =
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::UnitVentilator, unitVent.Name);
             if (unitVent.ZonePtr == 0) {
                 ErrorsFound = true;
             }
@@ -590,7 +591,7 @@ namespace UnitVentilator {
                 }
             }
 
-            unitVent.CoilOption = (CoilsUsed)getEnumerationValue(CoilsUsedNamesUC, Alphas(13));
+            unitVent.CoilOption = (CoilsUsed)getEnumValue(CoilsUsedNamesUC, Alphas(13));
 
             unitVent.FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(14));
             // Default to cycling fan when fan mode schedule is not present
@@ -624,8 +625,8 @@ namespace UnitVentilator {
                     unitVent.HCoilPresent = true;
                     cHeatingCoilType = Alphas(15);
                     unitVent.HCoilTypeCh = cHeatingCoilType;
-                    unitVent.HCoilType = (HeatCoilType)getEnumerationValue(HeatCoilTypeNamesUC, cHeatingCoilType);
-                    unitVent.HeatingCoilType = (DataPlant::PlantEquipmentType)getEnumerationValue(DataPlant::PlantEquipTypeNamesUC, cHeatingCoilType);
+                    unitVent.HCoilType = (HeatCoilType)getEnumValue(HeatCoilTypeNamesUC, cHeatingCoilType);
+                    unitVent.HeatingCoilType = (DataPlant::PlantEquipmentType)getEnumValue(DataPlant::PlantEquipTypeNamesUC, cHeatingCoilType);
 
                     unitVent.HCoilName = Alphas(16);
                     ValidateComponent(state, cHeatingCoilType, unitVent.HCoilName, IsNotOK, CurrentModuleObject);
@@ -673,8 +674,8 @@ namespace UnitVentilator {
 
                     cCoolingCoilType = Alphas(17);
                     unitVent.CCoilTypeCh = cCoolingCoilType;
-                    unitVent.CCoilType = (CoolCoilType)getEnumerationValue(CoolCoilTypeNamesUC, cCoolingCoilType);
-                    unitVent.CoolingCoilType = (DataPlant::PlantEquipmentType)getEnumerationValue(DataPlant::PlantEquipTypeNamesUC, cCoolingCoilType);
+                    unitVent.CCoilType = (CoolCoilType)getEnumValue(CoolCoilTypeNamesUC, cCoolingCoilType);
+                    unitVent.CoolingCoilType = (DataPlant::PlantEquipmentType)getEnumValue(DataPlant::PlantEquipTypeNamesUC, cCoolingCoilType);
                     unitVent.CCoilPlantName = Alphas(18);
 
                     if (cCoolingCoilType == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
@@ -1082,8 +1083,6 @@ namespace UnitVentilator {
         // Uses the status flags to trigger initializations.
 
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         static constexpr std::string_view RoutineName("InitUnitVentilator");
@@ -1105,13 +1104,13 @@ namespace UnitVentilator {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum);
             if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailManagerListName =
-                    unitVent.AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).ZoneNum = ZoneNum;
+                availMgr.AvailManagerListName = unitVent.AvailManagerListName;
+                availMgr.ZoneNum = ZoneNum;
                 state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
             }
-            unitVent.AvailStatus = ZoneComp(DataZoneEquipment::ZoneEquip::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum).AvailStatus;
+            unitVent.AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1257,7 +1256,8 @@ namespace UnitVentilator {
         }
 
         if (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) > 0) {
-            if ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOff) {
+            if ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) > 0 || state.dataHVACGlobal->TurnFansOn) &&
+                !state.dataHVACGlobal->TurnFansOff) {
                 if ((std::abs(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired) < DataHVACGlobals::SmallLoad) ||
                     (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum))) {
                     SetMassFlowRateToZero = true;
@@ -2391,8 +2391,6 @@ namespace UnitVentilator {
         // ASHRAE Systems and Equipment Handbook (SI), 1996. page 31.3
 
         // Using/Aliasing
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         // Smallest allowed temperature difference for comparisons (below this value the temperatures are assumed equal)
@@ -2477,7 +2475,8 @@ namespace UnitVentilator {
         if ((std::abs(state.dataUnitVentilators->QZnReq) < DataHVACGlobals::SmallLoad) ||
             (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
             (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) <= 0) ||
-            ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) || ZoneCompTurnFansOff)) {
+            ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) <= 0 && !state.dataHVACGlobal->TurnFansOn) ||
+             state.dataHVACGlobal->TurnFansOff)) {
 
             // Unit is off or has no load upon it; set the flow rates to zero and then
             // simulate the components with the no flow conditions
@@ -3042,8 +3041,6 @@ namespace UnitVentilator {
         // that a cooling coil must be present in order to call a cooling coil
         // simulation.  Other than that, the subroutine is very straightforward.
 
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         Real64 mdot; // hot water or steam mass flow rate for current time step
@@ -3071,11 +3068,10 @@ namespace UnitVentilator {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
             if (unitVent.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
-                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
             }
 
             if (unitVent.CCoilPresent) {
@@ -3160,10 +3156,9 @@ namespace UnitVentilator {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
             if (unitVent.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
-                    state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
-                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
             }
 
             if (unitVent.CCoilPresent) {

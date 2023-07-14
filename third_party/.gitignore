@@ -29,6 +29,9 @@ kiva/README.md
 kiva/.gitmodules
 penumbra/.gitmodules
 btwxt/.gitmodules
+btwxt/vendor/fmt
+btwxt/vendor/courierr/vendor/fmt
+btwxt/vendor/courierr/.gitmodules
 libtk205/.gitmodules
 
 # unused repo directories/files
@@ -39,3 +42,4 @@ libtk205/examples
 libtk205/test
 libtk205/vendor/btwxt
 libtk205/vendor/json
+libtk205/vendor/courierr
