@@ -704,7 +704,8 @@ namespace SteamBaseboardRadiator {
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBSteam &&
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType(zoneEquipTypeNum) ==
+                            DataZoneEquipment::ZoneEquipType::BaseboardSteam &&
                         state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) ==
                             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
@@ -755,8 +756,8 @@ namespace SteamBaseboardRadiator {
                     state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
                 }
                 if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(
-                        state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum)) = true;
+                    state.dataSurface->surfIntConv(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum))
+                        .getsRadiantHeat = true;
                 }
 
                 AllFracsSummed += state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);
