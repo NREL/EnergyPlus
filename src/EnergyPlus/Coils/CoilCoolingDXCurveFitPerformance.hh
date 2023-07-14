@@ -51,6 +51,7 @@
 #include <string>
 #include <vector>
 
+#include <EnergyPlus/Coils/CoilCoolingDXPerformanceBase.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -79,7 +80,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     std::string capacity_control;
 };
 
-struct CoilCoolingDXCurveFitPerformance
+struct CoilCoolingDXCurveFitPerformance : private CoilCoolingDXPerformanceBase
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
     std::string parentName;
