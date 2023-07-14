@@ -385,7 +385,7 @@ namespace ElectricBaseboardRadiator {
             elecBaseboard.FracDistribToSurf = 0.0;
 
             elecBaseboard.ZonePtr =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBElectric, elecBaseboard.EquipName);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardElectric, elecBaseboard.EquipName);
 
             Real64 AllFracsSummed = elecBaseboard.FracDistribPerson;
             for (int SurfNum = 1; SurfNum <= elecBaseboard.TotSurfToDistrib; ++SurfNum) {

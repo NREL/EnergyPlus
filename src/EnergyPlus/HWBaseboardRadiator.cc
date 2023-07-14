@@ -303,7 +303,7 @@ namespace HWBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             thisHWBaseboardDesign.HeatingCapMethod = static_cast<DataSizing::DesignSizingType>(
-                getEnumerationValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+                getEnumValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
             if (thisHWBaseboardDesign.HeatingCapMethod == DataSizing::DesignSizingType::CapacityPerFloorArea) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     thisHWBaseboardDesign.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -629,7 +629,7 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.FracDistribToSurf = 0.0;
 
             thisHWBaseboard.ZonePtr =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWater, thisHWBaseboard.Name);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardWater, thisHWBaseboard.Name);
 
             Real64 AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= thisHWBaseboard.TotSurfToDistrib; ++SurfNum) {

@@ -174,7 +174,7 @@ namespace HeatBalanceManager {
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
             //   if in the future surfaces are altered after this point
-            if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                                // Octree can be active
+            if (state.dataSurface->TotSurfaces >= Dayltg::octreeCrossover) {                                            // Octree can be active
                 if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
                     state.dataHeatBalMgr->surfaceOctree.init(state.dataSurface->Surface);                               // Set up surface octree
                 }
@@ -730,7 +730,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            Convect::HcInt hcIn = static_cast<Convect::HcInt>(getEnumerationValue(Convect::HcIntNamesUC, AlphaName(1)));
+            Convect::HcInt hcIn = static_cast<Convect::HcInt>(getEnumValue(Convect::HcIntNamesUC, AlphaName(1)));
 
             if (hcIn == Convect::HcInt::TrombeWall) {
                 ShowSevereError(state,
@@ -770,7 +770,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
-            Convect::HcExt hcOut = static_cast<Convect::HcExt>(getEnumerationValue(Convect::HcExtNamesUC, AlphaName(1)));
+            Convect::HcExt hcOut = static_cast<Convect::HcExt>(getEnumValue(Convect::HcExtNamesUC, AlphaName(1)));
 
             if (hcOut != Convect::HcExt::ASHRAESimple && hcOut != Convect::HcExt::ASHRAETARP && hcOut != Convect::HcExt::MoWiTTHcOutside &&
                 hcOut != Convect::HcExt::DOE2HcOutside && hcOut != Convect::HcExt::AdaptiveConvectionAlgorithm) {
@@ -1110,7 +1110,7 @@ namespace HeatBalanceManager {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
-                    int FlowTypeNum = getEnumerationValue(DataHeatBalance::AdjustmentTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(1)));
+                    int FlowTypeNum = getEnumValue(DataHeatBalance::AdjustmentTypeNamesUC, UtilityRoutines::makeUPPER(AlphaName(1)));
                     state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment = static_cast<DataHeatBalance::AdjustmentType>(FlowTypeNum);
                     AlphaName(1) = DataHeatBalance::AdjustmentTypeNamesCC[FlowTypeNum];
                     DataHeatBalance::AdjustmentType ZoneFlowAdjustment = state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment;
@@ -1134,7 +1134,7 @@ namespace HeatBalanceManager {
             }
             if (NumAlpha > 1) {
                 {
-                    int FlowTypeNum = getEnumerationValue(DataHeatBalance::InfiltrationFlowTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(2)));
+                    int FlowTypeNum = getEnumValue(DataHeatBalance::InfiltrationFlowTypeNamesUC, UtilityRoutines::makeUPPER(AlphaName(2)));
                     state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = static_cast<DataHeatBalance::InfiltrationFlow>(FlowTypeNum);
                     AlphaName(2) = DataHeatBalance::InfiltrationFlowTypeNamesCC[FlowTypeNum];
                     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add ||
@@ -1162,8 +1162,7 @@ namespace HeatBalanceManager {
             } else {
                 if (NumAlpha > 2) {
                     {
-                        int FlowTypeNum =
-                            getEnumerationValue(DataHeatBalance::InfiltrationZoneTypeNamesUC, UtilityRoutines::MakeUPPERCase(AlphaName(3)));
+                        int FlowTypeNum = getEnumValue(DataHeatBalance::InfiltrationZoneTypeNamesUC, UtilityRoutines::makeUPPER(AlphaName(3)));
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones = static_cast<DataHeatBalance::InfiltrationZoneType>(FlowTypeNum);
                         AlphaName(3) = DataHeatBalance::InfiltrationZoneTypeNamesCC[FlowTypeNum];
                         if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationForZones == DataHeatBalance::InfiltrationZoneType::Invalid) {
@@ -1703,9 +1702,9 @@ namespace HeatBalanceManager {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                std::string const thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = UtilityRoutines::makeUPPER(instance.key());
 
-                std::string construction_name = UtilityRoutines::MakeUPPERCase(fields.at("construction_name").get<std::string>());
+                std::string construction_name = UtilityRoutines::makeUPPER(fields.at("construction_name").get<std::string>());
                 int source_after_layer_number = fields.at("thermal_source_present_after_layer_number").get<int>();
                 int calculation_after_layer_number = fields.at("temperature_calculation_requested_after_layer_number").get<int>();
                 int ctf_dimensions = fields.at("dimensions_for_the_ctf_calculation").get<int>();
@@ -2469,7 +2468,7 @@ namespace HeatBalanceManager {
         if (NumNumbers >= 9) state.dataHeatBal->Zone(ZoneLoop).UserEnteredFloorArea = rNumericArgs(9);
 
         if (NumAlphas > 1 && !state.dataIPShortCut->lAlphaFieldBlanks(2)) {
-            Convect::HcInt hcIn = static_cast<Convect::HcInt>(getEnumerationValue(Convect::HcIntNamesUC, cAlphaArgs(2)));
+            Convect::HcInt hcIn = static_cast<Convect::HcInt>(getEnumValue(Convect::HcIntNamesUC, cAlphaArgs(2)));
 
             if (hcIn != Convect::HcInt::ASHRAESimple && hcIn != Convect::HcInt::ASHRAETARP && hcIn != Convect::HcInt::CeilingDiffuser &&
                 hcIn != Convect::HcInt::TrombeWall && hcIn != Convect::HcInt::AdaptiveConvectionAlgorithm && hcIn != Convect::HcInt::ASTMC1340) {
@@ -2486,7 +2485,7 @@ namespace HeatBalanceManager {
 
         if (NumAlphas > 2 && !state.dataIPShortCut->lAlphaFieldBlanks(3)) {
 
-            Convect::HcExt hcOut = static_cast<Convect::HcExt>(getEnumerationValue(Convect::HcExtNamesUC, cAlphaArgs(3)));
+            Convect::HcExt hcOut = static_cast<Convect::HcExt>(getEnumValue(Convect::HcExtNamesUC, cAlphaArgs(3)));
 
             if (hcOut != Convect::HcExt::ASHRAESimple && hcOut != Convect::HcExt::ASHRAETARP && hcOut != Convect::HcExt::MoWiTTHcOutside &&
                 hcOut != Convect::HcExt::DOE2HcOutside && hcOut != Convect::HcExt::AdaptiveConvectionAlgorithm) {
@@ -2567,7 +2566,7 @@ namespace HeatBalanceManager {
                 ++spaceNum;
                 auto const &objectFields = instance.value();
                 auto &thisSpace = state.dataHeatBal->space(spaceNum);
-                thisSpace.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                thisSpace.Name = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
                 thisSpace.CeilingHeight = ip->getRealFieldValue(objectFields, objectSchemaProps, "ceiling_height");
@@ -2626,7 +2625,7 @@ namespace HeatBalanceManager {
                 ++spaceListNum;
                 auto const &objectFields = instance.value();
                 auto &thisSpaceList = state.dataHeatBal->spaceList(spaceListNum);
-                thisSpaceList.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                thisSpaceList.Name = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 if (UtilityRoutines::FindItemInList(thisSpaceList.Name, state.dataHeatBal->Zone) > 0) {
@@ -2736,7 +2735,7 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using namespace WindowManager;
         using namespace SolarShading;
-        using DaylightingDevices::InitDaylightingDevices;
+        using Dayltg::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
@@ -3647,7 +3646,7 @@ namespace HeatBalanceManager {
             frameDivider.FrameEmis = FrameDividerProps(8);
 
             DataSurfaces::FrameDividerType currentDividerType =
-                DataSurfaces::FrameDividerType(getEnumerationValue(FrameDividerTypeNamesUC, FrameDividerAlphas(2)));
+                DataSurfaces::FrameDividerType(getEnumValue(FrameDividerTypeNamesUC, FrameDividerAlphas(2)));
             if (currentDividerType == DataSurfaces::FrameDividerType::Invalid) {
                 ShowWarningError(state,
                                  fmt::format("{}={}, Invalid {}",
@@ -3678,7 +3677,7 @@ namespace HeatBalanceManager {
             frameDivider.DividerEmis = FrameDividerProps(18);
 
             // look up the NFRC Product Type for Assembly Calculations using the DataSurfaces::NfrcProductName
-            frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions(getEnumerationValue(NfrcProductNamesUC, FrameDividerAlphas(3)));
+            frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions(getEnumValue(NfrcProductNamesUC, FrameDividerAlphas(3)));
             if (frameDivider.NfrcProductType == DataSurfaces::NfrcProductOptions::Invalid) {
                 frameDivider.NfrcProductType = DataSurfaces::NfrcProductOptions::CurtainWall;
             }
@@ -3902,7 +3901,7 @@ namespace HeatBalanceManager {
 
         // Get window name and check for match
         W5Name = std::string{DataLine(4).substr(19)};
-        WindowNameInW5DataFile = UtilityRoutines::MakeUPPERCase(W5Name);
+        WindowNameInW5DataFile = UtilityRoutines::makeUPPER(W5Name);
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found
         Label20:;
@@ -4988,7 +4987,7 @@ namespace HeatBalanceManager {
                 ++constrNum;
                 auto &thisConstruct = state.dataConstruction->Construct(constrNum);
 
-                thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisConstruct.Name = UtilityRoutines::makeUPPER(thisObjectName);
                 thisConstruct.TypeIsAirBoundary = true;
                 thisConstruct.IsUsedCTF = false;
 
@@ -5009,7 +5008,7 @@ namespace HeatBalanceManager {
                     }
                     if (fields.find("simple_mixing_schedule_name") != fields.end()) {
                         const std::string &schedName = fields.at("simple_mixing_schedule_name").get<std::string>();
-                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::MakeUPPERCase(schedName));
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(state, UtilityRoutines::makeUPPER(schedName));
                         if (thisConstruct.AirBoundaryMixingSched == 0) {
                             ShowSevereError(state,
                                             format("{}{}=\"{}\", invalid (not found) Simple Mixing Schedule Name=\"{}\".",
