@@ -2088,19 +2088,19 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         for (int AirLoopNum = 1; AirLoopNum <= numPrimaryAirSys; ++AirLoopNum) {
             auto &thisPrimaryAirSys = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
             auto &thisAirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum);
-            state.dataSimAirServingZones->SumZoneDesFlow = 0.0;
+            //state.dataSimAirServingZones->SumZoneDesFlow = 0.0;
             state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply = thisPrimaryAirSys.DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
             state.dataAirLoop->AirLoopFlow(AirLoopNum).DesReturnFrac = thisPrimaryAirSys.DesignReturnFlowFraction;
-            for (int ZoneInSysIndex = 1; ZoneInSysIndex <= thisAirToZoneNodeInfo.NumZonesCooled; ++ZoneInSysIndex) {
-                state.dataSimAirServingZones->TUInNode = thisAirToZoneNodeInfo.TermUnitCoolInletNodes(ZoneInSysIndex);
-                state.dataSimAirServingZones->SumZoneDesFlow += state.dataLoopNodes->Node(state.dataSimAirServingZones->TUInNode).MassFlowRateMax;
-            }
-            if (state.dataSimAirServingZones->SumZoneDesFlow > VerySmallMassFlow) {
-                state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio =
-                    state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / state.dataSimAirServingZones->SumZoneDesFlow;
-            } else {
-                state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = 1.0;
-            }
+            //for (int ZoneInSysIndex = 1; ZoneInSysIndex <= thisAirToZoneNodeInfo.NumZonesCooled; ++ZoneInSysIndex) {
+            //    state.dataSimAirServingZones->TUInNode = thisAirToZoneNodeInfo.TermUnitCoolInletNodes(ZoneInSysIndex);
+            //    state.dataSimAirServingZones->SumZoneDesFlow += state.dataLoopNodes->Node(state.dataSimAirServingZones->TUInNode).MassFlowRateMax;
+            //}
+            //if (state.dataSimAirServingZones->SumZoneDesFlow > VerySmallMassFlow) {
+            //    state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio =
+            //        state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply / state.dataSimAirServingZones->SumZoneDesFlow;
+            //} else {
+            //    state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio = 1.0;
+            //}
         }
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
