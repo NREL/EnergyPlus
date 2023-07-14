@@ -112,6 +112,21 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSourceEmptyField)
         "	GYP1,                    !- Layer 3",
         "	GYP2,                    !- Layer 4",
         "	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
+        "	ConstructionProperty:InternalHeatSource,	",
+        "	Radiant Source 2,          !- Name",
+        "	Slab Floor with Radiant 2, !- Construction Name",
+        "	4,                       !- Source Present After Layer Number",
+        "	4,                       !- Temperature Calculation Requested After Layer Number",
+        "	2,                       !- Dimensions for the CTF Calculation",
+        "	0.3048,                  !- Tube Spacing {m}",
+        "	0.2;                     !- Two-Dimensional Temperature Calculation Position",
+        "	Construction,	",
+        "	Slab Floor with Radiant 2, !- Name",
+        "	CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer",
+        "	INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2",
+        "	GYP1,                    !- Layer 3",
+        "	GYP2,                    !- Layer 4",
+        "	FINISH FLOORING - TILE 1 / 16 IN;  !- Layer 5",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -119,4 +134,8 @@ TEST_F(EnergyPlusFixture, ConstructionInternalSourceEmptyField)
     bool errorsFound(false);
 
     GetConstructData(*state, errorsFound);
+    // errorsFound is true, because the materials are included in the idf snippet - that's ok
+
+    EXPECT_EQ(state->dataConstruction->Construct(1).userTemperatureLocationPerpendicular, 0.0);
+    EXPECT_EQ(state->dataConstruction->Construct(2).userTemperatureLocationPerpendicular, 0.2);
 }
