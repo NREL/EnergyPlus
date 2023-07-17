@@ -1727,17 +1727,17 @@ void GetDXCoils(EnergyPlusData &state)
                         if (lAlphaBlanks2(7)) {
                             thisDXCoil.CondenserInletNodeNum(PerfModeNum) = 0;
                         } else {
-                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) = GetOnlySingleNode(
-                                state,
-                                Alphas2(7),
-                                ErrorsFound,
-                                (DataLoopNode::ConnectionObjectType)getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                                        UtilityRoutines::MakeUPPERCase(PerfObjectType)),
-                                PerfObjectName,
-                                DataLoopNode::NodeFluidType::Air,
-                                DataLoopNode::ConnectionType::OutsideAirReference,
-                                NodeInputManager::CompFluidStream::Primary,
-                                ObjectIsNotParent);
+                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) =
+                                GetOnlySingleNode(state,
+                                                  Alphas2(7),
+                                                  ErrorsFound,
+                                                  (DataLoopNode::ConnectionObjectType)getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
+                                                                                                   UtilityRoutines::makeUPPER(PerfObjectType)),
+                                                  PerfObjectName,
+                                                  DataLoopNode::NodeFluidType::Air,
+                                                  DataLoopNode::ConnectionType::OutsideAirReference,
+                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  ObjectIsNotParent);
                             if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(PerfModeNum))) {
                                 ShowWarningError(state, format("{}{}=\"{}\":", RoutineName, PerfObjectType, PerfObjectName));
                                 ShowContinueError(state, format("may not be valid {}=\"{}\".", cAlphaFields2(7), Alphas2(7)));
@@ -4017,7 +4017,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A12; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Alphas(12)));
+        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Alphas(12)));
 
         thisDXCoil.NumOfSpeeds = Numbers(6); // Number of speeds
         if (thisDXCoil.NumOfSpeeds < 2) {
@@ -4521,7 +4521,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // A9; \field Fuel type, Validate fuel type input
-        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Alphas(9)));
+        thisDXCoil.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Alphas(9)));
 
         thisDXCoil.RegionNum = Numbers(8);   // Region Number for HSPF Calc
         thisDXCoil.NumOfSpeeds = Numbers(9); // Number of speeds
@@ -7970,7 +7970,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
             CompName = thisDXCoil.Name;
             CompType = thisDXCoil.DXCoilType;
             if (Mode == thisDXCoil.NumOfSpeeds) {
-                FieldNum = 10 + (Mode - 1) * 13;
+                FieldNum = 10 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = thisDXCoil.MSRatedAirVolFlowRate(Mode);
                 state.dataSize->DataEMSOverrideON = thisDXCoil.RatedAirVolFlowRateEMSOverrideON(Mode);
@@ -7995,7 +7995,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                     MSRatedAirVolFlowRateDes = TempSize;
                 }
             } else {
-                FieldNum = 10 + (Mode - 1) * 13;
+                FieldNum = 10 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
@@ -8050,7 +8050,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 PrintFlag = true;
                 state.dataSize->DataFlowUsedForSizing = thisDXCoil.MSRatedAirVolFlowRate(Mode);
                 SizingMethod = CoolingCapacitySizing;
-                FieldNum = 7 + (Mode - 1) * 13;
+                FieldNum = 7 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 state.dataSize->DataEMSOverrideON = thisDXCoil.RatedTotCapEMSOverrideOn(Mode);
                 state.dataSize->DataEMSOverride = thisDXCoil.RatedTotCapEMSOverrideValue(Mode);
@@ -8084,7 +8084,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 // cooling capacity at lower speeds
                 PrintFlag = true;
                 SizingMethod = CoolingCapacitySizing;
-                FieldNum = 7 + (Mode - 1) * 13;
+                FieldNum = 7 + (Mode - 1) * 14;
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [W]";
                 if (IsAutoSize || !HardSizeNoDesRun) {
                     SizingMethod = AutoCalculateSizing;
@@ -15504,7 +15504,7 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
     DXCoolingCoilIndex = 0;
 
     DataLoopNode::ConnectionObjectType HeatingCoilTypeNum = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumerationValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::MakeUPPERCase(HeatingCoilType)));
+        getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, UtilityRoutines::makeUPPER(HeatingCoilType)));
 
     DataLoopNode::ConnectionObjectType CompSetsParentType; // Parent object type which uses DX heating coil pass into this function
     std::string CompSetsParentName;
