@@ -594,9 +594,12 @@ void ManageSizing(EnergyPlusData &state)
     if (state.dataSize->ZoneSizingRunDone) {
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow > 0.0) {
-                TimeStepAtPeak = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtCoolMax;
-                DDNum = state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDDNum;
+            auto const &thisZone = state.dataHeatBal->Zone(CtrlZoneNum);
+            auto const &thisFinalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
+            auto const &thisCalcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
+            if (thisFinalZoneSizing.DesCoolVolFlow > 0.0) {
+                TimeStepAtPeak = thisFinalZoneSizing.TimeStepNumAtCoolMax;
+                DDNum = thisFinalZoneSizing.CoolDDNum;
                 if (DDNum > 0 && TimeStepAtPeak > 0) {
                     TempAtPeak = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak);
                     HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
@@ -609,60 +612,40 @@ void ManageSizing(EnergyPlusData &state)
                     TStatSetPtAtPk = 0.0;
                 }
                 ReportZoneSizing(state,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).CoolSizingType,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDesDay,
+                                 thisFinalZoneSizing.ZoneName,
+                                 thisCalcFinalZoneSizing.CoolSizingType,
+                                 thisCalcFinalZoneSizing.DesCoolLoad,
+                                 thisFinalZoneSizing.DesCoolLoad,
+                                 thisCalcFinalZoneSizing.DesCoolVolFlow,
+                                 thisFinalZoneSizing.DesCoolVolFlow,
+                                 thisFinalZoneSizing.CoolDesDay,
                                  state.dataSize->CoolPeakDateHrMin(CtrlZoneNum),
                                  TempAtPeak,
                                  HumRatAtPeak,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).FloorArea,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).TotOccupants,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
+                                 thisZone.FloorArea,
+                                 thisZone.TotOccupants,
+                                 thisFinalZoneSizing.MinOA,
                                  DOASHeatGainRateAtClPk);
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnClUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad);
-                if (state.dataHeatBal->Zone(CtrlZoneNum).FloorArea != 0.0) {
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchZnClUserDesLdPerArea,
-                                     curName,
-                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad / state.dataHeatBal->Zone(CtrlZoneNum).FloorArea);
+                curName = thisFinalZoneSizing.ZoneName;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, thisCalcFinalZoneSizing.DesCoolLoad);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesLd, curName, thisFinalZoneSizing.DesCoolLoad);
+                if (thisZone.FloorArea != 0.0) {
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchZnClUserDesLdPerArea, curName, thisFinalZoneSizing.DesCoolLoad / thisZone.FloorArea);
                 }
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClCalcDesAirFlow,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClUserDesAirFlow,
-                                 curName,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
-                                 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClDesDay, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDesDay);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, thisCalcFinalZoneSizing.DesCoolVolFlow, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesAirFlow, curName, thisFinalZoneSizing.DesCoolVolFlow, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClDesDay, curName, thisFinalZoneSizing.CoolDesDay);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, state.dataSize->CoolPeakDateHrMin(CtrlZoneNum));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, TStatSetPtAtPk);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClPkIndTemp,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnClPkIndHum,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak,
-                                 5);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, thisCalcFinalZoneSizing.ZoneTempAtCoolPeak);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndHum, curName, thisCalcFinalZoneSizing.ZoneHumRatAtCoolPeak, 5);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOATemp, curName, TempAtPeak);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAHum, curName, HumRatAtPeak, 5);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, thisFinalZoneSizing.MinOA, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkDOASHeatGain, curName, DOASHeatGainRateAtClPk);
             } else {
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
+                curName = thisFinalZoneSizing.ZoneName;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, 0.0, 1);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesLd, curName, 0.0, 1);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesLdPerArea, curName, 0.0, 1);
@@ -678,9 +661,9 @@ void ManageSizing(EnergyPlusData &state)
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, 0.0, 1);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkDOASHeatGain, curName, 0.0, 1);
             }
-            if (state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow > 0.0) {
-                TimeStepAtPeak = state.dataSize->FinalZoneSizing(CtrlZoneNum).TimeStepNumAtHeatMax;
-                DDNum = state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDDNum;
+            if (thisFinalZoneSizing.DesHeatVolFlow > 0.0) {
+                TimeStepAtPeak = thisFinalZoneSizing.TimeStepNumAtHeatMax;
+                DDNum = thisFinalZoneSizing.HeatDDNum;
                 if (DDNum > 0 && TimeStepAtPeak > 0) {
                     TempAtPeak = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak);
                     HumRatAtPeak = state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak);
@@ -693,60 +676,40 @@ void ManageSizing(EnergyPlusData &state)
                     TStatSetPtAtPk = 0.0;
                 }
                 ReportZoneSizing(state,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).HeatSizingType,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay,
+                                 thisFinalZoneSizing.ZoneName,
+                                 thisCalcFinalZoneSizing.HeatSizingType,
+                                 thisCalcFinalZoneSizing.DesHeatLoad,
+                                 thisFinalZoneSizing.DesHeatLoad,
+                                 thisCalcFinalZoneSizing.DesHeatVolFlow,
+                                 thisFinalZoneSizing.DesHeatVolFlow,
+                                 thisFinalZoneSizing.HeatDesDay,
                                  state.dataSize->HeatPeakDateHrMin(CtrlZoneNum),
                                  TempAtPeak,
                                  HumRatAtPeak,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).FloorArea,
-                                 state.dataHeatBal->Zone(CtrlZoneNum).TotOccupants,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
+                                 thisZone.FloorArea,
+                                 thisZone.TotOccupants,
+                                 thisFinalZoneSizing.MinOA,
                                  DOASHeatGainRateAtHtPk);
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad);
-                if (state.dataHeatBal->Zone(CtrlZoneNum).FloorArea != 0.0) {
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea,
-                                     curName,
-                                     state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad / state.dataHeatBal->Zone(CtrlZoneNum).FloorArea);
+                curName = thisFinalZoneSizing.ZoneName;
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, thisCalcFinalZoneSizing.DesHeatLoad);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, thisFinalZoneSizing.DesHeatLoad);
+                if (thisZone.FloorArea != 0.0) {
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea, curName, thisFinalZoneSizing.DesHeatLoad / thisZone.FloorArea);
                 }
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 3);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtUserDesAirFlow,
-                                 curName,
-                                 state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
-                                 3);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtDesDay, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, thisCalcFinalZoneSizing.DesHeatVolFlow, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesAirFlow, curName, thisFinalZoneSizing.DesHeatVolFlow, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtDesDay, curName, thisFinalZoneSizing.HeatDesDay);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, state.dataSize->HeatPeakDateHrMin(CtrlZoneNum));
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtPkIndTemp,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchZnHtPkIndHum,
-                                 curName,
-                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak,
-                                 5);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, thisCalcFinalZoneSizing.ZoneTempAtHeatPeak);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, thisCalcFinalZoneSizing.ZoneHumRatAtHeatPeak, 5);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOATemp, curName, TempAtPeak);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOAHum, curName, HumRatAtPeak, 5);
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchZnHtPkOAMinFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA, 3);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOAMinFlow, curName, thisFinalZoneSizing.MinOA, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkDOASHeatGain, curName, DOASHeatGainRateAtHtPk);
             } else {
-                curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
+                curName = thisFinalZoneSizing.ZoneName;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, 0.0, 1);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, 0.0, 1);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea, curName, 0.0, 1);
@@ -1073,6 +1036,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                 for (int pIUATUNum = 1; pIUATUNum <= state.dataPowerInductionUnits->NumPIUs; ++pIUATUNum) {
                     if (AirLoopNum == state.dataPowerInductionUnits->PIU(pIUATUNum).AirLoopNum) {
                         int termUnitSizingIndex = AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
+                        auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                         airLoopMaxFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                         if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
                             DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
@@ -1103,10 +1067,10 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
 
                             // store Ep for 62.1 calculations
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFraction =
                                 state.dataSize->VpzMinClgByZone(termUnitSizingIndex) /
                                 state.dataSize->VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFractionHtg =
                                 state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
 
                         } else if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num ==
@@ -1144,10 +1108,10 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
                                 state.dataPowerInductionUnits->PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
 
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFraction =
                                 state.dataSize->VpzMinClgByZone(termUnitSizingIndex) /
                                 state.dataSize->VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
-                            state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
+                            thisTermUnitFinalZoneSizing.ZonePrimaryAirFractionHtg =
                                 state.dataSize->VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
                         }
                     }
@@ -1359,7 +1323,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             // each zone
             for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                 int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
+                auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                 if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
                         min(1.0, thisTermUnitFinalZoneSizing.VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
@@ -1375,7 +1339,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             }
             for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
                 int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
-                auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
+                auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                 if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                     state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
                         min(1.0, thisTermUnitFinalZoneSizing.VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
@@ -1453,7 +1417,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                     } else {
                         termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     }
-                    auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
+                    auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                     Real64 Er = thisTermUnitFinalZoneSizing.ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
 
                     if (state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SysOAMethod::SP) { // 62.1 simplified procedure
@@ -1530,7 +1494,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
             if (termUnitSizingIndex == 0) {
                 termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(1);
             }
-            auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
+            auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
             // single zone cooling
             state.dataSize->VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / thisTermUnitFinalZoneSizing.ZoneADEffCooling;
             state.dataSize->EvzByZoneCool(termUnitSizingIndex) = thisTermUnitFinalZoneSizing.ZoneADEffCooling;
@@ -1769,7 +1733,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         termUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                 }
                 if (MatchingCooledZoneNum == 0) {
-                    auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
+                    auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchS62zvpAlN,
                                                              thisTermUnitFinalZoneSizing.ZoneName,
@@ -1859,7 +1823,7 @@ void ManageSystemVentilationAdjustments(EnergyPlusData &state)
                         termUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                 }
                 if (MatchingCooledZoneNum == 0) {
-                    auto &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
+                    auto const &thisTermUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex);
                     // Zone ventilation parameters, (table 3)
                     RpPzSum += thisTermUnitFinalZoneSizing.DesOAFlowPPer * thisTermUnitFinalZoneSizing.TotPeopleInZone;
                     RaAzSum += thisTermUnitFinalZoneSizing.DesOAFlowPerArea * thisTermUnitFinalZoneSizing.TotalZoneFloorArea;
@@ -2169,16 +2133,17 @@ void DetermineSystemPopulationDiversity(EnergyPlusData &state)
         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
         // only retrieve data if the occupant density is set to be autosized
         if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).OccupantDiversity == AutoSize) {
-            state.dataSize->PzSumBySys(AirLoopNum) = 0.0;
+            auto &pzSumBySys = state.dataSize->PzSumBySys(AirLoopNum);
+            pzSumBySys = 0.0;
             state.dataSize->PsBySys(AirLoopNum) = 0.0;
             for (int zoneNumOnLoop = 1; zoneNumOnLoop <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++zoneNumOnLoop) {
-                int CtrlZoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
+                int zoneNum = state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).ActualZoneNumber(zoneNumOnLoop);
+                auto const &finalZoneSizing = state.dataSize->FinalZoneSizing(zoneNum);
                 for (int PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
-                    if (state.dataHeatBal->People(PeopleNum).ZonePtr == state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum) {
-                        state.dataSize->PzSumBySys(AirLoopNum) +=
-                            (state.dataHeatBal->People(PeopleNum).NumberOfPeople *
-                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).Multiplier *
-                             state.dataHeatBal->Zone(state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneNum).ListMultiplier);
+                    if (state.dataHeatBal->People(PeopleNum).ZonePtr == finalZoneSizing.ZoneNum) {
+                        pzSumBySys +=
+                            (state.dataHeatBal->People(PeopleNum).NumberOfPeople * state.dataHeatBal->Zone(finalZoneSizing.ZoneNum).Multiplier *
+                             state.dataHeatBal->Zone(finalZoneSizing.ZoneNum).ListMultiplier);
                     }
                 }
             }
@@ -5293,25 +5258,20 @@ void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, Constant::Call
         Real64 wghtdCoolDOASLatAdd = 0.;
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            Real64 curCoolLoad = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolLoadSeq(TimeStepInDay);
+            auto const &thisCalcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
+            Real64 curCoolLoad = thisCalcZoneSizing.CoolLoadSeq(TimeStepInDay);
             if (curCoolLoad > 0.0) {
                 sumCoolLoad += curCoolLoad;
-                wghtdCoolZoneTemp +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepInDay) * curCoolLoad;
-                wghtdCoolHumRat +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepInDay) * curCoolLoad;
-                wghtdCoolDOASHeatAdd +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASHeatAddSeq(TimeStepInDay) * curCoolLoad;
-                wghtdCoolDOASLatAdd +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolZoneTemp += thisCalcZoneSizing.CoolZoneTempSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolHumRat += thisCalcZoneSizing.CoolZoneHumRatSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolDOASHeatAdd += thisCalcZoneSizing.DOASHeatAddSeq(TimeStepInDay) * curCoolLoad;
+                wghtdCoolDOASLatAdd += thisCalcZoneSizing.DOASLatAddSeq(TimeStepInDay) * curCoolLoad;
             }
-            Real64 curHeatLoad = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay);
+            Real64 curHeatLoad = thisCalcZoneSizing.HeatLoadSeq(TimeStepInDay);
             if (curHeatLoad > 0.0) {
                 sumHeatLoad += curHeatLoad;
-                wghtdHeatZoneTemp +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
-                wghtdHeatHumRat +=
-                    state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
+                wghtdHeatZoneTemp += thisCalcZoneSizing.HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
+                wghtdHeatHumRat += thisCalcZoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
             }
         }
 
