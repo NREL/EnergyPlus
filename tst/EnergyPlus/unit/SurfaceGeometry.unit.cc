@@ -10268,48 +10268,63 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
 TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates_Tiny)
 {
     // Test for #9873
-    std::string const idf_objects = delimited_string({
 
-        "BuildingSurface:Detailed,",
-        "  Zn001:Ceiling002,        !- Name",
-        "  Ceiling,                 !- Surface Type",
-        "  FLOOR,                   !- Construction Name",
-        "  ZONE 1,                  !- Zone Name",
-        "  ,                        !- Space Name",
-        "  Surface,                 !- Outside Boundary Condition",
-        "  Zn002:Flr002,            !- Outside Boundary Condition Object",
-        "  NoSun,                   !- Sun Exposure",
-        "  NoWind,                  !- Wind Exposure",
-        "  ,                        !- View Factor to Ground",
-        "  ,                        !- Number of Vertices",
-        "  -41.27, -37.05, 0.00,    !- X,Y,Z ==> Vertex 1 {m}",
-        "  -41.27, -37.04, 0.00,    !- X,Y,Z ==> Vertex 2 {m}",
-        "  -41.25, -37.04, 0.00,    !- X,Y,Z ==> Vertex 3 {m}",
-        "  -41.25, -33.59, 0.00,    !- X,Y,Z ==> Vertex 4 {m}",
-        "  -41.28, -33.59, 0.00,    !- X,Y,Z ==> Vertex 5 {m}",
-        "  -41.28, -37.05, 0.00;    !- X,Y,Z ==> Vertex 6 {m}",
+    constexpr double offset = 0.01;
 
-        "BuildingSurface:Detailed,",
-        "  Zn002:Flr002,            !- Name",
-        "  Floor,                   !- Surface Type",
-        "  FLOOR,                   !- Construction Name",
-        "  ZONE 2,                  !- Zone Name",
-        "  ,                        !- Space Name",
-        "  Surface,                 !- Outside Boundary Condition",
-        "  Zn001:Ceiling002,        !- Outside Boundary Condition Object",
-        "  NoSun,                   !- Sun Exposure",
-        "  NoWind,                  !- Wind Exposure",
-        "  ,                        !- View Factor to Ground",
-        "  ,                        !- Number of Vertices",
-        "  -41.28, -37.05, 0.00,    !- X,Y,Z ==> Vertex 1 {m}",
-        "  -41.28, -33.59, 0.00,    !- X,Y,Z ==> Vertex 2 {m}",
-        "  -41.25, -33.59, 0.00,    !- X,Y,Z ==> Vertex 3 {m}",
-        "  -41.25, -37.04, 0.00,    !- X,Y,Z ==> Vertex 4 {m}",
-        "  -41.27, -37.04, 0.00,    !- X,Y,Z ==> Vertex 5 {m}",
-        "  -41.27, -37.05, 0.00;    !- X,Y,Z ==> Vertex 6 {m}",
+    constexpr double min_x = -41.28;
+    constexpr double max_x = min_x + 0.03;
+    constexpr double off_x = min_x + offset;
 
-    });
+    constexpr double min_y = -37.05;
+    constexpr double max_y = min_y + 0.09;
+    constexpr double off_y = min_y + offset;
 
+    std::string const idf_objects = fmt::format(R"idf(
+  BuildingSurface:Detailed,
+    Zn001:Ceiling002,        !- Name
+    Ceiling,                 !- Surface Type
+    FLOOR,                   !- Construction Name
+    ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    Zn002:Flr002,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    {off_x:.2f}, {min_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 1
+    {off_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 2
+    {max_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 3
+    {max_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 4
+    {min_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 5
+    {min_x:.2f}, {min_y:.2f}, 0.00;    !- X,Y,Z ==> Vertex 6
+
+  BuildingSurface:Detailed,
+    Zn002:Flr002,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR,                   !- Construction Name
+    ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    Zn001:Ceiling002,        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    {min_x:.2f}, {min_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 1
+    {min_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 2
+    {max_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 3
+    {max_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 4
+    {off_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 5
+    {off_x:.2f}, {min_y:.2f}, 0.00;    !- X,Y,Z ==> Vertex 6
+
+    )idf",
+                                                fmt::arg("min_x", min_x),
+                                                fmt::arg("max_x", max_x),
+                                                fmt::arg("off_x", off_x),
+                                                fmt::arg("min_y", min_y),
+                                                fmt::arg("max_y", max_y),
+                                                fmt::arg("off_y", off_y));
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->NumOfZones = 2;
@@ -10348,17 +10363,17 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates_Tiny)
     EXPECT_EQ(2, SurfNum);
     auto const error_string = delimited_string({
         "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN001:CEILING002, in Zone=ZONE 1",
-        "   **   ~~~   ** Vertex [5]=(54.37,-28.88,0.00)",
-        "   **   ~~~   ** Vertex [6]=(54.37,-28.89,0.00)",
-        "   **   ~~~   ** Dropping Vertex [6].",
+        fmt::format("   **   ~~~   ** Vertex [1]=({:.2f},{:.2f},0.00)", off_x, min_y),
+        fmt::format("   **   ~~~   ** Vertex [2]=({:.2f},{:.2f},0.00)", off_x, off_y),
+        "   **   ~~~   ** Dropping Vertex [2].",
         "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN001:CEILING002, in Zone=ZONE 1",
-        "   **   ~~~   ** Vertex [5]=(54.37,-28.88,0.00)",
-        "   **   ~~~   ** Vertex [1]=(54.38,-28.89,0.00)",
+        fmt::format("   **   ~~~   ** Vertex [5]=({:.2f},{:.2f},0.00)", min_x, min_y),
+        fmt::format("   **   ~~~   ** Vertex [1]=({:.2f},{:.2f},0.00)", off_x, min_y),
         "   **   ~~~   ** Dropping Vertex [1].",
         "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
-        "   **   ~~~   ** Vertex [1]=(54.37,-28.89,0.00)",
-        "   **   ~~~   ** Vertex [2]=(54.37,-28.88,0.00)",
-        "   **   ~~~   ** Dropping Vertex [2].",
+        fmt::format("   **   ~~~   ** Vertex [5]=({:.2f},{:.2f},0.00)", off_x, off_y),
+        fmt::format("   **   ~~~   ** Vertex [6]=({:.2f},{:.2f},0.00)", off_x, min_y),
+        "   **   ~~~   ** Dropping Vertex [6].",
         "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
         "   **   ~~~   ** Vertex [5]=(54.38,-28.89,0.00)",
         "   **   ~~~   ** Vertex [1]=(54.37,-28.89,0.00)",
