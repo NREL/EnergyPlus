@@ -237,6 +237,9 @@ Built on Platform: {}
             ->required(false)
             ->check(CLI::ExistingFile);
 
+        bool debugCLI = false;
+        app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
+
         // opt.example = "energyplus -w weather.epw -r input.idf";
         app.footer("energyplus -w weather.epw -r input.idf");
 
@@ -264,8 +267,9 @@ Built on Platform: {}
             }
         }
 
-        fmt::print(stderr,
-                   R"debug(
+        if (debugCLI) {
+            fmt::print(stderr,
+                       R"debug(
 state.dataGlobal->AnnualSimulation = {},
 state.dataGlobal->DDOnlySimulation = {},
 state.dataStrGlobals->outDirPath = '{}',
@@ -284,20 +288,22 @@ state.dataGlobal->numThread={},
 state.files.inputWeatherFilePath.filePath='{}',
 state.dataStrGlobals->inputFilePath='{}',
 )debug",
-                   state.dataGlobal->AnnualSimulation,
-                   state.dataGlobal->DDOnlySimulation,
-                   state.dataStrGlobals->outDirPath.generic_string(),
-                   state.dataStrGlobals->inputIddFilePath.generic_string(),
+                       state.dataGlobal->AnnualSimulation,
+                       state.dataGlobal->DDOnlySimulation,
+                       state.dataStrGlobals->outDirPath.generic_string(),
+                       state.dataStrGlobals->inputIddFilePath.generic_string(),
 
-                   runEPMacro,
-                   prefixOutName,
-                   state.dataGlobal->runReadVars,
-                   state.dataGlobal->outputEpJSONConversion,
-                   state.dataGlobal->outputEpJSONConversionOnly,
-                   suffixType,
-                   state.dataGlobal->numThread,
-                   state.files.inputWeatherFilePath.filePath,
-                   state.dataStrGlobals->inputFilePath);
+                       runEPMacro,
+                       prefixOutName,
+                       state.dataGlobal->runReadVars,
+                       state.dataGlobal->outputEpJSONConversion,
+                       state.dataGlobal->outputEpJSONConversionOnly,
+                       suffixType,
+                       state.dataGlobal->numThread,
+                       state.files.inputWeatherFilePath.filePath,
+                       state.dataStrGlobals->inputFilePath);
+            exit(0);
+        }
 
         // Convert all paths to native paths
         state.dataStrGlobals->inputFilePath = FileSystem::makeNativePath(state.dataStrGlobals->inputFilePath);
