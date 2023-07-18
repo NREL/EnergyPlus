@@ -237,7 +237,6 @@ struct SimAirServingZonesData : BaseGlobalStruct
     Real64 Vot = 0.0;            // Required outdoor air intake at primary AHU per ASHRAE std 62.1
 
     int TUInNode = 0;            // inlet node number of a terminal unit
-    //Real64 SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
     Real64 OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
     Real64 MassFlowSetToler;
     int salIterMax = 0;   // Maximum of iteration counters across all air loops
@@ -305,7 +304,6 @@ struct SimAirServingZonesData : BaseGlobalStruct
         this->Vot = 0.0;
 
         this->TUInNode = 0;         // inlet node number of a terminal unit
-        //this->SumZoneDesFlow = 0.0; // sum of the zone design air mass flow rates for zones served by a system
         this->OAReliefDiff = 0.0;   // local for massflow change across OA system, kg/s
         this->salIterMax = 0;       // Maximum of iteration counters across all air loops
         this->salIterTot = 0;       // Aggregated number of iterations across all air loops

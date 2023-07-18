@@ -163,7 +163,6 @@ namespace DataAirLoop {
         // Members
         Real64 DesSupply = 0.0;             // design supply air mass flow rate for loop [kg/s]
         Real64 DesReturnFrac = 1.0;         // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
-        Real64 SysToZoneDesFlowRatio = 0.0; // System design flow divided by the sum of the zone design flows
         Real64 ReqSupplyFrac = 1.0;         // required flow (as a fraction of DesSupply) set by a manager
         Real64 MinOutAir = 0.0;             // minimum outside air mass flow rate [kg/s]
         Real64 MaxOutAir = 0.0;             // current maximum available outside air mass flow rate [kg/s]

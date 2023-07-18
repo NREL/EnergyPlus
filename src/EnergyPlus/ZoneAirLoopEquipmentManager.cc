@@ -669,11 +669,11 @@ namespace ZoneAirLoopEquipmentManager {
         int AirDistCompNum;
         int InNodeNum;                      // air distribution unit inlet node
         int OutNodeNum;                     // air distribution unit outlet node
-        int AirLoopNum(0);                  // index of air loop
+        //int AirLoopNum(0);                  // index of air loop
         Real64 MassFlowRateMaxAvail;        // max avail mass flow rate excluding leaks [kg/s]
         Real64 MassFlowRateMinAvail;        // min avail mass flow rate excluding leaks [kg/s]
         Real64 MassFlowRateUpStreamLeakMax; // max upstream leak flow rate [kg/s]
-        Real64 DesFlowRatio(0.0);           // ratio of system to sum of zones design flow rate
+        //Real64 DesFlowRatio(0.0);           // ratio of system to sum of zones design flow rate
         Real64 SpecHumOut(0.0);             // Specific humidity ratio of outlet air (kg moisture / kg moist air)
         Real64 SpecHumIn(0.0);              // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
@@ -690,12 +690,6 @@ namespace ZoneAirLoopEquipmentManager {
                 if (InNodeNum > 0) {
                     MassFlowRateMaxAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail;
                     MassFlowRateMinAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMinAvail;
-                    AirLoopNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).AirLoopNum;
-                    //if (AirLoopNum > 0) {
-                    //    DesFlowRatio = state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio;
-                    //} else {
-                    //    DesFlowRatio = 1.0;
-                    //}
                     MassFlowRateUpStreamLeakMax = max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac *
                                                           state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail,
                                                       0.0);
