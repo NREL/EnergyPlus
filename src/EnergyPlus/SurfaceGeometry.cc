@@ -9308,6 +9308,65 @@ namespace SurfaceGeometry {
         }
     }
 
+    struct PopCoincidentVertexReturn
+    {
+        // bool popNeeded;
+        double perimeter;
+        int poppedVertexPos = -1; // This is a STL vector position, 0-indexed
+        int keptVertexPos = -1;
+    };
+
+    PopCoincidentVertexReturn checkPopCoincidentVertex(const Array1D<Vector> &vertices)
+    {
+        constexpr double tolerance = 0.01;
+
+        size_t const nSides = vertices.size();
+
+        // Vector of distance from this vertex to the next one
+        std::vector<Real64> distances(nSides);
+        size_t index = 0;
+        double min_distance = std::numeric_limits<Real64>::max();
+        double perimeter = 0.0;
+        for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+            auto itnext = std::next(it);
+            if (itnext == std::end(vertices)) {
+                itnext = std::begin(vertices);
+            }
+            const auto dist = distance(*it, *itnext);
+            distances[index++] = dist;
+            min_distance = std::min(min_distance, dist);
+            perimeter += dist;
+        }
+        if (min_distance >= tolerance) {
+            return {perimeter};
+        }
+
+        Real64 min_weight = std::numeric_limits<Real64>::max();
+        int poppedVertexPos = -1;
+        int keptVertexPos = -1;
+
+        for (size_t index = 0; index < nSides; ++index) {
+            size_t const prevIndex = (index == 0) ? nSides - 1 : index - 1;
+            Real64 &distanceThisToNext = distances[index];
+            Real64 &distanceThisToPrev = distances[prevIndex];
+            if ((distanceThisToNext >= tolerance) && (distanceThisToPrev >= tolerance)) {
+                continue;
+            }
+            Real64 const weight = distanceThisToNext + distanceThisToPrev;
+            if (weight < min_weight) {
+                min_weight = weight;
+                poppedVertexPos = static_cast<int>(index);
+                if (distanceThisToPrev < distanceThisToNext) {
+                    keptVertexPos = prevIndex;
+                } else {
+                    keptVertexPos = static_cast<int>((index == nSides - 1) ? 0 : index + 1);
+                }
+            }
+        }
+
+        return {perimeter, poppedVertexPos, keptVertexPos};
+    }
+
     void GetVertices(EnergyPlusData &state,
                      int const SurfNum,             // Current surface number
                      int const NSides,              // Number of sides to figure
@@ -9365,7 +9424,6 @@ namespace SurfaceGeometry {
         std::string TiltString;
         Real64 ThisWidth;
         Real64 ThisHeight;
-        Real64 DistanceCheck;
         // unused    REAL(r64) :: ccwtest
         // unused    LOGICAL   :: SurfaceCCW
         Real64 dotp;
@@ -9483,54 +9541,55 @@ namespace SurfaceGeometry {
             auto &vertices = surface.Vertex;
             auto &nSides = surface.Sides;
 
-            bool poppedVertex = true;
-            while (poppedVertex) {
-                poppedVertex = false;
-                Perimeter = 0.0;
+            while (true) {
+                PopCoincidentVertexReturn const popResult = checkPopCoincidentVertex(vertices);
+                Perimeter = popResult.perimeter;
+                if (popResult.poppedVertexPos < 0) {
+                    // No pop needed, we're done
+                    break;
+                }
 
-                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-                    auto itnext = std::next(it);
-                    if (itnext == std::end(vertices)) {
-                        itnext = std::begin(vertices);
-                    }
+                auto it = vertices.begin();
+                std::advance(it, popResult.poppedVertexPos);
+                int const poppedVertexIndex = popResult.poppedVertexPos + 1;
 
-                    // TODO: use isAlmostEqual3Pt for consistency? (which uses 0.0127 m / 1/2inch instead of 0.01 m)
-                    DistanceCheck = distance(*it, *itnext);
-                    if (DistanceCheck < 0.01) {
-                        int curVertexIndex = std::distance(vertices.begin(), it) + 1;
-                        int nextVertexIndex = std::distance(vertices.begin(), itnext) + 1;
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             format("{}Distance between two vertices < .01, possibly coincident. for Surface={}, in Zone={}",
-                                                    RoutineName,
-                                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
-                            ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", curVertexIndex, it->x, it->y, it->z));
-                            ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", nextVertexIndex, itnext->x, itnext->y, it->z));
-                        }
-                        ++state.dataErrTracking->TotalCoincidentVertices;
-                        if (nSides > 3) {
-                            if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowContinueError(state, format("Dropping Vertex [{}].", nextVertexIndex));
-                            }
-                            --nSides;
-                            vertices.erase(itnext);
-                            poppedVertex = true;
-                            break;
-                        } else {
-                            if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowContinueError(state,
-                                                  format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a "
-                                                         "degenerate surface.",
-                                                         curVertexIndex));
-                            }
-                            ++state.dataErrTracking->TotalDegenerateSurfaces;
-                            // mark degenerate surface?
-                        }
+                auto itKept = vertices.begin();
+                std::advance(itKept, popResult.keptVertexPos);
+                int const keptVertexIndex = popResult.keptVertexPos + 1;
+
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state,
+                                     format("{}Distance between two vertices < .01, possibly coincident. for Surface={}, in Zone={}",
+                                            RoutineName,
+                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+                    if (poppedVertexIndex > keptVertexIndex && poppedVertexIndex != nSides) {
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", keptVertexIndex, itKept->x, itKept->y, itKept->z));
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", poppedVertexIndex, it->x, it->y, it->z));
                     } else {
-                        Perimeter += DistanceCheck;
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", poppedVertexIndex, it->x, it->y, it->z));
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", keptVertexIndex, itKept->x, itKept->y, itKept->z));
                     }
                 }
+                ++state.dataErrTracking->TotalCoincidentVertices;
+                if (nSides <= 3) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowContinueError(state,
+                                          format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a "
+                                                 "degenerate surface.",
+                                                 poppedVertexIndex));
+                    }
+                    ++state.dataErrTracking->TotalDegenerateSurfaces;
+                    // mark degenerate surface?
+                    break;
+                }
+
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, format("Dropping Vertex [{}].", poppedVertexIndex));
+                }
+                --nSides;
+                vertices.erase(it);
+                // No need to recompute perimeter, because it'll be done in the next iteration, until no popping or degenerate happens
             }
 
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = Perimeter;
