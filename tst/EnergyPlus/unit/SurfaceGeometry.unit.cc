@@ -3309,8 +3309,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexity_ColinearStability)
     const int nVertices = static_cast<int>(floorVertices.size());
 
     state->dataSurface->TotSurfaces = 2;
-    const int floorSurfNum = 1;
-    const int ceilingSurfNum = 2;
+    constexpr int floorSurfNum = 1;
+    constexpr int ceilingSurfNum = 2;
     state->dataSurface->MaxVerticesPerSurface = nVertices;
     state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
 
