@@ -71,6 +71,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -1673,6 +1674,29 @@ namespace HeatRecovery {
 
             state.dataSize->DataAirFlowUsedForSizing = 0.0;
         }
+
+        // std 229 new heat recovery table variables
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirHRInputObjName, this->Name, this->Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirHRInputObjType, this->Name, this->ExchType); // convert to string?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchAirHRPlateOrRotary,
+                                                 this->Name,
+                                                 this->ExchType == DataHVACGlobals::HX_AIRTOAIR_FLATPLATE ? "FlatPlate" : " Rotary");
+
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirHRSenEffAt100PerHeatAirFlow, this->Name, this->HeatEffectSensible100);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirHRSenEffAt100PerCoolAirFlow, this->Name, this->CoolEffectSensible100);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirHRLatEffAt100PerHeatAirFlow, this->Name, this->HeatEffectLatent100);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirHRLatEffAt100PerCoolAirFlow, this->Name, this->CoolEffectLatent100);
+
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirHRExhaustAirflow, this->Name, this->NomSecAirMassFlow); // ? Nomsec ==? exhaust?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirHROutdoorAirflow, this->Name, this->NomSupAirMassFlow); // ? NomSup ==? outdoor air?
     }
 
     void

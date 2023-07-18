@@ -484,12 +484,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchAirHRInputObjName = 0;              // name
     int pdchAirHRInputObjType = 0;              // input object type
     int pdchAirHRPlateOrRotary = 0;             // plate/rotary
-    int pdchAirHPSenEffAt100PerHeatAirFlow = 0; // Sensible Effectiveness at 100% Heating Air Flow
-    int pdchAirHPSenEffAt100PerCoolAirFlow = 0; // Sensible Effectiveness at 100% Cooling Air Flow
-    int pdchAirHPLatEffAt100PerHeatAirFlow = 0; // Latent Effectiveness at 100% Heating Air Flow
-    int pdchAirHPLatEffAt100PerCoolAirFlow = 0; // Latent Effectiveness at 100% Cooling Air Flow
-    int pdchAirHPExhaustAirflow = 0;            // Exhaust airflow
-    int pdchAirHPOutdoorAirflow = 0;            // Outdoor airflow
+    int pdchAirHRSenEffAt100PerHeatAirFlow = 0; // Sensible Effectiveness at 100% Heating Air Flow
+    int pdchAirHRSenEffAt100PerCoolAirFlow = 0; // Sensible Effectiveness at 100% Cooling Air Flow
+    int pdchAirHRLatEffAt100PerHeatAirFlow = 0; // Latent Effectiveness at 100% Heating Air Flow
+    int pdchAirHRLatEffAt100PerCoolAirFlow = 0; // Latent Effectiveness at 100% Cooling Air Flow
+    int pdchAirHRExhaustAirflow = 0;            // Exhaust airflow
+    int pdchAirHROutdoorAirflow = 0;            // Outdoor airflow
 
     // Envelope Report
     int pdrEnvelope = 0;

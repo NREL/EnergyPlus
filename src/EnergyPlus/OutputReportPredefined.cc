@@ -560,12 +560,12 @@ namespace OutputReportPredefined {
         s->pdchAirHRInputObjName = newPreDefColumn(state, s->pdstAirHR, "name");
         s->pdchAirHRInputObjType = newPreDefColumn(state, s->pdstAirHR, "input object type");
         s->pdchAirHRPlateOrRotary = newPreDefColumn(state, s->pdstAirHR, "plate/rotary");
-        s->pdchAirHPSenEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Heating Air Flow");
-        s->pdchAirHPSenEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Cooling Air Flow");
-        s->pdchAirHPLatEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Heating Air Flow");
-        s->pdchAirHPLatEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Cooling Air Flow");
-        s->pdchAirHPExhaustAirflow = newPreDefColumn(state, s->pdstAirHR, "Exhaust airflow");
-        s->pdchAirHPOutdoorAirflow = newPreDefColumn(state, s->pdstAirHR, "Outdoor airflow");
+        s->pdchAirHRSenEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Heating Air Flow");
+        s->pdchAirHRSenEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Cooling Air Flow");
+        s->pdchAirHRLatEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Heating Air Flow");
+        s->pdchAirHRLatEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Cooling Air Flow");
+        s->pdchAirHRExhaustAirflow = newPreDefColumn(state, s->pdstAirHR, "Exhaust airflow [kg/s]");
+        s->pdchAirHROutdoorAirflow = newPreDefColumn(state, s->pdstAirHR, "Outdoor airflow [kg/s]");
 
         // Sizing Report
 
