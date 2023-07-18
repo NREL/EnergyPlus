@@ -276,8 +276,8 @@ void GetPollutionFactorInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        FuelType.FuelTypeNames(Loop) = static_cast<Constant::eFuel>(
-            getEnumerationValue(Constant::eFuelNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(1))));
+        FuelType.FuelTypeNames(Loop) =
+            static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(1))));
 
         switch (FuelType.FuelTypeNames(Loop)) {
         case Constant::eFuel::NaturalGas: {
