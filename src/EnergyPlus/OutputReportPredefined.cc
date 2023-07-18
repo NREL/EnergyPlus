@@ -522,8 +522,8 @@ namespace OutputReportPredefined {
         s->pdchPLCLType = newPreDefColumn(state, s->pdstPLCL, "type (PlantLoop or CondenserLoop)");
         s->pdchPLCLProvHeat = newPreDefColumn(state, s->pdstPLCL, "provides heating");
         s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "provides cooling");
-        s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate");
-        s->pdchPLCLMinLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Minimum Loop Flow Rate");
+        s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate [m3/s]");
+        s->pdchPLCLMinLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Minimum Loop Flow Rate [m3/s]");
         s->pdchPLCLTotPumpPwrOnLoop = newPreDefColumn(state, s->pdstPLCL, "Total pump power on loop");
         s->pdchPLCLBranchName = newPreDefColumn(state, s->pdstPLCL, "Branch name");
 

@@ -94,6 +94,7 @@
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutsideEnergySources.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
@@ -3091,19 +3092,51 @@ void SizePlantLoop(EnergyPlusData &state,
             }
             if (Finalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLName,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name);
                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         BaseSizer::reportSizerOutput(state,
                                                      "PlantLoop",
                                                      state.dataPlnt->PlantLoop(LoopNum).Name,
                                                      "Maximum Loop Flow Rate [m3/s]",
                                                      state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchPLCLType, state.dataPlnt->PlantLoop(LoopNum).Name, "PlantLoop");
                     } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                         BaseSizer::reportSizerOutput(state,
                                                      "CondenserLoop",
                                                      state.dataPlnt->PlantLoop(LoopNum).Name,
                                                      "Maximum Loop Flow Rate [m3/s]",
                                                      state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchPLCLType, state.dataPlnt->PlantLoop(LoopNum).Name, "CondenserLoop");
                     }
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLProvHeat,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).HeatingDemand >= 0 ? "Yes" : "No");
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLProvCool,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).CoolingDemand >= 0 ? "Yes" : "No");
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLMaxLoopFlowRate,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLMinLoopFlowRate,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLTotPumpPwrOnLoop,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).UsePressureForPumpCalcs);
+                    OutputReportPredefined::PreDefTableEntry(state,
+                                                             state.dataOutRptPredefined->pdchPLCLBranchName,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
+                                                             state.dataPlnt->PlantLoop(LoopNum).Name);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
