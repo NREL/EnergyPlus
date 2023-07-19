@@ -71,20 +71,6 @@ using namespace EnergyPlus::CommandLineInterface;
 
 namespace EnergyPlus {
 
-// Helper to construct an `int argc, const char *argv[]`. Take size() - 1 for argc
-std::vector<const char *> stringVecToArgcArgv(const std::vector<std::string> &input)
-{
-    std::vector<const char *> result;
-
-    // remember the nullptr terminator
-    result.reserve(input.size() + 2);
-    result.push_back("energyplus");
-
-    std::transform(std::begin(input), std::end(input), std::back_inserter(result), [](const std::string &s) { return s.data(); });
-    result.push_back(nullptr);
-    return result;
-}
-
 struct ExpectedParams
 {
     bool AnnualSimulation = false;
@@ -141,10 +127,10 @@ protected:
 public:
     ExpectedParams expectedParams;
 
-    int processArgsHelper(const std::vector<std::string> &input)
+    int processArgsHelper(std::vector<std::string> input)
     {
-        auto result = stringVecToArgcArgv(input);
-        return ProcessArgs(*state, result.size() - 1, result.data());
+        input.insert(input.begin(), "energyplus");
+        return ProcessArgs(*state, input);
     }
 
     template <typename T1,
