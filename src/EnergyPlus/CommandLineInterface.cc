@@ -106,7 +106,7 @@ namespace CommandLineInterface {
 
         CLI::App app{"energyplus", programName};
         // opt.add("", false, 0, 0, "Display version information", "-v", "--version");
-        app.set_version_flag("--version", EnergyPlus::DataStringGlobals::VerString);
+        app.set_version_flag("-v,--version", EnergyPlus::DataStringGlobals::VerString);
 
         // opt.overview = state.dataStrGlobals->VerStringVar;
         // opt.overview.append("\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state));
@@ -122,9 +122,9 @@ Built on Platform: {}
         app.description(description);
 
         // opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
-        auto *annaualOpt = app.add_flag("-a,--annual", state.dataGlobal->AnnualSimulation, "Force annual simulation");
+        auto *annualOpt = app.add_flag("-a,--annual", state.dataGlobal->AnnualSimulation, "Force annual simulation");
         // opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
-        app.add_flag("-D,--design-day", state.dataGlobal->DDOnlySimulation, "Force design-day-only simulation")->excludes(annaualOpt);
+        app.add_flag("-D,--design-day", state.dataGlobal->DDOnlySimulation, "Force design-day-only simulation")->excludes(annualOpt);
 
         // opt.add("", 0, 1, 0, "Output directory path (default: current directory)", "-d", "--output-directory");
         app.add_option("-d,--output-directory", state.dataStrGlobals->outDirPath, "Output directory path (default: current directory)")

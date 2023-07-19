@@ -435,7 +435,7 @@ int main(/** [[maybe_unused]] int argc, [[maybe_unused]] const char *argv[] */)
 
     CLI::App app{"ConvertInputFormat"};
     app.description("Run input file conversion tool");
-    app.set_version_flag("--version", EnergyPlus::DataStringGlobals::VerString);
+    app.set_version_flag("-v,--version", EnergyPlus::DataStringGlobals::VerString);
 
 #ifdef _OPENMP
     int number_of_threads = std::thread::hardware_concurrency();

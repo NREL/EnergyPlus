@@ -92,7 +92,7 @@ struct ExpectedParams
     std::string prefixOutName = "eplus";
     std::string suffixType = "L";
 
-    std::string VerStringVar;
+    std::string VerStringVar = EnergyPlus::DataStringGlobals::VerString;
 };
 
 class CommandLineInterfaceFixture : public EnergyPlusFixture
@@ -119,9 +119,9 @@ protected:
             FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath())) / "Energy+.idd";
 
         // This is done in EnergyPlusPgm, which we bypass
-        state->dataStrGlobals->CurrentDateTime = " unknown date/time";
-        state->dataStrGlobals->VerStringVar = EnergyPlus::DataStringGlobals::VerString + "," + state->dataStrGlobals->CurrentDateTime;
-        expectedParams.VerStringVar = state->dataStrGlobals->VerStringVar;
+        // state->dataStrGlobals->CurrentDateTime = " unknown date/time";
+        // state->dataStrGlobals->VerStringVar = EnergyPlus::DataStringGlobals::VerString + "," + state->dataStrGlobals->CurrentDateTime;
+        // expectedParams.VerStringVar = state->dataStrGlobals->VerStringVar;
     }
 
 public:
@@ -257,12 +257,11 @@ TEST_F(CommandLineInterfaceFixture, IdfDoesNotExist)
     expectedParams.inputFilePath = FileSystem::getAbsolutePath("WRONG.IDF");
     const int exitcode = processArgsHelper({expectedParams.inputFilePath.generic_string()});
     EXPECT_EQ(static_cast<int>(ReturnCodes::Failure), exitcode);
-    compare_cout_stream(delimited_string({
-        fmt::format("ERROR: Could not find input data file: {}.", FileSystem::makeNativePath(expectedParams.inputFilePath).string()),
-        "Type 'energyplus --help' for usage.",
+    compare_cout_stream("");
+    compare_cerr_stream(delimited_string({
+        fmt::format("input_file: File does not exist: {}", FileSystem::makeNativePath(expectedParams.inputFilePath).string()),
+        "Run with --help for more information.",
     }));
-    compare_cerr_stream("");
-    EXPECT_TRUE(testExpected(expectedParams));
 }
 
 TEST_F(CommandLineInterfaceFixture, AnnualSimulation)
@@ -295,9 +294,10 @@ TEST_F(CommandLineInterfaceFixture, AnnualExcludesDDSimulation)
 {
     const int exitcode = processArgsHelper({"-D", "-a", expectedParams.inputFilePath.generic_string()});
     EXPECT_EQ(static_cast<int>(ReturnCodes::Failure), exitcode);
-    compare_cout_stream(delimited_string({
-        "ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.",
-        "Type 'energyplus --help' for usage.",
+    compare_cout_stream("");
+    compare_cerr_stream(delimited_string({
+        "--annual excludes --design-day",
+        "Run with --help for more information.",
     }));
     compare_cerr_stream("");
 }
@@ -321,13 +321,11 @@ TEST_F(CommandLineInterfaceFixture, WeatherFileDoesNotExists)
         const int exitcode =
             processArgsHelper({flag, expectedParams.inputWeatherFilePath.generic_string(), expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Failure), exitcode);
-        compare_cout_stream(delimited_string({
-            "ERROR: Could not find weather file: " +
-                FileSystem::getAbsolutePath(FileSystem::makeNativePath(expectedParams.inputWeatherFilePath)).string() + ".",
-            "Type 'energyplus --help' for usage.",
+        compare_cout_stream("");
+        compare_cerr_stream(delimited_string({
+            "--weather: File does not exist: WRONG.epw",
+            "Run with --help for more information.",
         }));
-        compare_cerr_stream("");
-        EXPECT_TRUE(testExpected(expectedParams));
     }
 }
 
