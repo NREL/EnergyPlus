@@ -853,6 +853,9 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->CalcZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfZones);
     state.dataSize->CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->TermUnitFinalZoneSizing.allocate(state.dataSize->NumAirTerminalUnits);
+    for (auto &tufzs : state.dataSize->TermUnitFinalZoneSizing) {
+        tufzs.allocateMemberArrays(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+    }
     state.dataSize->DesDayWeath.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
     int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
     state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);

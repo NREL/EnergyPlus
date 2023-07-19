@@ -5346,7 +5346,7 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         auto const &thisFZSizing = state.dataSize->FinalZoneSizing(ctrlZoneNum);
 
         // Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
-        thisTUFZSizing = thisFZSizing;
+        thisTUFZSizing.copyFromZoneSizing(thisFZSizing);
         thisTUFZSizing.ADUName = thisTUSizing.ADUName;
 
         if (state.dataSize->NumAirTerminalSizingSpec > 0) {
@@ -5367,8 +5367,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
             }
             Real64 coolLoadRatio = thisTUSizing.SpecDesSensCoolingFrac;
             thisTUFZSizing.DesCoolLoad = thisFZSizing.DesCoolLoad * coolLoadRatio;
-            thisTUFZSizing.CoolMassFlow = thisFZSizing.CoolMassFlow * coolFlowRatio; // this field in TUFSizing doesn't appear to be used
-            thisTUFZSizing.CoolLoadSeq = thisFZSizing.CoolLoadSeq * coolLoadRatio;   // this field in TUFSizing doesn't appear to be used
             thisTUFZSizing.NonAirSysDesCoolLoad = thisFZSizing.NonAirSysDesCoolLoad * coolLoadRatio;
             thisTUFZSizing.NonAirSysDesCoolVolFlow = thisFZSizing.NonAirSysDesCoolVolFlow * coolFlowRatio;
             // Adjust DesCoolVolFlow, DesCoolMassFlow, and CoolFlowSeq with cooling frac, SAT ratio, and minOA frac adjustments
@@ -5402,8 +5400,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
             }
             Real64 heatLoadRatio = thisTUSizing.SpecDesSensHeatingFrac;
             thisTUFZSizing.DesHeatLoad = thisFZSizing.DesHeatLoad * heatLoadRatio;
-            thisTUFZSizing.HeatMassFlow = thisFZSizing.HeatMassFlow * heatFlowRatio; // this field in TUFSizing doesn't appear to be used
-            thisTUFZSizing.HeatLoadSeq = thisFZSizing.HeatLoadSeq * heatLoadRatio;   // this field in TUFSizing doesn't appear to be used
             thisTUFZSizing.NonAirSysDesHeatLoad = thisFZSizing.NonAirSysDesHeatLoad * heatLoadRatio;
             thisTUFZSizing.NonAirSysDesHeatVolFlow = thisFZSizing.NonAirSysDesHeatVolFlow * heatFlowRatio;
             // Adjust DesHeatVolFlow, DesHeatMassFlow, and HeatFlowSeq with Heating frac, SAT ratio, and minOA frac adjustments

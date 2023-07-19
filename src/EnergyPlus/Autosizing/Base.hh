@@ -255,7 +255,7 @@ struct BaseSizer
     EPVector<DataSizing::ZoneEqSizingData> zoneEqSizing;
     EPVector<DataAirLoop::OutsideAirSysProps> outsideAirSys;
     EPVector<DataSizing::TermUnitSizingData> termUnitSizing;
-    EPVector<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
+    EPVector<DataSizing::TermUnitZoneSizingData> termUnitFinalZoneSizing;
     EPVector<DataSizing::ZoneSizingData> finalZoneSizing;
     EPVector<DataSizing::SystemSizingData> finalSysSizing;
     EPVector<DataSizing::PlantSizingData> plantSizData;
