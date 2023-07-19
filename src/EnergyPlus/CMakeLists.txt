@@ -1070,6 +1070,44 @@ if(BUILD_TESTING)
   set_tests_properties("API.test_SysExit" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
   add_test(NAME "API.test_OutputFiles" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py")
   set_tests_properties("API.test_OutputFiles" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  set(CLI_TEST_DIR "${PROJECT_BINARY_DIR}/tst/cli")
+  set(EXAMPLES_FILES_DIR "${PROJECT_SOURCE_DIR}/testfiles")
+
+  set(NON_ASCII_DIRNAME "térmicà")
+  set(INPUT_TEST_DIR "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}")
+  file(MAKE_DIRECTORY ${INPUT_TEST_DIR})
+
+  set(TEST_CASE "1ZoneUncontrolled")
+  set(IDF_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.idf")
+  configure_file(${IDF_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.idf" COPYONLY)
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.NoPlugin.FromWithin
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/NoPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+  )
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.NoPlugin.FromOutside
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/NoPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+  )
+
+  set(TEST_CASE "PythonPlugin1ZoneUncontrolledCondFD")
+  set(IDF_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.idf")
+  configure_file(${IDF_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.idf" COPYONLY)
+  set(PY_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.py")
+  configure_file(${PY_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.py" COPYONLY)
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+  )
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+  )
+
 endif()
 
 if(UNIX AND NOT APPLE)
