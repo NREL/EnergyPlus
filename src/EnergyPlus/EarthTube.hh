@@ -85,7 +85,7 @@ namespace EarthTube {
         Real64 FanPressure = 0.0;
         Real64 FanEfficiency = 0.0;
         Real64 FanPower = 0.0;
-        Real64 GroundTempz1z2t = 0.0; // ground temp between z1 and z2 at time t
+        Real64 GroundTempt = 0.0; // ground temp at the depth of the earth tube midpoint at time t
         Real64 InsideAirTemp = 0.0;
         Real64 AirTemp = 0.0;
         Real64 HumRat = 0.0;          // Humidity ratio of air leaving EarthTube and entering zone

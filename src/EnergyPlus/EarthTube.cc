@@ -487,7 +487,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                 SetupOutputVariable(state,
                                     "Earth Tube Ground Interface Temperature",
                                     OutputProcessor::Unit::C,
-                                    thisEarthTube.GroundTempz1z2t,
+                                    thisEarthTube.GroundTempt,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
@@ -554,8 +554,8 @@ void CalcEarthTube(EnergyPlusData &state)
     // This subroutine simulates the components making up the EarthTube unit.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 Process1;        // Variable Used in the Middle of the Calculation
-    Real64 GroundTempz1z2t; // Average Ground Temperature between Depth z1 and z2 at time t
+    Real64 Process1;    // Variable Used in the Middle of the Calculation
+    Real64 GroundTempt; // Ground Temperature between Depth z at time t
 
     Real64 AirThermCond;         // Thermal Conductivity of Air (W/mC)
     Real64 AirKinemVisco;        // Kinematic Viscosity of Air (m2/s)
@@ -588,12 +588,11 @@ void CalcEarthTube(EnergyPlusData &state)
         thisEarthTube.FanPower = 0.0;
 
         // Skip this if the zone is below the minimum temperature limit
-        if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT < thisEarthTube.MinTemperature) continue;
+        if (thisZoneHB.MAT < thisEarthTube.MinTemperature) continue;
         // Skip this if the zone is above the maximum temperature limit
-        if (state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT > thisEarthTube.MaxTemperature) continue;
+        if (thisZoneHB.MAT > thisEarthTube.MaxTemperature) continue;
         // Skip if below the temperature difference limit
-        if (std::abs(state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature)
-            continue;
+        if (std::abs(thisZoneHB.MAT - state.dataEnvrn->OutDryBulbTemp) < thisEarthTube.DelTemperature) continue;
 
         AirDensity =
             Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
@@ -614,13 +613,13 @@ void CalcEarthTube(EnergyPlusData &state)
         AverPipeAirVel = EVF / Constant::Pi / pow_2(thisEarthTube.r1);
         AirMassFlowRate = EVF * AirDensity;
 
-        // Calculation of Average Ground Temperature between Depth z1 and z2 at time t
-        GroundTempz1z2t = thisEarthTube.AverSoilSurTemp -
-                          thisEarthTube.ApmlSoilSurTemp * std::exp(-thisEarthTube.z * std::sqrt(Constant::Pi / 365.0 / thisEarthTube.SoilThermDiff)) *
-                              std::cos(2.0 * Constant::Pi / 365.0 *
-                                       (state.dataEnvrn->DayOfYear - thisEarthTube.SoilSurPhaseConst -
-                                        thisEarthTube.z / 2.0 * std::sqrt(365.0 / Constant::Pi / thisEarthTube.SoilThermDiff)));
-        thisEarthTube.GroundTempz1z2t = GroundTempz1z2t;
+        // Calculation of Ground Temperature at Depth z at time t
+        GroundTempt = thisEarthTube.AverSoilSurTemp -
+                      thisEarthTube.ApmlSoilSurTemp * std::exp(-thisEarthTube.z * std::sqrt(Constant::Pi / 365.0 / thisEarthTube.SoilThermDiff)) *
+                          std::cos(2.0 * Constant::Pi / 365.0 *
+                                   (state.dataEnvrn->DayOfYear - thisEarthTube.SoilSurPhaseConst -
+                                    thisEarthTube.z / 2.0 * std::sqrt(365.0 / Constant::Pi / thisEarthTube.SoilThermDiff)));
+        thisEarthTube.GroundTempt = GroundTempt;
 
         // Calculation of Convective Heat Transfer Coefficient at Inner Pipe Surface
         AirThermCond = 0.02442 + 0.6992 * state.dataEnvrn->OutDryBulbTemp / 10000.0;
@@ -649,23 +648,23 @@ void CalcEarthTube(EnergyPlusData &state)
         OverallHeatTransCoef = 1.0 / Rt;
 
         if (AirMassFlowRate * AirSpecHeat == 0.0) {
-            thisEarthTube.InsideAirTemp = GroundTempz1z2t;
+            thisEarthTube.InsideAirTemp = GroundTempt;
 
         } else {
 
             // Calculation of Pipe Outlet Air Temperature
-            if (state.dataEnvrn->OutDryBulbTemp > GroundTempz1z2t) {
-                Process1 = (std::log(std::abs(state.dataEnvrn->OutDryBulbTemp - GroundTempz1z2t)) * AirMassFlowRate * AirSpecHeat -
+            if (state.dataEnvrn->OutDryBulbTemp > GroundTempt) {
+                Process1 = (std::log(std::abs(state.dataEnvrn->OutDryBulbTemp - GroundTempt)) * AirMassFlowRate * AirSpecHeat -
                             OverallHeatTransCoef * thisEarthTube.PipeLength) /
                            (AirMassFlowRate * AirSpecHeat);
-                thisEarthTube.InsideAirTemp = std::exp(Process1) + GroundTempz1z2t;
-            } else if (state.dataEnvrn->OutDryBulbTemp == GroundTempz1z2t) {
-                thisEarthTube.InsideAirTemp = GroundTempz1z2t;
+                thisEarthTube.InsideAirTemp = std::exp(Process1) + GroundTempt;
+            } else if (state.dataEnvrn->OutDryBulbTemp == GroundTempt) {
+                thisEarthTube.InsideAirTemp = GroundTempt;
             } else {
-                Process1 = (std::log(std::abs(state.dataEnvrn->OutDryBulbTemp - GroundTempz1z2t)) * AirMassFlowRate * AirSpecHeat -
+                Process1 = (std::log(std::abs(state.dataEnvrn->OutDryBulbTemp - GroundTempt)) * AirMassFlowRate * AirSpecHeat -
                             OverallHeatTransCoef * thisEarthTube.PipeLength) /
                            (AirMassFlowRate * AirSpecHeat);
-                thisEarthTube.InsideAirTemp = GroundTempz1z2t - std::exp(Process1);
+                thisEarthTube.InsideAirTemp = GroundTempt - std::exp(Process1);
             }
         }
 
