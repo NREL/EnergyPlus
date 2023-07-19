@@ -59,9 +59,11 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <array>
 #include <iterator>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <vector>
 
 using namespace EnergyPlus;
@@ -110,12 +112,23 @@ struct ExpectedParams
 class CommandLineInterfaceFixture : public EnergyPlusFixture
 {
 protected:
+    static void SetUpTestCase()
+    {
+        EnergyPlusFixture::SetUpTestCase();
+
+        // For the "legacy" mode, we need in.idf / in.epw in the current directory
+        auto inputFilePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf";
+        fs::copy_file(inputFilePath, FileSystem::getAbsolutePath("in.idf"), fs::copy_options::skip_existing);
+
+        auto inputWeatherFilePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+        fs::copy_file(inputWeatherFilePath, FileSystem::getAbsolutePath("in.epw"), fs::copy_options::skip_existing);
+    }
+
     void SetUp() override
     {
         EnergyPlusFixture::SetUp();
         state->dataGlobal->eplusRunningViaAPI = true; // Avoid using `exit()`
 
-        expectedParams.inputFilePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf";
         expectedParams.inputIddFilePath =
             FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath())) / "Energy+.idd";
 
@@ -222,11 +235,34 @@ public:
 };
 } // namespace EnergyPlus
 
+TEST_F(CommandLineInterfaceFixture, Legacy)
+{
+    expectedParams.inputIddFilePath = "Energy+.idd";
+    const int exitcode = processArgsHelper({});
+    EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
+    compare_cout_stream("");
+    compare_cerr_stream("");
+    EXPECT_TRUE(testExpected(expectedParams));
+}
+
 TEST_F(CommandLineInterfaceFixture, IdfOnly)
 {
+    expectedParams.inputFilePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf";
     const int exitcode = processArgsHelper({expectedParams.inputFilePath.generic_string()});
     EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
     compare_cout_stream("");
+    compare_cerr_stream("");
+    EXPECT_TRUE(testExpected(expectedParams));
+}
+
+TEST_F(CommandLineInterfaceFixture, IdfOnly_NativePath)
+{
+    expectedParams.inputFilePath =
+        FileSystem::makeNativePath(configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf");
+    const int exitcode = processArgsHelper({expectedParams.inputFilePath.string()});
+    EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
+    compare_cout_stream("");
+    compare_cerr_stream("");
     EXPECT_TRUE(testExpected(expectedParams));
 }
 
@@ -236,9 +272,10 @@ TEST_F(CommandLineInterfaceFixture, IdfDoesNotExist)
     const int exitcode = processArgsHelper({expectedParams.inputFilePath.generic_string()});
     EXPECT_EQ(static_cast<int>(ReturnCodes::Failure), exitcode);
     compare_cout_stream(delimited_string({
-        fmt::format("ERROR: Could not find input data file: {}.", expectedParams.inputFilePath.string()),
+        fmt::format("ERROR: Could not find input data file: {}.", FileSystem::makeNativePath(expectedParams.inputFilePath).string()),
         "Type 'energyplus --help' for usage.",
     }));
+    compare_cerr_stream("");
     EXPECT_TRUE(testExpected(expectedParams));
 }
 
@@ -250,6 +287,7 @@ TEST_F(CommandLineInterfaceFixture, AnnualSimulation)
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
         compare_cout_stream("");
+        compare_cerr_stream("");
         EXPECT_TRUE(testExpected(expectedParams));
     }
 }
@@ -262,6 +300,7 @@ TEST_F(CommandLineInterfaceFixture, DDSimulation)
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
         compare_cout_stream("");
+        compare_cerr_stream("");
         EXPECT_TRUE(testExpected(expectedParams));
     }
 }
@@ -274,6 +313,7 @@ TEST_F(CommandLineInterfaceFixture, AnnualExcludesDDSimulation)
         "ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.",
         "Type 'energyplus --help' for usage.",
     }));
+    compare_cerr_stream("");
 }
 
 TEST_F(CommandLineInterfaceFixture, WeatherFileExists)
@@ -283,6 +323,7 @@ TEST_F(CommandLineInterfaceFixture, WeatherFileExists)
         processArgsHelper({"-w", expectedParams.inputWeatherFilePath.generic_string(), expectedParams.inputFilePath.generic_string()});
     EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
     compare_cout_stream("");
+    compare_cerr_stream("");
     EXPECT_TRUE(testExpected(expectedParams));
 }
 
@@ -295,9 +336,11 @@ TEST_F(CommandLineInterfaceFixture, WeatherFileDoesNotExists)
             processArgsHelper({flag, expectedParams.inputWeatherFilePath.generic_string(), expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Failure), exitcode);
         compare_cout_stream(delimited_string({
-            "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(expectedParams.inputWeatherFilePath).generic_string() + ".",
+            "ERROR: Could not find weather file: " +
+                FileSystem::getAbsolutePath(FileSystem::makeNativePath(expectedParams.inputWeatherFilePath)).string() + ".",
             "Type 'energyplus --help' for usage.",
         }));
+        compare_cerr_stream("");
         EXPECT_TRUE(testExpected(expectedParams));
     }
 }
@@ -309,6 +352,7 @@ TEST_F(CommandLineInterfaceFixture, Version)
         const int exitcode = processArgsHelper({flag});
         EXPECT_EQ(static_cast<int>(ReturnCodes::SuccessButHelper), exitcode);
         compare_cout_stream(delimited_string({expectedParams.VerStringVar}));
+        compare_cerr_stream("");
     }
 }
 
@@ -320,6 +364,7 @@ TEST_F(CommandLineInterfaceFixture, Convert)
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
         compare_cout_stream("");
+        compare_cerr_stream("");
         EXPECT_TRUE(testExpected(expectedParams));
     }
 }
@@ -330,6 +375,7 @@ TEST_F(CommandLineInterfaceFixture, ConvertOnly)
     const int exitcode = processArgsHelper({"--convert-only", expectedParams.inputFilePath.generic_string()});
     EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
     compare_cout_stream("");
+    compare_cerr_stream("");
     EXPECT_TRUE(testExpected(expectedParams));
 }
 
@@ -341,6 +387,7 @@ TEST_F(CommandLineInterfaceFixture, runReadVars)
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
         compare_cout_stream("");
+        compare_cerr_stream("");
         EXPECT_TRUE(testExpected(expectedParams));
     }
 }
@@ -374,6 +421,7 @@ TEST_F(CommandLineInterfaceFixture, numThread)
             } else {
                 compare_cout_stream(delimited_string({error_message}));
             }
+            compare_cerr_stream("");
             EXPECT_TRUE(testExpected(expectedParams));
         }
     }
@@ -390,6 +438,7 @@ TEST_F(CommandLineInterfaceFixture, SuffixPrefix)
             processArgsHelper({"-s", expectedParams.suffixType, "-p", expectedParams.prefixOutName, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
         compare_cout_stream("");
+        compare_cerr_stream("");
         EXPECT_TRUE(testExpected(expectedParams));
     }
 
@@ -405,6 +454,7 @@ TEST_F(CommandLineInterfaceFixture, SuffixPrefix)
                                                 expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
         compare_cout_stream("");
+        compare_cerr_stream("");
         EXPECT_TRUE(testExpected(expectedParams));
     }
 }
