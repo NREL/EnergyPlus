@@ -2765,7 +2765,9 @@ namespace WeatherManager {
             for (int hour = 1; hour <= 24; ++hour) {
                 for (int CurTimeStep = 1; CurTimeStep <= state.dataWeatherManager->NumIntervalsPerHour; ++CurTimeStep) {
                     auto WeatherDataLine = state.files.inputWeatherFile.readLine();
-                    if (!WeatherDataLine.good) WeatherDataLine.data.clear();
+                    if (!WeatherDataLine.good) {
+                        WeatherDataLine.data.clear();
+                    }
                     if (WeatherDataLine.data.empty()) {
                         if (hour == 1) {
                             WeatherDataLine.eof = true;

@@ -1567,7 +1567,7 @@ namespace SurfaceGeometry {
 
                 //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
 
-                for (int Loop = 1; Loop <= 3; ++Loop) {
+                for (const DataSurfaces::SurfaceClass Loop : state.dataSurfaceGeometry->BaseSurfIDs) {
 
                     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
@@ -1575,7 +1575,7 @@ namespace SurfaceGeometry {
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone == 0) continue;
 
                         if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).spaceNum != spaceNum) continue;
-                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != state.dataSurfaceGeometry->BaseSurfIDs(Loop)) continue;
+                        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != Loop) continue;
 
                         ++MovedSurfs;
                         state.dataSurface->Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
@@ -1744,12 +1744,12 @@ namespace SurfaceGeometry {
 
         //  For each Base Surface Type (Wall, Floor, Roof)
 
-        for (int Loop = 1; Loop <= 3; ++Loop) {
+        for (const DataSurfaces::SurfaceClass Loop : state.dataSurfaceGeometry->BaseSurfIDs) {
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
                 if (state.dataSurface->Surface(SurfNum).Zone == 0) continue;
 
-                if (state.dataSurface->Surface(SurfNum).Class != state.dataSurfaceGeometry->BaseSurfIDs(Loop)) continue;
+                if (state.dataSurface->Surface(SurfNum).Class != Loop) continue;
 
                 //  Find all subsurfaces to this surface
                 for (int SubSurfNum = 1; SubSurfNum <= state.dataSurface->TotSurfaces; ++SubSurfNum) {
@@ -3056,16 +3056,16 @@ namespace SurfaceGeometry {
             if (std::abs(baseSurface.Azimuth - subSurface.Azimuth) > warningTolerance) {
                 subSurface.lcsx = baseSurface.lcsx;
                 subSurface.lcsy = baseSurface.lcsy;
-                subSurface.lcsy = baseSurface.lcsy;
+                subSurface.lcsz = baseSurface.lcsz;
             }
         } else {
-            // Not sure what this does, but keeping for now (MJW Dec 2015)
-            if (std::abs(subSurface.Azimuth - 360.0) < 0.01) {
-                subSurface.Azimuth = 360.0 - subSurface.Azimuth;
-            }
-            if (std::abs(baseSurface.Azimuth - 360.0) < 0.01) {
-                baseSurface.Azimuth = 360.0 - baseSurface.Azimuth;
-            }
+            // // Not sure what this does, but keeping for now (MJW Dec 2015)
+            // if (std::abs(subSurface.Azimuth - 360.0) < 0.01) {
+            //     subSurface.Azimuth = 360.0 - subSurface.Azimuth;
+            // }
+            // if (std::abs(baseSurface.Azimuth - 360.0) < 0.01) {
+            //     baseSurface.Azimuth = 360.0 - baseSurface.Azimuth;
+            // }
 
             // Is base surface horizontal? If so, ignore azimuth differences
             if (std::abs(baseSurface.Tilt) <= 1.0e-5 || std::abs(baseSurface.Tilt - 180.0) <= 1.0e-5) baseSurfHoriz = true;
