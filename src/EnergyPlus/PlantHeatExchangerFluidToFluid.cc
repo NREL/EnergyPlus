@@ -2310,6 +2310,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
     Real64 MinCapRate = SupSideMdot * WaterLoopInletCp;
     // The heat capacity rate of a fluid during a phase-change process must approach infinity since the temperature change is practically zero.
     // Therefore, C_min/C_max = 0, and the noncondensing fluid (water) is the minimum fluid.
+    // TODO: Add reference
 
     if (MinCapRate > 0.0) {
         Real64 NTU = this->UA / MinCapRate;
@@ -2356,7 +2357,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
                                                                       0.0,
                                                                       state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                                       RoutineName);
-    Real64 SteamMdot = std::abs(this->HeatTransferRate / (LatentHeatSteam + CpWaterSubcool * this->DegOfSubcooling));
+    Real64 SteamMdot = std::abs(this->HeatTransferRate) / (LatentHeatSteam + CpWaterSubcool * this->DegOfSubcooling);
 
     PlantUtilities::SetComponentFlowRate(
         state, SteamMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);
@@ -2377,7 +2378,7 @@ void HeatExchangerStruct::calculateSteamToWaterHX(EnergyPlusData &state, Real64 
     state.dataLoopNodes->Node(this->DemandSideLoop.outletNodeNum).Temp = this->DemandSideLoop.OutletTemp;
     state.dataLoopNodes->Node(this->SupplySideLoop.outletNodeNum).Temp = this->SupplySideLoop.OutletTemp;
 
-    this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
 
     if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
         (this->SupplySideLoop.InletMassFlowRate > 0.0)) {
