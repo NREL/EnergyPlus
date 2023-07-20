@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
@@ -61,9 +62,9 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
@@ -117,14 +118,14 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
     Material::MaterialChild *p = new Material::MaterialChild;
     state->dataMaterial->Material.push_back(p);
-    dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(MatNum))->AbsorpThermal = 0.8;
+    p->AbsorpThermal = 0.8;
     // allocate exterior vented cavity variable data
     state->dataHeatBal->ExtVentedCavity.allocate(1);
     state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
     state->dataHeatBal->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
     state->dataHeatBal->Zone.allocate(ZoneNum);
-    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ConvectionConstants::HcInt_ASHRAESimple;
+    state->dataHeatBal->Zone(ZoneNum).ExtConvAlgo = Convect::HcExt::ASHRAESimple;
     // allocate surface temperature variable data
     state->dataHeatBalSurf->SurfOutsideTempHist.allocate(1);
     state->dataHeatBalSurf->SurfOutsideTempHist(1).allocate(NumOfSurf);
@@ -133,10 +134,10 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(1);
     state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
-    state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
+    state->dataConvect->GetUserSuppliedConvectionCoeffs = false;
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.dimension(NumOfSurf, 1.0);
-    state->dataSurface->SurfExtConvCoeffIndex.allocate(NumOfSurf);
-    state->dataSurface->SurfExtConvCoeffIndex(SurfNum) = 0;
+    state->dataSurface->surfExtConv.allocate(NumOfSurf);
+    state->dataSurface->surfExtConv(SurfNum).model = Convect::HcExt::SetByZone;
     state->dataSurface->SurfEMSOverrideExtConvCoef.allocate(NumOfSurf);
     state->dataSurface->SurfEMSOverrideExtConvCoef(1) = false;
     auto &surface = state->dataSurface->Surface(SurfNum);
@@ -167,27 +168,27 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBuoyRpt; // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(*state,
-                                 state->dataHeatBal->ExtVentedCavity(1).SurfPtrs,
-                                 VentArea,
-                                 Cv,
-                                 Cd,
-                                 HdeltaNPL,
-                                 SolAbs,
-                                 AbsExt,
-                                 Tilt,
-                                 AspRat,
-                                 GapThick,
-                                 Roughness,
-                                 QdotSource,
-                                 TsBaffle,
-                                 TaGap,
-                                 HcGapRpt,
-                                 HrGapRpt,
-                                 IscRpt,
-                                 MdotVentRpt,
-                                 VdotWindRpt,
-                                 VdotBuoyRpt);
+    TranspiredCollector::CalcPassiveExteriorBaffleGap(*state,
+                                                      state->dataHeatBal->ExtVentedCavity(1).SurfPtrs,
+                                                      VentArea,
+                                                      Cv,
+                                                      Cd,
+                                                      HdeltaNPL,
+                                                      SolAbs,
+                                                      AbsExt,
+                                                      Tilt,
+                                                      AspRat,
+                                                      GapThick,
+                                                      Roughness,
+                                                      QdotSource,
+                                                      TsBaffle,
+                                                      TaGap,
+                                                      HcGapRpt,
+                                                      HrGapRpt,
+                                                      IscRpt,
+                                                      MdotVentRpt,
+                                                      VdotWindRpt,
+                                                      VdotBuoyRpt);
 
     EXPECT_NEAR(21.862, TsBaffle, 0.001);
     EXPECT_NEAR(1.692, HcGapRpt, 0.001);

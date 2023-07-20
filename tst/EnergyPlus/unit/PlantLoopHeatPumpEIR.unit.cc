@@ -2970,23 +2970,19 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, Constant::ResourceType> ResourceTypes;             // ResourceTypes for each variable
+    Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                            // EndUses for each variable
     Array1D_string Groups(NumVariables);                             // Groups for each variable
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
-
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::ResourceType>(varN, Constant::ResourceType::None));
-    }
 
     GetMeteredVariables(
         *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), Constant::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), Constant::ResourceType::Electricity)); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes(2), Constant::eResource::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "COOLING");
     EXPECT_EQ(Groups(2), "PLANT");
 }
@@ -3071,23 +3067,19 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, Constant::ResourceType> ResourceTypes;             // ResourceTypes for each variable
+    Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                            // EndUses for each variable
     Array1D_string Groups(NumVariables);                             // Groups for each variable
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
-
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::ResourceType>(varN, Constant::ResourceType::None));
-    }
 
     GetMeteredVariables(
         *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), Constant::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), Constant::ResourceType::Electricity)); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes(2), Constant::eResource::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "HEATING");
     EXPECT_EQ(Groups(2), "PLANT");
 }

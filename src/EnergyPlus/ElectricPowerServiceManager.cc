@@ -326,10 +326,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityPurchased",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -346,10 +346,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricitySurplusSold",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -366,10 +366,10 @@ void ElectricPowerServiceManager::getPowerManagerInput(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityNet",
                             "COGENERATION",
-                            _,
+                            {},
                             "Plant");
 
         SetupOutputVariable(state,
@@ -779,7 +779,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
             errorsFound = true;
         }
 
-        demandMeterName_ = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(5));
+        demandMeterName_ = UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5));
         // meters may not be "loaded" yet, defered check to later subroutine
 
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), "AlternatingCurrent")) {
@@ -2182,7 +2182,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
 
     name = objectName;
 
-    generatorType = static_cast<GeneratorType>(getEnumerationValue(GeneratorTypeNamesUC, UtilityRoutines::MakeUPPERCase(objectType)));
+    generatorType = static_cast<GeneratorType>(getEnumValue(GeneratorTypeNamesUC, UtilityRoutines::makeUPPER(objectType)));
     switch (generatorType) {
     case GeneratorType::ICEngine: {
         compPlantType = DataPlant::PlantEquipmentType::Generator_ICEngine;
@@ -2207,8 +2207,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
     case GeneratorType::PVWatts: {
         compPlantType = DataPlant::PlantEquipmentType::Invalid;
 
-        int ObjNum =
-            state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::MakeUPPERCase(objectName));
+        int ObjNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, "Generator:PVWatts", UtilityRoutines::makeUPPER(objectName));
         assert(ObjNum >= 0);
         if (ObjNum == 0) {
             ShowFatalError(state, format("Cannot find Generator:PVWatts {}", objectName));
@@ -2263,8 +2262,7 @@ GeneratorController::GeneratorController(EnergyPlusData &state,
                 // Except you need GetPVInput to have run already etc
                 // Note: you can't use state.dataIPShortCut->cAlphaArgs etc or it'll override what will still need to be processed in
                 // ElectPowerLoadCenter::ElectPowerLoadCenter after this function is called
-                int PVNum =
-                    state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::MakeUPPERCase(objectName));
+                int PVNum = state.dataInputProcessing->inputProcessor->getObjectItemNum(state, objectType, UtilityRoutines::makeUPPER(objectName));
                 int NumAlphas; // Number of PV Array parameter alpha names being passed
                 int NumNums;   // Number of PV Array numeric parameters are being passed
                 int IOStat;
@@ -2396,7 +2394,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
         if (!state.dataPlnt->PlantFirstSizeCompleted) break;
 
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->CalcMicroCHPNoNormalizeGeneratorModel(
-            state, runFlag, false, myElecLoadRequest, DataPrecisionGlobals::constant_zero, FirstHVACIteration);
+            state, runFlag, false, myElecLoadRequest, DataPrecisionGlobals::constant_zero);
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->CalcUpdateHeatRecovery(state);
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct *>(thisMCHP)->UpdateMicroCHPGeneratorRecords(state);
 
@@ -2680,10 +2678,10 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Inverter Thermal Loss Rate",
@@ -2713,7 +2711,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "DCtoACInverter Ancillary",
@@ -3140,10 +3138,10 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "POWERCONVERSION",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Converter Thermal Loss Rate",
@@ -3173,7 +3171,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "Electricity",
                             "Cogeneration",
                             "ACtoDCConverter Ancillary",
@@ -3716,10 +3714,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Electric Storage Discharge Power",
@@ -3735,10 +3733,10 @@ ElectricStorage::ElectricStorage( // main constructor
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name_,
-                            _,
+                            {},
                             "ElectricityProduced",
                             "ELECTRICSTORAGE",
-                            _,
+                            {},
                             "Plant");
         SetupOutputVariable(state,
                             "Electric Storage Thermal Loss Rate",
@@ -4814,7 +4812,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
 
             // Meter check deferred because they may have not been "loaded" yet,
             for (int loopCount = 0; loopCount < numWiredMeters; ++loopCount) {
-                wiredMeterNames_[loopCount] = UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
+                wiredMeterNames_[loopCount] = UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(loopCount + numAlphaBeforeMeter + 1));
                 // Assign SpecialMeter as TRUE if the meter name is Electricity:Facility or Electricity:HVAC
                 if (UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:Facility") ||
                     UtilityRoutines::SameString(wiredMeterNames_[loopCount], "Electricity:HVAC")) {
@@ -4909,7 +4907,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "Electricity",
                                 "ExteriorEquipment",
                                 "Transformer",
@@ -4923,10 +4921,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
         if (usageMode_ == TransformerUse::PowerBetweenLoadCenterAndBldg) {
@@ -4937,10 +4935,10 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 name_,
-                                _,
+                                {},
                                 "ElectricityProduced",
                                 "POWERCONVERSION",
-                                _,
+                                {},
                                 "System");
         }
 

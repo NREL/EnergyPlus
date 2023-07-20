@@ -446,14 +446,14 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _, _, _);                 // triggers sizing call
+    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);                       // triggers sizing call
     Real64 locFanSizeVdot = state->dataHVACFan->fanObjs[0]->designAirVolFlowRate; // get function
     Real64 locDesignHeatGain1 = state->dataHVACFan->fanObjs[0]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain1, 100.0, 0.1);
 
     fanName = "TEST FAN 2";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
-    state->dataHVACFan->fanObjs[1]->simulate(*state, _, _, _, _);                      // triggers sizing call
+    state->dataHVACFan->fanObjs[1]->simulate(*state, _, _);                            // triggers sizing call
     locFanSizeVdot = state->dataHVACFan->fanObjs[1]->designAirVolFlowRate;             // get function
     Real64 locDesignHeatGain2 = state->dataHVACFan->fanObjs[1]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain2, 200.0, 0.1);
@@ -461,7 +461,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     fanName = "TEST FAN 3";
     state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[2]->simulate(*state, _, _, _, _);          // triggers sizing call
+    state->dataHVACFan->fanObjs[2]->simulate(*state, _, _);                // triggers sizing call
     locFanSizeVdot = state->dataHVACFan->fanObjs[2]->designAirVolFlowRate; // get function
     Real64 locDesignHeatGain3 = state->dataHVACFan->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 400.0, 0.1);
@@ -664,7 +664,6 @@ TEST_F(SQLiteFixture, BaseSizer_SQLiteRecordReportSizerOutputTest)
     // get the sqlite output
     // query the sqLite
     auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
     // check that there are two sizing result records
     ASSERT_EQ(2ul, result.size());
     std::vector<std::string> testResult0{"1", "BOILER:HOTWATER", "RESIDENTIAL BOILER ELECTRIC", "Design Size Nominal Capacity", "105977.98934", "W"};

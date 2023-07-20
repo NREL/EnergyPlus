@@ -1908,12 +1908,12 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 }
 
 int MyPlantSizingIndex(EnergyPlusData &state,
-                       std::string const &CompType,                 // component description
-                       std::string_view CompName,                   // user name of component
-                       int const NodeNumIn,                         // component water inlet node
-                       [[maybe_unused]] int const NodeNumOut,       // component water outlet node
-                       bool &ErrorsFound,                           // set to true if there's an error, unchanged otherwise
-                       ObjexxFCL::Optional_bool_const SupressErrors // used for WSHP's where condenser loop may not be on a plant loop
+                       std::string_view const CompType,       // component description
+                       std::string_view const CompName,       // user name of component
+                       int const NodeNumIn,                   // component water inlet node
+                       [[maybe_unused]] int const NodeNumOut, // component water outlet node
+                       bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
+                       bool const PrintErrorFlag              // used for WSHP's where condenser loop may not be on a plant loop
 )
 {
 
@@ -1940,14 +1940,8 @@ int MyPlantSizingIndex(EnergyPlusData &state,
 
     int MyPltLoopNum{};
     PlantLocation DummyPlantLoc{};
-    bool PrintErrorFlag;
 
     MyPltSizNum = 0;
-    if (present(SupressErrors)) {
-        PrintErrorFlag = SupressErrors;
-    } else {
-        PrintErrorFlag = true;
-    }
 
     ScanPlantLoopsForNodeNum(state, "MyPlantSizingIndex", NodeNumIn, DummyPlantLoc);
 

@@ -422,7 +422,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
         } else {
             Remainder = stripped(Line.substr(Pos + 1));
         }
-        //    Keyword = UtilityRoutines::MakeUPPERCase(Line(1:Pos-1))
+        //    Keyword = UtilityRoutines::makeUPPER(Line(1:Pos-1))
         Keyword = Line.substr(0, Pos);
 
         // the functionality in each block of this parser structure is so different that a regular IF block seems reasonable
@@ -467,8 +467,7 @@ void ParseStack(EnergyPlusData &state, int const StackNum)
             } else {
                 Pos = scan(Remainder, ' ');
                 if (Pos == std::string::npos) Pos = Remainder.length();
-                Variable =
-                    UtilityRoutines::MakeUPPERCase(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
+                Variable = UtilityRoutines::makeUPPER(stripped(Remainder.substr(0, Pos))); // really the subroutine, or reference to instruction set
                 StackNum2 = UtilityRoutines::FindItemInList(Variable, state.dataRuntimeLang->ErlStack);
                 if (StackNum2 == 0) {
                     AddError(state, StackNum, LineNum, "Program or Subroutine name [" + Variable + "] not found for the RUN instruction.");
@@ -3515,15 +3514,15 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
-                                        _,
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        {},
+                                        1,
+                                        1,
+                                        -999,
                                         UnitsB);
                 }
                 // Last field is index key, no indexing here so mimic weather output data
@@ -3817,7 +3816,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
                                         EndUseSubCatString,
@@ -3830,10 +3829,10 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         FreqString,
                                         VarTypeString,
                                         "EMS",
-                                        _,
+                                        {},
                                         ResourceTypeString,
                                         EndUseTypeString,
-                                        _,
+                                        {},
                                         GroupTypeString);
                 }
             }
@@ -4059,7 +4058,7 @@ int FindEMSVariable(EnergyPlusData &state,
     int TrendVarNum;
 
     Found = false;
-    std::string const UppercaseName = UtilityRoutines::MakeUPPERCase(VariableName);
+    std::string const UppercaseName = UtilityRoutines::makeUPPER(VariableName);
 
     // check in ErlVariables
     for (VariableNum = 1; VariableNum <= state.dataRuntimeLang->NumErlVariables; ++VariableNum) {
@@ -4113,7 +4112,7 @@ int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int c
 
         // Add the new variable
         VariableNum = state.dataRuntimeLang->NumErlVariables;
-        state.dataRuntimeLang->ErlVariable(VariableNum).Name = UtilityRoutines::MakeUPPERCase(VariableName);
+        state.dataRuntimeLang->ErlVariable(VariableNum).Name = UtilityRoutines::makeUPPER(VariableName);
         state.dataRuntimeLang->ErlVariable(VariableNum).StackNum = StackNum;
         state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type = Value::Number; // ErlVariable values are numbers
     }

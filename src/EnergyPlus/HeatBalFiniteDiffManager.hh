@@ -310,7 +310,7 @@ namespace HeatBalFiniteDiffManager {
                                         Real64 &updatedDensity,
                                         Real64 &updatedThermalConductivity);
 
-    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData &state, int const constructionNum);
+    bool findAnySurfacesUsingConstructionAndCondFD(EnergyPlusData const &state, int const constructionNum);
 
 } // namespace HeatBalFiniteDiffManager
 

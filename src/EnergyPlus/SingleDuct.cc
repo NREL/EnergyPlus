@@ -5397,14 +5397,14 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
         Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
     } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {
-        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, _, _);
+        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
 
     } else { // pass through conditions
         state.dataHVACGlobal->TurnFansOff = true;
         if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
             Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
         } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _, state.dataHVACGlobal->TurnFansOff, _);
+            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
         }
         state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;
@@ -5873,7 +5873,7 @@ void GetATMixers(EnergyPlusData &state)
                             if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(3),
                                                             state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(Num)) &&
                                 UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(2),
-                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType(Num))) {
+                                                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipTypeName(Num))) {
                                 state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(ATMixerNum).ADUNum).ZoneEqNum = CtrlZone;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum = CtrlZone;
                                 // Must wait until InitATMixer to fill other zone equip config data because ultimate zone inlet node is not known yet

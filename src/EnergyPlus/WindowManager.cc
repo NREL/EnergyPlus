@@ -2286,7 +2286,7 @@ namespace WindowManager {
 
             // Reset hcin if necessary since too small a value sometimes causes non-convergence
             // of window layer heat balance solution.
-            if (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) {
+            if (state.dataSurface->surfIntConv(SurfNum).model == Convect::HcInt::SetByZone) {
                 if (state.dataWindowManager->hcin <=
                     state.dataHeatBal->LowHConvLimit) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
                     //  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
@@ -2422,19 +2422,19 @@ namespace WindowManager {
                         if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
                             int SurfWinSlatsAngIndex = state.dataSurface->SurfWinSlatsAngIndex(SurfNum);
                             Real64 SurfWinSlatsAngInterpFac = state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum);
-                            state.dataWindowManager->emis[state.dataWindowManager->nglface] = General::InterpGeneral(
+                            state.dataWindowManager->emis[state.dataWindowManager->nglface] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRFrontEmiss(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRFrontEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
-                            state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] = General::InterpGeneral(
+                            state.dataWindowManager->emis[state.dataWindowManager->nglface + 1] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRBackEmiss(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRBackEmiss(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
-                            state.dataWindowManager->tir[state.dataWindowManager->nglface] = General::InterpGeneral(
+                            state.dataWindowManager->tir[state.dataWindowManager->nglface] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRFrontTrans(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRFrontTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
-                            state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] = General::InterpGeneral(
+                            state.dataWindowManager->tir[state.dataWindowManager->nglface + 1] = General::Interp(
                                 state.dataMaterial->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex),
                                 state.dataMaterial->Blind(BlNum).IRBackTrans(std::min(Material::MaxSlatAngs, SurfWinSlatsAngIndex + 1)),
                                 SurfWinSlatsAngInterpFac);
@@ -2586,14 +2586,14 @@ namespace WindowManager {
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 SurfInsideTemp = state.dataWindowManager->thetas[2 * state.dataWindowManager->ngllayer + 1] - state.dataWindowManager->TKelvin;
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    EffShBlEmiss = General::InterpGeneral(
-                        window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
-                    EffGlEmiss = General::InterpGeneral(
-                        window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffShBlEmiss =
+                        General::Interp(window.EffShBlindEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                        window.EffShBlindEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss =
+                        General::Interp(window.EffGlassEmiss(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                        window.EffGlassEmiss(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     EffShBlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                     EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1);
@@ -3536,7 +3536,7 @@ namespace WindowManager {
         // by LU decomposition.
 
         // Using/Aliasing
-        using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
+        using Convect::CalcISO15099WindowIntConvCoeff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3646,9 +3646,9 @@ namespace WindowManager {
             }
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
-            if (((state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == 0) &&
-                 (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ConvectionConstants::HcInt_ASHRAETARP)) ||
-                (state.dataSurface->SurfIntConvCoeffIndex(SurfNum) == -2)) {
+            if (((state.dataSurface->surfIntConv(SurfNum).model == Convect::HcInt::SetByZone) &&
+                 (state.dataHeatBal->Zone(ZoneNum).IntConvAlgo == Convect::HcInt::ASHRAETARP)) ||
+                (state.dataSurface->surfIntConv(SurfNum).model == Convect::HcInt::ASHRAETARP)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
@@ -3860,11 +3860,11 @@ namespace WindowManager {
                 TransDiff = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
             } else if (ANY_BLIND(ShadeFlag)) {
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    TransDiff = General::InterpGeneral(
-                        state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                        state.dataConstruction->Construct(ConstrNumSh)
-                            .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    TransDiff =
+                        General::Interp(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                                        state.dataConstruction->Construct(ConstrNumSh)
+                                            .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
                     TransDiff = state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(1);
                 }
@@ -7937,7 +7937,7 @@ namespace WindowManager {
                     state.dataMaterial->Screens(ScreenNum).ScreenDiameterToSpacingRatio = 1.0 - std::sqrt(thisMaterial->Trans);
 
                     state.dataMaterial->Screens(ScreenNum).screenBeamReflectanceModel = static_cast<Material::ScreenBeamReflectanceModel>(
-                        getEnumerationValue(ScreenBeamReflectanceModelNamesUC, UtilityRoutines::MakeUPPERCase(thisMaterial->ReflectanceModeling)));
+                        getEnumValue(ScreenBeamReflectanceModelNamesUC, UtilityRoutines::makeUPPER(thisMaterial->ReflectanceModeling)));
 
                     // Reflectance of screen material only
                     state.dataMaterial->Screens(ScreenNum).ReflectCylinder = thisMaterial->ReflectShade / (1 - thisMaterial->Trans);

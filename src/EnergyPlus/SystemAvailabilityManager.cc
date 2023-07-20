@@ -605,14 +605,14 @@ namespace SystemAvailabilityManager {
                     ErrorsFound = true;
                 }
 
-                nightCycleMgr.nightCycleControlType = static_cast<NightCycleControlType>(
-                    getEnumerationValue(NightCycleControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+                nightCycleMgr.nightCycleControlType =
+                    static_cast<NightCycleControlType>(getEnumValue(NightCycleControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
 
                 assert(nightCycleMgr.nightCycleControlType != NightCycleControlType::Invalid);
 
                 // Cycling Run Time Control Type
-                nightCycleMgr.cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(
-                    getEnumerationValue(CyclingRunTimeControlNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(5))));
+                nightCycleMgr.cyclingRunTimeControl =
+                    static_cast<CyclingRunTimeControl>(getEnumValue(CyclingRunTimeControlNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(5))));
 
                 assert(nightCycleMgr.cyclingRunTimeControl != CyclingRunTimeControl::Invalid);
 
@@ -808,8 +808,8 @@ namespace SystemAvailabilityManager {
 
                 optimumStartMgr.MaxOptStartTime = rNumericArgs(1);
 
-                optimumStartMgr.optimumStartControlType = static_cast<OptimumStartControlType>(
-                    getEnumerationValue(OptimumStartControlTypeNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(4))));
+                optimumStartMgr.optimumStartControlType =
+                    static_cast<OptimumStartControlType>(getEnumValue(OptimumStartControlTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(4))));
 
                 if (optimumStartMgr.optimumStartControlType == OptimumStartControlType::Invalid) {
                     optimumStartMgr.optimumStartControlType = OptimumStartControlType::ControlZone;
@@ -848,7 +848,7 @@ namespace SystemAvailabilityManager {
                 }
 
                 optimumStartMgr.controlAlgorithm =
-                    static_cast<ControlAlgorithm>(getEnumerationValue(ControlAlgorithmNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(7))));
+                    static_cast<ControlAlgorithm>(getEnumValue(ControlAlgorithmNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(7))));
 
                 assert(optimumStartMgr.controlAlgorithm != ControlAlgorithm::Invalid);
 
@@ -1319,7 +1319,7 @@ namespace SystemAvailabilityManager {
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 ++Item;
                 auto const &objectFields = instance.value();
-                std::string const thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const thisObjectName = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 auto &mgrList = state.dataSystemAvailabilityManager->ListData(Item);
                 mgrList.Name = thisObjectName;
@@ -1345,7 +1345,7 @@ namespace SystemAvailabilityManager {
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
                         mgrList.AvailManagerType(listItem) = static_cast<DataPlant::SystemAvailabilityType>(
-                            getEnumerationValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::MakeUPPERCase(availManagerObjType)));
+                            getEnumValue(SystemAvailabilityTypeNamesUC, UtilityRoutines::makeUPPER(availManagerObjType)));
                         if (mgrList.AvailManagerType(listItem) == DataPlant::SystemAvailabilityType::HybridVent)
                             mgrList.AvailManagerType(listItem) = DataPlant::SystemAvailabilityType::Invalid;
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
@@ -1811,7 +1811,7 @@ namespace SystemAvailabilityManager {
                 SysAvailNum = UtilityRoutines::FindItemInList(SysAvailName, state.dataSystemAvailabilityManager->NightVentData);
             }
             if (SysAvailNum > 0) {
-                CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType);
+                CalcNVentSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, present(ZoneEquipType));
             } else {
                 ShowFatalError(state, format("SimSysAvailManager: AvailabilityManager:NightVentilation not found: {}", SysAvailName));
             }
@@ -3474,10 +3474,10 @@ namespace SystemAvailabilityManager {
         }
     }
     void CalcNVentSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum,                      // number of the current scheduled system availability manager
-                              int const PriAirSysNum,                     // number of the primary air system affected by this Avail. Manager
-                              int &AvailStatus,                           // System status indicator
-                              ObjexxFCL::Optional_int_const ZoneEquipType // Type of zone equipment component
+                              int const SysAvailNum,     // number of the current scheduled system availability manager
+                              int const PriAirSysNum,    // number of the primary air system affected by this Avail. Manager
+                              int &AvailStatus,          // System status indicator
+                              bool const isZoneEquipType // Type of zone equipment component
     )
     {
 
@@ -3519,7 +3519,7 @@ namespace SystemAvailabilityManager {
             VentTemp = GetCurrentScheduleValue(state, nightVentMgr.VentTempSchedPtr);
             int ControlZoneNum = nightVentMgr.ZoneNum;
 
-            if (present(ZoneEquipType)) {
+            if (isZoneEquipType) {
                 // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
                 if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) > VentTemp) {
                     TempCheck = true;
@@ -3556,7 +3556,7 @@ namespace SystemAvailabilityManager {
             }
         }
 
-        if (!present(ZoneEquipType)) {
+        if (!isZoneEquipType) {
             if (AvailStatus == CycleOn) {
                 state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).LoopFlowRateSet = true;
                 state.dataAirLoop->AirLoopControlInfo(PriAirSysNum).NightVent = true;

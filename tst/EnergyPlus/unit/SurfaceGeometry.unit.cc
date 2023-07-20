@@ -65,6 +65,8 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -3272,6 +3274,86 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_ASHRAE901_Hospital_
     EXPECT_FALSE(surface.IsConvex);
 }
 
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexity_ColinearStability)
+{
+    // Test for #10103 - Regardless of the order of the vertices, we should drop colinear vertices consistently to avoid a fatal error due to vertex
+    // side mismatch
+    //
+    //  y
+    //    ▲          7     8     9
+    //    │          ┌─────x────┐
+    //    │          │          │
+    //    │          │          │
+    //    │          │          │
+    //    │5         │          │
+    //    ├──────────┘          │
+    //    │           6         │
+    //    │                     │
+    //    │                     │
+    //    │                     │10
+    //    └────x─────x─────x────┴─────►
+    //    4     3      2      1           x
+
+    const std::vector<Vector> floorVertices = {
+        {30.0, 0., 0.},
+        {20.0, 0., 0.},
+        {10.0, 0., 0.},
+        {0.0, 0., 0.},
+        {0.0, 20., 0.},
+        {20.0, 20., 0.},
+        {20.0, 40., 0.},
+        {30.0, 40., 0.},
+        {40.0, 40., 0.},
+        {40.0, 0., 0.},
+    };
+    const int nVertices = static_cast<int>(floorVertices.size());
+
+    state->dataSurface->TotSurfaces = 2;
+    constexpr int floorSurfNum = 1;
+    constexpr int ceilingSurfNum = 2;
+    state->dataSurface->MaxVerticesPerSurface = nVertices;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+
+    auto &floorSurface = state->dataSurfaceGeometry->SurfaceTmp(floorSurfNum);
+    auto &ceilingSurface = state->dataSurfaceGeometry->SurfaceTmp(ceilingSurfNum);
+    {
+        floorSurface.Azimuth = 0.0;
+        floorSurface.Tilt = 0.0;
+        floorSurface.Sides = nVertices;
+        floorSurface.GrossArea = 100.0;
+        floorSurface.Name = "Floor";
+        floorSurface.Vertex.allocate(nVertices);
+
+        floorSurface.Vertex = floorVertices;
+
+        CheckConvexity(*state, floorSurfNum, floorSurface.Sides);
+
+        EXPECT_EQ(6, floorSurface.Sides);
+        EXPECT_FALSE(floorSurface.IsConvex);
+    }
+
+    {
+        auto ceilingVertices = floorVertices;
+        std::reverse(ceilingVertices.begin(), ceilingVertices.end());
+
+        ceilingSurface.Azimuth = 0.0;
+        ceilingSurface.Tilt = 0.0;
+        ceilingSurface.Sides = nVertices;
+        ceilingSurface.GrossArea = 100.0;
+        ceilingSurface.Name = "Ceiling";
+        ceilingSurface.Vertex.allocate(nVertices);
+
+        ceilingSurface.Vertex = ceilingVertices;
+
+        CheckConvexity(*state, ceilingSurfNum, ceilingSurface.Sides);
+
+        EXPECT_EQ(6, ceilingSurface.Sides);
+        EXPECT_FALSE(ceilingSurface.IsConvex);
+    }
+
+    EXPECT_EQ(floorSurface.Sides, ceilingSurface.Sides);
+}
+
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
 {
     state->dataSurface->TotWinShadingControl = 3;
@@ -5738,13 +5820,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
 
     // Check surface order
-    int Zone1Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface1"), state->dataSurface->Surface);
-    int Zone1Surface2 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Surface2"), state->dataSurface->Surface);
-    int Zone2Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Surface1"), state->dataSurface->Surface);
-    int Zone3Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Surface1"), state->dataSurface->Surface);
-    int Zone1Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone1-Floor"), state->dataSurface->Surface);
-    int Zone2Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone2-Floor"), state->dataSurface->Surface);
-    int Zone3Floor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Floor"), state->dataSurface->Surface);
+    int Zone1Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Zone1-Surface1"), state->dataSurface->Surface);
+    int Zone1Surface2 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Zone1-Surface2"), state->dataSurface->Surface);
+    int Zone2Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Zone2-Surface1"), state->dataSurface->Surface);
+    int Zone3Surface1 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Zone3-Surface1"), state->dataSurface->Surface);
+    int Zone1Floor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Zone1-Floor"), state->dataSurface->Surface);
+    int Zone2Floor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Zone2-Floor"), state->dataSurface->Surface);
+    int Zone3Floor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Zone3-Floor"), state->dataSurface->Surface);
 
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst, Zone1Surface2);     // air boundary surface
     EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
@@ -8642,17 +8724,17 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     // Simulation Order (1-based):
     //  SHADING SURFACES:
     int siteShadeShadeFlatShadeSurface =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int mirSiteShadeFlatShadeSurface =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::makeUPPER("SiteShade:FlatShadeSurface"), state->dataSurface->Surface);
     int buildingShadeTiltedShadeSurface =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int mirBuildingShadeTiltedShadeSurface =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::makeUPPER("BuildingShade:TiltedShadeSurface"), state->dataSurface->Surface);
     int zoneShadeLivingSouthShade001 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     int mirZoneShadeLivingSouthShade001 =
-        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::MakeUPPERCase("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList("Mir-" + UtilityRoutines::makeUPPER("ZoneShade:Living:South:Shade001"), state->dataSurface->Surface);
     EXPECT_EQ(siteShadeShadeFlatShadeSurface, 1);
     EXPECT_EQ(mirSiteShadeFlatShadeSurface, 2);
     EXPECT_EQ(buildingShadeTiltedShadeSurface, 3);
@@ -8661,20 +8743,20 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(mirZoneShadeLivingSouthShade001, 6);
 
     //  LIVING ZONE:
-    int wallLivingNorth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:North"), state->dataSurface->Surface);
-    int wallLivingEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:East"), state->dataSurface->Surface);
-    int wallLivingSouth = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:South"), state->dataSurface->Surface);
-    int wallLivingWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:West"), state->dataSurface->Surface);
-    int wallLivingInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Interior"), state->dataSurface->Surface);
-    int floorLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Floor"), state->dataSurface->Surface);
-    int ceilingLivingCeiling = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Living:Ceiling"), state->dataSurface->Surface);
-    int doorWestDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestDoor"), state->dataSurface->Surface);
+    int wallLivingNorth = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Living:North"), state->dataSurface->Surface);
+    int wallLivingEast = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Living:East"), state->dataSurface->Surface);
+    int wallLivingSouth = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Living:South"), state->dataSurface->Surface);
+    int wallLivingWest = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Living:West"), state->dataSurface->Surface);
+    int wallLivingInterior = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Living:Interior"), state->dataSurface->Surface);
+    int floorLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Living:Floor"), state->dataSurface->Surface);
+    int ceilingLivingCeiling = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Living:Ceiling"), state->dataSurface->Surface);
+    int doorWestDoor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("WestDoor"), state->dataSurface->Surface);
     int windowTubularDaylightingDiffuser1 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
-    int windowNorthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthWindow"), state->dataSurface->Surface);
-    int windowEastWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastWindow"), state->dataSurface->Surface);
-    int windowSouthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthWindow"), state->dataSurface->Surface);
-    int windowWestWindow = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestWindow"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("TubularDaylightingDiffuser1"), state->dataSurface->Surface);
+    int windowNorthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("NorthWindow"), state->dataSurface->Surface);
+    int windowEastWindow = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("EastWindow"), state->dataSurface->Surface);
+    int windowSouthWindow = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("SouthWindow"), state->dataSurface->Surface);
+    int windowWestWindow = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("WestWindow"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallLivingNorth, 7);
     EXPECT_EQ(wallLivingEast, 8);
@@ -8697,13 +8779,13 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(state->dataHeatBal->space(1).WindowSurfaceLast, 19);
 
     //  GARAGE ZONE:
-    int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Interior"), state->dataSurface->Surface);
-    int wallGarageEast = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:EastWall"), state->dataSurface->Surface);
-    int wallGarageWest = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:WestWall"), state->dataSurface->Surface);
-    int wallGarageFrontDoor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:FrontDoor"), state->dataSurface->Surface);
-    int floorGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Floor"), state->dataSurface->Surface);
-    int ceilingGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Ceiling"), state->dataSurface->Surface);
-    int intmassEVChargingStation = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EVChargingStation"), state->dataSurface->Surface);
+    int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Garage:Interior"), state->dataSurface->Surface);
+    int wallGarageEast = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Garage:EastWall"), state->dataSurface->Surface);
+    int wallGarageWest = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Garage:WestWall"), state->dataSurface->Surface);
+    int wallGarageFrontDoor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Garage:FrontDoor"), state->dataSurface->Surface);
+    int floorGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Garage:Floor"), state->dataSurface->Surface);
+    int ceilingGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Garage:Ceiling"), state->dataSurface->Surface);
+    int intmassEVChargingStation = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("EVChargingStation"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallGarageInterior, 20);
     EXPECT_EQ(wallGarageEast, 21);
@@ -8720,21 +8802,21 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(state->dataHeatBal->space(2).WindowSurfaceLast, -1);
 
     //  ATTIC ZONE:
-    int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastGable"), state->dataSurface->Surface);
-    int wallWestGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestGable"), state->dataSurface->Surface);
-    int wallNorthGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthGable"), state->dataSurface->Surface);
-    int floorAtticLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:LivingFloor"), state->dataSurface->Surface);
-    int floorAtticGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Attic:GarageFloor"), state->dataSurface->Surface);
-    int roofNorthRoof1 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof1"), state->dataSurface->Surface);
-    int roofSouthRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("SouthRoof"), state->dataSurface->Surface);
-    int roofNorthRoof2 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof2"), state->dataSurface->Surface);
-    int roofNorthRoof3 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof3"), state->dataSurface->Surface);
-    int roofNorthRoof4 = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("NorthRoof4"), state->dataSurface->Surface);
-    int roofEastRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastRoof"), state->dataSurface->Surface);
-    int roofWestRoof = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("WestRoof"), state->dataSurface->Surface);
+    int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("EastGable"), state->dataSurface->Surface);
+    int wallWestGable = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("WestGable"), state->dataSurface->Surface);
+    int wallNorthGable = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("NorthGable"), state->dataSurface->Surface);
+    int floorAtticLivingFloor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Attic:LivingFloor"), state->dataSurface->Surface);
+    int floorAtticGarageFloor = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("Attic:GarageFloor"), state->dataSurface->Surface);
+    int roofNorthRoof1 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("NorthRoof1"), state->dataSurface->Surface);
+    int roofSouthRoof = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("SouthRoof"), state->dataSurface->Surface);
+    int roofNorthRoof2 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("NorthRoof2"), state->dataSurface->Surface);
+    int roofNorthRoof3 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("NorthRoof3"), state->dataSurface->Surface);
+    int roofNorthRoof4 = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("NorthRoof4"), state->dataSurface->Surface);
+    int roofEastRoof = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("EastRoof"), state->dataSurface->Surface);
+    int roofWestRoof = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("WestRoof"), state->dataSurface->Surface);
     int nonwindowTubularDaylightingDome1 =
-        UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("TubularDaylightingDome1"), state->dataSurface->Surface);
-    int windowAtticSkylight = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("AtticSkylight"), state->dataSurface->Surface);
+        UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("TubularDaylightingDome1"), state->dataSurface->Surface);
+    int windowAtticSkylight = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER("AtticSkylight"), state->dataSurface->Surface);
 
     EXPECT_EQ(wallEastGable, 27);
     EXPECT_EQ(wallWestGable, 28);
@@ -10023,7 +10105,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
@@ -10742,4 +10824,654 @@ TEST_F(EnergyPlusFixture, CalculatZoneVolume_WithoutAirBoundaries)
     EXPECT_FALSE(zone3.ceilingHeightEntered);
     EXPECT_EQ(zone3.CeilingHeight, 2.0);
     EXPECT_EQ(zone3.Volume, 8.0);
+}
+
+TEST_F(EnergyPlusFixture, Test_Rotational_Azimuth_Diffs)
+{
+    // Test Pull Request 9920 that fixes Issue 9910
+    SurfaceData BaseSurface;
+    SurfaceData SubSurface;
+    bool surfaceError;
+
+    // Base surface: Northeast
+    surfaceError = false;
+    BaseSurface.Azimuth = 30.0;
+    BaseSurface.Tilt = 90.0;
+    BaseSurface.NewellSurfaceNormalVector = Vectors::VecNormalize(DataVectorTypes::Vector(1, std::sqrt(3.0), 0));
+
+    // Sub surface: Northwest
+    // should be no error message and no surfaceError
+    SubSurface.Azimuth = 330.0;
+    SubSurface.Tilt = 90.0;
+    SubSurface.NewellSurfaceNormalVector = Vectors::VecNormalize(DataVectorTypes::Vector(-1, std::sqrt(3.0), 0));
+
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
+
+    // This test would fail due to a severe error if without RP 9920 fix
+    EXPECT_FALSE(surfaceError);
+
+    // This should be true due to a warning error (but not due to sever surface error)
+    EXPECT_TRUE(has_err_output());
+}
+TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleChecks)
+{
+
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "  Timestep, 6;",
+        "  Material,",
+        "    CB11,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2032000,               !- Thickness {m}",
+        "    1.048000,                !- Conductivity {W/m-K}",
+        "    1105.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  WindowMaterial:Glazing,",
+        "    CLEAR 3MM,               !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.003,                   !- Thickness {m}",
+        "    0.837,                   !- Solar Transmittance at Normal Incidence",
+        "    0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.898,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "  Construction,",
+        "    Walls,          !- Name",
+        "    CB11;        !- Outside Layer",
+
+        "  Construction,",
+        "    Windows,            !- Name",
+        "    CLEAR 3MM;                    !- Outside Layer",
+
+        "  Zone,",
+        "    LIVING ZONE;             !- Name",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:North,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    17.242,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:East,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    17.242,0,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    17.242,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:South,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,2.4383,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,0,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:West,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Ceiling,          !- Name",
+        "    Ceiling,                 !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Ceiling,       !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,2.4384,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,0,2.4384,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Floor,            !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    Walls,            !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Floor,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    EastWindow,              !- Name",
+        "    Window,                  !- Surface Type",
+        "    Windows,     !- Construction Name",
+        "    Living:East,             !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    17.242,2,2.1336,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    17.242,2,0.6096,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,6.572,0.6096,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,6.572,2.1336;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    SouthWindow,             !- Name",
+        "    Window,                  !- Surface Type",
+        "    Windows,     !- Construction Name",
+        "    Living:South,            !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2,0,2.1336,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    2,0,0.6096,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.572,0,0.6096,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.572,0,2.1336;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  ScheduleTypeLimits, AnyNumber;",
+
+        "  Schedule:Constant, AlwaysZero, AnyNumber, 0.0;",
+        "  Schedule:Constant, AlwaysOne, AnyNumber, 1.0;",
+        "  Schedule:Constant, AlwaysPoint8, AnyNumber, 0.8;",
+        "  Schedule:Compact, VaryWithinRange, AnyNumber, Through: 12/31, For: AllDays, ",
+        "  Until: 10:00, 0.2, Until: 12:00, 0.4, Until 14:00, 1.0, Until 24:00, 0.0;"
+        "  Schedule:Compact, OutofRange, AnyNumber, Through: 12/31, For: AllDays, ",
+        "  Until: 10:00, -1.0, Until: 12:00, 0.4, Until 14:00, 1.5, Until 24:00, 0.0;"
+
+        "  Shading:Zone:Detailed,",
+        "    ZoneShade:Living:South:Shade001,  !- Name",
+        "    Living:South,        !- Base Surface Name",
+        "    AlwaysZero,              !- Transmittance Schedule Name",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  Shading:Zone:Detailed,",
+        "    ZoneShade:Living:South:Shade002,  !- Name",
+        "    Living:South,        !- Base Surface Name",
+        "    AlwaysOne,              !- Transmittance Schedule Name",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  Shading:Zone:Detailed,",
+        "    ZoneShade:Living:South:Shade003,  !- Name",
+        "    Living:South,        !- Base Surface Name",
+        "    AlwaysPoint8,              !- Transmittance Schedule Name",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  Shading:Zone:Detailed,",
+        "    ZoneShade:Living:South:Shade004,  !- Name",
+        "    Living:South,        !- Base Surface Name",
+        "    VaryWithinRange,              !- Transmittance Schedule Name",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Building:Detailed,",
+        "  BuildingShade:TiltedShadeSurface,             !- Name",
+        "  AlwaysZero,                        !- Transmittance Schedule Name",
+        "  4,                       !- Number of Vertices",
+        "  -40.0,2.0,20.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  -40.0,0.00,20.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  -45.0,0.00,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  -45.0,2.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Site:Detailed,",
+        "  SiteShade:FlatShadeSurface,             !- Name",
+        "  AlwaysOne,                        !- Transmittance Schedule Name",
+        "  4,                       !- Number of Vertices",
+        "  40.0,2.0,10.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  40.0,0.00,10.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  45.0,0.00,10.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  45.0,2.0,10.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Building:Detailed,",
+        "  BuildingShade:TiltedShadeSurface2,             !- Name",
+        "  AlwaysPoint8,                        !- Transmittance Schedule Name",
+        "  4,                       !- Number of Vertices",
+        "  -40.0,2.0,20.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  -40.0,0.00,20.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  -45.0,0.00,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  -45.0,2.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Site:Detailed,",
+        "  SiteShade:FlatShadeSurface2,             !- Name",
+        "  VaryWithinRange,                        !- Transmittance Schedule Name",
+        "  4,                       !- Number of Vertices",
+        "  40.0,2.0,10.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  40.0,0.00,10.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  45.0,0.00,10.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  45.0,2.0,10.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state); // read project data
+    ScheduleManager::ProcessScheduleInput(*state);
+
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
+
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
+
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
+
+    SetupZoneGeometry(*state, ErrorsFound);
+    SolarShading::checkShadingSurfaceSchedules(*state);
+    std::string const error_string = delimited_string(
+        {"   ** Warning ** Shading Surface=\"SITESHADE:FLATSHADESURFACE\", Transmittance Schedule Name=\"ALWAYSONE\", is always transparent.",
+         "   **   ~~~   ** This shading surface will be ignored.",
+         "   ** Warning ** Shading Surface=\"ZONESHADE:LIVING:SOUTH:SHADE002\", Transmittance Schedule Name=\"ALWAYSONE\", is always transparent.",
+         "   **   ~~~   ** This shading surface will be ignored."});
+
+    compare_err_stream(error_string);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    static constexpr std::array<std::string_view, 8> surfacenames{"ZoneShade:Living:South:Shade001",
+                                                                  "ZoneShade:Living:South:Shade002",
+                                                                  "ZoneShade:Living:South:Shade003",
+                                                                  "ZoneShade:Living:South:Shade004",
+                                                                  "BuildingShade:TiltedShadeSurface",
+                                                                  "SiteShade:FlatShadeSurface",
+                                                                  "BuildingShade:TiltedShadeSurface2",
+                                                                  "SiteShade:FlatShadeSurface2"};
+    static constexpr std::array<bool, 8> isTransparent{false, true, false, false, false, true, false, false};
+
+    for (int surf = 0; surf < 8; ++surf) {
+        int surfNum = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER(surfacenames[surf]), state->dataSurface->Surface);
+        EXPECT_EQ(state->dataSurface->Surface(surfNum).IsTransparent, isTransparent[surf]);
+    }
+    EXPECT_TRUE(state->dataSolarShading->anyScheduledShadingSurface);
+    EXPECT_TRUE(state->dataSurface->ShadingTransmittanceVaries);
+
+    // compare_err_stream( "" ); // just for debugging
+}
+TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleOutOfRange)
+{
+
+    bool ErrorsFound(false);
+
+    std::string const idf_objects = delimited_string({
+        "  Timestep, 6;",
+        "  Material,",
+        "    CB11,                    !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.2032000,               !- Thickness {m}",
+        "    1.048000,                !- Conductivity {W/m-K}",
+        "    1105.000,                !- Density {kg/m3}",
+        "    837.0000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.2000000,               !- Solar Absorptance",
+        "    0.2000000;               !- Visible Absorptance",
+
+        "  WindowMaterial:Glazing,",
+        "    CLEAR 3MM,               !- Name",
+        "    SpectralAverage,         !- Optical Data Type",
+        "    ,                        !- Window Glass Spectral Data Set Name",
+        "    0.003,                   !- Thickness {m}",
+        "    0.837,                   !- Solar Transmittance at Normal Incidence",
+        "    0.075,                   !- Front Side Solar Reflectance at Normal Incidence",
+        "    0.075,                   !- Back Side Solar Reflectance at Normal Incidence",
+        "    0.898,                   !- Visible Transmittance at Normal Incidence",
+        "    0.081,                   !- Front Side Visible Reflectance at Normal Incidence",
+        "    0.081,                   !- Back Side Visible Reflectance at Normal Incidence",
+        "    0.0,                     !- Infrared Transmittance at Normal Incidence",
+        "    0.84,                    !- Front Side Infrared Hemispherical Emissivity",
+        "    0.84,                    !- Back Side Infrared Hemispherical Emissivity",
+        "    0.9;                     !- Conductivity {W/m-K}",
+
+        "  Construction,",
+        "    Walls,          !- Name",
+        "    CB11;        !- Outside Layer",
+
+        "  Construction,",
+        "    Windows,            !- Name",
+        "    CLEAR 3MM;                    !- Outside Layer",
+
+        "  Zone,",
+        "    LIVING ZONE;             !- Name",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:North,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    17.242,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    17.242,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:East,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    17.242,0,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    17.242,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:South,            !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,2.4383,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,0,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:West,             !- Name",
+        "    Wall,                    !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Ceiling,          !- Name",
+        "    Ceiling,                 !- Surface Type",
+        "    Walls,          !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Ceiling,       !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,10.778,2.4384,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,2.4384,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,0,2.4384,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,10.778,2.4384;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Living:Floor,            !- Name",
+        "    FLOOR,                   !- Surface Type",
+        "    Walls,            !- Construction Name",
+        "    LIVING ZONE,             !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Living:Floor,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,10.778,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,10.778,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,0,0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    EastWindow,              !- Name",
+        "    Window,                  !- Surface Type",
+        "    Windows,     !- Construction Name",
+        "    Living:East,             !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    17.242,2,2.1336,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    17.242,2,0.6096,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    17.242,6.572,0.6096,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    17.242,6.572,2.1336;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    SouthWindow,             !- Name",
+        "    Window,                  !- Surface Type",
+        "    Windows,     !- Construction Name",
+        "    Living:South,            !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    2,0,2.1336,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    2,0,0.6096,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    6.572,0,0.6096,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    6.572,0,2.1336;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  ScheduleTypeLimits, AnyNumber;",
+
+        "  Schedule:Compact, OutofRange, AnyNumber, Through: 12/31, For: AllDays, ",
+        "  Until: 10:00, -1.0, Until: 12:00, 0.4, Until 14:00, 1.5, Until 24:00, 0.0;"
+
+        "  Shading:Zone:Detailed,",
+        "    ZoneShade:Living:South:Shade001,  !- Name",
+        "    Living:South,        !- Base Surface Name",
+        "    OutofRange,              !- Transmittance Schedule Name",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Building:Detailed,",
+        "  BuildingShade:TiltedShadeSurface,             !- Name",
+        "  OutofRange,                        !- Transmittance Schedule Name",
+        "  4,                       !- Number of Vertices",
+        "  -40.0,2.0,20.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  -40.0,0.00,20.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  -45.0,0.00,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  -45.0,2.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state); // read project data
+    ScheduleManager::ProcessScheduleInput(*state);
+
+    GetMaterialData(*state, ErrorsFound); // read material data
+    EXPECT_FALSE(ErrorsFound);            // expect no errors
+
+    GetConstructData(*state, ErrorsFound); // read construction data
+    EXPECT_FALSE(ErrorsFound);             // expect no errors
+
+    GetZoneData(*state, ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);        // expect no errors
+
+    EXPECT_THROW(SetupZoneGeometry(*state, ErrorsFound), std::runtime_error);
+    // EXPECT_THROW(GetSurfaceData(*state, ErrorsFound), std::runtime_error);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string(
+        {"   ** Severe  ** Shading:Building:Detailed=\"BUILDINGSHADE:TILTEDSHADESURFACE\", Transmittance Schedule Name=\"OUTOFRANGE\", values not in "
+         "range [0,1].",
+         "   ** Severe  ** Shading:Building:Detailed=\"BUILDINGSHADE:TILTEDSHADESURFACE\", Transmittance Schedule Name=\"OUTOFRANGE\", "
+         "has schedule values < 0.",
+         "   **   ~~~   ** ...Schedule values < 0 have no meaning for shading elements.",
+         "   ** Severe  ** "
+         "Shading:Building:Detailed=\"BUILDINGSHADE:TILTEDSHADESURFACE\", Transmittance Schedule Name=\"OUTOFRANGE\", has schedule values > 1.",
+         "   **   ~~~   ** ...Schedule values > 1 have no meaning for shading elements.",
+         "   ** Severe  ** "
+         "Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Transmittance Schedule Name=\"OUTOFRANGE\", values not in range [0,1].",
+         "   ** "
+         "Severe  ** Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Base Surface Name=\"LIVING:SOUTH\", has schedule values < 0.",
+         "   **  "
+         " ~~~   ** ...Schedule values < 0 have no meaning for shading elements.",
+         "   ** Severe  ** "
+         "Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Base Surface Name=\"LIVING:SOUTH\", has schedule values > 1.",
+         "   **   ~~~   ** "
+         "...Schedule values > 1 have no meaning for shading elements.",
+         "   **  Fatal  ** GetSurfaceData: Errors discovered, program terminates.",
+         "   "
+         "...Summary of Errors that led to program termination:",
+         "   ..... Reference severe error count=6",
+         "   ..... Last severe error=Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Base Surface Name=\"LIVING:SOUTH\", has schedule "
+         "values > 1."});
+
+    compare_err_stream(error_string);
+    // compare_err_stream( "" ); // just for debugging
+}
+
+TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Test)
+{
+    // Unit Test for Pull Request 9905 that fixes a few potential problems described Issue 9893
+    SurfaceData BaseSurface;
+    SurfaceData SubSurface;
+    bool surfaceError;
+
+    // Test Base surf and subsurf normal vectors assignment
+    surfaceError = false;
+
+    BaseSurface.Vertex.dimension(4);
+
+    BaseSurface.Vertex = {
+        DataVectorTypes::Vector(0, 0, 0), DataVectorTypes::Vector(1, 0, 0), DataVectorTypes::Vector(1, 1, 0), DataVectorTypes::Vector(0, 1, 0)};
+    Vectors::CreateNewellSurfaceNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size(), BaseSurface.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
+                                     BaseSurface.Azimuth,
+                                     BaseSurface.Tilt,
+                                     BaseSurface.lcsx,
+                                     BaseSurface.lcsy,
+                                     BaseSurface.lcsz,
+                                     BaseSurface.NewellSurfaceNormalVector);
+
+    SubSurface.Vertex.dimension(4);
+
+    SubSurface.Vertex = {DataVectorTypes::Vector(0, 0, 0),
+                         DataVectorTypes::Vector(1, 0, 0),
+                         DataVectorTypes::Vector(1, 1, 0.0003),
+                         DataVectorTypes::Vector(0, 1, 0.0003)};
+    Vectors::CreateNewellSurfaceNormalVector(SubSurface.Vertex, SubSurface.Vertex.size(), SubSurface.NewellSurfaceNormalVector);
+    Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
+                                     SubSurface.Azimuth,
+                                     SubSurface.Tilt,
+                                     SubSurface.lcsx,
+                                     SubSurface.lcsy,
+                                     SubSurface.lcsz,
+                                     SubSurface.NewellSurfaceNormalVector);
+
+    bool sameSurfNormal(false);
+
+    // This is the sameSurfNormal test used in checkSubSurfAzTiltNorm()
+    Vectors::CompareTwoVectors(BaseSurface.NewellSurfaceNormalVector, SubSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+
+    // The surface normals are not exactly the same
+    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.y - SubSurface.NewellSurfaceNormalVector.y), 1e-5);
+    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.z - SubSurface.NewellSurfaceNormalVector.z), 1e-10);
+
+    // But should pass the sameSurfNormal test
+    EXPECT_TRUE(sameSurfNormal);
+
+    checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
+
+    // These should pass
+    EXPECT_FALSE(surfaceError);
+    EXPECT_FALSE(has_err_output());
+
+    // Without the fix in PR 9905 the following would fail since they are not assigned to be exactly the same
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.z, SubSurface.lcsz.z);
+    // The following two lines might pass in the original code, but probably not a consistent outcome
+    // In the new code (after PR 9905 fix, they should be consistently passing the tests
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.y, SubSurface.lcsz.y);
+    EXPECT_DOUBLE_EQ(BaseSurface.lcsz.x, SubSurface.lcsz.x);
 }

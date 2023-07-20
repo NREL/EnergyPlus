@@ -335,26 +335,26 @@ namespace OutputReportPredefined {
         s->pdchCoolCoilUATotal = newPreDefColumn(state, s->pdstCoolCoil, "Nominal Coil UA Value [W/C]");
         s->pdchCoolCoilArea = newPreDefColumn(state, s->pdstCoolCoil, "Nominal Coil Surface Area [m2]");
 
-        s->pdstDXCoolCoil = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coils");
-        s->pdchDXCoolCoilType = newPreDefColumn(state, s->pdstDXCoolCoil, "DX Cooling Coil Type");
-        s->pdchDXCoolCoilNetCapSI = newPreDefColumn(state, s->pdstDXCoolCoil, "Standard Rated Net Cooling Capacity [W]");
+        s->pdstDXCoolCoil = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coil Standard Ratings 2017");
+        s->pdchDXCoolCoilType = newPreDefColumn(state, s->pdstDXCoolCoil, "Cooling Coil Type #1");
+        s->pdchDXCoolCoilNetCapSI = newPreDefColumn(state, s->pdstDXCoolCoil, "Standard Rated Net Cooling Capacity [W] #2");
 
-        s->pdchDXCoolCoilCOP = newPreDefColumn(state, s->pdstDXCoolCoil, "Standard Rated Net COP [W/W]");
-        s->pdchDXCoolCoilEERIP = newPreDefColumn(state, s->pdstDXCoolCoil, "EER [Btu/W-h]");
-        s->pdchDXCoolCoilSEERUserIP = newPreDefColumn(state, s->pdstDXCoolCoil, "SEER User [Btu/W-h]");
-        s->pdchDXCoolCoilSEERStandardIP = newPreDefColumn(state, s->pdstDXCoolCoil, "SEER Standard [Btu/W-h]");
-        s->pdchDXCoolCoilIEERIP = newPreDefColumn(state, s->pdstDXCoolCoil, "IEER [Btu/W-h]");
+        s->pdchDXCoolCoilCOP = newPreDefColumn(state, s->pdstDXCoolCoil, "Standard Rated Net COP [W/W] #2");
+        s->pdchDXCoolCoilEERIP = newPreDefColumn(state, s->pdstDXCoolCoil, "EER [Btu/W-h] #2");
+        s->pdchDXCoolCoilSEERUserIP = newPreDefColumn(state, s->pdstDXCoolCoil, "SEER User [Btu/W-h] #2,3");
+        s->pdchDXCoolCoilSEERStandardIP = newPreDefColumn(state, s->pdstDXCoolCoil, "SEER Standard [Btu/W-h] #2,3");
+        s->pdchDXCoolCoilIEERIP = newPreDefColumn(state, s->pdstDXCoolCoil, "IEER [Btu/W-h] #2");
 
         // for DX Cooling Coil AHRI Standard 2023 Ratings | SEER2
-        s->pdstDXCoolCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coils [ SEER2 ]");
-        s->pdchDXCoolCoilType_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "DX Cooling Coil Type");
-        s->pdchDXCoolCoilNetCapSI_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net Cooling Capacity [W]");
+        s->pdstDXCoolCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coil Standard Ratings 2023");
+        s->pdchDXCoolCoilType_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Cooling Coil Type #1");
+        s->pdchDXCoolCoilNetCapSI_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net Cooling Capacity [W] #2");
 
-        s->pdchDXCoolCoilCOP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net COP2 [W/W]");
-        s->pdchDXCoolCoilEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "EER2 [Btu/W-h]");
-        s->pdchDXCoolCoilSEER2UserIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER2 User [Btu/W-h]");
-        s->pdchDXCoolCoilSEER2StandardIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER2 Standard [Btu/W-h]");
-        s->pdchDXCoolCoilIEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "IEER2 [Btu/W-h]");
+        s->pdchDXCoolCoilCOP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "Standard Rated Net COP [W/W] #2,4");
+        s->pdchDXCoolCoilEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "EER [Btu/W-h] #2,4");
+        s->pdchDXCoolCoilSEER2UserIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER User [Btu/W-h] #2,3");
+        s->pdchDXCoolCoilSEER2StandardIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "SEER Standard [Btu/W-h] #2,3");
+        s->pdchDXCoolCoilIEERIP_2023 = newPreDefColumn(state, s->pdstDXCoolCoil_2023, "IEER [Btu/W-h] #2");
 
         // for DX Cooling Coil ASHRAE 127-12 Report
         s->pdstDXCoolCoil2 = newPreDefSubTable(state, s->pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report");
@@ -1341,22 +1341,16 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int sigDigitCount;
-        std::string stringEntry;
-
         incrementTableEntry(state);
+        int sigDigitCount = 2;
         // check for number of significant digits
         if (present(numSigDigits)) {
             if ((numSigDigits <= 9) && (numSigDigits >= 0)) {
                 sigDigitCount = numSigDigits;
-            } else {
-                sigDigitCount = 2;
             }
-        } else {
-            sigDigitCount = 2;
         }
 
-        if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
+        if (std::abs(tableEntryReal) < 1e8) { // change from 1e10 for more robust entry writing
             // something changed in FMT 7.x and "{:#12.{}F}" now outputs 13. So changing it to 11.{}F to maintain existing functionality. Likely
             // related to https://github.com/fmtlib/fmt/issues/1893
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =

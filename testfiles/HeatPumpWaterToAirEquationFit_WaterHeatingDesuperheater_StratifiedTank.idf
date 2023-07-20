@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Building,                !- Name
@@ -2211,6 +2211,8 @@
     Sys 1 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 1 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.0,                     !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     23125.6,                 !- Gross Rated Total Cooling Capacity {W}
     16267.06,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2469,6 +2471,8 @@
     Sys 2 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 2 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.0,                     !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     11562.8,                 !- Gross Rated Total Cooling Capacity {W}
     8133.53,                 !- Gross Rated Sensible Cooling Capacity {W}
@@ -2727,6 +2731,8 @@
     Sys 3 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 3 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.0,                     !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     23125.6,                 !- Gross Rated Total Cooling Capacity {W}
     16267.06,                !- Gross Rated Sensible Cooling Capacity {W}
@@ -2985,6 +2991,8 @@
     Sys 4 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 4 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.0,                     !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.00165,                 !- Rated Water Flow Rate {m3/s}
     11562.8,                 !- Gross Rated Total Cooling Capacity {W}
     8133.53,                 !- Gross Rated Sensible Cooling Capacity {W}
@@ -3243,6 +3251,8 @@
     Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
     Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name
     1.0,                     !- Rated Air Flow Rate {m3/s}
+    ,                        !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.0033,                  !- Rated Water Flow Rate {m3/s}
     23125.59,                !- Gross Rated Total Cooling Capacity {W}
     16267,                   !- Gross Rated Sensible Cooling Capacity {W}

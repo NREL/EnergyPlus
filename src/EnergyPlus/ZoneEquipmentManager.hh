@@ -70,9 +70,9 @@ namespace ZoneEquipmentManager {
 
     struct SimulationOrder
     {
-        std::string EquipType;
-        int EquipTypeEnum = 0;
-        std::string EquipName;
+        std::string EquipTypeName = "";
+        DataZoneEquipment::ZoneEquipType equipType = DataZoneEquipment::ZoneEquipType::Invalid;
+        std::string EquipName = "";
         int EquipPtr = 0;
         int CoolingPriority = 0;
         int HeatingPriority = 0;

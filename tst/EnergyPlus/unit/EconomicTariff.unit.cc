@@ -1136,7 +1136,6 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
     ScheduleManager::ProcessScheduleInput(*state);
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 
-    state->dataSQLiteProcedures->sqlite->sqliteBegin();
     state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     state->dataOutRptTab->displayTabularBEPS = true;
@@ -1265,8 +1264,6 @@ TEST_F(SQLiteFixture, WriteEconomicTariffTable_DualUnits)
         // Add informative message if failed
         EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
     }
-
-    state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
 TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariff_with_Custom_Meter)
