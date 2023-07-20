@@ -583,7 +583,7 @@ struct DaylightingManagerData : BaseGlobalStruct
     Array1D<Real64> GLRNDX;                     // Glare index at reference point
     Array1D<Real64> GLRNEW;                     // New glare index at reference point
     Array1D<Dayltg::Illums> FLCWSK;             // Sky-related upgoing luminous flux
-                                    // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
+                                                // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
     std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> SkyObstructionMult;
     Array1D<Dayltg::Illums> FLFWSK;                                                  // Sky-related downgoing luminous flux
     std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> ObTransM; // ObTrans value for each (TH,PH) direction
