@@ -62,7 +62,7 @@ import sys
 # note I am skipping docs for right now; I want to do those files
 DIRS_TO_SKIP = [
     '.git', 'build', 'builds', 'cmake-build-debug',
-    'cmake-build-release', 'design', 'doc', 'release', 'third_party'
+    'cmake-build-release', 'design', 'release',
 ]
 
 # these CC files purposefully have bad characters
