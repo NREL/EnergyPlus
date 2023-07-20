@@ -767,6 +767,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
 
     if (!this->pModule) {
         EnergyPlus::ShowSevereError(state, format("Failed to import module \"{}\"", this->modulePath.generic_string()));
+        EnergyPlus::ShowContinueError(state, format("Current sys.path={}", PluginManager::currentPythonPath()));
         // ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
@@ -1122,6 +1123,18 @@ bool PluginInstance::run([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]
 #endif
 
 #if LINK_WITH_PYTHON
+std::vector<std::string> PluginManager::currentPythonPath()
+{
+    PyObject *sysPath = PySys_GetObject("path"); // Borrowed reference
+    size_t const n = PyList_Size(sysPath);       // Py_ssize_t
+    std::vector<std::string> pathLibs(n);
+    for (size_t i = 0; i < n; ++i) {
+        PyObject *element = PyList_GetItem(sysPath, i); // Borrowed reference
+        pathLibs[i] = std::string{PyUnicode_AsUTF8(element)};
+    }
+    return pathLibs;
+}
+
 void PluginManager::addToPythonPath(EnergyPlusData &state, const fs::path &includePath, bool userDefinedPath)
 {
     if (includePath.empty()) {
@@ -1162,6 +1175,10 @@ void PluginManager::addToPythonPath(EnergyPlusData &state, const fs::path &inclu
     // PyRun_SimpleString)("print(' EPS : ' + str(sys.path))");
 }
 #else
+std::vector<std::string> PluginManager::currentPythonPath()
+{
+    return {};
+}
 void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state,
                                     [[maybe_unused]] const fs::path &path,
                                     [[maybe_unused]] bool userDefinedPath)

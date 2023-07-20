@@ -834,7 +834,7 @@ if(APPLE OR UNIX)
 else() # windows
   add_executable(energyplus main.cc "${CMAKE_CURRENT_BINARY_DIR}/energyplus.rc")
 endif()
-target_link_libraries(energyplus PRIVATE fmt::fmt energyplusapi project_options project_fp_options project_warnings)
+target_link_libraries(energyplus PRIVATE energyplusapi project_options project_fp_options project_warnings)
 
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
@@ -1071,9 +1071,11 @@ if(BUILD_TESTING)
   add_test(NAME "API.test_OutputFiles" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py")
   set_tests_properties("API.test_OutputFiles" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
 
+  # 9825 - Test some non-ASCII directories
   set(CLI_TEST_DIR "${PROJECT_BINARY_DIR}/tst/cli")
   set(EXAMPLES_FILES_DIR "${PROJECT_SOURCE_DIR}/testfiles")
 
+  # This has some accented chars, and also the nice thing about it is that in `C:\path\dir\térmica`, you do have something that could be a `\t` escape sequence
   set(NON_ASCII_DIRNAME "térmicà")
   set(INPUT_TEST_DIR "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}")
   file(MAKE_DIRECTORY ${INPUT_TEST_DIR})

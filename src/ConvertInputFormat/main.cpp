@@ -295,11 +295,11 @@ bool processInput(fs::path const &inputFilePath,
 
     auto const inputFileType = EnergyPlus::FileSystem::getFileType(inputFilePath);
 
-    const bool isEpJSON = EnergyPlus::FileSystem::is_all_json_type(inputFileType);
-    const bool isCBOR = (inputFileType == EnergyPlus::FileSystem::FileTypes::CBOR);
-    const bool isMsgPack = (inputFileType == EnergyPlus::FileSystem::FileTypes::MsgPack);
-    const bool isUBJSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::UBJSON);
-    const bool isBSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::BSON);
+    bool const isEpJSON = EnergyPlus::FileSystem::is_all_json_type(inputFileType);
+    bool const isCBOR = (inputFileType == EnergyPlus::FileSystem::FileTypes::CBOR);
+    bool const isMsgPack = (inputFileType == EnergyPlus::FileSystem::FileTypes::MsgPack);
+    bool const isUBJSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::UBJSON);
+    bool const isBSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::BSON);
 
     if (!(isEpJSON || EnergyPlus::FileSystem::is_idf_type(inputFileType))) {
         displayMessage("ERROR: Input file must have IDF, IMF, or epJSON extension.");
@@ -349,10 +349,10 @@ bool processInput(fs::path const &inputFilePath,
         return false;
     }
 
-    bool is_valid = validation->validate(epJSON);
-    bool hasErrors = processErrors(idf_parser, validation);
-    bool versionMatch = checkVersionMatch(epJSON);
-    bool unsupportedFound = checkForUnsupportedObjects(epJSON, convertHVACTemplate);
+    bool const is_valid = validation->validate(epJSON);
+    bool const hasErrors = processErrors(idf_parser, validation);
+    bool const versionMatch = checkVersionMatch(epJSON);
+    bool const unsupportedFound = checkForUnsupportedObjects(epJSON, convertHVACTemplate);
 
     if (!is_valid || hasErrors || unsupportedFound) {
         displayMessage("Errors occurred when validating input file. Preceding condition(s) cause termination.");
@@ -457,10 +457,6 @@ int main(/** [[maybe_unused]] int argc, [[maybe_unused]] const char *argv[] */)
         ->option_text("DIR")
         ->required(false);
     // ->check(CLI::ExistingDirectory) // We don't require it to exist, we make it if needed
-
-    // opt.overview = "Run input file conversion tool";
-    // opt.syntax = "ConvertInputFormat [OPTIONS] input_file [input_file ..]";
-    // opt.example = "ConvertInputFormat in.idf\n\n";
 
     const std::map<std::string, OutputTypes> outputTypeMap{
         {"default", OutputTypes::Default},

@@ -83,6 +83,8 @@ namespace CommandLineInterface {
             if (doubleDashPosition == 0 && equalsPosition != std::string::npos) { // --option=value
                 arguments.push_back(inputArg.substr(0, equalsPosition));
                 arguments.push_back(inputArg.substr(equalsPosition + 1, inputArg.size() - 1));
+            } else if (doubleDashPosition == 0 && inputArg.size() == 2) {
+                // Filter it out, it's a bash-like separator (end of the command options, before positionals arguments are accepted)
             } else if ((inputArg.size() > 2) && (inputArg[0] == '-') && (inputArg[1] != '-')) { // -abc style
                 for (size_type c = 1; c < inputArg.size(); ++c) {
                     arguments.push_back(dash + inputArg[c]);
@@ -108,10 +110,6 @@ namespace CommandLineInterface {
         // opt.add("", false, 0, 0, "Display version information", "-v", "--version");
         app.set_version_flag("-v,--version", EnergyPlus::DataStringGlobals::VerString);
 
-        // opt.overview = state.dataStrGlobals->VerStringVar;
-        // opt.overview.append("\nPythonLinkage: " + PluginManagement::pythonStringForUsage(state));
-        // opt.overview.append("\nBuilt on Platform: " + DataStringGlobals::BuildPlatformString);
-
         std::string const description = fmt::format(R"({}
 PythonLinkage: {}
 Built on Platform: {}
@@ -121,18 +119,15 @@ Built on Platform: {}
                                                     DataStringGlobals::BuildPlatformString);
         app.description(description);
 
-        // opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
         auto *annualOpt = app.add_flag("-a,--annual", state.dataGlobal->AnnualSimulation, "Force annual simulation");
-        // opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
+
         app.add_flag("-D,--design-day", state.dataGlobal->DDOnlySimulation, "Force design-day-only simulation")->excludes(annualOpt);
 
-        // opt.add("", 0, 1, 0, "Output directory path (default: current directory)", "-d", "--output-directory");
         app.add_option("-d,--output-directory", state.dataStrGlobals->outDirPath, "Output directory path (default: current directory)")
             ->option_text("DIR")
             ->required(false);
         // ->check(CLI::ExistingDirectory) // We don't require it to exist, we make it if needed
 
-        // opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
         if (legacyMode) {
             state.dataStrGlobals->inputIddFilePath = "Energy+.idd";
         } else {
@@ -144,33 +139,20 @@ Built on Platform: {}
             ->option_text("IDD")
             ->check(CLI::ExistingFile);
 
-        // opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
         bool runEPMacro = false;
         app.add_flag("-m,--epmacro", runEPMacro, "Run EPMacro prior to simulation");
 
-        // opt.add("", 0, 1, 0, "Prefix for output file names (default: eplus)", "-p", "--output-prefix");
         std::string prefixOutName = "eplus";
         app.add_option("-p,--output-prefix", prefixOutName, "Prefix for output file names (default: eplus)")->required(false)->option_text("PRE");
 
-        // opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
         app.add_flag("-r,--readvars", state.dataGlobal->runReadVars, "Run ReadVarsESO after simulation");
 
-        // opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
         app.add_flag("-c,--convert", state.dataGlobal->outputEpJSONConversion, "Output IDF->epJSON or epJSON->IDF, dependent on input file type");
 
-        // opt.add("", 0, 0, 0, "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation", "--convert-only");
         app.add_flag("--convert-only",
                      state.dataGlobal->outputEpJSONConversionOnly,
                      "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation");
 
-        // opt.add("L",
-        // 0,
-        // 1,
-        // 0,
-        //"Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: "
-        //"Dash (e.g., eplus-table.csv)",
-        //"-s",
-        //"--output-suffix");
         // TODO: make it an enum instead?
         std::string suffixType = "L";
         std::string const suffixHelp = R"help(Suffix style for output file names (default: L)
@@ -182,7 +164,6 @@ Built on Platform: {}
             ->required(false)
             ->check(CLI::IsMember({"L", "C", "D"}, CLI::ignore_case));
 
-        // opt.add("1", false, 1, 0, "Multi-thread with N threads; 1 thread with no arg. (Currently only for G-Function generation)", "-j", "--jobs");
         // TODO: maybe delay validation to output a better error message?
         const int MAX_N = static_cast<int>(std::thread::hardware_concurrency());
         app.add_option("-j,--jobs",
@@ -210,24 +191,12 @@ Built on Platform: {}
                 return input;
             });
 
-        // if (state.dataGlobal->numThread == 0) {
-        //     DisplayString(state, "Invalid value for -j arg. Defaulting to 1.");
-        //     state.dataGlobal->numThread = 1;
-        // } else if (state.dataGlobal->numThread > (int)std::thread::hardware_concurrency()) {
-        //     DisplayString(state,
-        //                   fmt::format("Invalid value for -j arg. Value exceeds num available. Defaulting to num available. -j {}",
-        //                               (int)std::thread::hardware_concurrency()));
-        //     state.dataGlobal->numThread = (int)std::thread::hardware_concurrency();
-        // }
-
-        // opt.add("in.epw", false, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
         state.files.inputWeatherFilePath.filePath = "in.epw";
         app.add_option("-w,--weather", state.files.inputWeatherFilePath.filePath, "Weather file path (default: in.epw in current directory)")
             ->required(false)
             ->option_text("EPW")
             ->check(CLI::ExistingFile);
 
-        // opt.add("", false, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
         bool runExpandObjects = false;
         app.add_flag("-x,--expandobjects", runExpandObjects, "Run ExpandObjects prior to simulation");
 
@@ -240,8 +209,7 @@ Built on Platform: {}
         bool debugCLI = false;
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
 
-        // opt.example = "energyplus -w weather.epw -r input.idf";
-        app.footer("energyplus -w weather.epw -r input.idf");
+        app.footer("Example: energyplus -w weather.epw -r input.idf");
 
         const bool eplusRunningViaAPI = state.dataGlobal->eplusRunningViaAPI;
 
@@ -353,7 +321,6 @@ state.dataStrGlobals->inputFilePath='{}',
         }
 
         // File naming scheme
-        fs::path const prefix = FileSystem::makeNativePath(fs::path(prefixOutName)); // Why is this needed?
         fs::path outputFilePrefixFullPath = state.dataStrGlobals->outDirPath / prefixOutName;
 
         fs::path outputEpmdetFilePath;

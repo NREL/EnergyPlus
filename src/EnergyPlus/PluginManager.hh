@@ -210,6 +210,9 @@ namespace PluginManagement {
         static bool anyUnexpectedPluginObjects(EnergyPlusData &state);
 
         bool eplusRunningViaPythonAPI = false;
+
+        // For debugging purposes / issuing better error messages
+        static std::vector<std::string> currentPythonPath();
     };
 
     struct PluginTrendVariable
