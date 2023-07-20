@@ -184,8 +184,7 @@ namespace PluginManagement {
         ~PluginManager();
 
         static int numActiveCallbacks(EnergyPlusData &state);
-        static void addToPythonPath(EnergyPlusData &state, const fs::path &path, bool userDefinedPath);
-        static fs::path sanitizedPath(fs::path const &path);
+        static void addToPythonPath(EnergyPlusData &state, const fs::path &includePath, bool userDefinedPath);
         static void setupOutputVariables(EnergyPlusData &state);
 
         int maxGlobalVariableIndex = -1;
