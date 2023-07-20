@@ -6568,7 +6568,7 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     ASSERT_EQ("DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE2", thisCoil.performance.alternateMode.name);
-    int nsp = thisCoil.performance.normalMode.speeds.size();
+    int nsp = thisCoil.performance->NumSpeeds();
     ASSERT_EQ(2, nsp);
     auto speed1 = thisCoil.performance.normalMode.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
@@ -6872,7 +6872,7 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL", thisCoil.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
-    int nsp = thisCoil.performance.normalMode.speeds.size();
+    int nsp = thisCoil.performance->NumSpeeds();
     ASSERT_EQ(3, nsp);
     auto speed1 = thisCoil.performance.normalMode.speeds[0];
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);

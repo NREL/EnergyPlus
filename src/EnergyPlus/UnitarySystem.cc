@@ -2519,7 +2519,7 @@ namespace UnitarySystems {
                     ErrFound = true;
                 }
                 auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[childCCIndex];
-                this->m_NumOfSpeedCooling = newCoil.performance.normalMode.speeds.size();
+                this->m_NumOfSpeedCooling = newCoil.performance->NumSpeeds();
                 if (this->m_NumOfSpeedCooling > 0) {
                     if (this->m_CoolVolumeFlowRate.empty()) this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
                     if (this->m_CoolMassFlowRate.empty()) this->m_CoolMassFlowRate.resize(this->m_NumOfSpeedCooling + 1);
@@ -2539,23 +2539,23 @@ namespace UnitarySystems {
                 }
 
                 // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
-                if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
+                if (this->m_NumOfSpeedCooling != (int)newCoil.performance->NumSpeeds()) {
                     ShowWarningError(state, format("{}: {} = {}", RoutineName, CompType, CompName));
                     ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                     ShowFatalError(state, format("Cooling coil = Coil:Cooling:DX: {}", newCoil.name));
                 }
 
                 // Use discrete/continuous control algorithm regardless of number of speeds
-                if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
+                if (newCoil.performance->capControlMethod == CoilCoolingDXPerformanceBase::CapControlMethod::DISCRETE) {
                     this->m_DiscreteSpeedCoolingCoil = true;
-                } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
+                } else if (newCoil.performance->capControlMethod == CoilCoolingDXPerformanceBase::CapControlMethod::CONTINUOUS) {
                     this->m_ContSpeedCoolingCoil = true;
                 }
 
                 newCoil.size(state);
                 if (MSHPIndex == -1) {
                     for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
-                        this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
+                         this->m_CoolVolumeFlowRate[Iter] = newCoil.performance->EvapAirFlowRateAtSpeed(Iter - 1);
                         this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
                         // it seems the ratio should reference the actual flow rates, not the fan flow ???
                         if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
@@ -2567,7 +2567,7 @@ namespace UnitarySystems {
                     }
                 }
 
-                state.dataSize->DXCoolCap = newCoil.performance.normalMode.ratedGrossTotalCap;
+                state.dataSize->DXCoolCap = newCoil.performance->RatedGrossTotalCap();
                 EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
                 if (this->m_HeatPump) EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
 
@@ -2611,16 +2611,16 @@ namespace UnitarySystems {
             // mine capacity from Coil:Cooling:DX object
             auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
             // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
-            if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
+            if (this->m_NumOfSpeedCooling != (int)newCoil.performance->NumSpeeds()) {
                 ShowWarningError(state, format("{}: {} = {}", RoutineName, CompType, CompName));
                 ShowContinueError(state, "Number of cooling speeds does not match coil object.");
                 ShowFatalError(state, format("Cooling coil = Coil:Cooling:DX: {}", newCoil.name));
             }
 
             // Use discrete/continuous control algorithm regardless of number of speeds
-            if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
+            if (newCoil.performance->capControlMethod == CoilCoolingDXPerformanceBase::CapControlMethod::DISCRETE) {
                 this->m_DiscreteSpeedCoolingCoil = true;
-            } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
+            } else if (newCoil.performance->capControlMethod == CoilCoolingDXPerformanceBase::CapControlMethod::CONTINUOUS) {
                 this->m_ContSpeedCoolingCoil = true;
             }
 
@@ -2628,7 +2628,7 @@ namespace UnitarySystems {
             if (MSHPIndex == -1) {
                 // Gotta loop backwards since we may try to access the last element when there are no fans
                 for (Iter = this->m_NumOfSpeedCooling; Iter >= 1; --Iter) {
-                    this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
+                    this->m_CoolVolumeFlowRate[Iter] = newCoil.performance->EvapAirFlowRateAtSpeed(Iter - 1);
                     this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * state.dataEnvrn->StdRhoAir;
                     // it seems the ratio should reference the actual flow rates, not the fan flow ???
                     if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
@@ -2639,7 +2639,7 @@ namespace UnitarySystems {
                 }
             }
 
-            state.dataSize->DXCoolCap = newCoil.performance.normalMode.ratedGrossTotalCap;
+            state.dataSize->DXCoolCap = newCoil.performance->RatedGrossTotalCap();
             EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
             if (this->m_HeatPump) EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
 
@@ -3593,11 +3593,11 @@ namespace UnitarySystems {
                 } else {
                     // set variable speed coil flag as necessary
                     auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
-                    this->m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
+                    this->m_NumOfSpeedCooling = newCoil.performance->NumSpeeds();
                     if (this->m_NumOfSpeedCooling > 1) {
-                        if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
+                        if (newCoil.performance->capControlMethod == CoilCoolingDXPerformanceBase::CapControlMethod::DISCRETE) {
                             this->m_DiscreteSpeedCoolingCoil = true;
-                        } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
+                        } else if (newCoil.performance->capControlMethod == CoilCoolingDXPerformanceBase::CapControlMethod::CONTINUOUS) {
                             this->m_ContSpeedCoolingCoil = true;
                         }
                         this->m_MultiOrVarSpeedCoolCoil = true;
@@ -4596,16 +4596,16 @@ namespace UnitarySystems {
                         // mine data from coil object
                         // TODO: Need to check for autosize on these I guess
                         auto &newCoil = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex];
-                        this->m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
-                        this->m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
+                        this->m_DesignCoolingCapacity = newCoil.performance->RatedGrossTotalCap();
+                        this->m_MaxCoolAirVolFlow = newCoil.performance->RatedEvapAirFlowRate();
                         if (this->m_DesignCoolingCapacity == DataSizing::AutoSize) this->m_RequestAutoSize = true;
                         if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
                         this->m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
                         CoolingCoilInletNode = newCoil.evapInletNodeIndex;
                         CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
                         this->m_CondenserNodeNum = newCoil.condInletNodeIndex;
-                        this->m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
-                        this->m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+                        this->m_NumOfSpeedCooling = newCoil.performance->NumSpeeds();
+                        this->m_MinOATCompressorCooling = newCoil.performance->minOutdoorDrybulb;
                         newCoil.supplyFanName = this->m_FanName;
                         newCoil.supplyFanIndex = this->m_FanIndex;
                         newCoil.supplyFanType = this->m_FanType_Num;
@@ -4728,7 +4728,7 @@ namespace UnitarySystems {
 
                         // thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
                         // Get Coil:Cooling:DX coil air flow rate. Later fields will overwrite this IF input field is present
-                        this->m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
+                        this->m_MaxCoolAirVolFlow = newCoil.performance->RatedEvapAirFlowRate();
                         // if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                         if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize) this->m_RequestAutoSize = true;
 
@@ -15751,7 +15751,7 @@ namespace UnitarySystems {
                 if (state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
                     if (state.dataUnitarySystems->CoolingLoad && this->LoadSHR == 0.0) {
                         this->LoadSHR = 1.0;
-                        this->CoilSHR = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].performance.NormalSHR;
+                        this->CoilSHR = state.dataCoilCooingDX->coilCoolingDXs[this->m_CoolingCoilIndex].performance->NormalSHR;
                     }
                 }
                 Real64 CompPartLoadFrac = this->m_CompPartLoadRatio;

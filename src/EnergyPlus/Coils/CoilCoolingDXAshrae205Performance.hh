@@ -62,7 +62,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-struct CoilCoolingDX205Performance : private CoilCoolingDXPerformanceBase
+struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 {
     CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find);
 
@@ -72,7 +72,6 @@ struct CoilCoolingDX205Performance : private CoilCoolingDXPerformanceBase
     Btwxt::Method interpolation_type{Btwxt::Method::LINEAR};
     Real64 rated_total_cooling_capacity;
     Real64 rated_steady_state_heating_capacity;
-
-}
+};
 
 #endif // ENERGYPLUS_COILS_COIL_COOLING_DX_ASHRAE205_PERFORMANCE

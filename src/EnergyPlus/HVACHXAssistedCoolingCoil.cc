@@ -334,7 +334,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
 
-                thisHXCoil.DXCoilNumOfSpeeds = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex_temp].performance.normalMode.speeds.size();
+                thisHXCoil.DXCoilNumOfSpeeds = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex_temp].performance->NumSpeeds();
                 if (thisHXCoil.DXCoilNumOfSpeeds < 1) {
                     CoolingCoilErrFlag = true;
                 }
@@ -952,7 +952,7 @@ namespace HVACHXAssistedCoolingCoil {
                 bool singleMode = (mSingleMode == 1);
 
                 Real64 mCoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
-                                              .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
+                                              .performance->NumSpeeds(); // used the same for the original variable speed coil
 
                 int OperationMode = DataHVACGlobals::coilNormalMode;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
@@ -1196,7 +1196,7 @@ namespace HVACHXAssistedCoolingCoil {
 
                 if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                     int coolingCoilDXIndex = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilIndex;
-                    CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance.normalMode.ratedGrossTotalCap;
+                    CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance->RatedGrossTotalCap();
                 } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                     CoilCapacity = DXCoils::GetCoilCapacity(state,
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
