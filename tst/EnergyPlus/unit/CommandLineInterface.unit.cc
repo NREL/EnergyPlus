@@ -259,7 +259,7 @@ TEST_F(CommandLineInterfaceFixture, IdfDoesNotExist)
     EXPECT_EQ(static_cast<int>(ReturnCodes::Failure), exitcode);
     compare_cout_stream("");
     compare_cerr_stream(delimited_string({
-        fmt::format("input_file: File does not exist: {}", FileSystem::makeNativePath(expectedParams.inputFilePath).string()),
+        fmt::format("input_file: File does not exist: {}", expectedParams.inputFilePath.generic_string()),
         "Run with --help for more information.",
     }));
 }

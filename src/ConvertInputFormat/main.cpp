@@ -329,12 +329,7 @@ bool processInput(fs::path const &inputFilePath,
     }
 
     if (!EnergyPlus::FileSystem::fileExists(inputFilePath)) {
-#ifdef _WIN32
-        displayMessage("Input file path {} not found", inputFilePath.string());
-#else
-        displayMessage("Input file path {} not found", inputFilePath);
-#endif
-
+        displayMessage("Input file path {} not found", inputFilePath.generic_string());
         return false;
     }
 
@@ -548,9 +543,10 @@ Select one (case insensitive):
 #pragma omp atomic
             ++fileCount;
             if (successful) {
-                displayMessage("Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, files[i]);
+                displayMessage(
+                    "Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, files[i].generic_string());
             } else {
-                displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, files[i]);
+                displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, files[i].generic_string());
             }
         }
     }
@@ -565,9 +561,9 @@ Select one (case insensitive):
         bool successful = processInput(file, schema, outputType, outputDirectoryPath, outputTypeStr, convertHVACTemplate);
         ++fileCount;
         if (successful) {
-            displayMessage("Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, file);
+            displayMessage("Input file converted to {} successfully | {}/{} | {}", outputTypeStr, fileCount, number_files, file.generic_string());
         } else {
-            displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, file);
+            displayMessage("Input file conversion failed: | {}/{} | {}", fileCount, number_files, file.generic_string());
         }
     }
 #endif

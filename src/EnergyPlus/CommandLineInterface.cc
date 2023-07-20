@@ -300,8 +300,8 @@ state.dataStrGlobals->inputFilePath='{}',
                        state.dataGlobal->outputEpJSONConversionOnly,
                        suffixType,
                        state.dataGlobal->numThread,
-                       state.files.inputWeatherFilePath.filePath,
-                       state.dataStrGlobals->inputFilePath);
+                       state.files.inputWeatherFilePath.filePath.generic_string(),
+                       state.dataStrGlobals->inputFilePath.generic_string());
             exit(0);
         }
 
@@ -337,7 +337,8 @@ state.dataStrGlobals->inputFilePath='{}',
                 break;
             default:
                 DisplayString(state,
-                              fmt::format("ERROR: Input file must have IDF, IMF, or epJSON extension: {}", state.dataStrGlobals->inputFilePath));
+                              fmt::format("ERROR: Input file must have IDF, IMF, or epJSON extension: {}",
+                                          state.dataStrGlobals->inputFilePath.generic_string()));
                 if (eplusRunningViaAPI) {
                     return static_cast<int>(ReturnCodes::Failure);
                 } else {
