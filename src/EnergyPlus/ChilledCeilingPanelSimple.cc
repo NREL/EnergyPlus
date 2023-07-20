@@ -239,10 +239,9 @@ void GetCoolingPanelInput(EnergyPlusData &state)
     static constexpr std::string_view VariableOff("VariableOff");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 AllFracsSummed; // Sum of the fractions radiant
-    int NumAlphas;         // Number of Alphas for each GetobjectItem call
-    int NumNumbers;        // Number of Numbers for each GetobjectItem call
-    int SurfNum;           // Surface number Do loop counter
+    int NumAlphas;  // Number of Alphas for each GetobjectItem call
+    int NumNumbers; // Number of Numbers for each GetobjectItem call
+    int SurfNum;    // Surface number Do loop counter
     int IOStat;
     bool ErrorsFound(false); // If errors detected in input
     int NumCoolingPanels = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCMO_CoolingPanel_Simple);
@@ -544,8 +543,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         }
 
         // Remaining fraction is added to the zone as convective heat transfer
-        AllFracsSummed = thisCP.FracRadiant;
-        if (AllFracsSummed > MaxFraction) {
+        if (thisCP.FracRadiant > MaxFraction) {
             ShowWarningError(state,
                              format("{}{}=\"{}\", Fraction Radiant was higher than the allowable maximum.",
                                     RoutineName,
@@ -554,7 +552,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             thisCP.FracRadiant = MaxFraction;
             thisCP.FracConvect = 0.0;
         } else {
-            thisCP.FracConvect = 1.0 - AllFracsSummed;
+            thisCP.FracConvect = 1.0 - thisCP.FracRadiant;
         }
 
         thisCP.FracDistribPerson = state.dataIPShortCut->rNumericArgs(11);
@@ -613,7 +611,7 @@ void GetCoolingPanelInput(EnergyPlusData &state)
             continue;
         }
 
-        AllFracsSummed = thisCP.FracDistribPerson;
+        Real64 AllFracsSummed = thisCP.FracDistribPerson;
         for (SurfNum = 1; SurfNum <= thisCP.TotSurfToDistrib; ++SurfNum) {
             thisCP.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 8);
             thisCP.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(

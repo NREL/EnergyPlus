@@ -3274,6 +3274,86 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexityTest_ASHRAE901_Hospital_
     EXPECT_FALSE(surface.IsConvex);
 }
 
+TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckConvexity_ColinearStability)
+{
+    // Test for #10103 - Regardless of the order of the vertices, we should drop colinear vertices consistently to avoid a fatal error due to vertex
+    // side mismatch
+    //
+    //  y
+    //    ▲          7     8     9
+    //    │          ┌─────x────┐
+    //    │          │          │
+    //    │          │          │
+    //    │          │          │
+    //    │5         │          │
+    //    ├──────────┘          │
+    //    │           6         │
+    //    │                     │
+    //    │                     │
+    //    │                     │10
+    //    └────x─────x─────x────┴─────►
+    //    4     3      2      1           x
+
+    const std::vector<Vector> floorVertices = {
+        {30.0, 0., 0.},
+        {20.0, 0., 0.},
+        {10.0, 0., 0.},
+        {0.0, 0., 0.},
+        {0.0, 20., 0.},
+        {20.0, 20., 0.},
+        {20.0, 40., 0.},
+        {30.0, 40., 0.},
+        {40.0, 40., 0.},
+        {40.0, 0., 0.},
+    };
+    const int nVertices = static_cast<int>(floorVertices.size());
+
+    state->dataSurface->TotSurfaces = 2;
+    constexpr int floorSurfNum = 1;
+    constexpr int ceilingSurfNum = 2;
+    state->dataSurface->MaxVerticesPerSurface = nVertices;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+
+    auto &floorSurface = state->dataSurfaceGeometry->SurfaceTmp(floorSurfNum);
+    auto &ceilingSurface = state->dataSurfaceGeometry->SurfaceTmp(ceilingSurfNum);
+    {
+        floorSurface.Azimuth = 0.0;
+        floorSurface.Tilt = 0.0;
+        floorSurface.Sides = nVertices;
+        floorSurface.GrossArea = 100.0;
+        floorSurface.Name = "Floor";
+        floorSurface.Vertex.allocate(nVertices);
+
+        floorSurface.Vertex = floorVertices;
+
+        CheckConvexity(*state, floorSurfNum, floorSurface.Sides);
+
+        EXPECT_EQ(6, floorSurface.Sides);
+        EXPECT_FALSE(floorSurface.IsConvex);
+    }
+
+    {
+        auto ceilingVertices = floorVertices;
+        std::reverse(ceilingVertices.begin(), ceilingVertices.end());
+
+        ceilingSurface.Azimuth = 0.0;
+        ceilingSurface.Tilt = 0.0;
+        ceilingSurface.Sides = nVertices;
+        ceilingSurface.GrossArea = 100.0;
+        ceilingSurface.Name = "Ceiling";
+        ceilingSurface.Vertex.allocate(nVertices);
+
+        ceilingSurface.Vertex = ceilingVertices;
+
+        CheckConvexity(*state, ceilingSurfNum, ceilingSurface.Sides);
+
+        EXPECT_EQ(6, ceilingSurface.Sides);
+        EXPECT_FALSE(ceilingSurface.IsConvex);
+    }
+
+    EXPECT_EQ(floorSurface.Sides, ceilingSurface.Sides);
+}
+
 TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_test)
 {
     state->dataSurface->TotWinShadingControl = 3;
