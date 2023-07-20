@@ -300,7 +300,7 @@ void GetBoilerInput(EnergyPlusData &state)
 
         thisBoiler.ParasiticElecLoad = state.dataIPShortCut->rNumericArgs(8);
         thisBoiler.ParasiticFuelCapacity = state.dataIPShortCut->rNumericArgs(10);
-        if (thisBoiler.FuelType == Constant::ResourceType::Electricity) {
+        if (thisBoiler.FuelType == Constant::eFuel::Electricity) {
             ShowWarningError(
                 state, fmt::format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("{} should be zero when the fuel type is electricity.", state.dataIPShortCut->cNumericFieldNames(10)));
@@ -446,23 +446,23 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
                         "Heating",
                         "Boiler Parasitic",
                         "Plant");
-    if (this->FuelType != Constant::ResourceType::Electricity) {
+    if (this->FuelType != Constant::eFuel::Electricity) {
         SetupOutputVariable(state,
-                            "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                            format("Boiler Ancillary {} Rate", sFuelType),
                             OutputProcessor::Unit::W,
                             this->ParasiticFuelRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
-                            "Boiler Ancillary " + this->BoilerFuelTypeForOutputVariable + " Energy",
+                            format("Boiler Ancillary {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
                             this->ParasiticFuelLoad,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            _,
-                            this->BoilerFuelTypeForOutputVariable,
+                            {},
+                            sFuelType,
                             "Heating",
                             "Boiler Parasitic",
                             "Plant");
