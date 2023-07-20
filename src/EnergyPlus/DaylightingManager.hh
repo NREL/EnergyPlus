@@ -84,8 +84,8 @@ namespace Dayltg {
     constexpr int NPH(8);               // Number of altitude steps for sky integration
 
     // It's crazy having both NPH and NPHMAX
-    constexpr int NPHMAX(10);           // Number of sky/ground integration steps in altitude
-    constexpr int NTHMAX(16);           // Number of sky/ground integration steps in azimuth
+    constexpr int NPHMAX(10); // Number of sky/ground integration steps in altitude
+    constexpr int NTHMAX(16); // Number of sky/ground integration steps in azimuth
 
     void DayltgAveInteriorReflectance(EnergyPlusData &state, int const enclNum); // Enclosure number
 
@@ -473,8 +473,6 @@ namespace Dayltg {
                                std::string const &refPts,
                                Real64 const zcoord);
 
-
-
 } // namespace Dayltg
 
 struct DaylightingManagerData : BaseGlobalStruct
@@ -553,44 +551,44 @@ struct DaylightingManagerData : BaseGlobalStruct
     // int IConstShaded = 0; // The shaded window construction for switchable windows
     Real64 VTDark = 0.0; // Visible transmittance (VT) of electrochromic (EC) windows in fully dark state
                          // Real64 VTMULT = 1.0;  // VT multiplier for EC windows // I don't think this is used anywhere
-    std::array<Real64, (int)DataSurfaces::WinCover::Num> DFSUHR;    // Sun daylight factor for bare/shaded window
-    std::array<Real64, (int)DataSurfaces::WinCover::Num> BFSUHR;    // Sun background luminance factor for bare/shaded window
-    std::array<Real64, (int)DataSurfaces::WinCover::Num> SFSUHR;    // Sun source luminance factor for bare/shaded window
-    Dayltg::Illums HorIllSky;                                 // Horizontal illuminance for different sky types
-    Dayltg::Illums TDDTransVisDiff;                           // Weighted diffuse visible transmittance for each sky type
-    Dayltg::Illums ZSK;                                       // Sky-related and sun-related illuminance on window from sky/ground
+    std::array<Real64, (int)DataSurfaces::WinCover::Num> DFSUHR; // Sun daylight factor for bare/shaded window
+    std::array<Real64, (int)DataSurfaces::WinCover::Num> BFSUHR; // Sun background luminance factor for bare/shaded window
+    std::array<Real64, (int)DataSurfaces::WinCover::Num> SFSUHR; // Sun source luminance factor for bare/shaded window
+    Dayltg::Illums HorIllSky;                                    // Horizontal illuminance for different sky types
+    Dayltg::Illums TDDTransVisDiff;                              // Weighted diffuse visible transmittance for each sky type
+    Dayltg::Illums ZSK;                                          // Sky-related and sun-related illuminance on window from sky/ground
     Dayltg::Illums FFSKTot;
-    Dayltg::Illums WinLumSK;                                    // Sky related window luminance
-    Dayltg::Illums EDirSky;                                     // Sky related direct illuminance
+    Dayltg::Illums WinLumSK;                                                           // Sky related window luminance
+    Dayltg::Illums EDirSky;                                                            // Sky related direct illuminance
     std::array<Real64, (int)DataSurfaces::WinCover::Num> DayltgInteriorMapIllumDFSUHR; // Sun daylight factor for bare/shaded window
-    Dayltg::Illums DayltgInteriorMapIllumHorIllSky;             // Horizontal illuminance for different sky types
+    Dayltg::Illums DayltgInteriorMapIllumHorIllSky;                                    // Horizontal illuminance for different sky types
 
     // Sky daylight factor for sky type (first index), bare/shaded window (second index)
     std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> DayltgInteriorMapIllumDFSKHR;
     // Sky background luminance factor for sky type (first index), bare/shaded window (second index)
-    std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> DayltgInteriorMapIllumBFSKHR; 
+    std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> DayltgInteriorMapIllumBFSKHR;
     // Sky source luminance factor for sky type (first index), bare/shaded window (second index)
     std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> DayltgInteriorMapIllumSFSKHR;
 
     Array1D<Real64> BACLUM;
     Array1D<Real64> DayltgInteriorMapIllumGLRNDX;
     Array1D<Real64> daylight_illum;
-    Array1D<Real64> FLFWSU;                                 // Sun-related downgoing luminous flux, excluding entering beam
-    Array1D<Real64> FLFWSUdisk;                             // Sun-related downgoing luminous flux, due to entering beam
-    Array1D<Real64> FLCWSU;                                 // Sun-related upgoing luminous flux
-    std::array<Real64, Dayltg::NPH+1> PH;      // Altitude of sky element (radians)
-    std::array<Real64, Dayltg::NTH+1> TH;      // Azimuth of sky element (radians)
-    std::array<Real64, Dayltg::NPH+1> SPHCPH;  // Sine times cosine of altitude of sky element
-    Array1D<Real64> SetPnt;                                 // Illuminance setpoint at reference points (lux)
-    Array1D<Real64> GLRNDX;                                 // Glare index at reference point
-    Array1D<Real64> GLRNEW;                                 // New glare index at reference point
-    Array1D<Dayltg::Illums> FLCWSK;                         // Sky-related upgoing luminous flux
-        // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
-    std::array<std::array<Real64, Dayltg::NTHMAX+1>, Dayltg::NPHMAX+1> SkyObstructionMult;
-    Array1D<Dayltg::Illums> FLFWSK;      // Sky-related downgoing luminous flux
-    std::array<std::array<Real64, Dayltg::NTHMAX+1>, Dayltg::NPHMAX+1> ObTransM; // ObTrans value for each (TH,PH) direction
-    std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> SFSKHR; // Sky source luminance factor for sky type, bare/shaded window
-    std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> DFSKHR; // Sky daylight factor for sky type, bare/shaded window
+    Array1D<Real64> FLFWSU;                     // Sun-related downgoing luminous flux, excluding entering beam
+    Array1D<Real64> FLFWSUdisk;                 // Sun-related downgoing luminous flux, due to entering beam
+    Array1D<Real64> FLCWSU;                     // Sun-related upgoing luminous flux
+    std::array<Real64, Dayltg::NPH + 1> PH;     // Altitude of sky element (radians)
+    std::array<Real64, Dayltg::NTH + 1> TH;     // Azimuth of sky element (radians)
+    std::array<Real64, Dayltg::NPH + 1> SPHCPH; // Sine times cosine of altitude of sky element
+    Array1D<Real64> SetPnt;                     // Illuminance setpoint at reference points (lux)
+    Array1D<Real64> GLRNDX;                     // Glare index at reference point
+    Array1D<Real64> GLRNEW;                     // New glare index at reference point
+    Array1D<Dayltg::Illums> FLCWSK;             // Sky-related upgoing luminous flux
+                                    // Ratio of obstructed to unobstructed sky diffuse at a ground point for each (TH,PH) direction
+    std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> SkyObstructionMult;
+    Array1D<Dayltg::Illums> FLFWSK;                                                  // Sky-related downgoing luminous flux
+    std::array<std::array<Real64, Dayltg::NTHMAX + 1>, Dayltg::NPHMAX + 1> ObTransM; // ObTrans value for each (TH,PH) direction
+    std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> SFSKHR;             // Sky source luminance factor for sky type, bare/shaded window
+    std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> DFSKHR;             // Sky daylight factor for sky type, bare/shaded window
     std::array<Dayltg::Illums, (int)DataSurfaces::WinCover::Num> BFSKHR; // Sky background luminance factor for sky type, bare/shaded window
 
     Array2D<std::array<Real64, (int)DataSurfaces::WinCover::Num>> tmpIllumFromWinAtRefPt;

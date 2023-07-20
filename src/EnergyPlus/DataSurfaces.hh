@@ -168,7 +168,8 @@ namespace DataSurfaces {
     };
 
     // A coarse grain version of SurfaceClass
-    enum class FWC {
+    enum class FWC
+    {
         Invalid = -1,
         Floor,
         Wall,
@@ -205,13 +206,14 @@ namespace DataSurfaces {
                                                                                                          "ALLINTERIORCEILINGS",
                                                                                                          "ALLINTERIORFLOORS"};
 
-    enum class WinCover {
+    enum class WinCover
+    {
         Invalid = -1,
         Bare,
         Shaded,
         Num
     };
-        
+
     enum class WinShadingType
     {
         Invalid = -1,
@@ -659,7 +661,6 @@ namespace DataSurfaces {
         }
     };
 
-        
     struct SurfaceData
     {
 
@@ -854,13 +855,14 @@ namespace DataSurfaces {
     struct SurfaceWindowCalc // Calculated window-related values
     {
         // Members
-        Array1D<Real64> SolidAngAtRefPt;         // Solid angle subtended by window from daylit ref points 1 and 2
-        Array1D<Real64> SolidAngAtRefPtWtd;      // Solid angle subtended by window from ref pts weighted by glare pos factor
+        Array1D<Real64> SolidAngAtRefPt;    // Solid angle subtended by window from daylit ref points 1 and 2
+        Array1D<Real64> SolidAngAtRefPtWtd; // Solid angle subtended by window from ref pts weighted by glare pos factor
         Array1D<std::array<Real64, (int)WinCover::Num>> IllumFromWinAtRefPt; // Illuminance from window at ref pts for window with and w/o shade (lux)
-        Array1D<std::array<Real64, (int)WinCover::Num>> BackLumFromWinAtRefPt; // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
+        Array1D<std::array<Real64, (int)WinCover::Num>>
+            BackLumFromWinAtRefPt; // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
         Array1D<std::array<Real64, (int)WinCover::Num>> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
-        Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};               // X,Y,Z coordinates of window center point in building coord system
-        Array1D<Real64> ThetaFace;               // Face temperatures of window layers (K)
+        Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};                             // X,Y,Z coordinates of window center point in building coord system
+        Array1D<Real64> ThetaFace;                                               // Face temperatures of window layers (K)
 
         Array1D<Real64> OutProjSLFracMult; // Multiplier on sunlit fraction due to shadowing of glass by frame
         // and divider outside projections
@@ -872,9 +874,11 @@ namespace DataSurfaces {
         Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
         Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
-        std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {0.0, 0.0, 0.0}; // Enclosure inside surface area minus this surface and its subsurfaces
+        std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {
+            0.0, 0.0, 0.0}; // Enclosure inside surface area minus this surface and its subsurfaces
         // for floor/wall/ceiling (m2)
-        std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {0.0, 0.0, 0.0}; // Enclosure product of inside surface area times vis reflectance
+        std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {
+            0.0, 0.0, 0.0}; // Enclosure product of inside surface area times vis reflectance
         // minus this surface and its subsurfaces,
         // for floor/wall/ceiling (m2)
 
@@ -882,8 +886,8 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceWindowCalc()
-            : ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0),
-              EffShBlindEmiss(Material::MaxSlatAngs, 0.0), EffGlassEmiss(Material::MaxSlatAngs, 0.0)
+            : ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(Material::MaxSlatAngs, 0.0),
+              EffGlassEmiss(Material::MaxSlatAngs, 0.0)
         {
         }
     };
