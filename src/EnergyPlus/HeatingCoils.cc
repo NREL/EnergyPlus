@@ -1878,6 +1878,10 @@ namespace HeatingCoils {
                                                  heatingCoil.Name,
                                                  state.dataPlnt->PlantLoop(1).Name); // no plantloc.num available?
         OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchHeatCoilPlantloopBranchName,
+                                                 heatingCoil.Name,
+                                                 state.dataPlnt->PlantLoop(1).Name); // no plantloc.num available?
+        OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchHeatCoilSupHeatHighShutoffTemp,
                                                  heatingCoil.Name,
                                                  heatingCoil.DesiredOutletTemp); // no Super heating high shut off temp defined?
