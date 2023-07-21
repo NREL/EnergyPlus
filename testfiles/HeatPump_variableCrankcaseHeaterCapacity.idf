@@ -1501,7 +1501,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     1.0,                     !- Crankcase Heater Capacity {W}
-    heaterCapCurve,          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    heaterCapCurve,          !- Crankcase Heater Capacity Function of Temperature Curve Name
     35,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -1533,7 +1533,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     1.0,                     !- Crankcase Heater Capacity {W}
-    heaterCapCurve,          !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    heaterCapCurve,          !- Crankcase Heater Capacity Function of Temperature Curve Name
     35.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control

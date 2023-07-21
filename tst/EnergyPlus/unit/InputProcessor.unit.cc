@@ -3575,7 +3575,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
         "  AirCooled, !- Condenser Type",
         "  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
         "  200.0, !- Crankcase Heater Capacity{ W }",
-        "  heaterCapCurve,      !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "  heaterCapCurve,      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         "  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation",
         "  , !- Supply Water Storage Tank Name",

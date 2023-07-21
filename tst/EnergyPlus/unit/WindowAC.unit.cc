@@ -169,7 +169,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    0.0,                     !- Crankcase Heater Capacity {W}",
-        "    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",

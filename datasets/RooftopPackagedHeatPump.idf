@@ -206,7 +206,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -428,7 +428,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -649,7 +649,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -870,7 +870,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -1091,7 +1091,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -1199,7 +1199,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -1414,7 +1414,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -1512,7 +1512,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -1727,7 +1727,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -1939,7 +1939,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -2037,7 +2037,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -2252,7 +2252,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -2464,7 +2464,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -2562,7 +2562,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -2777,7 +2777,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control
@@ -2875,7 +2875,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -3090,7 +3090,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Defrost Strategy
     ,                        !- Defrost Control

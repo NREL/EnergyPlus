@@ -159,7 +159,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
         "   ,                              !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "   5.0,                           !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "   200.0,                         !- Crankcase Heater Capacity {W}",
-        "   ,                              !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "   ,                              !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   0.0,                           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   Resistive,                     !- Defrost Strategy",
         "   TIMED,                         !- Defrost Control",

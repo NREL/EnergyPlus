@@ -1408,7 +1408,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
 ! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
@@ -1636,7 +1636,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
 ! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps

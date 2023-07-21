@@ -412,7 +412,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:2)=InArgs(1:2)
-                OutArgs(3) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(3) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(4:CurArgs+1)=InArgs(3:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -420,7 +420,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:26)=InArgs(1:26)
-                OutArgs(27) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(27) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(28:CurArgs+1)=InArgs(27:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -428,7 +428,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:12)=InArgs(1:12)
-                OutArgs(13) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(13) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(14:CurArgs+1)=InArgs(13:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -437,7 +437,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
                 ! manipulate all the speeds regardless of CurArgs count
                 OutArgs(1:14)=InArgs(1:14)
-                OutArgs(15) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(15) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(16:26)=InArgs(15:25)
                 OutArgs(27) = ''  ! new speed 1 2017 rated field
                 OutArgs(28) = ''  ! new speed 1 2023 rated field
@@ -485,7 +485,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:5)=InArgs(1:5)
-                OutArgs(6) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(6) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(7:CurArgs+1)=InArgs(6:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -493,7 +493,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:19)=InArgs(1:19)
-                OutArgs(20) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(20) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(21:CurArgs+1)=InArgs(20:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -501,7 +501,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:7)=InArgs(1:7)
-                OutArgs(8) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(8) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -510,7 +510,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
                 ! manipulate all the speeds regardless of CurArgs count
                 OutArgs(1:13)=InArgs(1:13)
-                OutArgs(14) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(14) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(15:22)=InArgs(14:21)
                 OutArgs(23) = ''  ! new speed 1 2017 rated field
                 OutArgs(24) = ''  ! new speed 1 2023 rated field
@@ -558,7 +558,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:19)=InArgs(1:19)
-                OutArgs(20) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(20) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(21:CurArgs+1)=InArgs(20:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -566,7 +566,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:12)=InArgs(1:12)
-                OutArgs(13) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(13) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(14:CurArgs+1)=InArgs(13:CurArgs)
                 CurArgs = CurArgs + 1
 
@@ -574,7 +574,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 OutArgs(1:18)=InArgs(1:18)
-                OutArgs(19) = ''  ! new Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name field
+                OutArgs(19) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
                 OutArgs(20:CurArgs+1)=InArgs(19:CurArgs)
                 CurArgs = CurArgs + 1
 

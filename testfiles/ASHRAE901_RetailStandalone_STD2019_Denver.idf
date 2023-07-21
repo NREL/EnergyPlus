@@ -4270,7 +4270,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}
@@ -4331,7 +4331,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}
@@ -4392,7 +4392,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}
@@ -4453,7 +4453,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}

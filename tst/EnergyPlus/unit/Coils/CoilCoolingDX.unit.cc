@@ -1678,7 +1678,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
         "  Coil:Cooling:DX:CurveFit:Performance,",
         "    DX Cooling Coil Performance,  !- Name",
         "    0,                       !- Crankcase Heater Capacity {W}",
-        "    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Unit Internal Static Air Pressure {Pa}",

@@ -11457,7 +11457,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11487,7 +11487,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11517,7 +11517,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11547,7 +11547,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11577,7 +11577,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11607,7 +11607,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11637,7 +11637,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11667,7 +11667,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11697,7 +11697,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11727,7 +11727,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11757,7 +11757,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11787,7 +11787,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11817,7 +11817,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11847,7 +11847,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11877,7 +11877,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11907,7 +11907,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11937,7 +11937,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11967,7 +11967,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -11997,7 +11997,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -12027,7 +12027,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -12057,7 +12057,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -12087,7 +12087,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -12117,7 +12117,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Cooling:DX:SingleSpeed,
@@ -12147,7 +12147,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
   Coil:Heating:Fuel,

@@ -2754,7 +2754,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Main Cooling Coil 1 Performance,  !- Name
     0.0,                     !- Crankcase Heater Capacity
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
     ,                        !- Unit Internal Static Air Pressure

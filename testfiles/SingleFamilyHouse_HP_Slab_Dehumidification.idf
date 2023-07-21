@@ -3847,7 +3847,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     200.0,                   !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     OnDemand;                !- Defrost Control
@@ -3867,7 +3867,7 @@
     Zone Exhaust Node1_unit1,!- Evaporator Air Inlet Node Name
     Heat Pump Water Heater Fan Inlet Node_unit1,  !- Evaporator Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Outdoor Temperature Dependent Crankcase Heater Capacity Curve Name
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name
