@@ -118,7 +118,7 @@ struct CoilCoolingDX
     int availScheduleIndex = 0;
     int condInletNodeIndex = 0;
     int condOutletNodeIndex = 0;
-    std::shared_ptr<CoilCoolingDXPerformanceBase> performance;
+    std::shared_ptr<CoilCoolingDXPerformanceBase> performance; //TODO: unique_ptr and explicit copy ctor
     int condensateTankIndex = 0;
     int condensateTankSupplyARRID = 0;
     Real64 condensateVolumeFlow = 0.0;
