@@ -51,5 +51,10 @@ libtk205/vendor/json/doc
 libtk205/vendor/json/doc
 libtk205/vendor/json/test
 libtk205/vendor/json/third_party
-libtk205/vendor/json/*.*
+libtk205/vendor/json/.*
+libtk205/vendor/json/*.md
+libtk205/vendor/json/*.build
+libtk205/vendor/json/*.natvis
+libtk205/vendor/json/*.cff
+libtk205/vendor/json/*.yml
 
