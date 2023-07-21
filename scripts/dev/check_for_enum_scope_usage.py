@@ -205,7 +205,6 @@ class EnumScopeEvaluator:
                 if len(unique_files_in_usages) == 1:
                     apparent_enums_in_only_one_source_file.append(f"{e.describe()} in {next(iter(unique_files_in_usages))}")
 
-
         if verbose:
             print("Reporting results")
         if len(apparent_enums_in_zero_source_files) > 0:
