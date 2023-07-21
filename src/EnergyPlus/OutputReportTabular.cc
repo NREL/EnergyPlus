@@ -613,7 +613,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // #ifdef ITM_KEYCACHE
             //  Noel comment:  First time in this TabNum/ColNum loop, let's save the results
             //   of GetVariableKeyCountandType & GetVariableKeys.
-            std::string const &curVariMeter = UtilityRoutines::MakeUPPERCase(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
+            std::string const &curVariMeter = UtilityRoutines::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
@@ -650,7 +650,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) = IndexesForKeyVar(iKey)  !noel
             //    ENDDO
             // #else
-            //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+            //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
             //    ! call the key count function but only need count during this pass
             //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
             //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -743,7 +743,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
             //    ENDDO
             // #else
-            //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+            //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
             //    ! call the key count function but only need count during this pass
             //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
             //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -839,7 +839,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                 //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
                 //    ENDDO
                 // #else
-                //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+                //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
                 //    ! call the key count function but only need count during this pass
                 //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
                 //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -18582,7 +18582,7 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
     int constexpr misParen(2);
     int constexpr misBrce(3);
     int constexpr misNoHint(4);
-    std::string const stringInUpper(UtilityRoutines::MakeUPPERCase(stringInWithSI));
+    std::string const stringInUpper(UtilityRoutines::makeUPPER(stringInWithSI));
     auto &ort = state.dataOutRptTab;
 
     stringOutWithIP = "";

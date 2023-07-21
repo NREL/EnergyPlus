@@ -484,19 +484,19 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetMonthNumber)
 {
-    EXPECT_EQ(0, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("January")));
-    EXPECT_EQ(1, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("February")));
-    EXPECT_EQ(2, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("March")));
-    EXPECT_EQ(3, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("April")));
-    EXPECT_EQ(4, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("May")));
-    EXPECT_EQ(5, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("June")));
-    EXPECT_EQ(6, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("July")));
-    EXPECT_EQ(7, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("August")));
-    EXPECT_EQ(8, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("September")));
-    EXPECT_EQ(9, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("October")));
-    EXPECT_EQ(10, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("November")));
-    EXPECT_EQ(11, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("December")));
-    EXPECT_EQ(-1, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("Hexember")));
+    EXPECT_EQ(0, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("January")));
+    EXPECT_EQ(1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("February")));
+    EXPECT_EQ(2, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("March")));
+    EXPECT_EQ(3, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("April")));
+    EXPECT_EQ(4, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("May")));
+    EXPECT_EQ(5, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("June")));
+    EXPECT_EQ(6, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("July")));
+    EXPECT_EQ(7, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("August")));
+    EXPECT_EQ(8, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("September")));
+    EXPECT_EQ(9, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("October")));
+    EXPECT_EQ(10, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("November")));
+    EXPECT_EQ(11, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("December")));
+    EXPECT_EQ(-1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("Hexember")));
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)

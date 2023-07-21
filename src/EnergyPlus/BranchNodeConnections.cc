@@ -1794,15 +1794,15 @@ void SetUpCompSets(EnergyPlusData &state,
     // inlet/outlet nodes have been input.  This routine assumes that identical
     // "CompSets" cannot be used in multiple places and issues a warning if they are.
 
-    std::string ParentTypeUC = UtilityRoutines::MakeUPPERCase(ParentType);
-    std::string CompTypeUC = UtilityRoutines::MakeUPPERCase(CompType);
+    std::string ParentTypeUC = UtilityRoutines::makeUPPER(ParentType);
+    std::string CompTypeUC = UtilityRoutines::makeUPPER(CompType);
     // TODO: Refactor this away by passing in enums
     DataLoopNode::ConnectionObjectType ParentTypeEnum =
-        static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(ConnectionObjectTypeNamesUC, ParentTypeUC));
+        static_cast<DataLoopNode::ConnectionObjectType>(getEnumValue(ConnectionObjectTypeNamesUC, ParentTypeUC));
     assert(ParentTypeEnum != DataLoopNode::ConnectionObjectType::Invalid);
 
     DataLoopNode::ConnectionObjectType ComponentTypeEnum =
-        static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(ConnectionObjectTypeNamesUC, CompTypeUC));
+        static_cast<DataLoopNode::ConnectionObjectType>(getEnumValue(ConnectionObjectTypeNamesUC, CompTypeUC));
     assert(ComponentTypeEnum != DataLoopNode::ConnectionObjectType::Invalid);
 
     int Found = 0;
@@ -1961,9 +1961,9 @@ void SetUpCompSets(EnergyPlusData &state,
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).ComponentObjectType = ComponentTypeEnum;
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).CName = CompName;
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).InletNodeName =
-            UtilityRoutines::MakeUPPERCase(InletNode); // TODO: Fix this....
+            UtilityRoutines::makeUPPER(InletNode); // TODO: Fix this....
         state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).OutletNodeName =
-            UtilityRoutines::MakeUPPERCase(OutletNode); // TODO: Fix this....
+            UtilityRoutines::makeUPPER(OutletNode); // TODO: Fix this....
         if (!Description.empty()) {
             state.dataBranchNodeConnections->CompSets(state.dataBranchNodeConnections->NumCompSets).Description = Description;
         } else {
@@ -2096,10 +2096,10 @@ void TestCompSet(EnergyPlusData &state,
     //   c)  If not found, call SetUpCompSets (with parent type and name UNDEFINED)
     //       to add a new item in the CompSets array
 
-    std::string CompTypeUC = UtilityRoutines::MakeUPPERCase(CompType);
+    std::string CompTypeUC = UtilityRoutines::makeUPPER(CompType);
     // TODO: Refactor this away by passing in enums
     DataLoopNode::ConnectionObjectType ComponentTypeEnum =
-        static_cast<DataLoopNode::ConnectionObjectType>(getEnumerationValue(ConnectionObjectTypeNamesUC, CompTypeUC));
+        static_cast<DataLoopNode::ConnectionObjectType>(getEnumValue(ConnectionObjectTypeNamesUC, CompTypeUC));
     assert(ComponentTypeEnum != DataLoopNode::ConnectionObjectType::Invalid);
 
     // See if Already there
