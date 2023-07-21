@@ -4447,7 +4447,7 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
 
     // User inputs from above
     // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
-    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), UtilityRoutines::MakeUPPERCase(name2)); // Material Name field is NOT tagged with /retaincase
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), UtilityRoutines::makeUPPER(name2)); // Material Name field is NOT tagged with /retaincase
     EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(2), "MEDIUMROUGH");
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(1), 2.0, 0.0001);
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(3), 0.5, 0.0001);
@@ -4681,7 +4681,7 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &objectFields = instance.value();
-            std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+            std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
             EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
             // Fields before extensibles
             alphaFieldValue = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");
