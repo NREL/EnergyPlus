@@ -161,25 +161,25 @@ namespace DataAirLoop {
     struct AirLoopFlowData // Derived type for air loop flow information
     {
         // Members
-        Real64 DesSupply = 0.0;             // design supply air mass flow rate for loop [kg/s]
-        Real64 DesReturnFrac = 1.0;         // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
-        Real64 ReqSupplyFrac = 1.0;         // required flow (as a fraction of DesSupply) set by a manager
-        Real64 MinOutAir = 0.0;             // minimum outside air mass flow rate [kg/s]
-        Real64 MaxOutAir = 0.0;             // current maximum available outside air mass flow rate [kg/s]
-        Real64 OAMinFrac = 0.0;             // minimum outside air flow fraction this time step
-        Real64 Previous = 0.0;              // Previous mass air flow rate for this loop [kg/s]
-        Real64 SupFlow = 0.0;               // supply air flow rate (includes LeakFlow) [kg/s]
-        Real64 ZoneRetFlow = 0.0;           // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
-        Real64 ZoneRetFlowRatio = 1.0;      // ratio for adjusting zone return flows for excess zone exhaust
-        Real64 SysRetFlow = 0.0;            // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
-        Real64 RecircFlow = 0.0;            // sum of zone plenum recirculated flows [kg/s]
-        Real64 LeakFlow = 0.0;              // sum of air distribution leak flows to return plenum [kg/s]
-        Real64 ExcessZoneExhFlow = 0.0;     // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
-        Real64 FanPLR = 1.0;                // Operating PLR of air loop fan
-        Real64 OAFrac = 0.0;                // fraction of outside air to mixed air mass flow rate
-        Real64 OAFlow = 0.0;                // oa flow rate this time step [kg/s]
-        bool FlowError = false;             // error flag for flow error message
-        Real64 BypassMassFlow = 0.0;        // air loop bypass mass flow NOT entering splitter but included in mixer or plenum
+        Real64 DesSupply = 0.0;         // design supply air mass flow rate for loop [kg/s]
+        Real64 DesReturnFrac = 1.0;     // the design return flow rate as a fraction of supply flow assuming no exhaust (0 to 1)
+        Real64 ReqSupplyFrac = 1.0;     // required flow (as a fraction of DesSupply) set by a manager
+        Real64 MinOutAir = 0.0;         // minimum outside air mass flow rate [kg/s]
+        Real64 MaxOutAir = 0.0;         // current maximum available outside air mass flow rate [kg/s]
+        Real64 OAMinFrac = 0.0;         // minimum outside air flow fraction this time step
+        Real64 Previous = 0.0;          // Previous mass air flow rate for this loop [kg/s]
+        Real64 SupFlow = 0.0;           // supply air flow rate (includes LeakFlow) [kg/s]
+        Real64 ZoneRetFlow = 0.0;       // return air flow rate at all zone return air nodes (includes RecircFlow, excludes LeakFlow) [kg/s]
+        Real64 ZoneRetFlowRatio = 1.0;  // ratio for adjusting zone return flows for excess zone exhaust
+        Real64 SysRetFlow = 0.0;        // return air flow rate back to central return (excludes RecircFlow, includes LeakFlow) [kg/s]
+        Real64 RecircFlow = 0.0;        // sum of zone plenum recirculated flows [kg/s]
+        Real64 LeakFlow = 0.0;          // sum of air distribution leak flows to return plenum [kg/s]
+        Real64 ExcessZoneExhFlow = 0.0; // excess zone exhuast flows made up by reduced return flow in other zones on same airloop [kg/s]
+        Real64 FanPLR = 1.0;            // Operating PLR of air loop fan
+        Real64 OAFrac = 0.0;            // fraction of outside air to mixed air mass flow rate
+        Real64 OAFlow = 0.0;            // oa flow rate this time step [kg/s]
+        bool FlowError = false;         // error flag for flow error message
+        Real64 BypassMassFlow = 0.0;    // air loop bypass mass flow NOT entering splitter but included in mixer or plenum
     };
 
     enum class ControllerKind
