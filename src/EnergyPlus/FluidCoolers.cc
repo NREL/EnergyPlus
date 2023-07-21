@@ -1623,24 +1623,24 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCCondLoopName, this->Name, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name);
         OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCTFCCondLoopBranchName, this->Name, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name);
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCTFCFluidType, this->Name, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName); // Fluid Name more reasonably than FluidType
+            state,
+            state.dataOutRptPredefined->pdchCTFCCondLoopBranchName,
+            this->Name,
+            state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Name);
         OutputReportPredefined::PreDefTableEntry(
             state,
-            state.dataOutRptPredefined->pdchCTFCRange,
+            state.dataOutRptPredefined->pdchCTFCFluidType,
             this->Name,
-            this->DesignEnteringWaterTemp-this->DesignLeavingWaterTemp);
+            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName); // Fluid Name more reasonably than FluidType
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignEnteringWaterTemp - this->DesignLeavingWaterTemp);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignEnteringWaterTemp - this->DesignEnteringAirWetBulbTemp);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCDesFanPwr, this->Name, this->HighSpeedFanPower); // eqival to Design Fan Power?
         OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCTFCDesInletAirWBT,
-            this->Name,
-            this->DesignEnteringAirWetBulbTemp);
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCTFCDesWaterFlowRate, this->Name, this->DesignWaterFlowRate);
+            state, state.dataOutRptPredefined->pdchCTFCDesInletAirWBT, this->Name, this->DesignEnteringAirWetBulbTemp);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCDesWaterFlowRate, this->Name, this->DesignWaterFlowRate);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCLevWaterSPTemp, this->Name, this->DesignLeavingWaterTemp);
     }
 
