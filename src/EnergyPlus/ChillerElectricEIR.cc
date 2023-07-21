@@ -1691,13 +1691,17 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
                                                  this->Name,
-                                                 state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name); // PH; to find branch name
+                                                 state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
+                                                     .LoopSide(this->CWPlantLoc.loopSideNum)
+                                                     .Branch(this->CWPlantLoc.branchNum)
+                                                     .Name);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchChillerCondLoopName, this->Name, state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name);
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
-                                                 this->Name,
-                                                 state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name); // PH still; to find branch name
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            this->Name,
+            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).LoopSide(this->CDPlantLoc.loopSideNum).Branch(this->CDPlantLoc.branchNum).Name);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->ChillerEIRFPLRMin);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, "Electricity");
         OutputReportPredefined::PreDefTableEntry(
@@ -1717,10 +1721,11 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                                                  this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName, this->Name, state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name);
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
-                                                 this->Name,
-                                                 state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name); // PH still; to find branch name
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            this->Name,
+            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).LoopSide(this->HRPlantLoc.loopSideNum).Branch(this->HRPlantLoc.branchNum).Name);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
     }
