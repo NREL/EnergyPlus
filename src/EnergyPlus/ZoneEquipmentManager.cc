@@ -1389,12 +1389,12 @@ void updateZoneSizingBeginDay(EnergyPlusData &state, DataSizing::ZoneSizingData 
 
 void updateZoneSizingDuringDay(DataSizing::ZoneSizingData &zsSizing,
                                DataSizing::ZoneSizingData &zsCalcSizing,
-                               Real64 tstatHi,
-                               Real64 tstatLo,
-                               Real64 sizTstatHi,
-                               Real64 sizTstatLo,
-                               int timeStepInDay,
-                               Real64 fracTimeStepZone)
+                               Real64 const tstatHi,
+                               Real64 const tstatLo,
+                               Real64 &sizTstatHi,
+                               Real64 &sizTstatLo,
+                               int const timeStepInDay,
+                               Real64 const fracTimeStepZone)
 {
     if (tstatHi > 0.0 && tstatHi > sizTstatHi) {
         sizTstatHi = tstatHi;
@@ -1440,7 +1440,7 @@ void updateZoneSizingDuringDay(DataSizing::ZoneSizingData &zsSizing,
     }
 }
 
-void updateZoneSizingEndDayMovingAvg(DataSizing::ZoneSizingData &zsCalcSizing, int numTimeStepsInAvg)
+void updateZoneSizingEndDayMovingAvg(DataSizing::ZoneSizingData &zsCalcSizing, int const numTimeStepsInAvg)
 {
     General::MovingAvg(zsCalcSizing.CoolFlowSeq, numTimeStepsInAvg);
     General::MovingAvg(zsCalcSizing.CoolLoadSeq, numTimeStepsInAvg);
@@ -1465,9 +1465,9 @@ void updateZoneSizingEndDayMovingAvg(DataSizing::ZoneSizingData &zsCalcSizing, i
 
 void updateZoneSizingEndDay(DataSizing::ZoneSizingData &zsCalcSizing,
                             DataSizing::ZoneSizingData &zsCalcFinalSizing,
-                            int numTimeStepInDay,
-                            DataSizing::DesDayWeathData &desDayWeath,
-                            Real64 stdRhoAir)
+                            int const numTimeStepInDay,
+                            DataSizing::DesDayWeathData const &desDayWeath,
+                            Real64 const stdRhoAir)
 {
     zsCalcFinalSizing.CoolSizingType = zsCalcSizing.CoolSizingType;
     zsCalcFinalSizing.HeatSizingType = zsCalcSizing.HeatSizingType;
@@ -1902,7 +1902,6 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int DesDayNum;         // design day index
     int TimeStepIndex;     // zone time step index
-    int TimeStepInDay;     // zone time step in day
     int I;                 // write statement index
     int HourCounter;       // Hour Counter
     int TimeStepCounter;   // Time Step Counter
@@ -1926,6 +1925,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
 
+            // auto &calcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
             updateZoneSizingBeginDay(state, state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum));
         }
     } break;
@@ -1963,8 +1963,8 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
         // auto &desDayWeath = state.dataSize->DesDayWeath(state.dataSize->CurOverallSimDay);
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            auto &calcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
-            auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
+            // auto &calcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum);
+            // auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
             updateZoneSizingEndDay(state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum),
                                    state.dataSize->CalcFinalZoneSizing(CtrlZoneNum),
                                    state.dataZoneEquipmentManager->NumOfTimeStepInDay,
