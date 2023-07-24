@@ -852,6 +852,12 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->FinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->CalcZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfZones);
     state.dataSize->CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
+    if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+        state.dataSize->ZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->numSpaces);
+        state.dataSize->FinalZoneSizing.allocate(state.dataGlobal->numSpaces);
+        state.dataSize->CalcZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->numSpaces);
+        state.dataSize->CalcFinalZoneSizing.allocate(state.dataGlobal->numSpaces);
+    }
     state.dataSize->TermUnitFinalZoneSizing.allocate(state.dataSize->NumAirTerminalUnits);
     for (auto &tufzs : state.dataSize->TermUnitFinalZoneSizing) {
         tufzs.allocateMemberArrays(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
@@ -859,17 +865,8 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->DesDayWeath.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
     int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
     state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);
-    state.dataSize->CoolPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
-    state.dataSize->HeatPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
-    state.dataSize->LatCoolPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
-    state.dataSize->LatHeatPeakDateHrMin.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->ZoneSizThermSetPtHi.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->ZoneSizThermSetPtLo.allocate(state.dataGlobal->NumOfZones);
-
-    state.dataSize->CoolPeakDateHrMin = "";
-    state.dataSize->HeatPeakDateHrMin = "";
-    state.dataSize->LatCoolPeakDateHrMin = "";
-    state.dataSize->LatHeatPeakDateHrMin = "";
 
     state.dataSize->ZoneSizThermSetPtHi = 0.0;
     state.dataSize->ZoneSizThermSetPtLo = 1000.0;
@@ -2220,19 +2217,17 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
                         if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtHeatMax) {
-                            state.dataSize->HeatPeakDateHrMin(CtrlZoneNum) =
-                                calcFinalZoneSizing.cHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
+                            calcFinalZoneSizing.HeatPeakDateHrMin = calcFinalZoneSizing.cHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
                         }
                         if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtCoolMax) {
-                            state.dataSize->CoolPeakDateHrMin(CtrlZoneNum) =
-                                calcFinalZoneSizing.cCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
+                            calcFinalZoneSizing.CoolPeakDateHrMin = calcFinalZoneSizing.cCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
                         }
                         if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtLatentHeatMax) {
-                            state.dataSize->LatHeatPeakDateHrMin(CtrlZoneNum) =
+                            calcFinalZoneSizing.LatHeatPeakDateHrMin =
                                 calcFinalZoneSizing.cLatentHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
                         }
                         if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtLatentCoolMax) {
-                            state.dataSize->LatCoolPeakDateHrMin(CtrlZoneNum) =
+                            calcFinalZoneSizing.LatCoolPeakDateHrMin =
                                 calcFinalZoneSizing.cLatentCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
                         }
                     }
@@ -2410,7 +2405,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                     calcFinalZoneSizing.ZoneRetTempAtCoolPeak = calcFinalZoneSizing.ZoneRetTempAtLatentCoolPeak;
                     calcFinalZoneSizing.ZoneTempAtCoolPeak = calcFinalZoneSizing.ZoneTempAtLatentCoolPeak;
                     calcFinalZoneSizing.ZoneHumRatAtCoolPeak = calcFinalZoneSizing.ZoneHumRatAtLatentCoolPeak;
-                    state.dataSize->CoolPeakDateHrMin(zoneNum) = state.dataSize->LatCoolPeakDateHrMin(zoneNum);
+                    calcFinalZoneSizing.CoolPeakDateHrMin = calcFinalZoneSizing.LatCoolPeakDateHrMin;
 
                     // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
                     if (calcFinalZoneSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio) {
@@ -2434,7 +2429,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                         calcZoneSizing.ZoneRetTempAtCoolPeak = calcZoneSizing.ZoneRetTempAtLatentCoolPeak;
                         calcZoneSizing.ZoneTempAtCoolPeak = calcZoneSizing.ZoneTempAtLatentCoolPeak;
                         calcZoneSizing.ZoneHumRatAtCoolPeak = calcZoneSizing.ZoneHumRatAtLatentCoolPeak;
-                        state.dataSize->CoolPeakDateHrMin(zoneNum) = state.dataSize->LatCoolPeakDateHrMin(zoneNum);
+                        calcZoneSizing.CoolPeakDateHrMin = calcFinalZoneSizing.LatCoolPeakDateHrMin;
 
                         // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
                         if (calcZoneSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio) {
@@ -2462,7 +2457,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                     calcFinalZoneSizing.ZoneRetTempAtHeatPeak = calcFinalZoneSizing.ZoneRetTempAtLatentHeatPeak;
                     calcFinalZoneSizing.ZoneTempAtHeatPeak = calcFinalZoneSizing.ZoneTempAtLatentHeatPeak;
                     calcFinalZoneSizing.ZoneHumRatAtHeatPeak = calcFinalZoneSizing.ZoneHumRatAtLatentHeatPeak;
-                    state.dataSize->HeatPeakDateHrMin(zoneNum) = state.dataSize->LatHeatPeakDateHrMin(zoneNum);
+                    calcFinalZoneSizing.HeatPeakDateHrMin = calcFinalZoneSizing.LatHeatPeakDateHrMin;
 
                     // will this cause sizing issues with heating coils since SA humrat is higher than zone humrat?
                     // use zone humrat instead? this value would size humidifiers well, but what about heating coils?
@@ -2488,7 +2483,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                         calcZoneSizing.ZoneRetTempAtHeatPeak = calcZoneSizing.ZoneRetTempAtLatentHeatPeak;
                         calcZoneSizing.ZoneTempAtHeatPeak = calcZoneSizing.ZoneTempAtLatentHeatPeak;
                         calcZoneSizing.ZoneHumRatAtHeatPeak = calcZoneSizing.ZoneHumRatAtLatentHeatPeak;
-                        state.dataSize->HeatPeakDateHrMin(zoneNum) = state.dataSize->LatHeatPeakDateHrMin(zoneNum);
+                        calcZoneSizing.HeatPeakDateHrMin = calcFinalZoneSizing.LatHeatPeakDateHrMin;
 
                         // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
                         // not sure at this point if heating should reset HeatDesHumRat

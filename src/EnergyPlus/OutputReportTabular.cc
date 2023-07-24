@@ -15760,7 +15760,7 @@ void CollectPeakZoneConditions(
                                                 state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
-                compLoad.peakDateHrMin = state.dataSize->CoolPeakDateHrMin(zoneIndex);
+                compLoad.peakDateHrMin = thisCalcFinalZoneSizing.CoolPeakDateHrMin;
             }
 
             // Outside Dry Bulb Temperature
@@ -15816,7 +15816,7 @@ void CollectPeakZoneConditions(
                                                 state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
-                compLoad.peakDateHrMin = state.dataSize->HeatPeakDateHrMin(zoneIndex);
+                compLoad.peakDateHrMin = thisCalcFinalZoneSizing.HeatPeakDateHrMin;
             }
 
             // Outside Dry Bulb Temperature

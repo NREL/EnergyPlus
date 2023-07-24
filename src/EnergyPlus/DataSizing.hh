@@ -594,6 +594,10 @@ namespace DataSizing {
         ZoneSizing zoneSizingMethod = ZoneSizing::Invalid; // load to sizing on: sensible, latent, sensibleandlatent, sensibleonlynolatent
         std::string CoolSizingType;                        // string reported to eio, Cooling or Latent Cooling
         std::string HeatSizingType;                        // string reported to eio, Heating or Latent Heating
+        std::string CoolPeakDateHrMin;                     // date:hr:min of cooling peak
+        std::string HeatPeakDateHrMin;                     // date:hr:min of heating peak
+        std::string LatCoolPeakDateHrMin;                  // date:hr:min of latent cooling peak
+        std::string LatHeatPeakDateHrMin;                  // date:hr:min of latent heating peak
 
         void zeroMemberData();
         void allocateMemberArrays(int numOfTimeStepInDay);
@@ -1316,10 +1320,6 @@ struct SizingData : BaseGlobalStruct
     Real64 UnitaryHeatCap = 0.0;                     // the heating capacity of a unitary system
     Array1D<Real64> ZoneSizThermSetPtHi;             // highest zone thermostat setpoint during zone sizing calcs
     Array1D<Real64> ZoneSizThermSetPtLo;             // lowest zone thermostat setpoint during zone sizing calcs
-    Array1D_string CoolPeakDateHrMin;                // date:hr:min of cooling peak
-    Array1D_string HeatPeakDateHrMin;                // date:hr:min of heating peak
-    Array1D_string LatCoolPeakDateHrMin;             // date:hr:min of latent cooling peak
-    Array1D_string LatHeatPeakDateHrMin;             // date:hr:min of latent heating peak
     char SizingFileColSep;                           // Character to separate columns in sizing outputs
     int DataDesicDehumNum = 0;                       // index to desiccant dehumidifier
     bool DataDesicRegCoil = false;                   // TRUE if heating coil desiccant regeneration coil

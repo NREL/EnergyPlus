@@ -619,7 +619,7 @@ void ManageSizing(EnergyPlusData &state)
                                  thisCalcFinalZoneSizing.DesCoolVolFlow,
                                  thisFinalZoneSizing.DesCoolVolFlow,
                                  thisFinalZoneSizing.CoolDesDay,
-                                 state.dataSize->CoolPeakDateHrMin(CtrlZoneNum),
+                                 thisCalcFinalZoneSizing.CoolPeakDateHrMin,
                                  TempAtPeak,
                                  HumRatAtPeak,
                                  thisZone.FloorArea,
@@ -636,7 +636,7 @@ void ManageSizing(EnergyPlusData &state)
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, thisCalcFinalZoneSizing.DesCoolVolFlow, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesAirFlow, curName, thisFinalZoneSizing.DesCoolVolFlow, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClDesDay, curName, thisFinalZoneSizing.CoolDesDay);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, state.dataSize->CoolPeakDateHrMin(CtrlZoneNum));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, thisCalcFinalZoneSizing.CoolPeakDateHrMin);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, TStatSetPtAtPk);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, thisCalcFinalZoneSizing.ZoneTempAtCoolPeak);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndHum, curName, thisCalcFinalZoneSizing.ZoneHumRatAtCoolPeak, 5);
@@ -683,7 +683,7 @@ void ManageSizing(EnergyPlusData &state)
                                  thisCalcFinalZoneSizing.DesHeatVolFlow,
                                  thisFinalZoneSizing.DesHeatVolFlow,
                                  thisFinalZoneSizing.HeatDesDay,
-                                 state.dataSize->HeatPeakDateHrMin(CtrlZoneNum),
+                                 thisCalcFinalZoneSizing.HeatPeakDateHrMin,
                                  TempAtPeak,
                                  HumRatAtPeak,
                                  thisZone.FloorArea,
@@ -700,7 +700,7 @@ void ManageSizing(EnergyPlusData &state)
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, thisCalcFinalZoneSizing.DesHeatVolFlow, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesAirFlow, curName, thisFinalZoneSizing.DesHeatVolFlow, 3);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtDesDay, curName, thisFinalZoneSizing.HeatDesDay);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, state.dataSize->HeatPeakDateHrMin(CtrlZoneNum));
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, thisCalcFinalZoneSizing.HeatPeakDateHrMin);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, thisCalcFinalZoneSizing.ZoneTempAtHeatPeak);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, thisCalcFinalZoneSizing.ZoneHumRatAtHeatPeak, 5);

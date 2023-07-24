@@ -6599,8 +6599,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
-
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
     state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
@@ -7113,7 +7111,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     auto &finalZoneSizing = state->dataSize->CalcFinalZoneSizing(1);
     finalZoneSizing.CoolDDNum = coolDDNum;
     finalZoneSizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
     finalZoneSizing.CoolOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.CoolOutTempSeq(coolTimeOfMax) = 38.;
@@ -7132,7 +7129,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int heatTimeOfMax = 4;
     finalZoneSizing.HeatDDNum = heatDDNum;
     finalZoneSizing.TimeStepNumAtHeatMax = heatTimeOfMax;
-    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
     finalZoneSizing.HeatOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.HeatOutTempSeq(heatTimeOfMax) = -17.4;
@@ -7186,10 +7182,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->SysSizInput(1).AirLoopNum = 1;
     state->dataSize->SysSizInput(1).SizingOption = DataSizing::NonCoincident;
-    auto degC_to_F = [](Real64 celsius) constexpr
-    {
-        return celsius * (9.0 / 5.0) + 32.0;
-    };
+    auto degC_to_F = [](Real64 celsius) constexpr { return celsius * (9.0 / 5.0) + 32.0; };
     constexpr Real64 coolMixTempSys = 26.2;
     constexpr Real64 coolMixTempSysIP = degC_to_F(coolMixTempSys);
     constexpr Real64 heatMixTempSys = -1.7;
