@@ -4194,7 +4194,7 @@ void GetDXCoils(EnergyPlusData &state)
                     ShowContinueError(state, format("...required {} is blank.", cAlphaFields(17 + (I - 1) * 6)));
                 } else {
                     ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(17 + (I - 1) * 6), Alphas(16 + (I - 1) * 6)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(17 + (I - 1) * 6), Alphas(17 + (I - 1) * 6)));
                 }
                 ErrorsFound = true;
             } else {
