@@ -436,9 +436,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
                 ! manipulate all the speeds regardless of CurArgs count
-                OutArgs(1:13)=InArgs(1:13)
-                OutArgs(14) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
-                OutArgs(15:26)=InArgs(14:25)
+                OutArgs(1:14)=InArgs(1:14)
+                OutArgs(15) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
+                OutArgs(16:26)=InArgs(15:25)
                 OutArgs(27) = ''  ! new speed 1 2017 rated field
                 OutArgs(28) = ''  ! new speed 1 2023 rated field
                 OutArgs(29:38)=InArgs(26:35)
