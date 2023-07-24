@@ -74,7 +74,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXInput)
     int coilIndex = CoilCoolingDX::factory(*state, "coolingCoil");
     auto const &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
     EXPECT_EQ("COOLINGCOIL", thisCoil.name);
-    EXPECT_EQ("PERFORMANCEOBJECTNAME", thisCoil.performance.name);
+    EXPECT_EQ("PERFORMANCEOBJECTNAME", thisCoil.performance->name);
 }
 
 TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
@@ -1842,10 +1842,10 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     this_dx_clg_coil.size(*state);
 
     // check the normal operating mode names
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[0].name, "DX COOLING COIL SPEED 1 PERFORMANCE");
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[1].name, "DX COOLING COIL SPEED 2 PERFORMANCE");
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[2].name, "DX COOLING COIL SPEED 3 PERFORMANCE");
-    EXPECT_EQ(this_dx_clg_coil.performance.normalMode.speeds[3].name, "DX COOLING COIL SPEED 4 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(0), "DX COOLING COIL SPEED 1 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(1), "DX COOLING COIL SPEED 2 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(2), "DX COOLING COIL SPEED 3 PERFORMANCE");
+    EXPECT_EQ(this_dx_clg_coil.performance->NameAtSpeed(3), "DX COOLING COIL SPEED 4 PERFORMANCE");
 
     struct TestQuery
     {
@@ -1887,7 +1887,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
 
     // test 2: speed 2 cooling coil dx
     compType = "Coil:Cooling:DX:CurveFit:Speed";
-    compName = this_dx_clg_coil.performance.normalMode.speeds[1].name;
+    compName = this_dx_clg_coil.performance->NameAtSpeed(1);
     // expected results
     std::vector<TestQuery> speed2_testQueries(
         {TestQuery("Design Size Rated Air Flow Rate", "m3/s", 0.4000), TestQuery("Design Size Gross Cooling Capacity", "W", 6520.2056)});
@@ -1913,7 +1913,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
 
     // test 3: speed 3 cooling coil dx
     compType = "Coil:Cooling:DX:CurveFit:Speed";
-    compName = this_dx_clg_coil.performance.normalMode.speeds[2].name;
+    compName = this_dx_clg_coil.performance->NameAtSpeed(2);
     // expected results
     std::vector<TestQuery> speed3_testQueries(
         {TestQuery("Design Size Rated Air Flow Rate", "m3/s", 0.6000), TestQuery("Design Size Gross Cooling Capacity", "W", 9780.3084)});

@@ -6565,7 +6565,7 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     thisCoil.size(*state);
 
     ASSERT_EQ("DX COOLING COIL", thisCoil.name);
-    ASSERT_EQ("DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
+    ASSERT_EQ("DX COOL COOLING COIL PERFORMANCE", thisCoil.performance->name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE2", thisCoil.performance.alternateMode.name);
     int nsp = thisCoil.performance->NumSpeeds();
@@ -6575,7 +6575,7 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     auto speed2 = thisCoil.performance.normalMode.speeds[1];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2.name);
 
-    auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
+    auto hasAlternateMode = thisCoil.performance->hasAlternateMode;
     auto normalMode = thisCoil.performance.normalMode.speeds;
     auto alternateMode1 = thisCoil.performance.alternateMode;
     EXPECT_EQ(1, hasAlternateMode);
@@ -6601,10 +6601,10 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     EXPECT_EQ(0.3, maxEIRfLowPLRXInput);
 
     // Rated Total Capacity
-    EXPECT_NEAR(15000, thisCoil.performance.normalMode.ratedGrossTotalCap, 0.01);
+    EXPECT_NEAR(15000, thisCoil.performance->RatedGrossTotalCap(), 0.01);
 
     // Reated Air Vol Flow Rate | evap air flow rate and condenser air flow rate ??
-    EXPECT_NEAR(0.80, thisCoil.performance.normalMode.ratedEvapAirFlowRate, 0.01);
+    EXPECT_NEAR(0.80, thisCoil.performance->RatedEvapAirFlowRate(), 0.01);
 
     EXPECT_NEAR(7500, speed1.rated_total_capacity, 0.01);
     EXPECT_NEAR(15000, speed2.rated_total_capacity, 0.01);
@@ -6870,16 +6870,16 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     thisCoil.size(*state);
 
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL", thisCoil.name);
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL PERFORMANCE", thisCoil.performance->name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
     int nsp = thisCoil.performance->NumSpeeds();
     ASSERT_EQ(3, nsp);
-    auto speed1 = thisCoil.performance.normalMode.speeds[0];
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
-    auto speed2 = thisCoil.performance.normalMode.speeds[1];
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2.name);
-    auto speed3 = thisCoil.performance.normalMode.speeds[2];
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 3 PERFORMANCE", speed3.name);
+    auto speed1name = thisCoil.performance->NameAtSpeed(0);
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1name);
+    auto speed2name = thisCoil.performance->NameAtSpeed(1);
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2name);
+    auto speed3name = thisCoil.performance->NameAtSpeed(2);
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 3 PERFORMANCE", speed3name);
 
     auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
     auto alternateMode1 = thisCoil.performance.alternateMode.speeds;
@@ -6903,10 +6903,10 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
 
     // Rated Total Capacity
-    EXPECT_NEAR(5000, thisCoil.performance.normalMode.ratedGrossTotalCap, 0.01);
+    EXPECT_NEAR(5000, thisCoil.performance->RatedGrossTotalCap(), 0.01);
 
     // Reated Air Vol Flow Rate | evap air flow rate and condenser air flow rate ??
-    EXPECT_NEAR(0.25, thisCoil.performance.normalMode.ratedEvapAirFlowRate, 0.01);
+    EXPECT_NEAR(0.25, thisCoil.performance->RatedEvapAirFlowRate(), 0.01);
 
     EXPECT_NEAR(1666.5, speed1.rated_total_capacity, 0.01);
     EXPECT_NEAR(3333.5, speed2.rated_total_capacity, 0.01);
