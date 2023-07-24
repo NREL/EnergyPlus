@@ -96,6 +96,25 @@ namespace ZoneEquipmentManager {
 
     void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator CallIndicator);
 
+    void updateZoneSizingBeginDay(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing);
+
+    void updateZoneSizingDuringDay(DataSizing::ZoneSizingData &zsSizing,
+                                   DataSizing::ZoneSizingData &zsCalcSizing,
+                                   Real64 tstatHi,
+                                   Real64 tstatLo,
+                                   Real64 sizTstatHi,
+                                   Real64 sizTstatLo,
+                                   int timeStepInDay,
+                                   Real64 fracTimeStepZone);
+
+    void updateZoneSizingEndDayMovingAvg(DataSizing::ZoneSizingData &zsCalcSizing, int numTimeStepsInAvg);
+
+    void updateZoneSizingEndDay(DataSizing::ZoneSizingData &zsCalcSizing,
+                                DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                int numTimeStepInDay,
+                                DataSizing::DesDayWeathData &desDayWeath,
+                                Real64 stdRhoAir);
+
     void SimZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration, bool &SimAir);
 
     void SetZoneEquipSimOrder(EnergyPlusData &state, int ControlledZoneNum);
