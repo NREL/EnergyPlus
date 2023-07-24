@@ -376,7 +376,7 @@ void TermUnitZoneSizingData::copyFromZoneSizing(ZoneSizingData const &sourceData
     this->MinOA = sourceData.MinOA;
     this->DesCoolMinAirFlow2 = sourceData.DesCoolMinAirFlow2;
     this->DesHeatMaxAirFlow2 = sourceData.DesHeatMaxAirFlow2;
-    for (int t = 1; t <= this->HeatFlowSeq.size(); ++t) {
+    for (size_t t = 1; t <= this->HeatFlowSeq.size(); ++t) {
         this->HeatFlowSeq(t) = sourceData.HeatFlowSeq(t);
         this->HeatFlowSeqNoOA(t) = sourceData.HeatFlowSeqNoOA(t);
         this->CoolFlowSeq(t) = sourceData.CoolFlowSeq(t);
