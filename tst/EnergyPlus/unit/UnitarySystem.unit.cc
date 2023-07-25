@@ -6272,7 +6272,7 @@ Curve:Biquadratic,
     EXPECT_NEAR(DeliveredSensibleCapacity, SaveDeliveredSensibleCapacity, 0.0001);                                 // actual delivered capacity
     EXPECT_NEAR(DeliveredSensibleCapacity, 1010.6, 0.001);                                                         // actual delivered capacity
     EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(thisSys->m_SuppHeatCoilIndex).HeatingCoilRate, 18268.1, 0.1); // actual reheat load to meet SP
-    EXPECT_NEAR(state->dataHeatingCoils->HeatingCoil(thisSys->m_SuppHeatCoilIndex).HeatingCoilRate, 18268.1, 0.1);
+    EXPECT_NEAR(thisSys->m_MoistureLoadPredicted, -1467.1, 0.1); // dehumidification control type = CoolReheat so MoistureLoad < 0
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_VSDXCoilSizing)
