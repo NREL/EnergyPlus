@@ -24,7 +24,6 @@ if(MSVC AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")) # Visual C++ (VS 
   target_compile_options(project_options INTERFACE /EHsc)
   target_compile_options(project_options INTERFACE /MP) # Enables multi-processor compilation of source within a single project
   target_compile_options(project_options INTERFACE /Zc:externConstexpr)  # allows constexpr to be extern'd in headers, which is part of the standard, and supported by default on non-vs compilers
-  target_compile_options(project_options INTERFACE /utf-8)  # Specifies both the source character set and the execution character set as UTF-8
 
   # string(REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}"
   # )# Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
