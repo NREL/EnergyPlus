@@ -45,24 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
-
-#include <CLI/CLI11.hpp>
 
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
 #include <EnergyPlus/fenv_missing.h>
 #endif
 
-int main()
+int main(int argc, const char *argv[])
 {
 #ifdef DEBUG_ARITHM_GCC_OR_CLANG
     feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
 
-    int const argc = CLI::argc();
-    const char *const *argv = CLI::argv(); // This is going to use CommandLineToArgvW on Windows and **narrow** from wchar_t to char
-
-    const std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
-    return EnergyPlusPgm(args);
+    return EnergyPlusPgm(argc, argv);
 }

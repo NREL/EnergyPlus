@@ -72,8 +72,7 @@ int energyplus(EnergyPlusState state, int argc, const char *argv[])
         return 1;
     }
     thisState->ready = false;
-    std::vector<std::string> args(argv, std::next(argv, static_cast<std::ptrdiff_t>(argc)));
-    return runEnergyPlusAsLibrary(*thisState, args);
+    return runEnergyPlusAsLibrary(*thisState, argc, argv);
 }
 
 void stopSimulation(EnergyPlusState state)
