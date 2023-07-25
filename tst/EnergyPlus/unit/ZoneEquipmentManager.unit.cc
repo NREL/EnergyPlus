@@ -4578,10 +4578,6 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(*state);
     UpdateZoneSizing(*state, Constant::CallIndicator::BeginDay);
-    state->dataSize->ZoneSizThermSetPtHi.allocate(state->dataGlobal->NumOfZones);
-    state->dataSize->ZoneSizThermSetPtLo.allocate(state->dataGlobal->NumOfZones);
-    state->dataSize->ZoneSizThermSetPtHi(1) = 24;
-    state->dataSize->ZoneSizThermSetPtLo(1) = 22;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;

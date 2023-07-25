@@ -852,12 +852,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->FinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
     state.dataSize->CalcZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->NumOfZones);
     state.dataSize->CalcFinalZoneSizing.allocate(state.dataGlobal->NumOfZones);
-    if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-        state.dataSize->ZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->numSpaces);
-        state.dataSize->FinalZoneSizing.allocate(state.dataGlobal->numSpaces);
-        state.dataSize->CalcZoneSizing.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays, state.dataGlobal->numSpaces);
-        state.dataSize->CalcFinalZoneSizing.allocate(state.dataGlobal->numSpaces);
-    }
     state.dataSize->TermUnitFinalZoneSizing.allocate(state.dataSize->NumAirTerminalUnits);
     for (auto &tufzs : state.dataSize->TermUnitFinalZoneSizing) {
         tufzs.allocateMemberArrays(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
@@ -865,12 +859,6 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     state.dataSize->DesDayWeath.allocate(state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays);
     int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
     state.dataZoneEquipmentManager->AvgData.allocate(NumOfTimeStepInDay);
-    state.dataSize->ZoneSizThermSetPtHi.allocate(state.dataGlobal->NumOfZones);
-    state.dataSize->ZoneSizThermSetPtLo.allocate(state.dataGlobal->NumOfZones);
-
-    state.dataSize->ZoneSizThermSetPtHi = 0.0;
-    state.dataSize->ZoneSizThermSetPtLo = 1000.0;
-
     for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
         auto &thisDesDayWeather = state.dataSize->DesDayWeath(DesDayNum);
         thisDesDayWeather.Temp.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
@@ -1942,8 +1930,8 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                                       state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum),
                                       state.dataHeatBalFanSys->ZoneThermostatSetPointHi(CtrlZoneNum),
                                       state.dataHeatBalFanSys->ZoneThermostatSetPointLo(CtrlZoneNum),
-                                      state.dataSize->ZoneSizThermSetPtHi(CtrlZoneNum),
-                                      state.dataSize->ZoneSizThermSetPtLo(CtrlZoneNum),
+                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneSizThermSetPtHi,
+                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneSizThermSetPtLo,
                                       timeStepInDay,
                                       fracTimeStepZone);
         }

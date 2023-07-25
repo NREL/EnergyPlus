@@ -404,6 +404,8 @@ void TermUnitZoneSizingData::copyFromZoneSizing(ZoneSizingData const &sourceData
     this->VozClgByZone = sourceData.VozClgByZone;
     this->VozHtgByZone = sourceData.VozHtgByZone;
     this->VpzMinByZoneSPSized = sourceData.VpzMinByZoneSPSized;
+    this->ZoneSizThermSetPtHi = sourceData.ZoneSizThermSetPtHi;
+    this->ZoneSizThermSetPtLo = sourceData.ZoneSizThermSetPtLo;
 }
 
 void resetHVACSizingGlobals(EnergyPlusData &state,

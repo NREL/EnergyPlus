@@ -598,6 +598,8 @@ namespace DataSizing {
         std::string HeatPeakDateHrMin;                     // date:hr:min of heating peak
         std::string LatCoolPeakDateHrMin;                  // date:hr:min of latent cooling peak
         std::string LatHeatPeakDateHrMin;                  // date:hr:min of latent heating peak
+        Real64 ZoneSizThermSetPtHi = 0.0;                  // highest zone thermostat setpoint during zone sizing calcs
+        Real64 ZoneSizThermSetPtLo = 1000.0;               // lowest zone thermostat setpoint during zone sizing calcs
 
         void zeroMemberData();
         void allocateMemberArrays(int numOfTimeStepInDay);
@@ -681,6 +683,8 @@ namespace DataSizing {
         Real64 VozClgByZone = 0.0; // value of required cooling vent to zone, used in 62.1 tabular report, already includes people diversity term
         Real64 VozHtgByZone = 0.0; // value of required heating vent to zone, used in 62.1 tabular report, already includes people diversity term
         bool VpzMinByZoneSPSized = false; // is Vpz_min sized using the 62.1 Standard Simplified Procedure
+        Real64 ZoneSizThermSetPtHi = 0.0;    // highest zone thermostat setpoint during zone sizing calcs
+        Real64 ZoneSizThermSetPtLo = 1000.0; // lowest zone thermostat setpoint during zone sizing calcs
 
         void scaleZoneCooling(Real64 ratio);
         void scaleZoneHeating(Real64 ratio);
@@ -1318,8 +1322,6 @@ struct SizingData : BaseGlobalStruct
     Real64 GlobalCoolSizingFactor = 0.0;             // the global cooling sizing ratio
     Real64 SuppHeatCap = 0.0;                        // the heating capacity of the supplemental heater in a unitary system
     Real64 UnitaryHeatCap = 0.0;                     // the heating capacity of a unitary system
-    Array1D<Real64> ZoneSizThermSetPtHi;             // highest zone thermostat setpoint during zone sizing calcs
-    Array1D<Real64> ZoneSizThermSetPtLo;             // lowest zone thermostat setpoint during zone sizing calcs
     char SizingFileColSep;                           // Character to separate columns in sizing outputs
     int DataDesicDehumNum = 0;                       // index to desiccant dehumidifier
     bool DataDesicRegCoil = false;                   // TRUE if heating coil desiccant regeneration coil
