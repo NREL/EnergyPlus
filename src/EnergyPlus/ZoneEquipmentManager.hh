@@ -92,6 +92,15 @@ namespace ZoneEquipmentManager {
 
     void SetUpZoneSizingArrays(EnergyPlusData &state);
 
+    void fillZoneSizingFromInput(EnergyPlusData &state,
+                                 DataSizing::ZoneSizingInputData const &zoneSizingInput,
+                                 DataZoneEquipment::EquipConfiguration const &zoneEquipConfig,
+                                 Array2D<DataSizing::ZoneSizingData> &zsSizing,
+                                 Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                 DataSizing::ZoneSizingData &zsFinalSizing,
+                                 DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                 int const zoneOrSpaceNum);
+
     void RezeroZoneSizingArrays(EnergyPlusData &state);
 
     void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator CallIndicator);

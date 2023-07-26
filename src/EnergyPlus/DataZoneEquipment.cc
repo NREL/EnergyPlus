@@ -367,9 +367,24 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         // assigned to this node
         if (ControlledZoneNum > 0) {
             Zone(ControlledZoneNum).SystemZoneNodeNumber = thisZoneEquipConfig.ZoneNode;
-            // SpaceHB TODO: For now, assign the same system node to the spaces in the zone
-            for (int spaceNum : Zone(ControlledZoneNum).spaceIndexes) {
-                state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = thisZoneEquipConfig.ZoneNode;
+            if (state.dataHeatBal->doSpaceHeatBalance) {
+
+                // SpaceHB TODO: For now, auto-assign the system node name for spaces
+                int spaceCount = 0;
+                for (int spaceNum : Zone(ControlledZoneNum).spaceIndexes) {
+                    ++spaceCount;
+                    std::string spaceNodeName = format("{}-Space {}", AlphArray(5), spaceCount);
+                    int spaceNodeNum = GetOnlySingleNode(state,
+                                                         spaceNodeName,
+                                                         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                                         DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
+                                                         AlphArray(1),
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::ConnectionType::ZoneNode,
+                                                         NodeInputManager::CompFluidStream::Primary,
+                                                         ObjectIsNotParent);
+                    state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = spaceNodeNum;
+                }
             }
         } // This error already detected and program will be terminated.
 

@@ -11787,7 +11787,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             spaceTableBody(colZoneName, spaceTableRowNum) = curZone.Name;
             spaceTableBody(colSpaceType, spaceTableRowNum) = curSpace.spaceType;
             spaceTableBody(colEnclName, spaceTableRowNum) = state.dataViewFactor->EnclSolInfo(curSpace.solarEnclosureNum).Name;
-            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
             // Conditioned or not
             if (curZone.SystemZoneNodeNumber > 0) {
                 spaceTableBody(colConditioned, spaceTableRowNum) = "Yes";
@@ -11806,23 +11806,23 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             }
             // lighting density
             spaceTableBody(colMultipliers, spaceTableRowNum) = RealToStr(mult, 2);
-            if (curSpace.floorArea > 0) {
+            if (curSpace.FloorArea > 0) {
                 spaceTableBody(colSpaceLighting, spaceTableRowNum) =
-                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.floorArea, 4);
+                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.FloorArea, 4);
             } else {
                 spaceTableBody(colSpaceLighting, spaceTableRowNum) = RealToStr(0.0, 4);
             }
             // people density
             if (spaceTotPeople(spaceNum) > 0) {
                 spaceTableBody(colSpacePeople, spaceTableRowNum) =
-                    RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
+                    RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
             } else {
                 spaceTableBody(colSpacePeople, spaceTableRowNum) = RealToStr(0.0, 2);
             }
             // plug and process density
-            if (curSpace.floorArea > 0) {
+            if (curSpace.FloorArea > 0) {
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) =
-                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.floorArea, 4);
+                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.FloorArea, 4);
             } else {
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
             }
@@ -11831,15 +11831,15 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
 
             // If not part of total, goes directly to this row
             if (!useSpaceFloorArea) {
-                spaceTypeNotTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
-                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.floorArea;
+                spaceTypeNotTotArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.FloorArea;
                 state.dataOutRptTab->zstLight(state.dataOutRptTab->notpartTotal) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(state.dataOutRptTab->notpartTotal) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(state.dataOutRptTab->notpartTotal) += mult * spaceTotPlugProcess(spaceNum);
             } else {
                 // Add it to the 'Total'
-                spaceTypeTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
-                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.floorArea;
+                spaceTypeTotArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.FloorArea;
                 state.dataOutRptTab->zstLight(state.dataOutRptTab->grandTotal) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(state.dataOutRptTab->grandTotal) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(state.dataOutRptTab->grandTotal) += mult * spaceTotPlugProcess(spaceNum);
@@ -11847,14 +11847,14 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
                 // Subtotal between cond/unconditioned
                 int condUncondTotalIndex;
                 if (spaceIsCond) {
-                    spaceTypeCondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    spaceTypeCondArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
                     condUncondTotalIndex = state.dataOutRptTab->condTotal;
 
                 } else {
-                    spaceTypeUncondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    spaceTypeUncondArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
                     condUncondTotalIndex = state.dataOutRptTab->uncondTotal;
                 }
-                state.dataOutRptTab->zstArea(condUncondTotalIndex) += mult * curSpace.floorArea;
+                state.dataOutRptTab->zstArea(condUncondTotalIndex) += mult * curSpace.FloorArea;
                 state.dataOutRptTab->zstLight(condUncondTotalIndex) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(condUncondTotalIndex) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(condUncondTotalIndex) += mult * spaceTotPlugProcess(spaceNum);

@@ -1342,6 +1342,10 @@ struct SizingData : BaseGlobalStruct
     EPVector<DataSizing::ZoneSizingData> FinalZoneSizing;                 // Final data for zone sizing including effects
     Array2D<DataSizing::ZoneSizingData> CalcZoneSizing;                   // Data for zone sizing (all data)
     EPVector<DataSizing::ZoneSizingData> CalcFinalZoneSizing;             // Final data for zone sizing (calculated only)
+    Array2D<DataSizing::ZoneSizingData> SpaceSizing;                      // Data for space sizing (all data, all design)
+    EPVector<DataSizing::ZoneSizingData> FinalSpaceSizing;                // Final data for space sizing including effects
+    Array2D<DataSizing::ZoneSizingData> CalcSpaceSizing;                  // Data for space sizing (all data)
+    EPVector<DataSizing::ZoneSizingData> CalcFinalSpaceSizing;            // Final data for space sizing (calculated only)
     EPVector<DataSizing::TermUnitZoneSizingData> TermUnitFinalZoneSizing; // Final data for sizing terminal units (indexed per terminal unit)
     EPVector<DataSizing::SystemSizingInputData> SysSizInput;              // Input data array for system sizing object
     Array2D<DataSizing::SystemSizingData> SysSizing;                      // Data array for system sizing (all data)

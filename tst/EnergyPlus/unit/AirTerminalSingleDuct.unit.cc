@@ -1012,8 +1012,6 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     // setup variables for VAV Reheat
     int SysNum = 1;
     int ZoneNum = 1;
-    int ZoneNodeNum = 1;
-    int InletNodeNum = 5;
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
@@ -1053,6 +1051,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from VAV reheat AT
 
     // test with heating load and turndown fraction schedule value set 1.0
+    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = UtilityRoutines::FindItemInList("NODE 24", state->dataLoopNodes->NodeID);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 1; //
     state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
@@ -1221,8 +1221,6 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
-    int ZoneNodeNum = 1;
-    int InletNodeNum = 5;
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
@@ -1250,6 +1248,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     // check VAV reheat air terminal inputs
+    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = UtilityRoutines::FindItemInList("SPACE1-1 ATU IN NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", state->dataSingleDuct->sd_airterminal(SysNum).sysType); // VAV Reheat Type
     EXPECT_EQ("VAV REHEAT VS FAN AT", state->dataSingleDuct->sd_airterminal(SysNum).SysName);                               // VAV Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist);                              // turndown schdule exists
@@ -1397,8 +1397,6 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
-    int ZoneNodeNum = 1;
-    int InletNodeNum = 5;
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
@@ -1438,6 +1436,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from VAV coolheat reheat AT
 
     // test with heating load and turndown fraction schedule value set 1.0
+    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = UtilityRoutines::FindItemInList("NODE 7", state->dataLoopNodes->NodeID);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 1; //
     state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
@@ -1584,8 +1584,6 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     // setup variables for VAV Reheat VS Fan
     int SysNum = 1;
     int ZoneNum = 1;
-    int ZoneNodeNum = 1;
-    int InletNodeNum = 5;
     bool ErrorsFound = false;
     bool FirstHVACIteration = true;
 
@@ -1617,6 +1615,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     auto &thisAirTerminalOutlet = state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet;
 
     // check VAV reheat VS Fan air terminal inputs
+    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = UtilityRoutines::FindItemInList("ZONE 1 ATU IN NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", thisAirTerminal.sysType);
     EXPECT_EQ("VAV RHT VS FAN AIRTERM", thisAirTerminal.SysName);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisAirTerminal.ReheatComp);
@@ -1765,7 +1765,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     EXPECT_EQ(thisHeatCoolAT.MaxAirVolFlowRate, 1.0);                                   // input from VAV HeatCool reheat air terminal
     ;
 
-    int ZoneNodeNum = 1;
+    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
     int InletNodeNum = thisHeatCoolAT.InletNodeNum;
     state->dataZoneEquip->ZoneEquipConfig(thisHeatCoolAT.CtrlZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions

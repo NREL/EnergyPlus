@@ -11189,7 +11189,11 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     case SizingMode::PerPerson: {
         // how to get number of people?
 
-        Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+        // MJW TODO: this won't compile now: Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+        Real64 SumPeopleAllZones = 0.0;
+        for (auto &thisZone : state.dataHeatBal->Zone) {
+            SumPeopleAllZones += thisZone.TotOccupants;
+        }
         if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerPerson * SumPeopleAllZones;
 
         if (this->MaxCapacityWasAutoSized) {
@@ -11237,7 +11241,11 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
     }
     case SizingMode::PerFloorArea: {
 
-        Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+        // MJW TODO: this won't compile now: Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+        Real64 SumFloorAreaAllZones = 0.0;
+        for (auto &thisZone : state.dataHeatBal->Zone) {
+            SumFloorAreaAllZones += thisZone.FloorArea;
+        }
         if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
         if (this->MaxCapacityWasAutoSized) {
             Real64 rho;
@@ -11902,7 +11910,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
         case SizingMode::PerPerson: {
             // how to get number of people?
 
-            Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+            // MJW TODO: this won't compile now: Real64 SumPeopleAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::TotOccupants);
+            Real64 SumPeopleAllZones = 0.0;
+            for (auto &thisZone : state.dataHeatBal->Zone) {
+                SumPeopleAllZones += thisZone.TotOccupants;
+            }
             if (this->VolumeWasAutoSized) {
                 tmpTankVolume = this->Sizing.TankCapacityPerPerson * SumPeopleAllZones;
             }
@@ -11926,7 +11938,11 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
         }
         case SizingMode::PerFloorArea: {
 
-            Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+            // MJW TODO: this won't compile now: Real64 SumFloorAreaAllZones = sum(state.dataHeatBal->Zone, &DataHeatBalance::ZoneData::FloorArea);
+            Real64 SumFloorAreaAllZones = 0.0;
+            for (auto &thisZone : state.dataHeatBal->Zone) {
+                SumFloorAreaAllZones += thisZone.FloorArea;
+            }
             if (this->VolumeWasAutoSized) {
                 tmpTankVolume = this->Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
             }

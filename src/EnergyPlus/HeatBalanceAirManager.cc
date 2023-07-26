@@ -298,7 +298,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
     // Following used for reporting
     state.dataHeatBal->ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
     if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-        state.dataHeatBal->spaceAirRpt.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBal->spaceAirRpt.allocate(state.dataGlobal->numSpaces);
     }
 
     for (int Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
@@ -779,9 +779,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpecAlt::FlowPerArea:
                     if (thisInfiltration.ZonePtr != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisInfiltration.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
+                            thisInfiltration.DesignLevel = rNumericArgs(2) * thisSpace.FloorArea;
                             if (thisInfiltration.ZonePtr > 0) {
-                                if (thisSpace.floorArea <= 0.0) {
+                                if (thisSpace.FloorArea <= 0.0) {
                                     ShowWarningError(state,
                                                      format("{}{}=\"{}\", {} specifies {}, but Space Floor Area = 0.  0 Infiltration will result.",
                                                             RoutineName,
@@ -1416,8 +1416,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::FlowPerArea:
                     if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
-                            if (thisSpace.floorArea <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(2) * thisSpace.FloorArea;
+                            if (thisSpace.FloorArea <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Space Floor Area = 0.  0 Ventilation will result.",
                                                         RoutineName,
@@ -1450,8 +1450,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::FlowPerPerson:
                     if (thisVentilation.spaceIndex != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisVentilation.DesignLevel = rNumericArgs(3) * thisSpace.totOccupants;
-                            if (thisSpace.totOccupants <= 0.0) {
+                            thisVentilation.DesignLevel = rNumericArgs(3) * thisSpace.TotOccupants;
+                            if (thisSpace.TotOccupants <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Zone Total Occupants = 0.  0 Ventilation will result.",
                                                         RoutineName,
@@ -2610,7 +2610,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::FlowPerArea:
                     if (thisMixing.spaceIndex != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisMixing.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
+                            thisMixing.DesignLevel = rNumericArgs(2) * thisSpace.FloorArea;
                             if (thisMixing.spaceIndex > 0) {
                                 if (thisZone.FloorArea <= 0.0) {
                                     ShowWarningError(state,
@@ -2646,8 +2646,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::FlowPerPerson:
                     if (thisMixing.spaceIndex != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisMixing.DesignLevel = rNumericArgs(3) * thisSpace.totOccupants;
-                            if (thisSpace.totOccupants <= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(3) * thisSpace.TotOccupants;
+                            if (thisSpace.TotOccupants <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Space Total Occupants = 0.  0 Mixing will result.",
                                                         RoutineName,
@@ -3229,7 +3229,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::FlowPerArea:
                     if (thisMixing.spaceIndex != 0) {
                         if (rNumericArgs(2) >= 0.0) {
-                            thisMixing.DesignLevel = rNumericArgs(2) * thisSpace.floorArea;
+                            thisMixing.DesignLevel = rNumericArgs(2) * thisSpace.FloorArea;
                             if (thisMixing.spaceIndex > 0) {
                                 if (thisZone.FloorArea <= 0.0) {
                                     ShowWarningError(state,
@@ -3265,8 +3265,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                 case AirflowSpec::FlowPerPerson:
                     if (thisMixing.spaceIndex != 0) {
                         if (rNumericArgs(3) >= 0.0) {
-                            thisMixing.DesignLevel = rNumericArgs(3) * thisSpace.totOccupants;
-                            if (thisSpace.totOccupants <= 0.0) {
+                            thisMixing.DesignLevel = rNumericArgs(3) * thisSpace.TotOccupants;
+                            if (thisSpace.TotOccupants <= 0.0) {
                                 ShowWarningError(state,
                                                  format("{}{}=\"{}\", {} specifies {}, but Space Total Occupants = 0.  0 Cross Mixing will result.",
                                                         RoutineName,

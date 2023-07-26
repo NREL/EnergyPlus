@@ -673,7 +673,7 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
             auto const &thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerPerson && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
                 thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
-                Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).floorArea;
+                Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).FloorArea;
                 sumAreaOA += thisDSOA.OAFlowPerArea * spaceArea;
             }
         }
@@ -702,7 +702,7 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
             auto const &thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerArea && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
                 thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
-                Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
+                Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).TotOccupants;
                 sumPeopleOA += thisDSOA.OAFlowPerPerson * spacePeople;
             }
         }
@@ -763,14 +763,14 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     Real64 curNumOccupants = 0.0;
     Real64 maxOccupants = 0.0;
     if (spaceNum > 0) {
-        floorArea = state.dataHeatBal->space(spaceNum).floorArea;
+        floorArea = state.dataHeatBal->space(spaceNum).FloorArea;
         // TODO MJW: For now just proportion space volume by floor area
         if (thisZone.FloorArea > 0.0) {
-            volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+            volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).FloorArea / thisZone.FloorArea;
         } else {
             volume = 0.0;
         }
-        nomTotOccupants = state.dataHeatBal->space(spaceNum).totOccupants;
+        nomTotOccupants = state.dataHeatBal->space(spaceNum).TotOccupants;
         curNumOccupants = state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
         maxOccupants = state.dataHeatBal->space(spaceNum).maxOccupants;
     } else {
