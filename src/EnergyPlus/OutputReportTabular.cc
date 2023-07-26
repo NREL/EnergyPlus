@@ -613,7 +613,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // #ifdef ITM_KEYCACHE
             //  Noel comment:  First time in this TabNum/ColNum loop, let's save the results
             //   of GetVariableKeyCountandType & GetVariableKeys.
-            std::string const &curVariMeter = UtilityRoutines::MakeUPPERCase(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
+            std::string const &curVariMeter = UtilityRoutines::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
@@ -650,7 +650,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             //      MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) = IndexesForKeyVar(iKey)  !noel
             //    ENDDO
             // #else
-            //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+            //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
             //    ! call the key count function but only need count during this pass
             //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
             //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -743,7 +743,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
             //    ENDDO
             // #else
-            //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+            //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
             //    ! call the key count function but only need count during this pass
             //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
             //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -839,7 +839,7 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                 //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
                 //    ENDDO
                 // #else
-                //    curVariMeter = UtilityRoutines::MakeUPPERCase(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
+                //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
                 //    ! call the key count function but only need count during this pass
                 //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
                 //    ALLOCATE(NamesOfKeys(KeyCount))
@@ -2872,7 +2872,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     //                  + gatherTotalsBEPS(5)*sourceFactorSteam  & !steam
     //                                          ) / largeConversionFactor
 
-    GetFuelFactorInfo(state, "NaturalGas", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::NaturalGas, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorNaturalGas = curSourceFactor;
         ort->fuelfactorsused(2) = true;
@@ -2885,7 +2885,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(2) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "FuelOilNo2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::FuelOilNo2, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorFuelOil2 = curSourceFactor;
         ort->fuelfactorsused(7) = true;
@@ -2898,7 +2898,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(11) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "FuelOilNo1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::FuelOilNo1, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorFuelOil1 = curSourceFactor;
         ort->fuelfactorsused(6) = true;
@@ -2911,7 +2911,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(10) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Coal", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Coal, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorCoal = curSourceFactor;
         ort->fuelfactorsused(5) = true;
@@ -2924,7 +2924,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(9) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Electricity", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Electricity, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorElectric = curSourceFactor;
         ort->fuelfactorsused(1) = true;
@@ -2937,7 +2937,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(1) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Gasoline", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Gasoline, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorGasoline = curSourceFactor;
         ort->fuelfactorsused(3) = true;
@@ -2950,7 +2950,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(6) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Propane", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Propane, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorPropane = curSourceFactor;
         ort->fuelfactorsused(8) = true;
@@ -2963,7 +2963,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(12) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Diesel", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Diesel, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorDiesel = curSourceFactor;
         ort->fuelfactorsused(4) = true;
@@ -2976,7 +2976,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(8) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "DistrictCooling", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::DistrictCooling, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->ffUsed(3) = true;
     }
@@ -2986,7 +2986,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(3) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "DistrictHeating", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::DistrictHeating, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->ffUsed(4) = true;
     }
@@ -2996,7 +2996,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(4) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Steam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->ffUsed(5) = true;
     }
@@ -3006,7 +3006,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(5) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "OtherFuel1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::OtherFuel1, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorOtherFuel1 = curSourceFactor;
         ort->fuelfactorsused(11) = true; // should be source number
@@ -3019,7 +3019,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(13) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "OtherFuel2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::OtherFuel2, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorOtherFuel2 = curSourceFactor;
         ort->fuelfactorsused(12) = true; // should be source number
@@ -4385,7 +4385,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.EvapCondPumpElecConsumption + thisDXCoil.BasinHeaterConsumption +
                                                                  thisDXCoil.EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
             }
-            if (thisDXCoil.FuelType != Constant::eResource::Electricity) {
+            if (thisDXCoil.FuelType != Constant::eFuel::Electricity) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.MSFuelWasteHeat * TimeStepSysSec;
             }
         } else if (thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
@@ -15595,9 +15595,12 @@ void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
         resCellsUsd(LoadCompCol::SensDelay, LoadCompRow::PowerGen) = true;
 
         // DOAS
-        resultCells(LoadCompCol::SensInst, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
+        Real64 const mult = state.dataHeatBal->Zone(zoneIndex).Multiplier * state.dataHeatBal->Zone(zoneIndex).ListMultiplier;
+        resultCells(LoadCompCol::SensInst, LoadCompRow::DOAS) =
+            state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax) / mult;
         resCellsUsd(LoadCompCol::SensInst, LoadCompRow::DOAS) = true;
-        resultCells(LoadCompCol::Latent, LoadCompRow::DOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
+        resultCells(LoadCompCol::Latent, LoadCompRow::DOAS) =
+            state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax) / mult;
         resCellsUsd(LoadCompCol::Latent, LoadCompRow::DOAS) = true;
 
         // INFILTRATION
@@ -17328,6 +17331,12 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
             s += "&gt;";
         } else if (c == char(176)) {
             s += "&deg;";
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(164)) { // ≤
+            s += "&le;";
+            index += 2;
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(165)) { // ≥
+            s += "&ge;";
+            index += 2;
         } else if (c == '\xC2') {
             if (index == inputSize) {
                 s += '\xC2';
@@ -18566,7 +18575,7 @@ void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int 
     int constexpr misParen(2);
     int constexpr misBrce(3);
     int constexpr misNoHint(4);
-    std::string const stringInUpper(UtilityRoutines::MakeUPPERCase(stringInWithSI));
+    std::string const stringInUpper(UtilityRoutines::makeUPPER(stringInWithSI));
     auto &ort = state.dataOutRptTab;
 
     stringOutWithIP = "";
