@@ -532,20 +532,21 @@ namespace DataSurfaces {
     {
         // Values that must be the same in order for surfaces to use a representative calculation
 
-        int Construction;        // Pointer to the construction in the Construct derived type
-        Real64 Azimuth;          // Direction the surface outward normal faces (degrees) or FACING
-        Real64 Tilt;             // Angle (deg) between the ground outward normal and the surface outward normal
-        Real64 Height;           // Height of the surface (m)
-        int Zone;                // Interior environment or zone the surface is a part of
-        int EnclIndex;           // Pointer to enclosure this surface belongs to
-        int TAirRef;             // Flag for reference air temperature
-        int ExtZone;             // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
-        int ExtCond;             // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
-        int ExtEnclIndex;        // For an "interzone" surface, this is the adjacent ENCLOSURE number
-        bool ExtSolar;           // True if the "outside" of the surface is exposed to solar
-        bool ExtWind;            // True if the "outside" of the surface is exposed to wind
-        Real64 ViewFactorGround; // View factor to the ground from the exterior of the surface for diffuse solar radiation
-        Real64 ViewFactorSky;    // View factor to the sky from the exterior of the surface for diffuse solar radiation
+        int Construction;          // Pointer to the construction in the Construct derived type
+        Real64 Azimuth;            // Direction the surface outward normal faces (degrees) or FACING
+        Real64 Tilt;               // Angle (deg) between the ground outward normal and the surface outward normal
+        Real64 Height;             // Height of the surface (m)
+        int Zone;                  // Interior environment or zone the surface is a part of
+        int EnclIndex;             // Pointer to enclosure this surface belongs to
+        int TAirRef;               // Flag for reference air temperature
+        int ExtZone;               // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+        int ExtCond;               // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
+        int ExtEnclIndex;          // For an "interzone" surface, this is the adjacent ENCLOSURE number
+        bool ExtSolar;             // True if the "outside" of the surface is exposed to solar
+        bool ExtWind;              // True if the "outside" of the surface is exposed to wind
+        Real64 ViewFactorGround;   // View factor to the ground from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSky;      // View factor to the sky from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSrdSurfs; // View factor to the surrounding surfaces seen from the exterior of the surface
 
         // Special Properties
         HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
@@ -800,6 +801,8 @@ namespace DataSurfaces {
         int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node, zero if none
         Real64 AE = 0.0;                       // Product of area and emissivity for each surface
         Real64 enclAESum = 0.0;                // Sum of area times emissivity for all other surfaces in enclosure
+        Real64 SrdSurfTemp;                    // surrounding surfaces average temperature seen by an exterior surface (C)
+        Real64 ViewFactorSrdSurfs;             // surrounding surfaces view factor sum seen by an exterior surface(-)
 
         // Default Constructor
         SurfaceData()
@@ -817,7 +820,7 @@ namespace DataSurfaces {
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), IsSurfPropertyGndSurfacesDefined(false),
               SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
               SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false), SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0),
-              SurfLinkedOutAirNode(0)
+              SurfLinkedOutAirNode(0), SrdSurfTemp(0.0), ViewFactorSrdSurfs(0.0)
         {
         }
 
@@ -1284,6 +1287,7 @@ namespace DataSurfaces {
         std::string Name;
         Real64 SkyViewFactor = 0.0;         // sky view factor
         Real64 GroundViewFactor = 0.0;      // ground view factor
+        Real64 SurfsViewFactorSum = 0.0;    // surrounding surfaces view factor sum
         int SkyTempSchNum = 0;              // schedule pointer
         int GroundTempSchNum = 0;           // schedule pointer
         int TotSurroundingSurface = 0;      // Total number of surrounding surfaces defined for an exterior surface
