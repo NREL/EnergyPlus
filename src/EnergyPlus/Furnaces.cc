@@ -8217,6 +8217,7 @@ namespace Furnaces {
             } else if (ZoneSensLoadMetFanONCompOFF < TotalZoneSensLoad) {
                 CoolPartLoadRatio = 0.0;
                 thisFurnace.CompPartLoadRatio = 0.0; // compressor OFF
+                thisFurnace.CoolingCoilSensDemand = 0.0;
                 CalcFurnaceOutput(state,
                                   FurnaceNum,
                                   FirstHVACIteration,
