@@ -468,6 +468,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(125:134)=InArgs(106:115)
                 OutArgs(135)='' ! new speed 10 2017 rated field
                 OutArgs(136)='' ! new speed 10 2023 rated field
+                CurArgs = CurArgs + 1
                 OutArgs(137:CurArgs+21)=InArgs(116:CurArgs)
                 ! But then only modify CurArgs based on the number of fields
                 IF (CurArgs .GE. 26) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
@@ -541,6 +542,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(97:103)=InArgs(78:84)
                 OutArgs(104)='' ! new speed 10 2017 rated field
                 OutArgs(105)='' ! new speed 10 2023 rated field
+                CurArgs = CurArgs + 1
                 OutArgs(106:CurArgs+21)=InArgs(85:CurArgs)
                 ! But then only modify CurArgs based on the number of fields
                 IF (CurArgs .GE. 22) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
