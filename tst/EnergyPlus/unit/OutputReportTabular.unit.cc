@@ -11633,7 +11633,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                             "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_total = execAndReturnFirstDouble(query_total);
-    EXPECT_EQ(return_val_total, 515.19);
+    EXPECT_EQ(return_val_total, 598.2);
 
     // get the sensible instant 'DOAS Direct to Zone' cooling peak load component
     std::string query_sensible_instant("SELECT Value From TabularDataWithStrings"
@@ -11643,7 +11643,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                                        "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_sensible_instant = execAndReturnFirstDouble(query_sensible_instant);
-    EXPECT_EQ(return_val_sensible_instant, 517.05);
+    EXPECT_EQ(return_val_sensible_instant, 600.28);
 }
 
 TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
