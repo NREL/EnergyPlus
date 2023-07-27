@@ -5489,8 +5489,7 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchAirTermHeatReheatCoilObjType, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
         OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermZoneName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // convert to zone name
-
+            state, state.dataOutRptPredefined->pdchAirTermZoneName, thisTUFZSizing.ADUName, state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name);
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchAirTermHWPlantloopName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
         OutputReportPredefined::PreDefTableEntry(
