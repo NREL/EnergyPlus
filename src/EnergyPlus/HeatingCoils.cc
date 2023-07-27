@@ -1911,6 +1911,19 @@ namespace HeatingCoils {
                                              1]); // if cannot do this way, then need to add this line to the case branches above
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLoc_CCs, heatingCoil.Name,
                                                  heatingCoil.Name); // PH
+
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchCoilAirloopName_CCs,
+                                                 heatingCoil.Name,
+                                                 state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchCoilAirloopBranchName_CCs,
+                                                 heatingCoil.Name,
+                                                 heatingCoil.AirLoopNum); // PH
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchCoilLocCountOnAirloopBranch_CCs,
+                                                 heatingCoil.Name,
+                                                 heatingCoil.AirLoopNum); // PH
     }
 
     void CalcElectricHeatingCoil(EnergyPlusData &state,
