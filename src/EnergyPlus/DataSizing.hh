@@ -682,7 +682,7 @@ namespace DataSizing {
         Real64 ZpzHtgByZone = 0.0;               // OA Std 62.1 required fraction in heating mode ? should this be ZdzHtgByZone
         Real64 VozClgByZone = 0.0; // value of required cooling vent to zone, used in 62.1 tabular report, already includes people diversity term
         Real64 VozHtgByZone = 0.0; // value of required heating vent to zone, used in 62.1 tabular report, already includes people diversity term
-        bool VpzMinByZoneSPSized = false; // is Vpz_min sized using the 62.1 Standard Simplified Procedure
+        bool VpzMinByZoneSPSized = false;    // is Vpz_min sized using the 62.1 Standard Simplified Procedure
         Real64 ZoneSizThermSetPtHi = 0.0;    // highest zone thermostat setpoint during zone sizing calcs
         Real64 ZoneSizThermSetPtLo = 1000.0; // lowest zone thermostat setpoint during zone sizing calcs
 

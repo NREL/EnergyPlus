@@ -157,21 +157,12 @@ void ManageSizing(EnergyPlusData &state)
     int TimeStepInDay(0); // time step number
     int LastMonth(0);
     int LastDayOfMonth(0);
-    Real64 TempAtPeak(0.0);   // Outside temperature at peak cooling/heating for reporting
-    Real64 HumRatAtPeak(0.0); // Outside humidity ratio at peak cooling/heating for reporting
-    int TimeStepAtPeak(0);    // time step number at heat or cool peak
-    int DDNum(0);             // Design Day index
-    int AirLoopNum(0);        // air loop index
-    //  EXTERNAL            ReportZoneSizing
-    //  EXTERNAL            ReportSysSizing
+    int AirLoopNum(0); // air loop index
     std::string curName;
     int NumSizingPeriodsPerformed;
     int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
     int iZoneCalcIter;   // index for repeating the zone sizing calcs
     bool isUserReqCompLoadReport;
-    Real64 DOASHeatGainRateAtHtPk(0.0); // zone heat gain rate from the DOAS at the heating peak [W]
-    Real64 DOASHeatGainRateAtClPk(0.0); // zone heat gain rate from the DOAS at the cooling peak [W]
-    Real64 TStatSetPtAtPk(0.0);         // thermostat set point at peak
 
     auto &FinalSysSizing = state.dataSize->FinalSysSizing;
 
