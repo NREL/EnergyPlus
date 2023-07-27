@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -87,6 +88,15 @@ namespace ZoneEquipmentManager {
     void GetZoneEquipment(EnergyPlusData &state);
 
     void InitZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration); // unused 1208
+
+    void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
+                                     DataZoneEquipment::EquipConfiguration &ZoneEquipConfig,
+                                     DataSizing::ZoneSizingData &zsCalcSizing,
+                                     DataZoneEnergyDemands::ZoneSystemSensibleDemand &zsEnergyDemand,
+                                     DataZoneEnergyDemands::ZoneSystemMoistureDemand &zsMoistureDemand,
+                                     DataHeatBalance::ZoneData &zoneOrSpace,
+                                     int zoneNum,
+                                     int spaceNum = 0);
 
     void SizeZoneEquipment(EnergyPlusData &state);
 

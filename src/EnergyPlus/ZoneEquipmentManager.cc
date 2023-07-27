@@ -380,6 +380,276 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
         airLoopFlow.ExcessZoneExhFlow = 0.0;
     }
 }
+void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
+                                 DataZoneEquipment::EquipConfiguration &zoneEquipConfig,
+                                 DataSizing::ZoneSizingData &zsCalcSizing,
+                                 DataZoneEnergyDemands::ZoneSystemSensibleDemand &zsEnergyDemand,
+                                 DataZoneEnergyDemands::ZoneSystemMoistureDemand &zsMoistureDemand,
+                                 DataHeatBalance::ZoneData &zoneOrSpace,
+                                 int zoneNum,
+                                 int spaceNum)
+{
+    static constexpr std::string_view RoutineName("sizeZoneSpaceEquipmentPart1");
+    // set up references for space vs zoneHeatBalance
+    auto &nonAirSystemResponse = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse
+                                                : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).NonAirSystemResponse;
+    auto &sysDepZoneLoads = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoads
+                                           : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).SysDepZoneLoads;
+    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGain
+                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneLatentGain;
+    nonAirSystemResponse = 0.0;
+    sysDepZoneLoads = 0.0;
+    // InitSystemOutputRequired(state, zoneNum, true);
+    initOutputRequired(state, zoneNum, zsEnergyDemand, zsMoistureDemand, true, false, spaceNum);
+
+    auto &zoneNode = state.dataLoopNodes->Node(zoneEquipConfig.ZoneNode);
+    // save raw zone loads without impact of outdoor air
+    Real64 LatOutputProvidedNoDOAS = zsMoistureDemand.RemainingOutputRequired;
+    Real64 SysOutputProvidedNoDOAS = zsEnergyDemand.RemainingOutputRequired;
+    // if Tstat deadband is true then load will be reported as 0
+    if (state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum)) SysOutputProvidedNoDOAS = 0.0;
+    // replicate deadband flag - zone condition is either below the humidistat or above the dehumidistat set point
+    // using logic: NOT (!) (there is a load)
+    // Pretty sure this could just be if (OutputRequiredToHumidifyingSP < 0 && OutputRequiredToDehumidifyingSP > 0)
+    if (!((zsMoistureDemand.OutputRequiredToHumidifyingSP > 0.0 && zsMoistureDemand.OutputRequiredToDehumidifyingSP > 0.0) ||
+          (zsMoistureDemand.OutputRequiredToHumidifyingSP < 0.0 && zsMoistureDemand.OutputRequiredToDehumidifyingSP < 0.0))) {
+        LatOutputProvidedNoDOAS = 0.0;
+    }
+
+    // calculate DOAS heating/cooling effect
+    int supplyAirNodeNum = 0;
+    if (zsCalcSizing.AccountForDOAS) {
+        Real64 DOASMassFlowRate = 0.0;         // DOAS air mass flow rate for sizing [kg/s]
+        Real64 DOASSupplyTemp = 0.0;           // DOAS supply air temperature [C]
+        Real64 DOASSupplyHumRat = 0.0;         // DOAS supply air humidity ratio [kgWater/kgDryAir]
+        Real64 DOASCpAir = 0.0;                // heat capacity of DOAS air [J/kg-C]
+        Real64 DOASSysOutputProvided = 0.0;    // heating / cooling provided by DOAS system [W]
+        Real64 DOASLatOutputProvided = 0.0;    // DOAS system latent output [kg/s]
+        Real64 TotDOASSysOutputProvided = 0.0; // total DOAS load on the zone [W]
+        Real64 HR90H = 0.0;                    // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+        Real64 HR90L = 0.0;                    // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+        // check for adequate number of supply nodes
+        int supplyAirNodeNum1 = 0;
+        int supplyAirNodeNum2 = 0;
+        if (zoneEquipConfig.NumInletNodes >= 2) {
+            supplyAirNodeNum1 = zoneEquipConfig.InletNode(1);
+            supplyAirNodeNum2 = zoneEquipConfig.InletNode(2);
+        } else if (zoneEquipConfig.NumInletNodes >= 1) {
+            supplyAirNodeNum1 = zoneEquipConfig.InletNode(1);
+            supplyAirNodeNum2 = 0;
+        } else {
+            ShowSevereError(state, format("{}: to account for the effect a Dedicated Outside Air System on zone equipment sizing", RoutineName));
+            ShowContinueError(state, "there must be at least one zone air inlet node");
+            ShowFatalError(state, "Previous severe error causes abort ");
+        }
+        // set the DOAS mass flow rate and supply temperature and humidity ratio
+        HR90H = PsyWFnTdbRhPb(state, zsCalcSizing.DOASHighSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
+        HR90L = PsyWFnTdbRhPb(state, zsCalcSizing.DOASLowSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
+        DOASMassFlowRate = state.dataSize->CalcFinalZoneSizing(zoneNum).MinOA * state.dataEnvrn->StdRhoAir;
+        CalcDOASSupCondsForSizing(state,
+                                  state.dataEnvrn->OutDryBulbTemp,
+                                  state.dataEnvrn->OutHumRat,
+                                  zsCalcSizing.DOASControlStrategy,
+                                  zsCalcSizing.DOASLowSetpoint,
+                                  zsCalcSizing.DOASHighSetpoint,
+                                  HR90H,
+                                  HR90L,
+                                  DOASSupplyTemp,
+                                  DOASSupplyHumRat);
+        DOASCpAir = PsyCpAirFnW(DOASSupplyHumRat);
+        DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * (DOASSupplyTemp - zoneNode.Temp);
+        TotDOASSysOutputProvided = DOASMassFlowRate * (PsyHFnTdbW(DOASSupplyTemp, DOASSupplyHumRat) - PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat));
+        if (zsCalcSizing.zoneLatentSizing) {
+            DOASLatOutputProvided = DOASMassFlowRate * (DOASSupplyHumRat - zoneNode.HumRat); // kgw/s
+        }
+
+        UpdateSystemOutputRequired(state, zoneNum, DOASSysOutputProvided, DOASLatOutputProvided);
+        auto &supplyAirNode1 = state.dataLoopNodes->Node(supplyAirNodeNum1);
+        supplyAirNode1.Temp = DOASSupplyTemp;
+        supplyAirNode1.HumRat = DOASSupplyHumRat;
+        supplyAirNode1.MassFlowRate = DOASMassFlowRate;
+        supplyAirNode1.Enthalpy = PsyHFnTdbW(DOASSupplyTemp, DOASSupplyHumRat);
+        zsCalcSizing.DOASHeatAdd = DOASSysOutputProvided;
+        zsCalcSizing.DOASLatAdd = TotDOASSysOutputProvided - DOASSysOutputProvided;
+        supplyAirNodeNum = supplyAirNodeNum2;
+        zsCalcSizing.DOASSupMassFlow = DOASMassFlowRate;
+        zsCalcSizing.DOASSupTemp = DOASSupplyTemp;
+        zsCalcSizing.DOASSupHumRat = DOASSupplyHumRat;
+        if (DOASSysOutputProvided > 0.0) {
+            zsCalcSizing.DOASHeatLoad = DOASSysOutputProvided;
+            zsCalcSizing.DOASCoolLoad = 0.0;
+            zsCalcSizing.DOASTotCoolLoad = 0.0;
+        } else {
+            zsCalcSizing.DOASCoolLoad = DOASSysOutputProvided;
+            zsCalcSizing.DOASTotCoolLoad = TotDOASSysOutputProvided;
+            zsCalcSizing.DOASHeatLoad = 0.0;
+        }
+
+    } else {
+        if (zoneEquipConfig.NumInletNodes > 0) {
+            supplyAirNodeNum = zoneEquipConfig.InletNode(1);
+        } else {
+            supplyAirNodeNum = 0;
+        }
+    }
+
+    Real64 DeltaTemp = 0.0;         // difference between supply air temp and zone temp [C]
+    Real64 CpAir = 0.0;             // heat capacity of air [J/kg-C]
+    Real64 SysOutputProvided = 0.0; // system sensible output [W]
+    Real64 LatOutputProvided = 0.0; // system latent output [kg/s]
+    Real64 Temp = 0.0;              // inlet temperature [C]
+    Real64 HumRat = 0.0;            // inlet humidity ratio [kg water/kg dry air]
+    Real64 Enthalpy = 0.0;          // inlet specific enthalpy [J/kg]
+    Real64 MassFlowRate = 0.0;      // inlet mass flow rate [kg/s]
+    Real64 RetTemp = 0.0;           // zone return temperature [C]
+    // Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
+    //                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
+    if (!state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum) && std::abs(zsEnergyDemand.RemainingOutputRequired) > DataHVACGlobals::SmallLoad) {
+        // Determine design supply air temperture and design supply air temperature difference
+        if (zsEnergyDemand.RemainingOutputRequired < 0.0) { // Cooling case
+            // If the user specify the design cooling supply air temperature, then
+            if (zsCalcSizing.ZnCoolDgnSAMethod == SupplyAirTemperature) {
+                Temp = zsCalcSizing.CoolDesTemp;
+                HumRat = zsCalcSizing.CoolDesHumRat;
+                DeltaTemp = Temp - zoneNode.Temp;
+                if (zoneOrSpace.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
+                    DeltaTemp = Temp - zoneOrSpace.AdjustedReturnTempByITE;
+                }
+                // If the user specify the design cooling supply air temperature difference, then
+            } else {
+                DeltaTemp = -std::abs(zsCalcSizing.CoolDesTempDiff);
+                Temp = DeltaTemp + zoneNode.Temp;
+                if (zoneOrSpace.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
+                    Temp = DeltaTemp + zoneOrSpace.AdjustedReturnTempByITE;
+                }
+                HumRat = zsCalcSizing.CoolDesHumRat;
+            }
+        } else { // Heating Case
+            // If the user specify the design heating supply air temperature, then
+            if (zsCalcSizing.ZnHeatDgnSAMethod == SupplyAirTemperature) {
+                Temp = zsCalcSizing.HeatDesTemp;
+                HumRat = zsCalcSizing.HeatDesHumRat;
+                DeltaTemp = Temp - zoneNode.Temp;
+                // If the user specify the design heating supply air temperature difference, then
+            } else {
+                DeltaTemp = std::abs(zsCalcSizing.HeatDesTempDiff);
+                Temp = DeltaTemp + zoneNode.Temp;
+                HumRat = zsCalcSizing.HeatDesHumRat;
+            }
+        }
+
+        Enthalpy = PsyHFnTdbW(Temp, HumRat);
+        SysOutputProvided = zsEnergyDemand.RemainingOutputRequired;
+        CpAir = PsyCpAirFnW(HumRat);
+        if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) {
+            //!!PH/WFB/LKL (UCDV model)        MassFlowRate = SysOutputProvided / (CpAir*DeltaTemp)
+            MassFlowRate = max(SysOutputProvided / (CpAir * DeltaTemp), 0.0);
+        } else {
+            MassFlowRate = 0.0;
+        }
+
+        if (zsCalcSizing.SupplyAirAdjustFactor > 1.0) {
+            MassFlowRate *= zsCalcSizing.SupplyAirAdjustFactor;
+        }
+    } else {
+
+        Temp = zoneNode.Temp;
+        HumRat = zoneNode.HumRat;
+        Enthalpy = zoneNode.Enthalpy;
+        MassFlowRate = 0.0;
+    }
+
+    if (SysOutputProvided > 0.0) {
+        zsCalcSizing.HeatLoad = SysOutputProvided;
+        zsCalcSizing.HeatMassFlow = MassFlowRate;
+        zsCalcSizing.CoolLoad = 0.0;
+        zsCalcSizing.CoolMassFlow = 0.0;
+    } else if (SysOutputProvided < 0.0) {
+        zsCalcSizing.CoolLoad = -SysOutputProvided;
+        zsCalcSizing.CoolMassFlow = MassFlowRate;
+        zsCalcSizing.HeatLoad = 0.0;
+        zsCalcSizing.HeatMassFlow = 0.0;
+    } else {
+        zsCalcSizing.CoolLoad = 0.0;
+        zsCalcSizing.CoolMassFlow = 0.0;
+        zsCalcSizing.HeatLoad = 0.0;
+        zsCalcSizing.HeatMassFlow = 0.0;
+    }
+    zsCalcSizing.HeatZoneTemp = zoneNode.Temp;
+    zsCalcSizing.HeatZoneHumRat = zoneNode.HumRat;
+    zsCalcSizing.CoolZoneTemp = zoneNode.Temp;
+    zsCalcSizing.CoolZoneHumRat = zoneNode.HumRat;
+    zsCalcSizing.HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
+    zsCalcSizing.HeatOutHumRat = state.dataEnvrn->OutHumRat;
+    zsCalcSizing.CoolOutTemp = state.dataEnvrn->OutDryBulbTemp;
+    zsCalcSizing.CoolOutHumRat = state.dataEnvrn->OutHumRat;
+
+    Real64 LatentAirMassFlow = 0.0;
+    Real64 MoistureLoad = 0.0;
+    Real64 HgAir = PsyHgAirFnWTdb(zoneNode.HumRat, zoneNode.Temp);
+    if (zsCalcSizing.zoneLatentSizing) {
+        // replicate deadband flag - zone condition is either below the humidistat or above the dehumidistat set point
+        if ((zsMoistureDemand.OutputRequiredToHumidifyingSP > 0.0 && zsMoistureDemand.OutputRequiredToDehumidifyingSP > 0.0) ||
+            (zsMoistureDemand.OutputRequiredToHumidifyingSP < 0.0 && zsMoistureDemand.OutputRequiredToDehumidifyingSP < 0.0)) {
+            LatOutputProvided = zsMoistureDemand.RemainingOutputRequired;
+        }
+        Real64 DeltaHumRat = 0.0;      // positive LatOutputProvided means humidification load
+        if (LatOutputProvided < 0.0) { // use SA humrat - zone humrat, or delta humrat based on user choice
+            DeltaHumRat = (zsCalcSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio) ? (zsCalcSizing.LatentCoolDesHumRat - zoneNode.HumRat)
+                                                                                        : -zsCalcSizing.CoolDesHumRatDiff;
+        } else if (LatOutputProvided > 0.0) {
+            DeltaHumRat = (zsCalcSizing.ZnLatHeatDgnSAMethod == SupplyAirHumidityRatio) ? (zsCalcSizing.LatentHeatDesHumRat - zoneNode.HumRat)
+                                                                                        : zsCalcSizing.HeatDesHumRatDiff;
+        }
+        if (std::abs(DeltaHumRat) > DataHVACGlobals::VerySmallMassFlow) LatentAirMassFlow = std::max(0.0, LatOutputProvided / DeltaHumRat);
+        MoistureLoad = LatOutputProvided * HgAir;
+
+        if (MassFlowRate > 0.0) {
+            HumRat = zoneNode.HumRat + LatOutputProvided / MassFlowRate;
+            CpAir = PsyCpAirFnW(HumRat);
+            Temp = (SysOutputProvided / (MassFlowRate * CpAir)) + zoneNode.Temp;
+            Enthalpy = PsyHFnTdbW(Temp, HumRat);
+        } else if (LatentAirMassFlow > 0.0) {
+            // if there is no sensible load then still need to hold zone RH at set point
+            // no need to recalculate T, Sensible load = 0 so T = T,zone
+            HumRat = zoneNode.HumRat + LatOutputProvided / LatentAirMassFlow;
+            Enthalpy = PsyHFnTdbW(Temp, HumRat);
+            MassFlowRate = (LatentAirMassFlow > DataHVACGlobals::VerySmallMassFlow) ? LatentAirMassFlow : 0.0;
+        }
+
+        zsCalcSizing.HeatLatentLoad = (LatOutputProvided > 0.0) ? MoistureLoad : 0.0;
+        zsCalcSizing.ZoneHeatLatentMassFlow = (LatOutputProvided > 0.0) ? LatentAirMassFlow : 0.0;
+        zsCalcSizing.CoolLatentLoad = (LatOutputProvided < 0.0) ? -MoistureLoad : 0.0;
+        zsCalcSizing.ZoneCoolLatentMassFlow = (LatOutputProvided < 0.0) ? LatentAirMassFlow : 0.0;
+        zsCalcSizing.HeatLoadNoDOAS = (SysOutputProvidedNoDOAS > 0.0) ? SysOutputProvidedNoDOAS : 0.0;
+        zsCalcSizing.CoolLoadNoDOAS = (SysOutputProvidedNoDOAS < 0.0) ? -SysOutputProvidedNoDOAS : 0.0;
+        zsCalcSizing.HeatLatentLoadNoDOAS = (LatOutputProvidedNoDOAS > 0.0) ? LatOutputProvidedNoDOAS * HgAir : 0.0;
+        zsCalcSizing.CoolLatentLoadNoDOAS = (LatOutputProvidedNoDOAS < 0.0) ? -LatOutputProvidedNoDOAS * HgAir : 0.0;
+    }
+
+    if (supplyAirNodeNum > 0) {
+        auto &supplyAirNode = state.dataLoopNodes->Node(supplyAirNodeNum);
+        supplyAirNode.Temp = Temp;
+        supplyAirNode.HumRat = HumRat;
+        supplyAirNode.Enthalpy = Enthalpy;
+        supplyAirNode.MassFlowRate = MassFlowRate;
+    } else {
+        nonAirSystemResponse = SysOutputProvided;
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                // SpaceHB ToDo: For now allocate by space volume frac
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse =
+                    nonAirSystemResponse * state.dataHeatBal->space(spaceNum).fracZoneVolume;
+            }
+        }
+        if (zsCalcSizing.zoneLatentSizing) {
+            int ZoneMult = zoneOrSpace.Multiplier * zoneOrSpace.ListMultiplier;
+            zoneLatentGain += (LatOutputProvided * HgAir) / ZoneMult;
+        }
+    }
+
+    UpdateSystemOutputRequired(state, zoneNum, SysOutputProvided, LatOutputProvided);
+}
 
 void SizeZoneEquipment(EnergyPlusData &state)
 {
@@ -399,26 +669,9 @@ void SizeZoneEquipment(EnergyPlusData &state)
 
     static constexpr std::string_view RoutineName("SizeZoneEquipment");
 
-    int SupplyAirNode1;                   // node number of 1st zone supply air node
-    int SupplyAirNode2;                   // node number of 2nd zone supply air node
-    int SupplyAirNode;                    // node number of supply air node for ideal air system
-    Real64 DeltaTemp;                     // difference between supply air temp and zone temp [C]
-    Real64 CpAir;                         // heat capacity of air [J/kg-C]
-    Real64 SysOutputProvided;             // system sensible output [W]
-    Real64 LatOutputProvided;             // system latent output [kg/s]
-    Real64 Temp;                          // inlet temperature [C]
-    Real64 HumRat;                        // inlet humidity ratio [kg water/kg dry air]
-    Real64 Enthalpy;                      // inlet specific enthalpy [J/kg]
-    Real64 MassFlowRate;                  // inlet mass flow rate [kg/s]
-    Real64 RetTemp;                       // zone return temperature [C]
-    Real64 DOASMassFlowRate(0.0);         // DOAS air mass flow rate for sizing [kg/s]
-    Real64 DOASSupplyTemp(0.0);           // DOAS supply air temperature [C]
-    Real64 DOASSupplyHumRat(0.0);         // DOAS supply air humidity ratio [kgWater/kgDryAir]
-    Real64 DOASCpAir(0.0);                // heat capacity of DOAS air [J/kg-C]
-    Real64 DOASSysOutputProvided(0.0);    // heating / cooling provided by DOAS system [W]
-    Real64 TotDOASSysOutputProvided(0.0); // total DOAS load on the zone [W]
-    Real64 HR90H;                         // humidity ratio at DOAS high setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
-    Real64 HR90L;                         // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
+    int SupplyAirNode1; // node number of 1st zone supply air node
+    int SupplyAirNode2; // node number of 2nd zone supply air node
+    int SupplyAirNode;  // node number of supply air node for ideal air system
 
     auto &Node(state.dataLoopNodes->Node);
 
@@ -438,250 +691,20 @@ void SizeZoneEquipment(EnergyPlusData &state)
         auto &zoneSysMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum);
         auto &zone = state.dataHeatBal->Zone(ControlledZoneNum);
 
-        thisZoneHB.NonAirSystemResponse = 0.0;
-        thisZoneHB.SysDepZoneLoads = 0.0;
+        sizeZoneSpaceEquipmentPart1(state, zoneEquipConfig, calcZoneSizing, zoneSysEnergyDemand, zoneSysMoistureDemand, zone, ControlledZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
                 // SpaceHB ToDo: For now allocate by space volume frac
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse = 0.0;
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoads = 0.0;
+                sizeZoneSpaceEquipmentPart1(state,
+                                            zoneEquipConfig,
+                                            state.dataSize->CalcSpaceSizing(state.dataSize->CurOverallSimDay, spaceNum),
+                                            state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum),
+                                            state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum),
+                                            zone,
+                                            ControlledZoneNum,
+                                            spaceNum);
             }
         }
-        SysOutputProvided = 0.0;
-        LatOutputProvided = 0.0;
-        InitSystemOutputRequired(state, ControlledZoneNum, true);
-        int ZoneNode = zoneEquipConfig.ZoneNode;
-        SupplyAirNode = 0;
-        SupplyAirNode1 = 0;
-        SupplyAirNode2 = 0;
-        // save raw zone loads without impact of outdoor air
-        Real64 LatOutputProvidedNoDOAS = zoneSysMoistureDemand.RemainingOutputRequired;
-        Real64 SysOutputProvidedNoDOAS = zoneSysEnergyDemand.RemainingOutputRequired;
-        // if Tstat deadband is true then load will be reported as 0
-        if (state.dataZoneEnergyDemand->DeadBandOrSetback(ControlledZoneNum)) SysOutputProvidedNoDOAS = 0.0;
-        // replicate deadband flag - zone condition is either below the humidistat or above the dehumidistat set point
-        // using logic: NOT (!) (there is a load)
-        // Pretty sure this could just be if (OutputRequiredToHumidifyingSP < 0 && OutputRequiredToDehumidifyingSP > 0)
-        if (!((zoneSysMoistureDemand.OutputRequiredToHumidifyingSP > 0.0 && zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP > 0.0) ||
-              (zoneSysMoistureDemand.OutputRequiredToHumidifyingSP < 0.0 && zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP < 0.0))) {
-            LatOutputProvidedNoDOAS = 0.0;
-        }
-
-        // calculate DOAS heating/cooling effect
-        if (calcZoneSizing.AccountForDOAS) {
-            // check for adequate number of supply nodes
-            if (zoneEquipConfig.NumInletNodes >= 2) {
-                SupplyAirNode1 = zoneEquipConfig.InletNode(1);
-                SupplyAirNode2 = zoneEquipConfig.InletNode(2);
-            } else if (zoneEquipConfig.NumInletNodes >= 1) {
-                SupplyAirNode1 = zoneEquipConfig.InletNode(1);
-                SupplyAirNode2 = 0;
-            } else {
-                ShowSevereError(state, format("{}: to account for the effect a Dedicated Outside Air System on zone equipment sizing", RoutineName));
-                ShowContinueError(state, "there must be at least one zone air inlet node");
-                ShowFatalError(state, "Previous severe error causes abort ");
-            }
-            // set the DOAS mass flow rate and supply temperature and humidity ratio
-            HR90H = PsyWFnTdbRhPb(state, calcZoneSizing.DOASHighSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
-            HR90L = PsyWFnTdbRhPb(state, calcZoneSizing.DOASLowSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
-            DOASMassFlowRate = state.dataSize->CalcFinalZoneSizing(ControlledZoneNum).MinOA * state.dataEnvrn->StdRhoAir;
-            CalcDOASSupCondsForSizing(state,
-                                      state.dataEnvrn->OutDryBulbTemp,
-                                      state.dataEnvrn->OutHumRat,
-                                      calcZoneSizing.DOASControlStrategy,
-                                      calcZoneSizing.DOASLowSetpoint,
-                                      calcZoneSizing.DOASHighSetpoint,
-                                      HR90H,
-                                      HR90L,
-                                      DOASSupplyTemp,
-                                      DOASSupplyHumRat);
-            DOASCpAir = PsyCpAirFnW(DOASSupplyHumRat);
-            DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * (DOASSupplyTemp - Node(ZoneNode).Temp);
-            TotDOASSysOutputProvided =
-                DOASMassFlowRate * (PsyHFnTdbW(DOASSupplyTemp, DOASSupplyHumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
-            Real64 DOASLatOutputProvided = 0.0;
-            if (calcZoneSizing.zoneLatentSizing) {
-                DOASLatOutputProvided = DOASMassFlowRate * (DOASSupplyHumRat - Node(ZoneNode).HumRat); // kgw/s
-            }
-
-            UpdateSystemOutputRequired(state, ControlledZoneNum, DOASSysOutputProvided, DOASLatOutputProvided);
-            Node(SupplyAirNode1).Temp = DOASSupplyTemp;
-            Node(SupplyAirNode1).HumRat = DOASSupplyHumRat;
-            Node(SupplyAirNode1).MassFlowRate = DOASMassFlowRate;
-            Node(SupplyAirNode1).Enthalpy = PsyHFnTdbW(DOASSupplyTemp, DOASSupplyHumRat);
-            calcZoneSizing.DOASHeatAdd = DOASSysOutputProvided;
-            calcZoneSizing.DOASLatAdd = TotDOASSysOutputProvided - DOASSysOutputProvided;
-            SupplyAirNode = SupplyAirNode2;
-            calcZoneSizing.DOASSupMassFlow = DOASMassFlowRate;
-            calcZoneSizing.DOASSupTemp = DOASSupplyTemp;
-            calcZoneSizing.DOASSupHumRat = DOASSupplyHumRat;
-            if (DOASSysOutputProvided > 0.0) {
-                calcZoneSizing.DOASHeatLoad = DOASSysOutputProvided;
-                calcZoneSizing.DOASCoolLoad = 0.0;
-                calcZoneSizing.DOASTotCoolLoad = 0.0;
-            } else {
-                calcZoneSizing.DOASCoolLoad = DOASSysOutputProvided;
-                calcZoneSizing.DOASTotCoolLoad = TotDOASSysOutputProvided;
-                calcZoneSizing.DOASHeatLoad = 0.0;
-            }
-
-        } else {
-            if (zoneEquipConfig.NumInletNodes > 0) {
-                SupplyAirNode = zoneEquipConfig.InletNode(1);
-            } else {
-                SupplyAirNode = 0;
-            }
-        }
-
-        // Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
-        //                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
-        if (!state.dataZoneEnergyDemand->DeadBandOrSetback(ControlledZoneNum) &&
-            std::abs(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputRequired) > DataHVACGlobals::SmallLoad) {
-            // Determine design supply air temperture and design supply air temperature difference
-            if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputRequired < 0.0) { // Cooling case
-                // If the user specify the design cooling supply air temperature, then
-                if (calcZoneSizing.ZnCoolDgnSAMethod == SupplyAirTemperature) {
-                    Temp = calcZoneSizing.CoolDesTemp;
-                    HumRat = calcZoneSizing.CoolDesHumRat;
-                    DeltaTemp = Temp - Node(ZoneNode).Temp;
-                    if (zone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
-                        DeltaTemp = Temp - zone.AdjustedReturnTempByITE;
-                    }
-                    // If the user specify the design cooling supply air temperature difference, then
-                } else {
-                    DeltaTemp = -std::abs(calcZoneSizing.CoolDesTempDiff);
-                    Temp = DeltaTemp + Node(ZoneNode).Temp;
-                    if (zone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
-                        Temp = DeltaTemp + zone.AdjustedReturnTempByITE;
-                    }
-                    HumRat = calcZoneSizing.CoolDesHumRat;
-                }
-            } else { // Heating Case
-                // If the user specify the design heating supply air temperature, then
-                if (calcZoneSizing.ZnHeatDgnSAMethod == SupplyAirTemperature) {
-                    Temp = calcZoneSizing.HeatDesTemp;
-                    HumRat = calcZoneSizing.HeatDesHumRat;
-                    DeltaTemp = Temp - Node(ZoneNode).Temp;
-                    // If the user specify the design heating supply air temperature difference, then
-                } else {
-                    DeltaTemp = std::abs(calcZoneSizing.HeatDesTempDiff);
-                    Temp = DeltaTemp + Node(ZoneNode).Temp;
-                    HumRat = calcZoneSizing.HeatDesHumRat;
-                }
-            }
-
-            Enthalpy = PsyHFnTdbW(Temp, HumRat);
-            SysOutputProvided = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputRequired;
-            CpAir = PsyCpAirFnW(HumRat);
-            if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) {
-                //!!PH/WFB/LKL (UCDV model)        MassFlowRate = SysOutputProvided / (CpAir*DeltaTemp)
-                MassFlowRate = max(SysOutputProvided / (CpAir * DeltaTemp), 0.0);
-            } else {
-                MassFlowRate = 0.0;
-            }
-
-            if (calcZoneSizing.SupplyAirAdjustFactor > 1.0) {
-                MassFlowRate *= calcZoneSizing.SupplyAirAdjustFactor;
-            }
-        } else {
-
-            Temp = Node(ZoneNode).Temp;
-            HumRat = Node(ZoneNode).HumRat;
-            Enthalpy = Node(ZoneNode).Enthalpy;
-            MassFlowRate = 0.0;
-        }
-
-        if (SysOutputProvided > 0.0) {
-            calcZoneSizing.HeatLoad = SysOutputProvided;
-            calcZoneSizing.HeatMassFlow = MassFlowRate;
-            calcZoneSizing.CoolLoad = 0.0;
-            calcZoneSizing.CoolMassFlow = 0.0;
-        } else if (SysOutputProvided < 0.0) {
-            calcZoneSizing.CoolLoad = -SysOutputProvided;
-            calcZoneSizing.CoolMassFlow = MassFlowRate;
-            calcZoneSizing.HeatLoad = 0.0;
-            calcZoneSizing.HeatMassFlow = 0.0;
-        } else {
-            calcZoneSizing.CoolLoad = 0.0;
-            calcZoneSizing.CoolMassFlow = 0.0;
-            calcZoneSizing.HeatLoad = 0.0;
-            calcZoneSizing.HeatMassFlow = 0.0;
-        }
-        calcZoneSizing.HeatZoneTemp = Node(ZoneNode).Temp;
-        calcZoneSizing.HeatZoneHumRat = Node(ZoneNode).HumRat;
-        calcZoneSizing.CoolZoneTemp = Node(ZoneNode).Temp;
-        calcZoneSizing.CoolZoneHumRat = Node(ZoneNode).HumRat;
-        calcZoneSizing.HeatOutTemp = state.dataEnvrn->OutDryBulbTemp;
-        calcZoneSizing.HeatOutHumRat = state.dataEnvrn->OutHumRat;
-        calcZoneSizing.CoolOutTemp = state.dataEnvrn->OutDryBulbTemp;
-        calcZoneSizing.CoolOutHumRat = state.dataEnvrn->OutHumRat;
-
-        Real64 LatentAirMassFlow = 0.0;
-        Real64 MoistureLoad = 0.0;
-        Real64 HgAir = PsyHgAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
-        if (calcZoneSizing.zoneLatentSizing) {
-            // replicate deadband flag - zone condition is either below the humidistat or above the dehumidistat set point
-            if ((zoneSysMoistureDemand.OutputRequiredToHumidifyingSP > 0.0 && zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP > 0.0) ||
-                (zoneSysMoistureDemand.OutputRequiredToHumidifyingSP < 0.0 && zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP < 0.0)) {
-                LatOutputProvided = zoneSysMoistureDemand.RemainingOutputRequired;
-            }
-            Real64 DeltaHumRat = 0.0;      // positive LatOutputProvided means humidification load
-            if (LatOutputProvided < 0.0) { // use SA humrat - zone humrat, or delta humrat based on user choice
-                DeltaHumRat = (calcZoneSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio)
-                                  ? (calcZoneSizing.LatentCoolDesHumRat - Node(ZoneNode).HumRat)
-                                  : -calcZoneSizing.CoolDesHumRatDiff;
-            } else if (LatOutputProvided > 0.0) {
-                DeltaHumRat = (calcZoneSizing.ZnLatHeatDgnSAMethod == SupplyAirHumidityRatio)
-                                  ? (calcZoneSizing.LatentHeatDesHumRat - Node(ZoneNode).HumRat)
-                                  : calcZoneSizing.HeatDesHumRatDiff;
-            }
-            if (std::abs(DeltaHumRat) > DataHVACGlobals::VerySmallMassFlow) LatentAirMassFlow = std::max(0.0, LatOutputProvided / DeltaHumRat);
-            MoistureLoad = LatOutputProvided * HgAir;
-
-            if (MassFlowRate > 0.0) {
-                HumRat = Node(ZoneNode).HumRat + LatOutputProvided / MassFlowRate;
-                CpAir = PsyCpAirFnW(HumRat);
-                Temp = (SysOutputProvided / (MassFlowRate * CpAir)) + Node(ZoneNode).Temp;
-                Enthalpy = PsyHFnTdbW(Temp, HumRat);
-            } else if (LatentAirMassFlow > 0.0) {
-                // if there is no sensible load then still need to hold zone RH at set point
-                // no need to recalculate T, Sensible load = 0 so T = T,zone
-                HumRat = Node(ZoneNode).HumRat + LatOutputProvided / LatentAirMassFlow;
-                Enthalpy = PsyHFnTdbW(Temp, HumRat);
-                MassFlowRate = (LatentAirMassFlow > DataHVACGlobals::VerySmallMassFlow) ? LatentAirMassFlow : 0.0;
-            }
-
-            calcZoneSizing.HeatLatentLoad = (LatOutputProvided > 0.0) ? MoistureLoad : 0.0;
-            calcZoneSizing.ZoneHeatLatentMassFlow = (LatOutputProvided > 0.0) ? LatentAirMassFlow : 0.0;
-            calcZoneSizing.CoolLatentLoad = (LatOutputProvided < 0.0) ? -MoistureLoad : 0.0;
-            calcZoneSizing.ZoneCoolLatentMassFlow = (LatOutputProvided < 0.0) ? LatentAirMassFlow : 0.0;
-            calcZoneSizing.HeatLoadNoDOAS = (SysOutputProvidedNoDOAS > 0.0) ? SysOutputProvidedNoDOAS : 0.0;
-            calcZoneSizing.CoolLoadNoDOAS = (SysOutputProvidedNoDOAS < 0.0) ? -SysOutputProvidedNoDOAS : 0.0;
-            calcZoneSizing.HeatLatentLoadNoDOAS = (LatOutputProvidedNoDOAS > 0.0) ? LatOutputProvidedNoDOAS * HgAir : 0.0;
-            calcZoneSizing.CoolLatentLoadNoDOAS = (LatOutputProvidedNoDOAS < 0.0) ? -LatOutputProvidedNoDOAS * HgAir : 0.0;
-        }
-
-        if (SupplyAirNode > 0) {
-            Node(SupplyAirNode).Temp = Temp;
-            Node(SupplyAirNode).HumRat = HumRat;
-            Node(SupplyAirNode).Enthalpy = Enthalpy;
-            Node(SupplyAirNode).MassFlowRate = MassFlowRate;
-        } else {
-            thisZoneHB.NonAirSystemResponse = SysOutputProvided;
-            if (state.dataHeatBal->doSpaceHeatBalance) {
-                for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
-                    // SpaceHB ToDo: For now allocate by space volume frac
-                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse =
-                        thisZoneHB.NonAirSystemResponse * state.dataHeatBal->space(spaceNum).fracZoneVolume;
-                }
-            }
-            if (calcZoneSizing.zoneLatentSizing) {
-                int ZoneMult = zone.Multiplier * zone.ListMultiplier;
-                thisZoneHB.ZoneLatentGain += (LatOutputProvided * HgAir) / ZoneMult;
-            }
-        }
-
-        UpdateSystemOutputRequired(state, ControlledZoneNum, SysOutputProvided, LatOutputProvided);
     }
 
     CalcZoneMassBalance(state, true);
@@ -697,7 +720,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
         // MJW for now - use first return node, make a separate commit to add a dimension to all of the sizing rettemp variables
         int ReturnNode = (zoneEquipConfig.NumReturnNodes > 0) ? zoneEquipConfig.ReturnNode(1) : 0;
         int ZoneNode = zoneEquipConfig.ZoneNode;
-        RetTemp = (ReturnNode > 0) ? Node(ReturnNode).Temp : Node(ZoneNode).Temp;
+        Real64 RetTemp = (ReturnNode > 0) ? Node(ReturnNode).Temp : Node(ZoneNode).Temp;
         auto &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ControlledZoneNum);
         if (calcZoneSizing.HeatLoad > 0.0) {
             calcZoneSizing.HeatZoneRetTemp = RetTemp;
