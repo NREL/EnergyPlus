@@ -391,6 +391,9 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchSWHRecEff = 0;
     int pdchSWHEnFac = 0;
 
+    // std 229 HVAC Topology new table
+    int pdstHVACTopo = 0;
+
     // Std 229 Chiller Table in Equipment Summary
     int pdstChiller = 0;
     int pdchChillerType = 0;                        // Type
