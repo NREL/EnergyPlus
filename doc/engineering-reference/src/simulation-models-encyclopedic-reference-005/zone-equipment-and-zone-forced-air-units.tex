@@ -2324,7 +2324,7 @@ This can be rearranged to:
 
 \emph{\textit{Node Type 4: Earth Tube Node}}
 
-The earth tube node is connected to nodes above and below it via conduction and also accounts for the convection between the air flowing through the tube and the conduction through the earth tube pipe material.  The equation for this node is:
+The earth tube node is connected to nodes above and below it via conduction and also accounts for the convection between the air flowing through the tube and the conduction through the earth tube pipe material.  The equation for this node, assuming an effectiveness-NTU model for heat exchange between the air and ground (see below), is:
 
 \begin{equation}
 \rho x_{et} w z c_p \frac{T_{et,new} - T_{et,old}}{\Delta t} = k w z \frac{T_{et+1,new}-T_{et,new}}{(x_b + x_{et})/2} + k w z \frac{T_{et-1,new}-T_{et,new}}{(x_t + x_{et})/2} + {\dot m_a}{C_a} \eta (T_{air} - T_{et,new})
@@ -2352,7 +2352,7 @@ The region below the earth tube node is physically very similar to the region ab
 This can be rearranged to:
 
 \begin{equation}
-[\frac{-k \Delta t}{\rho c_p x_b (x_b + x_{et})/2}] T_{et,new} + [1 + \frac{k \Delta t}{\rho c_p {x_b}^2} + \frac{k \Delta t}{\rho c_p x_b (x_b+x_{et})/2}] T_{et+1,new} + [\frac{-k \Delta t}{\rho c_p {x_b}2}] T_{et+2,new} = T_{et+1,old}
+[\frac{-k \Delta t}{\rho c_p x_b (x_b + x_{et})/2}] T_{et,new} + [1 + \frac{k \Delta t}{\rho c_p {x_b}^2} + \frac{k \Delta t}{\rho c_p x_b (x_b+x_{et})/2}] T_{et+1,new} + [\frac{-k \Delta t}{\rho c_p {x_b}^2}] T_{et+2,new} = T_{et+1,old}
 \end{equation}
 
 \emph{\textit{Node Type 6: Generic Node in Lower Region}}
@@ -2383,11 +2383,67 @@ This can be rearranged to:
 (\frac{-k \Delta t}{\rho c_p {x_b}^2}) T_{n-1,new} + (1 + \frac{3 k \Delta t}{\rho c_p {x_b}^2}) T_{n,new} = \frac{2 k \Delta t}{\rho c_p {x_b}^2} T_{l,t} + T_{n,old}
 \end{equation}
 
+\emph{\textit{Calculation of Effectiveness for Heat Transfer Between the Air and Ground}}
+
+Similar to the low temperature radiant system where a fluid of variable temperature is passing through a solid that is assumed to be at a single temperature, the relationship between effectiveness and heat transfer between the air and the ground can be summarized using the following relationship:
+
+\begin{equation}
+q = \dot m_a * C_{p,a} * (T_{air,in} - T_{air,out})
+\end{equation}
+
+where \(T_{air,in}\) is the outside air temperatre and \(T_{air,out}\) is the temperature of the air leaving the earth tube and entering the zone.
+
+\begin{equation}
+q_{max} = \dot m_a * C_{p,a} * (T_{air,in} - T_{et})
+\end{equation}
+
+where \(T_{et}\) is the temperature of the ground at the depth of the earth tube (i.e., at the earth tube node).
+
+The effectiveness (\(\eta\)) is the ratio of these two terms or:
+
+\begin{equation}
+\eta = \frac{q}{q_{max}}
+\end{equation}
+
+For the situation where a fluid of varying temperature flows through a solid of constant temperature, the effectiveness can be related to the number of transfer units (NTU) by:
+
+\begin{equation}
+\eta = 1 - e^{-NTU}
+\end{equation}
+
+NTU is calculated using the following equation:
+
+\begin{equation}
+NTU = U A / (\dot m C_p)_{min}
+\end{equation}
+
+Since the solid is not moving, \((\dot m C_p)_{min}\) is evaluated for the air side.  The U-value for this situation includes the heat conduction through the pipe wall and the convection between the inside surface of the earth tube and the air passing through it.  The relations for both the conduction and convection terms rely on the relationships developed for the Basic model.  With the effectiveness determined for a particular flow rate, the overall matrix equation is set and can be solved for the new node temperatures.
+
 \emph{\textit{Solution Strtegy}}
 
-The node equations above result in a system of equations that can be arranged as a matrix in the form of [A][x] = [b], where the number of node (n) is the index of the matrices.  The A matrix (n by n square matrix) consists primarily of constant terms that relate to the thermo-physical properties of the solution space.  The vector x consists of the new temperatures of the nodes (again, using the implicit formulation for stability) and the algorithm needs to solve for these.  The vector b includes terms such as the old temperatures at the nodes, the impact of boundary conditions at the top and bottom of the solution space, and the impact of the earth tube on the earth tube node.  The values of the vector b will vary with every time step since the temperatures of the nodes, ground, and air will vary with time.
+The node equations above result in a system of equations that can be arranged as a matrix in the form of [A][x] = [b], where the number of node (n) is the index of the matrices.  The A matrix (n by n square matrix) consists primarily of constant terms that relate to the thermo-physical properties of the solution space.  The vector x consists of the new temperatures of the nodes (again, using the implicit formulation for stability) and the algorithm needs to solve for these.  The vector b includes terms such as the old temperatures at the nodes, the impact of boundary conditions at the top and bottom of the solution space, and the impact of the earth tube on the earth tube node.  The values of the vector b will vary with every time step since the temperatures of the nodes, ground, and air will vary with time.  The seven equation types that were rearranged above were done so to fit with the [A][x] = [b] format.
 
-Upon inspection of the terms that make up the A matrix, it is clear that A will be a tridiagonal matrix.  Tridiagonal matrices can be solved more efficiently using what is known as the Thomas algorithm which require operations on the order of the index (n) whereas solution strategies such as matrix inversion which require operations on the order of the index (n) cubed.  In addition, there is only one term in the A matrix that might potentially vary--the term associated with the air flow rate and efficiency of heat exchange between the earth tube and the air flow through it at the earth tube node.  Since it is not known ahead of time what this flow rate or efficiency will be, the matrix system will have to go through a full solution at any time step.  The only exception to this when there is no air flow through the earth tube.  Since there will be significant time when the earth tube is dormant (no flow through it), the first step of the solution will be done for the zero flow situation and the values stored to reduce the number of calculations required by the solution.  Note that while in many cases when the earth tube is running that the effectiveness (\(\eta\)) will be unity, the flow rate may still vary based on the user input flow coefficients.  As a result, it does not make sense to store an intermediate step in the solution for when effectiveness is unity.
+Upon inspection of the terms that make up the A matrix, it is clear that A will be a tridiagonal matrix.  Tridiagonal matrices can be solved more efficiently using what is known as the Thomas algorithm which require operations on the order of the index (n) whereas solution strategies such as matrix inversion require operations on the order of the index (n) cubed.  In addition, there is only one term in the A matrix that might potentially vary--the term associated with the air flow rate and efficiency of heat exchange between the earth tube and the air flow through it at the earth tube node.  Since it is not known ahead of time what this flow rate or efficiency will be, the matrix system will have to go through a full solution at any time step.  The only exception to this when there is no air flow through the earth tube.  Since there will be significant time when the earth tube is dormant (no flow through it), the first step of the Thomas algorithm will be done for the zero flow situation and the values stored to reduce the number of calculations required by the solution.  Note that while in many cases when the earth tube is running that the effectiveness (\(\eta\)) will be unity, the flow rate may still vary based on the user input flow coefficients.  As a result, it does not make sense to store an intermediate step in the solution for when effectiveness is unity.
+
+In general, many of the related calculations (such as air flow rate, thermal properties of air, etc.) are identical to the Basic earth tube model.  The main difference is the calculation of the temperature at the earth tube location--the Basic model uses the undisturbed ground temperature relationship while the Vertical solution uses the implicit finite difference scheme and the Thomas algorithm.
+
+Once the node (ground) temperatures have been determined, the calculation of the air temperature leaving the earth tube can be calculated using the effectiveness-NTU formulation above.  Cancelling out the common flow rate and air specific heat, the equation for effectiveness simplifies to:
+
+\begin{equation}
+\eta = \frac{T_{air,in} - T_{air,out}}{T_{air,in} - T_{et}}
+\end{equation}
+
+Rearranging this equation to find the temperature of the air leaving the earth tube (inlet to the zone):
+
+\begin{equation}
+T_{air,in} - T_{air,out} = \eta * (T_{air,in} - T_{et})
+\end{equation}
+
+or:
+
+\begin{equation}
+T_{air,out} = T_{air,in} - \eta * (T_{air,in} - T_{et})
+\end{equation}
 
 % table 87
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
