@@ -501,7 +501,6 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
     Real64 HumRat = 0.0;            // inlet humidity ratio [kg water/kg dry air]
     Real64 Enthalpy = 0.0;          // inlet specific enthalpy [J/kg]
     Real64 MassFlowRate = 0.0;      // inlet mass flow rate [kg/s]
-    Real64 RetTemp = 0.0;           // zone return temperature [C]
     // Sign convention: SysOutputProvided <0 Supply air is heated on entering zone (zone is cooled)
     //                  SysOutputProvided >0 Supply air is cooled on entering zone (zone is heated)
     if (!state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum) && std::abs(zsEnergyDemand.RemainingOutputRequired) > DataHVACGlobals::SmallLoad) {
@@ -667,14 +666,6 @@ void SizeZoneEquipment(EnergyPlusData &state)
     // for each controlled zone this subroutine performs a "purchased air" calculation
     // and saves the results in the zone sizing data arrays.
 
-    static constexpr std::string_view RoutineName("SizeZoneEquipment");
-
-    int SupplyAirNode1; // node number of 1st zone supply air node
-    int SupplyAirNode2; // node number of 2nd zone supply air node
-    int SupplyAirNode;  // node number of supply air node for ideal air system
-
-    auto &Node(state.dataLoopNodes->Node);
-
     if (state.dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag) {
         SetUpZoneSizingArrays(state);
         state.dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
@@ -682,7 +673,6 @@ void SizeZoneEquipment(EnergyPlusData &state)
 
     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
         auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum);
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ControlledZoneNum);
         if (!zoneEquipConfig.IsControlled) continue;
 
         // use reference to eliminate lots of long lines in this function, after initial commit, so reviewers can see changes
@@ -720,7 +710,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
         // MJW for now - use first return node, make a separate commit to add a dimension to all of the sizing rettemp variables
         int ReturnNode = (zoneEquipConfig.NumReturnNodes > 0) ? zoneEquipConfig.ReturnNode(1) : 0;
         int ZoneNode = zoneEquipConfig.ZoneNode;
-        Real64 RetTemp = (ReturnNode > 0) ? Node(ReturnNode).Temp : Node(ZoneNode).Temp;
+        Real64 RetTemp = (ReturnNode > 0) ? state.dataLoopNodes->Node(ReturnNode).Temp : state.dataLoopNodes->Node(ZoneNode).Temp;
         auto &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ControlledZoneNum);
         if (calcZoneSizing.HeatLoad > 0.0) {
             calcZoneSizing.HeatZoneRetTemp = RetTemp;
