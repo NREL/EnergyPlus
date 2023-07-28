@@ -397,12 +397,15 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
                                            : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).SysDepZoneLoads;
     auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGain
                                           : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneLatentGain;
+    auto &zoneNodeNum =
+        (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber;
     nonAirSystemResponse = 0.0;
     sysDepZoneLoads = 0.0;
+    auto &zoneNode = state.dataLoopNodes->Node(zoneNodeNum);
+
     // InitSystemOutputRequired(state, zoneNum, true);
     initOutputRequired(state, zoneNum, zsEnergyDemand, zsMoistureDemand, true, false, spaceNum);
 
-    auto &zoneNode = state.dataLoopNodes->Node(zoneEquipConfig.ZoneNode);
     // save raw zone loads without impact of outdoor air
     Real64 LatOutputProvidedNoDOAS = zsMoistureDemand.RemainingOutputRequired;
     Real64 SysOutputProvidedNoDOAS = zsEnergyDemand.RemainingOutputRequired;
@@ -650,6 +653,33 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
     UpdateSystemOutputRequired(state, zoneNum, SysOutputProvided, LatOutputProvided);
 }
 
+void sizeZoneSpaceEquipmentPart2(EnergyPlusData &state,
+                                 DataZoneEquipment::EquipConfiguration &zoneEquipConfig,
+                                 DataSizing::ZoneSizingData &zsCalcSizing,
+                                 int zoneNum,
+                                 int spaceNum)
+{
+    // MJW for now - use first return node, make a separate commit to add a dimension to all of the sizing rettemp variables
+    int returnNodeNum = (zoneEquipConfig.NumReturnNodes > 0) ? zoneEquipConfig.ReturnNode(1) : 0;
+    int zoneNodeNum =
+        (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber;
+    Real64 RetTemp = (returnNodeNum > 0) ? state.dataLoopNodes->Node(returnNodeNum).Temp : state.dataLoopNodes->Node(zoneNodeNum).Temp;
+    auto &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum);
+    if (zsCalcSizing.HeatLoad > 0.0) {
+        zsCalcSizing.HeatZoneRetTemp = RetTemp;
+        zsCalcSizing.HeatTstatTemp = (zoneTstatSP > 0.0) ? zoneTstatSP : state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
+        zsCalcSizing.CoolTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum);
+    } else if (zsCalcSizing.CoolLoad > 0.0) {
+        zsCalcSizing.CoolZoneRetTemp = RetTemp;
+        zsCalcSizing.CoolTstatTemp = (zoneTstatSP > 0.0) ? zoneTstatSP : state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum);
+        zsCalcSizing.HeatTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
+    } else {
+        zsCalcSizing.CoolZoneRetTemp = RetTemp;
+        zsCalcSizing.HeatTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum);
+        zsCalcSizing.CoolTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum);
+    }
+}
+
 void SizeZoneEquipment(EnergyPlusData &state)
 {
 
@@ -705,25 +735,14 @@ void SizeZoneEquipment(EnergyPlusData &state)
 
         auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum);
         if (!zoneEquipConfig.IsControlled) continue;
-        auto &calcZoneSizing = state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum);
-
-        // MJW for now - use first return node, make a separate commit to add a dimension to all of the sizing rettemp variables
-        int ReturnNode = (zoneEquipConfig.NumReturnNodes > 0) ? zoneEquipConfig.ReturnNode(1) : 0;
-        int ZoneNode = zoneEquipConfig.ZoneNode;
-        Real64 RetTemp = (ReturnNode > 0) ? state.dataLoopNodes->Node(ReturnNode).Temp : state.dataLoopNodes->Node(ZoneNode).Temp;
-        auto &zoneTstatSP = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ControlledZoneNum);
-        if (calcZoneSizing.HeatLoad > 0.0) {
-            calcZoneSizing.HeatZoneRetTemp = RetTemp;
-            calcZoneSizing.HeatTstatTemp = (zoneTstatSP > 0.0) ? zoneTstatSP : state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum);
-            calcZoneSizing.CoolTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum);
-        } else if (calcZoneSizing.CoolLoad > 0.0) {
-            calcZoneSizing.CoolZoneRetTemp = RetTemp;
-            calcZoneSizing.CoolTstatTemp = (zoneTstatSP > 0.0) ? zoneTstatSP : state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum);
-            calcZoneSizing.HeatTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum);
-        } else {
-            calcZoneSizing.CoolZoneRetTemp = RetTemp;
-            calcZoneSizing.HeatTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ControlledZoneNum);
-            calcZoneSizing.CoolTstatTemp = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ControlledZoneNum);
+        sizeZoneSpaceEquipmentPart2(
+            state, zoneEquipConfig, state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum), ControlledZoneNum);
+        if (state.dataHeatBal->doSpaceHeatBalance) {
+            for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
+                // SpaceHB ToDo: For now allocate by space volume frac
+                sizeZoneSpaceEquipmentPart2(
+                    state, zoneEquipConfig, state.dataSize->CalcSpaceSizing(state.dataSize->CurOverallSimDay, spaceNum), ControlledZoneNum, spaceNum);
+            }
         }
     }
 }
@@ -1911,6 +1930,669 @@ void updateZoneSizingEndDay(DataSizing::ZoneSizingData &zsCalcSizing,
     }
 }
 
+void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneSizingData const &zsCalcSizing)
+{
+    if (std::abs(zsCalcSizing.DesCoolLoad) <= 1.e-8) {
+        ShowWarningError(state, format("Calculated design cooling load for zone={} is zero.", zsCalcSizing.ZoneName));
+        ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
+    }
+    if (std::abs(zsCalcSizing.DesHeatLoad) <= 1.e-8) {
+        ShowWarningError(state, format("Calculated design heating load for zone={} is zero.", zsCalcSizing.ZoneName));
+        ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
+    }
+
+    Real64 SupplyTemp = 0.0;
+    Real64 DeltaTemp = 0.0;
+    // Should this be done only if there is a cooling load? Or would this message help determine why there was no load?
+    if (std::abs(zsCalcSizing.DesCoolLoad) > 1.e-8) {
+        // check for low cooling delta T from supply to zone to see if air volume flow rate might be excessively high
+        if (zsCalcSizing.ZnCoolDgnSAMethod == SupplyAirTemperature) {
+            SupplyTemp = zsCalcSizing.CoolDesTemp;
+            DeltaTemp = SupplyTemp - zsCalcSizing.ZoneTempAtCoolPeak;
+        } else {
+            DeltaTemp = -std::abs(zsCalcSizing.CoolDesTempDiff);
+            SupplyTemp = DeltaTemp + zsCalcSizing.ZoneTempAtCoolPeak;
+        }
+
+        // check for low delta T to avoid very high flow rates
+        if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
+            if (std::abs(DeltaTemp) >= 2.0) {                                                    // Vdot exceeds 3000 cfm/ton @ DT=2
+                ShowWarningError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 5C of zone temperature");
+            } else {
+                ShowSevereError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of zone temperature");
+            }
+            ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
+            ShowContinueError(state, format("...zone name = {}", zsCalcSizing.ZoneName));
+            ShowContinueError(state, format("...design sensible cooling load = {:.2R} W", zsCalcSizing.DesCoolLoad));
+            ShowContinueError(state, format("...thermostat set point temp    = {:.3R} C", zsCalcSizing.CoolTstatTemp));
+            ShowContinueError(state, format("...zone temperature             = {:.3R} C", zsCalcSizing.ZoneTempAtCoolPeak));
+            ShowContinueError(state, format("...supply air temperature       = {:.3R} C", SupplyTemp));
+            ShowContinueError(state, format("...temperature difference       = {:.5R} C", DeltaTemp));
+            ShowContinueError(state, format("...calculated volume flow rate  = {:.5R} m3/s", (zsCalcSizing.DesCoolVolFlow)));
+            ShowContinueError(state, format("...calculated mass flow rate    = {:.5R} kg/s", (zsCalcSizing.DesCoolMassFlow)));
+            if (SupplyTemp > zsCalcSizing.ZoneTempAtCoolPeak)
+                ShowContinueError(state, "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
+        } else if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff && SupplyTemp > zsCalcSizing.ZoneTempAtCoolPeak) {
+            ShowSevereError(state, "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations");
+            ShowContinueError(state, format("...calculated volume flow rate  = {:.5R} m3/s", (zsCalcSizing.DesCoolVolFlow)));
+            ShowContinueError(state, format("...calculated mass flow rate    = {:.5R} kg/s", (zsCalcSizing.DesCoolMassFlow)));
+            ShowContinueError(state, format("...thermostat set point temp    = {:.3R} C", zsCalcSizing.CoolTstatTemp));
+            ShowContinueError(state, format("...zone temperature            = {:.3R} C", zsCalcSizing.ZoneTempAtCoolPeak));
+            ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
+            ShowContinueError(state, format("...occurs in zone              = {}", zsCalcSizing.ZoneName));
+            ShowContinueError(state, "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
+        }
+    }
+    // Should this be done only if there is a heating load? Or would this message help determine why there was no load?
+    if (std::abs(zsCalcSizing.DesHeatLoad) > 1.e-8) { // ABS() ?
+        // check for low cooling delta T from supply to zone to see if air volume flow rate might be excessively high
+        if (zsCalcSizing.ZnHeatDgnSAMethod == SupplyAirTemperature) {
+            SupplyTemp = zsCalcSizing.HeatDesTemp;
+            DeltaTemp = SupplyTemp - zsCalcSizing.ZoneTempAtHeatPeak;
+        } else {
+            DeltaTemp = zsCalcSizing.HeatDesTempDiff;
+            SupplyTemp = DeltaTemp + zsCalcSizing.ZoneTempAtHeatPeak;
+        }
+
+        if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
+            if (std::abs(DeltaTemp) >= 2.0) {                                                    // Vdot exceeds 3000 cfm/ton @ DT=2
+                ShowWarningError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 5C of zone temperature");
+            } else {
+                ShowSevereError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of zone temperature");
+            }
+            ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
+            ShowContinueError(state, format("...zone name = {}", zsCalcSizing.ZoneName));
+            ShowContinueError(state, format("...design heating load         = {:.2R} W", zsCalcSizing.DesHeatLoad));
+            ShowContinueError(state, format("...thermostat set point temp   = {:.3R} C", zsCalcSizing.HeatTstatTemp));
+            ShowContinueError(state, format("...zone temperature            = {:.3R} C", zsCalcSizing.ZoneTempAtHeatPeak));
+            ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
+            ShowContinueError(state, format("...temperature difference      = {:.5R} C", DeltaTemp));
+            ShowContinueError(state, format("...calculated volume flow rate = {:.5R} m3/s", (zsCalcSizing.DesHeatVolFlow)));
+            ShowContinueError(state, format("...calculated mass flow rate   = {:.5R} kg/s", (zsCalcSizing.DesHeatMassFlow)));
+            if (SupplyTemp < zsCalcSizing.ZoneTempAtHeatPeak)
+                ShowContinueError(state,
+                                  "...Note: supply air temperature should be greater than zone temperature during heating air "
+                                  "flow calculations");
+        } else if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff && SupplyTemp < zsCalcSizing.ZoneTempAtHeatPeak) {
+            ShowSevereError(state, "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations");
+            ShowContinueError(state, format("...calculated design heating volume flow rate = {:.5R} m3/s", (zsCalcSizing.DesHeatVolFlow)));
+            ShowContinueError(state, format("...calculated design heating mass flow rate   = {:.5R} kg/s", (zsCalcSizing.DesHeatMassFlow)));
+            ShowContinueError(state, format("...thermostat set point temp   = {:.3R} C", zsCalcSizing.HeatTstatTemp));
+            ShowContinueError(state, format("...zone temperature            = {:.3R} C", zsCalcSizing.ZoneTempAtHeatPeak));
+            ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
+            ShowContinueError(state, format("...occurs in zone              = {}", zsCalcSizing.ZoneName));
+            ShowContinueError(state,
+                              "...Note: supply air temperature should be greater than zone temperature during heating air "
+                              "flow calculations");
+        }
+    }
+}
+
+void updateZoneSizingEndZoneSizingCalc2(DataSizing::ZoneSizingData &zsCalcSizing, int const timeStepIndex, int const hourPrint, int const minutes)
+{
+    // SpaceSizing TODO: There's gotta be a better place to set these timestamps
+    if (timeStepIndex == zsCalcSizing.TimeStepNumAtHeatMax) {
+        zsCalcSizing.HeatPeakDateHrMin = zsCalcSizing.cHeatDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
+    }
+    if (timeStepIndex == zsCalcSizing.TimeStepNumAtCoolMax) {
+        zsCalcSizing.CoolPeakDateHrMin = zsCalcSizing.cCoolDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
+    }
+    if (timeStepIndex == zsCalcSizing.TimeStepNumAtLatentHeatMax) {
+        zsCalcSizing.LatHeatPeakDateHrMin = zsCalcSizing.cLatentHeatDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
+    }
+    if (timeStepIndex == zsCalcSizing.TimeStepNumAtLatentCoolMax) {
+        zsCalcSizing.LatCoolPeakDateHrMin = zsCalcSizing.cLatentCoolDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
+    }
+}
+
+void updateZoneSizingEndZoneSizingCalc3(DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                        Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                        bool &anyLatentLoad,
+                                        int const zoneOrSpaceNum)
+{
+    // latent sizing data has the same variables as sensible sizing data
+    // if the user has specified latent sizing, move the latent sizing data into the final calc arrays
+    // this method allows all upstream sizing functions to use the same data as before (e.g., DesCoolVolFlow)
+    // if sensible sizing, use sensible data. if latent sizing, use latent data (if there is latent data).
+    // if sensible or latent sizing, use larger of sensible and latent based on volume flow rate
+
+    if ((zsCalcFinalSizing.zoneSizingMethod == ZoneSizing::Latent && zsCalcFinalSizing.DesLatentCoolVolFlow > 0.0) ||
+        (zsCalcFinalSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent &&
+         zsCalcFinalSizing.DesLatentCoolLoad > zsCalcFinalSizing.DesCoolLoad)) {
+        anyLatentLoad = true;
+        zsCalcFinalSizing.CoolSizingType = "Latent Cooling"; // string reported to eio
+        zsCalcFinalSizing.DesCoolVolFlow = zsCalcFinalSizing.DesLatentCoolVolFlow;
+        zsCalcFinalSizing.DesCoolMassFlow = zsCalcFinalSizing.DesLatentCoolMassFlow;
+        zsCalcFinalSizing.DesCoolLoad = zsCalcFinalSizing.DesLatentCoolLoad;
+        zsCalcFinalSizing.CoolDesDay = zsCalcFinalSizing.LatCoolDesDay;
+        zsCalcFinalSizing.cCoolDDDate = zsCalcFinalSizing.cLatentCoolDDDate;
+        zsCalcFinalSizing.CoolDDNum = zsCalcFinalSizing.LatentCoolDDNum;
+        zsCalcFinalSizing.TimeStepNumAtCoolMax = zsCalcFinalSizing.TimeStepNumAtLatentCoolMax;
+        zsCalcFinalSizing.CoolFlowSeq = zsCalcFinalSizing.LatentCoolFlowSeq;
+        zsCalcFinalSizing.DesCoolCoilInTemp = zsCalcFinalSizing.DesLatentCoolCoilInTemp;
+        zsCalcFinalSizing.DesCoolCoilInHumRat = zsCalcFinalSizing.DesLatentCoolCoilInHumRat;
+        zsCalcFinalSizing.ZoneRetTempAtCoolPeak = zsCalcFinalSizing.ZoneRetTempAtLatentCoolPeak;
+        zsCalcFinalSizing.ZoneTempAtCoolPeak = zsCalcFinalSizing.ZoneTempAtLatentCoolPeak;
+        zsCalcFinalSizing.ZoneHumRatAtCoolPeak = zsCalcFinalSizing.ZoneHumRatAtLatentCoolPeak;
+        zsCalcFinalSizing.CoolPeakDateHrMin = zsCalcFinalSizing.LatCoolPeakDateHrMin;
+
+        // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
+        if (zsCalcFinalSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio) {
+            zsCalcFinalSizing.CoolDesHumRat = zsCalcFinalSizing.LatentCoolDesHumRat;
+        } else {
+            zsCalcFinalSizing.CoolDesHumRat = zsCalcFinalSizing.ZoneHumRatAtLatentCoolPeak - zsCalcFinalSizing.CoolDesHumRatDiff;
+        }
+
+        if (zsCalcFinalSizing.LatentCoolDDNum > 0) {
+            auto &calcZoneSizing = zsCalcSizing(zsCalcFinalSizing.LatentCoolDDNum, zoneOrSpaceNum);
+            calcZoneSizing.DesCoolVolFlow = calcZoneSizing.DesLatentCoolVolFlow;
+            calcZoneSizing.DesCoolMassFlow = calcZoneSizing.DesLatentCoolMassFlow;
+            calcZoneSizing.DesCoolLoad = calcZoneSizing.DesLatentCoolLoad;
+            calcZoneSizing.CoolDesDay = calcZoneSizing.LatCoolDesDay;
+            calcZoneSizing.cCoolDDDate = zsCalcFinalSizing.cLatentCoolDDDate; // this has correct CoolDDDate
+            calcZoneSizing.CoolDDNum = calcZoneSizing.LatentCoolDDNum;
+            calcZoneSizing.TimeStepNumAtCoolMax = calcZoneSizing.TimeStepNumAtLatentCoolMax;
+            calcZoneSizing.CoolFlowSeq = calcZoneSizing.LatentCoolFlowSeq;
+            calcZoneSizing.DesCoolCoilInTemp = calcZoneSizing.DesLatentCoolCoilInTemp;
+            calcZoneSizing.DesCoolCoilInHumRat = calcZoneSizing.DesLatentCoolCoilInHumRat;
+            calcZoneSizing.ZoneRetTempAtCoolPeak = calcZoneSizing.ZoneRetTempAtLatentCoolPeak;
+            calcZoneSizing.ZoneTempAtCoolPeak = calcZoneSizing.ZoneTempAtLatentCoolPeak;
+            calcZoneSizing.ZoneHumRatAtCoolPeak = calcZoneSizing.ZoneHumRatAtLatentCoolPeak;
+            calcZoneSizing.CoolPeakDateHrMin = zsCalcFinalSizing.LatCoolPeakDateHrMin;
+
+            // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
+            if (calcZoneSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio) {
+                calcZoneSizing.CoolDesHumRat = calcZoneSizing.LatentCoolDesHumRat;
+            } else {
+                calcZoneSizing.CoolDesHumRat = calcZoneSizing.ZoneHumRatAtLatentCoolPeak - calcZoneSizing.CoolDesHumRatDiff;
+            }
+        }
+    }
+    if ((zsCalcFinalSizing.zoneSizingMethod == ZoneSizing::Latent && zsCalcFinalSizing.DesLatentHeatVolFlow > 0.0) ||
+        (zsCalcFinalSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent &&
+         zsCalcFinalSizing.DesLatentHeatLoad > zsCalcFinalSizing.DesHeatLoad)) {
+
+        zsCalcFinalSizing.HeatSizingType = "Latent Heating"; // string reported to eio
+        zsCalcFinalSizing.DesHeatVolFlow = zsCalcFinalSizing.DesLatentHeatVolFlow;
+        zsCalcFinalSizing.DesHeatMassFlow = zsCalcFinalSizing.DesLatentHeatMassFlow;
+        zsCalcFinalSizing.DesHeatLoad = zsCalcFinalSizing.DesLatentHeatLoad;
+        zsCalcFinalSizing.HeatDesDay = zsCalcFinalSizing.LatHeatDesDay;
+        zsCalcFinalSizing.cHeatDDDate = zsCalcFinalSizing.cLatentHeatDDDate;
+        zsCalcFinalSizing.HeatDDNum = zsCalcFinalSizing.LatentHeatDDNum;
+        zsCalcFinalSizing.TimeStepNumAtHeatMax = zsCalcFinalSizing.TimeStepNumAtLatentHeatMax;
+        zsCalcFinalSizing.HeatFlowSeq = zsCalcFinalSizing.LatentHeatFlowSeq;
+        zsCalcFinalSizing.DesHeatCoilInTemp = zsCalcFinalSizing.DesLatentHeatCoilInTemp;
+        zsCalcFinalSizing.DesHeatCoilInHumRat = zsCalcFinalSizing.DesLatentHeatCoilInHumRat;
+        zsCalcFinalSizing.ZoneRetTempAtHeatPeak = zsCalcFinalSizing.ZoneRetTempAtLatentHeatPeak;
+        zsCalcFinalSizing.ZoneTempAtHeatPeak = zsCalcFinalSizing.ZoneTempAtLatentHeatPeak;
+        zsCalcFinalSizing.ZoneHumRatAtHeatPeak = zsCalcFinalSizing.ZoneHumRatAtLatentHeatPeak;
+        zsCalcFinalSizing.HeatPeakDateHrMin = zsCalcFinalSizing.LatHeatPeakDateHrMin;
+
+        // will this cause sizing issues with heating coils since SA humrat is higher than zone humrat?
+        // use zone humrat instead? this value would size humidifiers well, but what about heating coils?
+        // not sure at this point if heating should reset HeatDesHumRat
+        if (zsCalcFinalSizing.ZnLatHeatDgnSAMethod == SupplyAirHumidityRatio) {
+            zsCalcFinalSizing.HeatDesHumRat = zsCalcFinalSizing.LatentHeatDesHumRat;
+        } else {
+            zsCalcFinalSizing.HeatDesHumRat = zsCalcFinalSizing.ZoneHumRatAtLatentHeatPeak + zsCalcFinalSizing.HeatDesHumRatDiff;
+        }
+
+        if (zsCalcFinalSizing.LatentHeatDDNum > 0) {
+            auto &calcZoneSizing = zsCalcSizing(zsCalcFinalSizing.LatentHeatDDNum, zoneOrSpaceNum);
+            calcZoneSizing.DesHeatVolFlow = calcZoneSizing.DesLatentHeatVolFlow;
+            calcZoneSizing.DesHeatMassFlow = calcZoneSizing.DesLatentHeatMassFlow;
+            calcZoneSizing.DesHeatLoad = calcZoneSizing.DesLatentHeatLoad;
+            calcZoneSizing.HeatDesDay = calcZoneSizing.LatHeatDesDay;
+            calcZoneSizing.cHeatDDDate = zsCalcFinalSizing.cLatentHeatDDDate; // this has correct HeatDDDate
+            calcZoneSizing.HeatDDNum = calcZoneSizing.LatentHeatDDNum;
+            calcZoneSizing.TimeStepNumAtHeatMax = calcZoneSizing.TimeStepNumAtLatentHeatMax;
+            calcZoneSizing.HeatFlowSeq = calcZoneSizing.LatentHeatFlowSeq;
+            calcZoneSizing.DesHeatCoilInTemp = calcZoneSizing.DesLatentHeatCoilInTemp;
+            calcZoneSizing.DesHeatCoilInHumRat = calcZoneSizing.DesLatentHeatCoilInHumRat;
+            calcZoneSizing.ZoneRetTempAtHeatPeak = calcZoneSizing.ZoneRetTempAtLatentHeatPeak;
+            calcZoneSizing.ZoneTempAtHeatPeak = calcZoneSizing.ZoneTempAtLatentHeatPeak;
+            calcZoneSizing.ZoneHumRatAtHeatPeak = calcZoneSizing.ZoneHumRatAtLatentHeatPeak;
+            calcZoneSizing.HeatPeakDateHrMin = zsCalcFinalSizing.LatHeatPeakDateHrMin;
+
+            // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
+            // not sure at this point if heating should reset HeatDesHumRat
+            if (calcZoneSizing.ZnLatHeatDgnSAMethod == SupplyAirHumidityRatio) {
+                calcZoneSizing.HeatDesHumRat = calcZoneSizing.LatentHeatDesHumRat;
+            } else {
+                calcZoneSizing.HeatDesHumRat = calcZoneSizing.ZoneHumRatAtLatentHeatPeak + calcZoneSizing.HeatDesHumRatDiff;
+            }
+        }
+    }
+}
+void updateZoneSizingEndZoneSizingCalc4(DataSizing::ZoneSizingData &zsSizing, DataSizing::ZoneSizingData const &zsCalcSizing)
+{
+    zsSizing.CoolDesDay = zsCalcSizing.CoolDesDay;
+    zsSizing.HeatDesDay = zsCalcSizing.HeatDesDay;
+    zsSizing.DesHeatDens = zsCalcSizing.DesHeatDens;
+    zsSizing.DesCoolDens = zsCalcSizing.DesCoolDens;
+    zsSizing.HeatDDNum = zsCalcSizing.HeatDDNum;
+    zsSizing.CoolDDNum = zsCalcSizing.CoolDDNum;
+
+    zsSizing.DesHeatLoad = zsCalcSizing.DesHeatLoad;
+    zsSizing.DesHeatMassFlow = zsCalcSizing.DesHeatMassFlow;
+    zsSizing.ZoneTempAtHeatPeak = zsCalcSizing.ZoneTempAtHeatPeak;
+    zsSizing.OutTempAtHeatPeak = zsCalcSizing.OutTempAtHeatPeak;
+    zsSizing.ZoneRetTempAtHeatPeak = zsCalcSizing.ZoneRetTempAtHeatPeak;
+    zsSizing.ZoneHumRatAtHeatPeak = zsCalcSizing.ZoneHumRatAtHeatPeak;
+    zsSizing.OutHumRatAtHeatPeak = zsCalcSizing.OutHumRatAtHeatPeak;
+    zsSizing.TimeStepNumAtHeatMax = zsCalcSizing.TimeStepNumAtHeatMax;
+    zsSizing.DesHeatVolFlow = zsCalcSizing.DesHeatVolFlow;
+    zsSizing.DesHeatCoilInTemp = zsCalcSizing.DesHeatCoilInTemp;
+    zsSizing.DesHeatCoilInHumRat = zsCalcSizing.DesHeatCoilInHumRat;
+    zsSizing.CoolDesHumRat = zsCalcSizing.CoolDesHumRat;
+
+    zsSizing.DesCoolLoad = zsCalcSizing.DesCoolLoad;
+    zsSizing.DesCoolMassFlow = zsCalcSizing.DesCoolMassFlow;
+    zsSizing.ZoneTempAtCoolPeak = zsCalcSizing.ZoneTempAtCoolPeak;
+    zsSizing.OutTempAtCoolPeak = zsCalcSizing.OutTempAtCoolPeak;
+    zsSizing.ZoneRetTempAtCoolPeak = zsCalcSizing.ZoneRetTempAtCoolPeak;
+    zsSizing.ZoneHumRatAtCoolPeak = zsCalcSizing.ZoneHumRatAtCoolPeak;
+    zsSizing.OutHumRatAtCoolPeak = zsCalcSizing.OutHumRatAtCoolPeak;
+    zsSizing.TimeStepNumAtCoolMax = zsCalcSizing.TimeStepNumAtCoolMax;
+    zsSizing.DesCoolVolFlow = zsCalcSizing.DesCoolVolFlow;
+    zsSizing.DesCoolCoilInTemp = zsCalcSizing.DesCoolCoilInTemp;
+    zsSizing.DesCoolCoilInHumRat = zsCalcSizing.DesCoolCoilInHumRat;
+}
+
+void updateZoneSizingEndZoneSizingCalc5(DataSizing::ZoneSizingData &zsFinalSizing, DataSizing::ZoneSizingData const &zsCalcFinalSizing)
+{
+    // SpaceSizing TODO: This is essentially the same as updateZoneSizingEndZoneSizingCalc4, except there are two extra fields copied here
+    zsFinalSizing.CoolDesDay = zsCalcFinalSizing.CoolDesDay;
+    zsFinalSizing.HeatDesDay = zsCalcFinalSizing.HeatDesDay;
+    zsFinalSizing.DesHeatDens = zsCalcFinalSizing.DesHeatDens;
+    zsFinalSizing.DesCoolDens = zsCalcFinalSizing.DesCoolDens;
+    zsFinalSizing.HeatDDNum = zsCalcFinalSizing.HeatDDNum;
+    zsFinalSizing.CoolDDNum = zsCalcFinalSizing.CoolDDNum;
+
+    zsFinalSizing.DesHeatLoad = zsCalcFinalSizing.DesHeatLoad;
+    zsFinalSizing.NonAirSysDesHeatLoad = zsCalcFinalSizing.DesHeatLoad;
+    zsFinalSizing.DesHeatMassFlow = zsCalcFinalSizing.DesHeatMassFlow;
+    zsFinalSizing.ZoneTempAtHeatPeak = zsCalcFinalSizing.ZoneTempAtHeatPeak;
+    zsFinalSizing.OutTempAtHeatPeak = zsCalcFinalSizing.OutTempAtHeatPeak;
+    zsFinalSizing.ZoneRetTempAtHeatPeak = zsCalcFinalSizing.ZoneRetTempAtHeatPeak;
+    zsFinalSizing.ZoneHumRatAtHeatPeak = zsCalcFinalSizing.ZoneHumRatAtHeatPeak;
+    zsFinalSizing.OutHumRatAtHeatPeak = zsCalcFinalSizing.OutHumRatAtHeatPeak;
+    zsFinalSizing.TimeStepNumAtHeatMax = zsCalcFinalSizing.TimeStepNumAtHeatMax;
+    zsFinalSizing.DesHeatVolFlow = zsCalcFinalSizing.DesHeatVolFlow;
+    zsFinalSizing.NonAirSysDesHeatVolFlow = zsCalcFinalSizing.DesHeatVolFlow; // SpaceSizing TODO: Suspicious
+    zsFinalSizing.DesHeatCoilInTemp = zsCalcFinalSizing.DesHeatCoilInTemp;
+    zsFinalSizing.DesHeatCoilInHumRat = zsCalcFinalSizing.DesHeatCoilInHumRat;
+    zsFinalSizing.CoolDesHumRat = zsCalcFinalSizing.CoolDesHumRat;
+
+    zsFinalSizing.DesCoolLoad = zsCalcFinalSizing.DesCoolLoad;
+    zsFinalSizing.NonAirSysDesCoolLoad = zsCalcFinalSizing.DesCoolLoad;
+    zsFinalSizing.DesCoolMassFlow = zsCalcFinalSizing.DesCoolMassFlow;
+    zsFinalSizing.ZoneTempAtCoolPeak = zsCalcFinalSizing.ZoneTempAtCoolPeak;
+    zsFinalSizing.OutTempAtCoolPeak = zsCalcFinalSizing.OutTempAtCoolPeak;
+    zsFinalSizing.ZoneRetTempAtCoolPeak = zsCalcFinalSizing.ZoneRetTempAtCoolPeak;
+    zsFinalSizing.ZoneHumRatAtCoolPeak = zsCalcFinalSizing.ZoneHumRatAtCoolPeak;
+    zsFinalSizing.OutHumRatAtCoolPeak = zsCalcFinalSizing.OutHumRatAtCoolPeak;
+    zsFinalSizing.TimeStepNumAtCoolMax = zsCalcFinalSizing.TimeStepNumAtCoolMax;
+    zsFinalSizing.DesCoolVolFlow = zsCalcFinalSizing.DesCoolVolFlow;
+    zsFinalSizing.NonAirSysDesCoolVolFlow = zsCalcFinalSizing.DesCoolVolFlow; // SpaceSizing TODO: Suspicious
+    zsFinalSizing.DesCoolCoilInTemp = zsCalcFinalSizing.DesCoolCoilInTemp;
+    zsFinalSizing.DesCoolCoilInHumRat = zsCalcFinalSizing.DesCoolCoilInHumRat;
+}
+
+void updateZoneSizingEndZoneSizingCalc6(DataSizing::ZoneSizingData &zsSizing,
+                                        DataSizing::ZoneSizingData const &zsCalcSizing,
+                                        int const numTimeStepsInDay)
+{
+    // This is called for all zsSizing/zsCalcSizing (2D arrays) and FinalZoneSizing/CalcFinalZoneSizing (1D arrays) for both zones and spaces
+    for (int TimeStepIndex = 1; TimeStepIndex <= numTimeStepsInDay; ++TimeStepIndex) {
+        zsSizing.HeatFlowSeq(TimeStepIndex) = zsCalcSizing.HeatFlowSeq(TimeStepIndex);
+        zsSizing.HeatLoadSeq(TimeStepIndex) = zsCalcSizing.HeatLoadSeq(TimeStepIndex);
+        zsSizing.CoolFlowSeq(TimeStepIndex) = zsCalcSizing.CoolFlowSeq(TimeStepIndex);
+        zsSizing.CoolLoadSeq(TimeStepIndex) = zsCalcSizing.CoolLoadSeq(TimeStepIndex);
+        zsSizing.HeatZoneTempSeq(TimeStepIndex) = zsCalcSizing.HeatZoneTempSeq(TimeStepIndex);
+        zsSizing.HeatOutTempSeq(TimeStepIndex) = zsCalcSizing.HeatOutTempSeq(TimeStepIndex);
+        zsSizing.HeatZoneRetTempSeq(TimeStepIndex) = zsCalcSizing.HeatZoneRetTempSeq(TimeStepIndex);
+        zsSizing.HeatZoneHumRatSeq(TimeStepIndex) = zsCalcSizing.HeatZoneHumRatSeq(TimeStepIndex);
+        zsSizing.HeatOutHumRatSeq(TimeStepIndex) = zsCalcSizing.HeatOutHumRatSeq(TimeStepIndex);
+        zsSizing.CoolZoneTempSeq(TimeStepIndex) = zsCalcSizing.CoolZoneTempSeq(TimeStepIndex);
+        zsSizing.CoolOutTempSeq(TimeStepIndex) = zsCalcSizing.CoolOutTempSeq(TimeStepIndex);
+        zsSizing.CoolZoneRetTempSeq(TimeStepIndex) = zsCalcSizing.CoolZoneRetTempSeq(TimeStepIndex);
+        zsSizing.CoolZoneHumRatSeq(TimeStepIndex) = zsCalcSizing.CoolZoneHumRatSeq(TimeStepIndex);
+        zsSizing.CoolOutHumRatSeq(TimeStepIndex) = zsCalcSizing.CoolOutHumRatSeq(TimeStepIndex);
+    }
+}
+
+void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
+                                        DataSizing::ZoneSizingData &zsFinalSizing,
+                                        DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                        Array2D<DataSizing::ZoneSizingData> &zsSizing,
+                                        Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                        int const zoneOrSpaceNum)
+{
+    static constexpr std::string_view RoutineName("updateZoneSizingEndZoneSizingCalc7");
+    // update non air system design load and air flow to include the sizing factor
+    zsFinalSizing.NonAirSysDesCoolLoad *= zsFinalSizing.CoolSizingFactor;
+    zsFinalSizing.NonAirSysDesCoolVolFlow *= zsFinalSizing.CoolSizingFactor; // NonAirSysDesCoolVolFlow not currently used
+    // Now take into account the user specified sizing factor and user specified cooling design air flow rate
+    Real64 TotCoolSizMult = 0.0;
+    // Calculate a sizing factor from the user specified cooling design air flow rate
+    if (zsFinalSizing.InpDesCoolAirFlow > 0.0 && zsFinalSizing.CoolAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
+        zsFinalSizing.DesCoolVolFlow > 0.0) {
+        TotCoolSizMult = (zsFinalSizing.InpDesCoolAirFlow / zsFinalSizing.DesCoolVolFlow) * zsFinalSizing.CoolSizingFactor;
+        // If no user specified cooling design air flow rate input, use the user specified szing factor
+    } else {
+        TotCoolSizMult = zsFinalSizing.CoolSizingFactor;
+    }
+    // If the cooling sizing multiplier is not 1, adjust the cooling design data
+    if (std::abs(TotCoolSizMult - 1.0) > 0.00001) {
+        if (zsFinalSizing.DesCoolVolFlow > 0.0) {
+            int TimeStepAtPeak = zsFinalSizing.TimeStepNumAtCoolMax;
+            int DDNum = zsFinalSizing.CoolDDNum;
+            zsFinalSizing.DesCoolVolFlow = zsCalcFinalSizing.DesCoolVolFlow * TotCoolSizMult;
+            zsFinalSizing.DesCoolMassFlow = zsCalcFinalSizing.DesCoolMassFlow * TotCoolSizMult;
+            zsFinalSizing.DesCoolLoad = zsCalcFinalSizing.DesCoolLoad * TotCoolSizMult;
+            zsFinalSizing.CoolFlowSeq = zsCalcFinalSizing.CoolFlowSeq * TotCoolSizMult;
+            zsFinalSizing.CoolLoadSeq = zsCalcFinalSizing.CoolLoadSeq * TotCoolSizMult;
+            Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesCoolVolFlow;
+            OAFrac = min(1.0, max(0.0, OAFrac));
+            zsFinalSizing.DesCoolCoilInTemp =
+                OAFrac * state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zsFinalSizing.ZoneTempAtCoolPeak;
+            zsFinalSizing.DesCoolCoilInHumRat =
+                OAFrac * state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak) + (1.0 - OAFrac) * zsFinalSizing.ZoneHumRatAtCoolPeak;
+        } else {
+            zsFinalSizing.DesCoolVolFlow = zsFinalSizing.InpDesCoolAirFlow;
+            zsFinalSizing.DesCoolMassFlow = zsFinalSizing.DesCoolVolFlow * zsFinalSizing.DesCoolDens;
+        }
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            if (zoneSizing.DesCoolVolFlow > 0.0) {
+                int TimeStepAtPeak = zoneSizing.TimeStepNumAtCoolMax;
+                auto &calcZoneSizing = zsCalcSizing(DDNum, zoneOrSpaceNum);
+                auto &desDayWeath = state.dataSize->DesDayWeath(DDNum);
+                zoneSizing.DesCoolVolFlow = calcZoneSizing.DesCoolVolFlow * TotCoolSizMult;
+                zoneSizing.DesCoolMassFlow = calcZoneSizing.DesCoolMassFlow * TotCoolSizMult;
+                zoneSizing.DesCoolLoad = calcZoneSizing.DesCoolLoad * TotCoolSizMult;
+                zoneSizing.CoolFlowSeq = calcZoneSizing.CoolFlowSeq * TotCoolSizMult;
+                zoneSizing.CoolLoadSeq = calcZoneSizing.CoolLoadSeq * TotCoolSizMult;
+                Real64 OAFrac = zoneSizing.MinOA / zoneSizing.DesCoolVolFlow;
+                OAFrac = min(1.0, max(0.0, OAFrac));
+                zoneSizing.DesCoolCoilInTemp = OAFrac * desDayWeath.Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizing.ZoneTempAtCoolPeak;
+                zoneSizing.DesCoolCoilInHumRat = OAFrac * desDayWeath.HumRat(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizing.ZoneHumRatAtCoolPeak;
+            } else {
+                zoneSizing.DesCoolVolFlow = zoneSizing.InpDesCoolAirFlow;
+                zoneSizing.DesCoolMassFlow = zoneSizing.DesCoolVolFlow * zoneSizing.DesCoolDens;
+            }
+            // Save cooling flows without MinOA for use later
+            zoneSizing.CoolFlowSeqNoOA = zoneSizing.CoolFlowSeq;
+            zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
+            zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
+        }
+    }
+    // Save a set of design cooling air flow rates greater than or equal to the specified minimums without MinOA
+    {
+        Real64 MaxOfMinCoolVolFlowNoOA = 0.0; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
+        if (zsFinalSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
+            MaxOfMinCoolVolFlowNoOA = max(zsFinalSizing.DesCoolMinAirFlow, zsFinalSizing.DesCoolMinAirFlow2);
+        }
+        Real64 MaxOfMinCoolMassFlowNoOA =
+            MaxOfMinCoolVolFlowNoOA * zsFinalSizing.DesCoolDens; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
+        zsFinalSizing.DesCoolVolFlowNoOA = zsFinalSizing.DesCoolVolFlow;
+        zsFinalSizing.DesCoolMassFlowNoOA = zsFinalSizing.DesCoolMassFlow;
+        if (MaxOfMinCoolVolFlowNoOA > zsFinalSizing.DesCoolVolFlowNoOA) {
+            zsFinalSizing.DesCoolVolFlowNoOA = MaxOfMinCoolVolFlowNoOA;
+            zsFinalSizing.DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
+        }
+        for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+            zsFinalSizing.CoolFlowSeqNoOA(TimeStepIndex) = zsFinalSizing.CoolFlowSeq(TimeStepIndex);
+            if (MaxOfMinCoolMassFlowNoOA > zsFinalSizing.CoolFlowSeqNoOA(TimeStepIndex)) {
+                zsFinalSizing.CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
+            }
+        }
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
+            zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
+            MaxOfMinCoolVolFlowNoOA = max(zoneSizing.DesCoolMinAirFlow, zoneSizing.DesCoolMinAirFlow);
+            MaxOfMinCoolMassFlowNoOA = MaxOfMinCoolVolFlowNoOA * zoneSizing.DesCoolDens;
+            if (MaxOfMinCoolVolFlowNoOA > zoneSizing.DesCoolVolFlow) {
+                zoneSizing.DesCoolVolFlowNoOA = MaxOfMinCoolVolFlowNoOA;
+                zoneSizing.DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
+            }
+            for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+                zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = zoneSizing.CoolFlowSeq(TimeStepIndex);
+                if (MaxOfMinCoolMassFlowNoOA > zoneSizing.CoolFlowSeq(TimeStepIndex)) {
+                    zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
+                }
+            }
+        }
+    }
+
+    // Now make sure that the design cooling air flow rates are greater than or equal to the specified minimums including MinOA
+    {
+        Real64 MaxOfMinCoolVolFlow = 0.0; // max of the user specified design cooling minimum flows and min OA flow [m3/s]
+        if (zsFinalSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
+            MaxOfMinCoolVolFlow = max(zsFinalSizing.DesCoolMinAirFlow, zsFinalSizing.DesCoolMinAirFlow2, zsFinalSizing.MinOA);
+        } else {
+            MaxOfMinCoolVolFlow = zsFinalSizing.MinOA;
+        }
+        Real64 MaxOfMinCoolMassFlow =
+            MaxOfMinCoolVolFlow * zsFinalSizing.DesCoolDens; // max of the user specified design cooling minimum flows and min OA flow [kg/s]
+        if (MaxOfMinCoolVolFlow > zsFinalSizing.DesCoolVolFlow) {
+            zsFinalSizing.DesCoolVolFlow = MaxOfMinCoolVolFlow;
+            zsFinalSizing.DesCoolMassFlow = MaxOfMinCoolMassFlow;
+        }
+        for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+            if (MaxOfMinCoolMassFlow > zsFinalSizing.CoolFlowSeq(TimeStepIndex)) {
+                zsFinalSizing.CoolFlowSeq(TimeStepIndex) = MaxOfMinCoolMassFlow;
+            }
+        }
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            MaxOfMinCoolVolFlow = max(zoneSizing.DesCoolMinAirFlow, zoneSizing.DesCoolMinAirFlow, zoneSizing.MinOA);
+            MaxOfMinCoolMassFlow = MaxOfMinCoolVolFlow * zoneSizing.DesCoolDens;
+            if (MaxOfMinCoolVolFlow > zoneSizing.DesCoolVolFlow) {
+                zoneSizing.DesCoolVolFlow = MaxOfMinCoolVolFlow;
+                zoneSizing.DesCoolMassFlow = MaxOfMinCoolMassFlow;
+            }
+            for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+                if (MaxOfMinCoolMassFlow > zoneSizing.CoolFlowSeq(TimeStepIndex)) {
+                    zoneSizing.CoolFlowSeq(TimeStepIndex) = MaxOfMinCoolMassFlow;
+                }
+            }
+        }
+    }
+    // IF cooling flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data (end of IF)
+    if (zsFinalSizing.DesCoolLoad == 0) {
+        // Check CoolDDNum and TimeStepNumAtCoolMax value and default to 1 if not set, carried over from previous code
+        if (zsCalcFinalSizing.CoolDDNum == 0) {
+            zsCalcFinalSizing.CoolDDNum = 1;
+        }
+        if (zsCalcFinalSizing.TimeStepNumAtCoolMax == 0) {
+            zsCalcFinalSizing.TimeStepNumAtCoolMax = 1;
+        }
+        zsFinalSizing.TimeStepNumAtCoolMax = zsCalcFinalSizing.TimeStepNumAtCoolMax;
+        zsFinalSizing.CoolDDNum = zsCalcFinalSizing.CoolDDNum;
+        zsFinalSizing.CoolDesDay = zsCalcFinalSizing.CoolDesDay;
+        int DDNumF = zsFinalSizing.CoolDDNum;
+        auto &zoneSizingF = zsSizing(DDNumF, zoneOrSpaceNum);
+        int TimeStepAtPeakF = zsFinalSizing.TimeStepNumAtCoolMax;
+
+        // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
+        // issue 6006, heating coils sizing to 0 when no heating load in zone
+        if (zoneSizingF.DesCoolSetPtSeq.empty()) {
+            ShowSevereError(
+                state,
+                format("{}:  Thermostat cooling set point temperatures are not initialized for Zone = {}", RoutineName, zsFinalSizing.ZoneName));
+            ShowFatalError(state, "Please send your input file to the EnergyPlus support/development team for further investigation.");
+        } else {
+            zsFinalSizing.ZoneTempAtCoolPeak = *std::min_element(zoneSizingF.DesCoolSetPtSeq.begin(), zoneSizingF.DesCoolSetPtSeq.end());
+        }
+        zsFinalSizing.OutTempAtCoolPeak = *std::min_element(zoneSizingF.CoolOutTempSeq.begin(), zoneSizingF.CoolOutTempSeq.end());
+        zsFinalSizing.OutHumRatAtCoolPeak = zoneSizingF.CoolOutHumRatSeq(TimeStepAtPeakF);
+        zsFinalSizing.ZoneHumRatAtCoolPeak = zoneSizingF.CoolDesHumRat;
+        zsCalcFinalSizing.ZoneTempAtCoolPeak = zoneSizingF.CoolZoneTempSeq(TimeStepAtPeakF);
+        zsCalcFinalSizing.ZoneHumRatAtCoolPeak = zoneSizingF.CoolZoneHumRatSeq(TimeStepAtPeakF);
+        zsCalcFinalSizing.ZoneRetTempAtCoolPeak = zsCalcFinalSizing.ZoneTempAtCoolPeak;
+        zsFinalSizing.DesCoolCoilInTemp = zsFinalSizing.ZoneTempAtCoolPeak;
+        zsFinalSizing.DesCoolCoilInHumRat = zsFinalSizing.ZoneHumRatAtCoolPeak;
+        zsFinalSizing.ZoneRetTempAtCoolPeak = zsFinalSizing.ZoneTempAtCoolPeak;
+    }
+    // update non air system design load and air flow to include the sizing factor
+    zsFinalSizing.NonAirSysDesHeatLoad *= zsFinalSizing.HeatSizingFactor;
+    zsFinalSizing.NonAirSysDesHeatVolFlow *= zsFinalSizing.HeatSizingFactor;
+    // Now take into account the user specified sizing factor or user specified heating design air flow rate (which overrides the
+    // sizing factor)
+    Real64 TotHeatSizMult = 0.0;
+    // Calculate a sizing factor from the user specified heating design air flow rate
+    if (zsFinalSizing.InpDesHeatAirFlow > 0.0 && zsFinalSizing.HeatAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
+        zsFinalSizing.DesHeatVolFlow > 0.0) {
+        TotHeatSizMult = (zsFinalSizing.InpDesHeatAirFlow / zsFinalSizing.DesHeatVolFlow) * zsFinalSizing.HeatSizingFactor;
+        // Calculate a sizing factor from the user specified max heating design air flow rates
+    } else if (zsFinalSizing.HeatAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim && zsFinalSizing.DesHeatVolFlow > 0.0) {
+        Real64 MaxHeatVolFlow = max(
+            zsFinalSizing.DesHeatMaxAirFlow, zsFinalSizing.DesHeatMaxAirFlow2, zsFinalSizing.DesCoolVolFlow * zsFinalSizing.DesHeatMaxAirFlowFrac);
+        if (MaxHeatVolFlow < zsFinalSizing.DesHeatVolFlow) {
+            TotHeatSizMult = (MaxHeatVolFlow / zsFinalSizing.DesHeatVolFlow) * zsFinalSizing.HeatSizingFactor;
+        } else {
+            TotHeatSizMult = zsFinalSizing.HeatSizingFactor;
+        }
+        // If no user specified heating design air flow rate input, use the user specified sizing factor
+    } else {
+        TotHeatSizMult = zsFinalSizing.HeatSizingFactor;
+    }
+
+    if (std::abs(TotHeatSizMult - 1.0) > 0.00001) {
+        if (zsFinalSizing.DesHeatVolFlow > 0.0) {
+            auto &desDayWeath = state.dataSize->DesDayWeath(zsFinalSizing.HeatDDNum);
+            zsFinalSizing.DesHeatVolFlow = zsCalcFinalSizing.DesHeatVolFlow * TotHeatSizMult;
+            zsFinalSizing.DesHeatMassFlow = zsCalcFinalSizing.DesHeatMassFlow * TotHeatSizMult;
+            zsFinalSizing.DesHeatLoad = zsCalcFinalSizing.DesHeatLoad * TotHeatSizMult;
+            zsFinalSizing.HeatFlowSeq = zsCalcFinalSizing.HeatFlowSeq * TotHeatSizMult;
+            zsFinalSizing.HeatLoadSeq = zsCalcFinalSizing.HeatLoadSeq * TotHeatSizMult;
+            Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesHeatVolFlow;
+            OAFrac = min(1.0, max(0.0, OAFrac));
+            zsFinalSizing.DesHeatCoilInTemp =
+                OAFrac * desDayWeath.Temp(zsFinalSizing.TimeStepNumAtHeatMax) + (1.0 - OAFrac) * zsFinalSizing.ZoneTempAtHeatPeak;
+            zsFinalSizing.DesHeatCoilInHumRat =
+                OAFrac * desDayWeath.HumRat(zsFinalSizing.TimeStepNumAtHeatMax) + (1.0 - OAFrac) * zsFinalSizing.ZoneHumRatAtHeatPeak;
+        } else {
+            zsFinalSizing.DesHeatVolFlow = zsFinalSizing.InpDesHeatAirFlow;
+            zsFinalSizing.DesHeatMassFlow = zsFinalSizing.DesHeatVolFlow * zsFinalSizing.DesHeatDens;
+        }
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            auto &zoneSizingDD = zsSizing(DDNum, zoneOrSpaceNum);
+            if (zoneSizingDD.DesHeatVolFlow > 0.0) {
+                auto &calcZoneSizing = zsCalcSizing(DDNum, zoneOrSpaceNum);
+                int TimeStepAtPeak = zoneSizingDD.TimeStepNumAtHeatMax;
+                zoneSizingDD.DesHeatVolFlow = calcZoneSizing.DesHeatVolFlow * TotHeatSizMult;
+                zoneSizingDD.DesHeatMassFlow = calcZoneSizing.DesHeatMassFlow * TotHeatSizMult;
+                zoneSizingDD.DesHeatLoad = calcZoneSizing.DesHeatLoad * TotHeatSizMult;
+                zoneSizingDD.HeatFlowSeq = calcZoneSizing.HeatFlowSeq * TotHeatSizMult;
+                zoneSizingDD.HeatLoadSeq = calcZoneSizing.HeatLoadSeq * TotHeatSizMult;
+                Real64 OAFrac = zoneSizingDD.MinOA / zoneSizingDD.DesHeatVolFlow;
+                OAFrac = min(1.0, max(0.0, OAFrac));
+                zoneSizingDD.DesHeatCoilInTemp =
+                    OAFrac * state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizingDD.ZoneTempAtHeatPeak;
+                zoneSizingDD.DesHeatCoilInHumRat =
+                    OAFrac * state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizingDD.ZoneHumRatAtHeatPeak;
+            } else {
+                zoneSizingDD.DesHeatVolFlow = zoneSizingDD.InpDesHeatAirFlow;
+                zoneSizingDD.DesHeatMassFlow = zoneSizingDD.DesHeatVolFlow * zoneSizingDD.DesHeatDens;
+            }
+            // Save heating flows without MinOA for use later
+            zoneSizingDD.HeatFlowSeqNoOA = zoneSizingDD.HeatFlowSeq;
+            zoneSizingDD.DesHeatVolFlowNoOA = zoneSizingDD.DesHeatVolFlow;
+            zoneSizingDD.DesHeatMassFlowNoOA = zoneSizingDD.DesHeatMassFlow;
+        }
+    }
+
+    // Save a set of design heating air flow rates before the MinOA adjustment
+    // just in zsFinalSizing to use for TermUnit sizing adjustments in SizingManager::UpdateTermUnitFinalZoneSizing
+    zsFinalSizing.DesHeatVolFlowNoOA = zsFinalSizing.DesHeatVolFlow;
+    zsFinalSizing.DesHeatMassFlowNoOA = zsFinalSizing.DesHeatMassFlow;
+    for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+        zsFinalSizing.HeatFlowSeqNoOA(TimeStepIndex) = zsFinalSizing.HeatFlowSeq(TimeStepIndex);
+    }
+
+    // Now make sure that the design heating air flow rates are greater than or equal to MinOA
+    Real64 MinOAMass = zsFinalSizing.MinOA * zsFinalSizing.DesHeatDens;
+    if (zsFinalSizing.MinOA > zsFinalSizing.DesHeatVolFlow) {
+        zsFinalSizing.DesHeatVolFlow = zsFinalSizing.MinOA;
+        zsFinalSizing.DesHeatMassFlow = MinOAMass;
+    }
+    for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+        if (MinOAMass > zsFinalSizing.HeatFlowSeq(TimeStepIndex)) {
+            zsFinalSizing.HeatFlowSeq(TimeStepIndex) = MinOAMass;
+        }
+    }
+    for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+        auto &zoneSizingDD = zsSizing(DDNum, zoneOrSpaceNum);
+        MinOAMass = zoneSizingDD.MinOA * zoneSizingDD.DesHeatDens;
+        if (zoneSizingDD.MinOA > zoneSizingDD.DesHeatVolFlow) {
+            zoneSizingDD.DesHeatVolFlow = zoneSizingDD.MinOA;
+            zoneSizingDD.DesHeatMassFlow = MinOAMass;
+        }
+        for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
+            if (MinOAMass > zoneSizingDD.HeatFlowSeq(TimeStepIndex)) {
+                zoneSizingDD.HeatFlowSeq(TimeStepIndex) = MinOAMass;
+            }
+        }
+    }
+    // IF heating flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data
+    if (zsFinalSizing.DesHeatLoad == 0) {
+        // Check HDDNum and TimeStepNumAtHeatMax value and default to 1 if not set, carried over from previous code
+        if (zsCalcFinalSizing.HeatDDNum == 0) {
+            zsCalcFinalSizing.HeatDDNum = 1;
+        }
+        if (zsCalcFinalSizing.TimeStepNumAtHeatMax == 0) {
+            zsCalcFinalSizing.TimeStepNumAtHeatMax = 1;
+        }
+        zsFinalSizing.TimeStepNumAtHeatMax = zsCalcFinalSizing.TimeStepNumAtHeatMax;
+        zsFinalSizing.HeatDDNum = zsCalcFinalSizing.HeatDDNum;
+        zsFinalSizing.HeatDesDay = zsCalcFinalSizing.HeatDesDay;
+        int DDNumF = zsFinalSizing.HeatDDNum;
+        auto &zoneSizingDDF = zsSizing(DDNumF, zoneOrSpaceNum);
+        int TimeStepAtPeakF = zsFinalSizing.TimeStepNumAtHeatMax;
+
+        // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
+        // issue 6006, heating coils sizing to 0 when no heating load in zone
+        if (zoneSizingDDF.DesHeatSetPtSeq.empty()) {
+            ShowSevereError(
+                state, format("{}:  Thermostat heating set point temperatures not initialized for Zone = {}", RoutineName, zsFinalSizing.ZoneName));
+            ShowFatalError(state, "Please send your input file to the EnergyPlus support/development team for further investigation.");
+        } else {
+            zsFinalSizing.ZoneTempAtHeatPeak = *std::max_element(zoneSizingDDF.DesHeatSetPtSeq.begin(), zoneSizingDDF.DesHeatSetPtSeq.end());
+        }
+        zsFinalSizing.OutTempAtHeatPeak = *std::min_element(zoneSizingDDF.HeatOutTempSeq.begin(), zoneSizingDDF.HeatOutTempSeq.end());
+        zsFinalSizing.OutHumRatAtHeatPeak = zoneSizingDDF.HeatOutHumRatSeq(TimeStepAtPeakF);
+        zsFinalSizing.ZoneHumRatAtHeatPeak = zoneSizingDDF.HeatDesHumRat;
+        zsCalcFinalSizing.ZoneTempAtHeatPeak = zoneSizingDDF.HeatZoneTempSeq(TimeStepAtPeakF);
+        zsCalcFinalSizing.ZoneHumRatAtHeatPeak = zoneSizingDDF.HeatZoneHumRatSeq(TimeStepAtPeakF);
+        zsCalcFinalSizing.ZoneRetTempAtHeatPeak = zsCalcFinalSizing.ZoneTempAtHeatPeak;
+        zsFinalSizing.DesHeatCoilInTemp = zsFinalSizing.ZoneTempAtHeatPeak;
+        zsFinalSizing.DesHeatCoilInHumRat = zsFinalSizing.ZoneHumRatAtHeatPeak;
+        zsFinalSizing.ZoneRetTempAtHeatPeak = zsFinalSizing.ZoneTempAtHeatPeak;
+    }
+
+    // set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
+    // minimum flow rates (comment seems incorrect, really used as a minimum lower limit for the maximum air flow)
+    zsFinalSizing.DesCoolVolFlowMin =
+        max(zsFinalSizing.DesCoolMinAirFlow, zsFinalSizing.DesCoolMinAirFlow2, zsFinalSizing.DesCoolVolFlow * zsFinalSizing.DesCoolMinAirFlowFrac);
+    // set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
+    // max heating flow rates
+    zsFinalSizing.DesHeatVolFlowMax = max(zsFinalSizing.DesHeatMaxAirFlow,
+                                          zsFinalSizing.DesHeatMaxAirFlow2,
+                                          max(zsFinalSizing.DesCoolVolFlow, zsFinalSizing.DesHeatVolFlow) * zsFinalSizing.DesHeatMaxAirFlowFrac);
+    // Determine the design cooling supply air temperature if the supply air temperature difference is specified by user.
+    if (zsFinalSizing.ZnCoolDgnSAMethod == TemperatureDifference) {
+        zsFinalSizing.CoolDesTemp = zsFinalSizing.ZoneTempAtCoolPeak - std::abs(zsFinalSizing.CoolDesTempDiff);
+    }
+    // Determine the design heating supply air temperature if the supply air temperature difference is specified by user.
+    if (zsFinalSizing.ZnHeatDgnSAMethod == TemperatureDifference) {
+        zsFinalSizing.HeatDesTemp = zsFinalSizing.ZoneTempAtHeatPeak + std::abs(zsFinalSizing.HeatDesTempDiff);
+    }
+}
+
 void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallIndicator)
 {
 
@@ -2070,17 +2752,15 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
             for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-                auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
-                if (std::abs(calcFinalZoneSizing.DesCoolLoad) <= 1.e-8) {
-                    ShowWarningError(state, format("Calculated design cooling load for zone={} is zero.", calcFinalZoneSizing.ZoneName));
-                    ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
-                }
-                if (std::abs(calcFinalZoneSizing.DesHeatLoad) <= 1.e-8) {
-                    ShowWarningError(state, format("Calculated design heating load for zone={} is zero.", calcFinalZoneSizing.ZoneName));
-                    ShowContinueError(state, "Check Sizing:Zone and ZoneControl:Thermostat inputs.");
+                updateZoneSizingEndZoneSizingCalc1(state, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum));
+                if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                    for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
+                        updateZoneSizingEndZoneSizingCalc1(state, state.dataSize->CalcFinalSpaceSizing(spaceNum));
+                    }
                 }
             }
 
+            // SpaceSizing TODO: For now only write zone-level zsz
             print(state.files.zsz, "Time");
             for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
@@ -2154,116 +2834,6 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                       calcFinalZoneSizing.ZoneName,
                       calcFinalZoneSizing.CoolDesDay,
                       ":Cooling Zone Relative Humidity [%]");
-
-                // Should this be done only if there is a cooling load? Or would this message help determine why there was no load?
-                if (std::abs(state.dataSize->CalcFinalZoneSizing(I).DesCoolLoad) > 1.e-8) {
-                    // check for low cooling delta T from supply to zone to see if air volume flow rate might be excessively high
-                    if (state.dataSize->CalcFinalZoneSizing(I).ZnCoolDgnSAMethod == SupplyAirTemperature) {
-                        SupplyTemp = state.dataSize->CalcFinalZoneSizing(I).CoolDesTemp;
-                        DeltaTemp = SupplyTemp - state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak;
-                    } else {
-                        DeltaTemp = -std::abs(state.dataSize->CalcFinalZoneSizing(I).CoolDesTempDiff);
-                        SupplyTemp = DeltaTemp + state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak;
-                    }
-
-                    // check for low delta T to avoid very high flow rates
-                    if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
-                        if (std::abs(DeltaTemp) >= 2.0) {                                                    // Vdot exceeds 3000 cfm/ton @ DT=2
-                            ShowWarningError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 5C of zone temperature");
-                        } else {
-                            ShowSevereError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of zone temperature");
-                        }
-                        ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
-                        ShowContinueError(state, format("...zone name = {}", state.dataSize->CalcFinalZoneSizing(I).ZoneName));
-                        ShowContinueError(state,
-                                          format("...design sensible cooling load = {:.2R} W", state.dataSize->CalcFinalZoneSizing(I).DesCoolLoad));
-                        ShowContinueError(state,
-                                          format("...thermostat set point temp    = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).CoolTstatTemp));
-                        ShowContinueError(
-                            state, format("...zone temperature             = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak));
-                        ShowContinueError(state, format("...supply air temperature       = {:.3R} C", SupplyTemp));
-                        ShowContinueError(state, format("...temperature difference       = {:.5R} C", DeltaTemp));
-                        ShowContinueError(
-                            state, format("...calculated volume flow rate  = {:.5R} m3/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolVolFlow)));
-                        ShowContinueError(
-                            state, format("...calculated mass flow rate    = {:.5R} kg/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolMassFlow)));
-                        if (SupplyTemp > state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak)
-                            ShowContinueError(
-                                state, "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
-                    } else if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff &&
-                               SupplyTemp > state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak) {
-                        ShowSevereError(
-                            state, "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations");
-                        ShowContinueError(
-                            state, format("...calculated volume flow rate  = {:.5R} m3/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolVolFlow)));
-                        ShowContinueError(
-                            state, format("...calculated mass flow rate    = {:.5R} kg/s", (state.dataSize->CalcFinalZoneSizing(I).DesCoolMassFlow)));
-                        ShowContinueError(state,
-                                          format("...thermostat set point temp    = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).CoolTstatTemp));
-                        ShowContinueError(
-                            state, format("...zone temperature            = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtCoolPeak));
-                        ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
-                        ShowContinueError(state, format("...occurs in zone              = {}", state.dataSize->CalcFinalZoneSizing(I).ZoneName));
-                        ShowContinueError(
-                            state, "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations");
-                    }
-                }
-                // Should this be done only if there is a heating load? Or would this message help determine why there was no load?
-                if (std::abs(state.dataSize->CalcFinalZoneSizing(I).DesHeatLoad) > 1.e-8) { // ABS() ?
-                    // check for low cooling delta T from supply to zone to see if air volume flow rate might be excessively high
-                    if (state.dataSize->CalcFinalZoneSizing(I).ZnHeatDgnSAMethod == SupplyAirTemperature) {
-                        SupplyTemp = state.dataSize->CalcFinalZoneSizing(I).HeatDesTemp;
-                        DeltaTemp = SupplyTemp - state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak;
-                    } else {
-                        DeltaTemp = state.dataSize->CalcFinalZoneSizing(I).HeatDesTempDiff;
-                        SupplyTemp = DeltaTemp + state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak;
-                    }
-
-                    if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
-                        if (std::abs(DeltaTemp) >= 2.0) {                                                    // Vdot exceeds 3000 cfm/ton @ DT=2
-                            ShowWarningError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 5C of zone temperature");
-                        } else {
-                            ShowSevereError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of zone temperature");
-                        }
-                        ShowContinueError(state, "...check zone thermostat set point and design supply air temperatures");
-                        ShowContinueError(state, format("...zone name = {}", state.dataSize->CalcFinalZoneSizing(I).ZoneName));
-                        ShowContinueError(state,
-                                          format("...design heating load         = {:.2R} W", state.dataSize->CalcFinalZoneSizing(I).DesHeatLoad));
-                        ShowContinueError(state,
-                                          format("...thermostat set point temp   = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).HeatTstatTemp));
-                        ShowContinueError(
-                            state, format("...zone temperature            = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak));
-                        ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
-                        ShowContinueError(state, format("...temperature difference      = {:.5R} C", DeltaTemp));
-                        ShowContinueError(
-                            state, format("...calculated volume flow rate = {:.5R} m3/s", (state.dataSize->CalcFinalZoneSizing(I).DesHeatVolFlow)));
-                        ShowContinueError(
-                            state, format("...calculated mass flow rate   = {:.5R} kg/s", (state.dataSize->CalcFinalZoneSizing(I).DesHeatMassFlow)));
-                        if (SupplyTemp < state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak)
-                            ShowContinueError(state,
-                                              "...Note: supply air temperature should be greater than zone temperature during heating air "
-                                              "flow calculations");
-                    } else if (std::abs(DeltaTemp) > DataHVACGlobals::SmallTempDiff &&
-                               SupplyTemp < state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak) {
-                        ShowSevereError(
-                            state, "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations");
-                        ShowContinueError(state,
-                                          format("...calculated design heating volume flow rate = {:.5R} m3/s",
-                                                 (state.dataSize->CalcFinalZoneSizing(I).DesHeatVolFlow)));
-                        ShowContinueError(state,
-                                          format("...calculated design heating mass flow rate   = {:.5R} kg/s",
-                                                 (state.dataSize->CalcFinalZoneSizing(I).DesHeatMassFlow)));
-                        ShowContinueError(state,
-                                          format("...thermostat set point temp   = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).HeatTstatTemp));
-                        ShowContinueError(
-                            state, format("...zone temperature            = {:.3R} C", state.dataSize->CalcFinalZoneSizing(I).ZoneTempAtHeatPeak));
-                        ShowContinueError(state, format("...supply air temperature      = {:.3R} C", SupplyTemp));
-                        ShowContinueError(state, format("...occurs in zone              = {}", state.dataSize->CalcFinalZoneSizing(I).ZoneName));
-                        ShowContinueError(state,
-                                          "...Note: supply air temperature should be greater than zone temperature during heating air "
-                                          "flow calculations");
-                    }
-                }
             }
 
             print(state.files.zsz, "\n");
@@ -2283,19 +2853,11 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
-                        if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtHeatMax) {
-                            calcFinalZoneSizing.HeatPeakDateHrMin = calcFinalZoneSizing.cHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
-                        }
-                        if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtCoolMax) {
-                            calcFinalZoneSizing.CoolPeakDateHrMin = calcFinalZoneSizing.cCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
-                        }
-                        if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtLatentHeatMax) {
-                            calcFinalZoneSizing.LatHeatPeakDateHrMin =
-                                calcFinalZoneSizing.cLatentHeatDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
-                        }
-                        if (TimeStepIndex == calcFinalZoneSizing.TimeStepNumAtLatentCoolMax) {
-                            calcFinalZoneSizing.LatCoolPeakDateHrMin =
-                                calcFinalZoneSizing.cLatentCoolDDDate + ' ' + format(PeakHrMinFmt, HourPrint, Minutes);
+                        updateZoneSizingEndZoneSizingCalc2(state.dataSize->CalcFinalZoneSizing(CtrlZoneNum), TimeStepIndex, HourPrint, Minutes);
+                        if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                            for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
+                                updateZoneSizingEndZoneSizingCalc2(state.dataSize->CalcFinalSpaceSizing(spaceNum), TimeStepIndex, HourPrint, Minutes);
+                            }
                         }
                     }
 
@@ -2446,119 +3008,14 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                 if (!state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) continue;
                 // if this zone does not use latent sizing, skip zone and retain sensible load variables
                 if (!state.dataSize->CalcFinalZoneSizing(zoneNum).zoneLatentSizing) continue;
-                auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(zoneNum);
-
-                // latent sizing data has the same variables as sensible sizing data
-                // if the user has specified latent sizing, move the latent sizing data into the final calc arrays
-                // this method allows all upstream sizing functions to use the same data as before (e.g., DesCoolVolFlow)
-                // if sensible sizing, use sensible data. if latent sizing, use latent data (if there is latent data).
-                // if sensible or latent sizing, use larger of sensible and latent based on volume flow rate
-
-                if ((calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::Latent && calcFinalZoneSizing.DesLatentCoolVolFlow > 0.0) ||
-                    (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent &&
-                     calcFinalZoneSizing.DesLatentCoolLoad > calcFinalZoneSizing.DesCoolLoad)) {
-                    state.dataHeatBal->isAnyLatentLoad = true;
-                    calcFinalZoneSizing.CoolSizingType = "Latent Cooling"; // string reported to eio
-                    calcFinalZoneSizing.DesCoolVolFlow = calcFinalZoneSizing.DesLatentCoolVolFlow;
-                    calcFinalZoneSizing.DesCoolMassFlow = calcFinalZoneSizing.DesLatentCoolMassFlow;
-                    calcFinalZoneSizing.DesCoolLoad = calcFinalZoneSizing.DesLatentCoolLoad;
-                    calcFinalZoneSizing.CoolDesDay = calcFinalZoneSizing.LatCoolDesDay;
-                    calcFinalZoneSizing.cCoolDDDate = calcFinalZoneSizing.cLatentCoolDDDate;
-                    calcFinalZoneSizing.CoolDDNum = calcFinalZoneSizing.LatentCoolDDNum;
-                    calcFinalZoneSizing.TimeStepNumAtCoolMax = calcFinalZoneSizing.TimeStepNumAtLatentCoolMax;
-                    calcFinalZoneSizing.CoolFlowSeq = calcFinalZoneSizing.LatentCoolFlowSeq;
-                    calcFinalZoneSizing.DesCoolCoilInTemp = calcFinalZoneSizing.DesLatentCoolCoilInTemp;
-                    calcFinalZoneSizing.DesCoolCoilInHumRat = calcFinalZoneSizing.DesLatentCoolCoilInHumRat;
-                    calcFinalZoneSizing.ZoneRetTempAtCoolPeak = calcFinalZoneSizing.ZoneRetTempAtLatentCoolPeak;
-                    calcFinalZoneSizing.ZoneTempAtCoolPeak = calcFinalZoneSizing.ZoneTempAtLatentCoolPeak;
-                    calcFinalZoneSizing.ZoneHumRatAtCoolPeak = calcFinalZoneSizing.ZoneHumRatAtLatentCoolPeak;
-                    calcFinalZoneSizing.CoolPeakDateHrMin = calcFinalZoneSizing.LatCoolPeakDateHrMin;
-
-                    // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
-                    if (calcFinalZoneSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio) {
-                        calcFinalZoneSizing.CoolDesHumRat = calcFinalZoneSizing.LatentCoolDesHumRat;
-                    } else {
-                        calcFinalZoneSizing.CoolDesHumRat = calcFinalZoneSizing.ZoneHumRatAtLatentCoolPeak - calcFinalZoneSizing.CoolDesHumRatDiff;
-                    }
-
-                    if (calcFinalZoneSizing.LatentCoolDDNum > 0) {
-                        auto &calcZoneSizing = state.dataSize->CalcZoneSizing(calcFinalZoneSizing.LatentCoolDDNum, zoneNum);
-                        calcZoneSizing.DesCoolVolFlow = calcZoneSizing.DesLatentCoolVolFlow;
-                        calcZoneSizing.DesCoolMassFlow = calcZoneSizing.DesLatentCoolMassFlow;
-                        calcZoneSizing.DesCoolLoad = calcZoneSizing.DesLatentCoolLoad;
-                        calcZoneSizing.CoolDesDay = calcZoneSizing.LatCoolDesDay;
-                        calcZoneSizing.cCoolDDDate = calcFinalZoneSizing.cLatentCoolDDDate; // this has correct CoolDDDate
-                        calcZoneSizing.CoolDDNum = calcZoneSizing.LatentCoolDDNum;
-                        calcZoneSizing.TimeStepNumAtCoolMax = calcZoneSizing.TimeStepNumAtLatentCoolMax;
-                        calcZoneSizing.CoolFlowSeq = calcZoneSizing.LatentCoolFlowSeq;
-                        calcZoneSizing.DesCoolCoilInTemp = calcZoneSizing.DesLatentCoolCoilInTemp;
-                        calcZoneSizing.DesCoolCoilInHumRat = calcZoneSizing.DesLatentCoolCoilInHumRat;
-                        calcZoneSizing.ZoneRetTempAtCoolPeak = calcZoneSizing.ZoneRetTempAtLatentCoolPeak;
-                        calcZoneSizing.ZoneTempAtCoolPeak = calcZoneSizing.ZoneTempAtLatentCoolPeak;
-                        calcZoneSizing.ZoneHumRatAtCoolPeak = calcZoneSizing.ZoneHumRatAtLatentCoolPeak;
-                        calcZoneSizing.CoolPeakDateHrMin = calcFinalZoneSizing.LatCoolPeakDateHrMin;
-
-                        // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
-                        if (calcZoneSizing.ZnLatCoolDgnSAMethod == SupplyAirHumidityRatio) {
-                            calcZoneSizing.CoolDesHumRat = calcZoneSizing.LatentCoolDesHumRat;
-                        } else {
-                            calcZoneSizing.CoolDesHumRat = calcZoneSizing.ZoneHumRatAtLatentCoolPeak - calcZoneSizing.CoolDesHumRatDiff;
-                        }
-                    }
-                }
-                if ((calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::Latent && calcFinalZoneSizing.DesLatentHeatVolFlow > 0.0) ||
-                    (calcFinalZoneSizing.zoneSizingMethod == ZoneSizing::SensibleAndLatent &&
-                     calcFinalZoneSizing.DesLatentHeatLoad > calcFinalZoneSizing.DesHeatLoad)) {
-
-                    calcFinalZoneSizing.HeatSizingType = "Latent Heating"; // string reported to eio
-                    calcFinalZoneSizing.DesHeatVolFlow = calcFinalZoneSizing.DesLatentHeatVolFlow;
-                    calcFinalZoneSizing.DesHeatMassFlow = calcFinalZoneSizing.DesLatentHeatMassFlow;
-                    calcFinalZoneSizing.DesHeatLoad = calcFinalZoneSizing.DesLatentHeatLoad;
-                    calcFinalZoneSizing.HeatDesDay = calcFinalZoneSizing.LatHeatDesDay;
-                    calcFinalZoneSizing.cHeatDDDate = calcFinalZoneSizing.cLatentHeatDDDate;
-                    calcFinalZoneSizing.HeatDDNum = calcFinalZoneSizing.LatentHeatDDNum;
-                    calcFinalZoneSizing.TimeStepNumAtHeatMax = calcFinalZoneSizing.TimeStepNumAtLatentHeatMax;
-                    calcFinalZoneSizing.HeatFlowSeq = calcFinalZoneSizing.LatentHeatFlowSeq;
-                    calcFinalZoneSizing.DesHeatCoilInTemp = calcFinalZoneSizing.DesLatentHeatCoilInTemp;
-                    calcFinalZoneSizing.DesHeatCoilInHumRat = calcFinalZoneSizing.DesLatentHeatCoilInHumRat;
-                    calcFinalZoneSizing.ZoneRetTempAtHeatPeak = calcFinalZoneSizing.ZoneRetTempAtLatentHeatPeak;
-                    calcFinalZoneSizing.ZoneTempAtHeatPeak = calcFinalZoneSizing.ZoneTempAtLatentHeatPeak;
-                    calcFinalZoneSizing.ZoneHumRatAtHeatPeak = calcFinalZoneSizing.ZoneHumRatAtLatentHeatPeak;
-                    calcFinalZoneSizing.HeatPeakDateHrMin = calcFinalZoneSizing.LatHeatPeakDateHrMin;
-
-                    // will this cause sizing issues with heating coils since SA humrat is higher than zone humrat?
-                    // use zone humrat instead? this value would size humidifiers well, but what about heating coils?
-                    // not sure at this point if heating should reset HeatDesHumRat
-                    if (calcFinalZoneSizing.ZnLatHeatDgnSAMethod == SupplyAirHumidityRatio) {
-                        calcFinalZoneSizing.HeatDesHumRat = calcFinalZoneSizing.LatentHeatDesHumRat;
-                    } else {
-                        calcFinalZoneSizing.HeatDesHumRat = calcFinalZoneSizing.ZoneHumRatAtLatentHeatPeak + calcFinalZoneSizing.HeatDesHumRatDiff;
-                    }
-
-                    if (calcFinalZoneSizing.LatentHeatDDNum > 0) {
-                        auto &calcZoneSizing = state.dataSize->CalcZoneSizing(calcFinalZoneSizing.LatentHeatDDNum, zoneNum);
-                        calcZoneSizing.DesHeatVolFlow = calcZoneSizing.DesLatentHeatVolFlow;
-                        calcZoneSizing.DesHeatMassFlow = calcZoneSizing.DesLatentHeatMassFlow;
-                        calcZoneSizing.DesHeatLoad = calcZoneSizing.DesLatentHeatLoad;
-                        calcZoneSizing.HeatDesDay = calcZoneSizing.LatHeatDesDay;
-                        calcZoneSizing.cHeatDDDate = calcFinalZoneSizing.cLatentHeatDDDate; // this has correct HeatDDDate
-                        calcZoneSizing.HeatDDNum = calcZoneSizing.LatentHeatDDNum;
-                        calcZoneSizing.TimeStepNumAtHeatMax = calcZoneSizing.TimeStepNumAtLatentHeatMax;
-                        calcZoneSizing.HeatFlowSeq = calcZoneSizing.LatentHeatFlowSeq;
-                        calcZoneSizing.DesHeatCoilInTemp = calcZoneSizing.DesLatentHeatCoilInTemp;
-                        calcZoneSizing.DesHeatCoilInHumRat = calcZoneSizing.DesLatentHeatCoilInHumRat;
-                        calcZoneSizing.ZoneRetTempAtHeatPeak = calcZoneSizing.ZoneRetTempAtLatentHeatPeak;
-                        calcZoneSizing.ZoneTempAtHeatPeak = calcZoneSizing.ZoneTempAtLatentHeatPeak;
-                        calcZoneSizing.ZoneHumRatAtHeatPeak = calcZoneSizing.ZoneHumRatAtLatentHeatPeak;
-                        calcZoneSizing.HeatPeakDateHrMin = calcFinalZoneSizing.LatHeatPeakDateHrMin;
-
-                        // the zone supply air humrat used for latent sizing is required to adequately size coil capacity
-                        // not sure at this point if heating should reset HeatDesHumRat
-                        if (calcZoneSizing.ZnLatHeatDgnSAMethod == SupplyAirHumidityRatio) {
-                            calcZoneSizing.HeatDesHumRat = calcZoneSizing.LatentHeatDesHumRat;
-                        } else {
-                            calcZoneSizing.HeatDesHumRat = calcZoneSizing.ZoneHumRatAtLatentHeatPeak + calcZoneSizing.HeatDesHumRatDiff;
-                        }
+                updateZoneSizingEndZoneSizingCalc3(
+                    state.dataSize->CalcFinalZoneSizing(zoneNum), state.dataSize->CalcZoneSizing, state.dataHeatBal->isAnyLatentLoad, zoneNum);
+                if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                    for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+                        updateZoneSizingEndZoneSizingCalc3(state.dataSize->CalcFinalSpaceSizing(spaceNum),
+                                                           state.dataSize->CalcSpaceSizing,
+                                                           state.dataHeatBal->isAnyLatentLoad,
+                                                           spaceNum);
                     }
                 }
             }
@@ -2567,460 +3024,72 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
         // Move data from Calc arrays to user modified arrays
 
         for (std::size_t i = 0; i < state.dataSize->ZoneSizing.size(); ++i) {
-            auto &z(state.dataSize->ZoneSizing[i]);
-            auto const &c(state.dataSize->CalcZoneSizing[i]);
-            z.CoolDesDay = c.CoolDesDay;
-            z.HeatDesDay = c.HeatDesDay;
-            z.DesHeatDens = c.DesHeatDens;
-            z.DesCoolDens = c.DesCoolDens;
-            z.HeatDDNum = c.HeatDDNum;
-            z.CoolDDNum = c.CoolDDNum;
-
-            z.DesHeatLoad = c.DesHeatLoad;
-            z.DesHeatMassFlow = c.DesHeatMassFlow;
-            z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
-            z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
-            z.ZoneRetTempAtHeatPeak = c.ZoneRetTempAtHeatPeak;
-            z.ZoneHumRatAtHeatPeak = c.ZoneHumRatAtHeatPeak;
-            z.OutHumRatAtHeatPeak = c.OutHumRatAtHeatPeak;
-            z.TimeStepNumAtHeatMax = c.TimeStepNumAtHeatMax;
-            z.DesHeatVolFlow = c.DesHeatVolFlow;
-            z.DesHeatCoilInTemp = c.DesHeatCoilInTemp;
-            z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
-            z.CoolDesHumRat = c.CoolDesHumRat;
-
-            z.DesCoolLoad = c.DesCoolLoad;
-            z.DesCoolMassFlow = c.DesCoolMassFlow;
-            z.ZoneTempAtCoolPeak = c.ZoneTempAtCoolPeak;
-            z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
-            z.ZoneRetTempAtCoolPeak = c.ZoneRetTempAtCoolPeak;
-            z.ZoneHumRatAtCoolPeak = c.ZoneHumRatAtCoolPeak;
-            z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
-            z.TimeStepNumAtCoolMax = c.TimeStepNumAtCoolMax;
-            z.DesCoolVolFlow = c.DesCoolVolFlow;
-            z.DesCoolCoilInTemp = c.DesCoolCoilInTemp;
-            z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
+            updateZoneSizingEndZoneSizingCalc4(state.dataSize->ZoneSizing[i], state.dataSize->CalcZoneSizing[i]);
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (std::size_t i = 0; i < state.dataSize->SpaceSizing.size(); ++i) {
+                    updateZoneSizingEndZoneSizingCalc4(state.dataSize->SpaceSizing[i], state.dataSize->CalcSpaceSizing[i]);
+                }
+            }
         }
 
         for (std::size_t i = 0; i < state.dataSize->FinalZoneSizing.size(); ++i) {
-            auto &z(state.dataSize->FinalZoneSizing[i]);
-            auto const &c(state.dataSize->CalcFinalZoneSizing[i]);
-            z.CoolDesDay = c.CoolDesDay;
-            z.HeatDesDay = c.HeatDesDay;
-            z.DesHeatDens = c.DesHeatDens;
-            z.DesCoolDens = c.DesCoolDens;
-            z.HeatDDNum = c.HeatDDNum;
-            z.CoolDDNum = c.CoolDDNum;
-
-            z.DesHeatLoad = c.DesHeatLoad;
-            z.NonAirSysDesHeatLoad = c.DesHeatLoad;
-            z.DesHeatMassFlow = c.DesHeatMassFlow;
-            z.ZoneTempAtHeatPeak = c.ZoneTempAtHeatPeak;
-            z.OutTempAtHeatPeak = c.OutTempAtHeatPeak;
-            z.ZoneRetTempAtHeatPeak = c.ZoneRetTempAtHeatPeak;
-            z.ZoneHumRatAtHeatPeak = c.ZoneHumRatAtHeatPeak;
-            z.OutHumRatAtHeatPeak = c.OutHumRatAtHeatPeak;
-            z.TimeStepNumAtHeatMax = c.TimeStepNumAtHeatMax;
-            z.DesHeatVolFlow = c.DesHeatVolFlow;
-            z.NonAirSysDesHeatVolFlow = c.DesHeatVolFlow;
-            z.DesHeatCoilInTemp = c.DesHeatCoilInTemp;
-            z.DesHeatCoilInHumRat = c.DesHeatCoilInHumRat;
-            z.CoolDesHumRat = c.CoolDesHumRat;
-
-            z.DesCoolLoad = c.DesCoolLoad;
-            z.NonAirSysDesCoolLoad = c.DesCoolLoad;
-            z.DesCoolMassFlow = c.DesCoolMassFlow;
-            z.ZoneTempAtCoolPeak = c.ZoneTempAtCoolPeak;
-            z.OutTempAtCoolPeak = c.OutTempAtCoolPeak;
-            z.ZoneRetTempAtCoolPeak = c.ZoneRetTempAtCoolPeak;
-            z.ZoneHumRatAtCoolPeak = c.ZoneHumRatAtCoolPeak;
-            z.OutHumRatAtCoolPeak = c.OutHumRatAtCoolPeak;
-            z.TimeStepNumAtCoolMax = c.TimeStepNumAtCoolMax;
-            z.DesCoolVolFlow = c.DesCoolVolFlow;
-            z.NonAirSysDesCoolVolFlow = c.DesCoolVolFlow;
-            z.DesCoolCoilInTemp = c.DesCoolCoilInTemp;
-            z.DesCoolCoilInHumRat = c.DesCoolCoilInHumRat;
+            updateZoneSizingEndZoneSizingCalc5(state.dataSize->FinalZoneSizing[i], state.dataSize->CalcFinalZoneSizing[i]);
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (std::size_t i = 0; i < state.dataSize->FinalSpaceSizing.size(); ++i) {
+                    updateZoneSizingEndZoneSizingCalc5(state.dataSize->FinalSpaceSizing[i], state.dataSize->CalcFinalSpaceSizing[i]);
+                }
+            }
         }
 
         for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-                auto &zoneSizing = state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum);
-                auto const &calcZoneSizing = state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum);
-                for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                    zoneSizing.HeatFlowSeq(TimeStepIndex) = calcZoneSizing.HeatFlowSeq(TimeStepIndex);
-                    zoneSizing.HeatLoadSeq(TimeStepIndex) = calcZoneSizing.HeatLoadSeq(TimeStepIndex);
-                    zoneSizing.CoolFlowSeq(TimeStepIndex) = calcZoneSizing.CoolFlowSeq(TimeStepIndex);
-                    zoneSizing.CoolLoadSeq(TimeStepIndex) = calcZoneSizing.CoolLoadSeq(TimeStepIndex);
-                    zoneSizing.HeatZoneTempSeq(TimeStepIndex) = calcZoneSizing.HeatZoneTempSeq(TimeStepIndex);
-                    zoneSizing.HeatOutTempSeq(TimeStepIndex) = calcZoneSizing.HeatOutTempSeq(TimeStepIndex);
-                    zoneSizing.HeatZoneRetTempSeq(TimeStepIndex) = calcZoneSizing.HeatZoneRetTempSeq(TimeStepIndex);
-                    zoneSizing.HeatZoneHumRatSeq(TimeStepIndex) = calcZoneSizing.HeatZoneHumRatSeq(TimeStepIndex);
-                    zoneSizing.HeatOutHumRatSeq(TimeStepIndex) = calcZoneSizing.HeatOutHumRatSeq(TimeStepIndex);
-                    zoneSizing.CoolZoneTempSeq(TimeStepIndex) = calcZoneSizing.CoolZoneTempSeq(TimeStepIndex);
-                    zoneSizing.CoolOutTempSeq(TimeStepIndex) = calcZoneSizing.CoolOutTempSeq(TimeStepIndex);
-                    zoneSizing.CoolZoneRetTempSeq(TimeStepIndex) = calcZoneSizing.CoolZoneRetTempSeq(TimeStepIndex);
-                    zoneSizing.CoolZoneHumRatSeq(TimeStepIndex) = calcZoneSizing.CoolZoneHumRatSeq(TimeStepIndex);
-                    zoneSizing.CoolOutHumRatSeq(TimeStepIndex) = calcZoneSizing.CoolOutHumRatSeq(TimeStepIndex);
+                updateZoneSizingEndZoneSizingCalc6(state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum),
+                                                   state.dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum),
+                                                   state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+                if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                    for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
+                        updateZoneSizingEndZoneSizingCalc6(state.dataSize->SpaceSizing(DesDayNum, spaceNum),
+                                                           state.dataSize->CalcSpaceSizing(DesDayNum, spaceNum),
+                                                           state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+                    }
                 }
             }
         }
 
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
-            auto const &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
-            for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                finalZoneSizing.HeatFlowSeq(TimeStepIndex) = calcFinalZoneSizing.HeatFlowSeq(TimeStepIndex);
-                finalZoneSizing.HeatLoadSeq(TimeStepIndex) = calcFinalZoneSizing.HeatLoadSeq(TimeStepIndex);
-                finalZoneSizing.CoolFlowSeq(TimeStepIndex) = calcFinalZoneSizing.CoolFlowSeq(TimeStepIndex);
-                finalZoneSizing.CoolLoadSeq(TimeStepIndex) = calcFinalZoneSizing.CoolLoadSeq(TimeStepIndex);
-                finalZoneSizing.HeatZoneTempSeq(TimeStepIndex) = calcFinalZoneSizing.HeatZoneTempSeq(TimeStepIndex);
-                finalZoneSizing.HeatOutTempSeq(TimeStepIndex) = calcFinalZoneSizing.HeatOutTempSeq(TimeStepIndex);
-                finalZoneSizing.HeatZoneRetTempSeq(TimeStepIndex) = calcFinalZoneSizing.HeatZoneRetTempSeq(TimeStepIndex);
-                finalZoneSizing.HeatZoneHumRatSeq(TimeStepIndex) = calcFinalZoneSizing.HeatZoneHumRatSeq(TimeStepIndex);
-                finalZoneSizing.HeatOutHumRatSeq(TimeStepIndex) = calcFinalZoneSizing.HeatOutHumRatSeq(TimeStepIndex);
-                finalZoneSizing.CoolZoneTempSeq(TimeStepIndex) = calcFinalZoneSizing.CoolZoneTempSeq(TimeStepIndex);
-                finalZoneSizing.CoolOutTempSeq(TimeStepIndex) = calcFinalZoneSizing.CoolOutTempSeq(TimeStepIndex);
-                finalZoneSizing.CoolZoneRetTempSeq(TimeStepIndex) = calcFinalZoneSizing.CoolZoneRetTempSeq(TimeStepIndex);
-                finalZoneSizing.CoolZoneHumRatSeq(TimeStepIndex) = calcFinalZoneSizing.CoolZoneHumRatSeq(TimeStepIndex);
-                finalZoneSizing.CoolOutHumRatSeq(TimeStepIndex) = calcFinalZoneSizing.CoolOutHumRatSeq(TimeStepIndex);
+            // Yes, call updateZoneSizingEndZoneSizingCalc6 again here to copyd the same fields
+            updateZoneSizingEndZoneSizingCalc6(state.dataSize->FinalZoneSizing(CtrlZoneNum),
+                                               state.dataSize->CalcFinalZoneSizing(CtrlZoneNum),
+                                               state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
+                    updateZoneSizingEndZoneSizingCalc6(state.dataSize->FinalSpaceSizing(spaceNum),
+                                                       state.dataSize->CalcFinalSpaceSizing(spaceNum),
+                                                       state.dataZoneEquipmentManager->NumOfTimeStepInDay);
+                }
             }
         }
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
             auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
-            // update non air system design load and air flow to include the sizing factor
-            finalZoneSizing.NonAirSysDesCoolLoad *= finalZoneSizing.CoolSizingFactor;
-            finalZoneSizing.NonAirSysDesCoolVolFlow *= finalZoneSizing.CoolSizingFactor; // NonAirSysDesCoolVolFlow not currently used
-            // Now take into account the user specified sizing factor and user specified cooling design air flow rate
-            TotCoolSizMult = 0.0;
-            // Calculate a sizing factor from the user specified cooling design air flow rate
-            if (finalZoneSizing.InpDesCoolAirFlow > 0.0 && finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
-                finalZoneSizing.DesCoolVolFlow > 0.0) {
-                TotCoolSizMult = (finalZoneSizing.InpDesCoolAirFlow / finalZoneSizing.DesCoolVolFlow) * finalZoneSizing.CoolSizingFactor;
-                // If no user specified cooling design air flow rate input, use the user specified szing factor
-            } else {
-                TotCoolSizMult = finalZoneSizing.CoolSizingFactor;
-            }
-            // If the cooling sizing multiplier is not 1, adjust the cooling design data
-            if (std::abs(TotCoolSizMult - 1.0) > 0.00001) {
-                if (finalZoneSizing.DesCoolVolFlow > 0.0) {
-                    TimeStepAtPeak = finalZoneSizing.TimeStepNumAtCoolMax;
-                    DDNum = finalZoneSizing.CoolDDNum;
-                    finalZoneSizing.DesCoolVolFlow = calcFinalZoneSizing.DesCoolVolFlow * TotCoolSizMult;
-                    finalZoneSizing.DesCoolMassFlow = calcFinalZoneSizing.DesCoolMassFlow * TotCoolSizMult;
-                    finalZoneSizing.DesCoolLoad = calcFinalZoneSizing.DesCoolLoad * TotCoolSizMult;
-                    finalZoneSizing.CoolFlowSeq = calcFinalZoneSizing.CoolFlowSeq * TotCoolSizMult;
-                    finalZoneSizing.CoolLoadSeq = calcFinalZoneSizing.CoolLoadSeq * TotCoolSizMult;
-                    OAFrac = finalZoneSizing.MinOA / finalZoneSizing.DesCoolVolFlow;
-                    OAFrac = min(1.0, max(0.0, OAFrac));
-                    finalZoneSizing.DesCoolCoilInTemp =
-                        OAFrac * state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak) + (1.0 - OAFrac) * finalZoneSizing.ZoneTempAtCoolPeak;
-                    finalZoneSizing.DesCoolCoilInHumRat =
-                        OAFrac * state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak) + (1.0 - OAFrac) * finalZoneSizing.ZoneHumRatAtCoolPeak;
-                } else {
-                    finalZoneSizing.DesCoolVolFlow = finalZoneSizing.InpDesCoolAirFlow;
-                    finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * finalZoneSizing.DesCoolDens;
+            updateZoneSizingEndZoneSizingCalc7(state,
+                                               state.dataSize->FinalZoneSizing(CtrlZoneNum),
+                                               state.dataSize->CalcFinalZoneSizing(CtrlZoneNum),
+                                               state.dataSize->ZoneSizing,
+                                               state.dataSize->CalcZoneSizing,
+                                               CtrlZoneNum);
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
+                    updateZoneSizingEndZoneSizingCalc7(state,
+                                                       state.dataSize->FinalSpaceSizing(spaceNum),
+                                                       state.dataSize->CalcFinalSpaceSizing(spaceNum),
+                                                       state.dataSize->SpaceSizing,
+                                                       state.dataSize->CalcSpaceSizing,
+                                                       spaceNum);
                 }
-                for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-                    auto &zoneSizing = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum);
-                    if (zoneSizing.DesCoolVolFlow > 0.0) {
-                        TimeStepAtPeak = zoneSizing.TimeStepNumAtCoolMax;
-                        auto &calcZoneSizing = state.dataSize->CalcZoneSizing(DDNum, CtrlZoneNum);
-                        auto &desDayWeath = state.dataSize->DesDayWeath(DDNum);
-                        zoneSizing.DesCoolVolFlow = calcZoneSizing.DesCoolVolFlow * TotCoolSizMult;
-                        zoneSizing.DesCoolMassFlow = calcZoneSizing.DesCoolMassFlow * TotCoolSizMult;
-                        zoneSizing.DesCoolLoad = calcZoneSizing.DesCoolLoad * TotCoolSizMult;
-                        zoneSizing.CoolFlowSeq = calcZoneSizing.CoolFlowSeq * TotCoolSizMult;
-                        zoneSizing.CoolLoadSeq = calcZoneSizing.CoolLoadSeq * TotCoolSizMult;
-                        OAFrac = zoneSizing.MinOA / zoneSizing.DesCoolVolFlow;
-                        OAFrac = min(1.0, max(0.0, OAFrac));
-                        zoneSizing.DesCoolCoilInTemp = OAFrac * desDayWeath.Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizing.ZoneTempAtCoolPeak;
-                        zoneSizing.DesCoolCoilInHumRat =
-                            OAFrac * desDayWeath.HumRat(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizing.ZoneHumRatAtCoolPeak;
-                    } else {
-                        zoneSizing.DesCoolVolFlow = zoneSizing.InpDesCoolAirFlow;
-                        zoneSizing.DesCoolMassFlow = zoneSizing.DesCoolVolFlow * zoneSizing.DesCoolDens;
-                    }
-                    // Save cooling flows without MinOA for use later
-                    zoneSizing.CoolFlowSeqNoOA = zoneSizing.CoolFlowSeq;
-                    zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
-                    zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
-                }
-            }
-            // Save a set of design cooling air flow rates greater than or equal to the specified minimums without MinOA
-            {
-                Real64 MaxOfMinCoolVolFlowNoOA = 0.0; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
-                if (finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
-                    MaxOfMinCoolVolFlowNoOA = max(finalZoneSizing.DesCoolMinAirFlow, finalZoneSizing.DesCoolMinAirFlow2);
-                }
-                Real64 MaxOfMinCoolMassFlowNoOA =
-                    MaxOfMinCoolVolFlowNoOA *
-                    finalZoneSizing.DesCoolDens; // max of the user specified design cooling minimum flows without min OA flow [m3/s]
-                finalZoneSizing.DesCoolVolFlowNoOA = finalZoneSizing.DesCoolVolFlow;
-                finalZoneSizing.DesCoolMassFlowNoOA = finalZoneSizing.DesCoolMassFlow;
-                if (MaxOfMinCoolVolFlowNoOA > finalZoneSizing.DesCoolVolFlowNoOA) {
-                    finalZoneSizing.DesCoolVolFlowNoOA = MaxOfMinCoolVolFlowNoOA;
-                    finalZoneSizing.DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
-                }
-                for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                    finalZoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = finalZoneSizing.CoolFlowSeq(TimeStepIndex);
-                    if (MaxOfMinCoolMassFlowNoOA > finalZoneSizing.CoolFlowSeqNoOA(TimeStepIndex)) {
-                        finalZoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
-                    }
-                }
-                for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-                    auto &zoneSizing = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum);
-                    zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
-                    zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
-                    MaxOfMinCoolVolFlowNoOA = max(zoneSizing.DesCoolMinAirFlow, zoneSizing.DesCoolMinAirFlow);
-                    MaxOfMinCoolMassFlowNoOA = MaxOfMinCoolVolFlowNoOA * zoneSizing.DesCoolDens;
-                    if (MaxOfMinCoolVolFlowNoOA > zoneSizing.DesCoolVolFlow) {
-                        zoneSizing.DesCoolVolFlowNoOA = MaxOfMinCoolVolFlowNoOA;
-                        zoneSizing.DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
-                    }
-                    for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                        zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = zoneSizing.CoolFlowSeq(TimeStepIndex);
-                        if (MaxOfMinCoolMassFlowNoOA > zoneSizing.CoolFlowSeq(TimeStepIndex)) {
-                            zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
-                        }
-                    }
-                }
-            }
-
-            // Now make sure that the design cooling air flow rates are greater than or equal to the specified minimums including MinOA
-            {
-                Real64 MaxOfMinCoolVolFlow = 0.0; // max of the user specified design cooling minimum flows and min OA flow [m3/s]
-                if (finalZoneSizing.CoolAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim) {
-                    MaxOfMinCoolVolFlow = max(finalZoneSizing.DesCoolMinAirFlow, finalZoneSizing.DesCoolMinAirFlow2, finalZoneSizing.MinOA);
-                } else {
-                    MaxOfMinCoolVolFlow = finalZoneSizing.MinOA;
-                }
-                Real64 MaxOfMinCoolMassFlow =
-                    MaxOfMinCoolVolFlow *
-                    finalZoneSizing.DesCoolDens; // max of the user specified design cooling minimum flows and min OA flow [kg/s]
-                if (MaxOfMinCoolVolFlow > finalZoneSizing.DesCoolVolFlow) {
-                    finalZoneSizing.DesCoolVolFlow = MaxOfMinCoolVolFlow;
-                    finalZoneSizing.DesCoolMassFlow = MaxOfMinCoolMassFlow;
-                }
-                for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                    if (MaxOfMinCoolMassFlow > finalZoneSizing.CoolFlowSeq(TimeStepIndex)) {
-                        finalZoneSizing.CoolFlowSeq(TimeStepIndex) = MaxOfMinCoolMassFlow;
-                    }
-                }
-                for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-                    auto &zoneSizing = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum);
-                    MaxOfMinCoolVolFlow = max(zoneSizing.DesCoolMinAirFlow, zoneSizing.DesCoolMinAirFlow, zoneSizing.MinOA);
-                    MaxOfMinCoolMassFlow = MaxOfMinCoolVolFlow * zoneSizing.DesCoolDens;
-                    if (MaxOfMinCoolVolFlow > zoneSizing.DesCoolVolFlow) {
-                        zoneSizing.DesCoolVolFlow = MaxOfMinCoolVolFlow;
-                        zoneSizing.DesCoolMassFlow = MaxOfMinCoolMassFlow;
-                    }
-                    for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                        if (MaxOfMinCoolMassFlow > zoneSizing.CoolFlowSeq(TimeStepIndex)) {
-                            zoneSizing.CoolFlowSeq(TimeStepIndex) = MaxOfMinCoolMassFlow;
-                        }
-                    }
-                }
-            }
-            // IF cooling flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data (end of IF)
-            if (finalZoneSizing.DesCoolLoad == 0) {
-                // Check CoolDDNum and TimeStepNumAtCoolMax value and default to 1 if not set, carried over from previous code
-                if (calcFinalZoneSizing.CoolDDNum == 0) {
-                    calcFinalZoneSizing.CoolDDNum = 1;
-                }
-                if (calcFinalZoneSizing.TimeStepNumAtCoolMax == 0) {
-                    calcFinalZoneSizing.TimeStepNumAtCoolMax = 1;
-                }
-                finalZoneSizing.TimeStepNumAtCoolMax = calcFinalZoneSizing.TimeStepNumAtCoolMax;
-                finalZoneSizing.CoolDDNum = calcFinalZoneSizing.CoolDDNum;
-                finalZoneSizing.CoolDesDay = calcFinalZoneSizing.CoolDesDay;
-                DDNumF = finalZoneSizing.CoolDDNum;
-                auto &zoneSizingF = state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum);
-                TimeStepAtPeakF = finalZoneSizing.TimeStepNumAtCoolMax;
-
-                // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
-                // issue 6006, heating coils sizing to 0 when no heating load in zone
-                if (zoneSizingF.DesCoolSetPtSeq.empty()) {
-                    ShowSevereError(state,
-                                    format("{}:  Thermostat cooling set point temperatures are not initialized for Zone = {}",
-                                           RoutineName,
-                                           finalZoneSizing.ZoneName));
-                    ShowFatalError(state, "Please send your input file to the EnergyPlus support/development team for further investigation.");
-                } else {
-                    finalZoneSizing.ZoneTempAtCoolPeak = *std::min_element(zoneSizingF.DesCoolSetPtSeq.begin(), zoneSizingF.DesCoolSetPtSeq.end());
-                }
-                finalZoneSizing.OutTempAtCoolPeak = *std::min_element(zoneSizingF.CoolOutTempSeq.begin(), zoneSizingF.CoolOutTempSeq.end());
-                finalZoneSizing.OutHumRatAtCoolPeak = zoneSizingF.CoolOutHumRatSeq(TimeStepAtPeakF);
-                finalZoneSizing.ZoneHumRatAtCoolPeak = zoneSizingF.CoolDesHumRat;
-                calcFinalZoneSizing.ZoneTempAtCoolPeak = zoneSizingF.CoolZoneTempSeq(TimeStepAtPeakF);
-                calcFinalZoneSizing.ZoneHumRatAtCoolPeak = zoneSizingF.CoolZoneHumRatSeq(TimeStepAtPeakF);
-                calcFinalZoneSizing.ZoneRetTempAtCoolPeak = calcFinalZoneSizing.ZoneTempAtCoolPeak;
-                finalZoneSizing.DesCoolCoilInTemp = finalZoneSizing.ZoneTempAtCoolPeak;
-                finalZoneSizing.DesCoolCoilInHumRat = finalZoneSizing.ZoneHumRatAtCoolPeak;
-                finalZoneSizing.ZoneRetTempAtCoolPeak = finalZoneSizing.ZoneTempAtCoolPeak;
-            }
-            // update non air system design load and air flow to include the sizing factor
-            finalZoneSizing.NonAirSysDesHeatLoad *= finalZoneSizing.HeatSizingFactor;
-            finalZoneSizing.NonAirSysDesHeatVolFlow *= finalZoneSizing.HeatSizingFactor;
-            // Now take into account the user specified sizing factor or user specified heating design air flow rate (which overrides the
-            // sizing factor)
-            TotHeatSizMult = 0.0;
-            // Calculate a sizing factor from the user specified heating design air flow rate
-            if (finalZoneSizing.InpDesHeatAirFlow > 0.0 && finalZoneSizing.HeatAirDesMethod == AirflowSizingMethod::InpDesAirFlow &&
-                finalZoneSizing.DesHeatVolFlow > 0.0) {
-                TotHeatSizMult = (finalZoneSizing.InpDesHeatAirFlow / finalZoneSizing.DesHeatVolFlow) * finalZoneSizing.HeatSizingFactor;
-                // Calculate a sizing factor from the user specified max heating design air flow rates
-            } else if (finalZoneSizing.HeatAirDesMethod == AirflowSizingMethod::DesAirFlowWithLim && finalZoneSizing.DesHeatVolFlow > 0.0) {
-                MaxHeatVolFlow = max(finalZoneSizing.DesHeatMaxAirFlow,
-                                     finalZoneSizing.DesHeatMaxAirFlow2,
-                                     finalZoneSizing.DesCoolVolFlow * finalZoneSizing.DesHeatMaxAirFlowFrac);
-                if (MaxHeatVolFlow < finalZoneSizing.DesHeatVolFlow) {
-                    TotHeatSizMult = (MaxHeatVolFlow / finalZoneSizing.DesHeatVolFlow) * finalZoneSizing.HeatSizingFactor;
-                } else {
-                    TotHeatSizMult = finalZoneSizing.HeatSizingFactor;
-                }
-                // If no user specified heating design air flow rate input, use the user specified sizing factor
-            } else {
-                TotHeatSizMult = finalZoneSizing.HeatSizingFactor;
-            }
-
-            if (std::abs(TotHeatSizMult - 1.0) > 0.00001) {
-                if (finalZoneSizing.DesHeatVolFlow > 0.0) {
-                    auto &desDayWeath = state.dataSize->DesDayWeath(finalZoneSizing.HeatDDNum);
-                    finalZoneSizing.DesHeatVolFlow = calcFinalZoneSizing.DesHeatVolFlow * TotHeatSizMult;
-                    finalZoneSizing.DesHeatMassFlow = calcFinalZoneSizing.DesHeatMassFlow * TotHeatSizMult;
-                    finalZoneSizing.DesHeatLoad = calcFinalZoneSizing.DesHeatLoad * TotHeatSizMult;
-                    finalZoneSizing.HeatFlowSeq = calcFinalZoneSizing.HeatFlowSeq * TotHeatSizMult;
-                    finalZoneSizing.HeatLoadSeq = calcFinalZoneSizing.HeatLoadSeq * TotHeatSizMult;
-                    OAFrac = finalZoneSizing.MinOA / finalZoneSizing.DesHeatVolFlow;
-                    OAFrac = min(1.0, max(0.0, OAFrac));
-                    finalZoneSizing.DesHeatCoilInTemp =
-                        OAFrac * desDayWeath.Temp(finalZoneSizing.TimeStepNumAtHeatMax) + (1.0 - OAFrac) * finalZoneSizing.ZoneTempAtHeatPeak;
-                    finalZoneSizing.DesHeatCoilInHumRat =
-                        OAFrac * desDayWeath.HumRat(finalZoneSizing.TimeStepNumAtHeatMax) + (1.0 - OAFrac) * finalZoneSizing.ZoneHumRatAtHeatPeak;
-                } else {
-                    finalZoneSizing.DesHeatVolFlow = finalZoneSizing.InpDesHeatAirFlow;
-                    finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * finalZoneSizing.DesHeatDens;
-                }
-                for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-                    auto &zoneSizingDD = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum);
-                    if (zoneSizingDD.DesHeatVolFlow > 0.0) {
-                        auto &calcZoneSizing = state.dataSize->CalcZoneSizing(DDNum, CtrlZoneNum);
-                        TimeStepAtPeak = zoneSizingDD.TimeStepNumAtHeatMax;
-                        zoneSizingDD.DesHeatVolFlow = calcZoneSizing.DesHeatVolFlow * TotHeatSizMult;
-                        zoneSizingDD.DesHeatMassFlow = calcZoneSizing.DesHeatMassFlow * TotHeatSizMult;
-                        zoneSizingDD.DesHeatLoad = calcZoneSizing.DesHeatLoad * TotHeatSizMult;
-                        zoneSizingDD.HeatFlowSeq = calcZoneSizing.HeatFlowSeq * TotHeatSizMult;
-                        zoneSizingDD.HeatLoadSeq = calcZoneSizing.HeatLoadSeq * TotHeatSizMult;
-                        OAFrac = zoneSizingDD.MinOA / zoneSizingDD.DesHeatVolFlow;
-                        OAFrac = min(1.0, max(0.0, OAFrac));
-                        zoneSizingDD.DesHeatCoilInTemp =
-                            OAFrac * state.dataSize->DesDayWeath(DDNum).Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizingDD.ZoneTempAtHeatPeak;
-                        zoneSizingDD.DesHeatCoilInHumRat =
-                            OAFrac * state.dataSize->DesDayWeath(DDNum).HumRat(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizingDD.ZoneHumRatAtHeatPeak;
-                    } else {
-                        zoneSizingDD.DesHeatVolFlow = zoneSizingDD.InpDesHeatAirFlow;
-                        zoneSizingDD.DesHeatMassFlow = zoneSizingDD.DesHeatVolFlow * zoneSizingDD.DesHeatDens;
-                    }
-                    // Save heating flows without MinOA for use later
-                    zoneSizingDD.HeatFlowSeqNoOA = zoneSizingDD.HeatFlowSeq;
-                    zoneSizingDD.DesHeatVolFlowNoOA = zoneSizingDD.DesHeatVolFlow;
-                    zoneSizingDD.DesHeatMassFlowNoOA = zoneSizingDD.DesHeatMassFlow;
-                }
-            }
-
-            // Save a set of design heating air flow rates before the MinOA adjustment
-            // just in FinalZoneSizing to use for TermUnit sizing adjustments in SizingManager::UpdateTermUnitFinalZoneSizing
-            finalZoneSizing.DesHeatVolFlowNoOA = finalZoneSizing.DesHeatVolFlow;
-            finalZoneSizing.DesHeatMassFlowNoOA = finalZoneSizing.DesHeatMassFlow;
-            for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                finalZoneSizing.HeatFlowSeqNoOA(TimeStepIndex) = finalZoneSizing.HeatFlowSeq(TimeStepIndex);
-            }
-
-            // Now make sure that the design heating air flow rates are greater than or equal to MinOA
-            MinOAMass = finalZoneSizing.MinOA * finalZoneSizing.DesHeatDens;
-            if (finalZoneSizing.MinOA > finalZoneSizing.DesHeatVolFlow) {
-                finalZoneSizing.DesHeatVolFlow = finalZoneSizing.MinOA;
-                finalZoneSizing.DesHeatMassFlow = MinOAMass;
-            }
-            for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                if (MinOAMass > finalZoneSizing.HeatFlowSeq(TimeStepIndex)) {
-                    finalZoneSizing.HeatFlowSeq(TimeStepIndex) = MinOAMass;
-                }
-            }
-            for (DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
-                auto &zoneSizingDD = state.dataSize->ZoneSizing(DDNum, CtrlZoneNum);
-                MinOAMass = zoneSizingDD.MinOA * zoneSizingDD.DesHeatDens;
-                if (zoneSizingDD.MinOA > zoneSizingDD.DesHeatVolFlow) {
-                    zoneSizingDD.DesHeatVolFlow = zoneSizingDD.MinOA;
-                    zoneSizingDD.DesHeatMassFlow = MinOAMass;
-                }
-                for (TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                    if (MinOAMass > zoneSizingDD.HeatFlowSeq(TimeStepIndex)) {
-                        zoneSizingDD.HeatFlowSeq(TimeStepIndex) = MinOAMass;
-                    }
-                }
-            }
-            // IF heating flow rate is 0, this data may be used to size a HP so initialize DDNum, TimeStepatPeak, and sizing data
-            if (finalZoneSizing.DesHeatLoad == 0) {
-                // Check HDDNum and TimeStepNumAtHeatMax value and default to 1 if not set, carried over from previous code
-                if (calcFinalZoneSizing.HeatDDNum == 0) {
-                    calcFinalZoneSizing.HeatDDNum = 1;
-                }
-                if (calcFinalZoneSizing.TimeStepNumAtHeatMax == 0) {
-                    calcFinalZoneSizing.TimeStepNumAtHeatMax = 1;
-                }
-                finalZoneSizing.TimeStepNumAtHeatMax = calcFinalZoneSizing.TimeStepNumAtHeatMax;
-                finalZoneSizing.HeatDDNum = calcFinalZoneSizing.HeatDDNum;
-                finalZoneSizing.HeatDesDay = calcFinalZoneSizing.HeatDesDay;
-                DDNumF = finalZoneSizing.HeatDDNum;
-                auto &zoneSizingDDF = state.dataSize->ZoneSizing(DDNumF, CtrlZoneNum);
-                TimeStepAtPeakF = finalZoneSizing.TimeStepNumAtHeatMax;
-
-                // initialize sizing conditions if they have not been set (i.e., no corresponding load) to zone condition
-                // issue 6006, heating coils sizing to 0 when no heating load in zone
-                if (zoneSizingDDF.DesHeatSetPtSeq.empty()) {
-                    ShowSevereError(state,
-                                    format("{}:  Thermostat heating set point temperatures not initialized for Zone = {}",
-                                           RoutineName,
-                                           finalZoneSizing.ZoneName));
-                    ShowFatalError(state, "Please send your input file to the EnergyPlus support/development team for further investigation.");
-                } else {
-                    finalZoneSizing.ZoneTempAtHeatPeak =
-                        *std::max_element(zoneSizingDDF.DesHeatSetPtSeq.begin(), zoneSizingDDF.DesHeatSetPtSeq.end());
-                }
-                finalZoneSizing.OutTempAtHeatPeak = *std::min_element(zoneSizingDDF.HeatOutTempSeq.begin(), zoneSizingDDF.HeatOutTempSeq.end());
-                finalZoneSizing.OutHumRatAtHeatPeak = zoneSizingDDF.HeatOutHumRatSeq(TimeStepAtPeakF);
-                finalZoneSizing.ZoneHumRatAtHeatPeak = zoneSizingDDF.HeatDesHumRat;
-                calcFinalZoneSizing.ZoneTempAtHeatPeak = zoneSizingDDF.HeatZoneTempSeq(TimeStepAtPeakF);
-                calcFinalZoneSizing.ZoneHumRatAtHeatPeak = zoneSizingDDF.HeatZoneHumRatSeq(TimeStepAtPeakF);
-                calcFinalZoneSizing.ZoneRetTempAtHeatPeak = calcFinalZoneSizing.ZoneTempAtHeatPeak;
-                finalZoneSizing.DesHeatCoilInTemp = finalZoneSizing.ZoneTempAtHeatPeak;
-                finalZoneSizing.DesHeatCoilInHumRat = finalZoneSizing.ZoneHumRatAtHeatPeak;
-                finalZoneSizing.ZoneRetTempAtHeatPeak = finalZoneSizing.ZoneTempAtHeatPeak;
-            }
-
-            // set the zone minimum cooling supply air flow rate. This will be used for autosizing VAV terminal unit
-            // minimum flow rates (comment seems incorrect, really used as a minimum lower limit for the maximum air flow)
-            finalZoneSizing.DesCoolVolFlowMin = max(finalZoneSizing.DesCoolMinAirFlow,
-                                                    finalZoneSizing.DesCoolMinAirFlow2,
-                                                    finalZoneSizing.DesCoolVolFlow * finalZoneSizing.DesCoolMinAirFlowFrac);
-            // set the zone maximum heating supply air flow rate. This will be used for autosizing VAV terminal unit
-            // max heating flow rates
-            finalZoneSizing.DesHeatVolFlowMax =
-                max(finalZoneSizing.DesHeatMaxAirFlow,
-                    finalZoneSizing.DesHeatMaxAirFlow2,
-                    max(finalZoneSizing.DesCoolVolFlow, finalZoneSizing.DesHeatVolFlow) * finalZoneSizing.DesHeatMaxAirFlowFrac);
-            // Determine the design cooling supply air temperature if the supply air temperature difference is specified by user.
-            if (finalZoneSizing.ZnCoolDgnSAMethod == TemperatureDifference) {
-                finalZoneSizing.CoolDesTemp = finalZoneSizing.ZoneTempAtCoolPeak - std::abs(finalZoneSizing.CoolDesTempDiff);
-            }
-            // Determine the design heating supply air temperature if the supply air temperature difference is specified by user.
-            if (finalZoneSizing.ZnHeatDgnSAMethod == TemperatureDifference) {
-                finalZoneSizing.HeatDesTemp = finalZoneSizing.ZoneTempAtHeatPeak + std::abs(finalZoneSizing.HeatDesTempDiff);
             }
         }
     } break;

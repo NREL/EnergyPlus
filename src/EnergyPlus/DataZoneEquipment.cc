@@ -367,7 +367,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
         // assigned to this node
         if (ControlledZoneNum > 0) {
             Zone(ControlledZoneNum).SystemZoneNodeNumber = thisZoneEquipConfig.ZoneNode;
-            if (state.dataHeatBal->doSpaceHeatBalance) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
 
                 // SpaceHB TODO: For now, auto-assign the system node name for spaces
                 int spaceCount = 0;

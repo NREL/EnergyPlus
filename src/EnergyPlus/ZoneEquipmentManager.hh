@@ -98,6 +98,12 @@ namespace ZoneEquipmentManager {
                                      int zoneNum,
                                      int spaceNum = 0);
 
+    void sizeZoneSpaceEquipmentPart2(EnergyPlusData &state,
+                                     DataZoneEquipment::EquipConfiguration &zoneEquipConfig,
+                                     DataSizing::ZoneSizingData &zsCalcSizing,
+                                     int zoneNum,
+                                     int spaceNum = 0);
+
     void SizeZoneEquipment(EnergyPlusData &state);
 
     void SetUpZoneSizingArrays(EnergyPlusData &state);
@@ -133,6 +139,31 @@ namespace ZoneEquipmentManager {
                                 int const numTimeStepInDay,
                                 DataSizing::DesDayWeathData const &desDayWeath,
                                 Real64 const stdRhoAir);
+
+    void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneSizingData const &zsCalcSizing);
+
+    void
+    updateZoneSizingEndZoneSizingCalc2(DataSizing::ZoneSizingData &zsCalcSizing, int const timeStepIndex, int const hourPrint, int const minutes);
+
+    void updateZoneSizingEndZoneSizingCalc3(DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                            Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                            bool &anyLatentLoad,
+                                            int const zoneOrSpaceNum);
+
+    void updateZoneSizingEndZoneSizingCalc4(DataSizing::ZoneSizingData &zsSizing, DataSizing::ZoneSizingData const &zsCalcSizing);
+
+    void updateZoneSizingEndZoneSizingCalc5(DataSizing::ZoneSizingData &zsFinalSizing, DataSizing::ZoneSizingData const &zsCalcFinalSizing);
+
+    void updateZoneSizingEndZoneSizingCalc6(DataSizing::ZoneSizingData &zsSizing,
+                                            DataSizing::ZoneSizingData const &zsCalcSizing,
+                                            int const numTimeStepsInDay);
+
+    void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
+                                            DataSizing::ZoneSizingData &zsFinalSizing,
+                                            DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                            Array2D<DataSizing::ZoneSizingData> &zsSizing,
+                                            Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
+                                            int const zoneOrSpaceNum);
 
     void SimZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration, bool &SimAir);
 

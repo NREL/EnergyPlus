@@ -4496,6 +4496,7 @@ TEST_F(EnergyPlusFixture, CZoeEquipmentManager_CalcZoneLeavingConditions_Test)
     state->dataHeatBal->Zone(1).NoHeatToReturnAir = false;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -4559,6 +4560,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
@@ -4844,6 +4846,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest)
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
