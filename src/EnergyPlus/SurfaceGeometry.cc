@@ -8397,6 +8397,11 @@ namespace SurfaceGeometry {
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         surface.SurfHasSurroundingSurfProperty = true;
                         surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
+                        surface.ViewFactorSrdSurfs =
+                            state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum).SurfsViewFactorSum;
+                        if (surface.ViewFactorSrdSurfs == 0.0) {
+                            surface.SurfHasSurroundingSurfProperty = false;
+                        }
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
                         surface.IsSurfPropertyGndSurfacesDefined = true;
@@ -8512,6 +8517,7 @@ namespace SurfaceGeometry {
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(SurfLoop + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).TempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 3));
+                    SrdSurfsProp.SurfsViewFactorSum += SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor;
                 }
             }
         }
@@ -15788,30 +15794,33 @@ namespace SurfaceGeometry {
             }
 
             if (SignFlag != PrevSignFlag) {
-                if (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal && surfaceTmp.ExtSolar) {
-                    if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowWarningError(state,
-                                         format("CheckConvexity: Zone=\"{}\", Surface=\"{}\" is non-convex.",
-                                                state.dataHeatBal->Zone(surfaceTmp.Zone).Name,
-                                                surfaceTmp.Name));
-                        int Np1 = n + 1;
-                        if (Np1 > NSides) {
-                            Np1 -= NSides;
-                        }
-                        int Np2 = n + 2;
-                        if (Np2 > NSides) {
-                            Np2 -= NSides;
-                        }
-                        ShowContinueError(state, format("...vertex {} to vertex {} to vertex {}", n, Np1, Np2));
-                        ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", n, X(n), Y(n), Z(n)));
-                        ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np1, X(n + 1), Y(n + 1), Z(n + 1)));
-                        ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np2, X(n + 2), Y(n + 2), Z(n + 2)));
-                        // ShowContinueError(state, format("...theta angle=[{:.6R}]", Theta));
-                        // ShowContinueError(state, format("...last theta angle=[{:.6R}]", LastTheta));
+                if (state.dataGlobal->DisplayExtraWarnings && surfaceTmp.ExtSolar &&
+                    (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) &&
+                    // Warn only once
+                    surfaceTmp.IsConvex) {
+                    ShowWarningError(state,
+                                     format("CheckConvexity: Zone=\"{}\", Surface=\"{}\" is non-convex.",
+                                            state.dataHeatBal->Zone(surfaceTmp.Zone).Name,
+                                            surfaceTmp.Name));
+                    int Np1 = n + 1;
+                    if (Np1 > NSides) {
+                        Np1 -= NSides;
                     }
+                    int Np2 = n + 2;
+                    if (Np2 > NSides) {
+                        Np2 -= NSides;
+                    }
+                    ShowContinueError(state, format("...vertex {} to vertex {} to vertex {}", n, Np1, Np2));
+                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", n, X(n), Y(n), Z(n)));
+                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np1, X(n + 1), Y(n + 1), Z(n + 1)));
+                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np2, X(n + 2), Y(n + 2), Z(n + 2)));
+                    // ShowContinueError(state, format("...theta angle=[{:.6R}]", Theta));
+                    // ShowContinueError(state, format("...last theta angle=[{:.6R}]", LastTheta));
                 }
                 surfaceTmp.IsConvex = false;
-                break;
+                // #10103 - We do not want to break early, because we do want to consistently remove colinear vertices
+                // to avoid potential vertex size mismatch fatal errors
+                // break;
             }
             PrevSignFlag = SignFlag;
             LastTheta = Theta;
