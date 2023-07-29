@@ -445,7 +445,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             }
             if (thisEarthTube.vertParametersPtr = 0) { // didn't find a match
                 ShowSevereError(state,
-                                format("{}: {}={}, {} Parameter Object {} was not found in the input file.",
+                                format("{}: {}={}, Parameter Object {} was not found in the input file.",
                                        cCurrentModuleObject,
                                        state.dataIPShortCut->cAlphaFieldNames(1),
                                        state.dataIPShortCut->cAlphaArgs(1),
