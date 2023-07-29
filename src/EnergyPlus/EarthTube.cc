@@ -96,6 +96,8 @@ enum class SoilType
     Num
 };
 
+int totEarthTube = 0;
+
 constexpr std::array<std::string_view, static_cast<int>(Ventilation::Num)> ventilationNamesUC = {"NATURAL", "INTAKE", "EXHAUST"};
 constexpr std::array<std::string_view, static_cast<int>(SoilType::Num)> soilTypeNamesUC = {
     "HEAVYANDSATURATED", "HEAVYANDDAMP", "HEAVYANDDRY", "LIGHTANDDRY"};
@@ -121,7 +123,7 @@ void ManageEarthTube(EnergyPlusData &state)
     }
 
     if (state.dataEarthTube->EarthTubeSys.empty()) return;
-    
+
     initEarthTubeVertical(state);
 
     CalcEarthTube(state);
@@ -154,13 +156,13 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
 
     // Following used for reporting
     state.dataEarthTube->ZnRptET.allocate(state.dataGlobal->NumOfZones);
-    
+
     std::string_view cCurrentModuleObject = "ZoneEarthtube:Parameters";
-    int TotEarthTubePars = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-    
-    state.dataEarthTube->EarthTubePars.allocate(TotEarthTubePars);
-    
-    for (Loop = 1; Loop <= TotEarthTubePars; ++Loop) {
+    int totEarthTubePars = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+
+    state.dataEarthTube->EarthTubePars.allocate(totEarthTubePars);
+
+    for (Loop = 1; Loop <= totEarthTubePars; ++Loop) {
         auto &thisEarthTubePars = state.dataEarthTube->EarthTubePars(Loop);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
@@ -174,19 +176,21 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        
+
         thisEarthTubePars.nameParameters = state.dataIPShortCut->cAlphaArgs(1);
         // Check to make sure name is unique
         for (int otherParams = 1; otherParams < Loop; ++otherParams) {
-            if (UtilityRoutines::SameString(thisEarthTubePars.nameParameters,state.dataEarthTube->EarthTubePars(otherParams).nameParameters)) {
-                ShowSevereError(
-                    state,
-                    format("{}: {} = {} is not a unique name.", cCurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), state.dataIPShortCut->cAlphaArgs(1)));
+            if (UtilityRoutines::SameString(thisEarthTubePars.nameParameters, state.dataEarthTube->EarthTubePars(otherParams).nameParameters)) {
+                ShowSevereError(state,
+                                format("{}: {} = {} is not a unique name.",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1)));
                 ShowContinueError(state, format("Check the other {} names for a duplicate.", cCurrentModuleObject));
                 ErrorsFound = true;
             }
         }
-        
+
         thisEarthTubePars.numNodesAbove = state.dataIPShortCut->rNumericArgs(1);
         thisEarthTubePars.numNodesBelow = state.dataIPShortCut->rNumericArgs(2);
         thisEarthTubePars.dimBoundAbove = state.dataIPShortCut->rNumericArgs(3);
@@ -195,11 +199,11 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
     }
 
     cCurrentModuleObject = "ZoneEarthtube";
-    int TotEarthTube = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+    totEarthTube = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-    state.dataEarthTube->EarthTubeSys.allocate(TotEarthTube);
+    state.dataEarthTube->EarthTubeSys.allocate(totEarthTube);
 
-    for (Loop = 1; Loop <= TotEarthTube; ++Loop) {
+    for (Loop = 1; Loop <= totEarthTube; ++Loop) {
         auto &thisEarthTube = state.dataEarthTube->EarthTubeSys(Loop);
         state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                  cCurrentModuleObject,
@@ -430,27 +434,27 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         // only process cAlphaArgs(6) if cAlphaArgs(5) is "Vertical"
         thisEarthTube.ModelType = static_cast<EarthTubeModelType>(getEnumValue(solutionTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
         if (thisEarthTube.ModelType == EarthTubeModelType::Vertical) {
-            thisEarthTube.r3 = 0.0;  // Vertical model does not use this parameter--reset to zero (keep because r3=0 necessary so Rs=0 in calc routine)
+            thisEarthTube.r3 = 0.0; // Vertical model does not use this parameter--reset to zero (keep because r3=0 necessary so Rs=0 in calc routine)
             // Process the parameters based on the name (link via index)
             thisEarthTube.vertParametersPtr = 0;
-            for (int parIndex = 1; Loop <= TotEarthTubePars; ++parIndex) {
-                if (UtilityRoutines::SameString(cAlphaArgs(6),state.dataEarthTube->EarthTubePars(parIndex).nameParameters)) {
+            for (int parIndex = 1; Loop <= totEarthTubePars; ++parIndex) {
+                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataEarthTube->EarthTubePars(parIndex).nameParameters)) {
                     thisEarthTube.vertParametersPtr = parIndex;
                     break;
                 }
             }
-            if (thisEarthTube.vertParametersPtr = 0) {    // didn't find a match
+            if (thisEarthTube.vertParametersPtr = 0) { // didn't find a match
                 ShowSevereError(state,
                                 format("{}: {}={}, {} Parameter Object {} was not found in the input file.",
                                        cCurrentModuleObject,
                                        state.dataIPShortCut->cAlphaFieldNames(1),
                                        state.dataIPShortCut->cAlphaArgs(1),
                                        state.dataIPShortCut->cAlphaArgs(6)));
-                ShowContinueError(state, "Check this name and make sure one of the earth tube parameters objects matches it.")
+                ShowContinueError(state, "Check this name and make sure one of the earth tube parameters objects matches it.");
                 ErrorsFound = true;
             }
         }
-        
+
         if (thisEarthTube.ZonePtr > 0) {
             if (RepVarSet(thisEarthTube.ZonePtr)) {
                 RepVarSet(thisEarthTube.ZonePtr) = false;
@@ -581,38 +585,6 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
-                if (thisEarthTube.ModelType == EarthTubeModelType::Vertical) {
-                    for (int nodeNum = 1; nodeNum <= thisEarthTube.totNodes; ++nodeNum) {
-                        SetupOutputVariable(state,
-                                            format("Earth Tube Node Temperature {}", nodeNum),
-                                            OutputProcessor::Unit::C,
-                                            thisEarthTube.tCurrent(nodeNum-1),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
-                                            thisEarthTube.name);
-                        SetupOutputVariable(state,
-                                            format("Earth Tube Undisturbed Ground Temperature {}", nodeNum),
-                                            OutputProcessor::Unit::C,
-                                            thisEarthTube.tUndist(nodeNum-1),
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::State,
-                                            thisEarthTube.name);
-                    }
-                    SetupOutputVariable(state,
-                                        "Earth Tube Upper Boundary Ground Temperature {}",
-                                        OutputProcessor::Unit::C,
-                                        thisEarthTube.tUpperBound,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
-                                        thisEarthTube.name);
-                    SetupOutputVariable(state,
-                                        "Earth Tube Lower Boundary Ground Temperature {}",
-                                        OutputProcessor::Unit::C,
-                                        thisEarthTube.tLowerBound,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
-                                        thisEarthTube.name);
-                }
             }
         }
     }
@@ -648,135 +620,168 @@ void initEarthTubeVertical(EnergyPlusData &state)
 {
     if (state.dataEarthTube->initFirstTime) {
         state.dataEarthTube->initFirstTime = false;
-        for (int etNum = 1; etNum <= numEarthTubes; ++etNum) {
+        for (int etNum = 1; etNum <= totEarthTube; ++etNum) {
             auto &thisEarthTube = state.dataEarthTube->EarthTubeSys(etNum);
-            if (thisEarthTube.ModelType != EarthTubeModelType::Vertical) continue;  // Skip earth tubes that do not use vertical solution
-            auto &thisEarthTubeParams = state.dataEarthTube->EarthTubeParams(thisEarthTube.vertParametersPtr);
+            if (thisEarthTube.ModelType != EarthTubeModelType::Vertical) continue; // Skip earth tubes that do not use vertical solution
+            auto &thisEarthTubeParams = state.dataEarthTube->EarthTubePars(thisEarthTube.vertParametersPtr);
             thisEarthTube.totNodes = thisEarthTubeParams.numNodesAbove + thisEarthTubeParams.numNodesBelow + 1;
-            thisEarthTube.aCoeff.resize(thisEarthTube.totNodes);
-            thisEarthTube.bCoeff.resize(thisEarthTube.totNodes);
-            thisEarthTube.cCoeff.resize(thisEarthTube.totNodes);
-            thisEarthTube.cCoeff0.resize(thisEarthTube.totNodes);
-            thisEarthTube.dCoeff.resize(thisEarthTube.totNodes);
-            thisEarthTube.cPrime.resize(thisEarthTube.totNodes);
-            thisEarthTube.dPrime.resize(thisEarthTube.totNodes);
-            thisEarthTube.cPrime0.resize(thisEarthTube.totNodes);
-            thisEarthTube.tCurrent.resize(thisEarthTube.totNodes);
-            thisEarthTube.tLast.resize(thisEarthTube.totNodes);
-            thisEarthTube.tUndist.resize(thisEarthTube.totNodes);
+            thisEarthTube.aCoeff.reserve(thisEarthTube.totNodes);
+            thisEarthTube.bCoeff.reserve(thisEarthTube.totNodes);
+            thisEarthTube.cCoeff.reserve(thisEarthTube.totNodes);
+            thisEarthTube.cCoeff0.reserve(thisEarthTube.totNodes);
+            thisEarthTube.dCoeff.reserve(thisEarthTube.totNodes);
+            thisEarthTube.cPrime.reserve(thisEarthTube.totNodes);
+            thisEarthTube.dPrime.reserve(thisEarthTube.totNodes);
+            thisEarthTube.cPrime0.reserve(thisEarthTube.totNodes);
+            thisEarthTube.tCurrent.reserve(thisEarthTube.totNodes);
+            thisEarthTube.tLast.reserve(thisEarthTube.totNodes);
+            thisEarthTube.tUndist.reserve(thisEarthTube.totNodes);
             Real64 thickBase = (thisEarthTube.z - thisEarthTube.r1);
             Real64 thickTop = thickBase * thisEarthTubeParams.dimBoundAbove / float(thisEarthTubeParams.numNodesAbove);
             Real64 thickBottom = thickBase * thisEarthTubeParams.dimBoundBelow / float(thisEarthTubeParams.numNodesBelow);
             Real64 thickEarthTube = 4.0 * thisEarthTube.r1;
             Real64 deltat = state.dataGlobal->TimeStepZone;
-            thisEarthTube.dCoeffs = 0.0;    // these are calculated later
-            
-            // Node equations determine the _Coeffs terms--see Engineering Referenve for details on these equation types
+
+            // Node equations determine the _Coeff terms--see Engineering Referenve for details on these equation types
             // Note that node numbers are shifted for c++ arrays that go from 0 to numNodes-1.
             // Node Type 1 (Top Node)
             Real64 commonTerm = thisEarthTube.SoilThermDiff * deltat / (thickTop * thickTop);
-            thisEarthTube.aCoeffs(0) = 0.0;   // no a0 value
-            thisEarthTube.bCoeffs(0) = 1.0 + 3.0 * commonTerm;
-            thisEarthTube.cCoeffs(0) = -1.0 * commonTerm;
-            thisEarthTube.dMult0 =  2.0 * commonTerm;  // does not include temperatures (upper boundary or previous time step)--added later
+            thisEarthTube.aCoeff[0] = 0.0; // no a0 value
+            thisEarthTube.bCoeff[0] = 1.0 + 3.0 * commonTerm;
+            thisEarthTube.cCoeff[0] = -1.0 * commonTerm;
+            thisEarthTube.dMult0 = 2.0 * commonTerm; // does not include temperatures (upper boundary or previous time step)--added later
             // Node Type 2 (Generic Top Section Node)
             for (int nodeNum = 1; nodeNum <= thisEarthTubeParams.numNodesAbove - 2; ++nodeNum) {
-                thisEarthTube.aCoeffs(nodeNum) = -1.0 * commonTerm;
-                thisEarthTube.bCoeffs(nodeNum) = 1.0 + 2.0 * commonTerm;
-                thisEarthTube.cCoeffs(nodeNum) = -1.0 * commonTerm;
+                thisEarthTube.aCoeff[nodeNum] = -1.0 * commonTerm;
+                thisEarthTube.bCoeff[nodeNum] = 1.0 + 2.0 * commonTerm;
+                thisEarthTube.cCoeff[nodeNum] = -1.0 * commonTerm;
             }
             // Node Type 3 (Last Top Section Node)
             int thisNode = thisEarthTubeParams.numNodesAbove - 1;
             Real64 commonTerm2 = 2.0 * thisEarthTube.SoilThermDiff * deltat / (thickTop + thickEarthTube) / thickTop;
-            thisEarthTube.aCoeffs(thisNode) = -1.0 * commonTerm;
-            thisEarthTube.bCoeffs(thisNode) = 1.0 + commonTerm + commontTerm2;
-            thisEarthTube.cCoeffs(thisNode) = -1.0 * commonTerm2;
+            thisEarthTube.aCoeff[thisNode] = -1.0 * commonTerm;
+            thisEarthTube.bCoeff[thisNode] = 1.0 + commonTerm + commonTerm2;
+            thisEarthTube.cCoeff[thisNode] = -1.0 * commonTerm2;
             // Node Type 4 (Earth Tube Node)
-            thisNode += 1;  // now thisEarthTubeParams.numNodesAbove
+            thisNode += 1; // now thisEarthTubeParams.numNodesAbove
             commonTerm = 2.0 * thisEarthTube.SoilThermDiff * deltat / (thickTop + thickEarthTube) / thickEarthTube;
             commonTerm2 = 2.0 * thisEarthTube.SoilThermDiff * deltat / (thickBottom + thickEarthTube) / thickEarthTube;
-            thisEarthTube.aCoeffs(thisNode) = -1.0 * commonTerm;
-            thisEarthTube. bCoeffs(thisNode) = 1.0 + commonTerm + commontTerm2;    // does not include earth tube air flow term--added later
-            thisEarthTube. cCoeffs(thisNode) = -1.0 * commonTerm2;
+            thisEarthTube.aCoeff[thisNode] = -1.0 * commonTerm;
+            thisEarthTube.bCoeff[thisNode] = 1.0 + commonTerm + commonTerm2; // does not include earth tube air flow term--added later
+            thisEarthTube.cCoeff[thisNode] = -1.0 * commonTerm2;
             // Node Type 5 (First Bottom Section Node)
-            thisNode += 1;  // now thisEarthTubeParams.numNodesAbove+1
+            thisNode += 1; // now thisEarthTubeParams.numNodesAbove+1
             commonTerm = thisEarthTube.SoilThermDiff * deltat / (thickBottom * thickBottom);
             commonTerm2 = 2.0 * thisEarthTube.SoilThermDiff * deltat / (thickBottom + thickEarthTube) / thickBottom;
-            thisEarthTube.aCoeffs(thisNode) = -1.0 * commonTerm2;
-            thisEarthTube.bCoeffs(thisNode) = 1.0 + commonTerm + commontTerm2;    // does not include earth tube air flow term--added later
-            thisEarthTube. cCoeffs(thisNode) = -1.0 * commonTerm;
+            thisEarthTube.aCoeff[thisNode] = -1.0 * commonTerm2;
+            thisEarthTube.bCoeff[thisNode] = 1.0 + commonTerm + commonTerm2; // does not include earth tube air flow term--added later
+            thisEarthTube.cCoeff[thisNode] = -1.0 * commonTerm;
             // Node Type 6 (Generic Bottom Section Node)
             for (int nodeNum = thisNode + 1; nodeNum <= thisEarthTube.totNodes - 2; ++nodeNum) {
-                thisEarthTube.aCoeffs(nodeNum) = -1.0 * commonTerm;
-                thisEarthTube.bCoeffs(nodeNum) = 1.0 + 2.0 * commonTerm;
-                thisEarthTube.cCoeffs(nodeNum) = -1.0 * commonTerm;
+                thisEarthTube.aCoeff[nodeNum] = -1.0 * commonTerm;
+                thisEarthTube.bCoeff[nodeNum] = 1.0 + 2.0 * commonTerm;
+                thisEarthTube.cCoeff[nodeNum] = -1.0 * commonTerm;
             }
             // Node Type 7 (Last Bottom Section Node, i.e. Last Node)
-            thisNode = thisEarthTube.totNodes - 1;  // shifted due to c++ arrays that go from 0 to numNodes-1
-            thisEarthTube.aCoeffs(thisNode) = -1.0 * commonTerm;
-            thisEarthTube.bCoeffs(thisNode) = 1.0 + 3.0 * commonTerm;
-            thisEarthTube.cCoeffs(thisNode) = 0.0;    // no cN value
-            thisEarthTube.dMultN = 2.0 * commonTerm;  // does not include previous temperature and earth tube air flow terms--added later
-            
+            thisNode = thisEarthTube.totNodes - 1; // shifted due to c++ arrays that go from 0 to numNodes-1
+            thisEarthTube.aCoeff[thisNode] = -1.0 * commonTerm;
+            thisEarthTube.bCoeff[thisNode] = 1.0 + 3.0 * commonTerm;
+            thisEarthTube.cCoeff[thisNode] = 0.0;    // no cN value
+            thisEarthTube.dMultN = 2.0 * commonTerm; // does not include previous temperature and earth tube air flow terms--added later
+
             // Initialize node temperatures using undisturbed temperature equation and node depths
             // First, nodes above the earth tube
             for (int nodeNum = 0; nodeNum <= thisEarthTubeParams.numNodesAbove - 1; ++nodeNum) {
-                thisEarthTube.depthNode(nodeNum) = thisEarthTube.z - (thisEarthTubeParams.numNodesAbove - nodeNum) * thickTop;
+                thisEarthTube.depthNode[nodeNum] = thisEarthTube.z - (thisEarthTubeParams.numNodesAbove - nodeNum) * thickTop;
             }
             // Now, the earth tube node
-            thisEarthTube.depthNode(thisEarthTubeParams.numNodesAbove) = thisEarthTube.z;
+            thisEarthTube.depthNode[thisEarthTubeParams.numNodesAbove] = thisEarthTube.z;
             // Finally the nodes below the earth tube
-            for (int nodeNumBelow = 1; nodeNum <= thisEarthTubeParams.numNodesBelow; ++nodeNum) {
+            for (int nodeNumBelow = 1; nodeNumBelow <= thisEarthTubeParams.numNodesBelow; ++nodeNumBelow) {
                 int nodeNum = thisEarthTubeParams.numNodesAbove + nodeNumBelow;
-                thisEarthTube.depthNode(nodeNum) = thisEarthTube.z + nodeNumBelow * thickBottom;
+                thisEarthTube.depthNode[nodeNum] = thisEarthTube.z + nodeNumBelow * thickBottom;
             }
-            for (int nodeNum = 0; nodeNum <= thisEarth.totNodes - 1; ++nodeNum) {
-                tLast(nodeNum) = thisEarthTube.calcUndisturbedGroundTemperature(state, thisEarthTube.depthNode(nodeNum));
+            for (int nodeNum = 0; nodeNum <= thisEarthTube.totNodes - 1; ++nodeNum) {
+                thisEarthTube.tLast[nodeNum] = thisEarthTube.calcUndisturbedGroundTemperature(state, thisEarthTube.depthNode[nodeNum]);
             }
-            
-            thisEarthTube.depthUpperBound = thisEarthTube.depthNode(0) - 0.5 * thickTop;
-            thisEarthTube.depthLowerBound = thisEarthTube.depthNode(thisEarthTube.totNodes - 1) + 0.5 * thickBottom;
 
-            tCurrent = tLast;  // initialize current temperatures as well just in case
-            
+            thisEarthTube.depthUpperBound = thisEarthTube.depthNode[0] - 0.5 * thickTop;
+            thisEarthTube.depthLowerBound = thisEarthTube.depthNode[thisEarthTube.totNodes - 1] + 0.5 * thickBottom;
+
+            thisEarthTube.tCurrent = thisEarthTube.tLast; // initialize current temperatures as well just in case
+
             // Calculate constant part of air flow term at earth tube node.  Note that diffusiity/conductivity = 1/(density*specific_heat)
-            thisEarthTube.airFlowCoeff = state.dataGlobal->TimeStepZone * thisEarthTube.SoilThermDiff / thisEarthTube.SoilThermCond
-                                         / thickEarthTube / thisEarthTubeParams(thisEarthTube.vertParametersPtr).width / thisEarthTube.PipeLength;
+            thisEarthTube.airFlowCoeff = state.dataGlobal->TimeStepZone * thisEarthTube.SoilThermDiff / thisEarthTube.SoilThermCond / thickEarthTube /
+                                         thisEarthTubeParams.width / thisEarthTube.PipeLength;
 
-            
             // Calculate some initial values in the Thomas algorithm.  This includes c' when effectiveness is zero (entire c').
             // For any other effectiveness, c' will be the same as c' when effectiveness for is zero for the nodes above the earth
             // tube.  So, the c' for effectiveness of zero (cPrime0) can be reused as needed.
-            thisEarthTube.cCoeffs0 = thisEarthTube.cCoeffs;
-            thisEarthTube.initCPrime0(state, etNum);
+            thisEarthTube.cCoeff0 = thisEarthTube.cCoeff;
+            thisEarthTube.initCPrime0();
+
+            auto &zone = state.dataHeatBal->Zone(thisEarthTube.ZonePtr);
+            for (int nodeNum = 1; nodeNum <= thisEarthTube.totNodes; ++nodeNum) {
+                SetupOutputVariable(state,
+                                    format("Earth Tube Node Temperature {}", nodeNum),
+                                    OutputProcessor::Unit::C,
+                                    thisEarthTube.tCurrent[nodeNum - 1],
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
+                                    zone.Name);
+                SetupOutputVariable(state,
+                                    format("Earth Tube Undisturbed Ground Temperature {}", nodeNum),
+                                    OutputProcessor::Unit::C,
+                                    thisEarthTube.tUndist[nodeNum - 1],
+                                    OutputProcessor::SOVTimeStepType::Zone,
+                                    OutputProcessor::SOVStoreType::State,
+                                    zone.Name);
+            }
+            SetupOutputVariable(state,
+                                "Earth Tube Upper Boundary Ground Temperature {}",
+                                OutputProcessor::Unit::C,
+                                thisEarthTube.tUpperBound,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                zone.Name);
+            SetupOutputVariable(state,
+                                "Earth Tube Lower Boundary Ground Temperature {}",
+                                OutputProcessor::Unit::C,
+                                thisEarthTube.tLowerBound,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                zone.Name);
         }
-    }   // ...end of firstTimeInits block
-    
+    } // ...end of firstTimeInits block
+
     if (state.dataGlobal->BeginDayFlag) {
         // update all of the undisturbed temperatures (only need to do this once per day because the equation only changes as the day changes
-        for (int etNum = 1; etNum <= numEarthTubes; ++etNum) {
+        for (int etNum = 1; etNum <= totEarthTube; ++etNum) {
             auto &thisEarthTube = state.dataEarthTube->EarthTubeSys(etNum);
-            if (thisEarthTube.ModelType != EarthTubeModelType::Vertical) continue;  // Skip earth tubes that do not use vertical solution
+            if (thisEarthTube.ModelType != EarthTubeModelType::Vertical) continue; // Skip earth tubes that do not use vertical solution
             thisEarthTube.tUpperBound = thisEarthTube.calcUndisturbedGroundTemperature(state, thisEarthTube.depthUpperBound);
             thisEarthTube.tLowerBound = thisEarthTube.calcUndisturbedGroundTemperature(state, thisEarthTube.depthLowerBound);
-            for (int nodeNum = 0; thisEarthTube.totNodes-1; ++nodeNum) {
-                tUndist(nodeNum) = thisEarthTube.calcUndisturbedGroundTemperature(state, thisEarthTube.depthNode(nodeNum));
+            for (int nodeNum = 0; thisEarthTube.totNodes - 1; ++nodeNum) {
+                thisEarthTube.tUndist[nodeNum] = thisEarthTube.calcUndisturbedGroundTemperature(state, thisEarthTube.depthNode[nodeNum]);
             }
-    }   // ...end of BeginDayFlag block
-    
-    tLast = tCurrent;   // update temperatures before simulating
-    
+        }
+    } // ...end of BeginDayFlag block
+
+    for (int etNum = 1; etNum <= totEarthTube; ++etNum) {
+        auto &thisEarthTube = state.dataEarthTube->EarthTubeSys(etNum);
+        thisEarthTube.tLast = thisEarthTube.tCurrent; // update temperatures before simulating
+    }
 }
 
-void EarthTubeData::initCPrime0(EnergyPlusData &state)
+void EarthTubeData::initCPrime0()
 {
     // Calculate c' for when effectiveness is zero.  Will use these values when there is no air flow through the earth tube
     // and also use the values in the top portion of the solution (before the earth tube node) since these will not change.
-    this->cPrime0(0) = this->cCoeffs0(0) / this->bCoeffs(0);
-    for (int i = 1; i <= this->totNodes-2; ++i) {
-        this->cPrime0(i) = this->cCoeffs0(i) / (this->bCoeffs(i) - this->aCoeffs(i) * this->cPrime0(i-1));
+    this->cPrime0[0] = this->cCoeff0[0] / this->bCoeff[0];
+    for (int i = 1; i <= this->totNodes - 2; ++i) {
+        this->cPrime0[i] = this->cCoeff0[i] / (this->bCoeff[i] - this->aCoeff[i] * this->cPrime0[i - 1]);
     }
-    cPrime0(this->totNodes-1) = 0.0;
+    cPrime0[this->totNodes - 1] = 0.0;
 }
 
 void CalcEarthTube(EnergyPlusData &state)
@@ -834,8 +839,7 @@ void CalcEarthTube(EnergyPlusData &state)
         // check for Basic model and some temperature limit preventing the earth tube from running
         if ((thisEarthTube.ModelType == EarthTubeModelType::Basic) && (tempShutDown)) continue;
 
-        AirDensity =
-            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, outTdb, state.dataEnvrn->OutHumRat);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, outTdb, state.dataEnvrn->OutHumRat);
         AirSpecHeat = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         if (tempShutDown) {
             EVF = 0.0;
@@ -845,8 +849,7 @@ void CalcEarthTube(EnergyPlusData &state)
         thisZoneHB.MCPE =
             EVF * AirDensity * AirSpecHeat *
             (thisEarthTube.ConstantTermCoef +
-             std::abs(outTdb - state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT) *
-                 thisEarthTube.TemperatureTermCoef +
+             std::abs(outTdb - state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ).MAT) * thisEarthTube.TemperatureTermCoef +
              state.dataEnvrn->WindSpeed * (thisEarthTube.VelocityTermCoef + state.dataEnvrn->WindSpeed * thisEarthTube.VelocitySQTermCoef));
 
         thisZoneHB.EAMFL = thisZoneHB.MCPE / AirSpecHeat;
@@ -886,83 +889,85 @@ void CalcEarthTube(EnergyPlusData &state)
         Rp = std::log((thisEarthTube.r1 + thisEarthTube.r2) / thisEarthTube.r1) / 2.0 / Constant::Pi / thisEarthTube.PipeThermCond;
         if (thisEarthTube.r3 > 0.0) {
             Rs = std::log((thisEarthTube.r1 + thisEarthTube.r2 + thisEarthTube.r3) / (thisEarthTube.r1 + thisEarthTube.r2)) / 2.0 / Constant::Pi /
-            thisEarthTube.SoilThermCond;
-        } else {    // for the Vertical solution .r3 was reset to zero for this
+                 thisEarthTube.SoilThermCond;
+        } else { // for the Vertical solution .r3 was reset to zero for this
             Rs = 0.0;
         }
         Rt = Rc + Rp + Rs;
         OverallHeatTransCoef = 1.0 / Rt;
 
         switch (thisEarthTube.ModelType) {
-            case EarthTubeModelType::Vertical: {
-                // First calculate term that will need to be added at the diagonal for flow and then solve the matrix for new temperatures
-                Real64 eff;  // effectiveness
-                if (AirMassFlowRate > 0.0) {
-                    // Calculate the NTU parameter: NTU = UA/[(Mdot*Cp)min] where Mdot*Cp is for the air side
-                    // where: U = OverallHeatTransCoef
-                    //        A = 2*Pi*r1*TubeLength
-                    Real64 NTU = OverallHeatTransferCoef * 2.0 * Constant::Pi * thisEarthTube.r1 * thisEarthTube.PipeLength / (AirMassFlowRate * AirSpecHeat);
-                    
-                    // Effectiveness is 1 - e(-NTU)
-                    Real64 constexpr MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
-                    if (NTU > maxExpPower) {
-                        eff = 1.0;
-                    } else {
-                        eff = 1.0 - std::exp(-NTU);
-                    }
-                } else {    // if no flow, then eff is zero
-                    eff = 0.0;
-                }
-                
-                Real64 airFlowTerm = AirMassFlowRate * AirSpecHeat * eff * thisEarthTube.airFlowCoeff;
-                thisEarthTube.calcVerticalEarthTube(state, airFlowTerm);
-                
-                int nodeET = state.dataEarthTube->EarthTubePars(thisEarthTube.ventParametersPtr).numNodesAbove
-                if (eff <= 0.0) {   // no flow--air temperature leaving earth tube is the same as what went in
-                    thisEarthTube.InsideAirTemp = outTdb;
-                } else (eff >= 1.0) {   // effectiveness is one so leaving temperature is the same as the ground node temperatre
-                    thisEarthTube.InsideAirTemp = thisEarthTube.tCurrent(nodeET);
-                } else {    // the temperature is between the inlet and ground temperatures
-                    thisEarthTube.InsideAirTemp = outTdb - eff * (outTdb - thisEarthTube.tCurrent(nodeET))
-                }
+        case EarthTubeModelType::Vertical: {
+            // First calculate term that will need to be added at the diagonal for flow and then solve the matrix for new temperatures
+            Real64 eff; // effectiveness
+            if (AirMassFlowRate > 0.0) {
+                // Calculate the NTU parameter: NTU = UA/[(Mdot*Cp)min] where Mdot*Cp is for the air side
+                // where: U = OverallHeatTransCoef
+                //        A = 2*Pi*r1*TubeLength
+                Real64 NTU =
+                    OverallHeatTransCoef * 2.0 * Constant::Pi * thisEarthTube.r1 * thisEarthTube.PipeLength / (AirMassFlowRate * AirSpecHeat);
 
-            } break;
-            case EarthTubeModelType::Basic: { // Basic model
-                if (AirMassFlowRate * AirSpecHeat == 0.0) {
-                    thisEarthTube.InsideAirTemp = GroundTempt;
-                    
+                // Effectiveness is 1 - e(-NTU)
+                Real64 constexpr maxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
+                if (NTU > maxExpPower) {
+                    eff = 1.0;
                 } else {
-                    
-                    // Calculation of Pipe Outlet Air Temperature
-                    if (outTdb > GroundTempt) {
-                        Process1 = (std::log(std::abs(outTdb - GroundTempt)) * AirMassFlowRate * AirSpecHeat -
-                                    OverallHeatTransCoef * thisEarthTube.PipeLength) /
-                        (AirMassFlowRate * AirSpecHeat);
-                        thisEarthTube.InsideAirTemp = std::exp(Process1) + GroundTempt;
-                    } else if (outTdb == GroundTempt) {
-                        thisEarthTube.InsideAirTemp = GroundTempt;
-                    } else {
-                        Process1 = (std::log(std::abs(outTdb - GroundTempt)) * AirMassFlowRate * AirSpecHeat -
-                                    OverallHeatTransCoef * thisEarthTube.PipeLength) /
-                        (AirMassFlowRate * AirSpecHeat);
-                        thisEarthTube.InsideAirTemp = GroundTempt - std::exp(Process1);
-                    }
+                    eff = 1.0 - std::exp(-NTU);
                 }
-            } break;
-            default: { // should never get here
-                assert (false);
-            } break;
+            } else { // if no flow, then eff is zero
+                eff = 0.0;
+            }
+
+            Real64 airFlowTerm = AirMassFlowRate * AirSpecHeat * eff * thisEarthTube.airFlowCoeff;
+            thisEarthTube.calcVerticalEarthTube(state, airFlowTerm);
+
+            int nodeET = state.dataEarthTube->EarthTubePars(thisEarthTube.vertParametersPtr).numNodesAbove;
+            if (eff <= 0.0) { // no flow--air temperature leaving earth tube is the same as what went in
+                thisEarthTube.InsideAirTemp = outTdb;
+            } else if (eff >= 1.0) { // effectiveness is one so leaving temperature is the same as the ground node temperatre
+                thisEarthTube.InsideAirTemp = thisEarthTube.tCurrent[nodeET];
+            } else { // the temperature is between the inlet and ground temperatures
+                thisEarthTube.InsideAirTemp = outTdb - eff * (outTdb - thisEarthTube.tCurrent[nodeET]);
+            }
+
+        } break;
+        case EarthTubeModelType::Basic: { // Basic model
+            if (AirMassFlowRate * AirSpecHeat == 0.0) {
+                thisEarthTube.InsideAirTemp = GroundTempt;
+
+            } else {
+
+                // Calculation of Pipe Outlet Air Temperature
+                if (outTdb > GroundTempt) {
+                    Process1 =
+                        (std::log(std::abs(outTdb - GroundTempt)) * AirMassFlowRate * AirSpecHeat - OverallHeatTransCoef * thisEarthTube.PipeLength) /
+                        (AirMassFlowRate * AirSpecHeat);
+                    thisEarthTube.InsideAirTemp = std::exp(Process1) + GroundTempt;
+                } else if (outTdb == GroundTempt) {
+                    thisEarthTube.InsideAirTemp = GroundTempt;
+                } else {
+                    Process1 =
+                        (std::log(std::abs(outTdb - GroundTempt)) * AirMassFlowRate * AirSpecHeat - OverallHeatTransCoef * thisEarthTube.PipeLength) /
+                        (AirMassFlowRate * AirSpecHeat);
+                    thisEarthTube.InsideAirTemp = GroundTempt - std::exp(Process1);
+                }
+            }
+        } break;
+        default: { // should never get here
+            assert(false);
+        } break;
         }
-        
+
         thisEarthTube.CalcEarthTubeHumRat(state, NZ);
     }
 }
 
 Real64 EarthTubeData::calcUndisturbedGroundTemperature(EnergyPlusData &state, Real64 depth)
 {
-    return this->AverSoilSurTemp - this->ApmlSoilSurTemp * std::exp(-depth * std::sqrt(Constant::Pi / 365.0 / this->SoilThermDiff)) *
-           std::cos(2.0 * Constant::Pi / 365.0 * (state.dataEnvrn->DayOfYear - this->SoilSurPhaseConst
-                                                  - depth / 2.0 * std::sqrt(365.0 / Constant::Pi / this->SoilThermDiff)));
+    return this->AverSoilSurTemp -
+           this->ApmlSoilSurTemp * std::exp(-depth * std::sqrt(Constant::Pi / 365.0 / this->SoilThermDiff)) *
+               std::cos(2.0 * Constant::Pi / 365.0 *
+                        (state.dataEnvrn->DayOfYear - this->SoilSurPhaseConst - depth / 2.0 * std::sqrt(365.0 / Constant::Pi / this->SoilThermDiff)));
 }
 
 void EarthTubeData::calcVerticalEarthTube(EnergyPlusData &state, Real64 airFlowTerm)
@@ -973,41 +978,40 @@ void EarthTubeData::calcVerticalEarthTube(EnergyPlusData &state, Real64 airFlowT
     // vectors of coefficients and then perform the Thomas algorithm.
     // Note that airFlowTerm is mdot_a*cp_a*eff*deltat/rho_soil/cp_soil/nodethickness_et/width/length
 
-    int nodeET = state.dataEarthTube.EarthTubePars(this->vertParametersPtr).numNodesAbove;
-    int nodeLast = this->totNodes - 1;  // minus one because c++ arrays start at 0
-    
+    int nodeET = state.dataEarthTube->EarthTubePars(this->vertParametersPtr).numNodesAbove;
+    int nodeLast = this->totNodes - 1; // minus one because c++ arrays start at 0
+
     // First, calculate cPrime in the forward sweep.
     // If airFlowTerm is zero, there is no flow so we can use can use cPrime0 for cPrime.
     if (airFlowTerm <= 0.0) {
         this->cPrime = this->cPrime0;
-    } else {    // there is positive flow so calculate cPrime
+    } else { // there is positive flow so calculate cPrime
         for (int nodeNum = 0; nodeNum <= nodeET - 1; ++nodeNum) {
-            this->cPrime(nodeNum) = this->cPrime0(nodeNum);  // until we get to the earth tube node, these are unchanged
+            this->cPrime[nodeNum] = this->cPrime0[nodeNum]; // until we get to the earth tube node, these are unchanged
         }
-        this->cPrime(nodeET) = this->cCoeff(nodeET)
-                                   / (this->bCoeff(nodeET) + airFlowTerm - this->aCoeff(nodeET) * this->cPrime(nodeET - 1)); // earth tube node
-        for (int nodeNum = nodesAbove + 1; nodeLast; ++nodeNum) {
-            this->cPrime(nodeNum) = this->cCoeff(nodeNum) / (this->bCoeff(nodeNum) - this->aCoeff(nodeNum) * this->cPrime(nodeNum - 1));
+        this->cPrime[nodeET] =
+            this->cCoeff[nodeET] / (this->bCoeff[nodeET] + airFlowTerm - this->aCoeff[nodeET] * this->cPrime[nodeET - 1]); // earth tube node
+        for (int nodeNum = nodeET + 1; nodeNum <= nodeLast; ++nodeNum) {
+            this->cPrime[nodeNum] = this->cCoeff[nodeNum] / (this->bCoeff[nodeNum] - this->aCoeff[nodeNum] * this->cPrime[nodeNum - 1]);
         }
     }
-    
+
     // Second, set-up dCoeff and then calculate dPrime in the forward sweep.
     this->dCoeff = this->tLast; // set to last temperature at this node, then add on for special nodes
-    this->dCoeff(0) += this->dMult0 * this->tUpperBound;
-    this->dCoeff(nodeET) += airFlowTerm * state.dataEnvrn->OutDryBulbTemp;
-    this->dCoeff(nodeLast) += this->dMultN * this->tLowerBound;
-    this->dPrime(0) = this->dCoeff(0) / this->bCoeff(0)
+    this->dCoeff[0] += this->dMult0 * this->tUpperBound;
+    this->dCoeff[nodeET] += airFlowTerm * state.dataEnvrn->OutDryBulbTemp;
+    this->dCoeff[nodeLast] += this->dMultN * this->tLowerBound;
+    this->dPrime[0] = this->dCoeff[0] / this->bCoeff[0];
     for (int nodeNum = 1; nodeNum <= nodeLast; ++nodeNum) {
-        this->dPrime(nodeNum) = (this->dCoeff(nodeNum) - this->aCoeff(nodeNum) * this->dPrime(nodeNum - 1))
-                                / (this->bCoeff(nodeNum) - this->aCoeff(nodeNum) * this->cPrime(nodeNum - 1));
+        this->dPrime[nodeNum] = (this->dCoeff[nodeNum] - this->aCoeff[nodeNum] * this->dPrime[nodeNum - 1]) /
+                                (this->bCoeff[nodeNum] - this->aCoeff[nodeNum] * this->cPrime[nodeNum - 1]);
     }
-    
+
     // Finally, obtain the solution (tCurrent) by back substitution.
-    this->tCurrent(nodeLast) = this->dPrime(nodeLast);
+    this->tCurrent[nodeLast] = this->dPrime[nodeLast];
     for (int nodeNum = nodeLast - 1; nodeNum >= 0; --nodeNum) {
-        this->tCurrent(nodeNum) = this->dPrime(nodeNum) - this->cPrime(nodeNum) * this->tCurrent(nodeNum + 1);
+        this->tCurrent[nodeNum] = this->dPrime[nodeNum] - this->cPrime[nodeNum] * this->tCurrent[nodeNum + 1];
     }
-    
 }
 
 void EarthTubeData::CalcEarthTubeHumRat(EnergyPlusData &state, int const NZ)
