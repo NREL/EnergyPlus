@@ -49,6 +49,8 @@ if(ENABLE_PCH)
     )
 endif()
 
+option(ENABLE_UNITY "Enable Unity Build" OFF)
+
 add_library(project_fp_options INTERFACE)
 
 add_library(project_warnings INTERFACE)
