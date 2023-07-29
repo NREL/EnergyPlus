@@ -8,7 +8,7 @@ endif()
 
 # Make sure expat is compiled as a static library
 target_compile_definitions(project_options INTERFACE -DXML_STATIC)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   option(BUILD_TIME_TRACE "Enable -ftime-trace for investigating build times on clang" OFF)
   mark_as_advanced(BUILD_TIME_TRACE)
   if (BUILD_TIME_TRACE)
