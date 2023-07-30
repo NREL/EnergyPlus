@@ -432,7 +432,22 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
 
         // cAlphaArgs(5)--Model type: basic or vertical
         // only process cAlphaArgs(6) if cAlphaArgs(5) is "Vertical"
-        thisEarthTube.ModelType = static_cast<EarthTubeModelType>(getEnumValue(solutionTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+        if (state.dataIPShortCut->cAlphaArgs(5).empty()) {
+            thisEarthTube.ModelType = EarthTubeModelType::Basic;
+        } else {
+            thisEarthTube.ModelType = static_cast<EarthTubeModelType>(getEnumValue(solutionTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+            if (thisEarthTube.ModelType == EarthTubeModelType::Invalid) {
+                ShowSevereError(state,
+                                format("{}: {}={}, {} invalid={}",
+                                       cCurrentModuleObject,
+                                       state.dataIPShortCut->cAlphaFieldNames(1),
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(5),
+                                       state.dataIPShortCut->cAlphaArgs(5)));
+                ErrorsFound = true;
+            }
+        }
+
         if (thisEarthTube.ModelType == EarthTubeModelType::Vertical) {
             thisEarthTube.r3 = 0.0; // Vertical model does not use this parameter--reset to zero (keep because r3=0 necessary so Rs=0 in calc routine)
             // Process the parameters based on the name (link via index)
@@ -443,7 +458,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                     break;
                 }
             }
-            if (thisEarthTube.vertParametersPtr = 0) { // didn't find a match
+            if (thisEarthTube.vertParametersPtr == 0) { // didn't find a match
                 ShowSevereError(state,
                                 format("{}: {}={}, Parameter Object {} was not found in the input file.",
                                        cCurrentModuleObject,
