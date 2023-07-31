@@ -27,7 +27,7 @@ In the meantime, while Decent CI is still handling the regression and bulkier te
 
 ## Releases
 
-[![](https://github.com/NREL/EnergyPlus/workflows/Windows%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/windows_release.yml) 
+[![](https://github.com/NREL/EnergyPlus/workflows/Windows%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/windows_release.yml)
 [![](https://github.com/NREL/EnergyPlus/workflows/Mac%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/mac_release.yml) 
 [![](https://github.com/NREL/EnergyPlus/workflows/Linux%20Releases/badge.svg)](https://github.com/NREL/EnergyPlus/actions/workflows/linux_release.yml)
 
