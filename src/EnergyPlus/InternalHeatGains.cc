@@ -7217,7 +7217,7 @@ namespace InternalHeatGains {
             e.QGELost = 0.0;
             e.QBBRAD = 0.0;
             e.QBBCON = 0.0;
-            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num + 1; ++i) {
                 e.QOELAT[i] = 0.0;
                 e.QOERAD[i] = 0.0;
                 e.QOECON[i] = 0.0;
@@ -7256,7 +7256,7 @@ namespace InternalHeatGains {
             e.QGELost = 0.0;
             e.QBBRAD = 0.0;
             e.QBBCON = 0.0;
-            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num + 1; ++i) {
                 e.QOELAT[i] = 0.0;
                 e.QOERAD[i] = 0.0;
                 e.QOECON[i] = 0.0;
@@ -7532,6 +7532,7 @@ namespace InternalHeatGains {
 
             int NZ = state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr;
             int fuelType = (int)state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType;
+            if (fuelType == (int)ExteriorEnergyUse::ExteriorFuelUsage::Invalid) fuelType = (int)ExteriorEnergyUse::ExteriorFuelUsage::Num;
             state.dataHeatBal->ZoneRpt(NZ).OtherPower[fuelType] += state.dataHeatBal->ZoneOtherEq(Loop).Power;
             state.dataHeatBal->ZoneIntGain(NZ).QOERAD[fuelType] += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOECON[fuelType] += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
@@ -8398,7 +8399,17 @@ namespace InternalHeatGains {
                                                                      state.dataHeatBal->spaceRpt(spaceNum).SteamLatGainRate;
 
             // Other Equipment
-            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+            state.dataHeatBal->spaceRpt(spaceNum).OtherConGain = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLatGain = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLost = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherConGainRate = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherRadGainRate = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLatGainRate = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherLostRate = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGain = 0.0;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate = 0.0;
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num + 1; ++i) {
                 state.dataHeatBal->spaceRpt(spaceNum).OtherConGain +=
                     state.dataHeatBal->spaceIntGain(spaceNum).QOECON[i] * state.dataGlobal->TimeStepZoneSec;
                 state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain +=
@@ -8419,9 +8430,9 @@ namespace InternalHeatGains {
                     (state.dataHeatBal->spaceIntGain(spaceNum).QOECON[i] + state.dataHeatBal->spaceIntGain(spaceNum).QOERAD[i] +
                      state.dataHeatBal->spaceIntGain(spaceNum).QOELAT[i]) *
                     state.dataGlobal->TimeStepZoneSec;
-                state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate += state.dataHeatBal->spaceRpt(spaceNum).OtherConGainRate +
-                                                                          state.dataHeatBal->spaceRpt(spaceNum).OtherRadGainRate +
-                                                                          state.dataHeatBal->spaceRpt(spaceNum).OtherLatGainRate;
+                state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate += state.dataHeatBal->spaceIntGain(spaceNum).QOECON[i] +
+                                                                          state.dataHeatBal->spaceIntGain(spaceNum).QOERAD[i] +
+                                                                          state.dataHeatBal->spaceIntGain(spaceNum).QOELAT[i];
             }
 
             // Baseboard Heat
@@ -8584,7 +8595,17 @@ namespace InternalHeatGains {
                                                                     state.dataHeatBal->ZoneRpt(ZoneLoop).SteamLatGainRate;
 
             // Other Equipment
-            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConGain = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGain = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLatGain = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLost = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConGainRate = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGainRate = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLatGainRate = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLostRate = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGain = 0.0;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGainRate = 0.0;
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num + 1; ++i) {
                 state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConGain +=
                     state.dataHeatBal->ZoneIntGain(ZoneLoop).QOECON[i] * state.dataGlobal->TimeStepZoneSec;
                 state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGain +=
@@ -8605,9 +8626,9 @@ namespace InternalHeatGains {
                     (state.dataHeatBal->ZoneIntGain(ZoneLoop).QOECON[i] + state.dataHeatBal->ZoneIntGain(ZoneLoop).QOERAD[i] +
                      state.dataHeatBal->ZoneIntGain(ZoneLoop).QOELAT[i]) *
                     state.dataGlobal->TimeStepZoneSec;
-                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGainRate += state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConGainRate +
-                                                                         state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGainRate +
-                                                                         state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLatGainRate;
+                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGainRate += state.dataHeatBal->ZoneIntGain(ZoneLoop).QOECON[i] +
+                                                                         state.dataHeatBal->ZoneIntGain(ZoneLoop).QOERAD[i] +
+                                                                         state.dataHeatBal->ZoneIntGain(ZoneLoop).QOELAT[i];
             }
 
             // Baseboard Heat
