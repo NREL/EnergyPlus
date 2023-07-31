@@ -925,21 +925,21 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
 
         fillZoneSizingFromInput(state,
                                 zoneSizingInput,
-                                zoneEquipConfig,
                                 state.dataSize->ZoneSizing,
                                 state.dataSize->CalcZoneSizing,
                                 state.dataSize->FinalZoneSizing(CtrlZoneNum),
                                 state.dataSize->CalcFinalZoneSizing(CtrlZoneNum),
+                                state.dataHeatBal->Zone(CtrlZoneNum).Name,
                                 CtrlZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
             for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
                 fillZoneSizingFromInput(state,
                                         zoneSizingInput,
-                                        zoneEquipConfig,
                                         state.dataSize->SpaceSizing,
                                         state.dataSize->CalcSpaceSizing,
                                         state.dataSize->FinalSpaceSizing(spaceNum),
                                         state.dataSize->CalcFinalSpaceSizing(spaceNum),
+                                        state.dataHeatBal->space(spaceNum).Name,
                                         spaceNum);
             }
         }
@@ -1221,19 +1221,19 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
 
 void fillZoneSizingFromInput(EnergyPlusData &state,
                              DataSizing::ZoneSizingInputData const &zoneSizingInput,
-                             DataZoneEquipment::EquipConfiguration const &zoneEquipConfig,
                              Array2D<DataSizing::ZoneSizingData> &zsSizing,
                              Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
                              DataSizing::ZoneSizingData &zsFinalSizing,
                              DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                             std::string_view const zoneOrSpaceName,
                              int const zoneOrSpaceNum)
 {
     for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
         auto &zoneSizing = zsSizing(DesDayNum, zoneOrSpaceNum);
         auto &calcZoneSizing = zsCalcSizing(DesDayNum, zoneOrSpaceNum);
-        zoneSizing.ZoneName = zoneEquipConfig.ZoneName;
+        zoneSizing.ZoneName = zoneOrSpaceName;
         zoneSizing.ZoneNum = zoneOrSpaceNum;
-        calcZoneSizing.ZoneName = zoneEquipConfig.ZoneName;
+        calcZoneSizing.ZoneName = zoneOrSpaceName;
         calcZoneSizing.ZoneNum = zoneOrSpaceNum;
 
         zoneSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
@@ -1309,9 +1309,9 @@ void fillZoneSizingFromInput(EnergyPlusData &state,
         calcZoneSizing.allocateMemberArrays(state.dataZoneEquipmentManager->NumOfTimeStepInDay);
     }
 
-    zsFinalSizing.ZoneName = zoneEquipConfig.ZoneName;
+    zsFinalSizing.ZoneName = zoneOrSpaceName;
     zsFinalSizing.ZoneNum = zoneOrSpaceNum;
-    zsCalcFinalSizing.ZoneName = zoneEquipConfig.ZoneName;
+    zsCalcFinalSizing.ZoneName = zoneOrSpaceName;
     zsCalcFinalSizing.ZoneNum = zoneOrSpaceNum;
 
     zsFinalSizing.ZnCoolDgnSAMethod = zoneSizingInput.ZnCoolDgnSAMethod;
@@ -1406,12 +1406,24 @@ void RezeroZoneSizingArrays(EnergyPlusData &state)
     DisplayString(state, "Re-zeroing zone sizing arrays");
 
     for (int ctrlZoneNum = 1; ctrlZoneNum <= state.dataGlobal->NumOfZones; ++ctrlZoneNum) {
+        if (!state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).IsControlled) continue;
         for (int desDayNum = 1; desDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++desDayNum) {
             state.dataSize->ZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
             state.dataSize->CalcZoneSizing(desDayNum, ctrlZoneNum).zeroMemberData();
         }
         state.dataSize->CalcFinalZoneSizing(ctrlZoneNum).zeroMemberData();
         state.dataSize->FinalZoneSizing(ctrlZoneNum).zeroMemberData();
+    }
+    if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+            if (!state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->space(spaceNum).zoneNum).IsControlled) continue;
+            for (int desDayNum = 1; desDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++desDayNum) {
+                state.dataSize->SpaceSizing(desDayNum, spaceNum).zeroMemberData();
+                state.dataSize->CalcSpaceSizing(desDayNum, spaceNum).zeroMemberData();
+            }
+            state.dataSize->CalcFinalSpaceSizing(spaceNum).zeroMemberData();
+            state.dataSize->FinalSpaceSizing(spaceNum).zeroMemberData();
+        }
     }
 }
 void updateZoneSizingBeginDay(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing)

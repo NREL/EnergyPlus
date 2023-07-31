@@ -2165,8 +2165,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays)
     state->dataSize->CalcZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
     state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
     state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum) {
+        state->dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled = true;
         for (int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             auto &thisSizingType(state->dataSize->ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";

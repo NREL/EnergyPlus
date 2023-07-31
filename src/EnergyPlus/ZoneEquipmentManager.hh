@@ -110,11 +110,11 @@ namespace ZoneEquipmentManager {
 
     void fillZoneSizingFromInput(EnergyPlusData &state,
                                  DataSizing::ZoneSizingInputData const &zoneSizingInput,
-                                 DataZoneEquipment::EquipConfiguration const &zoneEquipConfig,
                                  Array2D<DataSizing::ZoneSizingData> &zsSizing,
                                  Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,
                                  DataSizing::ZoneSizingData &zsFinalSizing,
                                  DataSizing::ZoneSizingData &zsCalcFinalSizing,
+                                 std::string_view const zoneOrSpaceName,
                                  int const zoneOrSpaceNum);
 
     void RezeroZoneSizingArrays(EnergyPlusData &state);

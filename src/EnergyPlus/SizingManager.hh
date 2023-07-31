@@ -151,8 +151,8 @@ namespace SizingManager {
                              Real64 FloorArea,              // zone floor area [m2]
                              Real64 TotOccs,                // design number of occupants for the zone
                              Real64 MinOAVolFlow,           // zone design minimum outside air flow rate [m3/s]
-                             Real64 DOASHeatAddRate         // zone design heat addition rate from the DOAS [W]
-    );
+                             Real64 DOASHeatAddRate,        // zone design heat addition rate from the DOAS [W]
+                             bool const isSpace);
 
     void ReportSysSizing(EnergyPlusData &state,
                          std::string const &SysName,    // the name of the zone
@@ -180,6 +180,7 @@ struct SizingManagerData : BaseGlobalStruct
     // MODULE VARIABLE DECLARATIONS:
     int NumAirLoops = 0;
     bool ReportZoneSizingMyOneTimeFlag = true;
+    bool ReportSpaceSizingMyOneTimeFlag = true;
     bool ReportSysSizingMyOneTimeFlag = true;
     bool runZeroingOnce = true;
 
@@ -187,6 +188,7 @@ struct SizingManagerData : BaseGlobalStruct
     {
         NumAirLoops = 0;
         ReportZoneSizingMyOneTimeFlag = true;
+        ReportSpaceSizingMyOneTimeFlag = true;
         ReportSysSizingMyOneTimeFlag = true;
         runZeroingOnce = true;
     }

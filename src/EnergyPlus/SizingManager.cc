@@ -583,12 +583,22 @@ void ManageSizing(EnergyPlusData &state)
 
     // report sizing results to eio file
     if (state.dataSize->ZoneSizingRunDone) {
+        bool isSpace = true;
+        if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+            for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(state.dataHeatBal->space(spaceNum).zoneNum).IsControlled) continue;
+                reportZoneSizing(state,
+                                 state.dataHeatBal->space(spaceNum),
+                                 state.dataSize->FinalSpaceSizing(spaceNum),
+                                 state.dataSize->CalcFinalSpaceSizing(spaceNum),
+                                 state.dataSize->CalcSpaceSizing,
+                                 state.dataSize->SpaceSizing,
+                                 isSpace);
+            }
+        }
+        isSpace = false;
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            // auto const &thisZone = state.dataHeatBal->Zone(CtrlZoneNum);
-            // auto const &thisFinalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
-            // auto const &thisCalcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
-            bool isSpace = false;
             reportZoneSizing(state,
                              state.dataHeatBal->Zone(CtrlZoneNum),
                              state.dataSize->FinalZoneSizing(CtrlZoneNum),
@@ -596,22 +606,13 @@ void ManageSizing(EnergyPlusData &state)
                              state.dataSize->CalcZoneSizing,
                              state.dataSize->ZoneSizing,
                              isSpace);
-            if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-                isSpace = true;
-                for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
-                    reportZoneSizing(state,
-                                     state.dataHeatBal->space(spaceNum),
-                                     state.dataSize->FinalSpaceSizing(spaceNum),
-                                     state.dataSize->CalcFinalSpaceSizing(spaceNum),
-                                     state.dataSize->CalcSpaceSizing,
-                                     state.dataSize->SpaceSizing,
-                                     isSpace);
-                }
-            }
         }
-        // Deallocate arrays no longer needed
-        state.dataSize->ZoneSizing.deallocate();
-        // CalcZoneSizing.deallocate();
+    }
+    // Deallocate arrays no longer needed
+    state.dataSize->ZoneSizing.deallocate();
+    // CalcZoneSizing.deallocate();
+    if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+        state.dataSize->SpaceSizing.deallocate();
     }
     if (state.dataSize->SysSizingRunDone) {
         for (AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
@@ -4276,7 +4277,8 @@ void reportZoneSizing(EnergyPlusData &state,
                             zoneOrSpace.FloorArea,
                             zoneOrSpace.TotOccupants,
                             zsFinalSizing.MinOA,
-                            DOASHeatGainRateAtClPk);
+                            DOASHeatGainRateAtClPk,
+                            isSpace);
         OutputReportPredefined::PreDefTableEntry(
             state, shift + state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, zsCalcFinalSizing.DesCoolLoad);
         OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnClUserDesLd, curName, zsFinalSizing.DesCoolLoad);
@@ -4343,7 +4345,8 @@ void reportZoneSizing(EnergyPlusData &state,
                             zoneOrSpace.FloorArea,
                             zoneOrSpace.TotOccupants,
                             zsFinalSizing.MinOA,
-                            DOASHeatGainRateAtHtPk);
+                            DOASHeatGainRateAtHtPk,
+                            isSpace);
         OutputReportPredefined::PreDefTableEntry(
             state, shift + state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, zsCalcFinalSizing.DesHeatLoad);
         OutputReportPredefined::PreDefTableEntry(state, shift + state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, zsFinalSizing.DesHeatLoad);
@@ -4398,47 +4401,76 @@ void reportZoneSizingEio(EnergyPlusData &state,
                          Real64 const FloorArea,        // zone floor area [m2]
                          Real64 const TotOccs,          // design number of occupants for the zone
                          Real64 const MinOAVolFlow,     // zone design minimum outside air flow rate [m3/s]
-                         Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
-)
+                         Real64 const DOASHeatAddRate,  // zone design heat addition rate from the DOAS [W]
+                         bool const isSpace)
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   Decenber 2001
     //       MODIFIED       August 2008, Greg Stark
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine writes one item of zone sizing data to the "eio" file..
 
-    if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag) {
-        static constexpr std::string_view Format_990(
+    if (state.dataSizingManager->ReportZoneSizingMyOneTimeFlag && !isSpace) {
+        static constexpr std::string_view Format_990_Zone(
             "! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
             "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
             "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
             "Calc DOAS Heat Addition Rate {W}");
-        print(state.files.eio, "{}\n", Format_990);
+        print(state.files.eio, "{}\n", Format_990_Zone);
         state.dataSizingManager->ReportZoneSizingMyOneTimeFlag = false;
     }
+    if (state.dataSizingManager->ReportSpaceSizingMyOneTimeFlag && isSpace) {
+        static constexpr std::string_view Format_990_Space(
+            "! <Space Sizing Information>, Space Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
+            "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
+            "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
+            "Calc DOAS Heat Addition Rate {W}");
+        print(state.files.eio, "{}\n", Format_990_Space);
+        state.dataSizingManager->ReportSpaceSizingMyOneTimeFlag = false;
+    }
 
-    static constexpr std::string_view Format_991(
+    static constexpr std::string_view Format_991_Space(
+        " Space Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
+    static constexpr std::string_view Format_991_Zone(
         " Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
-    print(state.files.eio,
-          Format_991,
-          ZoneName,
-          LoadType,
-          CalcDesLoad,
-          UserDesLoad,
-          CalcDesFlow,
-          UserDesFlow,
-          DesDayName,
-          PeakHrMin,
-          PeakTemp,
-          PeakHumRat,
-          FloorArea,
-          TotOccs,
-          MinOAVolFlow,
-          DOASHeatAddRate);
+    if (isSpace) {
+        print(state.files.eio,
+              Format_991_Space,
+              ZoneName,
+              LoadType,
+              CalcDesLoad,
+              UserDesLoad,
+              CalcDesFlow,
+              UserDesFlow,
+              DesDayName,
+              PeakHrMin,
+              PeakTemp,
+              PeakHumRat,
+              FloorArea,
+              TotOccs,
+              MinOAVolFlow,
+              DOASHeatAddRate);
+    } else {
+        print(state.files.eio,
+              Format_991_Zone,
+              ZoneName,
+              LoadType,
+              CalcDesLoad,
+              UserDesLoad,
+              CalcDesFlow,
+              UserDesFlow,
+              DesDayName,
+              PeakHrMin,
+              PeakTemp,
+              PeakHumRat,
+              FloorArea,
+              TotOccs,
+              MinOAVolFlow,
+              DOASHeatAddRate);
+    }
 
     // BSLLC Start
     if (state.dataSQLiteProcedures->sqlite) {
