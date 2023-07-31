@@ -8397,6 +8397,11 @@ namespace SurfaceGeometry {
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         surface.SurfHasSurroundingSurfProperty = true;
                         surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
+                        surface.ViewFactorSrdSurfs =
+                            state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum).SurfsViewFactorSum;
+                        if (surface.ViewFactorSrdSurfs == 0.0) {
+                            surface.SurfHasSurroundingSurfProperty = false;
+                        }
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
                         surface.IsSurfPropertyGndSurfacesDefined = true;
@@ -8512,6 +8517,7 @@ namespace SurfaceGeometry {
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(SurfLoop + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).TempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 3));
+                    SrdSurfsProp.SurfsViewFactorSum += SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor;
                 }
             }
         }
