@@ -6238,7 +6238,7 @@ namespace InternalHeatGains {
         // Zone total report variables
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             if (addZoneOutputs(zoneNum)) {
-                for (int i = 0; i < state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums.size(); ++i) {
+                for (size_t i = 0; i < state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums.size(); ++i) {
                     ExteriorEnergyUse::ExteriorFuelUsage fuelTypeNum = state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums[i];
                     std::string fuelTypeName = state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames[i];
 
@@ -6336,7 +6336,7 @@ namespace InternalHeatGains {
         // Space total report variables
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             if (addSpaceOutputs(spaceNum)) {
-                for (int i = 0; i < state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums.size(); ++i) {
+                for (size_t i = 0; i < state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums.size(); ++i) {
                     ExteriorEnergyUse::ExteriorFuelUsage fuelTypeNum = state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums[i];
                     std::string fuelTypeName = state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames[i];
 
