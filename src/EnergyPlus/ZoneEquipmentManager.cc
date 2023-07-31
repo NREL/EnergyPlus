@@ -2613,26 +2613,6 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
     static constexpr std::string_view RoutineName("UpdateZoneSizing");
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int DesDayNum;         // design day index
-    int TimeStepIndex;     // zone time step index
-    int I;                 // write statement index
-    int HourCounter;       // Hour Counter
-    int TimeStepCounter;   // Time Step Counter
-    int Minutes;           // Current Minutes Counter
-    int HourPrint;         // Hour to print (timestamp)
-    Real64 OAFrac;         // outside air fraction
-    int TimeStepAtPeak;    // time step number at heat or cool peak
-    int TimeStepAtPeakF;   // time step number at heat or cool peak (final)
-    int DDNum;             // Design Day index
-    int DDNumF;            // Design Day index (final)
-    Real64 TotCoolSizMult; // combines user cooling design flow input with zone sizing multiplier
-    Real64 TotHeatSizMult; // combines user heating design flow input with zone sizing multiplier
-    Real64 MinOAMass;      // zone minimum outside air mass flow rate kg/s
-    Real64 MaxHeatVolFlow; // max of user specified design heating max flow [m3/s]
-    Real64 SupplyTemp;     // supply air temperature [C]
-    Real64 DeltaTemp;      // supply air delta temperature [deltaC]
-
     switch (CallIndicator) {
     case Constant::CallIndicator::BeginDay: {
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
@@ -2762,7 +2742,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
             // SpaceSizing TODO: For now only write zone-level zsz
             print(state.files.zsz, "Time");
-            for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
+            for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
                 auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
 
@@ -2838,21 +2818,19 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
             print(state.files.zsz, "\n");
             //      HourFrac = 0.0
-            Minutes = 0;
-            TimeStepIndex = 0;
-            for (HourCounter = 1; HourCounter <= 24; ++HourCounter) {
-                for (TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
+            int Minutes = 0;
+            int TimeStepIndex = 0;
+            for (int HourCounter = 1; HourCounter <= 24; ++HourCounter) {
+                for (int TimeStepCounter = 1; TimeStepCounter <= state.dataGlobal->NumOfTimeStepInHour; ++TimeStepCounter) {
                     ++TimeStepIndex;
                     Minutes += state.dataGlobal->MinutesPerTimeStep;
+                    int HourPrint = HourCounter - 1;
                     if (Minutes == 60) {
                         Minutes = 0;
                         HourPrint = HourCounter;
-                    } else {
-                        HourPrint = HourCounter - 1;
                     }
                     for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-                        auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
                         updateZoneSizingEndZoneSizingCalc2(state.dataSize->CalcFinalZoneSizing(CtrlZoneNum), TimeStepIndex, HourPrint, Minutes);
                         if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
                             for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
@@ -2863,7 +2841,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
                     static constexpr std::string_view ZSizeFmt20("{:02}:{:02}:00");
                     print(state.files.zsz, ZSizeFmt20, HourPrint, Minutes);
-                    for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
+                    for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                         if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
                         auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
                         static constexpr std::string_view ZSizeFmt21(
@@ -2931,7 +2909,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
             }
             print(state.files.zsz, "Peak");
 
-            for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
+            for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
                 auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
 
@@ -2971,7 +2949,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
             print(state.files.zsz, "\n");
 
             print(state.files.zsz, "\nPeak Vol Flow (m3/s)");
-            for (I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
+            for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(I).IsControlled) continue;
                 auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(I);
                 static constexpr std::string_view ZSizeFmt41("{}{}{}{:12.6E}{}{:12.6E}{}{}{}{:12.6E}{}{:12.6E}{}{}{}{}{}{}{}{}");
@@ -3041,7 +3019,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
             }
         }
 
-        for (DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
+        for (int DesDayNum = 1; DesDayNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
             for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 updateZoneSizingEndZoneSizingCalc6(state.dataSize->ZoneSizing(DesDayNum, CtrlZoneNum),
@@ -3073,8 +3051,6 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
         }
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            auto &finalZoneSizing = state.dataSize->FinalZoneSizing(CtrlZoneNum);
-            auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(CtrlZoneNum);
             updateZoneSizingEndZoneSizingCalc7(state,
                                                state.dataSize->FinalZoneSizing(CtrlZoneNum),
                                                state.dataSize->CalcFinalZoneSizing(CtrlZoneNum),
