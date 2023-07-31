@@ -175,8 +175,7 @@ namespace EIRPlantLoopHeatPumps {
         PlantLocation sourceSidePlantLoc;
         InOutNodePair loadSideNodes;
         InOutNodePair sourceSideNodes;
-        bool loadSideIsPlantInlet = false;
-        bool sourceSideIsPlantOutlet = false;
+        bool heatRecoveryHeatPump = false; // HP that transfers heat between plants and should not increase plant size
 
         // counters and indexes
         int condMassFlowRateTriggerIndex = 0;

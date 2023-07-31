@@ -212,24 +212,23 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool
     } else { // the heat pump must run
         // apply min/max operating limits based on source side entering fluid temperature
         if (this->minSourceTempLimit > this->sourceSideInletTemp || this->maxSourceTempLimit < this->sourceSideInletTemp) {
-            this->loadSideMassFlowRate = (this->loadSideIsPlantInlet) ? state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate : 0.0;
-            this->sourceSideMassFlowRate =
-                (this->sourceSideIsPlantOutlet) ? state.dataLoopNodes->Node(this->sourceSideNodes.inlet).MassFlowRate : 0.0;
+            this->loadSideMassFlowRate = (this->heatRecoveryHeatPump) ? state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate : 0.0;
+            this->sourceSideMassFlowRate = (this->heatRecoveryHeatPump) ? state.dataLoopNodes->Node(this->sourceSideNodes.inlet).MassFlowRate : 0.0;
             this->running = false;
         } else {
             this->loadSideMassFlowRate =
-                (this->loadSideIsPlantInlet) ? state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate : this->loadSideDesignMassFlowRate;
-            this->sourceSideMassFlowRate = (this->sourceSideIsPlantOutlet) ? state.dataLoopNodes->Node(this->sourceSideNodes.inlet).MassFlowRate
-                                                                           : this->sourceSideDesignMassFlowRate;
+                (this->heatRecoveryHeatPump) ? state.dataLoopNodes->Node(this->loadSideNodes.inlet).MassFlowRate : this->loadSideDesignMassFlowRate;
+            this->sourceSideMassFlowRate = (this->heatRecoveryHeatPump) ? state.dataLoopNodes->Node(this->sourceSideNodes.inlet).MassFlowRate
+                                                                        : this->sourceSideDesignMassFlowRate;
 
             if (!FirstHVACIteration && this->flowControl == DataPlant::FlowMode::VariableSpeedPump) {
-                if ((this->loadVSBranchPump || this->loadVSLoopPump) && !this->loadSideIsPlantInlet) {
+                if ((this->loadVSBranchPump || this->loadVSLoopPump) && !this->heatRecoveryHeatPump) {
                     this->loadSideMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
                     if (this->loadVSBranchPump) {
                         this->loadSideMassFlowRate = std::max(this->loadSideMassFlowRate, this->loadVSPumpMinLimitMassFlow);
                     }
                 }
-                if ((this->sourceVSBranchPump || this->sourceVSLoopPump) && !this->sourceSideMassFlowRate) {
+                if ((this->sourceVSBranchPump || this->sourceVSLoopPump) && !this->heatRecoveryHeatPump) {
                     this->sourceSideMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
                     if (this->sourceVSBranchPump) {
                         this->sourceSideMassFlowRate = std::max(this->sourceSideMassFlowRate, this->sourceVSPumpMinLimitMassFlow);
@@ -269,10 +268,6 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
         this->sourceSideMassFlowRate = 0.0;
         PlantUtilities::SetComponentFlowRate(
             state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
-        if (this->waterSource) {
-            PlantUtilities::SetComponentFlowRate(
-                state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
-        }
         // Set flows if the heat pump is running
     } else { // the heat pump must run
         // apply min/max operating limits based on source side entering fluid temperature
@@ -282,10 +277,6 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
             this->running = false;
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
-            if (this->waterSource) {
-                PlantUtilities::SetComponentFlowRate(
-                    state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
-            }
         } else {
             this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
             this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
@@ -307,23 +298,15 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
 
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
-            if (this->waterSource) {
-                PlantUtilities::SetComponentFlowRate(
-                    state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
-            }
         }
 
         // if there's no flow in one, try to turn the entire heat pump off
-        if (this->loadSideMassFlowRate <= 0.0 || this->sourceSideMassFlowRate <= 0.0) {
+        if (this->loadSideMassFlowRate <= 0.0) {
             this->loadSideMassFlowRate = 0.0;
             this->sourceSideMassFlowRate = 0.0;
             this->running = false;
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
-            if (this->waterSource) {
-                PlantUtilities::SetComponentFlowRate(
-                    state, this->sourceSideMassFlowRate, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet, this->sourceSidePlantLoc);
-            }
         }
     }
 }
@@ -393,7 +376,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
                 waterTempExceeded = true;
             }
         }
-        if (this->sourceSideIsPlantOutlet || this->loadSideIsPlantInlet) {
+        if (this->heatRecoveryHeatPump) {
             // check to see if souce side outlet temp exceeds limit and reduce PLR if necessary
             auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
             Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
@@ -821,7 +804,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
             if (this->referenceCapacityWasAutoSized) tmpCapacity = 0.0;
             if (this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = 0.0;
         }
-        if (this->loadSideIsPlantInlet) {
+        if (this->heatRecoveryHeatPump) {
             tmpLoadVolFlow = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate;
         }
         if (this->loadSideDesignVolFlowRateWasAutoSized) this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
@@ -1006,7 +989,7 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
         //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
         //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
         tmpSourceVolFlow = designSourceSideHeatTransfer / (state.dataSize->PlantSizData(plantSourceSizingIndex).DeltaT * CpSrc * rhoSrc);
-        if (this->waterSource && this->sourceSideIsPlantOutlet) {
+        if (this->waterSource && this->heatRecoveryHeatPump) {
             // If component is on plant outlet branch, use plant flow rate.
             tmpSourceVolFlow = state.dataSize->PlantSizData(plantSourceSizingIndex).DesVolFlowRate;
         }
@@ -1063,10 +1046,10 @@ void EIRPlantLoopHeatPump::sizeSrcSideWSHP(EnergyPlusData &state)
 
     // register the design volume flows with the plant, only doing half of source because the companion
     // is generally on the same loop
-    if (!this->loadSideIsPlantInlet) {
+    if (!this->heatRecoveryHeatPump) {
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->loadSideNodes.inlet, tmpLoadVolFlow);
     }
-    if (!this->sourceSideIsPlantOutlet) {
+    if (!this->heatRecoveryHeatPump) {
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
     }
 
@@ -1571,17 +1554,22 @@ void EIRPlantLoopHeatPump::isPlantInletOrOutlet(EnergyPlusData &state)
     // only components on plant parallel component branches should be registered
     // this check for the load side on a plant inlet branch and source side on a plant outlet branch
     // likely will need more checking here but this works for now with existing test file
+    bool loadSideIsPlantInlet = false;
+    bool sourceSideIsPlantOutlet = false;
     for (auto thisPlant : state.dataPlnt->PlantLoop) {
         for (auto thisLoopSide : thisPlant.LoopSide) {
             if (this->loadSideNodes.inlet == thisLoopSide.NodeNumIn) {
-                this->loadSideIsPlantInlet = true;
+                loadSideIsPlantInlet = true;
                 break;
             }
             if (this->sourceSideNodes.outlet == thisLoopSide.NodeNumOut) {
-                this->sourceSideIsPlantOutlet = true;
+                sourceSideIsPlantOutlet = true;
                 break;
             }
-            if (this->loadSideIsPlantInlet && this->sourceSideIsPlantOutlet) break;
+            if (loadSideIsPlantInlet && sourceSideIsPlantOutlet) {
+                this->heatRecoveryHeatPump = true;
+                break;
+            }
         }
     }
 }
