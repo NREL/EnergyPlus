@@ -55,7 +55,7 @@
 #include <EnergyPlus/PollutionModule.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::PollutionModule;
+using namespace EnergyPlus::Pollution;
 
 TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
 {
@@ -468,63 +468,62 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestOutputVariables)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    state->dataPollutionModule->FuelType.FuelTypeNames.allocate(10);
-    state->dataPollutionModule->FuelType.FuelTypeNames = Constant::eFuel::Invalid;
-    state->dataPollutionModule->GetInputFlagPollution = true;
-    PollutionModule::SetupPollutionMeterReporting(*state);
+    state->dataPollution->GetInputFlagPollution = true;
+    Pollution::SetupPollutionMeterReporting(*state);
 
     // Test get output variables for Total Sky Cover and Opaque Sky Cover
-    std::string fuelTypeNames[9] = {"NaturalGas", "Diesel", "Gasoline", "Propane", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "Coal", "Electricity"};
-    for (unsigned long i = 0; i < size(fuelTypeNames); i++) {
-        EXPECT_EQ(format("Site:Environmental Impact {} Source Energy", fuelTypeNames[i]),
+    for (int i = 0; i < (int)PollFuel::Num; i++) {
+        std::string_view fuelName = Constant::eFuelNames[(int)pollFuel2fuel[i]];
+            
+        EXPECT_EQ(format("Site:Environmental Impact {} Source Energy", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 1).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} CO2 Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} CO2 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 2).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} CO Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} CO Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 3).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} CH4 Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} CH4 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 4).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} NOx Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} NOx Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 5).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} N2O Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} N2O Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 6).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} SO2 Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} SO2 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 7).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} PM Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} PM Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 8).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} PM10 Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} PM10 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 9).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} PM2.5 Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} PM2.5 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 10).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} NH3 Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} NH3 Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 11).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} NMVOC Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} NMVOC Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 12).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} Hg Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} Hg Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 13).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} Pb Emissions Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} Pb Emissions Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 14).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} Water Consumption Volume", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} Water Consumption Volume", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 15).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} Nuclear High Level Waste Mass", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} Nuclear High Level Waste Mass", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 16).VarName);
-        EXPECT_EQ(format("Site:Environmental Impact {} Nuclear Low Level Waste Volume", fuelTypeNames[i]),
+        EXPECT_EQ(format("Site:Environmental Impact {} Nuclear Low Level Waste Volume", fuelName),
                   state->dataOutputProcessor->RVariableTypes(i * 17 + 17).VarName);
     }
 
     // Variables specific to the Electricity fuel type
     EXPECT_EQ("Site:Environmental Impact Purchased Electricity Source Energy",
-              state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 1).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 1).VarName);
     EXPECT_EQ("Site:Environmental Impact Surplus Sold Electricity Source",
-              state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 2).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 2).VarName);
 
     // Variables always setup for total carbon equivalent
     EXPECT_EQ("Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass",
-              state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 3).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 3).VarName);
     EXPECT_EQ("Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass",
-              state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 4).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 4).VarName);
     EXPECT_EQ("Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass",
-              state->dataOutputProcessor->RVariableTypes(size(fuelTypeNames) * 17 + 5).VarName);
+              state->dataOutputProcessor->RVariableTypes((int)PollFuel::Num * 17 + 5).VarName);
 }
 
 TEST_F(EnergyPlusFixture, PollutionModule_TestEnvironmentalImpactFactors)
@@ -580,9 +579,9 @@ TEST_F(EnergyPlusFixture, PollutionModule_TestEnvironmentalImpactFactors)
     Real64 ExpectedOutput(0.3);
     Real64 AllowedTolerance(0.001);
 
-    PollutionModule::GetPollutionFactorInput(*state);
+    Pollution::GetPollutionFactorInput(*state);
 
     // The get routine should rest the steam conversion efficiency to the default value of 0.25.
     // Previously because of a typo, it would reset it to the input value of zero (or even a negative number).
-    ASSERT_NEAR(state->dataPollutionModule->Pollution.SteamConvEffic, ExpectedOutput, AllowedTolerance);
+    ASSERT_NEAR(state->dataPollution->SteamConvEffic, ExpectedOutput, AllowedTolerance);
 }

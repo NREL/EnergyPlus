@@ -6169,7 +6169,7 @@ void SetInitialMeterReportingAndOutputNames(EnergyPlusData &state,
     }
 }
 
-int GetMeterIndex(EnergyPlusData &state, std::string const &MeterName)
+int GetMeterIndex(EnergyPlusData &state, std::string_view const MeterName)
 {
 
     // FUNCTION INFORMATION:
