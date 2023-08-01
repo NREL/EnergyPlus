@@ -402,18 +402,18 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             for (int spaceNum : thisZone.spaceIndexes) {
                 ++spaceCount;
                 if (state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber == 0) {
+                    std::string spaceNodeName = format("{}-Space {}", state.dataLoopNodes->NodeID(thisZone.SystemZoneNodeNumber), spaceCount);
+                    int spaceNodeNum = GetOnlySingleNode(state,
+                                                         spaceNodeName,
+                                                         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                                         DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
+                                                         AlphArray(1),
+                                                         DataLoopNode::NodeFluidType::Air,
+                                                         DataLoopNode::ConnectionType::ZoneNode,
+                                                         NodeInputManager::CompFluidStream::Primary,
+                                                         DataLoopNode::ObjectIsNotParent);
+                    state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = spaceNodeNum;
                 }
-                std::string spaceNodeName = format("{}-Space {}", AlphArray(5), spaceCount);
-                int spaceNodeNum = GetOnlySingleNode(state,
-                                                     spaceNodeName,
-                                                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
-                                                     AlphArray(1),
-                                                     DataLoopNode::NodeFluidType::Air,
-                                                     DataLoopNode::ConnectionType::ZoneNode,
-                                                     NodeInputManager::CompFluidStream::Primary,
-                                                     DataLoopNode::ObjectIsNotParent);
-                state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber = spaceNodeNum;
             }
         }
     }

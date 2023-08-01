@@ -4420,7 +4420,6 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
         SNLoad = ZoneEnthalpyIn - (thisSystemNode.MassFlowRate / ZoneMult) * CpAir * thisSystemNode.Temp + this->NonAirSystemResponse / ZoneMult +
                  this->SysDepZoneLoadsLagged;
-        Real64 dummy = SNLoad;
 
     } else {
 
