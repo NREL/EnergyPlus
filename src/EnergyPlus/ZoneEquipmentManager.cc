@@ -2621,10 +2621,6 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
     // CallIndicator = 3 (EndDay) calculate daily maxima
     // CallIndicator = 4 (EndZoneSizingCalc) write out results
 
-    // SUBROUTINE PARAMETER DEFINITIONS:
-
-    static constexpr std::string_view RoutineName("UpdateZoneSizing");
-
     switch (CallIndicator) {
     case Constant::CallIndicator::BeginDay: {
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
