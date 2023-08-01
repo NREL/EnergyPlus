@@ -484,7 +484,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
             // set the DOAS mass flow rate and supply temperature and humidity ratio
             HR90H = PsyWFnTdbRhPb(state, calcZoneSizing.DOASHighSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
             HR90L = PsyWFnTdbRhPb(state, calcZoneSizing.DOASLowSetpoint, 0.9, state.dataEnvrn->StdBaroPress);
-            DOASMassFlowRate = state.dataSize->CalcFinalZoneSizing(ControlledZoneNum).MinOA;
+            DOASMassFlowRate = state.dataSize->CalcFinalZoneSizing(ControlledZoneNum).MinOA * state.dataEnvrn->StdRhoAir;
             CalcDOASSupCondsForSizing(state,
                                       state.dataEnvrn->OutDryBulbTemp,
                                       state.dataEnvrn->OutHumRat,
