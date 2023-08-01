@@ -489,6 +489,21 @@ namespace DataZoneEquipment {
 
     void GetZoneEquipmentData(EnergyPlusData &state);
 
+    void processZoneEquipmentInput(EnergyPlusData &state,
+                                   std::string_view zoneEqModuleObject,
+                                   int const zoneOrSpaceNum,
+                                   bool const isSpace,
+                                   int &locTermUnitSizingCounter,
+                                   int &overallEquipCount,
+                                   DataZoneEquipment::EquipConfiguration &thisEquipConfig,
+                                   Array1D_string &AlphArray,
+                                   Array1D<Real64> &NumArray,
+                                   Array1D_string &cAlphaFields,   // Alpha field names
+                                   Array1D_string &cNumericFields, // Numeric field names
+                                   Array1D_bool &lAlphaBlanks,     // Logical array, alpha field input BLANK = .TRUE.
+                                   Array1D_bool &lNumericBlanks,   // Logical array, numeric field input BLANK = .TRUE.
+                                   Array1D_int &NodeNums);
+
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component
@@ -534,6 +549,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     int NumOfZoneEquipLists = 0;
     Array1D_int ZoneEquipAvail;
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
+    EPVector<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;

@@ -455,6 +455,7 @@ namespace DataHeatBalance {
         int SystemZoneNodeNumber = 0;                   // This is the zone or space node number for the system for a controlled zone
         Real64 FloorArea = 0.0;                         // Floor area used for this space
         Real64 TotOccupants = 0.0;                      // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        bool IsControlled = false;                      // True when this is a controlled zone or space.
     };
 
     struct SpaceData : ZoneSpaceData
@@ -597,7 +598,6 @@ namespace DataHeatBalance {
         Real64 ExteriorTotalGroundSurfArea = 0.0;                  // Total surface area of all surfaces for Zone with ground contact
         Real64 ExtGrossGroundWallArea = 0.0;                       // Ground contact Wall Area for Zone (Gross)
         Real64 ExtGrossGroundWallArea_Multiplied = 0.0;            // Ground contact Wall Area for Zone (Gross) with multipliers
-        bool IsControlled = false;                                 // True when this is a controlled zone.
         bool IsSupplyPlenum = false;                               // True when this zone is a supply plenum
         bool IsReturnPlenum = false;                               // True when this zone is a return plenum
         int PlenumCondNum = 0;                                     // Supply or return plenum conditions number, 0 if this is not a plenum zone
