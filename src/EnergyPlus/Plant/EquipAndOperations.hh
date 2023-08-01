@@ -241,7 +241,7 @@ struct ChillerHeaterSupervisoryOperationData
 
     void DetermineCurrentPlantLoads(EnergyPlusData &state);
 
-    void DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state);
+    // void DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state);
 
     void ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state);
 

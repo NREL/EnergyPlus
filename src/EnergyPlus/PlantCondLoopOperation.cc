@@ -2932,15 +2932,17 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
             //    ENDIF
         }
     } else { // call supervisory scheme every iteration
-        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-            auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
-            for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
-                auto &this_op_scheme = this_loop.OpScheme(OpNum);
-                if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
-                    if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr) {
-                        this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state, FirstHVACIteration);
+        if (!state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes.empty()) {
+            for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
+                for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
+                    auto &this_op_scheme = this_loop.OpScheme(OpNum);
+                    if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
+                        if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr) {
+                            this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state, FirstHVACIteration);
+                        }
+                        continue;
                     }
-                    continue;
                 }
             }
         }

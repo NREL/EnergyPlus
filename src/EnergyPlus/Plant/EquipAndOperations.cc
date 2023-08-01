@@ -918,11 +918,11 @@ namespace DataPlant {
         this->Report.PrimaryPlantHeatingLoad = HW_Qdot;
     }
 
-    void ChillerHeaterSupervisoryOperationData::DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state)
+    // void ChillerHeaterSupervisoryOperationData::DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state)
     // do a test call to see what capacity any dedicated heat recovery WWHP could provide if run at the current time
-    {
+    // {
         //
-    }
+    // }
 
     void ChillerHeaterSupervisoryOperationData::ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state)
     {
