@@ -119,7 +119,8 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
     }
 }
 
-int testDataTransferGetEnumValueFunction() {
+int testDataTransferGetEnumValueFunction()
+{
     int errors = 0;
 
     // check invalid class type

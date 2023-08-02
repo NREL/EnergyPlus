@@ -246,9 +246,23 @@ void freeObjectNames(const char **objectNames, unsigned int arraySize)
     delete[] objectNames;
 }
 
-enum class DummyEnum1 {Invalid=-1, Hello, World, Num};
+enum class DummyEnum1
+{
+    Invalid = -1,
+    Hello,
+    World,
+    Num
+};
 constexpr std::array<std::string_view, (int)DummyEnum1::Num> dummyEnum1UC = {"HELLO", "WORLD"};
-enum class Beatles {Invalid=-1, Ringo, Paul, John, George, Num};
+enum class Beatles
+{
+    Invalid = -1,
+    Ringo,
+    Paul,
+    John,
+    George,
+    Num
+};
 constexpr std::array<std::string_view, (int)Beatles::Num> beatlesUC = {"RINGO", "PAUL", "JOHN", "GEORGE"};
 
 int getEnergyPlusEnumValue(const char *enumClass, const char *enumKey)
