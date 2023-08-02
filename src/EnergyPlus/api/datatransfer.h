@@ -161,7 +161,7 @@ ENERGYPLUSLIB_API void freeObjectNames(const char **objectNames, unsigned int ar
 /// \param[in] enumClass A const char * of the enum class to be looked up.  The full list of possible class/keys is TODO.
 /// \param[in] enumKey A const char * of the enum key to be looked up.  The full list of possible class/keys is TODO.
 /// \return unsigned int of the actual value given to this enum class/key pair inside EnergyPlus
-ENERGYPLUSLIB_API int getEnumValue(const char *enumClass, const char *enumKey);
+ENERGYPLUSLIB_API int getEnergyPlusEnumValue(const char *enumClass, const char *enumKey);
 
 // ----- FUNCTIONS RELATED TO VARIABLES
 

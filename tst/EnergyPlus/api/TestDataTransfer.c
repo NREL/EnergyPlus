@@ -119,6 +119,27 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
     }
 }
 
+int testDataTransferGetEnumValueFunction() {
+    int errors = 0;
+
+    // check invalid class type
+    if (-1 != getEnergyPlusEnumValue("MissingEnumClass", "OK")) ++errors;
+
+    // check DummyEnum1
+    if (0 != getEnergyPlusEnumValue("DummyEnum1", "Hello")) ++errors;
+    if (1 != getEnergyPlusEnumValue("DummyEnum1", "World")) ++errors;
+    if (-1 != getEnergyPlusEnumValue("DummyEnum1", "Foo")) ++errors;
+
+    // check Beatles
+    if (0 != getEnergyPlusEnumValue("Beatles", "Ringo")) ++errors;
+    if (1 != getEnergyPlusEnumValue("Beatles", "Paul")) ++errors;
+    if (2 != getEnergyPlusEnumValue("Beatles", "John")) ++errors;
+    if (3 != getEnergyPlusEnumValue("Beatles", "George")) ++errors;
+    if (-1 != getEnergyPlusEnumValue("Beatles", "Jimi")) ++errors;
+
+    return errors;
+}
+
 int main(int argc, const char *argv[])
 {
     EnergyPlusState state = stateNew();
@@ -128,6 +149,10 @@ int main(int argc, const char *argv[])
     energyplus(state, argc, argv);
     if (handlesRetrieved == 0) {
         fprintf(stderr, "We never got ANY handles\n");
+        return 1;
+    }
+    if (testDataTransferGetEnumValueFunction() > 0) {
+        fprintf(stderr, "DataTransfer::getEnumValue tests failed in TestDataTransfer.c, did an enum change?\n");
         return 1;
     }
     return 0;
