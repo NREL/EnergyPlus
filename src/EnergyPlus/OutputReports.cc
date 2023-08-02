@@ -423,9 +423,9 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
             DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
             std::string refPtType;
-            if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+            if (thisDaylightControl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
                 refPtType = "DEDayRefPt";
-            } else if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
+            } else if (thisDaylightControl.DaylightMethod == Dayltg::DaylightingMethod::SplitFlux) {
                 refPtType = "DayRefPt";
             }
 
@@ -439,9 +439,9 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
                                                 Format_709,
                                                 normalizeName(thisDaylightControl.ZoneName),
                                                 state.dataSurfColor->DXFcolorno[static_cast<int>(curcolorno)],
-                                                thisDaylightControl.DaylRefPtAbsCoord(1, refpt),
-                                                thisDaylightControl.DaylRefPtAbsCoord(2, refpt),
-                                                thisDaylightControl.DaylRefPtAbsCoord(3, refpt),
+                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).x,
+                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).y,
+                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).z,
                                                 0.2);
                 curcolorno = DataSurfaceColors::ColorNo::DaylSensor2; // ref pts 2 and later are this color
             }
@@ -784,9 +784,9 @@ void DXFOut(EnergyPlusData &state,
                       Format_709,
                       normalizeName(state.dataHeatBal->Zone(zones).Name),
                       DXFcolorno[static_cast<int>(curcolorno)],
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt),
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(2, refpt),
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(3, refpt),
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).x,
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).y,
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).z,
                       0.05);
             }
         }
