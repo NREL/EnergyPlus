@@ -5071,7 +5071,7 @@ Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std
         newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
         // last two points lie between [oldVals[1] and oldVals[2])
         Real64 delta21 = oldVals[2] - oldVals[1];
-        newVals[2] = oldVals[1] + delta21 * ((oldTime1 - newTime2) / OldTimeStep);
+        newVals[2] = oldVals[1] + 0;
         newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime3) / OldTimeStep);
 
     } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
@@ -5081,7 +5081,6 @@ Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std
         newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
         newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
         // last point lie between [oldVals[1] and oldVals[2])
-        Real64 delta21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
         newVals[3] = oldVals[1] + 0;
 
     } else { // DSRatio = 4 or more
