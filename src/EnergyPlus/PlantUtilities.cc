@@ -1114,10 +1114,10 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
                 state, state.dataPlnt->PlantLoop(LoopNum).FluidName, ModelInletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
             state.dataLoopNodes->Node(OutletNodeNum).Temp =
                 state.dataLoopNodes->Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
-            state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
-                state.dataLoopNodes->Node(InletNodeNum).MassFlowRate; // if heat recovery bundle is on inlet branch, the mass flow needs to be
-                                                                      // updated or get splitter/mixer failures
         }
+        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
+            state.dataLoopNodes->Node(InletNodeNum).MassFlowRate; // if heat recovery bundle is on inlet branch, the mass flow needs to be
+        // updated or get splitter/mixer failures
 
         // set sim flag for this loop
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;

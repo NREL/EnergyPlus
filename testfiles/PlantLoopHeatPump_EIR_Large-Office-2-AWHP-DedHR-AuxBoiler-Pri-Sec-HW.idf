@@ -10532,38 +10532,38 @@ Curve:Biquadratic,
     HeatSys1 Demand Outlet Node;  !- Outlet Node Name
 
   HeatPump:PlantLoop:EIR:Heating,
-    Dedicated HR Heating Side WSHP,            !- Name
-    Heating Side WSHP Load Side Inlet,  !- Load Side Inlet Node Name
-    Heating Side WSHP Load Side Outlet,  !- Load Side Outlet Node Name
-    WaterSource,             !- Condenser Type
+    Dedicated HR Heating Side WSHP,       !- Name
+    Heating Side WSHP Load Side Inlet,    !- Load Side Inlet Node Name
+    Heating Side WSHP Load Side Outlet,   !- Load Side Outlet Node Name
+    WaterSource,                          !- Condenser Type
     Heating Side WSHP Source Side Inlet,  !- Source Side Inlet Node Name
     Heating Side WSHP Source Side Oulet,  !- Source Side Outlet Node Name
-    Dedicated HR Cooling Side WSHP,            !- Companion Heat Pump Name
+    Dedicated HR Cooling Side WSHP,       !- Companion Heat Pump Name
     autosize,                   !- Load Side Reference Flow Rate {m3/s}
     autosize,                   !- Source Side Reference Flow Rate {m3/s}
     autosize,                   !- Reference Capacity {W}
-    3.5,                     !- Reference Coefficient of Performance {W/W}
+    3.5,                        !- Reference Coefficient of Performance {W/W}
     0.2,                        !- Sizing Factor
-    CapCurveFuncTemp,        !- Capacity Modifier Function of Temperature Curve Name
-    EIRCurveFuncTemp,        !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
-    EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
-    1.0,                         !- Heating To Cooling Capacity Sizing Ratio
-    CoolingCapacity,             !- Heat Pump Sizing Method
-    Setpoint,                    !- Control Type
-    VariableSpeedPumping,        !- Flow Mode
-    0.2,                     !- Minimum Part Load Ratio
-    -25.0,                   !- Minimum Source Inlet Temperature
-    35.0,                    !- Maximum Source Inlet Temperature
-     ,             !- Minimum Supply Water Temperature Curve Name
-     ,             !- Maximum Supply Water Temperature Curve Name
-     ,      !- Dry Outdoor Correction Factor Curve Name
-    ,             !- Maximum Outdoor Dry Bulb Temperature For Defrost Operation
-    ,          !- Heat Pump Defrost Control
-    ,               !- Heat Pump Defrost Time Period Fraction
-    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
-    ,   !- Timed Demand Defrost Frequency Curve Name
-    ,    !- Timed Demand Defrost Heat Load Penalty Curve Name
-    ;  !- Timed Demand Defrost Heat Input Energy Fraction Curve Name
+    CapCurveFuncTemp,           !- Capacity Modifier Function of Temperature Curve Name
+    EIRCurveFuncTemp,           !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+    EIRCurveFuncPLR,            !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+    1.0,                        !- Heating To Cooling Capacity Sizing Ratio
+    CoolingCapacity,            !- Heat Pump Sizing Method
+    Setpoint,                   !- Control Type
+    VariableSpeedPumping,       !- Flow Mode
+    0.2,                        !- Minimum Part Load Ratio
+    2.0,                        !- Minimum Source Inlet Temperature
+    25.0,                       !- Maximum Source Inlet Temperature
+    ,                           !- Minimum Supply Water Temperature Curve Name
+    ,                           !- Maximum Supply Water Temperature Curve Name
+    ,                           !- Dry Outdoor Correction Factor Curve Name
+    ,                           !- Maximum Outdoor Dry Bulb Temperature For Defrost Operation
+    ,                           !- Heat Pump Defrost Control
+    ,                           !- Heat Pump Defrost Time Period Fraction
+    ,                           !- Defrost Energy Input Ratio Function of Temperature Curve Name
+    ,                           !- Timed Demand Defrost Frequency Curve Name
+    ,                           !- Timed Demand Defrost Heat Load Penalty Curve Name
+    ;                           !- Timed Demand Defrost Heat Input Energy Fraction Curve Name
 
   Curve:Biquadratic,
     CapCurveFuncTemp,        !- Name
@@ -10603,24 +10603,26 @@ Curve:Biquadratic,
 
 
   HeatPump:PlantLoop:EIR:Cooling,
-    Dedicated HR Cooling Side WSHP,            !- Name
-    Cooling Side WSHP Load Side Inlet,  !- Load Side Inlet Node Name
-    Cooling Side WSHP Load Side Outlet,  !- Load Side Outlet Node Name
-    WaterSource,             !- Condenser Type
-    Cooling Side WSHP Source Side Inlet,  !- Source Side Inlet Node Name
+    Dedicated HR Cooling Side WSHP,        !- Name
+    Cooling Side WSHP Load Side Inlet,     !- Load Side Inlet Node Name
+    Cooling Side WSHP Load Side Outlet,    !- Load Side Outlet Node Name
+    WaterSource,                           !- Condenser Type
+    Cooling Side WSHP Source Side Inlet,   !- Source Side Inlet Node Name
     Cooling Side WSHP Source Side Outlet,  !- Source Side Outlet Node Name
-    Dedicated HR Heating Side WSHP,            !- Companion Heat Pump Name
-    autosize,                   !- Load Side Reference Flow Rate {m3/s}
-    autosize,                   !- Source Side Reference Flow Rate {m3/s}
-    autosize,                  !- Reference Capacity {W}
+    Dedicated HR Heating Side WSHP,        !- Companion Heat Pump Name
+    autosize,                !- Load Side Reference Flow Rate {m3/s}
+    autosize,                !- Source Side Reference Flow Rate {m3/s}
+    autosize,                !- Reference Capacity {W}
     3.5,                     !- Reference Coefficient of Performance {W/W}
-    0.2,                        !- Sizing Factor
+    0.2,                     !- Sizing Factor
     CapCurveFuncTemp2,       !- Capacity Modifier Function of Temperature Curve Name
     EIRCurveFuncTemp2,       !- Electric Input to Output Ratio Modifier Function of Temperature Curve Name
     EIRCurveFuncPLR2,        !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                !- Control Type
     VariableSpeedPumping,    !- Flow Mode
-    0.2;                     !- Minimum Part Load Ratio
+    0.2,                     !- Minimum Part Load Ratio
+    10.0,                    !- Minimum Source Inlet Temperature
+    50.0;                    !- Maximum Source Inlet Temperature
 
   Curve:Biquadratic,
     CapCurveFuncTemp2,       !- Name
