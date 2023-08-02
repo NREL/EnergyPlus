@@ -1049,7 +1049,8 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
                                                                         Constant::InitConvTemp,
                                                                         state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                         RoutineName);
-                Real64 tmpDesCap = rhoWater * tmpSupSideDesignVolFlowRate * CpWater * state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT; // TODO: Debug and check the real value of DelT
+                Real64 tmpDesCap = rhoWater * tmpSupSideDesignVolFlowRate * CpWater *
+                                   state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT; // TODO: Debug and check the real value of DelT
 
                 Real64 TempSteamIn = FluidProperties::GetSatTemperatureRefrig(state,
                                                                               state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
@@ -2569,7 +2570,7 @@ void HeatExchangerStruct::findSteamLoopFlow(EnergyPlusData &state, Real64 Target
     this->calculateSteamToWaterHX(state, WaterMdot);
     TargetWaterLoopLeavingTemp = this->SupplySideLoop.OutletTemp;
     Real64 TargetSteamMdot = this->DemandSideLoop.InletMassFlowRate;
- 
+
     // mass flow rate of steam
     PlantUtilities::SetComponentFlowRate(
         state, TargetSteamMdot, this->DemandSideLoop.inletNodeNum, this->DemandSideLoop.outletNodeNum, this->DemandSideLoop);

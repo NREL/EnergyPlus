@@ -6496,20 +6496,6 @@ void GetFuelFactorInfo(EnergyPlusData &state,
             fuelSourceFactor = 1.084 / Pollution.PurchHeatWaterEffic;
         }
     } break;
-    case Constant::eFuel::DistrictHeatingWater: {
-        if (Pollution.NatGasCoef.FuelFactorUsed) {
-            fuelFactorUsed = true;
-            fuelSourceFactor = Pollution.NatGasCoef.Source / Pollution.PurchHeatWaterEffic;
-            if (Pollution.NatGasCoef.SourceSched == 0) {
-                fuelFactorScheduleUsed = false;
-            } else {
-                fuelFactorScheduleUsed = true;
-                ffScheduleIndex = Pollution.NatGasCoef.SourceSched;
-            }
-        } else {
-            fuelSourceFactor = 1.084 / Pollution.PurchHeatWaterEffic;
-        }
-    } break;
     case Constant::eFuel::DistrictCooling: {
         if (Pollution.ElecCoef.FuelFactorUsed) {
             fuelFactorUsed = true;

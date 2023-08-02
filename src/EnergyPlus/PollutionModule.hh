@@ -400,11 +400,11 @@ namespace PollutionModule {
               Coal(0.0), Gasoline(0.0), Propane(0.0), Diesel(0.0), OtherFuel1(0.0), OtherFuel2(0.0), ElecPurch(0.0), ElecSold(0.0),
               ElecFacilityIndex(0), DieselFacilityIndex(0), PurchCoolFacilityIndex(0), PurchHeatWaterFacilityIndex(0), PurchHeatSteamFacilityIndex(0),
               NatGasFacilityIndex(0), GasolineFacilityIndex(0), CoalFacilityIndex(0), FuelOil1FacilityIndex(0), FuelOil2FacilityIndex(0),
-              PropaneFacilityIndex(0), OtherFuel1FacilityIndex(0), OtherFuel2FacilityIndex(0), ElecProducedFacilityIndex(0), SteamFacilityIndex(0),
+              PropaneFacilityIndex(0), OtherFuel1FacilityIndex(0), OtherFuel2FacilityIndex(0), ElecProducedFacilityIndex(0),
               ElecPurchasedFacilityIndex(0), ElecSurplusSoldFacilityIndex(0), ElecFacility(0.0), DieselFacility(0.0), PurchCoolFacility(0.0),
               PurchHeatWaterFacility(0.0), PurchHeatSteamFacility(0.0), NatGasFacility(0.0), GasolineFacility(0.0), CoalFacility(0.0),
               FuelOil1Facility(0.0), FuelOil2Facility(0.0), PropaneFacility(0.0), OtherFuel1Facility(0.0), OtherFuel2Facility(0.0),
-              ElecProducedFacility(0.0), SteamFacility(0.0), ElecPurchasedFacility(0.0), ElecSurplusSoldFacility(0.0)
+              ElecProducedFacility(0.0), ElecPurchasedFacility(0.0), ElecSurplusSoldFacility(0.0)
         {
         }
     };
