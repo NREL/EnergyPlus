@@ -180,18 +180,14 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas;
     int NumNums;
-    int NodeNum;
     int IOStat;
     Array1D_string AlphArray;
     Array1D<Real64> NumArray;
     int MaxAlphas;
     int MaxNums;
     int NumParams;
-    int NumNodes;
     Array1D_int NodeNums;
-    bool IsNotOK; // Flag to verify nam
-    bool NodeListError;
-    bool UniqueNodeError;
+    bool IsNotOK;                    // Flag to verify nam
     std::string CurrentModuleObject; // Object type for getting and error messages
     Array1D_string cAlphaFields;     // Alpha field names
     Array1D_string cNumericFields;   // Numeric field names
@@ -335,11 +331,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                   overallEquipCount,
                                   state.dataZoneEquip->ZoneEquipConfig(zoneOrSpaceNum),
                                   AlphArray,
-                                  NumArray,
                                   cAlphaFields,
-                                  cNumericFields,
                                   lAlphaBlanks,
-                                  lNumericBlanks,
                                   NodeNums);
         state.dataHeatBal->Zone(zoneOrSpaceNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(zoneOrSpaceNum).ZoneNode;
     } // end loop over controlled zones
@@ -386,11 +379,8 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                   overallEquipCount,
                                   state.dataZoneEquip->spaceEquipConfig(zoneOrSpaceNum),
                                   AlphArray,
-                                  NumArray,
                                   cAlphaFields,
-                                  cNumericFields,
                                   lAlphaBlanks,
-                                  lNumericBlanks,
                                   NodeNums);
         state.dataHeatBal->space(zoneOrSpaceNum).SystemZoneNodeNumber = state.dataZoneEquip->spaceEquipConfig(zoneOrSpaceNum).ZoneNode;
     } // end loop over controlled spaces
@@ -632,11 +622,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                                int &overallEquipCount,
                                DataZoneEquipment::EquipConfiguration &thisEquipConfig,
                                Array1D_string &AlphArray,
-                               Array1D<Real64> &NumArray,
-                               Array1D_string &cAlphaFields,   // Alpha field names
-                               Array1D_string &cNumericFields, // Numeric field names
-                               Array1D_bool &lAlphaBlanks,     // Logical array, alpha field input BLANK = .TRUE.
-                               Array1D_bool &lNumericBlanks,   // Logical array, numeric field input BLANK = .TRUE.
+                               Array1D_string &cAlphaFields, // Alpha field names
+                               Array1D_bool &lAlphaBlanks,   // Logical array, alpha field input BLANK = .TRUE.
                                Array1D_int &NodeNums)
 {
     static constexpr std::string_view RoutineName("processZoneEquipmentInput: "); // include trailing blank space
