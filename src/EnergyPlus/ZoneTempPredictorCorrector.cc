@@ -5061,38 +5061,41 @@ Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std
     Real64 const newTime1 = newTime0 - NewTimeStep;
     Real64 const newTime2 = newTime1 - NewTimeStep;
     Real64 const newTime3 = newTime2 - NewTimeStep;
-    Real64 const newTime4 = newTime3 - NewTimeStep;
 
     Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
 
     if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
-        // first two points lie between oldVals[0] and oldVals[1]
+        // first two points lie between [oldVals[0] and oldVals[1])
         Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
-        // last two points lie between oldVals[1] and oldVals[2]
+        newVals[0] = oldVals[0];
+        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
+        // last two points lie between [oldVals[1] and oldVals[2])
         Real64 delta21 = oldVals[2] - oldVals[1];
-        newVals[2] = oldVals[1] + delta21 * ((oldTime1 - newTime3) / OldTimeStep);
-        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime4) / OldTimeStep);
+        newVals[2] = oldVals[0] + delta10 * ((oldTime1 - newTime2) / OldTimeStep);
+        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime3) / OldTimeStep);
+
     } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
-        // first three points lie between oldVals[0] and oldVals[1]
+        // first three points lie between [oldVals[0] and oldVals[1])
         Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
-        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
-        // last point lie between oldVals[1] and oldVals[2]
+        newVals[0] = oldVals[0];
+        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
+        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
+        // last point lie between [oldVals[1] and oldVals[2])
         Real64 delta21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
-        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime4) / OldTimeStep);
+        newVals[3] = oldVals[0] + delta21 * ((oldTime1 - newTime3) / OldTimeStep);
 
     } else { // DSRatio = 4 or more
-        // all new points lie between oldVals[0] and oldVals[1]
+        // all new points lie between [oldVals[0] and oldVals[1])
         Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
-        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
-        newVals[3] = oldVals[0] + delta10 * ((oldTime0 - newTime4) / OldTimeStep);
+        newVals[0] = oldVals[0];
+        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
+        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
+        newVals[3] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
+
     }
     return oldVals[0];
+
+    
 
     // if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
     //     // first two points lie between oldVals[0] and oldVals[1]
