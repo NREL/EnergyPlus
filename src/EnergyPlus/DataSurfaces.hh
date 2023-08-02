@@ -167,6 +167,16 @@ namespace DataSurfaces {
         Num // The counter representing the total number of surface class, always stays at the bottom
     };
 
+    // A coarse grain version of SurfaceClass
+    enum class FWC
+    {
+        Invalid = -1,
+        Floor,
+        Wall,
+        Ceiling,
+        Num
+    };
+
     enum class SurfaceFilter
     {
         Invalid = -1,
@@ -195,6 +205,14 @@ namespace DataSurfaces {
                                                                                                          "ALLINTERIORROOFS",
                                                                                                          "ALLINTERIORCEILINGS",
                                                                                                          "ALLINTERIORFLOORS"};
+
+    enum class WinCover
+    {
+        Invalid = -1,
+        Bare,
+        Shaded,
+        Num
+    };
 
     enum class WinShadingType
     {
@@ -514,20 +532,21 @@ namespace DataSurfaces {
     {
         // Values that must be the same in order for surfaces to use a representative calculation
 
-        int Construction;        // Pointer to the construction in the Construct derived type
-        Real64 Azimuth;          // Direction the surface outward normal faces (degrees) or FACING
-        Real64 Tilt;             // Angle (deg) between the ground outward normal and the surface outward normal
-        Real64 Height;           // Height of the surface (m)
-        int Zone;                // Interior environment or zone the surface is a part of
-        int EnclIndex;           // Pointer to enclosure this surface belongs to
-        int TAirRef;             // Flag for reference air temperature
-        int ExtZone;             // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
-        int ExtCond;             // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
-        int ExtEnclIndex;        // For an "interzone" surface, this is the adjacent ENCLOSURE number
-        bool ExtSolar;           // True if the "outside" of the surface is exposed to solar
-        bool ExtWind;            // True if the "outside" of the surface is exposed to wind
-        Real64 ViewFactorGround; // View factor to the ground from the exterior of the surface for diffuse solar radiation
-        Real64 ViewFactorSky;    // View factor to the sky from the exterior of the surface for diffuse solar radiation
+        int Construction;          // Pointer to the construction in the Construct derived type
+        Real64 Azimuth;            // Direction the surface outward normal faces (degrees) or FACING
+        Real64 Tilt;               // Angle (deg) between the ground outward normal and the surface outward normal
+        Real64 Height;             // Height of the surface (m)
+        int Zone;                  // Interior environment or zone the surface is a part of
+        int EnclIndex;             // Pointer to enclosure this surface belongs to
+        int TAirRef;               // Flag for reference air temperature
+        int ExtZone;               // For an "interzone" surface, this is the adjacent ZONE number (not adjacent SURFACE number).
+        int ExtCond;               // Exterior condition type. Same as ExtBoundCond for non-interzone surfaces. Value = 1 for interzone surfaces.
+        int ExtEnclIndex;          // For an "interzone" surface, this is the adjacent ENCLOSURE number
+        bool ExtSolar;             // True if the "outside" of the surface is exposed to solar
+        bool ExtWind;              // True if the "outside" of the surface is exposed to wind
+        Real64 ViewFactorGround;   // View factor to the ground from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSky;      // View factor to the sky from the exterior of the surface for diffuse solar radiation
+        Real64 ViewFactorSrdSurfs; // View factor to the surrounding surfaces seen from the exterior of the surface
 
         // Special Properties
         HeatTransferModel HeatTransferAlgorithm; // used for surface-specific heat transfer algorithm.
@@ -782,6 +801,8 @@ namespace DataSurfaces {
         int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node, zero if none
         Real64 AE = 0.0;                       // Product of area and emissivity for each surface
         Real64 enclAESum = 0.0;                // Sum of area times emissivity for all other surfaces in enclosure
+        Real64 SrdSurfTemp;                    // surrounding surfaces average temperature seen by an exterior surface (C)
+        Real64 ViewFactorSrdSurfs;             // surrounding surfaces view factor sum seen by an exterior surface(-)
 
         // Default Constructor
         SurfaceData()
@@ -799,7 +820,7 @@ namespace DataSurfaces {
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), IsSurfPropertyGndSurfacesDefined(false),
               SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
               SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false), SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0),
-              SurfLinkedOutAirNode(0)
+              SurfLinkedOutAirNode(0), SrdSurfTemp(0.0), ViewFactorSrdSurfs(0.0)
         {
         }
 
@@ -837,13 +858,14 @@ namespace DataSurfaces {
     struct SurfaceWindowCalc // Calculated window-related values
     {
         // Members
-        Array1D<Real64> SolidAngAtRefPt;         // Solid angle subtended by window from daylit ref points 1 and 2
-        Array1D<Real64> SolidAngAtRefPtWtd;      // Solid angle subtended by window from ref pts weighted by glare pos factor
-        Array2D<Real64> IllumFromWinAtRefPt;     // Illuminance from window at ref pts for window with and w/o shade (lux)
-        Array2D<Real64> BackLumFromWinAtRefPt;   // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
-        Array2D<Real64> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
-        Vector3<Real64> WinCenter;               // X,Y,Z coordinates of window center point in building coord system
-        Array1D<Real64> ThetaFace;               // Face temperatures of window layers (K)
+        Array1D<Real64> SolidAngAtRefPt;    // Solid angle subtended by window from daylit ref points 1 and 2
+        Array1D<Real64> SolidAngAtRefPtWtd; // Solid angle subtended by window from ref pts weighted by glare pos factor
+        Array1D<std::array<Real64, (int)WinCover::Num>> IllumFromWinAtRefPt; // Illuminance from window at ref pts for window with and w/o shade (lux)
+        Array1D<std::array<Real64, (int)WinCover::Num>>
+            BackLumFromWinAtRefPt; // Window background luminance from window wrt ref pts (cd/m2) with and w/o shade (cd/m2)
+        Array1D<std::array<Real64, (int)WinCover::Num>> SourceLumFromWinAtRefPt; // Window luminance at ref pts for window with and w/o shade (cd/m2)
+        Vector3<Real64> WinCenter = {0.0, 0.0, 0.0};                             // X,Y,Z coordinates of window center point in building coord system
+        Array1D<Real64> ThetaFace;                                               // Face temperatures of window layers (K)
 
         Array1D<Real64> OutProjSLFracMult; // Multiplier on sunlit fraction due to shadowing of glass by frame
         // and divider outside projections
@@ -855,9 +877,11 @@ namespace DataSurfaces {
         Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
         Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
-        Array1D<Real64> EnclAreaMinusThisSurf; // Enclosure inside surface area minus this surface and its subsurfaces
+        std::array<Real64, (int)FWC::Num> EnclAreaMinusThisSurf = {
+            0.0, 0.0, 0.0}; // Enclosure inside surface area minus this surface and its subsurfaces
         // for floor/wall/ceiling (m2)
-        Array1D<Real64> EnclAreaReflProdMinusThisSurf; // Enclosure product of inside surface area times vis reflectance
+        std::array<Real64, (int)FWC::Num> EnclAreaReflProdMinusThisSurf = {
+            0.0, 0.0, 0.0}; // Enclosure product of inside surface area times vis reflectance
         // minus this surface and its subsurfaces,
         // for floor/wall/ceiling (m2)
 
@@ -865,9 +889,8 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceWindowCalc()
-            : WinCenter(0.0, 0.0, 0.0), ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0),
-              EffShBlindEmiss(Material::MaxSlatAngs, 0.0), EffGlassEmiss(Material::MaxSlatAngs, 0.0), EnclAreaMinusThisSurf(3, 0.0),
-              EnclAreaReflProdMinusThisSurf(3, 0.0)
+            : ThetaFace(10, 296.15), OutProjSLFracMult(24, 1.0), InOutProjSLFracMult(24, 1.0), EffShBlindEmiss(Material::MaxSlatAngs, 0.0),
+              EffGlassEmiss(Material::MaxSlatAngs, 0.0)
         {
         }
     };
@@ -1264,6 +1287,7 @@ namespace DataSurfaces {
         std::string Name;
         Real64 SkyViewFactor = 0.0;         // sky view factor
         Real64 GroundViewFactor = 0.0;      // ground view factor
+        Real64 SurfsViewFactorSum = 0.0;    // surrounding surfaces view factor sum
         int SkyTempSchNum = 0;              // schedule pointer
         int GroundTempSchNum = 0;           // schedule pointer
         int TotSurroundingSurface = 0;      // Total number of surrounding surfaces defined for an exterior surface

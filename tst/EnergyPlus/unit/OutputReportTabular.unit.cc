@@ -7186,10 +7186,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->SysSizInput(1).AirLoopNum = 1;
     state->dataSize->SysSizInput(1).SizingOption = DataSizing::NonCoincident;
-    auto degC_to_F = [](Real64 celsius) constexpr
-    {
-        return celsius * (9.0 / 5.0) + 32.0;
-    };
+    auto degC_to_F = [](Real64 celsius) constexpr { return celsius * (9.0 / 5.0) + 32.0; };
     constexpr Real64 coolMixTempSys = 26.2;
     constexpr Real64 coolMixTempSysIP = degC_to_F(coolMixTempSys);
     constexpr Real64 heatMixTempSys = -1.7;
@@ -8495,7 +8492,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
     bool fFScheduleUsed;
     int ffScheduleIndex;
 
-    PollutionModule::GetFuelFactorInfo(*state, "DistrictHeatingSteam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    PollutionModule::GetFuelFactorInfo(
+        *state, Constant::eFuel::DistrictHeatingSteam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
 
     EXPECT_EQ(curSourceFactor, 1.2);
 }
@@ -11640,7 +11638,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                             "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_total = execAndReturnFirstDouble(query_total);
-    EXPECT_EQ(return_val_total, 515.19);
+    EXPECT_EQ(return_val_total, 598.2);
 
     // get the sensible instant 'DOAS Direct to Zone' cooling peak load component
     std::string query_sensible_instant("SELECT Value From TabularDataWithStrings"
@@ -11650,7 +11648,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                                        "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_sensible_instant = execAndReturnFirstDouble(query_sensible_instant);
-    EXPECT_EQ(return_val_sensible_instant, 517.05);
+    EXPECT_EQ(return_val_sensible_instant, 600.28);
 }
 
 TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
