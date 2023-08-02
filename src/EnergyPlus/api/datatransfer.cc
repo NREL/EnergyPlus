@@ -246,6 +246,53 @@ void freeObjectNames(const char **objectNames, unsigned int arraySize)
     delete[] objectNames;
 }
 
+inline constexpr auto hash(const std::string_view sv)
+{
+    unsigned long hash{5381};
+    for (unsigned char c : sv) {hash = ((hash << 5) + hash) ^ c;}
+    return hash;
+}
+
+inline constexpr unsigned long operator"" _hash(const char *str, size_t len)
+{
+    return hash(std::string_view{str, len});
+}
+
+enum class DummyEnum1 {Invalid=-1, Hello, World, Num};
+enum class Beatles {Invalid=-1, Ringo, Paul, John, George, Num};
+
+int getEnumValue(const char *enumClass, const char *enumKey)
+{
+    unsigned long hashed_class = hash(enumClass);
+    unsigned long hashed_key = hash(enumKey);
+    switch (hashed_class) {
+    case "DummyEnum1"_hash:
+        switch (hashed_key) {
+        case "Hello"_hash:
+            return (int)DummyEnum1::Hello;
+        case "World"_hash:
+            return (int)DummyEnum1::World;
+        default:
+            return -1;
+        }
+    case "Beatles"_hash:
+        switch (hashed_key) {
+        case "Ringo"_hash:
+            return (int)Beatles::Ringo;
+        case "Paul"_hash:
+            return (int)Beatles::Paul;
+        case "John"_hash:
+            return (int)Beatles::John;
+        case "George"_hash:
+            return (int)Beatles::George;
+        default:
+            return -1;
+        }
+    default:
+        return -1;
+    }
+}
+
 int getNumNodesInCondFDSurfaceLayer(EnergyPlusState state, const char *surfName, const char *matName)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);

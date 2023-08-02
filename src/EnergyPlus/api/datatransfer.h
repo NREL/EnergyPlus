@@ -150,6 +150,18 @@ ENERGYPLUSLIB_API const char **getObjectNames(EnergyPlusState state, const char 
 /// \param[in] arraySize The size of the object name array, which is known after the call to getObjectNames.
 /// \return Nothing, this simply frees the memory
 ENERGYPLUSLIB_API void freeObjectNames(const char **objectNames, unsigned int arraySize);
+/// \brief Gets an enum value for a given enum type and key
+/// \details There are certain actuators inside EnergyPlus that expect a discrete value to be passed in, usually
+///          for specifying a control signal.  Historically, these have been hard-coded right into the input file in
+///          the EMS program logic.  With the addition of Python workflows, code now lives outside the input file, and
+///          these hard-wired values feel more inappropriate.  This worker function allows a user to replace the
+///          hard-wired numeric magic numbers with meaningful strings.  This allows the code to be future-proof in case
+///          the magic numbers ever change (not expected).
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] enumClass A const char * of the enum class to be looked up.  The full list of possible class/keys is TODO.
+/// \param[in] enumKey A const char * of the enum key to be looked up.  The full list of possible class/keys is TODO.
+/// \return unsigned int of the actual value given to this enum class/key pair inside EnergyPlus
+ENERGYPLUSLIB_API int getEnumValue(const char *enumClass, const char *enumKey);
 
 // ----- FUNCTIONS RELATED TO VARIABLES
 
