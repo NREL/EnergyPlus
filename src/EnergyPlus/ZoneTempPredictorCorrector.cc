@@ -5014,54 +5014,40 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
     //  is expected to be roughly integer-valued and near 2.0 or 3.0 or 4.0 or more.
 
     // first construct data on timestamps for interpolating with later
-    Real64 const oldTime0 = 0.0;
-    Real64 const oldTime1 = oldTime0 - OldTimeStep;
-
-    Real64 const newTime0 = 0.0;
-    Real64 const newTime1 = newTime0 - NewTimeStep;
-    Real64 const newTime2 = newTime1 - NewTimeStep;
-    Real64 const newTime3 = newTime2 - NewTimeStep;
-    Real64 const newTime4 = newTime3 - NewTimeStep;
-
     Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
 
     newVal0 = oldVal0;
 
     if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
         // first two points lie between oldVal0 and oldVal1
-        newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
-        newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
+        newVal1 = (oldVal0 + oldVal1) / 2;
+        newVal2 = oldVal1;
         // last two points lie between oldVal1 and oldVal2
-        newVal3 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime3) / (OldTimeStep));
-        newVal4 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime4) / (OldTimeStep));
+        newVal3 = (oldVal1 + oldVal2) / 2;
+        newVal4 = oldVal2;
     } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
         // first three points lie between oldVal0 and oldVal1
-        newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
-        newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
-        newVal3 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime3) / (OldTimeStep));
+        Real64 delta10 = oldVal1 - oldVal0;
+        newVal1 = oldVal0 + delta10 / 3;
+        newVal2 = newVal1 + delta10 / 3;
+        newVal3 = newVal2 + delta10 / 3;
         // last point lie between oldVal1 and oldVal2
-        newVal4 = oldVal1 + (oldVal2 - oldVal1) * ((oldTime1 - newTime4) / (OldTimeStep));
+        newVal4 = oldVal1 + (oldVal2 - oldVal1) / 3;
 
     } else { // DSRatio = 4 or more
+        Real64 delta10 = oldVal1 - oldVal0;
+
         // all new points lie between oldVal0 and oldVal1
-        newVal1 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime1) / (OldTimeStep));
-        newVal2 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime2) / (OldTimeStep));
-        newVal3 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime3) / (OldTimeStep));
-        newVal4 = oldVal0 + (oldVal1 - oldVal0) * ((oldTime0 - newTime4) / (OldTimeStep));
+        newVal1 = oldVal0 + delta10 / DSRatio;
+        newVal2 = newVal1 + delta10 / DSRatio;
+        newVal3 = newVal2 + delta10 / DSRatio;
+        newVal4 = newVal3 + delta10 / DSRatio;
     }
 }
 
 Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std::array<Real64, 4> const &oldVals, std::array<Real64, 4> &newVals)
 {
-    // first construct data on timestamps for interpolating with later
-    Real64 const oldTime0 = 0.0;
-    Real64 const oldTime1 = oldTime0 - OldTimeStep;
-
-    Real64 const newTime0 = 0.0;
-    Real64 const newTime1 = newTime0 - NewTimeStep;
-    Real64 const newTime2 = newTime1 - NewTimeStep;
-    Real64 const newTime3 = newTime2 - NewTimeStep;
-
+    // first determine the ratio of system time step to zone time step
     Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
 
     newVals[0] = oldVals[0];
@@ -5084,9 +5070,9 @@ Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std
     } else { // DSRatio = 4 or more
         // all new points lie between (oldVals[0] and oldVals[1])
         Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
-        newVals[3] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
+        newVals[1] = oldVals[0] + delta10 / DSRatio;
+        newVals[2] = newVals[1] + delta10 / DSRatio;
+        newVals[3] = newVals[2] + delta10 / DSRatio;
     }
     return oldVals[0];
 }
