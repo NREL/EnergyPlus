@@ -2879,7 +2879,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
 
                 if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
                     if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr) {
-                        this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state, FirstHVACIteration);
+                        this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state);
                     }
                     continue;
                 }
@@ -2939,7 +2939,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                     auto &this_op_scheme = this_loop.OpScheme(OpNum);
                     if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
                         if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr) {
-                            this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state, FirstHVACIteration);
+                            this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state);
                         }
                         continue;
                     }
