@@ -235,21 +235,21 @@ struct ChillerHeaterSupervisoryOperationData
 
     void OneTimeInitChillerHeaterChangeoverOpScheme(EnergyPlusData &state);
 
-    void EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration);
+    void EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state);
 
     void DetermineCurrentBuildingLoads(EnergyPlusData &state);
 
     void DetermineCurrentPlantLoads(EnergyPlusData &state);
 
-    // void DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state);
+    void DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state);
 
     void ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state);
 
-    void InitAirSourcePlantEquipmentOff(EnergyPlusData &state, bool const FirstHVACIteration);
+    void InitAirSourcePlantEquipmentOff(EnergyPlusData &state);
 
     void ProcessAndSetAirSourcePlantEquipLists(EnergyPlusData &state);
 
-    void ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state, bool const FirstHVACIteration);
+    void ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state);
 
     void ProcessAndSetAuxilBoiler(EnergyPlusData &state);
 

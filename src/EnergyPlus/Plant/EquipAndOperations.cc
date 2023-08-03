@@ -816,15 +816,15 @@ namespace DataPlant {
         this->oneTimeSetupComplete = true;
     }
 
-    void ChillerHeaterSupervisoryOperationData::EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state, bool const FirstHVACIteration)
+    void ChillerHeaterSupervisoryOperationData::EvaluateChillerHeaterChangeoverOpScheme(EnergyPlusData &state)
     {
 
         DetermineCurrentBuildingLoads(state);
         DetermineCurrentPlantLoads(state);
         ProcessSupervisoryControlLogicForAirSourcePlants(state);
-        InitAirSourcePlantEquipmentOff(state, FirstHVACIteration);
+        InitAirSourcePlantEquipmentOff(state);
         ProcessAndSetAirSourcePlantEquipLists(state);
-        ProcessAndSetDedicatedHeatRecovWWHP(state, FirstHVACIteration);
+        ProcessAndSetDedicatedHeatRecovWWHP(state);
         ProcessAndSetAuxilBoiler(state);
     }
 
@@ -921,7 +921,7 @@ namespace DataPlant {
     // void ChillerHeaterSupervisoryOperationData::DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state)
     // do a test call to see what capacity any dedicated heat recovery WWHP could provide if run at the current time
     // {
-        //
+    //
     // }
 
     void ChillerHeaterSupervisoryOperationData::ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state)
@@ -1025,89 +1025,86 @@ namespace DataPlant {
         }
     }
 
-    void ChillerHeaterSupervisoryOperationData::InitAirSourcePlantEquipmentOff(EnergyPlusData &state, bool const FirstHVACIteration)
+    void ChillerHeaterSupervisoryOperationData::InitAirSourcePlantEquipmentOff(EnergyPlusData &state)
     {
         //_____________________________________________________________________________
         // initialize all possible equipment to turn off machines before applying controls to turn them on.
-        // set .Available and .ON to false in plant structure, assumes no machines will get turned on after FirstHVACIteration and later turned off at
-        // subsequent iteration of plant solver.  This is faster but may need to remove the trap and reinit everytime.
-        if (FirstHVACIteration) {
+        // set .Available and .ON to false in plant structure
 
-            if (this->PlantOps.NumCoolingOnlyEquipLists > 0) {
-                for (int equipListNum = 1; equipListNum <= this->PlantOps.NumCoolingOnlyEquipLists; ++equipListNum) {
-                    int NumComps = this->CoolingOnlyEquipList(equipListNum).NumComps;
-                    for (int compNum = 1; compNum <= NumComps; ++compNum) {
-                        auto &this_equip(this->CoolingOnlyEquipList(equipListNum).Comp(compNum));
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .Available = false;
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .ON = false;
-                    }
+        if (this->PlantOps.NumCoolingOnlyEquipLists > 0) {
+            for (int equipListNum = 1; equipListNum <= this->PlantOps.NumCoolingOnlyEquipLists; ++equipListNum) {
+                int NumComps = this->CoolingOnlyEquipList(equipListNum).NumComps;
+                for (int compNum = 1; compNum <= NumComps; ++compNum) {
+                    auto &this_equip(this->CoolingOnlyEquipList(equipListNum).Comp(compNum));
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .Available = false;
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .ON = false;
                 }
             }
+        }
 
-            if (this->PlantOps.NumHeatingOnlyEquipLists > 0) {
-                for (int equipListNum = 1; equipListNum <= this->PlantOps.NumHeatingOnlyEquipLists; ++equipListNum) {
-                    int NumComps = this->HeatingOnlyEquipList(equipListNum).NumComps;
-                    for (int compNum = 1; compNum <= NumComps; ++compNum) {
-                        auto &this_equip(this->HeatingOnlyEquipList(equipListNum).Comp(compNum));
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .Available = false;
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .ON = false;
-                    }
+        if (this->PlantOps.NumHeatingOnlyEquipLists > 0) {
+            for (int equipListNum = 1; equipListNum <= this->PlantOps.NumHeatingOnlyEquipLists; ++equipListNum) {
+                int NumComps = this->HeatingOnlyEquipList(equipListNum).NumComps;
+                for (int compNum = 1; compNum <= NumComps; ++compNum) {
+                    auto &this_equip(this->HeatingOnlyEquipList(equipListNum).Comp(compNum));
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .Available = false;
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .ON = false;
                 }
             }
+        }
 
-            if (this->PlantOps.NumSimultHeatCoolCoolingEquipLists > 0) {
-                for (int equipListNum = 1; equipListNum <= this->PlantOps.NumSimultHeatCoolCoolingEquipLists; ++equipListNum) {
+        if (this->PlantOps.NumSimultHeatCoolCoolingEquipLists > 0) {
+            for (int equipListNum = 1; equipListNum <= this->PlantOps.NumSimultHeatCoolCoolingEquipLists; ++equipListNum) {
 
-                    int NumComps = this->SimultHeatCoolCoolingEquipList(equipListNum).NumComps;
-                    for (int compNum = 1; compNum <= NumComps; ++compNum) {
-                        auto &this_equip(this->SimultHeatCoolCoolingEquipList(equipListNum).Comp(compNum));
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .Available = false;
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .ON = false;
-                    }
+                int NumComps = this->SimultHeatCoolCoolingEquipList(equipListNum).NumComps;
+                for (int compNum = 1; compNum <= NumComps; ++compNum) {
+                    auto &this_equip(this->SimultHeatCoolCoolingEquipList(equipListNum).Comp(compNum));
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .Available = false;
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .ON = false;
                 }
             }
+        }
 
-            if (this->PlantOps.NumSimultHeatCoolHeatingEquipLists > 0) {
-                for (int equipListNum = 1; equipListNum <= this->PlantOps.NumSimultHeatCoolHeatingEquipLists; ++equipListNum) {
+        if (this->PlantOps.NumSimultHeatCoolHeatingEquipLists > 0) {
+            for (int equipListNum = 1; equipListNum <= this->PlantOps.NumSimultHeatCoolHeatingEquipLists; ++equipListNum) {
 
-                    int NumComps = this->SimultHeatCoolHeatingEquipList(equipListNum).NumComps;
-                    for (int compNum = 1; compNum <= NumComps; ++compNum) {
-                        auto &this_equip(this->SimultHeatCoolHeatingEquipList(equipListNum).Comp(compNum));
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .Available = false;
-                        state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
-                            .LoopSide(this_equip.LoopSideNumPtr)
-                            .Branch(this_equip.BranchNumPtr)
-                            .Comp(this_equip.CompNumPtr)
-                            .ON = false;
-                    }
+                int NumComps = this->SimultHeatCoolHeatingEquipList(equipListNum).NumComps;
+                for (int compNum = 1; compNum <= NumComps; ++compNum) {
+                    auto &this_equip(this->SimultHeatCoolHeatingEquipList(equipListNum).Comp(compNum));
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .Available = false;
+                    state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
+                        .LoopSide(this_equip.LoopSideNumPtr)
+                        .Branch(this_equip.BranchNumPtr)
+                        .Comp(this_equip.CompNumPtr)
+                        .ON = false;
                 }
             }
         }
@@ -1284,7 +1281,7 @@ namespace DataPlant {
         }
     }
 
-    void ChillerHeaterSupervisoryOperationData::ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state, bool const FirstHVACIteration)
+    void ChillerHeaterSupervisoryOperationData::ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state)
     {
         // evaluate if and how dedicated heat recovery WWHP should run
 
@@ -1292,50 +1289,48 @@ namespace DataPlant {
             return;
         }
 
-        if (FirstHVACIteration) {
-            // initialize off
-            state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.compNum)
-                .Available = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.compNum)
-                .ON = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.compNum)
-                .Available = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.compNum)
-                .ON = false;
+        // initialize off
+        state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.compNum)
+            .Available = false;
+        state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.compNum)
+            .ON = false;
+        state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.compNum)
+            .Available = false;
+        state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.compNum)
+            .ON = false;
 
-            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
-                .Available = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
-                .ON = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.compNum)
-                .Available = false;
-            state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
-                .LoopSide(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopSideNum)
-                .Branch(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.branchNum)
-                .Comp(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.compNum)
-                .ON = false;
-        }
+        state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
+            .Available = false;
+        state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
+            .ON = false;
+        state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.compNum)
+            .Available = false;
+        state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
+            .LoopSide(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopSideNum)
+            .Branch(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.branchNum)
+            .Comp(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.compNum)
+            .ON = false;
 
         // Dedicated Heat Recovery Water To Water Heat Pump Control.
         // Assume there are two companion machines, one leads for cooling the return chilled water, the other leads for heating the return hot
