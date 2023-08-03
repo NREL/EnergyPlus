@@ -4800,3 +4800,153 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_WindAndStackArea)
         EXPECT_NEAR(expectedCw, calcCw(thisVentilation.MCP), 0.0001) << formatFailure();
     }
 }
+
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest)
+{
+
+    state->dataLoopNodes->Node.allocate(10);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataSize->ZoneEqSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+
+    state->dataSize->ZoneSizing.allocate(1, state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizing(1, 1).DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
+    state->dataSize->CalcZoneSizing.allocate(1, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->TempControlType.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(state->dataGlobal->NumOfZones);
+    auto &zoneSysMoistureDemand = state->dataZoneEnergyDemand->ZoneSysMoistureDemand(1);
+    state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(2);
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
+    state->dataHeatBalFanSys->ZoneMassBalanceFlag.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 23.5;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.5;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.5;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataSize->CalcZoneSizing(1, 1).ZoneNum = 1;
+    state->dataSize->CurOverallSimDay = 1;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -23710.957638822721;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -23710.957638822721;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -26404.193133207900;
+    zoneSysMoistureDemand.TotalOutputRequired = 0.0;
+    zoneSysMoistureDemand.OutputRequiredToHumidifyingSP = 0.0;
+    zoneSysMoistureDemand.OutputRequiredToDehumidifyingSP = 0.0;
+    state->dataZoneEnergyDemand->DeadBandOrSetback(1) = true;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(2) = 2;
+    state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 3;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataEnvrn->StdBaroPress = 101325.;
+    state->dataEnvrn->StdRhoAir = 1.20;
+
+    state->dataSize->CalcFinalZoneSizing(1).AccountForDOAS = true;
+    state->dataSize->CalcFinalZoneSizing(1).MinOA = 3.672;
+    state->dataSize->CalcFinalZoneSizing(1).OutTempAtCoolPeak = 32.12;
+    state->dataEnvrn->OutDryBulbTemp = 32.12;
+    state->dataEnvrn->OutHumRat = 0.01446;
+    state->dataLoopNodes->Node(4).Temp = 23.90;
+    state->dataLoopNodes->Node(4).HumRat = 0.01446;
+    state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
+    state->dataHeatBalFanSys->ZoneMassBalanceFlag(1) = false;
+
+    state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
+    SizeZoneEquipment(*state);
+    UpdateZoneSizing(*state, Constant::CallIndicator::BeginDay);
+    state->dataSize->ZoneSizThermSetPtHi.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizThermSetPtLo.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizThermSetPtHi(1) = 23.5;
+    state->dataSize->ZoneSizThermSetPtLo(1) = 22.5;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataSize->NumTimeStepsInAvg = 1;
+    state->dataHVACGlobal->FracTimeStepZone = 1;
+    state->dataEnvrn->TotDesDays = 1;
+    state->dataZoneEquipmentManager->NumOfTimeStepInDay = 1;
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp(1) = 32.12;
+    state->dataZoneEquipmentManager->AvgData.allocate(1);
+    state->dataSize->ZoneSizing(1, 1).allocateMemberArrays(1);
+    state->dataSize->CalcZoneSizing(1, 1).allocateMemberArrays(1);
+    state->dataSize->CalcFinalZoneSizing(1).allocateMemberArrays(1);
+    state->dataSize->FinalZoneSizing(1).allocateMemberArrays(1);
+
+    auto &calcZoneSizing = state->dataSize->CalcZoneSizing(1, 1);
+    auto &finalZoneSizing = state->dataSize->FinalZoneSizing(1);
+    auto &calcFinalZoneSizing = state->dataSize->CalcFinalZoneSizing(1);
+    calcZoneSizing.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
+    calcZoneSizing.AccountForDOAS = true;
+    calcZoneSizing.DOASLowSetpoint = 22.0;
+    calcZoneSizing.DOASHighSetpoint = 23.0;
+    finalZoneSizing.DOASControlStrategy = DataSizing::DOASControl::NeutralSup;
+    finalZoneSizing.AccountForDOAS = true;
+    finalZoneSizing.DOASLowSetpoint = calcZoneSizing.DOASLowSetpoint;
+    finalZoneSizing.DOASHighSetpoint = calcZoneSizing.DOASHighSetpoint;
+    UpdateZoneSizing(*state, Constant::CallIndicator::DuringDay);
+    UpdateZoneSizing(*state, Constant::CallIndicator::EndDay);
+    state->dataGlobal->isPulseZoneSizing = true;
+    UpdateZoneSizing(*state, Constant::CallIndicator::EndZoneSizingCalc);
+    // verify no heating or cooling load
+    EXPECT_DOUBLE_EQ(0.0, calcZoneSizing.HeatLoad);
+    EXPECT_DOUBLE_EQ(0.0, calcZoneSizing.CoolLoad);
+    // check for correct TstatTemps
+    EXPECT_DOUBLE_EQ(22.5, calcZoneSizing.HeatTstatTemp);
+    EXPECT_DOUBLE_EQ(23.5, calcZoneSizing.CoolTstatTemp);
+    // New calculated design values that get reported in the Zone Sensible Heating/Cooling table
+    EXPECT_DOUBLE_EQ(23.9, calcFinalZoneSizing.ZoneTempAtHeatPeak);
+    EXPECT_DOUBLE_EQ(23.9, calcFinalZoneSizing.ZoneTempAtCoolPeak);
+    // turn on latent sizing
+    calcZoneSizing.zoneLatentSizing = false;
+    SizeZoneEquipment(*state);
+    // test sizing results when no sensible load exists
+    auto &zoneNode = state->dataLoopNodes->Node(4);
+    auto &supplyNode = state->dataLoopNodes->Node(1);
+    // check supply air and zone condition
+    EXPECT_NEAR(zoneNode.Temp, 23.9, 0.000001);
+    EXPECT_NEAR(supplyNode.Temp, 23.0, 0.000001);
+    EXPECT_NEAR(zoneNode.HumRat, 0.01446, 0.000001);
+    EXPECT_NEAR(supplyNode.HumRat, 0.01446, 0.000001);
+    EXPECT_NEAR(supplyNode.MassFlowRate, 4.4064, 0.000001);
+    // check for correct doas loads and supply conditions
+    EXPECT_NEAR(4.4064, calcZoneSizing.DOASSupMassFlow, 0.00001);
+    EXPECT_NEAR(23.0, calcZoneSizing.DOASSupTemp, 0.001);
+    EXPECT_NEAR(0.01446, calcZoneSizing.DOASSupHumRat, 0.001);
+    EXPECT_NEAR(-4091.6, calcZoneSizing.DOASCoolLoad, 0.1);
+    EXPECT_NEAR(-4091.6, calcZoneSizing.DOASTotCoolLoad, 0.1);
+    EXPECT_NEAR(0.0, calcZoneSizing.DOASHeatLoad, 0.0001);
+    // check calculated doas mass flow rate
+    Real64 doas_mdot_result = calcFinalZoneSizing.MinOA * state->dataEnvrn->StdRhoAir;
+    EXPECT_NEAR(4.4064, doas_mdot_result, 0.000001);
+    EXPECT_NEAR(supplyNode.MassFlowRate, doas_mdot_result, 0.000001);
+    Real64 doas_temp = supplyNode.Temp;
+    Real64 doas_humrat = supplyNode.HumRat;
+    Real64 zone_temp = zoneNode.Temp;
+    Real64 zone_humrat = zoneNode.HumRat;
+    Real64 SensibleOutput;
+    Real64 TotalOutput;
+    // calculate the DOAS loads
+    SensibleOutput = doas_mdot_result * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(doas_temp, zone_temp, doas_humrat);
+    TotalOutput = doas_mdot_result * (Psychrometrics::PsyHFnTdbW(doas_temp, doas_humrat) - Psychrometrics::PsyHFnTdbW(zone_temp, zone_humrat));
+    // check sensible and total doas zone loads
+    EXPECT_NEAR(SensibleOutput, -4091.6, 0.1); // W
+    EXPECT_NEAR(TotalOutput, -4091.6, 0.1);    // W
+}

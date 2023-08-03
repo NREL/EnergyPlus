@@ -893,25 +893,25 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     compare_err_stream("");
     EXPECT_EQ(3, (int)state->dataDaylightingData->DaylRefPt.size());
 
-    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 45.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 90.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataGlobal->BeginSimFlag = true;
     state->dataGlobal->WeightNow = 1.0;
@@ -2605,25 +2605,25 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true)); // reset eio stream after compare
     EXPECT_EQ(4, (int)state->dataDaylightingData->DaylRefPt.size());
 
-    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 45.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.603, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(0.707, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     state->dataHeatBal->Zone(1).RelNorth = 90.;
 
     GeometryTransformForDaylighting(*state);
 
-    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1), 0.001);
-    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1), 0.001);
-    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1), 0.001);
+    EXPECT_NEAR(3.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).x, 0.001);
+    EXPECT_NEAR(-2.048, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).y, 0.001);
+    EXPECT_NEAR(0.9, state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1).z, 0.001);
 
     EXPECT_FALSE(has_dfs_output(true));
 
@@ -3365,7 +3365,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataGlobal->NumOfZones = 1;
     state->dataDaylightingData->daylightControl.allocate(1);
     state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints = 3;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(3, state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord.allocate(state->dataDaylightingData->daylightControl(1).TotalDaylRefPoints);
     state->dataDaylightingManager->SavedMnDy.allocate(1);
     state->dataDaylightingData->IllumMap.allocate(state->dataGlobal->NumOfZones);
     state->dataDaylightingData->IllumMap(MapNum).zoneIndex = 1;
@@ -3374,15 +3374,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ReportIllumMap)
     state->dataEnvrn->CurMnDyHr = "JAN012001";
     state->dataDaylightingManager->SavedMnDy(1) = "JAN01";
     state->dataGlobal->WarmupFlag = true;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 1) = 1.23;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 1) = 2.34;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 1) = 3.45;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 2) = 4.56;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 2) = 5.67;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 2) = 6.78;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1, 3) = 7.89;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2, 3) = 8.90;
-    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3, 3) = 9.01;
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(1) = {1.23, 2.34, 3.45};
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(2) = {4.56, 5.67, 6.78};
+    state->dataDaylightingData->daylightControl(1).DaylRefPtAbsCoord(3) = {7.89, 8.90, 9.01};
     state->dataDaylightingData->IllumMap(MapNum).Name = "ThisOne";
     state->dataDaylightingData->IllumMap(MapNum).Z = 23.23;
 
@@ -3699,7 +3693,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_SteppedControl_LowDaylightCondition
     auto &thisDaylightControl = state->dataDaylightingData->daylightControl(1);
     int nRefPts = 1;
     thisDaylightControl.TotalDaylRefPoints = nRefPts;
-    thisDaylightControl.DaylRefPtAbsCoord.allocate(3, nRefPts);
+    thisDaylightControl.DaylRefPtAbsCoord.allocate(nRefPts);
 
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(1);
