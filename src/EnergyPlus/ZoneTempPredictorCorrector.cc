@@ -5064,64 +5064,31 @@ Real64 DownInterpolate4HistoryValues(Real64 OldTimeStep, Real64 NewTimeStep, std
 
     Real64 const DSRatio = OldTimeStep / NewTimeStep; // should pretty much be an integer value 2, 3, 4, etc.
 
+    newVals[0] = oldVals[0];
+
     if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
-        // first two points lie between [oldVals[0] and oldVals[1])
-        Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0];
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
+        // first two points lie between (oldVals[0] and oldVals[1])
+        newVals[1] = (oldVals[0] + oldVals[1]) / 2;
         // last two points lie between [oldVals[1] and oldVals[2])
-        Real64 delta21 = oldVals[2] - oldVals[1];
         newVals[2] = oldVals[1];
-        newVals[3] = oldVals[1] + delta21 * ((oldTime1 - newTime3) / OldTimeStep);
+        newVals[3] = (oldVals[1] + oldVals[2]) / 2;
 
     } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
-        // first three points lie between [oldVals[0] and oldVals[1])
+        // first three points lie between (oldVals[0] and oldVals[1])
         Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0];
-        newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
-        newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
+        newVals[1] = oldVals[0] + delta10 / 3;
+        newVals[2] = newVals[1] + delta10 / 3;
         // last point lie between [oldVals[1] and oldVals[2])
         newVals[3] = oldVals[1];
 
     } else { // DSRatio = 4 or more
-        // all new points lie between [oldVals[0] and oldVals[1])
+        // all new points lie between (oldVals[0] and oldVals[1])
         Real64 delta10 = oldVals[1] - oldVals[0];
-        newVals[0] = oldVals[0];
         newVals[1] = oldVals[0] + delta10 * ((oldTime0 - newTime1) / OldTimeStep);
         newVals[2] = oldVals[0] + delta10 * ((oldTime0 - newTime2) / OldTimeStep);
         newVals[3] = oldVals[0] + delta10 * ((oldTime0 - newTime3) / OldTimeStep);
     }
     return oldVals[0];
-
-    
-
-    // if (std::abs(DSRatio - 2.0) < 0.01) { // DSRatio = 2
-    //     // first two points lie between oldVals[0] and oldVals[1]
-    //     Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
-    //     newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
-    //     newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
-    //     // last two points lie between oldVals[1] and oldVals[2]
-    //     Real64 ratio21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
-    //     newVals[2] = oldVals[1] + ratio21 * (oldTime1 - newTime3);
-    //     newVals[3] = oldVals[1] + ratio21 * (oldTime1 - newTime4);
-    // } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
-    //     // first three points lie between oldVals[0] and oldVals[1]
-    //     Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
-    //     newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
-    //     newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
-    //     newVals[2] = oldVals[0] + ratio10 * (oldTime0 - newTime3);
-    //     // last point lie between oldVals[1] and oldVals[2]
-    //     Real64 ratio21 = (oldVals[2] - oldVals[1]) / OldTimeStep;
-    //     newVals[3] = oldVals[1] + ratio21 * (oldTime1 - newTime4);
-
-    //} else { // DSRatio = 4 or more
-    //    // all new points lie between oldVals[0] and oldVals[1]
-    //    Real64 ratio10 = (oldVals[1] - oldVals[0]) / OldTimeStep;
-    //    newVals[0] = oldVals[0] + ratio10 * (oldTime0 - newTime1);
-    //    newVals[1] = oldVals[0] + ratio10 * (oldTime0 - newTime2);
-    //    newVals[2] = oldVals[0] + ratio10 * (oldTime0 - newTime3);
-    //    newVals[3] = oldVals[0] + ratio10 * (oldTime0 - newTime4);
-    //}
 }
 void InverseModelTemperature(EnergyPlusData &state,
                              int const ZoneNum,                   // Zone number
