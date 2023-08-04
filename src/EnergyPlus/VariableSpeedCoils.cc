@@ -1182,7 +1182,7 @@ namespace VariableSpeedCoils {
                     ShowWarningError(
                         state,
                         format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(14), AlphArray(10)));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(10), AlphArray(10)));
                     ShowContinueError(state, "Basin heater will be available to operate throughout the simulation.");
                 }
             }
@@ -1717,7 +1717,7 @@ namespace VariableSpeedCoils {
                                                RoutineName,
                                                CurrentModuleObject,
                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(14 + (I - 1) * 6)));
+                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(AlfaFieldIncre)));
                     }
                     ErrorsFound = true;
                 } else {
@@ -1810,7 +1810,7 @@ namespace VariableSpeedCoils {
                                                RoutineName,
                                                CurrentModuleObject,
                                                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(16 + (I - 1) * 6)));
+                        ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(AlfaFieldIncre), AlphArray(AlfaFieldIncre)));
                     }
                     ErrorsFound = true;
                 } else {
