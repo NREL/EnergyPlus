@@ -11577,8 +11577,7 @@ Output:Variable,Cooling Side WSHP Load Side Outlet,System Node Mass Flow Rate,ti
     One AWHP Cooling Operation Scheme,              !- Simultaneous Cooling And Heating Plant Equipment Operation Cooling Load Name
     One AWHP Heating Operation Scheme,              !- Simultaneous Cooling And Heating Plant Equipment Operation Heating Load Name
     Dedicated HR Cooling Side WSHP,                 !- Dedicated Chilled Water Return Recovery HeatPump Name
-    Dedicated HR Heating Side WSHP,                 !- Dedicated Hot Water Return Recovery HeatPump Name
-    1.0;                                            !-  Dedicated Recovery Heat Pump Control Load Capacity Factor
+    Dedicated HR Heating Side WSHP;                 !- Dedicated Hot Water Return Recovery HeatPump Name
     
   PlantEquipmentOperation:CoolingLoad,
     Two AWHP Cooling Operation Scheme,  !- Name
@@ -11675,6 +11674,8 @@ Output:Variable,*,Supervisory Plant Operation Polled Building Cooling Load,times
 Output:Variable,*,Supervisory Plant Heat Recovery Operation Mode,timestep; !- HVAC Average [unknown]
 Output:Variable,*,Supervisory Plant Operation Primary Plant Heating Load,timestep; !- HVAC Average [W]
 Output:Variable,*,Supervisory Plant Operation Primary Plant Cooling Load,timestep; !- HVAC Average [W]
+Output:Variable,*,Supervisory Plant Operation Secondary Plant Heating Load,timestep; !- HVAC Average [W]
+Output:Variable,*,Supervisory Plant Operation Secondary Plant Cooling Load,timestep; !- HVAC Average [W]
 Output:Variable,*,Supervisory Plant Auxiliary Boiler Mode,timestep; !- HVAC Average [unknown]
 
 Output:Variable,*,Chilled Water Thermal Storage Tank Temperature,timestep; !- HVAC Average [C]
