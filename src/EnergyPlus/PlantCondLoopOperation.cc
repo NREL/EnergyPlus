@@ -2941,7 +2941,7 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         if (!state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes.empty()) {
             // set sim flag so each supervisor is only simulated once in the plant loop below
             for (DataPlant::ChillerHeaterSupervisoryOperationData &supervisor : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes) {
-                supervisor.EvaluateChillerHeaterChangeoverOpScheme(state);
+                supervisor.needsSimulation = true;
             }
             for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
