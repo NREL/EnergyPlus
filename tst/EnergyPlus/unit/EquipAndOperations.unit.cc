@@ -345,7 +345,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
 
     FirstHVACIteration = true;
     auto &thisSupervisor = state->dataPlnt->PlantLoop(1).OpScheme(1).ChillerHeaterSupervisoryOperation;
-    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
 
     // zone loads have not been initialized
     EXPECT_EQ(0, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // off
@@ -359,7 +359,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.001; // set fake HW plant flow rate
 
     // zones have a heating load
-    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
     EXPECT_EQ(1, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // heating
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.BuildingPolledCoolingLoad);
     EXPECT_EQ(1000.0, chillerHeaterSupervisor.Report.BuildingPolledHeatingLoad);
@@ -394,7 +394,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataLoopNodes->Node(coolBranch1.NodeNumIn).MassFlowRate = 0.0; // set CW plant flow rate
 
     // zone heating loads are 0 and zone cooling loads are positive (no cooling)
-    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
     EXPECT_EQ(0, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // off
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.BuildingPolledCoolingLoad);
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.BuildingPolledHeatingLoad);
@@ -408,7 +408,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataLoopNodes->Node(coolBranch1.NodeNumIn).MassFlowRate = 0.001; // set fake CW plant flow rate
 
     // zone heating loads are 0 and zone cooling loads are negative (cooling)
-    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
     EXPECT_EQ(2, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // cooling
     EXPECT_EQ(-1000.0, chillerHeaterSupervisor.Report.BuildingPolledCoolingLoad);
     EXPECT_EQ(0.0, chillerHeaterSupervisor.Report.BuildingPolledHeatingLoad);
@@ -426,7 +426,7 @@ TEST_F(DistributeEquipOpTest, EvaluateChillerHeaterChangeoverOpSchemeTest)
     state->dataLoopNodes->Node(heatBranch1.NodeNumIn).MassFlowRate = 0.001; // set fake HW plant flow rate
 
     // zone heating loads are positive (heating) and zone cooling loads are negative (cooling)
-    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state, FirstHVACIteration);
+    thisSupervisor->EvaluateChillerHeaterChangeoverOpScheme(*state);
     EXPECT_EQ(3, chillerHeaterSupervisor.Report.AirSourcePlant_OpMode); // simultaneous cooling and heating
     EXPECT_EQ(-1000.0, chillerHeaterSupervisor.Report.BuildingPolledCoolingLoad);
     EXPECT_EQ(1000.0, chillerHeaterSupervisor.Report.BuildingPolledHeatingLoad);
