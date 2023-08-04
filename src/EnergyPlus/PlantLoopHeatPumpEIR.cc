@@ -354,12 +354,13 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     if (this->waterSource) {
         CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
                                                        thisSourcePlantLoop.FluidName,
-                                                       state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
+                                                       state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp,
                                                        thisSourcePlantLoop.FluidIndex,
                                                        "PLHPEIR::simulate()");
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    this->sourceSideCp = CpSrc;
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 }
@@ -1222,6 +1223,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             "Heat Pump Source Side Mass Flow Rate",
                             OutputProcessor::Unit::kg_s,
                             this->sourceSideMassFlowRate,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
+        SetupOutputVariable(state,
+                            "MyCp",
+                            OutputProcessor::Unit::J_kgK,
+                            this->sourceSideCp,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);

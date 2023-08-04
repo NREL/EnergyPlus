@@ -119,6 +119,7 @@ namespace EIRPlantLoopHeatPumps {
         Real64 sourceSideEnergy = 0.0;
         Real64 powerEnergy = 0.0;
         bool running = false;
+        Real64 sourceSideCp = 0.0;
 
         // topology variables
         PlantLocation loadSidePlantLoc;
