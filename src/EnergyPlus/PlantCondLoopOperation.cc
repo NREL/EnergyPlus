@@ -2870,6 +2870,10 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                 }
             }
         }
+        // set sim flag so each supervisor is only simulated once in the plant loop below
+        for (DataPlant::ChillerHeaterSupervisoryOperationData &supervisor : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes) {
+            supervisor.needsSimulation = true;
+        }
         // Update the OpScheme schedules
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             FoundScheme = false;
@@ -2878,8 +2882,10 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
                 auto &this_op_scheme = this_loop.OpScheme(OpNum);
 
                 if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
-                    if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr) {
+                    if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr &&
+                        this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation) {
                         this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state);
+                        this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation = false;
                     }
                     continue;
                 }
@@ -2933,13 +2939,19 @@ void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
         }
     } else { // call supervisory scheme every iteration
         if (!state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes.empty()) {
+            // set sim flag so each supervisor is only simulated once in the plant loop below
+            for (DataPlant::ChillerHeaterSupervisoryOperationData &supervisor : state.dataPlantCondLoopOp->ChillerHeaterSupervisoryOperationSchemes) {
+                supervisor.EvaluateChillerHeaterChangeoverOpScheme(state);
+            }
             for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 auto &this_loop = state.dataPlnt->PlantLoop(LoopNum);
                 for (int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum) {
                     auto &this_op_scheme = this_loop.OpScheme(OpNum);
                     if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
-                        if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr) {
+                        if (this_op_scheme.ChillerHeaterSupervisoryOperation != nullptr &&
+                            this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation) {
                             this_op_scheme.ChillerHeaterSupervisoryOperation->EvaluateChillerHeaterChangeoverOpScheme(state);
+                            this_op_scheme.ChillerHeaterSupervisoryOperation->needsSimulation = false;
                         }
                         continue;
                     }

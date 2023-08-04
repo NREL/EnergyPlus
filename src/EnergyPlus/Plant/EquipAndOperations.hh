@@ -210,6 +210,7 @@ struct ChillerHeaterSupervisoryOperationData
     std::string DedicatedHR_HWRetControl_Name;
 
     bool oneTimeSetupComplete = false;
+    bool needsSimulation = false;
     DataPlant::OpScheme Type = DataPlant::OpScheme::Invalid; // Op scheme type (from keyword)
 
     TempSetpoint Setpoint;
