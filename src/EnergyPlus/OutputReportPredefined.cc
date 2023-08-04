@@ -835,6 +835,7 @@ namespace OutputReportPredefined {
         s->pdchCoilLoc_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Coil Location");
         s->pdchCoilHVACType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "HVAC Type");
         s->pdchCoilHVACName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "HVAC Name");
+        s->pdchCoilZoneNames_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Zone Name(s)");
         s->pdchCoilSupFanName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Name for HVAC");
         s->pdchCoilSupFanType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Type for HVAC");
         s->pdchCoilPlantName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Name for Coil");

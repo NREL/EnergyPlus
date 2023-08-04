@@ -787,6 +787,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchCoilLoc_CCs = 0;
     int pdchCoilHVACType_CCs = 0;
     int pdchCoilHVACName_CCs = 0;
+    int pdchCoilZoneNames_CCs = 0;
     int pdchCoilSupFanName_CCs = 0;
     int pdchCoilSupFanType_CCs = 0;
     int pdchCoilPlantName_CCs = 0;                 // Plant Name for Coil*
