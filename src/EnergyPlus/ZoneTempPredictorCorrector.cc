@@ -5027,21 +5027,21 @@ void DownInterpolate4HistoryValues(Real64 const OldTimeStep,
         newVal4 = oldVal2;
     } else if (std::abs(DSRatio - 3.0) < 0.01) { // DSRatio = 3
         // first three points lie between oldVal0 and oldVal1
-        Real64 delta10 = oldVal1 - oldVal0;
-        newVal1 = oldVal0 + delta10 / 3;
-        newVal2 = newVal1 + delta10 / 3;
-        newVal3 = newVal2 + delta10 / 3;
+        Real64 delta10 = (oldVal1 - oldVal0) / 3;
+        newVal1 = oldVal0 + delta10;
+        newVal2 = newVal1 + delta10;
+        newVal3 = newVal2 + delta10;
         // last point lie between oldVal1 and oldVal2
         newVal4 = oldVal1 + (oldVal2 - oldVal1) / 3;
 
     } else { // DSRatio = 4 or more
-        Real64 delta10 = oldVal1 - oldVal0;
+        Real64 delta10 = (oldVal1 - oldVal0) / DSRatio;
 
         // all new points lie between oldVal0 and oldVal1
-        newVal1 = oldVal0 + delta10 / DSRatio;
-        newVal2 = newVal1 + delta10 / DSRatio;
-        newVal3 = newVal2 + delta10 / DSRatio;
-        newVal4 = newVal3 + delta10 / DSRatio;
+        newVal1 = oldVal0 + delta10;
+        newVal2 = newVal1 + delta10;
+        newVal3 = newVal2 + delta10;
+        newVal4 = newVal3 + delta10;
     }
 }
 
