@@ -2286,7 +2286,7 @@ As can be seen in the node diagram, there are seven types of nodes.  One is a no
 The first node includes conduction between the upper boundary and the node as well as the second node and the first node.  The equation for this node is:
 
 \begin{equation}
-\rho x_t w z c_p \frac{T_{1,new} - T_{1,old}}{\Delta t} = k w z \frac{T_{u,t}-T_{1,new}}{x_t / 2} + k w z \frac{T_{2,new}-T_{1,new}}{x_t}
+\rho x_t w L c_p \frac{T_{1,new} - T_{1,old}}{\Delta t} = k w L \frac{T_{u,t}-T_{1,new}}{x_t / 2} + k w L \frac{T_{2,new}-T_{1,new}}{x_t}
 \end{equation}
 
 This can be rearranged to:
@@ -2295,12 +2295,19 @@ This can be rearranged to:
 (1 + \frac{3 k \Delta t}{\rho c_p {x_t}^2}) T_{1,new} + (\frac{-k \Delta t}{\rho c_p {x_t}^2}) T_{2,new} = \frac{2 k \Delta t}{\rho c_p {x_t}^2} T_{u,t} + T_{1,old}
 \end{equation}
 
+or:
+
+\begin{equation}
+(1 + \frac{3 \alpha_s \Delta t}{{x_t}^2}) T_{1,new} + (\frac{-\alpha_s \Delta t}{{x_t}^2}) T_{2,new} = \frac{2 \alpha_s \Delta t}{{x_t}^2} T_{u,t} + T_{1,old}
+\end{equation}
+
+
 \emph{\textit{Node Type 2: Generic Node Upper Region}}
 
 The second through fourth nodes in the above diagram are all "generic" nodes in the upper region.  They all have the same basic equation.  Using "i" as the number for such a generic node, the equation for these nodes can be written as:
 
 \begin{equation}
-\rho x_t w z c_p \frac{T_{i,new} - T_{i,old}}{\Delta t} = k w z \frac{T_{i+1,new}-T_{i,new}}{x_t} + k w z \frac{T_{i-1,new}-T_{i,new}}{x_t}
+\rho x_t w L c_p \frac{T_{i,new} - T_{i,old}}{\Delta t} = k w L \frac{T_{i+1,new}-T_{i,new}}{x_t} + k w L \frac{T_{i-1,new}-T_{i,new}}{x_t}
 \end{equation}
 
 This can be rearranged to:
@@ -2309,11 +2316,18 @@ This can be rearranged to:
 (\frac{-k \Delta t}{\rho c_p {x_t}^2}) T_{i+1,new} + (1 + \frac{2 k \Delta t}{\rho c_p {x_t}^2}) T_{i,new} + (\frac{-k \Delta t}{\rho c_p {x_t}^2}) T_{i+1,new} = T_{i,old}
 \end{equation}
 
+or:
+
+\begin{equation}
+(\frac{-\alpha_s \Delta t}{{x_t}^2}) T_{i+1,new} + (1 + \frac{2 \alpha_s \Delta t}{{x_t}^2}) T_{i,new} + (\frac{-\alpha_s \Delta t}{{x_t}^2}) T_{i+1,new} = T_{i,old}
+\end{equation}
+
+
 \emph{\textit{Node Type 3: Last Node in Upper Region}}
 The last node in the upper region connects to both the node above this one as well as the node at the earth tube ("et").  Since the thickness of the earth tube node and the nodes in the upper region are not the same, this requires a slight adjustment in the equations for a different thickness in the vertical direction.  Here is the equation for this node:
 
 \begin{equation}
-\rho x_t w z c_p \frac{T_{et-1,new} - T_{et-1,old}}{\Delta t} = k w z \frac{T_{et,new}-T_{et-1,new}}{(x_t + x_{et})/2} + k w z \frac{T_{et-2,new}-T_{et-1,new}}{x_t}
+\rho x_t w L c_p \frac{T_{et-1,new} - T_{et-1,old}}{\Delta t} = k w L \frac{T_{et,new}-T_{et-1,new}}{(x_t + x_{et})/2} + k w L \frac{T_{et-2,new}-T_{et-1,new}}{x_t}
 \end{equation}
 
 This can be rearranged to:
@@ -2322,12 +2336,19 @@ This can be rearranged to:
 (\frac{-k \Delta t}{\rho c_p {x_t}^2}) T_{et-2,new} + [1 + \frac{k \Delta t}{\rho c_p {x_t}^2} + \frac{k \Delta t}{\rho c_p x_t (x_t+x_{et})/2}] T_{et-1,new} + [\frac{-k \Delta t}{\rho c_p x_t (x_t+x_{et})/2}] T_{et,new} = T_{et-1,old}
 \end{equation}
 
+or:
+
+\begin{equation}
+(\frac{-\alpha_s \Delta t}{{x_t}^2}) T_{et-2,new} + [1 + \frac{\alpha_s \Delta t}{{x_t}^2} + \frac{\alpha_s \Delta t}{x_t (x_t+x_{et})/2}] T_{et-1,new} + [\frac{-\alpha_s \Delta t}{x_t (x_t+x_{et})/2}] T_{et,new} = T_{et-1,old}
+\end{equation}
+
+
 \emph{\textit{Node Type 4: Earth Tube Node}}
 
 The earth tube node is connected to nodes above and below it via conduction and also accounts for the convection between the air flowing through the tube and the conduction through the earth tube pipe material.  The equation for this node, assuming an effectiveness-NTU model for heat exchange between the air and ground (see below), is:
 
 \begin{equation}
-\rho x_{et} w z c_p \frac{T_{et,new} - T_{et,old}}{\Delta t} = k w z \frac{T_{et+1,new}-T_{et,new}}{(x_b + x_{et})/2} + k w z \frac{T_{et-1,new}-T_{et,new}}{(x_t + x_{et})/2} + {\dot m_a}{C_a} \eta (T_{air} - T_{et,new})
+\rho x_{et} w L c_p \frac{T_{et,new} - T_{et,old}}{\Delta t} = k w L \frac{T_{et+1,new}-T_{et,new}}{(x_b + x_{et})/2} + k w L \frac{T_{et-1,new}-T_{et,new}}{(x_t + x_{et})/2} + {\dot m_a}{C_a} \eta (T_{air} - T_{et,new})
 \end{equation}
 
 This can be rearranged to:
@@ -2335,9 +2356,20 @@ This can be rearranged to:
 \begin{equation}
 \begin{split}
 [ \frac{-2k \Delta t}{\rho c_p x_{et} (x_t + x_{et})} ] T_{et-1,new} \\
- + [ 1 + \frac{2 k \Delta t}{\rho c_p x_{et} (x_t + x_{et})} + \frac{2 k \Delta t}{\rho c_p x_{et} (x_b+x_{et})} + \frac{\dot m_a {C_a} \eta \Delta t}{\rho c_p x_{et} w z} ] T_{et,new} \\
+ + [ 1 + \frac{2 k \Delta t}{\rho c_p x_{et} (x_t + x_{et})} + \frac{2 k \Delta t}{\rho c_p x_{et} (x_b+x_{et})} + \frac{\dot m_a {C_a} \eta \Delta t}{\rho c_p x_{et} w L} ] T_{et,new} \\
  + [ \frac{-2k \Delta t}{\rho c_p x_{et} (x_b + x_{et})} ] T_{et+1,new} \\
- = T_{et,old} + \frac{\dot m_a {C_a} \eta \Delta t}{\rho c_p x_{et} w z} T_{air,in}
+ = T_{et,old} + \frac{\dot m_a {C_a} \eta \Delta t}{\rho c_p x_{et} w L} T_{air,in}
+\end{split}
+\end{equation}
+
+or:
+
+\begin{equation}
+\begin{split}
+[ \frac{-2 \alpha_s \Delta t}{x_{et} (x_t + x_{et})} ] T_{et-1,new} \\
+ + [ 1 + \frac{2 \alpha_s \Delta t}{x_{et} (x_t + x_{et})} + \frac{2 \alpha_s \Delta t}{x_{et} (x_b+x_{et})} + \frac{\dot m_a {C_a} \eta \Delta t}{\rho c_p x_{et} w L} ] T_{et,new} \\
+ + [ \frac{-2 \alpha_s \Delta t}{x_{et} (x_b + x_{et})} ] T_{et+1,new} \\
+ = T_{et,old} + \frac{\dot m_a {C_a} \eta \Delta t}{\rho c_p x_{et} w L} T_{air,in}
 \end{split}
 \end{equation}
 
@@ -2346,7 +2378,7 @@ This can be rearranged to:
 The region below the earth tube node is physically very similar to the region above the earth tube (reflected in a sense at the earth tube itself).  The main difference is the number of nodes and the overall thickness of the region can lead to a node height that is different than for the upper region.  Above this first node in the lower region, there is the earth tube node.  Below it is one or more generic lower region nodes (Type 6 below).  The equation for this node is:
 
 \begin{equation}
-\rho x_b w z c_p \frac{T_{et+1,new} - T_{et+1,old}}{\Delta t} = k w z \frac{T_{et,new}-T_{et+1,new}}{(x_b + x_{et})/2} + k w z \frac{T_{et+2,new}-T_{et+1,new}}{x_b}
+\rho x_b w L c_p \frac{T_{et+1,new} - T_{et+1,old}}{\Delta t} = k w L \frac{T_{et,new}-T_{et+1,new}}{(x_b + x_{et})/2} + k w L \frac{T_{et+2,new}-T_{et+1,new}}{x_b}
 \end{equation}
 
 This can be rearranged to:
@@ -2355,12 +2387,18 @@ This can be rearranged to:
 [\frac{-k \Delta t}{\rho c_p x_b (x_b + x_{et})/2}] T_{et,new} + [1 + \frac{k \Delta t}{\rho c_p {x_b}^2} + \frac{k \Delta t}{\rho c_p x_b (x_b+x_{et})/2}] T_{et+1,new} + [\frac{-k \Delta t}{\rho c_p {x_b}^2}] T_{et+2,new} = T_{et+1,old}
 \end{equation}
 
+or:
+
+\begin{equation}
+[\frac{-\alpha_s \Delta t}{x_b (x_b + x_{et})/2}] T_{et,new} + [1 + \frac{\alpha_s \Delta t}{{x_b}^2} + \frac{\alpha_s \Delta t}{x_b (x_b+x_{et})/2}] T_{et+1,new} + [\frac{-\alpha_s \Delta t}{{x_b}^2}] T_{et+2,new} = T_{et+1,old}
+\end{equation}
+
 \emph{\textit{Node Type 6: Generic Node in Lower Region}}
 
 The generic node equation in the lower region is nearly identical to generic node equation for the upper region except that the lower region node height replaces the upper region node height.  The equation is therefore:
 
 \begin{equation}
-\rho x_b w z c_p \frac{T_{i,new} - T_{i,old}}{\Delta t} = k w z \frac{T_{i+1,new}-T_{i,new}}{x_b} + k w z \frac{T_{i-1,new}-T_{i,new}}{x_b}
+\rho x_b w L c_p \frac{T_{i,new} - T_{i,old}}{\Delta t} = k w L \frac{T_{i+1,new}-T_{i,new}}{x_b} + k w L \frac{T_{i-1,new}-T_{i,new}}{x_b}
 \end{equation}
 
 This can be rearranged to:
@@ -2369,18 +2407,30 @@ This can be rearranged to:
 (\frac{-k \Delta t}{\rho c_p {x_b}^2}) T_{i+1,new} + (1 + \frac{2 k \Delta t}{\rho c_p {x_b}^2}) T_{i,new} + (\frac{-k \Delta t}{\rho c_p {x_b}^2}) T_{i+1,new} = T_{i,old}
 \end{equation}
 
+or:
+
+\begin{equation}
+(\frac{-\alpha_s \Delta t}{{x_b}^2}) T_{i+1,new} + (1 + \frac{2 \alpha_s \Delta t}{{x_b}^2}) T_{i,new} + (\frac{-\alpha_s \Delta t}{{x_b}^2}) T_{i+1,new} = T_{i,old}
+\end{equation}
+
 \emph{\textit{Node Type 7: Last Node (Above Lower Temperature Boundary)}}
 
 Finally, the last node temperature is in contact with the node above it as well as the temperature at the lower boundary condition.  The actual temperature of the lower boundary condition is set by the undisturbed ground temperature equation used in the basic model for the depth of the lower boundary condition.  The equation is similar to the first node:
 
 \begin{equation}
-\rho x_b w z c_p \frac{T_{n,new} - T_{n,old}}{\Delta t} = k w z \frac{T_{l,t} - T_{n,new}}{x_b / 2} + k w z \frac{T_{n-1,new} - T_{n,new}}{x_t}
+\rho x_b w L c_p \frac{T_{n,new} - T_{n,old}}{\Delta t} = k w L \frac{T_{l,t} - T_{n,new}}{x_b / 2} + k w L \frac{T_{n-1,new} - T_{n,new}}{x_t}
 \end{equation}
 
 This can be rearranged to:
 
 \begin{equation}
 (\frac{-k \Delta t}{\rho c_p {x_b}^2}) T_{n-1,new} + (1 + \frac{3 k \Delta t}{\rho c_p {x_b}^2}) T_{n,new} = \frac{2 k \Delta t}{\rho c_p {x_b}^2} T_{l,t} + T_{n,old}
+\end{equation}
+
+or:
+
+\begin{equation}
+(\frac{-\alpha_s \Delta t}{{x_b}^2}) T_{n-1,new} + (1 + \frac{3 \alpha_s \Delta t}{{x_b}^2}) T_{n,new} = \frac{2 \alpha_s \Delta t}{{x_b}^2} T_{l,t} + T_{n,old}
 \end{equation}
 
 \emph{\textit{Calculation of Effectiveness for Heat Transfer Between the Air and Ground}}
@@ -2461,13 +2511,14 @@ Variable & Description & Units \tabularnewline
 
 A\(_{s}\) & amplitude of the soil surface temperature variation & \(^{\circ}\)C \tabularnewline
 C\(_{a}\) & specific heat of air & J/kg-\(^{\circ}\)C \tabularnewline
+c\(_{p}\) & specific heat of soil & J/kg-\(^{\circ}\)C \tabularnewline
 h\(_{c}\) & convective heat transfer coefficient at the inner pipe surface & W/m\(^{2}\)-\(^{\circ}\)C \tabularnewline
 h\(_{s}\) & convective heat transfer coefficient at the soil surface & W/m\(^{2}\)-\(^{\circ}\)C \tabularnewline
 k\(_{air}\) & thermal conductivity of the air & W/m-\(^{\circ}\)C \tabularnewline
 k\(_{p}\) & pipe thermal conductivity & W/m-\(^{\circ}\)C \tabularnewline
-k\(_{s}\) & soil thermal conductivity & W/m-\(^{\circ}\)C \tabularnewline
+k\(_{s}\) or k & soil thermal conductivity & W/m-\(^{\circ}\)C \tabularnewline
 L & pipe length & m \tabularnewline
-m\(_{a}\) & mass flow rate of ambient air through pipe & kg/s \tabularnewline
+\(\dot m_a\) & mass flow rate of ambient air through pipe & kg/s \tabularnewline
 r\(_{a}\) & relative humidity & ~ \tabularnewline
 R\(_{c}\) & thermal resistance due to convection heat transfer between the air in the pipe and the pipe inner surface & m-\(^{\circ}\)C/W \tabularnewline
 R\(_{p}\) & thermal resistance due to conduction heat transfer between the pipe inner and outer surface & m-\(^{\circ}\)C/W \tabularnewline
@@ -2481,6 +2532,10 @@ S\(_{m}\) & average solar radiation & W/m\(^{2}\) \tabularnewline
 S\(_{v}\) & amplitude of the solar radiation & W/m\(^{2}\) \tabularnewline
 t & time elapsed from beginning of calendar year & days \tabularnewline
 T\(_{a}\)(y) & air temperature of the pipe at the distance y from the pipe inlet & \(^{\circ}\)C \tabularnewline
+T\(_{et,new}\)(y) & earth tube node temperature (current) & \(^{\circ}\)C \tabularnewline
+T\(_{et,old}\)(y) & earth tube node temperature (previous) & \(^{\circ}\)C \tabularnewline
+T\(_{i,new}\)(y) & node temperature for node "i" (current) & \(^{\circ}\)C \tabularnewline
+T\(_{i,old}\)(y) & node temperature for node "i" (previous) & \(^{\circ}\)C \tabularnewline
 T\(_{m}\) & average soil surface temperature & \(^{\circ}\)C \tabularnewline
 T\(_{ma}\) & average air temperature & \(^{\circ}\)C \tabularnewline
 t\(_{o}\) & phase constant of the soil surface & sec, days \tabularnewline
@@ -2491,14 +2546,20 @@ T\(_{z1,z2,t}\) & soil profile temperature at time t, averaged over depths betwe
 u & ~wind velocity above the ground surface & m/s \tabularnewline
 U\(_{t}\) & overall heat transfer coefficient of the whole earth tube system & W/m-\(^{\circ}\)C \tabularnewline
 V\(_{a}\) & average pipe air velocity & m/s \tabularnewline
+w & node width (user input) in the vertical solution & m \tabularnewline
+x\(_{t}\) & node thickness in the upper (top) region in the vertical solution & m \tabularnewline
+x\(_{et}\) & node thickness for the earth tube node in the vertical solution & m \tabularnewline
+x\(_{b}\) & node thickness in the lower (bottom) region in the vertical solution & m \tabularnewline
 z & depth of the radial center of pipe below soil surface & m \tabularnewline
 z\(_{1}\) & upper bounds of some vertical profile in soil & m \tabularnewline
 z\(_{2}\) & lower bounds of some vertical profile in soil & m \tabularnewline
-$\alpha$\(_{s}\) & soil thermal diffusivity & m\(^{2}\)/s; m\(^{2}\)/days \tabularnewline
+$\alpha$\(_{s}\) & soil thermal diffusivity & m\(^{2}\)/s; m\(^{2}\)/days; m\(^{2}\)/hr \tabularnewline
 $\beta$ & soil absorption coefficient ( = 1 – soil albedo) & ~ \tabularnewline
+$\Delta$t & time step & hr \tabularnewline
 $\varepsilon$ & hemispherical emittance of the ground surface & ~ \tabularnewline
 $\varphi$\(_{I}\) & phase angle between the insolation and the air temperature & rad \tabularnewline
 $\phi$\(_{s}\) & phase angle difference between the air and soil surface temperature & rad \tabularnewline
+$\rho$ & soil density & kg/m\(^3\) \tabularnewline
 $\upsilon$ & kinetic viscosity of air & m\(^{2}\)/s \tabularnewline
 w & annual angular frequency ( = 1.992 x 10\(^{-7}\)rad/s) & rad/s \tabularnewline
 \bottomrule
