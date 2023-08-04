@@ -2758,13 +2758,13 @@ namespace VariableSpeedCoils {
                 ErrorsFound = true;
             } else {
                 CurveVal = CurveValue(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).PLFFPLR, 1.0);
-                if (CurveVal > 1.11 || CurveVal < 0.90) {
+                if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError(state,
                                      format("{}{}=\"{}\", curve values",
                                             RoutineName,
                                             CurrentModuleObject,
                                             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name));
-                    ShowContinueError(state, format("...{} output is not equal to 1.0 (+ or - 11%) at rated conditions.", cAlphaFields(11)));
+                    ShowContinueError(state, format("...{} output is not equal to 1.0 (+ or - 10%) at rated conditions.", cAlphaFields(11)));
                     ShowContinueError(state, format("...Curve output at rated conditions = {:.3T}", CurveVal));
                 }
             }
