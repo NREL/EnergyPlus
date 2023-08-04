@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -343,7 +344,7 @@ namespace PollutionModule {
     {
         // Members
         // FuelType Names
-        Array1D_string FuelTypeNames;
+        Array1D<Constant::eFuel> FuelTypeNames;
         // Fuel Types used with the Pollution Factors
         Real64 Elec;
         Real64 NatGas;
@@ -394,15 +395,15 @@ namespace PollutionModule {
 
         // Default Constructor
         FuelTypeProps()
-            : FuelTypeNames({1, static_cast<int>(PollFactor::Num)}), Elec(0.0), NatGas(0.0), FuelOil1(0.0), FuelOil2(0.0), Coal(0.0), Gasoline(0.0),
-              Propane(0.0), Diesel(0.0), OtherFuel1(0.0), OtherFuel2(0.0), ElecPurch(0.0), ElecSold(0.0), ElecFacilityIndex(0),
-              DieselFacilityIndex(0), PurchCoolFacilityIndex(0), PurchHeatFacilityIndex(0), NatGasFacilityIndex(0), GasolineFacilityIndex(0),
-              CoalFacilityIndex(0), FuelOil1FacilityIndex(0), FuelOil2FacilityIndex(0), PropaneFacilityIndex(0), OtherFuel1FacilityIndex(0),
-              OtherFuel2FacilityIndex(0), ElecProducedFacilityIndex(0), SteamFacilityIndex(0), ElecPurchasedFacilityIndex(0),
-              ElecSurplusSoldFacilityIndex(0), ElecFacility(0.0), DieselFacility(0.0), PurchCoolFacility(0.0), PurchHeatFacility(0.0),
-              NatGasFacility(0.0), GasolineFacility(0.0), CoalFacility(0.0), FuelOil1Facility(0.0), FuelOil2Facility(0.0), PropaneFacility(0.0),
-              OtherFuel1Facility(0.0), OtherFuel2Facility(0.0), ElecProducedFacility(0.0), SteamFacility(0.0), ElecPurchasedFacility(0.0),
-              ElecSurplusSoldFacility(0.0)
+            : FuelTypeNames({1, static_cast<int>(PollFactor::Num)}, Constant::eFuel::Invalid), Elec(0.0), NatGas(0.0), FuelOil1(0.0), FuelOil2(0.0),
+              Coal(0.0), Gasoline(0.0), Propane(0.0), Diesel(0.0), OtherFuel1(0.0), OtherFuel2(0.0), ElecPurch(0.0), ElecSold(0.0),
+              ElecFacilityIndex(0), DieselFacilityIndex(0), PurchCoolFacilityIndex(0), PurchHeatFacilityIndex(0), NatGasFacilityIndex(0),
+              GasolineFacilityIndex(0), CoalFacilityIndex(0), FuelOil1FacilityIndex(0), FuelOil2FacilityIndex(0), PropaneFacilityIndex(0),
+              OtherFuel1FacilityIndex(0), OtherFuel2FacilityIndex(0), ElecProducedFacilityIndex(0), SteamFacilityIndex(0),
+              ElecPurchasedFacilityIndex(0), ElecSurplusSoldFacilityIndex(0), ElecFacility(0.0), DieselFacility(0.0), PurchCoolFacility(0.0),
+              PurchHeatFacility(0.0), NatGasFacility(0.0), GasolineFacility(0.0), CoalFacility(0.0), FuelOil1Facility(0.0), FuelOil2Facility(0.0),
+              PropaneFacility(0.0), OtherFuel1Facility(0.0), OtherFuel2Facility(0.0), ElecProducedFacility(0.0), SteamFacility(0.0),
+              ElecPurchasedFacility(0.0), ElecSurplusSoldFacility(0.0)
         {
         }
     };
@@ -431,11 +432,11 @@ namespace PollutionModule {
     void ReadEnergyMeters(EnergyPlusData &state);
 
     void GetFuelFactorInfo(EnergyPlusData &state,
-                           std::string const &fuelName,  // input fuel name  (standard from Tabular reports)
-                           bool &fuelFactorUsed,         // return value true if user has entered this fuel
-                           Real64 &fuelSourceFactor,     // if used, the source factor
-                           bool &fuelFactorScheduleUsed, // if true, schedules for this fuel are used
-                           int &ffScheduleIndex          // if schedules for this fuel are used, return schedule index
+                           Constant::eFuel const &fuelName, // input fuel name  (standard from Tabular reports)
+                           bool &fuelFactorUsed,            // return value true if user has entered this fuel
+                           Real64 &fuelSourceFactor,        // if used, the source factor
+                           bool &fuelFactorScheduleUsed,    // if true, schedules for this fuel are used
+                           int &ffScheduleIndex             // if schedules for this fuel are used, return schedule index
     );
 
     void GetEnvironmentalImpactFactorInfo(EnergyPlusData &state,

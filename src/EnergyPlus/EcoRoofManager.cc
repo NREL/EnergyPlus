@@ -200,16 +200,17 @@ namespace EcoRoofManager {
         Real64 HMovInsul = 0.0;                            // "Convection" coefficient of movable insulation
 
         if (state.dataSurface->Surface(SurfNum).ExtWind) {
-            ConvectionCoefficients::InitExteriorConvectionCoeff(state,
-                                                                SurfNum,
-                                                                HMovInsul,
-                                                                RoughSurf,
-                                                                AbsThermSurf,
-                                                                state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
-                                                                state.dataHeatBalSurf->SurfHcExt(SurfNum),
-                                                                state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
-                                                                state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
-                                                                state.dataHeatBalSurf->SurfHAirExt(SurfNum));
+            Convect::InitExtConvCoeff(state,
+                                      SurfNum,
+                                      HMovInsul,
+                                      RoughSurf,
+                                      AbsThermSurf,
+                                      state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum),
+                                      state.dataHeatBalSurf->SurfHConvExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHSkyExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHGrdExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHAirExt(SurfNum),
+                                      state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum));
         }
         // Long Wave Radiation (W/m^2) - original equation shown in comment
         // Real64 Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
