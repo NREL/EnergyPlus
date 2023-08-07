@@ -1710,7 +1710,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
             state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempRefEvapOut); // Rated==Ref?
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempRefCondIn);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempRefEvapOut);
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempRefCondIn);
+
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
                                                  this->Name,
