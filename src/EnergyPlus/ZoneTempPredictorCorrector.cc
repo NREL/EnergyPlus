@@ -7160,6 +7160,11 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     Real64 LoadToHeatingSetPoint = 0.0;
     Real64 LoadToCoolingSetPoint = 0.0;
 
+    int zoneNodeNum = thisZone.SystemZoneNodeNumber;
+    if (spaceNum > 0) {
+        zoneNodeNum = state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber;
+    }
+
     switch (state.dataHeatBalFanSys->TempControlType(zoneNum)) {
     case DataHVACGlobals::ThermostatType::Uncontrolled:
         // Uncontrolled Zone
@@ -7307,8 +7312,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
             totalLoad = LoadToCoolingSetPoint;
         } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
             totalLoad = 0.0;
-            if (thisZone.SystemZoneNodeNumber > 0) {
-                ZoneSetPoint = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).Temp;
+            if (zoneNodeNum > 0) {
+                ZoneSetPoint = state.dataLoopNodes->Node(zoneNodeNum).Temp;
                 ZoneSetPoint = max(ZoneSetPoint, thisZoneThermostatSetPointLo); // trap out of deadband
                 ZoneSetPoint = min(ZoneSetPoint, thisZoneThermostatSetPointHi); // trap out of deadband
             }
@@ -7393,8 +7398,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
             // this turns out to cause instabilities sometimes? that lead to setpoint errors if predictor is off.
             totalLoad = 0.0;
-            if (thisZone.SystemZoneNodeNumber > 0) {
-                ZoneSetPoint = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).Temp;
+            if (zoneNodeNum > 0) {
+                ZoneSetPoint = state.dataLoopNodes->Node(zoneNodeNum).Temp;
                 ZoneSetPoint = max(ZoneSetPoint, thisZoneThermostatSetPointLo); // trap out of deadband
                 ZoneSetPoint = min(ZoneSetPoint, thisZoneThermostatSetPointHi); // trap out of deadband
             }
@@ -7504,8 +7509,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     }
 
     // If the ZoneNodeNum has been set for a Controlled Zone, then the zone setpoint is placed on the node.
-    if (thisZone.SystemZoneNodeNumber > 0) {
-        state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber).TempSetPoint = ZoneSetPoint;
+    if (zoneNodeNum > 0) {
+        state.dataLoopNodes->Node(zoneNodeNum).TempSetPoint = ZoneSetPoint;
     }
 
     state.dataZoneEnergyDemand->Setback(zoneNum) = (ZoneSetPoint > this->ZoneSetPointLast);

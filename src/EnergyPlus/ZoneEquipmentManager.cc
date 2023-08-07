@@ -4524,6 +4524,16 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
             zoneNode.MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
             zoneNode.MassFlowRateMin = TotInletAirMassFlowRateMin;
             zoneNode.MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
+            if (state.dataHeatBal->doSpaceHeatBalance) {
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    auto &spaceNode = Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
+                    spaceNode.MassFlowRate = TotInletAirMassFlowRate;
+                    spaceNode.MassFlowRateMax = TotInletAirMassFlowRateMax;
+                    spaceNode.MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
+                    spaceNode.MassFlowRateMin = TotInletAirMassFlowRateMin;
+                    spaceNode.MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
+                }
+            }
 
             // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
             Real64 StdTotalReturnMassFlow =
