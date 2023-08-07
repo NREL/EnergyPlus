@@ -1547,7 +1547,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAirRatedCo
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(2).RatioRatedHeatRatedTotCoolCap = 1.23;
 
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.20;
-    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.0004;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 40;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0075;
