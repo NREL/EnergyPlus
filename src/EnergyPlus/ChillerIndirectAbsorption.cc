@@ -1559,6 +1559,54 @@ void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, equipName, "Chiller:Absorption:Indirect");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, equipName, "n/a");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, equipName, this->NomCap);
+
+        // std 229 new Chillers table
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:Absorption:Indirect");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCap);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->NomCap); // did not find rated cap
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, "N/A"); // did not find rated eff or cop ; also Eff == COP?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerPlantloopName, this->Name, state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+            this->Name,
+            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).Branch(this->CWPlantLoc.branchNum).Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerCondLoopName, this->Name, state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            this->Name,
+            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).LoopSide(this->CDPlantLoc.loopSideNum).Branch(this->CDPlantLoc.branchNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerFuelType,
+                                                 this->Name,
+                                                 DataLoopNode::NodeFluidTypeNames[static_cast<int>(this->GenHeatSourceType)]);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondIn); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempLowLimitEvapOut); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondIn);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempLowLimitEvapOut);
+
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                 this->Name,
+                                                 this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                 this->Name,
+                                                 this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerCondLoopBranchName, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, "N/A");
     }
 }
 
