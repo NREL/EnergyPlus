@@ -92,7 +92,7 @@ struct EquipListCompData
     int BranchNumPtr;                           // pointer to the comp location in the data structure
     int CompNumPtr;                             // pointer to the comp location in the data structure
     Real64 SetPointFlowRate;                    // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
-    bool SetPointFlowRateWasAutosized;          // TRANE, true if comp setpoint control flow rate was autosize on input
+    bool SetPointFlowRateWasAutosized;          // true if comp setpoint control flow rate was autosize on input (not used)
     std::string DemandNodeName;                 // COMP SETPOINT CTRL ONLY--The name of each item in the list
     int DemandNodeNum;                          // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
     std::string SetPointNodeName;               // COMP SETPOINT CTRL ONLY--The name of each item in the list
