@@ -267,7 +267,7 @@ TEST_F(CommandLineInterfaceFixture, IdfDoesNotExist)
 TEST_F(CommandLineInterfaceFixture, AnnualSimulation)
 {
     expectedParams.AnnualSimulation = true;
-    for (const std::string &flag : {"-a", "--annual"}) {
+    for (const std::string flag : {"-a", "--annual"}) {
         SCOPED_TRACE("Flag: '" + flag + "'");
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
@@ -280,7 +280,7 @@ TEST_F(CommandLineInterfaceFixture, AnnualSimulation)
 TEST_F(CommandLineInterfaceFixture, DDSimulation)
 {
     expectedParams.DDOnlySimulation = true;
-    for (const std::string &flag : {"-D", "--design-day"}) {
+    for (const std::string flag : {"-D", "--design-day"}) {
         SCOPED_TRACE("Flag: '" + flag + "'");
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
@@ -316,7 +316,7 @@ TEST_F(CommandLineInterfaceFixture, WeatherFileExists)
 TEST_F(CommandLineInterfaceFixture, WeatherFileDoesNotExists)
 {
     expectedParams.inputWeatherFilePath = "WRONG.epw";
-    for (const std::string &flag : {"-w", "--weather"}) {
+    for (const std::string flag : {"-w", "--weather"}) {
         SCOPED_TRACE("Flag: '" + flag + "'");
         const int exitcode =
             processArgsHelper({flag, expectedParams.inputWeatherFilePath.generic_string(), expectedParams.inputFilePath.generic_string()});
@@ -331,7 +331,7 @@ TEST_F(CommandLineInterfaceFixture, WeatherFileDoesNotExists)
 
 TEST_F(CommandLineInterfaceFixture, Version)
 {
-    for (const std::string &flag : {"-v", "--version"}) {
+    for (const std::string flag : {"-v", "--version"}) {
         SCOPED_TRACE("Flag: '" + flag + "'");
         const int exitcode = processArgsHelper({flag});
         EXPECT_EQ(static_cast<int>(ReturnCodes::SuccessButHelper), exitcode);
@@ -343,7 +343,7 @@ TEST_F(CommandLineInterfaceFixture, Version)
 TEST_F(CommandLineInterfaceFixture, Convert)
 {
     expectedParams.outputEpJSONConversion = true;
-    for (const std::string &flag : {"-c", "--convert"}) {
+    for (const std::string flag : {"-c", "--convert"}) {
         SCOPED_TRACE("Flag: '" + flag + "'");
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
@@ -366,7 +366,7 @@ TEST_F(CommandLineInterfaceFixture, ConvertOnly)
 TEST_F(CommandLineInterfaceFixture, runReadVars)
 {
     expectedParams.runReadVars = true;
-    for (const std::string &flag : {"-r", "--readvars"}) {
+    for (const std::string flag : {"-r", "--readvars"}) {
         SCOPED_TRACE("Flag: '" + flag + "'");
         const int exitcode = processArgsHelper({flag, expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
@@ -396,7 +396,7 @@ TEST_F(CommandLineInterfaceFixture, numThread)
     for (auto [j, expectedCorrectedJ, error_message] : test_data) {
         SCOPED_TRACE(fmt::format("Passing j={}", j));
         expectedParams.numThread = expectedCorrectedJ;
-        for (const std::string &flag : {"-j", "--jobs"}) {
+        for (const std::string flag : {"-j", "--jobs"}) {
             SCOPED_TRACE("Flag: '" + flag + "'");
             const int exitcode = processArgsHelper({flag, std::to_string(j), expectedParams.inputFilePath.generic_string()});
             EXPECT_EQ(static_cast<int>(ReturnCodes::Success), exitcode);
