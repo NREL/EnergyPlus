@@ -2856,6 +2856,11 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
 
+    thisCoolingPLHP->sourceSidePlantLoc.loopNum = 2;
+    thisCoolingPLHP->sourceSidePlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    thisCoolingPLHP->sourceSidePlantLoc.branchNum = 1;
+    thisCoolingPLHP->sourceSidePlantLoc.compNum = 1;
+
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node
     state->dataLoopNodes->Node.allocate(5);
@@ -3287,6 +3292,11 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
     thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
     thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
+
+    thisCoolingPLHP->sourceSidePlantLoc.loopNum = 2;
+    thisCoolingPLHP->sourceSidePlantLoc.loopSideNum = DataPlant::LoopSideLocation::Demand;
+    thisCoolingPLHP->sourceSidePlantLoc.branchNum = 1;
+    thisCoolingPLHP->sourceSidePlantLoc.compNum = 1;
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node

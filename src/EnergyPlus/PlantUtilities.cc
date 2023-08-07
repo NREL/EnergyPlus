@@ -957,15 +957,15 @@ void PullCompInterconnectTrigger(EnergyPlusData &state,
 }
 
 void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
-                                         int const LoopNum,                                   // component's loop index
-                                         const DataPlant::LoopSideLocation LoopSide,          // component's loop side number
-                                         DataPlant::PlantEquipmentType Type, // Component's type index
-                                         int const InletNodeNum,                              // Component's inlet node pointer
-                                         int const OutletNodeNum,                             // Component's outlet node pointer
-                                         Real64 const ModelCondenserHeatRate,                 // model's heat rejection rate at condenser (W)
-                                         Real64 const ModelInletTemp,                         // model's inlet temperature (C)
-                                         Real64 const ModelOutletTemp,                        // model's outlet temperature (C)
-                                         Real64 const ModelMassFlowRate,                      // model's condenser water mass flow rate (kg/s)
+                                         int const LoopNum,                          // component's loop index
+                                         const DataPlant::LoopSideLocation LoopSide, // component's loop side number
+                                         DataPlant::PlantEquipmentType Type,         // Component's type index
+                                         int const InletNodeNum,                     // Component's inlet node pointer
+                                         int const OutletNodeNum,                    // Component's outlet node pointer
+                                         Real64 const ModelCondenserHeatRate,        // model's heat rejection rate at condenser (W)
+                                         Real64 const ModelInletTemp,                // model's inlet temperature (C)
+                                         Real64 const ModelOutletTemp,               // model's outlet temperature (C)
+                                         Real64 const ModelMassFlowRate,             // model's condenser water mass flow rate (kg/s)
                                          bool const FirstHVACIteration)
 {
 
@@ -996,8 +996,8 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
     int ConnectLoopNum;                        // local do loop counter
     Real64 Cp;
 
-    auto & inletNode = state.dataLoopNodes->Node(InletNodeNum);
-    auto & outletNode = state.dataLoopNodes->Node(OutletNodeNum);
+    auto &inletNode = state.dataLoopNodes->Node(InletNodeNum);
+    auto &outletNode = state.dataLoopNodes->Node(OutletNodeNum);
 
     // check if any conditions have changed
     if (inletNode.MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;

@@ -287,7 +287,6 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     // evaluate the actual current operating load side heat transfer rate
     auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum);
-    auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
     Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(state,
                                                            thisLoadPlantLoop.FluidName,
                                                            state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp,
@@ -352,6 +351,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // calculate source side outlet conditions
     Real64 CpSrc = 0.0;
     if (this->waterSource) {
+        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
         CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
                                                        thisSourcePlantLoop.FluidName,
                                                        state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp,
@@ -1227,7 +1227,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
         SetupOutputVariable(state,
-                            "MyCp",
+                            "Heat Pump Source Side Specific Heat",
                             OutputProcessor::Unit::J_kgK,
                             this->sourceSideCp,
                             OutputProcessor::SOVTimeStepType::System,
