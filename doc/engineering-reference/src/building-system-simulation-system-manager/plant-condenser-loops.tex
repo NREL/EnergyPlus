@@ -569,7 +569,7 @@ The various ``PlantEquipmentOperation:Outdoor*'' statements define the different
 PlantEquipmentOperation:ComponentSetpoint provides an alternative way to control plant equipment operation.  Equipment is listed in order and loads are calculated for each individual peice of equipment using the difference between the temperature at a demand node, typically the inlet node, and the temperature of a setpoint node, typically the outlet node. These calculated loads are then distributed to the specific peice of equipment that they were calculated for. 
 
 \begin{equation}
-\dot Q_{load} = {\dot_m}{c_p}( {T_{demand} - T_{setpoint}} )
+\dot Q_{load} = {\dot m}{c_p}( {T_{demand} - T_{setpoint}} )
 \end{equation}
 
 \subsubsection{Supervisory Control of Heat Pumps that Changeover Between Heating and Cooling Operation}\label{supervisory-changeover-heating-cooling-operation}
@@ -580,17 +580,17 @@ The control routine detects the how the building is currently being loaded as pa
 
 
 \begin{equation}
-\dot Q_{ZonePredictedCooling}  = \sum_{n=1}^{zones} \min({0.0, \dot Q_{OutputRequiredToCoolingSP}) {Mult_{zone&list}}  
+\dot Q_{ZonePredictedCooling}  = \sum_{n=1}^{zones} \min({0.0, \dot Q_{OutputRequiredToCoolingSP}}) {Mult_{zonelist}}
 \end{equation}
 \begin{equation}
-\dot Q_{ZonePredictedHeating}  = \sum_{n=1}^{zones} \max({0.0, \dot Q_{OutputRequiredToHeatingSP}) {Mult_{zone&list}}  
+\dot Q_{ZonePredictedHeating}  = \sum_{n=1}^{zones} \max({0.0, \dot Q_{OutputRequiredToHeatingSP}}) {Mult_{zonelist}}
 \end{equation}
 Ventilation loads on the air system are modeled from the total heat transfer needed to bring the outdoor air to the conditions of the return air. The program detects which primary air systems are connected to zones included in the list of polled zones.  Then ventilation loads, which need to be added to the sensible predicted zone loads, are modeled using the mass flow rate multiplied by the change in enthalpy. 
 \begin{equation}
-\dot Q_{AirSysVentCooling} = \sum_{n=1}^{AirSystems} min({0.0, {\dot m_{OA}} ( {h_{ret}}  - {h_{OA}} }))
+\dot Q_{AirSysVentCooling} = \sum_{n=1}^{AirSystems} min(0.0, {\dot m_{OA}} ( {h_{ret}}  - {h_{OA}}))
 \end{equation}
 \begin{equation}
-\dot Q_{AirSysVentHeating} = \sum_{n=1}^{AirSystems} max({0.0, {\dot m_{OA}} ( {h_{ret}}  - {h_{OA}} }))
+\dot Q_{AirSysVentHeating} = \sum_{n=1}^{AirSystems} max(0.0, {\dot m_{OA}} ( {h_{ret}}  - {h_{OA}}))
 \end{equation}
 Process loads on a plant system that are not associated with conditioning the building's zones are included from any LoadProfile:Plant objects connected to the plant loops controlled by this operation scheme.  
 \begin{equation}
@@ -619,7 +619,7 @@ This operation scheme includes special handling of a water-to-water heat pump si
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/DHRU_diag.png}
-\caption{Dedicated Heat Recovery Heat Pump} \protect \label{fig:dhru-plant-config}}
+\caption{Dedicated Heat Recovery Heat Pump} \protect \label{fig:dhru-plant-config}
 \end{figure}
  
 \subsection{Condenser Operation Schemes}\label{condenser-operation-schemes}

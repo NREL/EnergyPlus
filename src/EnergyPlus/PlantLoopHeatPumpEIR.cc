@@ -288,12 +288,6 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
                         this->loadSideMassFlowRate = std::max(this->loadSideMassFlowRate, this->loadVSPumpMinLimitMassFlow);
                     }
                 }
-                if (this->waterSource && (this->sourceVSBranchPump || this->sourceVSLoopPump)) {
-                    this->sourceSideMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
-                    if (this->sourceVSBranchPump) {
-                        this->sourceSideMassFlowRate = std::max(this->sourceSideMassFlowRate, sourceVSPumpMinLimitMassFlow);
-                    }
-                }
             }
 
             PlantUtilities::SetComponentFlowRate(
