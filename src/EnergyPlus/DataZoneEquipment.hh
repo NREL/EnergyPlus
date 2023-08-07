@@ -497,8 +497,8 @@ namespace DataZoneEquipment {
                                    int &overallEquipCount,
                                    DataZoneEquipment::EquipConfiguration &thisEquipConfig,
                                    Array1D_string &AlphArray,
-                                   Array1D_string &cAlphaFields,   // Alpha field names
-                                   Array1D_bool &lAlphaBlanks,     // Logical array, alpha field input BLANK = .TRUE.
+                                   Array1D_string &cAlphaFields, // Alpha field names
+                                   Array1D_bool &lAlphaBlanks,   // Logical array, alpha field input BLANK = .TRUE.
                                    Array1D_int &NodeNums);
 
     bool CheckZoneEquipmentList(EnergyPlusData &state,
