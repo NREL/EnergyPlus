@@ -2826,12 +2826,14 @@ Zone,Sum,Surface Outside Face Net Thermal Radiation Heat Gain Energy [J]
 Zone,Average,Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient [W/m2-K]
 Zone,Average,Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient [W/m2-K]
 Zone,Average,Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Outside Face Thermal Radiation to Surrounding Surfaces Heat Transfer Coefficient [W/m2-K]
+Zone,Average,Surface Outside Face Surrounding Surfaces Average Temperature [C]
 Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate [W]
 Zone,Sum,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Energy [J]
 Zone,Average,Surface Inside Face Exterior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
 Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Interior Windows Incident Beam Solar Radiation Rate per Area[W/m2]
-Zone, Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
+Zone,Sum,Surface Inside Face Interior Windows Incident Beam Solar Radiation Energy [J]
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Absorbed Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Initial Transmitted Diffuse Transmitted Out Window Solar Radiation Rate [W]
 Zone,Average,Surface Inside Face Absorbed Shortwave Radiation Rate [W]
@@ -3241,6 +3243,14 @@ This is thermal radiation heat transfer rate between the outside face and the ai
 \subsubsection{Surface Outside Face Heat Emission to Air Rate {[}W{]}}\label{surface-outside-face-heat-emission-to-air-heat-transfer-rate-w}
 
 This is total heat transfer rate between the outside face and the air mass surrounding the surface by convection and thermal radiation.
+
+\subsubsection{Surface Outside Face Thermal Radiation to Surrounding Surfaces Heat Transfer Coefficient {[}W/m2-K{]}}\label{surface-outside-face-thermal-radiation-to-surrounding-surfaces-heat-transfer-coefficient-wm2-k}
+
+This is the coefficient that describes thermal radiation heat transfer between the outside face of an exterior surface and the surrounding surfaces it views. It is the value of ``Hr'' in the classic linearized model for thermal radiation exchange Q = Hr * A * (T\_surf -- T\_srdsurfs) when applied to the surrounding surfaces. Where T\_surf = Surface Outside Face Temperature, and T\_srdsurf = Average temperature of the surrounding surfaces viewed by an exterior surface.
+
+\subsubsection{Surface Outside Face Surrounding Surfaces Average Temperature {[}C{]}}\label{surface-outside-face-surrounding-surfaces-average-temperature-C}
+
+This is the average surface temperature of the surrounding surfaces viewed by an exterior surface, in degrees Celsius. The surrounding surfaces average temperature is a view factor weighed surface temperature of multiple surrounding surfaces seen by an exterior surface. If an exterior surface views a single surrounding surface then the average temperature is the same as the user specified surrounding surface temperature.
 
 \subsubsection{Surface Outside Face Solar Radiation Heat Gain Rate {[}W{]}}\label{surface-outside-face-solar-radiation-heat-gain-rate-w}
 

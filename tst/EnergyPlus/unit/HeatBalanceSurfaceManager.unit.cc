@@ -89,6 +89,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::HeatBalanceSurfaceManager;
+using namespace EnergyPlus::ScheduleManager;
 
 namespace EnergyPlus {
 
@@ -8563,9 +8564,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateThermalHistoriesIZSurf
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataHeatBal->AnyInternalHeatSourceInInput = false;
     state->dataHeatBal->SimpleCTFOnly = false;
-
+    
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
-
+    
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
@@ -8585,14 +8586,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateThermalHistoriesIZSurf
     state->dataHeatBal->space(2).OpaqOrIntMassSurfaceLast = 2;
     state->dataHeatBal->space(2).HTSurfaceFirst = 2;
     state->dataHeatBal->space(2).HTSurfaceLast = 2;
-
+    
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = false;
     state->dataConstruction->Construct(1).NumHistories = 1;
     state->dataConstruction->Construct(1).CTFOutside[0] = 1.5;
     state->dataConstruction->Construct(1).CTFCross[0] = 1.5;
     state->dataConstruction->Construct(1).CTFInside[0] = 1.5;
-
+    
     state->dataHeatBalSurf->SurfCurrNumHist(1) = 0;
     state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 20.0;
     state->dataHeatBalSurf->SurfTempIn(1) = 10.0;
@@ -8601,30 +8602,243 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateThermalHistoriesIZSurf
     state->dataHeatBalSurf->SurfOutsideTempHist(1)(2) = 10.0;
     state->dataHeatBalSurf->SurfTempIn(2) = 20.0;
     state->dataHeatBalSurf->SurfCTFConstInPart(2) = 0.0;
-
+    
     // Test 1: Partition--outside should still be zero
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(2).ExtBoundCond = 2;
-
+    
     UpdateThermalHistories(*state); // Test to make sure that the outside surface flux is being set properly for interzone surfaces
-
+    
     EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(1));
     EXPECT_EQ(0.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(1));
     EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(2));
     EXPECT_EQ(0.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(2));
-
+    
     // Test 2: Interzone Partition--outside should have a non-zero value
     state->dataSurface->Surface(1).ExtBoundCond = 2;
     state->dataSurface->Surface(2).ExtBoundCond = 1;
     state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux = 0.0;
     state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux = 0.0;
-
+    
     UpdateThermalHistories(*state); // Test to make sure that the outside surface flux is being set properly for interzone surfaces
-
+    
     EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(1));
     EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(1));
     EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(2));
     EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(2));
+}
+    
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
+{
+    std::string_view constexpr idf_objects = R"IDF(
+      Zone,
+        Zone,                         !- Name
+        0,                            !- Direction of Relative North {deg}
+        6.000000,                     !- X Origin {m}
+        6.000000,                     !- Y Origin {m}
+        0,                            !- Z Origin {m}
+        1,                            !- Type
+        1,                            !- Multiplier
+        autocalculate,                !- Ceiling Height {m}
+        autocalculate;                !- Volume {m3}
+                          
+	  Material,
+        Concrete Block,               !- Name
+        MediumRough,                  !- Roughness
+        0.1014984,                    !- Thickness {m}
+        0.3805070,                    !- Conductivity {W/m-K}
+        608.7016,                     !- Density {kg/m3}
+        836.8000;                     !- Specific Heat {J/kg-K}
+
+      Construction,
+        WallConstruction,             !- Name
+        Concrete Block;               !- Outside Layer
+
+      WindowMaterial:SimpleGlazingSystem,
+        WindowMaterial,               !- Name
+        5.778,                        !- U-Factor {W/m2-K}
+        0.819,                        !- Solar Heat Gain Coefficient
+        0.881;                        !- Visible Transmittance
+
+      Construction,
+        WindowConstruction,           !- Name
+        WindowMaterial;               !- Outside Layer
+
+      WindowProperty:FrameAndDivider,
+        WindowFrame,                  !- Name
+        0.05,                         !- Frame Width {m}
+        0.00,                         !- Frame Outside Projection {m}
+        0.00,                         !- Frame Inside Projection {m}
+        5.0,                          !- Frame Conductance {W/m2-K}
+        1.2,                          !- Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance
+        0.8,                          !- Frame Solar Absorptance
+        0.8,                          !- Frame Visible Absorptance
+        0.9,                          !- Frame Thermal Hemispherical Emissivity
+        DividedLite,                  !- Divider Type
+        0.02,                         !- Divider Width {m}
+        2,                            !- Number of Horizontal Dividers
+        2,                            !- Number of Vertical Dividers
+        0.00,                         !- Divider Outside Projection {m}
+        0.00,                         !- Divider Inside Projection {m}
+        5.0,                          !- Divider Conductance {W/m2-K}
+        1.2,                          !- Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
+        0.8,                          !- Divider Solar Absorptance
+        0.8,                          !- Divider Visible Absorptance
+        0.9;                          !- Divider Thermal Hemispherical Emissivity
+
+      FenestrationSurface:Detailed,
+        FenestrationSurface,          !- Name
+        Window,                       !- Surface Type
+        WindowConstruction,           !- Construction Name
+        Wall,                         !- Building Surface Name
+        ,                             !- Outside Boundary Condition Object
+        0.5000000,                    !- View Factor to Ground
+        WindowFrame,                  !- Frame and Divider Name
+        1.0,                          !- Multiplier
+        4,                            !- Number of Vertices
+        0.200000,0.0,9.900000,        !- X,Y,Z ==> Vertex 1 {m}
+        0.200000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 2 {m}
+        9.900000,0.0,0.1000000,       !- X,Y,Z ==> Vertex 3 {m}
+        9.900000,0.0,9.900000;        !- X,Y,Z ==> Vertex 4 {m}
+
+      SurfaceProperty:LocalEnvironment,
+        LocEnv:FenestrationSurface,   !- Name
+        FenestrationSurface,          !- Exterior Surface Name
+        ,                             !- External Shading Fraction Schedule Name
+        SrdSurfs:FenesSurface;        !- Surrounding Surfaces Object Name
+
+      SurfaceProperty:SurroundingSurfaces,
+        SrdSurfs:FenesSurface,        !- Name
+        0.4,                          !- Sky View Factor
+        Sky Temp Sch,                 !- Sky Temperature Schedule Name
+        ,                             !- Ground View Factor
+        ,                             !- Ground Temperature Schedule Name
+        SrdSurfs:Surface 1,           !- Surrounding Surface 1 Name
+        0.2,                          !- Surrounding Surface 1 View Factor
+        Surrounding Temp Sch 1,       !- Surrounding Surface 1 Temperature Schedule Name
+        SrdSurfs:Surface 2,           !- Surrounding Surface 2 Name
+        0.2,                          !- Surrounding Surface 2 View Factor
+        Surrounding Temp Sch 2,       !- Surrounding Surface 2 Temperature Schedule Name
+        SrdSurfs:Surface 3,           !- Surrounding Surface 3 Name
+        0.1,                          !- Surrounding Surface 3 View Factor
+        Surrounding Temp Sch 3;       !- Surrounding Surface 3 Temperature Schedule Name
+							
+      Schedule:Compact,
+        Surrounding Temp Sch 1,       !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 10.0;           !- Field 3
+
+      Schedule:Compact,
+        Surrounding Temp Sch 2,       !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 12.0;           !- Field 3
+
+      Schedule:Compact,
+        Surrounding Temp Sch 3,       !- Name
+        Any Number,                   !- Schedule Type Limits Name
+        Through: 12/31,               !- Field 1
+        For: AllDays,                 !- Field 2
+        Until: 24:00, 15.0;           !- Field 3
+
+      ScheduleTypeLimits,
+        Any Number;                   !- Name
+							
+      BuildingSurface:Detailed,
+        Wall,                         !- Name
+        Wall,                         !- Surface Type
+        WallConstruction,             !- Construction Name
+        Zone,                         !- Zone Name
+        ,                             !- Space Name
+        Outdoors,                     !- Outside Boundary Condition
+        ,                             !- Outside Boundary Condition Object
+        SunExposed,                   !- Sun Exposure
+        WindExposed,                  !- Wind Exposure
+        0.1000000,                    !- View Factor to Ground
+        4,                            !- Number of Vertices
+        0.0,0.000000,10.00000,        !- X,Y,Z ==> Vertex 1 {m}
+        0.0,0.000000,0.0,             !- X,Y,Z ==> Vertex 2 {m}
+        10.00000,0.0,0.0,             !- X,Y,Z ==> Vertex 3 {m}
+        10.00000,0.0,10.00000;        !- X,Y,Z ==> Vertex 4 {m}
+
+      BuildingSurface:Detailed,
+        Floor,                        !- Name
+        Floor,                        !- Surface Type
+        WallConstruction,             !- Construction Name
+        Zone,                         !- Zone Name
+        ,                             !- Space Name
+        Outdoors,                     !- Outside Boundary Condition
+        ,                             !- Outside Boundary Condition Object
+        NoSun,                        !- Sun Exposure
+        NoWind,                       !- Wind Exposure
+        1.0,                          !- View Factor to Ground
+        4,                            !- Number of Vertices
+        0.000000,0.000000,0,          !- X,Y,Z ==> Vertex 1 {m}
+        0.000000,10.000000,0,         !- X,Y,Z ==> Vertex 2 {m}
+        10.00000,10.000000,0,         !- X,Y,Z ==> Vertex 3 {m}
+        10.00000,0.000000,0;          !- X,Y,Z ==> Vertex 4 {m}
+
+    )IDF";
+
+    bool ErrorsFound = false;
+    ASSERT_TRUE(process_idf(idf_objects));
+    // set global and environmental variables
+    state->dataGlobal->BeginSimFlag = true;
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataGlobal->HourOfDay = 15;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1;
+    state->dataGlobal->TimeStepZoneSec = 3600.0;
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    state->dataGlobal->MinutesPerTimeStep = 60;
+    state->dataEnvrn->Month = 7;
+    state->dataEnvrn->DayOfMonth = 21;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+    state->dataEnvrn->OutBaroPress = 101325;
+    // process schedules
+    ScheduleManager::ProcessScheduleInput(*state);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
+    Material::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
+    HeatBalanceManager::AllocateHeatBalArrays(*state);
+    HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(state->dataGlobal->AnyLocalEnvironmentsInModel);
+    // test surface property object inputs
+    int srdSurfsPropNum = UtilityRoutines::FindItemInList("SRDSURFS:FENESSURFACE", state->dataSurface->SurroundingSurfsProperty);
+    EXPECT_EQ(1, state->dataSurface->SurfLocalEnvironment(srdSurfsPropNum).SurroundingSurfsPtr);
+    // set local derived data vars
+    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    auto &surface = state->dataSurface->Surface(surfNum);
+    int srdSurfsNum = state->dataSurface->Surface(surfNum).SurfSurroundingSurfacesNum;
+    auto &srdSurfsProperty = state->dataSurface->SurroundingSurfsProperty(srdSurfsNum);
+    // update schedule values for surrounding surfaces temperature
+    ScheduleManager::UpdateScheduleValues(*state);
+    GetSurroundingSurfacesTemperatureAverage(*state);
+    // calculate surrounding surfaces average temperature
+    Real64 SrdSurfaceTemp = 0.0;
+    Real64 SrdSurfaceTempSum = 0.0;
+    for (auto &surdSurfs : srdSurfsProperty.SurroundingSurfs) {
+        SrdSurfaceTemp = ScheduleManager::GetCurrentScheduleValue(*state, surdSurfs.TempSchNum) + Constant::KelvinConv;
+        SrdSurfaceTempSum += surdSurfs.ViewFactor * pow_4(SrdSurfaceTemp);
+    }
+    Real64 srdSurfacesTemp_result = root_4(SrdSurfaceTempSum / surface.ViewFactorSrdSurfs) - Constant::KelvinConv;
+    // check average temperature of surrounding surfaces
+    EXPECT_DOUBLE_EQ(srdSurfacesTemp_result, surface.SrdSurfTemp);
 }
 
 } // namespace EnergyPlus
