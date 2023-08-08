@@ -1402,6 +1402,45 @@ void ExhaustAbsorberSpecs::size(EnergyPlusData &state)
             state, state.dataOutRptPredefined->pdchMechType, this->Name, "ChillerHeater:Absorption:DoubleEffect");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->ThermalEnergyCoolRatio);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCoolingCap);
+
+        // std 229 new Chillers table
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerType, this->Name, "ChillerHeater:Absorption:DoubleEffect");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCoolingCap);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->ThermalEnergyCoolRatio);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->NomCoolingCap);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->ThermalEnergyCoolRatio);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerPlantloopName, this->Name, state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+            this->Name,
+            state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).Branch(this->CWPlantLoc.branchNum).Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerCondLoopName, this->Name, state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            this->Name,
+            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).LoopSide(this->CDPlantLoc.loopSideNum).Branch(this->CDPlantLoc.branchNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, this->ExhaustSourceName);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondReturn); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondReturn);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, "N/A");
+
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate, this->Name, this->DesEvapMassFlowRate);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate, this->Name, this->DesCondMassFlowRate);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerCondLoopBranchName, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, "N/A");
     }
 }
 
