@@ -136,10 +136,10 @@ TEST_F(EnergyPlusFixture, EarthTube_initCPrime0Test)
     state->dataEarthTube->EarthTubeSys.allocate(TotEarthTube);
     auto &thisEarthTube = state->dataEarthTube->EarthTubeSys(1);
     thisEarthTube.totNodes = 3;
-    thisEarthTube.aCoeff.reserve(thisEarthTube.totNodes);
-    thisEarthTube.bCoeff.reserve(thisEarthTube.totNodes);
-    thisEarthTube.cCoeff0.reserve(thisEarthTube.totNodes);
-    thisEarthTube.cPrime0.reserve(thisEarthTube.totNodes);
+    thisEarthTube.aCoeff.resize(thisEarthTube.totNodes);
+    thisEarthTube.bCoeff.resize(thisEarthTube.totNodes);
+    thisEarthTube.cCoeff0.resize(thisEarthTube.totNodes);
+    thisEarthTube.cPrime0.resize(thisEarthTube.totNodes);
 
     // Test 1
     thisEarthTube.aCoeff[0] = 0.0;
