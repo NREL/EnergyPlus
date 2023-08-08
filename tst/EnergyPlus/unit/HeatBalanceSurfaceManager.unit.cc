@@ -8564,9 +8564,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateThermalHistoriesIZSurf
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataHeatBal->AnyInternalHeatSourceInInput = false;
     state->dataHeatBal->SimpleCTFOnly = false;
-    
+
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
-    
+
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(1).HeatTransSurf = true;
     state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
@@ -8586,14 +8586,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateThermalHistoriesIZSurf
     state->dataHeatBal->space(2).OpaqOrIntMassSurfaceLast = 2;
     state->dataHeatBal->space(2).HTSurfaceFirst = 2;
     state->dataHeatBal->space(2).HTSurfaceLast = 2;
-    
+
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = false;
     state->dataConstruction->Construct(1).NumHistories = 1;
     state->dataConstruction->Construct(1).CTFOutside[0] = 1.5;
     state->dataConstruction->Construct(1).CTFCross[0] = 1.5;
     state->dataConstruction->Construct(1).CTFInside[0] = 1.5;
-    
+
     state->dataHeatBalSurf->SurfCurrNumHist(1) = 0;
     state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 20.0;
     state->dataHeatBalSurf->SurfTempIn(1) = 10.0;
@@ -8602,32 +8602,32 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateThermalHistoriesIZSurf
     state->dataHeatBalSurf->SurfOutsideTempHist(1)(2) = 10.0;
     state->dataHeatBalSurf->SurfTempIn(2) = 20.0;
     state->dataHeatBalSurf->SurfCTFConstInPart(2) = 0.0;
-    
-    // Test 1: Partition--outside should still be zero
+
+    // Test 1: Partition--outside should have a non-zero value (interzone and regular partitions treated the same)
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(2).ExtBoundCond = 2;
-    
+
     UpdateThermalHistories(*state); // Test to make sure that the outside surface flux is being set properly for interzone surfaces
-    
+
     EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(1));
-    EXPECT_EQ(0.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(1));
+    EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(1));
     EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(2));
-    EXPECT_EQ(0.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(2));
-    
+    EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(2));
+
     // Test 2: Interzone Partition--outside should have a non-zero value
     state->dataSurface->Surface(1).ExtBoundCond = 2;
     state->dataSurface->Surface(2).ExtBoundCond = 1;
     state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux = 0.0;
     state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux = 0.0;
-    
+
     UpdateThermalHistories(*state); // Test to make sure that the outside surface flux is being set properly for interzone surfaces
-    
+
     EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(1));
     EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(1));
     EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(2));
     EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(2));
 }
-    
+
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
 {
     std::string_view constexpr idf_objects = R"IDF(

@@ -5176,10 +5176,6 @@ void UpdateThermalHistories(EnergyPlusData &state)
                         state.dataHeatBalFanSys->CTFTuserConstPart(SurfNum);
                 }
 
-                // Don't need to evaluate outside for partitions (so continue),
-                // but do need to do remaining calculations for interzone partitions.
-                if (surface.ExtBoundCond > 0 && surface.ExtBoundCond == SurfNum) continue;
-
                 // Set current outside flux:
                 if (construct.SourceSinkPresent) {
                     state.dataHeatBalSurf->SurfOutsideFluxHist(1)(SurfNum) =
