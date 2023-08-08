@@ -200,6 +200,8 @@ struct EarthTubeData : BaseGlobalStruct
 {
     bool GetInputFlag = true;
     bool initFirstTime = true;
+    Real64 timeElapsed =
+        0.0; // keeps track so that certain initializations only happen once even if earth tubes are called multiple times per time step
     EPVector<EarthTube::EarthTubeData> EarthTubeSys;
     EPVector<EarthTube::EarthTubeZoneReportVars> ZnRptET;
     EPVector<EarthTube::EarthTubeParameters> EarthTubePars;
