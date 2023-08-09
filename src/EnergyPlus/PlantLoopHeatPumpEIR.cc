@@ -81,8 +81,11 @@ constexpr Real64 Fahrenheit2Celsius(Real64 F)
     return (F - 32.0) * 5.0 / 9.0;
 }
 
-void EIRPlantLoopHeatPump::simulate(
-    EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation, [[maybe_unused]] bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
+void EIRPlantLoopHeatPump::simulate(EnergyPlusData &state,
+                                    const EnergyPlus::PlantLocation &calledFromLocation,
+                                    [[maybe_unused]] bool const FirstHVACIteration,
+                                    Real64 &CurLoad,
+                                    bool const RunFlag)
 {
 
     // Call initialize to set flow rates, run flag, and entering temperatures
