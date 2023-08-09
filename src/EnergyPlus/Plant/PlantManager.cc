@@ -3102,17 +3102,22 @@ void SizePlantLoop(EnergyPlusData &state,
                                                      state.dataPlnt->PlantLoop(LoopNum).Name,
                                                      "Maximum Loop Flow Rate [m3/s]",
                                                      state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                        // begin std 229 plantloop equipment summary new table
                         OutputReportPredefined::PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchPLCLType, state.dataPlnt->PlantLoop(LoopNum).Name, "PlantLoop");
+                        // end std 229 plantloop equipment summary new table
                     } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                         BaseSizer::reportSizerOutput(state,
                                                      "CondenserLoop",
                                                      state.dataPlnt->PlantLoop(LoopNum).Name,
                                                      "Maximum Loop Flow Rate [m3/s]",
                                                      state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                        // begin std 229 plantloop equipment summary new table
                         OutputReportPredefined::PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchPLCLType, state.dataPlnt->PlantLoop(LoopNum).Name, "CondenserLoop");
+                        // end std 229 plantloop equipment summary new table
                     }
+                    // begin std 229 plantloop equipment summary new table
                     OutputReportPredefined::PreDefTableEntry(state,
                                                              state.dataOutRptPredefined->pdchPLCLProvHeat,
                                                              state.dataPlnt->PlantLoop(LoopNum).Name,
@@ -3129,14 +3134,15 @@ void SizePlantLoop(EnergyPlusData &state,
                                                              state.dataOutRptPredefined->pdchPLCLMinLoopFlowRate,
                                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                                              state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchPLCLTotPumpPwrOnLoop,
-                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
-                                                             state.dataPlnt->PlantLoop(LoopNum).UsePressureForPumpCalcs);
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchPLCLBranchName,
-                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
-                                                             state.dataPlnt->PlantLoop(LoopNum).Name);
+                    // OutputReportPredefined::PreDefTableEntry(state,
+                    //                                          state.dataOutRptPredefined->pdchPLCLTotPumpPwrOnLoop,
+                    //                                          state.dataPlnt->PlantLoop(LoopNum).Name,
+                    //                                          state.dataPlnt->PlantLoop(LoopNum).UsePressureForPumpCalcs);
+                    // OutputReportPredefined::PreDefTableEntry(state,
+                    //                                          state.dataOutRptPredefined->pdchPLCLBranchName,
+                    //                                          state.dataPlnt->PlantLoop(LoopNum).Name,
+                    //                                          state.dataPlnt->PlantLoop(LoopNum).Name);
+                    // end std 229 plantloop equipment summary new table
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
