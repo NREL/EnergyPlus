@@ -462,7 +462,7 @@ namespace OutputReportPredefined {
         s->pdchSWHEnFac = newPreDefColumn(state, s->pdstSWH, "Energy Factor");
 
         // Std 229 HVAC Topology new table
-        s->pdstHVACTopo = newPreDefSubTable(state, s->pdrEquip, "HVAC Topology");
+        // s->pdstHVACTopo = newPreDefSubTable(state, s->pdrEquip, "HVAC Topology");
 
         // Std 229 Chillers in Equipment Summary
         s->pdstChiller = newPreDefSubTable(state, s->pdrEquip, "Chillers");
