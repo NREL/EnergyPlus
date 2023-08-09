@@ -2612,7 +2612,7 @@ namespace HeatRecovery {
                 HXPartLoadRatio = max(0.0, HXPartLoadRatio);
                 HXPartLoadRatio = min(1.0, HXPartLoadRatio);
 
-            } else if (CompanionCoilIndex > 0) {
+            } else if (CompanionCoilIndex > 0 && !state.dataDXCoils->DXCoilPartLoadRatio.empty()) {
                 // VS coil issue here?
                 HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
             }

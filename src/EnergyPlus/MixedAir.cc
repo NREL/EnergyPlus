@@ -1050,8 +1050,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
                 OASys.ComponentIndex(CompNum) = CompNum;
-                OASys.compPointer[CompNum] =
-                    UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OASys.ComponentName(CompNum), false, 0);
             } else if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Invalid) {
                 std::string const thisComp = OASys.ComponentType(CompNum);
                 if (thisComp == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" || thisComp == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
@@ -1094,6 +1092,19 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     state.dataMixedAir->GetOASysInputFlag = false;
+
+    // once GetOASysInputFlag is set to false other calls to objects can occur without worry that GetOutsideAirSysInputs will be called again
+    // now get the pointer for UnitarySystem - doing this earlier can cause recursion which trips IntraObjUniquenessCheck warnings
+    for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
+        for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
+            if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::CoilSystemWater ||
+                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
+                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
+                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = UnitarySystems::UnitarySys::factory(
+                    state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+            }
+        }
+    }
 }
 
 void GetOAControllerInputs(EnergyPlusData &state)
