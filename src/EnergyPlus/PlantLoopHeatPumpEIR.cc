@@ -82,7 +82,7 @@ constexpr Real64 Fahrenheit2Celsius(Real64 F)
 }
 
 void EIRPlantLoopHeatPump::simulate(
-    EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
+    EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation, [[maybe_unused]] bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag)
 {
 
     // Call initialize to set flow rates, run flag, and entering temperatures
@@ -94,17 +94,25 @@ void EIRPlantLoopHeatPump::simulate(
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state);
         if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
-            PlantUtilities::UpdateChillerComponentCondenserSide(state,
-                                                                this->sourceSidePlantLoc.loopNum,
-                                                                this->sourceSidePlantLoc.loopSideNum,
-                                                                this->EIRHPType,
-                                                                this->sourceSideNodes.inlet,
-                                                                this->sourceSideNodes.outlet,
-                                                                this->sourceSideHeatTransfer,
-                                                                this->sourceSideInletTemp,
-                                                                this->sourceSideOutletTemp,
-                                                                this->sourceSideMassFlowRate,
-                                                                FirstHVACIteration);
+            // when calling from the condenser loop, just update the source side outlet and move on
+            auto &srcInletNode = state.dataLoopNodes->Node(this->sourceSideNodes.inlet);
+            auto &srcOutletNode = state.dataLoopNodes->Node(this->sourceSideNodes.outlet);
+            auto &srcLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
+            std::string x = "EIRPlantLoopHeatPump::simulate";
+            this->sourceSideCp = FluidProperties::GetSpecificHeatGlycol(state, srcLoop.FluidName, srcInletNode.Temp, srcLoop.FluidIndex, x);
+            if (srcInletNode.MassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+                // if there is no flow, just pass the temperature through
+                srcOutletNode.Temp = srcInletNode.Temp;
+            } else {
+                // if there is flow, update according to mCpDT, depending on the direction of heat transfer
+                if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+                    srcOutletNode.Temp = srcInletNode.Temp - this->sourceSideHeatTransfer / (srcInletNode.MassFlowRate * this->sourceSideCp);
+                } else {
+                    srcOutletNode.Temp = srcInletNode.Temp + this->sourceSideHeatTransfer / (srcInletNode.MassFlowRate * this->sourceSideCp);
+                }
+            }
+            // update the component member variable either way
+            this->sourceSideOutletTemp = srcOutletNode.Temp;
             return;
         }
     } else if (this->airSource) {
