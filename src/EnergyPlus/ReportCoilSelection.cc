@@ -136,28 +136,23 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
 
     // make calls to fill out predefined tabular report entries for each coil selection report object
     for (auto &c : coilSelectionDataObjs) {
-        // std 229 New coil connections table
-        // int pdstCoilConnections = 0;
-        // int pdchCoilName_CCs = 0;
-        // int pdchCoilType_CCs = 0;
-        // int pdchCoilLoc_CCs = 0;
-        // int pdchCoilHVACType_CCs = 0;
-        // int pdchCoilHVACName_CCs = 0;
-        // int pdchCoilZoneNames_CCs = 0;
-        // int pdchCoilSupFanName_CCs = 0;
-        // int pdchCoilSupFanType_CCs = 0;
-        // int pdchCoilPlantName_CCs = 0;                 // Plant Name for Coil*
-        // int pdchCoilAirloopName_CCs = 0;               // Airloop Name
-        // int pdchCoilAirloopBranchName_CCs = 0;         // Airloop Branch Name
-        // int pdchCoilLocCountOnAirloopBranch_CCs = 0;   // Location count on Airloop Branch
-        // int pdchCoilPlantloopName_CCs = 0;             // Plant Loop Name
-        // int pdchCoilPlantBranchName_CCs = 0;           // Plant Branch Name
-        // int pdchCoilLocCountOnPlantloopBranch_CCs = 0; // Location count on Plantloop Branch
 
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilType, c->coilName_, c->coilObjName);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLocation, c->coilName_, c->coilLocation);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType, c->coilName_, c->typeHVACname);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACName, c->coilName_, c->userNameforHVACsystem);
+
+        // begin std 229 existing heating coil table adding new variables
+        if (c->isHeating) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilUsedAsSupHeat, c->coilName_, c->isSupplementalHeater ? "Yes" : "No");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchHeatCoilAirloopName,
+                                                     c->coilName_,
+                                                     state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilPlantloopName, c->coilName_, c->plantLoopName);
+        }
+        // end std 229 existing heating coil table adding new variables
 
         // begin std 229 New coil connections table entries
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilName_CCs, c->coilName_, c->coilName_);

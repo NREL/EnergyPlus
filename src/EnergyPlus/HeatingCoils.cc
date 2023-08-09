@@ -1861,111 +1861,94 @@ namespace HeatingCoils {
             break;
         }
 
-        // std 229
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchHeatCoilUsedAsSupHeat, heatingCoil.Name, heatingCoil.HCoilType_Num); // usage?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchHeatCoilAirloopName,
-                                                 heatingCoil.Name,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name);
-        OutputReportPredefined::PreDefTableEntry(
-            state,
-            state.dataOutRptPredefined->pdchHeatCoilAirloopBranchName,
-            heatingCoil.Name,
-            state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Branch(1).Name); // to branch name?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchHeatCoilPlantloopName,
-                                                 heatingCoil.Name,
-                                                 state.dataPlnt->PlantLoop(1).Name); // no plantloc.num available?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchHeatCoilPlantloopBranchName,
-                                                 heatingCoil.Name,
-                                                 state.dataPlnt->PlantLoop(1).Name); // no plantloc.num available?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchHeatCoilSupHeatHighShutoffTemp,
-                                                 heatingCoil.Name,
-                                                 heatingCoil.DesiredOutletTemp); // no Super heating high shut off temp defined?
+        // std 229 heating coils existing table adding new variables:
+        // pdchHeatCoilUsedAsSupHeat is now reported at coil selection report
 
-        // std 229 Coil Connections New table
-        // int pdchCoilName_CCs = 0;
-        // int pdchCoilType_CCs = 0;
-        // int pdchCoilLoc_CCs = 0;
-        // int pdchCoilHVACType_CCs = 0;
-        // int pdchCoilHVACName_CCs = 0;
-        // int pdchCoilSupFanName_CCs = 0;
-        // int pdchCoilSupFanType_CCs = 0;
-        // int pdchCoilPlantName_CCs = 0;                 // Plant Name for Coil*
-        // int pdchCoilAirloopName_CCs = 0;               // Airloop Name
-        // int pdchCoilAirloopBranchName_CCs = 0;         // Airloop Branch Name
-        // int pdchCoilLocCountOnAirloopBranch_CCs = 0;   // Location count on Airloop Branch
-        // int pdchCoilPlantloopName_CCs = 0;             // Plant Loop Name
-        // int pdchCoilPlantBranchName_CCs = 0;           // Plant Branch Name
-        // int pdchCoilLocCountOnPlantloopBranch_CCs = 0; // Location count on Plantloop Branch
+        // pdchHeatCoilAirloopName is now reported at coil selection report
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                         state.dataOutRptPredefined->pdchHeatCoilAirloopName,
+        //                                         heatingCoil.Name,
+        //                                         state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name);
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state,
+        //     state.dataOutRptPredefined->pdchHeatCoilAirloopBranchName,
+        //     heatingCoil.Name,
+        //     state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Branch(1).Name); // to branch name?
 
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilName_CCs, heatingCoil.Name, heatingCoil.Name);
-        OutputReportPredefined::PreDefTableEntry(
-            state,
-            state.dataOutRptPredefined->pdchCoilType_CCs,
-            heatingCoil.Name,
-            DataHVACGlobals::coilTypeNamesUC[heatingCoil.HCoilType_Num -
-                                             1]); // if cannot do this way, then need to add this line to the case branches above
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilLoc_CCs,
-                                                 heatingCoil.Name,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).supFanLocation ==
-                                                         DataAirSystems::FanPlacement::BlowThru
-                                                     ? "BlowThrough"
-                                                     : "DrawThrough"); // ? Looks suspicous
+        // pdchHeatCoilPlantloopName is now reported at coil selection report
 
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType_CCs, heatingCoil.Name,
-                                                 heatingCoil.Name); // how to map heatingcoil index to coil selection array index?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilHVACName_CCs,
-                                                 heatingCoil.Name,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name); // PH?
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchHeatCoilPlantloopBranchName,
+        //                                          heatingCoil.Name,
+        //                                          state.dataPlnt->PlantLoop(1).Name); // no plantloc.num available?
 
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilZoneNames_CCs,
-                                                 heatingCoil.Name,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name); // changes pending: have a way to use existing report
-        
-        OutputReportPredefined::PreDefTableEntry(
-            state,
-            state.dataOutRptPredefined->pdchCoilSupFanName_CCs,
-            heatingCoil.Name,
-            state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).SupFanNum); // How to convert to fan name?
-        OutputReportPredefined::PreDefTableEntry(
-            state,
-            state.dataOutRptPredefined->pdchCoilSupFanType_CCs,
-            heatingCoil.Name,
-            state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).supFanModelType); // PH? How to convert to fan type?
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchHeatCoilSupHeatHighShutoffTemp,
+        //                                          heatingCoil.Name,
+        //                                          heatingCoil.DesiredOutletTemp); // no Super heating high shut off temp defined?
 
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCoilPlantName_CCs, heatingCoil.Name, state.dataPlnt->PlantLoop(1).Name); // PH
+        // std 229 Coil Connections New table: now all reported at coil selection report:
 
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilAirloopName_CCs,
-                                                 heatingCoil.Name,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name);
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilAirloopBranchName_CCs,
-                                                 heatingCoil.Name,
-                                                 heatingCoil.AirLoopNum); // PH
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilLocCountOnAirloopBranch_CCs,
-                                                 heatingCoil.Name,
-                                                 heatingCoil.AirLoopNum); // PH
-
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCoilPlantloopName_CCs, heatingCoil.Name, state.dataPlnt->PlantLoop(1).Name);
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilPlantBranchName_CCs,
-                                                 heatingCoil.Name,
-                                                 heatingCoil.AirLoopNum); // PH
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchCoilLocCountOnPlantloopBranch_CCs,
-                                                 heatingCoil.Name,
-                                                 heatingCoil.AirLoopNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilName_CCs, heatingCoil.Name, heatingCoil.Name);
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state,
+        //     state.dataOutRptPredefined->pdchCoilType_CCs,
+        //     heatingCoil.Name,
+        //     DataHVACGlobals::coilTypeNamesUC[heatingCoil.HCoilType_Num -
+        //                                      1]); // if cannot do this way, then need to add this line to the case branches above
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilLoc_CCs,
+        //                                          heatingCoil.Name,
+        //                                          state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).supFanLocation ==
+        //                                                  DataAirSystems::FanPlacement::BlowThru
+        //                                              ? "BlowThrough"
+        //                                              : "DrawThrough"); // ? Looks suspicous
+        // OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType_CCs, heatingCoil.Name,
+        //                                          heatingCoil.Name); // how to map heatingcoil index to coil selection array index?
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilHVACName_CCs,
+        //                                          heatingCoil.Name,
+        //                                          state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name); // PH?
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilZoneNames_CCs,
+        //                                          heatingCoil.Name,
+        //                                          state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name); // changes pending:
+        //                                          have a way to use existing report
+        //
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state,
+        //     state.dataOutRptPredefined->pdchCoilSupFanName_CCs,
+        //     heatingCoil.Name,
+        //     state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).SupFanNum); // How to convert to fan name?
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state,
+        //     state.dataOutRptPredefined->pdchCoilSupFanType_CCs,
+        //     heatingCoil.Name,
+        //     state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).supFanModelType); // PH? How to convert to fan type?
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchCoilPlantName_CCs, heatingCoil.Name, state.dataPlnt->PlantLoop(1).Name); // PH
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilAirloopName_CCs,
+        //                                          heatingCoil.Name,
+        //                                          state.dataAirSystemsData->PrimaryAirSystems(heatingCoil.AirLoopNum).Name);
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilAirloopBranchName_CCs,
+        //                                          heatingCoil.Name,
+        //                                          heatingCoil.AirLoopNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilLocCountOnAirloopBranch_CCs,
+        //                                          heatingCoil.Name,
+        //                                          heatingCoil.AirLoopNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchCoilPlantloopName_CCs, heatingCoil.Name, state.dataPlnt->PlantLoop(1).Name);
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilPlantBranchName_CCs,
+        //                                          heatingCoil.Name,
+        //                                          heatingCoil.AirLoopNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchCoilLocCountOnPlantloopBranch_CCs,
+        //                                          heatingCoil.Name,
+        //                                          heatingCoil.AirLoopNum); // PH
     }
 
     void CalcElectricHeatingCoil(EnergyPlusData &state,
