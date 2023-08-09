@@ -5484,53 +5484,53 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         // std 229 air terminal new table
         // thisTUFZSizing.ADUName, thisTUSizing.ADUName
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermName, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName);
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermTypeOfInputObj, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermHeatReheatCoilObjType, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermTypeOfInputObj, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermHeatReheatCoilObjType, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchAirTermZoneName, thisTUFZSizing.ADUName, state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name);
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermHWPlantloopName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermHWPlantBranchName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermHWPlantloopName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermHWPlantBranchName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
 
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermCHWCoilOjbType, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermCHWPlantloopName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermCHWPlantBranchName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermCHWCoilOjbType, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermCHWPlantloopName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermCHWPlantBranchName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
 
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermFanObjType, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermFanName, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermFanObjType, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermFanName, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
 
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermPriAirFlowRate, thisTUFZSizing.ADUName, thisTUFZSizing.ZonePrimaryAirFraction); // PH
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermSecAirFlowRate, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneSecondaryRecirculation); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermPriAirFlowRate, thisTUFZSizing.ADUName, thisTUFZSizing.ZonePrimaryAirFraction); // PH
+        // OutputReportPredefined::PreDefTableEntry(
+        //     state, state.dataOutRptPredefined->pdchAirTermSecAirFlowRate, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneSecondaryRecirculation); // PH
 
-        OutputReportPredefined::PreDefTableEntry(state,
+         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermMinFlow,
                                                  thisTUFZSizing.ADUName,
                                                  thisTUFZSizing.DesCoolVolFlowMin); // ? there is another name that looks similar (see the next line)
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermMinFlowSchName,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesCoolMinAirFlow); // PH
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermMaxFlowDuringReheat,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesHeatVolFlowMax); // PH
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchAirTermMinFlowSchName,
+        //                                          thisTUFZSizing.ADUName,
+        //                                          thisTUFZSizing.DesCoolMinAirFlow); // PH
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchAirTermMaxFlowDuringReheat,
+        //                                          thisTUFZSizing.ADUName,
+        //                                          thisTUFZSizing.DesHeatVolFlowMax); // PH
 
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, thisTUFZSizing.ADUName, thisTUFZSizing.MinOA);
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermMinOutdoorFlowSchName,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.MinOA); // PH
+         // OutputReportPredefined::PreDefTableEntry(state,
+         //                                          state.dataOutRptPredefined->pdchAirTermMinOutdoorFlowSchName,
+         //                                          thisTUFZSizing.ADUName,
+         //                                          thisTUFZSizing.MinOA); // PH
 
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermSupCoolingSP,
@@ -5541,10 +5541,10 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
                                                  thisTUFZSizing.ADUName,
                                                  thisTUFZSizing.DesHeatSetPtSeq(1)); // ? How to deal with array
 
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermTempControl,
-                                                 thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.ADUName); // PH
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchAirTermTempControl,
+        //                                          thisTUFZSizing.ADUName,
+        //                                          thisTUFZSizing.ADUName); // PH
 
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermHeatingCap,
