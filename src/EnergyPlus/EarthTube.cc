@@ -1021,7 +1021,8 @@ void EarthTubeData::calcVerticalEarthTube(EnergyPlusData &state, Real64 airFlowT
             this->cPrime[nodeNum] = this->cPrime0[nodeNum];
         }
     } else { // there is positive flow so calculate cPrime
-        for (int nodeNum = 0; nodeNum <= nodeLast; ++nodeNum) {
+        this->cPrime[0] = this->cCoeff[0] / this->bCoeff[0];
+        for (int nodeNum = 1; nodeNum <= nodeLast; ++nodeNum) {
             Real64 addTerm = 0.0;
             if (nodeNum == nodeET) addTerm = airFlowTerm;
             this->cPrime[nodeNum] = this->cCoeff[nodeNum] / (this->bCoeff[nodeNum] + addTerm - this->aCoeff[nodeNum] * this->cPrime[nodeNum - 1]);
