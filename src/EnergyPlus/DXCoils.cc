@@ -8714,7 +8714,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchDXHeatCoilAirloopName,
                                                  equipName,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(thisDXCoil.AirLoopNum).Name);
+                                                 thisDXCoil.AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(thisDXCoil.AirLoopNum).Name
+                                                                           : "N/A");
         // OutputReportPredefined::PreDefTableEntry(state,
         //                                          state.dataOutRptPredefined->pdchDXHeatCoilAirloopBranchName,
         //                                          equipName,
