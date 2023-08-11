@@ -1172,6 +1172,18 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         return;
     }
 
+    bool objectIsParent = true;
+    thisZeqSplitter.zoneEquipOutletNodeNum =
+        GetOnlySingleNode(state,
+                          ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_outlet_node_name"),
+                          state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                          DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter,
+                          thisZeqSplitter.Name,
+                          DataLoopNode::NodeFluidType::Air,
+                          DataLoopNode::ConnectionType::Outlet,
+                          NodeInputManager::CompFluidStream::Primary,
+                          objectIsParent);
+
     thisZeqSplitter.tstatControl = DataZoneEquipment::ZoneEquipTstatControl(
         getEnumValue(zoneEquipTstatControlNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "thermostat_control_method")));
     if (thisZeqSplitter.tstatControl == DataZoneEquipment::ZoneEquipTstatControl::SingleSpace) {
@@ -1204,7 +1216,6 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             } else {
                 thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_output_fraction");
-                bool objectIsParent = true;
                 thisZeqSpace.spaceInletNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_supply_node_name"),
