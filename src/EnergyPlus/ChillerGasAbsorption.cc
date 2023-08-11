@@ -1435,12 +1435,10 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondReturn);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, "N/A");
 
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
-                                                 this->Name,
-                                                 this->DesEvapMassFlowRate);
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate, this->Name, this->DesCondMassFlowRate);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate, this->Name, this->DesEvapMassFlowRate);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate, this->Name, this->DesCondMassFlowRate);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName, this->Name, "N/A");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerCondLoopBranchName, this->Name, "N/A");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, "N/A");

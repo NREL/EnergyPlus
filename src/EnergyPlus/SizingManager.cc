@@ -5512,7 +5512,7 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         // OutputReportPredefined::PreDefTableEntry(
         //     state, state.dataOutRptPredefined->pdchAirTermSecAirFlowRate, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneSecondaryRecirculation); // PH
 
-         OutputReportPredefined::PreDefTableEntry(state,
+        OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermMinFlow,
                                                  thisTUFZSizing.ADUName,
                                                  thisTUFZSizing.DesCoolVolFlowMin); // ? there is another name that looks similar (see the next line)
@@ -5527,10 +5527,10 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
 
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, thisTUFZSizing.ADUName, thisTUFZSizing.MinOA);
-         // OutputReportPredefined::PreDefTableEntry(state,
-         //                                          state.dataOutRptPredefined->pdchAirTermMinOutdoorFlowSchName,
-         //                                          thisTUFZSizing.ADUName,
-         //                                          thisTUFZSizing.MinOA); // PH
+        // OutputReportPredefined::PreDefTableEntry(state,
+        //                                          state.dataOutRptPredefined->pdchAirTermMinOutdoorFlowSchName,
+        //                                          thisTUFZSizing.ADUName,
+        //                                          thisTUFZSizing.MinOA); // PH
 
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermSupCoolingSP,
