@@ -2982,7 +2982,8 @@ namespace SurfaceGeometry {
                     ++state.dataHeatBal->Zone(zoneNum).numSpaces;
                     assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaceIndexes.size()));
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
-                    state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).Name =
+                        thisZone.Name + "-REMAINDER"; // Make UPPERcase so it can be referenced in input
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).isRemainderSpace = true;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
@@ -15545,7 +15546,7 @@ namespace SurfaceGeometry {
                     spaceEnclosureNum = curSpace.solarEnclosureNum;
                 }
                 if (spaceEnclosureNum == 0) {
-                    if (UtilityRoutines::SameString(curSpace.Name, state.dataHeatBal->Zone(curSpace.zoneNum).Name + "-Remainder")) {
+                    if (UtilityRoutines::SameString(curSpace.Name, state.dataHeatBal->Zone(curSpace.zoneNum).Name + "-REMAINDER")) {
                         // Search for existing enclosure with same name as the zone
                         spaceEnclosureNum = UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(curSpace.zoneNum).Name, Enclosures);
                     }
