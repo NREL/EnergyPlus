@@ -151,7 +151,8 @@ constexpr std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zon
 static constexpr std::array<std::string_view, static_cast<int>(LoadDist::Num)> LoadDistNamesUC = {
     "SEQUENTIALLOAD", "UNIFORMLOAD", "UNIFORMPLR", "SEQUENTIALUNIFORMPLR"};
 
-static constexpr std::array<std::string_view, static_cast<int>(ZoneEquipTstatControl::Num)> zoneEquipTstatControlNamesUC = {"SINGLESPACE", "MAXIMUM"};
+static constexpr std::array<std::string_view, static_cast<int>(ZoneEquipTstatControl::Num)> zoneEquipTstatControlNamesUC = {
+    "SINGLESPACE", "MAXIMUM", "IDEAL"};
 
 static constexpr std::array<std::string_view, static_cast<int>(SpaceEquipSizingBasis::Num)> spaceEquipSizingBasisNamesUC = {
     "DESIGNLOAD", "FLOORAREA", "VOLUME", "PERIMETERLENGTH"};

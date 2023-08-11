@@ -198,6 +198,7 @@ namespace DataZoneEquipment {
         Invalid = -1,
         SingleSpace,
         Maximum,
+        Ideal,
         Num
     };
 
