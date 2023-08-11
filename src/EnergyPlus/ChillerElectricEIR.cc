@@ -1686,15 +1686,17 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
             state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->RefCOP); // did not find rated eff or cop ; also Eff == COP?
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, IPLVSI_rpt_std229);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, IPLVIP_rpt_std229);
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchChillerPlantloopName, this->Name, state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name);
         OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+                                                 state.dataOutRptPredefined->pdchChillerPlantloopName,
                                                  this->Name,
-                                                 state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
-                                                     .LoopSide(this->CWPlantLoc.loopSideNum)
-                                                     .Branch(this->CWPlantLoc.branchNum)
-                                                     .Name);
+                                                 this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+            this->Name,
+            this->CWPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).Branch(this->CWPlantLoc.branchNum).Name
+                : "N/A");
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchChillerCondLoopName, this->Name, state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name);
         OutputReportPredefined::PreDefTableEntry(
@@ -1719,13 +1721,17 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                                                  state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
                                                  this->Name,
                                                  this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName, this->Name, state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
+                                                 this->Name,
+                                                 this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
         OutputReportPredefined::PreDefTableEntry(
             state,
             state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
             this->Name,
-            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).LoopSide(this->HRPlantLoc.loopSideNum).Branch(this->HRPlantLoc.branchNum).Name);
+            this->HRPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).LoopSide(this->HRPlantLoc.loopSideNum).Branch(this->HRPlantLoc.branchNum).Name
+                : "N/A");
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
     }
