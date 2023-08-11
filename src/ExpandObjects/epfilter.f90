@@ -17075,8 +17075,6 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Air Outlet Node Name',base + ussAirHandlerNameOff, TRIM(coolCoilUnitOutlet))
       CALL AddToObjStr('Rated Air Flow Rate {m3/s}','Autosize')
-      CALL AddToObjStr('2017 Rated Evaporator Fan Power Per Volume Flow Rate','')
-      CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate','')
       CALL AddToObjStr('Rated Water Flow Rate {m3/s}','Autosize')
       CALL AddToObjFld('Rated Total Cooling Capacity {W}',base + ussCoolCoilCapOff,'')
       IF (isCoolCapAutosize .OR. isSHRAutosize) THEN
@@ -30110,8 +30108,6 @@ DO iZone = 1, numCompactWaterAirHP
   END IF
   CALL AddToObjFld('Air Outlet Node Name', base + wahpNameOff,' WAHP Cooling Coil Outlet')
   CALL AddToObjStr('Rated Air Flow Rate {m3/s}','Autosize')
-  CALL AddToObjStr('2017 Rated Evaporator Fan Power Per Volume Flow Rate','')
-  CALL AddToObjStr('2023 Rated Evaporator Fan Power Per Volume Flow Rate','')
   CALL AddToObjStr('Rated Water Flow Rate {m3/s}','Autosize')
   CALL AddToObjFld('Rated Total Cooling Capacity {W}',base + wahpCoolCoilCapOff,'')
   IF (isCoolCoilCapAutosize .OR. isSHRAutosize) THEN

@@ -234,8 +234,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestAirFlow)
         "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "   2.0,                     !- Rated Air Flow Rate {m3/s}",
-        "   773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "   934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
         "   20000,                   !- Gross Rated Total Cooling Capacity {W}",
         "   16000,                   !- Gross Rated Sensible Cooling Capacity {W}",
@@ -590,8 +588,6 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "   1.0,                     !- Rated Air Flow Rate {m3/s}",
-        "   773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "   934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
         "   23125.59,                !- Gross Rated Total Cooling Capacity {W}",
         "   16267,                   !- Gross Rated Sensible Cooling Capacity {W}",
@@ -1527,8 +1523,6 @@ TEST_F(EnergyPlusFixture, EquationFit_Initialization)
         "   Sys 5 Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
         "   Sys 5 Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
         "   2.0,                     !- Rated Air Flow Rate {m3/s}",
-        "   773.3,                   !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "   934.4,                   !- 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "   0.0033,                  !- Rated Water Flow Rate {m3/s}",
         "   20000,                   !- Gross Rated Total Cooling Capacity {W}",
         "   16000,                   !- Gross Rated Sensible Cooling Capacity {W}",
@@ -1615,9 +1609,9 @@ TEST_F(EnergyPlusFixture, EquationFit_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 24);
+    EXPECT_EQ(TotalArgs, 22);
     EXPECT_EQ(NumAlphas, 9);
-    EXPECT_EQ(NumNumbers, 15);
+    EXPECT_EQ(NumNumbers, 13);
 
     GetCurveInput(*state);
     WaterToAirHeatPumpSimple::GetSimpleWatertoAirHPInput(*state);
@@ -1625,6 +1619,4 @@ TEST_F(EnergyPlusFixture, EquationFit_Initialization)
     EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name, "SYS 5 HEAT PUMP COOLING MODE");
     auto &thisCoil(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum));
     EXPECT_NEAR(thisCoil.RatedCOPCoolAtRatedCdts, 7.00776, 0.01);
-    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEvapFanPowerPerVolFlowRate2017, 773.3);
-    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedEvapFanPowerPerVolFlowRate2023, 934.4);
 }
