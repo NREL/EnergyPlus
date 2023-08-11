@@ -3615,7 +3615,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             }
 
             // If SpaceHVAC is active and this equipment has a space splitter, distribute the equipment output and update the spaces
-            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->SysSizingCalc &&
+                zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
                 auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)];
                 for (auto &space : thisZeqSplitter.spaces) {
                     Real64 spaceSysOutputProvided = SysOutputProvided * space.outputFraction;
@@ -3624,6 +3625,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                         auto &equipOutletNode = state.dataLoopNodes->Node(thisZeqSplitter.zoneEquipOutletNodeNum);
                         auto &spaceInletNode = state.dataLoopNodes->Node(space.spaceInletNodeNum);
                         spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * space.outputFraction;
+                        spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail;
+                        spaceInletNode.MassFlowRateMinAvail = equipOutletNode.MassFlowRateMinAvail;
+                        spaceInletNode.Temp = equipOutletNode.Temp;
+                        spaceInletNode.HumRat = equipOutletNode.HumRat;
+                        spaceInletNode.CO2 = equipOutletNode.CO2;
                     }
                     updateSystemOutputRequired(state,
                                                ControlledZoneNum,
@@ -3633,15 +3639,16 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                state.dataZoneEnergyDemand->spaceSysMoistureDemand(space.spaceIndex),
                                                EquipTypeNum);
                 }
-            } else {
-                updateSystemOutputRequired(state,
-                                           ControlledZoneNum,
-                                           SysOutputProvided,
-                                           LatOutputProvided,
-                                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum),
-                                           state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum),
-                                           EquipTypeNum);
             }
+            // Space HVAC TODO: For now, update both spaces and zone, but ultimately update one or the other
+            updateSystemOutputRequired(state,
+                                       ControlledZoneNum,
+                                       SysOutputProvided,
+                                       LatOutputProvided,
+                                       state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum),
+                                       state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum),
+                                       EquipTypeNum);
+
             state.dataSize->CurTermUnitSizingNum = 0;
         } // zone equipment loop
         if (state.dataHeatBal->doSpaceHeatBalance) {
