@@ -543,7 +543,8 @@ namespace BoilerSteam {
                                                                  state.dataOutRptPredefined->pdchBoilerFuelType,
                                                                  this->Name,
                                                                  Constant::eFuelNames[static_cast<int>(this->FuelType)]);
-                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchBoilerParaElecLoad, this->Name, "Not Applicable");
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchBoilerParaElecLoad, this->Name, "Not Applicable");
                     }
                     if (state.dataPlnt->PlantFirstSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state, "Boiler:Steam", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
