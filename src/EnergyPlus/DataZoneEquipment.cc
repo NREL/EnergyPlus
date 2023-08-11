@@ -1125,59 +1125,64 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
                                    int const zoneNum,
                                    InputProcessor::json const objectSchemaProps,
                                    InputProcessor::json const objectFields,
-                                   DataZoneEquipment::ZoneEquipmentSplitter &thisZoneEquipSplitter)
+                                   DataZoneEquipment::ZoneEquipmentSplitter &thisZeqSplitter)
 
 {
     static constexpr std::string_view RoutineName("processZoneEquipSplitterInput: "); // include trailing blank space
     auto &ip = state.dataInputProcessing->inputProcessor;
     std::string const zeqTypeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_object_type");
-    thisZoneEquipSplitter.equipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
+    thisZeqSplitter.equipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
     // SpaceHVAC TODO: Copied this block from processZoneEquipmentInput section for ZoneHVAC:EquipmentList - seems this could be simplified
-    if (thisZoneEquipSplitter.equipType == ZoneEquipType::Invalid) {
+    if (thisZeqSplitter.equipType == ZoneEquipType::Invalid) {
         if (zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" || zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
-            thisZoneEquipSplitter.equipType = ZoneEquipType::LowTemperatureRadiant;
+            thisZeqSplitter.equipType = ZoneEquipType::LowTemperatureRadiant;
         } else if (zeqTypeName == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-            thisZoneEquipSplitter.equipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
+            thisZeqSplitter.equipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
         } else {
-            ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZoneEquipSplitter.Name));
+            ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
             ShowContinueError(state, format("..Invalid Equipment Type = {}", zeqTypeName));
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         }
     }
 
-    thisZoneEquipSplitter.equipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
+    thisZeqSplitter.equipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
 
     // Search zone equipment list for matching equip type and name
     bool found = false;
     auto &thisZoneEqList = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex);
     for (int eqCount = 1; eqCount <= thisZoneEqList.NumOfEquipTypes; ++eqCount) {
-        if (thisZoneEquipSplitter.equipType == thisZoneEqList.EquipType(eqCount)) {
-            if (thisZoneEquipSplitter.equipName == thisZoneEqList.EquipName(eqCount)) {
+        if (thisZeqSplitter.equipType == thisZoneEqList.EquipType(eqCount)) {
+            if (thisZeqSplitter.equipName == thisZoneEqList.EquipName(eqCount)) {
                 found = true;
                 // Set index in zone equipment list pointing to this SpaceHVAC:ZoneEquipmentSplitter
                 thisZoneEqList.zoneEquipSplitterIndex = zeqSplitterNum;
                 // SpaceHVAC TODO: Outletnodes aren't know yet - need to set this in a later init
-                // thisZoneEquipSplitter.zoneEquipOutletNodeNum = thisZoneEqList.EquipData(eqCount).OutletNodeNums(1);
+                // thisZeqSplitter.zoneEquipOutletNodeNum = thisZoneEqList.EquipData(eqCount).OutletNodeNums(1);
                 break;
             }
         }
     }
     if (!found) {
-        ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZoneEquipSplitter.Name));
-        ShowContinueError(
-            state, format(".. Zone Equipment Object Type={} and Zone Equipment Name={} not found", zeqTypeName, thisZoneEquipSplitter.equipName));
+        ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
+        ShowContinueError(state,
+                          format(".. Zone Equipment Object Type={} and Zone Equipment Name={} not found", zeqTypeName, thisZeqSplitter.equipName));
         ShowContinueError(state, format(".. in ZoneHVAC:EquipmentList={}", thisZoneEqList.Name));
         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         return;
     }
 
-    thisZoneEquipSplitter.tstatControl = DataZoneEquipment::ZoneEquipTstatControl(
+    thisZeqSplitter.tstatControl = DataZoneEquipment::ZoneEquipTstatControl(
         getEnumValue(zoneEquipTstatControlNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "thermostat_control_method")));
-    if (thisZoneEquipSplitter.tstatControl == DataZoneEquipment::ZoneEquipTstatControl::SingleSpace) {
-        std::string_view spaceName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "control_space_name");
-        // thisZoneEquipSplitter.controlSpaceIndex =
+    if (thisZeqSplitter.tstatControl == DataZoneEquipment::ZoneEquipTstatControl::SingleSpace) {
+        std::string spaceName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "control_space_name");
+        thisZeqSplitter.controlSpaceIndex = UtilityRoutines::FindItemInList(spaceName, state.dataHeatBal->space);
+        if (thisZeqSplitter.controlSpaceIndex == 0) {
+            ShowSevereError(state, format("{}{}={}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
+            ShowContinueError(state, format("Space Name={} not found.", spaceName));
+            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+        }
     }
-    thisZoneEquipSplitter.spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis(
+    thisZeqSplitter.spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis(
         getEnumValue(spaceEquipSizingBasisNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_sizing_basis")));
 
     auto extensibles = objectFields.find("spaces");
@@ -1185,27 +1190,26 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
     if (extensibles != objectFields.end()) {
         auto &extensiblesArray = extensibles.value();
         int const numSpaces = extensiblesArray.size();
-        thisZoneEquipSplitter.spaces.resize(numSpaces);
+        thisZeqSplitter.spaces.resize(numSpaces);
         int spaceCount = -1;
         for (auto &extensibleInstance : extensiblesArray) {
             ++spaceCount;
-            auto &thisZeqSpace = thisZoneEquipSplitter.spaces[spaceCount];
+            auto &thisZeqSpace = thisZeqSplitter.spaces[spaceCount];
             std::string const spaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
             thisZeqSpace.spaceIndex = UtilityRoutines::FindItemInList(spaceName, state.dataHeatBal->space);
             if (thisZeqSpace.spaceIndex == 0) {
-                ShowSevereError(state, format("{}{}={}", RoutineName, zeqSplitterModuleObject, thisZoneEquipSplitter.Name));
+                ShowSevereError(state, format("{}{}={}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
                 ShowContinueError(state, format("Space Name={} not found.", spaceName));
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             } else {
                 thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_output_fraction");
-                bool errorsFound = false;
                 bool objectIsParent = true;
                 thisZeqSpace.spaceInletNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_supply_node_name"),
-                                      errorsFound,
+                                      state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                       DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter,
-                                      thisZoneEquipSplitter.Name,
+                                      thisZeqSplitter.Name,
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::ConnectionType::Outlet,
                                       NodeInputManager::CompFluidStream::Primary,

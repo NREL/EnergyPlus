@@ -541,7 +541,7 @@ namespace DataZoneEquipment {
                                        int const zoneNum,
                                        InputProcessor::json const objectSchemaProps,
                                        InputProcessor::json const objectFields,
-                                       DataZoneEquipment::ZoneEquipmentSplitter &thisZoneEquipSplitter);
+                                       DataZoneEquipment::ZoneEquipmentSplitter &thisZeqSplitter);
 
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
