@@ -3614,13 +3614,34 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
             }
 
-            updateSystemOutputRequired(state,
-                                       ControlledZoneNum,
-                                       SysOutputProvided,
-                                       LatOutputProvided,
-                                       state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum),
-                                       state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum),
-                                       EquipTypeNum);
+            // If SpaceHVAC is active and this equipment has a space splitter, distribute the equipment output and update the spaces
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
+                auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)];
+                for (auto &space : thisZeqSplitter.spaces) {
+                    Real64 spaceSysOutputProvided = SysOutputProvided * space.outputFraction;
+                    Real64 spaceLatOutputProvided = LatOutputProvided * space.outputFraction;
+                    if (thisZeqSplitter.zoneEquipOutletNodeNum > 0 && space.spaceInletNodeNum > 0) {
+                        auto &equipOutletNode = state.dataLoopNodes->Node(thisZeqSplitter.zoneEquipOutletNodeNum);
+                        auto &spaceInletNode = state.dataLoopNodes->Node(space.spaceInletNodeNum);
+                        spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * space.outputFraction;
+                    }
+                    updateSystemOutputRequired(state,
+                                               ControlledZoneNum,
+                                               spaceSysOutputProvided,
+                                               spaceLatOutputProvided,
+                                               state.dataZoneEnergyDemand->spaceSysEnergyDemand(space.spaceIndex),
+                                               state.dataZoneEnergyDemand->spaceSysMoistureDemand(space.spaceIndex),
+                                               EquipTypeNum);
+                }
+            } else {
+                updateSystemOutputRequired(state,
+                                           ControlledZoneNum,
+                                           SysOutputProvided,
+                                           LatOutputProvided,
+                                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum),
+                                           state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum),
+                                           EquipTypeNum);
+            }
             state.dataSize->CurTermUnitSizingNum = 0;
         } // zone equipment loop
         if (state.dataHeatBal->doSpaceHeatBalance) {
