@@ -351,6 +351,9 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "ZoneHVAC:WaterToAirHeatPump",
     "ZoneHVAC:WindowAirConditioner",
     "ZoneProperty:LocalEnvironment",
+    "SpaceHVAC:EquipmentConnections",
+    "SpaceHVAC:ZoneEquipmentSplitter",
+
 };
 
 constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::ConnectionObjectType::Num)> ConnectionObjectTypeNamesUC = {
@@ -628,6 +631,8 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "ZONEHVAC:WATERTOAIRHEATPUMP",
     "ZONEHVAC:WINDOWAIRCONDITIONER",
     "ZONEPROPERTY:LOCALENVIRONMENT",
+    "SPACEHVAC:EQUIPMENTCONNECTIONS",
+    "SPACEHVAC:ZONEEQUIPMENTSPLITTER",
 };
 
 void RegisterNodeConnection(EnergyPlusData &state,

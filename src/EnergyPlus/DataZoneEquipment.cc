@@ -151,6 +151,11 @@ constexpr std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zon
 static constexpr std::array<std::string_view, static_cast<int>(LoadDist::Num)> LoadDistNamesUC = {
     "SEQUENTIALLOAD", "UNIFORMLOAD", "UNIFORMPLR", "SEQUENTIALUNIFORMPLR"};
 
+static constexpr std::array<std::string_view, static_cast<int>(ZoneEquipTstatControl::Num)> zoneEquipTstatControlNamesUC = {"SINGLESPACE", "MAXIMUM"};
+
+static constexpr std::array<std::string_view, static_cast<int>(SpaceEquipSizingBasis::Num)> spaceEquipSizingBasisNamesUC = {
+    "DESIGNLOAD", "FLOORAREA", "VOLUME", "PERIMETERLENGTH"};
+
 void GetZoneEquipmentData(EnergyPlusData &state)
 {
 
@@ -222,6 +227,9 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     MaxAlphas = NumAlphas;
     MaxNums = NumNums;
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "ZoneHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums);
+    MaxAlphas = max(MaxAlphas, NumAlphas);
+    MaxNums = max(MaxNums, NumNums);
+    state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "SpaceHVAC:EquipmentConnections", NumParams, NumAlphas, NumNums);
     MaxAlphas = max(MaxAlphas, NumAlphas);
     MaxNums = max(MaxNums, NumNums);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "AirLoopHVAC:SupplyPath", NumParams, NumAlphas, NumNums);
@@ -351,7 +359,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
                                                                  cAlphaFields,
                                                                  cNumericFields); // Get Equipment | data for one zone
 
-        int zoneOrSpaceNum = UtilityRoutines::FindItemInList(AlphArray(1), state.dataHeatBal->Zone);
+        int zoneOrSpaceNum = UtilityRoutines::FindItemInList(AlphArray(1), state.dataHeatBal->space);
         std::string_view zsString = "Space";
 
         if (zoneOrSpaceNum == 0) {
@@ -467,6 +475,43 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     } // end loop over controlled zones
 
     EndUniqueNodeCheck(state, "ZoneHVAC:EquipmentConnections");
+
+    CurrentModuleObject = "SpaceHVAC:ZoneEquipmentSplitter";
+    auto &ip = state.dataInputProcessing->inputProcessor;
+    auto const instances = ip->epJSON.find(CurrentModuleObject);
+    if (instances != ip->epJSON.end()) {
+        auto const &objectSchemaProps = ip->getObjectSchemaProps(state, CurrentModuleObject);
+        auto &instancesValue = instances.value();
+        int numZoneEqSplitters = instancesValue.size();
+        state.dataZoneEquip->zoneEquipSplitter.resize(numZoneEqSplitters);
+        int zeqSplitterNum = -1;
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            ++zeqSplitterNum;
+            auto const &objectFields = instance.value();
+            auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zeqSplitterNum];
+            thisZeqSplitter.Name = UtilityRoutines::makeUPPER(instance.key());
+            ip->markObjectAsUsed(CurrentModuleObject, instance.key());
+
+            std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+            int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+            if (zoneNum == 0) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZeqSplitter.Name));
+                ShowContinueError(state, format("..Zone Name={} not found, remaining items for this object not processed.", zoneName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                continue;
+            }
+            if (!state.dataHeatBal->Zone(zoneNum).IsControlled) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZeqSplitter.Name));
+                ShowContinueError(
+                    state,
+                    format("..Zone Name={} is not a controlled zone. A ZoneHVAC:EquipmentConfiguration object is required for this zone.", zoneName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                continue;
+            }
+
+            processZoneEquipSplitterInput(state, CurrentModuleObject, zeqSplitterNum, zoneNum, objectSchemaProps, objectFields, thisZeqSplitter);
+        }
+    } // end loop over zone equipment splitters
 
     CurrentModuleObject = "AirLoopHVAC:SupplyPath";
     for (int PathNum = 1; PathNum <= state.dataZoneEquip->NumSupplyAirPaths; ++PathNum) {
@@ -629,8 +674,10 @@ void processZoneEquipmentInput(EnergyPlusData &state,
 {
     static constexpr std::string_view RoutineName("processZoneEquipmentInput: "); // include trailing blank space
     std::string_view zsString = "Zone";
+    int spaceFieldShift = 0;
     if (isSpace) {
         zsString = "Space";
+        spaceFieldShift = -1;
     }
 
     thisEquipConfig.IsControlled = true;
@@ -644,10 +691,10 @@ void processZoneEquipmentInput(EnergyPlusData &state,
         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
     }
     thisEquipConfig.EquipListName = AlphArray(2); // the name of the list containing all the zone eq.
-    std::string const InletNodeListName = AlphArray(3);
-    std::string const ExhaustNodeListName = AlphArray(4);
+    std::string const InletNodeListName = AlphArray(3 + spaceFieldShift);
+    std::string const ExhaustNodeListName = AlphArray(4 + spaceFieldShift);
     thisEquipConfig.ZoneNode = GetOnlySingleNode(state,
-                                                 AlphArray(5),
+                                                 AlphArray(5 + spaceFieldShift),
                                                  state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
                                                  DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
                                                  AlphArray(1),
@@ -657,22 +704,23 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                                                  DataLoopNode::ObjectIsNotParent); // all zone air state variables are
     if (thisEquipConfig.ZoneNode == 0) {
         ShowSevereError(state, format("{}{}: {}=\"{}\", invalid", RoutineName, zoneEqModuleObject, cAlphaFields(1), AlphArray(1)));
-        ShowContinueError(state, format("{} must be present.", cAlphaFields(5)));
+        ShowContinueError(state, format("{} must be present.", cAlphaFields(5 + spaceFieldShift)));
         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
     } else {
         bool UniqueNodeError = false;
-        NodeInputManager::CheckUniqueNodeNames(state, cAlphaFields(5), UniqueNodeError, AlphArray(5), AlphArray(1));
+        NodeInputManager::CheckUniqueNodeNames(
+            state, cAlphaFields(5 + spaceFieldShift), UniqueNodeError, AlphArray(5 + spaceFieldShift), AlphArray(1));
         if (UniqueNodeError) {
             // ShowContinueError(state, format("Occurs for {} = {}", trim( cAlphaFields( 1 ) ), trim( AlphArray( 1 ) )));
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         }
     }
 
-    std::string ReturnNodeListName = AlphArray(6);
+    std::string ReturnNodeListName = AlphArray(6 + spaceFieldShift);
     if (lAlphaBlanks(7)) {
         thisEquipConfig.ReturnFlowSchedPtrNum = ScheduleManager::ScheduleAlwaysOn;
     } else {
-        thisEquipConfig.ReturnFlowSchedPtrNum = ScheduleManager::GetScheduleIndex(state, AlphArray(7));
+        thisEquipConfig.ReturnFlowSchedPtrNum = ScheduleManager::GetScheduleIndex(state, AlphArray(7 + spaceFieldShift));
         if (thisEquipConfig.ReturnFlowSchedPtrNum == 0) {
             ShowSevereError(state,
                             format("{}{}: invalid {} entered ={} for {}={}",
@@ -685,218 +733,228 @@ void processZoneEquipmentInput(EnergyPlusData &state,
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         }
     }
-    std::string ReturnFlowBasisNodeListName = AlphArray(8);
+    std::string ReturnFlowBasisNodeListName = AlphArray(8 + spaceFieldShift);
 
     // Read in the equipment type, name and sequence information
     // for each equipment list
 
-    std::string CurrentModuleObject = "ZoneHVAC:EquipmentList";
-    auto &ip = state.dataInputProcessing->inputProcessor;
+    if (!isSpace) {
+        std::string CurrentModuleObject = "ZoneHVAC:EquipmentList";
+        auto &ip = state.dataInputProcessing->inputProcessor;
 
-    int ZoneEquipListNum = ip->getObjectItemNum(state, CurrentModuleObject, thisEquipConfig.EquipListName);
+        int ZoneEquipListNum = ip->getObjectItemNum(state, CurrentModuleObject, thisEquipConfig.EquipListName);
 
-    if (ZoneEquipListNum <= 0) {
-        ShowSevereError(state, format("{}{} not found = {}", RoutineName, CurrentModuleObject, thisEquipConfig.EquipListName));
-        ShowContinueError(state, format("In ZoneHVAC:EquipmentConnections object, for Zone = {}", thisEquipConfig.ZoneName));
-        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-    } else {
-        auto const &epListFields = ip->getJSONObjectItem(state, CurrentModuleObject, thisEquipConfig.EquipListName);
-
-        auto const &objectSchemaProps = ip->getObjectSchemaProps(state, CurrentModuleObject);
-
-        EquipList &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(zoneOrSpaceNum);
-
-        thisZoneEquipList.Name = thisEquipConfig.EquipListName;
-
-        std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
-        thisZoneEquipList.LoadDistScheme =
-            static_cast<DataZoneEquipment::LoadDist>(getEnumValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::makeUPPER(loadDistName)));
-        if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
-            ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-            ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));
+        if (ZoneEquipListNum <= 0) {
+            ShowSevereError(state, format("{}{} not found = {}", RoutineName, CurrentModuleObject, thisEquipConfig.EquipListName));
+            ShowContinueError(state, format("In ZoneHVAC:EquipmentConnections object, for Zone = {}", thisEquipConfig.ZoneName));
             state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-        }
+        } else {
+            auto const &epListFields = ip->getJSONObjectItem(state, CurrentModuleObject, thisEquipConfig.EquipListName);
 
-        auto extensibles = epListFields.find("equipment");
-        if (extensibles != epListFields.end()) {
-            auto &extensiblesArray = extensibles.value();
-            thisZoneEquipList.NumOfEquipTypes = static_cast<int>(extensiblesArray.size());
+            auto const &objectSchemaProps = ip->getObjectSchemaProps(state, CurrentModuleObject);
 
-            // Increment overall count of equipment
-            overallEquipCount += thisZoneEquipList.NumOfEquipTypes;
+            EquipList &thisZoneEquipList = state.dataZoneEquip->ZoneEquipList(zoneOrSpaceNum);
 
-            thisZoneEquipList.EquipTypeName.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.EquipType.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.compPointer.resize(thisZoneEquipList.NumOfEquipTypes + 1);
-            thisZoneEquipList.EquipName.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.EquipIndex.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.EquipData.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.CoolingPriority.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.HeatingPriority.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.CoolingCapacity.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.HeatingCapacity.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.SequentialCoolingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.SequentialHeatingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
-            thisZoneEquipList.EquipTypeName = "";
-            thisZoneEquipList.EquipType = DataZoneEquipment::ZoneEquipType::Invalid;
-            thisZoneEquipList.EquipName = "";
-            thisZoneEquipList.EquipIndex = 0;
-            thisZoneEquipList.CoolingPriority = 0;
-            thisZoneEquipList.HeatingPriority = 0;
-            thisZoneEquipList.CoolingCapacity = 0;
-            thisZoneEquipList.HeatingCapacity = 0;
-            thisZoneEquipList.SequentialCoolingFractionSchedPtr = 0;
-            thisZoneEquipList.SequentialHeatingFractionSchedPtr = 0;
+            thisZoneEquipList.Name = thisEquipConfig.EquipListName;
 
-            auto const &extensionSchemaProps = objectSchemaProps["equipment"]["items"]["properties"];
+            std::string loadDistName = ip->getAlphaFieldValue(epListFields, objectSchemaProps, "load_distribution_scheme");
+            thisZoneEquipList.LoadDistScheme =
+                static_cast<DataZoneEquipment::LoadDist>(getEnumValue(DataZoneEquipment::LoadDistNamesUC, UtilityRoutines::makeUPPER(loadDistName)));
+            if (thisZoneEquipList.LoadDistScheme == DataZoneEquipment::LoadDist::Invalid) {
+                ShowSevereError(state, format("{}{} = \"{}, Invalid choice\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                ShowContinueError(state, format("...load_distribution_scheme=\"{}\".", loadDistName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+            }
 
-            int ZoneEquipTypeNum = 0;
-            for (auto &extensibleInstance : extensiblesArray) {
-                ++ZoneEquipTypeNum;
+            auto extensibles = epListFields.find("equipment");
+            if (extensibles != epListFields.end()) {
+                auto &extensiblesArray = extensibles.value();
+                thisZoneEquipList.NumOfEquipTypes = static_cast<int>(extensiblesArray.size());
 
-                thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) =
-                    ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_object_type");
-                thisZoneEquipList.EquipName(ZoneEquipTypeNum) =
-                    ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_name");
+                // Increment overall count of equipment
+                overallEquipCount += thisZoneEquipList.NumOfEquipTypes;
 
-                ValidateComponent(state,
-                                  thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum),
-                                  thisZoneEquipList.EquipName(ZoneEquipTypeNum),
-                                  IsNotOK,
-                                  CurrentModuleObject);
-                if (IsNotOK) {
-                    ShowContinueError(state, format("In {}={}", CurrentModuleObject, thisZoneEquipList.Name));
-                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                thisZoneEquipList.EquipTypeName.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.EquipType.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.compPointer.resize(thisZoneEquipList.NumOfEquipTypes + 1);
+                thisZoneEquipList.EquipName.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.EquipIndex.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.zoneEquipSplitterIndex.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.EquipData.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.CoolingPriority.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.HeatingPriority.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.CoolingCapacity.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.HeatingCapacity.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.SequentialCoolingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
+                thisZoneEquipList.SequentialHeatingFractionSchedPtr.allocate(thisZoneEquipList.NumOfEquipTypes);
+                for (int eqNum = 1; eqNum <= thisZoneEquipList.NumOfEquipTypes; ++eqNum) {
+                    thisZoneEquipList.EquipTypeName(eqNum) = "";
+                    thisZoneEquipList.EquipType(eqNum) = DataZoneEquipment::ZoneEquipType::Invalid;
+                    thisZoneEquipList.EquipName(eqNum) = "";
+                    thisZoneEquipList.EquipIndex(eqNum) = 0;
+                    thisZoneEquipList.zoneEquipSplitterIndex(eqNum) = -1;
+                    thisZoneEquipList.compPointer[eqNum] = nullptr;
+                    thisZoneEquipList.CoolingPriority(eqNum) = 0;
+                    thisZoneEquipList.HeatingPriority(eqNum) = 0;
+                    thisZoneEquipList.CoolingCapacity(eqNum) = 0;
+                    thisZoneEquipList.HeatingCapacity(eqNum) = 0;
+                    thisZoneEquipList.SequentialCoolingFractionSchedPtr(eqNum) = 0;
+                    thisZoneEquipList.SequentialHeatingFractionSchedPtr(eqNum) = 0;
                 }
 
-                // If not present, this return 0
-                thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) =
-                    ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_cooling_sequence");
+                auto const &extensionSchemaProps = objectSchemaProps["equipment"]["items"]["properties"];
 
-                if ((thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) < 0) ||
-                    (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
-                    ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                    ShowContinueError(state,
-                                      format("invalid zone_equipment_cooling_sequence=[{}].", thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum)));
-                    ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
-                    if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0) {
-                        ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
-                    }
-                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-                }
+                int ZoneEquipTypeNum = 0;
+                for (auto &extensibleInstance : extensiblesArray) {
+                    ++ZoneEquipTypeNum;
 
-                thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) =
-                    ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_heating_or_no_load_sequence");
-                if ((thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) < 0) ||
-                    (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
-                    ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                    ShowContinueError(state,
-                                      format("invalid zone_equipment_heating_sequence=[{}].", thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum)));
-                    ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
-                    if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0) {
-                        ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
-                    }
-                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-                }
+                    thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) =
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_object_type");
+                    thisZoneEquipList.EquipName(ZoneEquipTypeNum) =
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_name");
 
-                std::string coolingSchName =
-                    ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_cooling_fraction_schedule_name");
-                if (coolingSchName.empty()) {
-                    thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::ScheduleAlwaysOn;
-                } else {
-                    thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::GetScheduleIndex(state, coolingSchName);
-                    if (thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
-                        ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                        ShowContinueError(state, format("invalid zone_equipment_sequential_cooling_fraction_schedule_name=[{}].", coolingSchName));
-                        ShowContinueError(state, "Schedule does not exist.");
+                    ValidateComponent(state,
+                                      thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum),
+                                      thisZoneEquipList.EquipName(ZoneEquipTypeNum),
+                                      IsNotOK,
+                                      CurrentModuleObject);
+                    if (IsNotOK) {
+                        ShowContinueError(state, format("In {}={}", CurrentModuleObject, thisZoneEquipList.Name));
                         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
-                }
 
-                std::string heatingSchName =
-                    ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_heating_fraction_schedule_name");
-                if (heatingSchName.empty()) {
-                    thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::ScheduleAlwaysOn;
-                } else {
-                    thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::GetScheduleIndex(state, heatingSchName);
-                    if (thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
+                    // If not present, this return 0
+                    thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) =
+                        ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_cooling_sequence");
+
+                    if ((thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) < 0) ||
+                        (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
                         ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                        ShowContinueError(state, format("invalid zone_equipment_sequential_heating_fraction_schedule_name=[{}].", coolingSchName));
-                        ShowContinueError(state, "Schedule does not exist.");
+                        ShowContinueError(
+                            state, format("invalid zone_equipment_cooling_sequence=[{}].", thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum)));
+                        ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
+                        if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0) {
+                            ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
+                        }
                         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     }
-                }
 
-                // do this here for initial prototype, but later will call all the equipment in a separate function to see who is on - maybe
-                if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0) {
-                    ++thisZoneEquipList.NumAvailHeatEquip;
-                }
-                if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0) {
-                    ++thisZoneEquipList.NumAvailCoolEquip;
-                }
+                    thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) =
+                        ip->getIntFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_heating_or_no_load_sequence");
+                    if ((thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) < 0) ||
+                        (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > thisZoneEquipList.NumOfEquipTypes)) {
+                        ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                        ShowContinueError(
+                            state, format("invalid zone_equipment_heating_sequence=[{}].", thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum)));
+                        ShowContinueError(state, "equipment sequence must be > 0 and <= number of equipments in the list.");
+                        if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0) {
+                            ShowContinueError(state, format("only {} in the list.", thisZoneEquipList.NumOfEquipTypes));
+                        }
+                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                    }
 
-                thisZoneEquipList.EquipType(ZoneEquipTypeNum) = static_cast<ZoneEquipType>(
-                    getEnumValue(zoneEquipTypeNamesUC, UtilityRoutines::makeUPPER(thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum))));
-
-                if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::UnitarySystem ||
-                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalAirConditioner ||
-                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalHeatPump ||
-                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalHeatPumpWaterToAir) {
-                    // loop index accesses correct pointer to equipment on this equipment list
-                    // EquipIndex is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
-                    thisZoneEquipList.compPointer[ZoneEquipTypeNum] = UnitarySystems::UnitarySys::factory(
-                        state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
-                    thisZoneEquipList.EquipIndex(ZoneEquipTypeNum) = thisZoneEquipList.compPointer[ZoneEquipTypeNum]->getEquipIndex();
-                }
-
-                if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::Invalid) {
-                    if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ||
-                        thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
-                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) = ZoneEquipType::LowTemperatureRadiant;
-                    } else if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
+                    std::string coolingSchName =
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_cooling_fraction_schedule_name");
+                    if (coolingSchName.empty()) {
+                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::ScheduleAlwaysOn;
                     } else {
-                        ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                        ShowContinueError(state, format("..Invalid Equipment Type = {}", thisZoneEquipList.EquipType(ZoneEquipTypeNum)));
-                        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                        thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) =
+                            ScheduleManager::GetScheduleIndex(state, coolingSchName);
+                        if (thisZoneEquipList.SequentialCoolingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
+                            ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                            ShowContinueError(state,
+                                              format("invalid zone_equipment_sequential_cooling_fraction_schedule_name=[{}].", coolingSchName));
+                            ShowContinueError(state, "Schedule does not exist.");
+                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                        }
+                    }
+
+                    std::string heatingSchName =
+                        ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "zone_equipment_sequential_heating_fraction_schedule_name");
+                    if (heatingSchName.empty()) {
+                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) = ScheduleManager::ScheduleAlwaysOn;
+                    } else {
+                        thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) =
+                            ScheduleManager::GetScheduleIndex(state, heatingSchName);
+                        if (thisZoneEquipList.SequentialHeatingFractionSchedPtr(ZoneEquipTypeNum) == 0) {
+                            ShowSevereError(state, format("{}{} = \"{}\".", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                            ShowContinueError(state,
+                                              format("invalid zone_equipment_sequential_heating_fraction_schedule_name=[{}].", coolingSchName));
+                            ShowContinueError(state, "Schedule does not exist.");
+                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                        }
+                    }
+
+                    // do this here for initial prototype, but later will call all the equipment in a separate function to see who is on - maybe
+                    if (thisZoneEquipList.HeatingPriority(ZoneEquipTypeNum) > 0) {
+                        ++thisZoneEquipList.NumAvailHeatEquip;
+                    }
+                    if (thisZoneEquipList.CoolingPriority(ZoneEquipTypeNum) > 0) {
+                        ++thisZoneEquipList.NumAvailCoolEquip;
+                    }
+
+                    thisZoneEquipList.EquipType(ZoneEquipTypeNum) = static_cast<ZoneEquipType>(
+                        getEnumValue(zoneEquipTypeNamesUC, UtilityRoutines::makeUPPER(thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum))));
+
+                    if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::UnitarySystem ||
+                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalAirConditioner ||
+                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalHeatPump ||
+                        thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::PackagedTerminalHeatPumpWaterToAir) {
+                        // loop index accesses correct pointer to equipment on this equipment list
+                        // EquipIndex is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
+                        thisZoneEquipList.compPointer[ZoneEquipTypeNum] = UnitarySystems::UnitarySys::factory(
+                            state, DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
+                        thisZoneEquipList.EquipIndex(ZoneEquipTypeNum) = thisZoneEquipList.compPointer[ZoneEquipTypeNum]->getEquipIndex();
+                    }
+
+                    if (thisZoneEquipList.EquipType(ZoneEquipTypeNum) == ZoneEquipType::Invalid) {
+                        if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" ||
+                            thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
+                            thisZoneEquipList.EquipType(ZoneEquipTypeNum) = ZoneEquipType::LowTemperatureRadiant;
+                        } else if (thisZoneEquipList.EquipTypeName(ZoneEquipTypeNum) == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
+                            thisZoneEquipList.EquipType(ZoneEquipTypeNum) = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
+                        } else {
+                            ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                            ShowContinueError(state, format("..Invalid Equipment Type = {}", thisZoneEquipList.EquipType(ZoneEquipTypeNum)));
+                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                        }
                     }
                 }
-            }
-        } // End parsing all extensible Zone Equipment info
+            } // End parsing all extensible Zone Equipment info
 
-        // Check for multiple assignments
-        for (int ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= thisZoneEquipList.NumOfEquipTypes; ++ZoneEquipTypeNum) {
-            if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) > 1) {
-                ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                ShowContinueError(state,
-                                  format("...multiple assignments for Zone Equipment Cooling Sequence={}, must be 1-1 correspondence between "
-                                         "sequence assignments and number of equipments.",
-                                         ZoneEquipTypeNum));
-                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-            } else if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) == 0) {
-                ShowWarningError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                ShowContinueError(state,
-                                  format("...zero assigned to Zone Equipment Cooling Sequence={}, apparent gap in sequence assignments in "
-                                         "this equipment list.",
-                                         ZoneEquipTypeNum));
+            // Check for multiple assignments
+            for (int ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= thisZoneEquipList.NumOfEquipTypes; ++ZoneEquipTypeNum) {
+                if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) > 1) {
+                    ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                    ShowContinueError(state,
+                                      format("...multiple assignments for Zone Equipment Cooling Sequence={}, must be 1-1 correspondence between "
+                                             "sequence assignments and number of equipments.",
+                                             ZoneEquipTypeNum));
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                } else if (count_eq(thisZoneEquipList.CoolingPriority, ZoneEquipTypeNum) == 0) {
+                    ShowWarningError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                    ShowContinueError(state,
+                                      format("...zero assigned to Zone Equipment Cooling Sequence={}, apparent gap in sequence assignments in "
+                                             "this equipment list.",
+                                             ZoneEquipTypeNum));
+                }
+                if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) > 1) {
+                    ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                    ShowContinueError(state,
+                                      format("...multiple assignments for Zone Equipment Heating or No-Load Sequence={}, must be 1-1 "
+                                             "correspondence between sequence assignments and number of equipments.",
+                                             ZoneEquipTypeNum));
+                    state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                } else if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) == 0) {
+                    ShowWarningError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
+                    ShowContinueError(state,
+                                      format("...zero assigned to Zone Equipment Heating or No-Load Sequence={}, apparent gap in sequence "
+                                             "assignments in this equipment list.",
+                                             ZoneEquipTypeNum));
+                }
             }
-            if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) > 1) {
-                ShowSevereError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                ShowContinueError(state,
-                                  format("...multiple assignments for Zone Equipment Heating or No-Load Sequence={}, must be 1-1 "
-                                         "correspondence between sequence assignments and number of equipments.",
-                                         ZoneEquipTypeNum));
-                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
-            } else if (count_eq(thisZoneEquipList.HeatingPriority, ZoneEquipTypeNum) == 0) {
-                ShowWarningError(state, format("{}{} = {}", RoutineName, CurrentModuleObject, thisZoneEquipList.Name));
-                ShowContinueError(state,
-                                  format("...zero assigned to Zone Equipment Heating or No-Load Sequence={}, apparent gap in sequence "
-                                         "assignments in this equipment list.",
-                                         ZoneEquipTypeNum));
-            }
-        }
-    } // End ZoneHVAC:EquipmentList
-
+        } // End ZoneHVAC:EquipmentList
+    }
     bool NodeListError = false;
     int NumNodes = 0;
     GetNodeNums(state,
@@ -905,7 +963,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                 NodeNums,
                 NodeListError,
                 DataLoopNode::NodeFluidType::Air,
-                DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
+                (isSpace ? DataLoopNode::ConnectionObjectType::SpaceHVACEquipmentConnections
+                         : DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections),
                 thisEquipConfig.ZoneName,
                 DataLoopNode::ConnectionType::ZoneInlet,
                 NodeInputManager::CompFluidStream::Primary,
@@ -933,9 +992,11 @@ void processZoneEquipmentInput(EnergyPlusData &state,
             thisEquipConfig.AirDistUnitHeat(NodeNum).InNode = 0;
             thisEquipConfig.AirDistUnitCool(NodeNum).OutNode = 0;
             thisEquipConfig.AirDistUnitHeat(NodeNum).OutNode = 0;
-            ++locTermUnitSizingCounter;
-            thisEquipConfig.AirDistUnitCool(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
-            thisEquipConfig.AirDistUnitHeat(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
+            if (!isSpace) {
+                ++locTermUnitSizingCounter;
+                thisEquipConfig.AirDistUnitCool(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
+                thisEquipConfig.AirDistUnitHeat(NodeNum).TermUnitSizingIndex = locTermUnitSizingCounter;
+            }
         }
     } else {
         ShowContinueError(
@@ -951,7 +1012,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                 NodeNums,
                 NodeListError,
                 DataLoopNode::NodeFluidType::Air,
-                DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
+                (isSpace ? DataLoopNode::ConnectionObjectType::SpaceHVACEquipmentConnections
+                         : DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections),
                 thisEquipConfig.ZoneName,
                 DataLoopNode::ConnectionType::ZoneExhaust,
                 NodeInputManager::CompFluidStream::Primary,
@@ -985,7 +1047,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                 NodeNums,
                 NodeListError,
                 DataLoopNode::NodeFluidType::Air,
-                DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
+                (isSpace ? DataLoopNode::ConnectionObjectType::SpaceHVACEquipmentConnections
+                         : DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections),
                 thisEquipConfig.ZoneName,
                 DataLoopNode::ConnectionType::ZoneReturn,
                 NodeInputManager::CompFluidStream::Primary,
@@ -1032,7 +1095,8 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                 NodeNums,
                 NodeListError,
                 DataLoopNode::NodeFluidType::Air,
-                DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections,
+                (isSpace ? DataLoopNode::ConnectionObjectType::SpaceHVACEquipmentConnections
+                         : DataLoopNode::ConnectionObjectType::ZoneHVACEquipmentConnections),
                 thisEquipConfig.ZoneName,
                 DataLoopNode::ConnectionType::Sensor,
                 NodeInputManager::CompFluidStream::Primary,
@@ -1055,6 +1119,101 @@ void processZoneEquipmentInput(EnergyPlusData &state,
     }
 }
 
+void processZoneEquipSplitterInput(EnergyPlusData &state,
+                                   std::string_view zeqSplitterModuleObject,
+                                   int const zeqSplitterNum,
+                                   int const zoneNum,
+                                   InputProcessor::json const objectSchemaProps,
+                                   InputProcessor::json const objectFields,
+                                   DataZoneEquipment::ZoneEquipmentSplitter &thisZoneEquipSplitter)
+
+{
+    static constexpr std::string_view RoutineName("processZoneEquipSplitterInput: "); // include trailing blank space
+    auto &ip = state.dataInputProcessing->inputProcessor;
+    std::string const zeqTypeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_object_type");
+    thisZoneEquipSplitter.equipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
+    // SpaceHVAC TODO: Copied this block from processZoneEquipmentInput section for ZoneHVAC:EquipmentList - seems this could be simplified
+    if (thisZoneEquipSplitter.equipType == ZoneEquipType::Invalid) {
+        if (zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" || zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
+            thisZoneEquipSplitter.equipType = ZoneEquipType::LowTemperatureRadiant;
+        } else if (zeqTypeName == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
+            thisZoneEquipSplitter.equipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
+        } else {
+            ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZoneEquipSplitter.Name));
+            ShowContinueError(state, format("..Invalid Equipment Type = {}", zeqTypeName));
+            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+        }
+    }
+
+    thisZoneEquipSplitter.equipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
+
+    // Search zone equipment list for matching equip type and name
+    bool found = false;
+    auto &thisZoneEqList = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex);
+    for (int eqCount = 1; eqCount <= thisZoneEqList.NumOfEquipTypes; ++eqCount) {
+        if (thisZoneEquipSplitter.equipType == thisZoneEqList.EquipType(eqCount)) {
+            if (thisZoneEquipSplitter.equipName == thisZoneEqList.EquipName(eqCount)) {
+                found = true;
+                // Set index in zone equipment list pointing to this SpaceHVAC:ZoneEquipmentSplitter
+                thisZoneEqList.zoneEquipSplitterIndex = zeqSplitterNum;
+                // SpaceHVAC TODO: Outletnodes aren't know yet - need to set this in a later init
+                // thisZoneEquipSplitter.zoneEquipOutletNodeNum = thisZoneEqList.EquipData(eqCount).OutletNodeNums(1);
+                break;
+            }
+        }
+    }
+    if (!found) {
+        ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZoneEquipSplitter.Name));
+        ShowContinueError(
+            state, format(".. Zone Equipment Object Type={} and Zone Equipment Name={} not found", zeqTypeName, thisZoneEquipSplitter.equipName));
+        ShowContinueError(state, format(".. in ZoneHVAC:EquipmentList={}", thisZoneEqList.Name));
+        state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+        return;
+    }
+
+    thisZoneEquipSplitter.tstatControl = DataZoneEquipment::ZoneEquipTstatControl(
+        getEnumValue(zoneEquipTstatControlNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "thermostat_control_method")));
+    if (thisZoneEquipSplitter.tstatControl == DataZoneEquipment::ZoneEquipTstatControl::SingleSpace) {
+        std::string_view spaceName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "control_space_name");
+        // thisZoneEquipSplitter.controlSpaceIndex =
+    }
+    thisZoneEquipSplitter.spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis(
+        getEnumValue(spaceEquipSizingBasisNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_sizing_basis")));
+
+    auto extensibles = objectFields.find("spaces");
+    auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
+    if (extensibles != objectFields.end()) {
+        auto &extensiblesArray = extensibles.value();
+        int const numSpaces = extensiblesArray.size();
+        thisZoneEquipSplitter.spaces.resize(numSpaces);
+        int spaceCount = -1;
+        for (auto &extensibleInstance : extensiblesArray) {
+            ++spaceCount;
+            auto &thisZeqSpace = thisZoneEquipSplitter.spaces[spaceCount];
+            std::string const spaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
+            thisZeqSpace.spaceIndex = UtilityRoutines::FindItemInList(spaceName, state.dataHeatBal->space);
+            if (thisZeqSpace.spaceIndex == 0) {
+                ShowSevereError(state, format("{}{}={}", RoutineName, zeqSplitterModuleObject, thisZoneEquipSplitter.Name));
+                ShowContinueError(state, format("Space Name={} not found.", spaceName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+            } else {
+                thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_output_fraction");
+                bool errorsFound = false;
+                bool objectIsParent = true;
+                thisZeqSpace.spaceInletNodeNum =
+                    GetOnlySingleNode(state,
+                                      ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_supply_node_name"),
+                                      errorsFound,
+                                      DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter,
+                                      thisZoneEquipSplitter.Name,
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      objectIsParent);
+            }
+        }
+    }
+}
 bool CheckZoneEquipmentList(EnergyPlusData &state,
                             std::string_view const ComponentType, // Type of component
                             std::string_view const ComponentName, // Name of component

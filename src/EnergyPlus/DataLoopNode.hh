@@ -419,6 +419,8 @@ namespace DataLoopNode {
         ZoneHVACWaterToAirHeatPump,
         ZoneHVACWindowAirConditioner,
         ZonePropertyLocalEnvironment,
+        SpaceHVACEquipmentConnections,
+        SpaceHVACZoneEquipmentSplitter,
         Num,
     };
 
