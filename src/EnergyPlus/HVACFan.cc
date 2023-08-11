@@ -322,7 +322,8 @@ namespace HVACFan {
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchFanAirLoopName,
                                                  name,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name); // airloop name needed?
+                                                 AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name
+                                                                : "N/A"); // airloop name needed?
         // OutputReportPredefined::PreDefTableEntry(state,
         //                                          state.dataOutRptPredefined->pdchFanAirBranchName,
         //                                          name,

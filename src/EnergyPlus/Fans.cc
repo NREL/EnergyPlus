@@ -1452,8 +1452,10 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, fan.FanName, fan.MotInAirFrac);
     // OutputReportPredefined::PreDefTableEntry(
     //     state, state.dataOutRptPredefined->pdchFanMotorLossZoneName, fan.FanName, fan.FanName); // motor heat to zone name?
-    OutputReportPredefined::PreDefTableEntry(
-        state, state.dataOutRptPredefined->pdchFanAirLoopName, fan.FanName, state.dataAirSystemsData->PrimaryAirSystems(fan.AirLoopNum).Name);
+    OutputReportPredefined::PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchFanAirLoopName,
+                                             fan.FanName,
+                                             fan.AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(fan.AirLoopNum).Name : "N/A");
     // OutputReportPredefined::PreDefTableEntry(state,
     //                                          state.dataOutRptPredefined->pdchFanAirBranchName,
     //                                          fan.FanName,
