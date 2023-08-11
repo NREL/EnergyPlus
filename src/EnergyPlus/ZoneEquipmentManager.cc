@@ -466,7 +466,7 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
             DOASLatOutputProvided = DOASMassFlowRate * (DOASSupplyHumRat - zoneNode.HumRat); // kgw/s
         }
 
-        UpdateSystemOutputRequired(state, zoneNum, DOASSysOutputProvided, DOASLatOutputProvided);
+        updateSystemOutputRequired(state, zoneNum, DOASSysOutputProvided, DOASLatOutputProvided, zsEnergyDemand, zsMoistureDemand);
         auto &supplyAirNode1 = state.dataLoopNodes->Node(supplyAirNodeNum1);
         supplyAirNode1.Temp = DOASSupplyTemp;
         supplyAirNode1.HumRat = DOASSupplyHumRat;
@@ -650,7 +650,7 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
         }
     }
 
-    UpdateSystemOutputRequired(state, zoneNum, SysOutputProvided, LatOutputProvided);
+    updateSystemOutputRequired(state, zoneNum, SysOutputProvided, LatOutputProvided, zsEnergyDemand, zsMoistureDemand);
 }
 
 void sizeZoneSpaceEquipmentPart2(EnergyPlusData &state,
@@ -3614,7 +3614,13 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
             }
 
-            UpdateSystemOutputRequired(state, ControlledZoneNum, SysOutputProvided, LatOutputProvided, EquipTypeNum);
+            updateSystemOutputRequired(state,
+                                       ControlledZoneNum,
+                                       SysOutputProvided,
+                                       LatOutputProvided,
+                                       state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum),
+                                       state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum),
+                                       EquipTypeNum);
             state.dataSize->CurTermUnitSizingNum = 0;
         } // zone equipment loop
         if (state.dataHeatBal->doSpaceHeatBalance) {
@@ -4175,21 +4181,19 @@ void distributeOutputRequired(EnergyPlusData &state,
     }
 }
 
-void UpdateSystemOutputRequired(EnergyPlusData &state,
+void updateSystemOutputRequired(EnergyPlusData &state,
                                 int const ZoneNum,
-                                Real64 const SysOutputProvided,                // sensible output provided by zone equipment (W)
-                                Real64 const LatOutputProvided,                // latent output provided by zone equipment (kg/s)
-                                ObjexxFCL::Optional_int_const EquipPriorityNum // index in PrioritySimOrder for this update
+                                Real64 const SysOutputProvided, // sensible output provided by zone equipment (W)
+                                Real64 const LatOutputProvided, // latent output provided by zone equipment (kg/s)
+                                DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                                int const EquipPriorityNum // optional index in PrioritySimOrder for this update
 )
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Russ Taylor
-    //       DATE WRITTEN   Unknown
     //       MODIFIED       B. Griffith Sept 2011, add storage of requirements by sequence
-
-    auto &energy(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
-    auto &moisture(state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum));
 
     // If zone is uncontrolled use original method for remaining output
     if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
@@ -4246,7 +4250,7 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
             break;
         }
 
-        if (present(EquipPriorityNum)) {
+        if (EquipPriorityNum > -1) {
             // now store remaining load at the by sequence level
             if (EquipPriorityNum + 1 <= energy.NumZoneEquipment) {
                 energy.SequencedOutputRequired(EquipPriorityNum + 1) = energy.RemainingOutputRequired;
@@ -4281,7 +4285,7 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
         moisture.UnadjRemainingOutputReqToHumidSP -= LatOutputProvided;
         moisture.UnadjRemainingOutputReqToDehumidSP -= LatOutputProvided;
 
-        if (present(EquipPriorityNum) && EquipPriorityNum < thisZEqList.NumOfEquipTypes) {
+        if ((EquipPriorityNum > -1) && (EquipPriorityNum < thisZEqList.NumOfEquipTypes)) {
 
             // Look up the next system in priority order
             int nextEquipPriorityNum = EquipPriorityNum + 1;
@@ -4361,7 +4365,7 @@ void UpdateSystemOutputRequired(EnergyPlusData &state,
     case DataZoneEquipment::LoadDist::SequentialUniformPLR:
         // For every load distribution scheme except SequentialLoad, do not touch the sequenced loads,
         // but set the remaining loads to the next equipment type's load to support equipment types that don't use the sequenced loads
-        if (present(EquipPriorityNum)) {
+        if (EquipPriorityNum > -1) {
             if (EquipPriorityNum + 1 <= energy.NumZoneEquipment) {
                 energy.RemainingOutputRequired = energy.SequencedOutputRequired(EquipPriorityNum + 1);
                 moisture.RemainingOutputRequired = moisture.SequencedOutputRequired(EquipPriorityNum + 1);

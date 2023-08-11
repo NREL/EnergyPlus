@@ -186,11 +186,13 @@ namespace ZoneEquipmentManager {
                                   DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
                                   DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture);
 
-    void UpdateSystemOutputRequired(EnergyPlusData &state,
-                                    int ZoneNum,
-                                    Real64 SysOutputProvided,                          // sensible output provided by zone equipment (W)
-                                    Real64 LatOutputProvided,                          // latent output provided by zone equipment (kg/s)
-                                    ObjexxFCL::Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
+    void updateSystemOutputRequired(EnergyPlusData &state,
+                                    int const ZoneNum,
+                                    Real64 const SysOutputProvided, // sensible output provided by zone equipment (W)
+                                    Real64 const LatOutputProvided, // latent output provided by zone equipment (kg/s)
+                                    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                                    int const EquipPriorityNum = -1 // optional index in PrioritySimOrder for this update
     );
 
     void CalcZoneMassBalance(EnergyPlusData &state, bool FirstHVACIteration);
