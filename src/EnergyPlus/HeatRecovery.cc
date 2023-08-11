@@ -178,7 +178,11 @@ namespace HeatRecovery {
         } else {
             //   HX is placed on a BRANCH, optional arguments are not passed in from SimAirServingZones.
             //   HX will calculate its own part-load ratio if optional HXUnitEnable flag is not present
-            HXUnitOn = (HXPartLoadRatio > 0.0);
+            if (present(HXPartLoadRatio)) {
+                HXUnitOn = (HXPartLoadRatio > 0.0);
+            } else {
+                HXUnitOn = true;
+            }
             state.dataHeatRecovery->CalledFromParentObject = false;
         }
 
