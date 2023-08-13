@@ -1337,12 +1337,15 @@ namespace PlantChillers {
             OutputReportPredefined::PreDefTableEntry(state,
                                                      state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
                                                      this->Name,
-                                                     state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name);
-            OutputReportPredefined::PreDefTableEntry(
-                state,
-                state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
-                this->Name,
-                state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).LoopSide(this->HRPlantLoc.loopSideNum).Branch(this->HRPlantLoc.branchNum).Name);
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum)
+                                                                                        .LoopSide(this->HRPlantLoc.loopSideNum)
+                                                                                        .Branch(this->HRPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
         }
