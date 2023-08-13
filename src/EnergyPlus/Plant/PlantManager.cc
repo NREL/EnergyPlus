@@ -3181,44 +3181,60 @@ void SizePlantLoop(EnergyPlusData &state,
                 // condenser loop vs plant loop breakout needed.
                 BaseSizer::reportSizerOutput(
                     state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]", state.dataPlnt->PlantLoop(LoopNum).Volume);
+                // begin std 229 added lines
                 BaseSizer::reportSizerOutput(state,
                                              "PlantLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Design Supply Temperature [C]",
-                                             state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp);
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp
+                                                 : -999.0);
                 BaseSizer::reportSizerOutput(state,
                                              "PlantLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Design Return Temperature [C]",
-                                             state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp -
-                                                 state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).DeltaT);
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp -
+                                                       state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).DeltaT
+                                                 : -999.0);
                 BaseSizer::reportSizerOutput(state,
                                              "PlantLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Sizing option (Coincident/NonCoincident)",
-                                             state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ConcurrenceOption);
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ConcurrenceOption
+                                                 : -1);
+                // end std 229 added lines
             } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                 BaseSizer::reportSizerOutput(state,
                                              "CondenserLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Condenser Loop Volume [m3]",
                                              state.dataPlnt->PlantLoop(LoopNum).Volume);
+                // begin std 229 added lines
                 BaseSizer::reportSizerOutput(state,
                                              "CondenserLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Design Supply Temperature [C]",
-                                             state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp);
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp
+                                                 : -999.0);
                 BaseSizer::reportSizerOutput(state,
                                              "CondenserLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Design Return Temperature [C]",
-                                             state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp -
-                                                 state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).DeltaT);
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ExitTemp -
+                                                       state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).DeltaT
+                                                 : -999.0);
                 BaseSizer::reportSizerOutput(state,
                                              "CondenserLoop",
                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                              "Sizing option (Coincident/NonCoincident)",
-                                             state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ConcurrenceOption);
+                                             state.dataPlnt->PlantLoop(LoopNum).PlantSizNum
+                                                 ? state.dataSize->PlantSizData(state.dataPlnt->PlantLoop(LoopNum).PlantSizNum).ConcurrenceOption
+                                                 : -1);
+                // end std 229 added lines
             }
         }
         if (state.dataPlnt->PlantFirstSizesOkayToReport) {
