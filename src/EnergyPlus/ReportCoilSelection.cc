@@ -245,7 +245,7 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchCoilAirloopName_CCs,
                                                  c->coilName_,
-                                                 state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name);
+                                                 c->airloopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name : "N/A");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilPlantloopName_CCs, c->coilName_, c->plantLoopName);
         // end of std 229 New coil connections table entries
 
