@@ -5488,8 +5488,10 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         //     state, state.dataOutRptPredefined->pdchAirTermTypeOfInputObj, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
         // OutputReportPredefined::PreDefTableEntry(
         //     state, state.dataOutRptPredefined->pdchAirTermHeatReheatCoilObjType, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName); // PH
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermZoneName, thisTUFZSizing.ADUName, state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchAirTermZoneName,
+                                                 thisTUFZSizing.ADUName,
+                                                 thisTUFZSizing.ZoneNum > 0 ? state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name : "N/A");
         // OutputReportPredefined::PreDefTableEntry(
         //     state, state.dataOutRptPredefined->pdchAirTermHWPlantloopName, thisTUFZSizing.ADUName, thisTUFZSizing.ZoneNum); // PH
         // OutputReportPredefined::PreDefTableEntry(
@@ -5535,11 +5537,13 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermSupCoolingSP,
                                                  thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesCoolSetPtSeq(1)); // ? how to deal with array
+                                                 thisTUFZSizing.DesCoolSetPtSeq.size() > 0 ? thisTUFZSizing.DesCoolSetPtSeq(1)
+                                                                                           : -999.0); // ? how to deal with array
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermSupHeatingSP,
                                                  thisTUFZSizing.ADUName,
-                                                 thisTUFZSizing.DesHeatSetPtSeq(1)); // ? How to deal with array
+                                                 thisTUFZSizing.DesHeatSetPtSeq.size() > 0 ? thisTUFZSizing.DesHeatSetPtSeq(1)
+                                                                                           : -999.0); // ? How to deal with array
 
         // OutputReportPredefined::PreDefTableEntry(state,
         //                                          state.dataOutRptPredefined->pdchAirTermTempControl,
