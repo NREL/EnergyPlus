@@ -52,6 +52,7 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXAshrae205Performance.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -77,6 +78,42 @@
 #include <EnergyPlus/WaterManager.hh>
 
 using namespace EnergyPlus;
+
+std::shared_ptr<CoilCoolingDXPerformanceBase> CoilCoolingDX::makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
+                                                                                     const std::string &performance_object_name)
+{
+    const auto &ip = state.dataInputProcessing->inputProcessor;
+
+    const auto &a205_object_name = CoilCoolingDX205Performance::object_name;
+    const auto &curve_fit_object_name = CoilCoolingDXCurveFitPerformance::object_name;
+
+    if (ip->getNumObjectsFound(state, a205_object_name) > 0)
+    {
+        auto const &json_dict_coil205 = ip->epJSON.find(a205_object_name).value();
+        for (auto &instance : json_dict_coil205.items()) {
+            std::string const &performance205_name = instance.key();
+            auto const &performance205_fields = instance.value();
+            if (performance205_name == performance_object_name) {
+                //ip->markObjectAsUsed(a205_object_name, performance205_name);
+                return std::make_shared<CoilCoolingDX205Performance>(state, performance_object_name);
+            }
+        }
+    }
+
+    else if (ip->getNumObjectsFound(state, curve_fit_object_name) > 0) {
+        auto const &json_dict_coil_curve = ip->epJSON.find(curve_fit_object_name).value();
+        for (auto &instance : json_dict_coil_curve.items()) {
+            std::string const &performance_name = EnergyPlus::UtilityRoutines::makeUPPER(instance.key());
+            auto const &performance_fields = instance.value();
+            if (performance_name == performance_object_name) {
+                // ip->markObjectAsUsed(curve_fit_object_name, performance_name);
+                return std::make_shared<CoilCoolingDXCurveFitPerformance>(state, performance_object_name);
+            }
+        }
+    }
+
+    return nullptr;
+}
 
 int CoilCoolingDX::factory(EnergyPlus::EnergyPlusData &state, std::string const &coilName)
 {
@@ -141,7 +178,7 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlus::EnergyPlusData &state, 
     this->reclaimHeat.Name = this->name;
     this->reclaimHeat.SourceType = state.dataCoilCooingDX->coilCoolingDXObjectName;
 
-    this->performance = std::make_shared<CoilCoolingDXCurveFitPerformance>(state, input_data.performance_object_name);
+    this->performance = makePerformanceSubclass(state, input_data.performance_object_name);
 
     this->SubcoolReheatFlag = this->performance->SubcoolReheatFlag();
 

@@ -66,12 +66,43 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 {
     CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find);
 
-    constexpr std::string object_name = "Coil:DX:ASHRAE205:Performance";
+    inline static const std::string object_name = "Coil:DX:ASHRAE205:Performance";
 
     std::shared_ptr<tk205::rs0004_ns::RS0004> representation; // ASHRAE205 representation instance
-    Btwxt::Method interpolation_type{Btwxt::Method::LINEAR};
+    Btwxt::Method interpolation_type{Btwxt::Method::linear};
     Real64 rated_total_cooling_capacity;
     Real64 rated_steady_state_heating_capacity;
-};
 
+    void simulate(EnergyPlusData &state,
+                  const DataLoopNode::NodeData &inletNode,
+                  DataLoopNode::NodeData &outletNode,
+                  int useAlternateMode,
+                  Real64 &PLR,
+                  int &speedNum,
+                  Real64 &speedRatio,
+                  int const fanOpMode,
+                  DataLoopNode::NodeData &condInletNode,
+                  DataLoopNode::NodeData &condOutletNode,
+                  bool const singleMode,
+                  Real64 LoadSHR = 0.0) override;
+
+    void calculate(EnergyPlusData &state,
+                   const DataLoopNode::NodeData &inletNode,
+                   DataLoopNode::NodeData &outletNode,
+                   Real64 &PLR,
+                   int &speedNum,
+                   Real64 &speedRatio,
+                   int const fanOpMode,
+                   DataLoopNode::NodeData &condInletNode,
+                   DataLoopNode::NodeData &condOutletNode);
+
+private:
+    void calculate_output_nodes(EnergyPlusData &state,
+                                const DataLoopNode::NodeData &inletNode,
+                                DataLoopNode::NodeData &outletNode,
+                                Real64 gross_total_capacity,
+                                Real64 gross_sensible_capacity,
+                                Real64 air_mass_flow_rate);
+};
+}
 #endif // ENERGYPLUS_COILS_COIL_COOLING_DX_ASHRAE205_PERFORMANCE

@@ -79,7 +79,7 @@ namespace EnergyPlus {
     };
 
     struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase {
-        std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
+        inline static const std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
 
         void instantiateFromInputSpec(EnergyPlusData &state,
                                       const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
