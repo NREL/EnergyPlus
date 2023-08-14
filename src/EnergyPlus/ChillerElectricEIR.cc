@@ -1697,13 +1697,17 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
             this->CWPlantLoc.loopNum > 0
                 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).Branch(this->CWPlantLoc.branchNum).Name
                 : "N/A");
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchChillerCondLoopName, this->Name, state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                 this->Name,
+                                                 this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
         OutputReportPredefined::PreDefTableEntry(
             state,
             state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
             this->Name,
-            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).LoopSide(this->CDPlantLoc.loopSideNum).Branch(this->CDPlantLoc.branchNum).Name);
+            this->CDPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).LoopSide(this->CDPlantLoc.loopSideNum).Branch(this->CDPlantLoc.branchNum).Name
+                : "N/A");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->ChillerEIRFPLRMin);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, "Electricity");
         OutputReportPredefined::PreDefTableEntry(
