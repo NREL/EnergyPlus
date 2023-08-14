@@ -9353,8 +9353,6 @@ Fan:OnOff,
   DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
   Heating Coil Air Inlet Node,  !- Air Outlet Node Name
   1.4,                     !- Rated Air Flow Rate {m3/s}
-  ,
-  ,
   0.00165,                 !- Rated Water Flow Rate {m3/s}
   40125.6,                 !- Gross Rated Total Cooling Capacity {W}
   28267.06,                !- Gross Rated Sensible Cooling Capacity {W}
