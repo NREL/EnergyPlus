@@ -1731,7 +1731,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                                                  this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
         OutputReportPredefined::PreDefTableEntry(
             state,
-            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName,
             this->Name,
             this->HRPlantLoc.loopNum > 0
                 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).LoopSide(this->HRPlantLoc.loopSideNum).Branch(this->HRPlantLoc.branchNum).Name
