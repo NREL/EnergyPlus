@@ -5565,14 +5565,16 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     }
 
     // Sum all system air flow: this->SumSysMCp, this->SumSysMCpT and check to see if this is a controlled zone
+    // If the space is controlled, use space supply nodes, otherwise use zone supply nodes and allocate later
+    bool isSpaceControlled = (spaceNum > 0 && state.dataZoneEquip->spaceEquipConfig(spaceNum).IsControlled);
     if (CorrectorFlag) {
         // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
         if (thisZone.IsControlled) {
-            auto const &zec(state.dataZoneEquip->ZoneEquipConfig(zoneNum));
-            for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
+            auto const &zsec = (isSpaceControlled ? state.dataZoneEquip->spaceEquipConfig(spaceNum) : state.dataZoneEquip->ZoneEquipConfig(zoneNum));
+            for (int NodeNum = 1, NodeNum_end = zsec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                 // Get node conditions, this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
                 //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
-                auto const &node(state.dataLoopNodes->Node(zec.InletNode(NodeNum)));
+                auto const &node(state.dataLoopNodes->Node(zsec.InletNode(NodeNum)));
                 Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat);
                 Real64 const MassFlowRate_CpAir(node.MassFlowRate * CpAir);
                 this->SumSysMCp += MassFlowRate_CpAir;
@@ -5617,7 +5619,8 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
         this->SumSysMCpT /= ZoneMult;
     }
 
-    if (spaceNum > 0) {
+    if (spaceNum > 0 && !isSpaceControlled) {
+        // If space is not controlled, allocate zone-level airflow
         Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
         this->SumSysMCp *= spaceFrac;
         this->SumSysMCpT *= spaceFrac;

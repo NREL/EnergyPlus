@@ -381,6 +381,8 @@ namespace DataZoneEquipment {
               ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0), AirLoopDesSupply(0.0)
         {
         }
+
+        Real64 setTotalInletFlows(EnergyPlusData &state);
     };
 
     struct EquipmentData // data for an individual component

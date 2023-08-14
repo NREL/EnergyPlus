@@ -1559,4 +1559,31 @@ void CheckSharedExhaust(EnergyPlusData &state)
     }
 }
 
+Real64 EquipConfiguration::setTotalInletFlows(EnergyPlusData &state)
+{
+    this->TotInletAirMassFlowRate = 0.0;
+    if (!IsControlled) return 0.0;
+    Real64 TotInletAirMassFlowRateMax = 0.0;
+    Real64 TotInletAirMassFlowRateMaxAvail = 0.0;
+    Real64 TotInletAirMassFlowRateMin = 0.0;
+    Real64 TotInletAirMassFlowRateMinAvail = 0.0;
+    for (int NodeNum = 1; NodeNum <= this->NumInletNodes; ++NodeNum) {
+        {
+            auto const &thisNode(state.dataLoopNodes->Node(this->InletNode(NodeNum)));
+            this->TotInletAirMassFlowRate += thisNode.MassFlowRate;
+            TotInletAirMassFlowRateMax += thisNode.MassFlowRateMax;
+            TotInletAirMassFlowRateMaxAvail += thisNode.MassFlowRateMaxAvail;
+            TotInletAirMassFlowRateMin += thisNode.MassFlowRateMin;
+            TotInletAirMassFlowRateMinAvail += thisNode.MassFlowRateMinAvail;
+        }
+    }
+    auto &zoneSpaceNode = state.dataLoopNodes->Node(this->ZoneNode);
+    zoneSpaceNode.MassFlowRate = this->TotInletAirMassFlowRate;
+    zoneSpaceNode.MassFlowRateMax = TotInletAirMassFlowRateMax;
+    zoneSpaceNode.MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
+    zoneSpaceNode.MassFlowRateMin = TotInletAirMassFlowRateMin;
+    zoneSpaceNode.MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
+    return this->TotInletAirMassFlowRate;
+}
+
 } // namespace EnergyPlus::DataZoneEquipment

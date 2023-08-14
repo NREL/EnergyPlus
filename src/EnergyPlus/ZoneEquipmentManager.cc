@@ -3195,6 +3195,17 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         zoneEquipConfig.ZoneExhBalanced = 0.0;
         zoneEquipConfig.PlenumMassFlow = 0.0;
         state.dataSize->CurZoneEqNum = ControlledZoneNum;
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->SysSizingCalc) {
+            for (auto &spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
+                auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                thisSpaceHB.NonAirSystemResponse = 0.0;
+                thisSpaceHB.SysDepZoneLoads = 0.0;
+                auto &thisSpaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(spaceNum);
+                thisSpaceEquipConfig.ZoneExh = 0.0;
+                thisSpaceEquipConfig.ZoneExhBalanced = 0.0;
+                thisSpaceEquipConfig.PlenumMassFlow = 0.0;
+            }
+        }
 
         InitSystemOutputRequired(state, ControlledZoneNum, FirstHVACIteration, true);
 
@@ -4480,6 +4491,12 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
                 state.dataHeatBal->MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 0.0;
                 state.dataHeatBal->MassConservation(ZoneNum).RetMassFlowRate = 0.0;
                 state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExcessZoneExh = 0.0;
+                if (state.dataHeatBal->doSpaceHeatBalance) {
+                    for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                        if (!state.dataZoneEquip->spaceEquipConfig(spaceNum).IsControlled) continue;
+                        state.dataZoneEquip->spaceEquipConfig(spaceNum).ExcessZoneExh = 0.0;
+                    }
+                }
             }
         }
         BuildingZoneMixingFlowOld = BuildingZoneMixingFlow;
@@ -4494,12 +4511,6 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
             if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) ZoneNum = state.dataHeatBalFanSys->ZoneReOrder(ZoneNum1);
             auto &massConservation = state.dataHeatBal->MassConservation(ZoneNum);
             auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
-            zoneEquipConfig.TotInletAirMassFlowRate = 0.0;
-            Real64 TotInletAirMassFlowRateMax = 0.0;
-            Real64 TotInletAirMassFlowRateMaxAvail = 0.0;
-            Real64 TotInletAirMassFlowRateMin = 0.0;
-            Real64 TotInletAirMassFlowRateMinAvail = 0.0;
-            Real64 TotInletAirMassFlowRate = 0.0;
             Real64 TotExhaustAirMassFlowRate = 0.0;
 
             zoneEquipConfig.TotExhaustAirMassFlowRate = 0.0;
@@ -4508,18 +4519,12 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
             Real64 ZoneMixingNetAirMassFlowRate = 0.0;
             Real64 ZoneReturnAirMassFlowRate = 0.0;
 
-            for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumInletNodes; ++NodeNum) {
-                {
-                    auto const &thisNode(Node(zoneEquipConfig.InletNode(NodeNum)));
-                    zoneEquipConfig.TotInletAirMassFlowRate += thisNode.MassFlowRate;
-                    TotInletAirMassFlowRateMax += thisNode.MassFlowRateMax;
-                    TotInletAirMassFlowRateMaxAvail += thisNode.MassFlowRateMaxAvail;
-                    TotInletAirMassFlowRateMin += thisNode.MassFlowRateMin;
-                    TotInletAirMassFlowRateMinAvail += thisNode.MassFlowRateMinAvail;
+            Real64 TotInletAirMassFlowRate = zoneEquipConfig.setTotalInletFlows(state);
+            if (state.dataHeatBal->doSpaceHeatBalance) {
+                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                    Real64 dummy = state.dataZoneEquip->spaceEquipConfig(spaceNum).setTotalInletFlows(state);
                 }
             }
-
-            TotInletAirMassFlowRate = zoneEquipConfig.TotInletAirMassFlowRate;
 
             for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumExhaustNodes; ++NodeNum) {
 
@@ -4549,22 +4554,6 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
                 }
                 CalcZoneMixingFlowRateOfReceivingZone(state, ZoneNum, ZoneMixingAirMassFlowRate);
                 ZoneMixingNetAirMassFlowRate = massConservation.MixingMassFlowRate - massConservation.MixingSourceMassFlowRate;
-            }
-            auto &zoneNode = Node(zoneEquipConfig.ZoneNode);
-            zoneNode.MassFlowRate = TotInletAirMassFlowRate;
-            zoneNode.MassFlowRateMax = TotInletAirMassFlowRateMax;
-            zoneNode.MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
-            zoneNode.MassFlowRateMin = TotInletAirMassFlowRateMin;
-            zoneNode.MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
-            if (state.dataHeatBal->doSpaceHeatBalance) {
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    auto &spaceNode = Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
-                    spaceNode.MassFlowRate = TotInletAirMassFlowRate;
-                    spaceNode.MassFlowRateMax = TotInletAirMassFlowRateMax;
-                    spaceNode.MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
-                    spaceNode.MassFlowRateMin = TotInletAirMassFlowRateMin;
-                    spaceNode.MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
-                }
             }
 
             // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
