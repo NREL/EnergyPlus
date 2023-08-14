@@ -1620,13 +1620,16 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
         // create std 229 new table for cooling towers and fluid coolers
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCTFCType, this->Name, DataPlant::PlantEquipTypeNames[static_cast<int>(this->FluidCoolerType)]);
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchCTFCCondLoopName, this->Name, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchCTFCCondLoopName,
+                                                 this->Name,
+                                                 this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name : "N/A");
         OutputReportPredefined::PreDefTableEntry(
             state,
             state.dataOutRptPredefined->pdchCTFCCondLoopBranchName,
             this->Name,
-            state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Name);
+            this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Name
+                                       : "N/A");
         OutputReportPredefined::PreDefTableEntry(
             state,
             state.dataOutRptPredefined->pdchCTFCFluidType,
