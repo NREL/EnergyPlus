@@ -55,6 +55,7 @@
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -6563,21 +6564,22 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     auto &thisCoil(state->dataCoilCooingDX->coilCoolingDXs[coilIndex]);
     // size it
     thisCoil.size(*state);
+    auto performance{dynamic_cast<CoilCoolingDXCurveFitPerformance *>(thisCoil.performance.get())};
 
     ASSERT_EQ("DX COOLING COIL", thisCoil.name);
     ASSERT_EQ("DX COOL COOLING COIL PERFORMANCE", thisCoil.performance->name);
-    ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
-    ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE2", thisCoil.performance.alternateMode.name);
+    ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE", performance->normalMode.name);
+    ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE2", performance->alternateMode.name);
     int nsp = thisCoil.performance->NumSpeeds();
     ASSERT_EQ(2, nsp);
-    auto speed1 = thisCoil.performance.normalMode.speeds[0];
+    auto speed1 = performance->normalMode.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
-    auto speed2 = thisCoil.performance.normalMode.speeds[1];
+    auto speed2 = performance->normalMode.speeds[1];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2.name);
 
     auto hasAlternateMode = thisCoil.performance->hasAlternateMode;
-    auto normalMode = thisCoil.performance.normalMode.speeds;
-    auto alternateMode1 = thisCoil.performance.alternateMode;
+    auto normalMode = performance->normalMode.speeds;
+    auto alternateMode1 = performance->alternateMode;
     EXPECT_EQ(1, hasAlternateMode);
     EXPECT_TRUE(2 == normalMode.size());
     auto speedA1 = alternateMode1.speeds[0];
@@ -6621,8 +6623,8 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     EXPECT_NEAR(631.3, speed2.rated_evap_fan_power_per_volume_flow_rate_2023, 0.01);
 
     // CondenserType is a different enum that is being used in case of CurveFit in comparison to other Cooling DX Coils
-    EXPECT_TRUE(CoilCoolingDXCurveFitOperatingMode::CondenserType::AIRCOOLED == thisCoil.performance.normalMode.condenserType);
-    EXPECT_FALSE(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED == thisCoil.performance.normalMode.condenserType);
+    EXPECT_TRUE(CoilCoolingDXCurveFitOperatingMode::CondenserType::AIRCOOLED == performance->normalMode.condenserType);
+    EXPECT_FALSE(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED == performance->normalMode.condenserType);
 
     // Check user curve coefficients
 
@@ -6654,7 +6656,7 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
 
     // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the applicability.
     std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", thisCoil.performance.normalMode);
+        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", performance->normalMode);
 
     NetCoolingCapRated(nsp) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
@@ -6869,21 +6871,23 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     // size it
     thisCoil.size(*state);
 
+    auto performance{dynamic_cast<CoilCoolingDXCurveFitPerformance *>(thisCoil.performance.get())};
+
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL", thisCoil.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL PERFORMANCE", thisCoil.performance->name);
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL OPERATING MODE", performance->normalMode.name);
     int nsp = thisCoil.performance->NumSpeeds();
     ASSERT_EQ(3, nsp);
-    auto speed1name = thisCoil.performance->NameAtSpeed(0);
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1name);
-    auto speed2name = thisCoil.performance->NameAtSpeed(1);
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2name);
-    auto speed3name = thisCoil.performance->NameAtSpeed(2);
-    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 3 PERFORMANCE", speed3name);
+    auto speed1 = performance->normalMode.speeds[0];
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
+    auto speed2 = performance->normalMode.speeds[1];
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2.name);
+    auto speed3 = performance->normalMode.speeds[2];
+    ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 3 PERFORMANCE", speed3.name);
 
-    auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
-    auto alternateMode1 = thisCoil.performance.alternateMode.speeds;
-    auto alternateMode2 = thisCoil.performance.alternateMode2.speeds;
+    auto hasAlternateMode = thisCoil.performance->hasAlternateMode;
+    auto alternateMode1 = performance->alternateMode.speeds;
+    auto alternateMode2 = performance->alternateMode2.speeds;
     EXPECT_EQ(0, hasAlternateMode);
     EXPECT_TRUE(0 == alternateMode1.size());
     EXPECT_TRUE(0 == alternateMode2.size());
@@ -6927,8 +6931,8 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     EXPECT_NEAR(812.9, speed3.rated_evap_fan_power_per_volume_flow_rate_2023, 0.01);
 
     // CondenserType is a different enum that is being used in case of CurveFit in comparison to other Cooling DX Coils
-    EXPECT_TRUE(CoilCoolingDXCurveFitOperatingMode::CondenserType::AIRCOOLED == thisCoil.performance.normalMode.condenserType);
-    EXPECT_FALSE(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED == thisCoil.performance.normalMode.condenserType);
+    EXPECT_TRUE(CoilCoolingDXCurveFitOperatingMode::CondenserType::AIRCOOLED == performance->normalMode.condenserType);
+    EXPECT_FALSE(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED == performance->normalMode.condenserType);
 
     // Check user curve coefficients
 
@@ -6960,7 +6964,7 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
 
     // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the applicability.
     std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) =
-        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", thisCoil.performance.normalMode);
+        IEERCalulcationCurveFit(*state, "Coil:Cooling:DX:CurveFit", performance->normalMode);
 
     NetCoolingCapRated(nsp) = NetCoolingCapRated2022;
     EXPECT_TRUE(IEER_2022 > 0.0);
