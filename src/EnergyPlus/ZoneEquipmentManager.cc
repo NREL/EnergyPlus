@@ -3196,7 +3196,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         zoneEquipConfig.PlenumMassFlow = 0.0;
         state.dataSize->CurZoneEqNum = ControlledZoneNum;
         if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->SysSizingCalc) {
-            for (auto &spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
+            for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
                 auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
                 thisSpaceHB.NonAirSystemResponse = 0.0;
                 thisSpaceHB.SysDepZoneLoads = 0.0;
@@ -4519,12 +4519,14 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
             Real64 ZoneMixingNetAirMassFlowRate = 0.0;
             Real64 ZoneReturnAirMassFlowRate = 0.0;
 
-            Real64 TotInletAirMassFlowRate = zoneEquipConfig.setTotalInletFlows(state);
+            Real64 TotInletAirMassFlowRate = 0.0;
             if (state.dataHeatBal->doSpaceHeatBalance) {
                 for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    Real64 dummy = state.dataZoneEquip->spaceEquipConfig(spaceNum).setTotalInletFlows(state);
+                    TotInletAirMassFlowRate = state.dataZoneEquip->spaceEquipConfig(spaceNum).setTotalInletFlows(state);
                 }
             }
+            // SpaceHVAC TODO: For now, ZoneMassBalance happens at the zone level, not space
+            TotInletAirMassFlowRate = zoneEquipConfig.setTotalInletFlows(state);
 
             for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumExhaustNodes; ++NodeNum) {
 
