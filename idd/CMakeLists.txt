@@ -77,15 +77,6 @@ if (BUILD_TESTING)
   else()
     message(VERBOSE "Found Pytest: ${Pytest_Version}")
     set(Pytest_AVAILABLE ON)
-    execute_process(COMMAND ${Python_EXECUTABLE} -m pip show pytest-timeout -q
-      RESULT_VARIABLE _Pytest_timeout_STATUS
-      ERROR_QUIET
-    )
-    if(_Pytest_timeout_STATUS AND NOT _Pytest_timeout_STATUS EQUAL 0)
-      # The idd tests could potentially timeout when the parser is stuck in an infinite loop.
-      message(AUTHOR_WARNING "Please do `${Python_EXECUTABLE} -m pip install pytest-timeout`")
-      set(Pytest_AVAILABLE OFF)
-    endif()
   endif()
 
   if (Pytest_AVAILABLE)
