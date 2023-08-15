@@ -120,3 +120,43 @@ BrokenObject,
                 ^~~~~~~~~~~~~~~~~~~~~~~~~
   A1; \field Name
 """
+
+
+def test_duplicate_a_field_number():
+    data = idd_parser.Data()
+    data.file = r"""BrokenObject,
+  A1, \field Name
+  N1, \field Number 1
+  A1, \field String Field
+  N2; \field Number 1
+"""
+    with pytest.raises(idd_parser.IddParsingError) as e:
+        idd_parser.parse_idd(data)
+    assert str(e.value) == r"""In object 'BrokenObject', duplicate field number A1
+Context:
+BrokenObject,
+  A1, \field Name
+  N1, \field Number 1
+  A1, \field String Field
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  N2; \field Number 1"""
+
+
+def test_duplicate_n_field_number():
+    data = idd_parser.Data()
+    data.file = r"""BrokenObject,
+  A1, \field Name
+  N1, \field Number 1
+  A2, \field String Field
+  N1; \field Number 1
+"""
+    with pytest.raises(idd_parser.IddParsingError) as e:
+        idd_parser.parse_idd(data)
+    assert str(e.value) == r"""In object 'BrokenObject', duplicate field number N1
+Context:
+BrokenObject,
+  A1, \field Name
+  N1, \field Number 1
+  A2, \field String Field
+  N1; \field Number 1
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"""

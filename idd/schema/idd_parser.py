@@ -275,6 +275,9 @@ def parse_obj(data, obj_name):
     extensible_count = 0
     duplicate_field_count = 0
 
+    a_field_numbers = []
+    n_field_numbers = []
+
     while True:
         token = look_ahead(data)
         if token == TOKEN_NONE:
@@ -350,6 +353,22 @@ def parse_obj(data, obj_name):
             data.index += 1
             field_index = data.index
             field_number += str(int(parse_number(data)))
+            if (token == TOKEN_A):
+                if field_number in a_field_numbers:
+                    raise IddParsingError(
+                        message="In object '{obj_name}', duplicate field number {field_number}".format(
+                            obj_name=obj_name, field_number=field_number
+                        ), data=data,
+                    )
+                a_field_numbers.append(field_number)
+            if (token == TOKEN_N):
+                if field_number in n_field_numbers:
+                    raise IddParsingError(
+                        message="In object '{obj_name}', duplicate field number {field_number}".format(
+                            obj_name=obj_name, field_number=field_number
+                        ), data=data,
+                    )
+                n_field_numbers.append(field_number)
             comma_or_semicolon = look_ahead(data)
             if comma_or_semicolon != TOKEN_COMMA and comma_or_semicolon != TOKEN_SEMICOLON:
                 raise IddParsingError(
