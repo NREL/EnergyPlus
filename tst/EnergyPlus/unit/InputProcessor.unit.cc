@@ -2919,11 +2919,10 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                            lAlphaBlanks));
 
     EXPECT_EQ(17, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<bool>({true, true, false, true,  true, true, false, true, true, true, false, true, true,
-                                                      true, true, true,  false, true, true, true,  true, true, true, true,  true, true}),
+    EXPECT_TRUE(compare_containers(std::vector<bool>({true, true, false, true, true, true,  false, true, true, true, false,
+                                                      true, true, true,  true, true, false, true,  true, true, true, true}),
                                    lNumericBlanks));
-    EXPECT_TRUE(
-        compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3570,6 +3569,9 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
         "  1.6, !- Rated Air Flow Rate At Selected Nominal Speed Level{ m3 / s }",
         "  0.0, !- Nominal Time for Condensate to Begin Leaving the Coil{ s }",
         "  0.0, !- Initial Moisture Evaporation Rate Divided by Steady - State AC Latent Capacity{ dimensionless }",
+        "  , !- Maximum Cycling Rate",
+        "  , !- Latent Capacity Time Constant",
+        "  , !- Fan Delay Time",
         "  PLFFPLR, !- Energy Part Load Fraction Curve Name",
         "  , !- Condenser Air Inlet Node Name",
         "  AirCooled, !- Condenser Type",
@@ -3804,22 +3806,22 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}),
         lAlphaBlanks));
 
-    EXPECT_EQ(92, NumNumbers); // Previously 72 Now 92 (2 more properties for 10 speeds)
+    EXPECT_EQ(95, NumNumbers);
     EXPECT_TRUE(compare_containers(
-        std::vector<Real64>({10.0,  10.0,  32000, 1.6, 0,      0,    0,   200,        10.0,  -25.0, 0,    2, 1524.1, .75,  4,   0.1359072,
-                             773.3, 934.4, 0.26,  0,   1877.9, 0.75, 4.0, 0.151008,   773.3, 934.4, 0.30, 0, 2226.6, .75,  4.0, 0.1661088,
-                             773.3, 934.4, 0.33,  0,   2911.3, 0.75, 4.0, 0.1963104,  773.3, 934.4, 0.38, 0, 3581.7, 0.75, 4.0, 0.226512,
-                             773.3, 934.4, 0.44,  0,   4239.5, 0.75, 4.0, 0.2567136,  773.3, 934.4, 0.5,  0, 4885.7, 0.75, 4.0, 0.2869152,
-                             773.3, 934.4, 0.57,  0,   5520.7, 0.75, 4.0, 0.31711680, 773.3, 934.4, 0.63, 0, 6144.8, .75,  4.0, 0.3473184,
-                             773.3, 934.4, 0.69,  0,   6758.0, 0.75, 4.0, 0.37752,    773.3, 934.4, 0.74, 0}),
+        std::vector<Real64>({10.0, 10.0, 32000,     1.6,   0,     0,    2.5, 60,     60,   0,   200,        10.0,  -25.0, 0,    2, 1524.1,
+                             .75,  4,    0.1359072, 773.3, 934.4, 0.26, 0,   1877.9, 0.75, 4.0, 0.151008,   773.3, 934.4, 0.30, 0, 2226.6,
+                             .75,  4.0,  0.1661088, 773.3, 934.4, 0.33, 0,   2911.3, 0.75, 4.0, 0.1963104,  773.3, 934.4, 0.38, 0, 3581.7,
+                             0.75, 4.0,  0.226512,  773.3, 934.4, 0.44, 0,   4239.5, 0.75, 4.0, 0.2567136,  773.3, 934.4, 0.5,  0, 4885.7,
+                             0.75, 4.0,  0.2869152, 773.3, 934.4, 0.57, 0,   5520.7, 0.75, 4.0, 0.31711680, 773.3, 934.4, 0.63, 0, 6144.8,
+                             .75,  4.0,  0.3473184, 773.3, 934.4, 0.69, 0,   6758.0, 0.75, 4.0, 0.37752,    773.3, 934.4, 0.74, 0}),
         Numbers));
     EXPECT_TRUE(compare_containers(
-        std::vector<bool>({false, false, false, false, false, false, true,  false, false, true,  true,  true, false, false, false, false,
-                           false, false, false, true,  false, false, false, false, false, false, false, true, false, false, false, false,
-                           false, false, false, true,  false, false, false, false, false, false, false, true, false, false, false, false,
-                           false, false, false, true,  false, false, false, false, false, false, false, true, false, false, false, false,
-                           false, false, false, true,  false, false, false, false, false, false, false, true, false, false, false, false,
-                           false, false, false, true,  false, false, false, false, false, false, false, true}),
+        std::vector<bool>({false, false, false, false, false, false, true, true,  true,  true,  false, false, true,  true,  true, false,
+                           false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false,
+                           false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false,
+                           false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false,
+                           false, false, false, false, false, false, true, false, false, false, false, false, false, false, true, false,
+                           false, false, false, false, false, false, true, false, false, false, false, false, false, false, true}),
         lNumericBlanks));
     EXPECT_EQ(1, IOStatus);
     // test logical return for ValidateComponent

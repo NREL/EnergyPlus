@@ -129,7 +129,7 @@ The Equipment Summary report (key: EquipmentSummary) produces a report that incl
 \item
   Cooling Coils includes the nominal total, sensible and latent capacities, the nominal sensible heat ratio, the nominal efficiency, nominal UA value, and nominal~ surface area for each cooling coil. These values are calculated by calling the cooling coil simulation routine with the rated inlet conditions: inlet air dry bulb temperature = 26.67C, inlet air wet bulb temperature = 19.44C, inlet chilled water temperature = 6.67C.
 \item
-  DX Cooling Coils summarizes the Standard Rating (Net) Cooling Capacity, SEER, EER and IEER values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} and \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeeed} with condenser type = AirCooled. However, the EER value is not reported for the mulit-speed DX cooling coil. There are two SEER values reported: \textit{SEER} and \textit{SEER Default}. The \textit{SEER} value is calculated using user specified Part Load Factor (PLF) curve used for energy performance calculation and the \textit{SEER Default} value is calculated using the AHRI Standard 210/240-2008 default PLF curve and cooling coefficent of degradation value of 0.25. 
+  DX Cooling Coils summarizes the Standard Rating (Net) Cooling Capacity, SEER, EER and IEER values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} and \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeeed} with condenser type = AirCooled. However, the EER value is not reported for the multi-speed DX cooling coil. There are two SEER values reported: \textit{SEER} and \textit{SEER Default}. The \textit{SEER} value is calculated using user specified Part Load Factor (PLF) curve used for energy performance calculation and the \textit{SEER Default} value is calculated using the AHRI Standard 210/240-2008 default PLF curve and cooling coefficient of degradation value of 0.25. 
   \item
   DX Heating Coils summarizes the High Temperature Heating Standard (Net) Rating Capacity, Low Temperature Heating Standard (Net) Rating Capacity and Heating Seasonal Performance Factor (HSPF) values at AHRI standard test. Currently, these values are only reported for coil type = \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
 \item
@@ -399,7 +399,7 @@ This table shows some ratios that may be handy in evaluating the results. It con
 
 The Air Loop Component Summary tables also include tables that indicate the zones included in the aggregated results for heating and cooling.
 
-If the time of the peak load for each Zone for cooling exactly matches the time of the peak load for the AirLoop or Facility than the Estimated Cooling Peak Load Components will represent a sum of the values from the corresponding zones. Likewise the Estimated Heating Peak Load Components will add up for the AirLoop or Facility if the times of the heating peaks exactly match. This is not necessarily the case for Peak Conditions or the Engineering Checks tables. Since the sizing of Airloops is based on the system sizing they usually will be different than the sum of the corresonding zones.
+If the time of the peak load for each Zone for cooling exactly matches the time of the peak load for the AirLoop or Facility than the Estimated Cooling Peak Load Components will represent a sum of the values from the corresponding zones. Likewise the Estimated Heating Peak Load Components will add up for the AirLoop or Facility if the times of the heating peaks exactly match. This is not necessarily the case for Peak Conditions or the Engineering Checks tables. Since the sizing of Airloops is based on the system sizing they usually will be different than the sum of the corresponding zones.
 
 \paragraph{Standard 62.1 Summary}\label{standard-62.1-summary}
 
@@ -450,7 +450,7 @@ The Economic Result Summary provides a summary of the Tariff Reports. The report
 
 \paragraph{Component Cost Economics Summary}\label{component-cost-economics-summary}
 
-The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight catagories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. The key used to obtain this report is ComponentCostEconomicsSummary.
+The Component Cost Economics Summary provides the construction cost estimate summary for the project. The costs are broken into eight categories and the reference building costs are provided as a comparison. A second table is also produced that provides line item details with one line for every line item object. The key used to obtain this report is ComponentCostEconomicsSummary.
 
 \paragraph{Life Cycle Cost Report}\label{LifeCycleCostReport}
 
@@ -497,7 +497,7 @@ building simulation model.
 
 \subsubsection{Predefined Monthly Summary Reports}\label{predefined-monthly-summary-reports}
 
-The predefined monthly report options are shown below. The key name of the predefined monthly report is all that is needed to have that report appear in the tabular output file. After each report name below are the output variables and aggregation types used. These cannot be modified when using the predefined reports but if changes are desired, a \hyperref[outputtablemonthly]{Output:Table:Monthly} can be used instead. The StandardReports.idf file in the DataSets directory includes a \hyperref[outputtablemonthly]{Output:Table:Monthly} that exactly corresponds to the predefined monthly reports shown below. They can be copied into an IDF file and extended if additional variables are desired. A listing of each available key for predefined monthly summary reports follows with a discrption of the variables included.
+The predefined monthly report options are shown below. The key name of the predefined monthly report is all that is needed to have that report appear in the tabular output file. After each report name below are the output variables and aggregation types used. These cannot be modified when using the predefined reports but if changes are desired, a \hyperref[outputtablemonthly]{Output:Table:Monthly} can be used instead. The StandardReports.idf file in the DataSets directory includes a \hyperref[outputtablemonthly]{Output:Table:Monthly} that exactly corresponds to the predefined monthly reports shown below. They can be copied into an IDF file and extended if additional variables are desired. A listing of each available key for predefined monthly summary reports follows with a description of the variables included.
 
 \paragraph{ZoneCoolingSummaryMonthly}\label{zonecoolingsummarymonthly}
 

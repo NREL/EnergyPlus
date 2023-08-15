@@ -301,7 +301,7 @@ where
 
 \(\rho_{material}\) = dry density of material, kg/m$^3$;
 
-\(\frac{du}{d\phi}\) = slope of moisture soprtion curve, \(a b \phi^{b-1} + c d \phi^{d-1}\).
+\(\frac{du}{d\phi}\) = slope of moisture sorption curve, \(a b \phi^{b-1} + c d \phi^{d-1}\).
 
 If this field is left blank or set to \texttt{autocalculate}, the above equation will be used to calculate the surface layer penetration depth assuming a $\tau_{surf}$ of 24 hours.
 
@@ -1917,7 +1917,7 @@ The molecular weight for gas.~ The molecular weight is the mass of 1 mol of the 
 
 \paragraph{Field: Specific Heat Ratio}\label{field-specific-heat-ratio-1}
 
-The specific heat ratio for gas.~ The specific heat ratio of a gas is the ratio of the specific heat at contant pressure, to the specific heat at constant volume.~ Used only if Gas Type = Custom.
+The specific heat ratio for gas.~ The specific heat ratio of a gas is the ratio of the specific heat at constant pressure, to the specific heat at constant volume.~ Used only if Gas Type = Custom.
 
 An IDF example:
 
@@ -2919,17 +2919,17 @@ WindowMaterial:Screen,
 
 \subsection{WindowMaterial:Shade:EquivalentLayer}\label{windowmaterialshadeequivalentlayer}
 
-This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittence is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
+This object specifies the properties of Equivalent Layer window shade (roller blind) materials. Shades are considered to be thin, flat and perfect diffusers (all transmitted and reflected radiation is hemispherically-diffuse). However, shades can have beam-beam transmittance by virtue of their material openness.~ The beam-beam transmittance is assumed to be the same for both sides of the shade and is the same as the openness area fraction. Beam-diffuse transmittance and reflectance, and emissivity properties can be different for front and back side of the shade.Window shades can be placed on the inside of the window, on the outside of the window, or between glass layers. WindowMaterial:Shade:EquivalentLayer is used for roller blinds. The off-normal solar property calculation of shades (roller blind) is based on a set of correlations developed from measurement of samples of commercially produced roller blind material with openness fraction less than 0.14. The model is not intended for materials with unusually high values of openness and should be limited to a maximum openness fraction of 0.20. The visible spectrum solar properties input fields are not used currently hence can be left blank. The equivalent layer window shade model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
 
 \subsubsection{Inputs}\label{inputs-26-002}
 
 \paragraph{Field: Name}\label{field-name-20-003}
 
-Name of the shade. It is referenced as an inside, inbetween or outside layer in an equivalent layer~ window construction.
+Name of the shade. It is referenced as an inside, in-between or outside layer in an equivalent layer~ window construction.
 
 \paragraph{Field: Shade Beam-Beam Solar Transmittance}\label{field-shade-beam-beam-solar-transmittance}
 
-This value is the beam-beam transmittance of the shade at normal incidence and it is the same as the openness area fraction of the shade material. Assumed to be the same for front and back sides of the roller blinds.~ The minimum value is 0.0 and maximum value is less than 1.0.~ The default value is 0.0. For most common shade materials (e.g.~Roller Blinds) the material oppeness fraction doesn't exceed 0.20.
+This value is the beam-beam transmittance of the shade at normal incidence and it is the same as the openness area fraction of the shade material. Assumed to be the same for front and back sides of the roller blinds.~ The minimum value is 0.0 and maximum value is less than 1.0.~ The default value is 0.0. For most common shade materials (e.g.~Roller Blinds) the material openness fraction doesn't exceed 0.20.
 
 \paragraph{Field: Front Side Shade Beam-Diffuse Solar Transmittance}\label{field-front-side-shade-beam-diffuse-solar-transmittance}
 
@@ -2994,7 +2994,7 @@ WindowMaterial:Shade:EquivalentLayer,
 
 Specifies the optical and thermal properties of equivalent layer window drape fabric materials.
 
-Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations reqiure that the solar absorptance of the fabric, at normal incidence, is not less than 1\%. The equivalent layer window drapery fabric shade model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
+Drapery fabric shades are commonly placed on the the inside of the window. The long-wave (Thermal) properties for commonly used drapery fabrics are assumed to be the same on both sides but different values can be specified when required. Drape fabric shade layers are considered to be perfect diffusers (reflected radiation is hemispherically-diffuse independent of angle of incidence). Unpleated drape fabric is treated as thin and flat layer.The off-normal optical properties of drapery fabric is determined from user specified optical properties at normal incidence using empirical correlations. Pleated drape fabric requires entering the pleated section average width and length as shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}. For pleated drapes the effective beam-beam and beam-diffuse solar properties are determined by tracking both radiation components, for a given incident angle solar radiation, through various interactions with a fabric pleated in a rectangular geometry shown in Figure~\ref{fig:geometry-used-for-pleated-drape-analysis}.~ The solar properties of the two different pleat facets are evaluated on the basis of the local solar incidence angle.~ Therefore, the effective layer properties are influenced not just by horizontal solar profile angle, but also by incidence angle. The correlations used for drape fabrics optical property calculations require that the solar absorptance of the fabric, at normal incidence, is not less than 1\%. The equivalent layer window drapery fabric shade model does not support \hyperref[windowpropertyshadingcontrol]{WindowShadingControl}.
 
 \begin{figure}[hbtp] % fig 21
 \centering
@@ -3189,7 +3189,7 @@ This value is the back side long-wave hemispherical emissivity of the slat mater
 
 \paragraph{Field: Slat Angle Control}\label{field-slat-angle-control}
 
-This input field is used only if slat angle control is desired.~ The three key choice inputs allowed are ``FixedSlatAngle'', ``MaximizeSolar'', and ``BlockBeamSolar''.~ The default value is ``FixedSlatAngle''.If Type of Slat Angle Control for Blinds = MaximizeSolar the slat angle is adjusted to maximize solar gain.~If Type of Slat Angle Control for Blinds = BlockBeamSolar, the slat angle is adjusted to maximize visibiity while eliminating beam solar radiation.~If Type of Slat Angle Control for Blinds = FixedSlatAngle, then the model uses a fixed slat angle specified above.
+This input field is used only if slat angle control is desired.~ The three key choice inputs allowed are ``FixedSlatAngle'', ``MaximizeSolar'', and ``BlockBeamSolar''.~ The default value is ``FixedSlatAngle''.If Type of Slat Angle Control for Blinds = MaximizeSolar the slat angle is adjusted to maximize solar gain.~If Type of Slat Angle Control for Blinds = BlockBeamSolar, the slat angle is adjusted to maximize visibility while eliminating beam solar radiation.~If Type of Slat Angle Control for Blinds = FixedSlatAngle, then the model uses a fixed slat angle specified above.
 
 An IDF example for this object, is shown below:
 
@@ -4066,7 +4066,7 @@ This field is a user specified name that will be used as a reference by other in
 
 \paragraph{Field: Source Present After Layer Number}\label{field-source-present-after-layer-number}
 
-This field is an integer that relates the location of the heat source or sink. The integer refers to the list of material layers that follow later in the syntax and determines the layer after which the source is present. If a source is embedded within a single homogenous layer (such as concrete), that layer should be split into two layers and the source added between them. For example, a value of ``2'' in this field tells EnergyPlus that the source is located between the second and third material layers listed later in the construction description (see layer fields below). This field must be between 1 and the number of material layers in the construction (maximum of 10 layers).
+This field is an integer that relates the location of the heat source or sink. The integer refers to the list of material layers that follow later in the syntax and determines the layer after which the source is present. If a source is embedded within a single homogeneous layer (such as concrete), that layer should be split into two layers and the source added between them. For example, a value of ``2'' in this field tells EnergyPlus that the source is located between the second and third material layers listed later in the construction description (see layer fields below). This field must be between 1 and the number of material layers in the construction (maximum of 10 layers).
 
 \paragraph{Field: Temperature Calculation Requested After Layer Number}\label{field-temperature-calculation-requested-after-layer-number}
 
