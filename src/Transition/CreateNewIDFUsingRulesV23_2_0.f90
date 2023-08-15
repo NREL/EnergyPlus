@@ -164,6 +164,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   REAL :: latentNmax
   REAL :: latentA
   REAL :: latentCd
+  INTEGER :: NumUnitarySystem
+  INTEGER :: NumUnitaryWAHP
+  INTEGER :: NumZoneWAHP
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -302,7 +305,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! Do any kind of Preprocessing that is needed here (eg: a first pass on objects to store some attributes etc)
-          ALLOCATE(CoilLatentStuff(NumIDFRecords))  ! Excessively large, but better than resizing the array over and over
+          NumUnitarySystem = GetNumObjectsFound('AIRLOOPHVAC:UNITARYSYSTEM')
+          NumUnitaryWAHP = GetNumObjectsFound('AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR')
+          NumZoneWAHP = GetNumObjectsFound('ZONEHVAC:WATERTOAIRHEATPUMP')
+          ALLOCATE(CoilLatentStuff(NumUnitarySystem + NumUnitaryWAHP + NumZoneWAHP))
+          NumCoilLatentStuff = 0
           DO Num=1,NumIDFRecords
               SELECT CASE (MakeUPPERCase(IDFRecords(Num)%Name))
               CASE ('AIRLOOPHVAC:UNITARYSYSTEM')
@@ -529,18 +536,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(127:136)=InArgs(106:115)
                 OutArgs(137)='' ! new speed 10 2017 rated field
                 OutArgs(138)='' ! new speed 10 2023 rated field
-                OutArgs(139:CurArgs+20)=InArgs(116:CurArgs)
+                OutArgs(139:148)=InArgs(116:125)
                 ! But then only modify CurArgs based on the number of fields
-                IF (CurArgs >= 25) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
-                IF (CurArgs >= 35) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 45) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 55) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 65) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 75) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 85) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 95) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 105) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
-                IF (CurArgs >= 115) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 28) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
+                IF (CurArgs >= 38) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 48) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 58) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 68) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 78) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 88) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 98) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 108) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
+                IF (CurArgs >= 118) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
 
               CASE('COIL:HEATING:DX:VARIABLESPEED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -611,27 +618,29 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   nodiff=.false.
                   OutArgs(1:41)=InArgs(1:41)
                   OutArgs(42:CurArgs-4) = InArgs(46:CurArgs)
-                  CurArgs = CurArgs - 4
+                  ! only reduce cur args if we actually had that many
+                  IF (CurArgs > 42) CurArgs = CurArgs - 4
                   CALL WriteOutIDFLines(DifLfn,'AirLoopHVAC:UnitarySystem',CurArgs,OutArgs,NwFldNames,NwFldUnits)
                   DO Num3 = 1, NumCoilLatentStuff
                       IF (('AIRLOOPHVAC:UNITARYSYSTEM' /= CoilLatentStuff(Num3)%ParentType) .OR. (MakeUPPERCase(InArgs(1)) /= CoilLatentStuff(Num3)%ParentName)) CYCLE
+                      IF (.NOT. CoilLatentStuff(Num3)%ActuallyCreateCurve) CYCLE
                       nodiff=.false.
                       CALL GetNewObjectDefInIDD('Curve:Linear',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                       IF (TRIM(CoilLatentStuff(Num3)%cHeatPumpTimeConst) == '') THEN
                           latentTau = 60
                       ELSE
-                          READ(CoilLatentStuff(Num3)%cHeatPumpTimeConst, *) latentTau
+                          latentTau = ProcessNumber(CoilLatentStuff(Num3)%cHeatPumpTimeConst, ErrFlag)
                       END IF
                       IF (TRIM(CoilLatentStuff(Num3)%cMaxCyclingRate) == '') THEN
                           latentNmax = 2.5  ! does this need to be converted to seconds?
                       ELSE
-                          READ(CoilLatentStuff(Num3)%cMaxCyclingRate, *) latentNmax
+                          latentNmax = ProcessNumber(CoilLatentStuff(Num3)%cMaxCyclingRate, ErrFlag)
                       END IF
                       latentA = 4 * latentTau * (latentNmax / 3600.0)
                       latentCd = latentA * (1 - EXP(-1 / latentA))
                       OutArgs(1) = CoilLatentStuff(Num3)%NewCurveName
-                      WRITE(OutArgs(2), *) (1 - latentCd)
-                      WRITE(OutArgs(3), *) latentCd
+                      OutArgs(2) = TrimSigDigits(1 - latentCd, 5)
+                      OutArgs(3) = TrimSigDigits(latentCd, 5)
                       OutArgs(4) = "0.0"
                       OutArgs(5) = "1.0"
                       OutArgs(6) = "0.0"
@@ -653,23 +662,24 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   CALL WriteOutIDFLines(DifLfn,'AirLoopHVAC:UnitaryHeatPump:WaterToAir',CurArgs,OutArgs,NwFldNames,NwFldUnits)
                   DO Num3 = 1, NumCoilLatentStuff
                       IF (('AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR' /= CoilLatentStuff(Num3)%ParentType) .OR. (MakeUPPERCase(InArgs(1)) /= CoilLatentStuff(Num3)%ParentName)) CYCLE
+                      IF (.NOT. CoilLatentStuff(Num3)%ActuallyCreateCurve) CYCLE
                       nodiff=.false.
                       CALL GetNewObjectDefInIDD('Curve:Linear',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                       IF (TRIM(CoilLatentStuff(Num3)%cHeatPumpTimeConst) == '') THEN
                           latentTau = 60
                       ELSE
-                          READ(CoilLatentStuff(Num3)%cHeatPumpTimeConst, *) latentTau
+                          latentTau = ProcessNumber(CoilLatentStuff(Num3)%cHeatPumpTimeConst, ErrFlag)
                       END IF
                       IF (TRIM(CoilLatentStuff(Num3)%cMaxCyclingRate) == '') THEN
                           latentNmax = 2.5  ! does this need to be converted to seconds?
                       ELSE
-                          READ(CoilLatentStuff(Num3)%cMaxCyclingRate, *) latentNmax
+                          latentNmax = ProcessNumber(CoilLatentStuff(Num3)%cMaxCyclingRate, ErrFlag)
                       END IF
                       latentA = 4 * latentTau * (latentNmax / 3600.0)
                       latentCd = latentA * (1 - EXP(-1 / latentA))
                       OutArgs(1) = CoilLatentStuff(Num3)%NewCurveName
-                      WRITE(OutArgs(2), *) (1 - latentCd)
-                      WRITE(OutArgs(3), *) latentCd
+                      OutArgs(2) = TrimSigDigits(1 - latentCd, 5)
+                      OutArgs(3) = TrimSigDigits(latentCd, 5)
                       OutArgs(4) = "0.0"
                       OutArgs(5) = "1.0"
                       OutArgs(6) = "0.0"
@@ -691,23 +701,24 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:WaterToAirHeatPump',CurArgs,OutArgs,NwFldNames,NwFldUnits)
                   DO Num3 = 1, NumCoilLatentStuff
                       IF (('ZONEHVAC:WATERTOAIRHEATPUMP' /= CoilLatentStuff(Num3)%ParentType) .OR. (MakeUPPERCase(InArgs(1)) /= CoilLatentStuff(Num3)%ParentName)) CYCLE
+                      IF (.NOT. CoilLatentStuff(Num3)%ActuallyCreateCurve) CYCLE
                       nodiff=.false.
                       CALL GetNewObjectDefInIDD('Curve:Linear',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                       IF (TRIM(CoilLatentStuff(Num3)%cHeatPumpTimeConst) == '') THEN
                           latentTau = 60
                       ELSE
-                          READ(CoilLatentStuff(Num3)%cHeatPumpTimeConst, *) latentTau
+                          latentTau = ProcessNumber(CoilLatentStuff(Num3)%cHeatPumpTimeConst, ErrFlag)
                       END IF
                       IF (TRIM(CoilLatentStuff(Num3)%cMaxCyclingRate) == '') THEN
                           latentNmax = 2.5  ! does this need to be converted to seconds?
                       ELSE
-                          READ(CoilLatentStuff(Num3)%cMaxCyclingRate, *) latentNmax
+                          latentNmax = ProcessNumber(CoilLatentStuff(Num3)%cMaxCyclingRate, ErrFlag)
                       END IF
                       latentA = 4 * latentTau * (latentNmax / 3600.0)
                       latentCd = latentA * (1 - EXP(-1 / latentA))
                       OutArgs(1) = CoilLatentStuff(Num3)%NewCurveName
-                      WRITE(OutArgs(2), *) (1 - latentCd)
-                      WRITE(OutArgs(3), *) latentCd
+                      OutArgs(2) = TrimSigDigits(1 - latentCd, 5)
+                      OutArgs(3) = TrimSigDigits(latentCd, 5)
                       OutArgs(4) = "0.0"
                       OutArgs(5) = "1.0"
                       OutArgs(6) = "0.0"
@@ -728,8 +739,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   DO Num3 = 1, NumCoilLatentStuff
                       IF (('COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION' /= CoilLatentStuff(Num3)%CoolingCoilType) .OR. (MakeUPPERCase(InArgs(1)) /= CoilLatentStuff(Num3)%CoolingCoilName)) CYCLE
                       nodiff=.false.
-                      OutArgs(1:27)=InArgs(1:27)
-                      OutArgs(28) = CoilLatentStuff(Num3)%NewCurveName
+                      OutArgs = ''  ! first make them all blank
+                      OutArgs(1:CurArgs)=InArgs(1:CurArgs)  ! fill out to the amount given in the input
+                      OutArgs(28) = CoilLatentStuff(Num3)%NewCurveName  ! add in the new trailing fields at the end
                       OutArgs(29) = CoilLatentStuff(Num3)%cMaxCyclingRate
                       OutArgs(30) = CoilLatentStuff(Num3)%cHeatPumpTimeConst
                       OutArgs(31) = CoilLatentStuff(Num3)%cHPDelayTime
@@ -753,13 +765,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   DO Num3 = 1, NumCoilLatentStuff
                       IF (('COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT' /= CoilLatentStuff(Num3)%CoolingCoilType) .OR. (MakeUPPERCase(InArgs(1)) /= CoilLatentStuff(Num3)%CoolingCoilName)) CYCLE
                       nodiff=.false.
-                      OutArgs(1:18)=InArgs(1:18)
-                      OutArgs(19) = CoilLatentStuff(Num3)%NewCurveName
-                      OutArgs(20:21) = InArgs(19:20)
-                      OutArgs(22) = CoilLatentStuff(Num3)%cMaxCyclingRate
-                      OutArgs(23) = CoilLatentStuff(Num3)%cHeatPumpTimeConst
-                      OutArgs(24) = CoilLatentStuff(Num3)%cHPDelayTime
-                      CurArgs = 24
+                      OutArgs(1:16)=InArgs(1:16)
+                      OutArgs(17) = CoilLatentStuff(Num3)%NewCurveName
+                      OutArgs(18:19) = InArgs(17:18)
+                      OutArgs(20) = CoilLatentStuff(Num3)%cMaxCyclingRate
+                      OutArgs(21) = CoilLatentStuff(Num3)%cHeatPumpTimeConst
+                      OutArgs(22) = CoilLatentStuff(Num3)%cHPDelayTime
+                      CurArgs = 22
                       EXIT
                   END DO
 
@@ -768,9 +780,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   DO Num3 = 1, NumCoilLatentStuff
                       IF (('COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT' /= CoilLatentStuff(Num3)%HeatingCoilType) .OR. (MakeUPPERCase(InArgs(1)) /= CoilLatentStuff(Num3)%HeatingCoilName)) CYCLE
                       nodiff=.false.
-                      OutArgs(1:24)=InArgs(1:24)
-                      OutArgs(25) = CoilLatentStuff(Num3)%NewCurveName
-                      CurArgs = 25
+                      OutArgs(1:14)=InArgs(1:14)
+                      OutArgs(15) = CoilLatentStuff(Num3)%NewCurveName
+                      CurArgs = 15
                       EXIT
                   END DO
 
@@ -783,6 +795,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                       OutArgs(13) = CoilLatentStuff(Num3)%cMaxCyclingRate
                       OutArgs(14) = CoilLatentStuff(Num3)%cHeatPumpTimeConst
                       OutArgs(15) = CoilLatentStuff(Num3)%cHPDelayTime
+                      OutArgs(16:CurArgs+3) = InArgs(13:CurArgs)
                       CurArgs = CurArgs + 3
                       EXIT
                   END DO
