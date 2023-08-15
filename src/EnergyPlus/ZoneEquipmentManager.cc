@@ -4519,14 +4519,22 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
             Real64 ZoneMixingNetAirMassFlowRate = 0.0;
             Real64 ZoneReturnAirMassFlowRate = 0.0;
 
-            Real64 TotInletAirMassFlowRate = 0.0;
+            // SpaceHVAC TODO: For now, ZoneMassBalance happens at the zone level, not space
+            zoneEquipConfig.setTotalInletFlows(state);
+            Real64 TotInletAirMassFlowRate = zoneEquipConfig.TotInletAirMassFlowRate;
             if (state.dataHeatBal->doSpaceHeatBalance) {
                 for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    TotInletAirMassFlowRate = state.dataZoneEquip->spaceEquipConfig(spaceNum).setTotalInletFlows(state);
+                    auto &spaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(spaceNum);
+                    if (spaceEquipConfig.IsControlled) {
+                        spaceEquipConfig.setTotalInletFlows(state);
+                    } else {
+                        // If space is not controlled, allocate zone-level airflow by volume
+                        auto &thisSpace = state.dataHeatBal->space(spaceNum);
+                        Real64 spaceFrac = thisSpace.fracZoneVolume;
+                        DataZoneEquipment::scaleInletFlows(state, zoneEquipConfig.ZoneNode, thisSpace.SystemZoneNodeNumber, spaceFrac);
+                    }
                 }
             }
-            // SpaceHVAC TODO: For now, ZoneMassBalance happens at the zone level, not space
-            TotInletAirMassFlowRate = zoneEquipConfig.setTotalInletFlows(state);
 
             for (int NodeNum = 1; NodeNum <= zoneEquipConfig.NumExhaustNodes; ++NodeNum) {
 

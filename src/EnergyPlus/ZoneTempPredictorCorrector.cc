@@ -5620,7 +5620,7 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
     }
 
     if (spaceNum > 0 && !isSpaceControlled) {
-        // If space is not controlled, allocate zone-level airflow
+        // If space is not controlled, allocate zone-level airflow by volume
         Real64 spaceFrac = state.dataHeatBal->space(spaceNum).fracZoneVolume;
         this->SumSysMCp *= spaceFrac;
         this->SumSysMCpT *= spaceFrac;

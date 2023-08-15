@@ -1559,10 +1559,9 @@ void CheckSharedExhaust(EnergyPlusData &state)
     }
 }
 
-Real64 EquipConfiguration::setTotalInletFlows(EnergyPlusData &state)
+void EquipConfiguration::setTotalInletFlows(EnergyPlusData &state)
 {
     this->TotInletAirMassFlowRate = 0.0;
-    if (!IsControlled) return 0.0;
     Real64 TotInletAirMassFlowRateMax = 0.0;
     Real64 TotInletAirMassFlowRateMaxAvail = 0.0;
     Real64 TotInletAirMassFlowRateMin = 0.0;
@@ -1583,7 +1582,18 @@ Real64 EquipConfiguration::setTotalInletFlows(EnergyPlusData &state)
     zoneSpaceNode.MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
     zoneSpaceNode.MassFlowRateMin = TotInletAirMassFlowRateMin;
     zoneSpaceNode.MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
-    return this->TotInletAirMassFlowRate;
 }
 
+void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spaceNodeNum, Real64 const frac)
+{
+    assert(zoneNodeNum > 0);
+    assert(spaceNodeNum > 0);
+    auto &zoneNode = state.dataLoopNodes->Node(zoneNodeNum);
+    auto &spaceNode = state.dataLoopNodes->Node(spaceNodeNum);
+    spaceNode.MassFlowRate = zoneNode.MassFlowRate * frac;
+    spaceNode.MassFlowRateMax = zoneNode.MassFlowRateMax * frac;
+    spaceNode.MassFlowRateMaxAvail = zoneNode.MassFlowRateMaxAvail * frac;
+    spaceNode.MassFlowRateMin = zoneNode.MassFlowRateMin * frac;
+    spaceNode.MassFlowRateMinAvail = zoneNode.MassFlowRateMinAvail * frac;
+}
 } // namespace EnergyPlus::DataZoneEquipment

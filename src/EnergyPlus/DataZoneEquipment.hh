@@ -382,7 +382,7 @@ namespace DataZoneEquipment {
         {
         }
 
-        Real64 setTotalInletFlows(EnergyPlusData &state);
+        void setTotalInletFlows(EnergyPlusData &state);
     };
 
     struct EquipmentData // data for an individual component
@@ -574,6 +574,8 @@ namespace DataZoneEquipment {
     bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
 
     void CheckSharedExhaust(EnergyPlusData &state);
+
+    void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spaceNodeNum, Real64 const frac);
 
 } // namespace DataZoneEquipment
 
