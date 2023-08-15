@@ -10,7 +10,7 @@ Several different coils may be added to zone equipment and air loops. This inclu
 
 \subsection{Coil:Cooling:Water}\label{coilcoolingwater}
 
-The water cooling coil (Coil:Cooling:Water) has the ability to give detailed output with simplified inputs, inputting complicated coil geometry is not required by the user for this model instead the coil is sized in terms of auto-sizeable thermodynamic inputs. The coil requires thermodynamic inputs such as temperatures, mass flow rates and humidity ratios.
+The water cooling coil (Coil:Cooling:Water) has the ability to give detailed output with simplified inputs, inputting complicated coil geometry is not required by the user for this model instead the coil is sized in terms of auto-sizable thermodynamic inputs. The coil requires thermodynamic inputs such as temperatures, mass flow rates and humidity ratios.
 
 The coil is sized using auto-sized/user design input conditions and the UA values are calculated from the design conditions. A rough estimate of the coil area is provided along with percentage of surface wet and/or dry. This model uses the NTU-effectiveness approach to model heat transfer and has two types of flow arrangements cross-flow or counter-flow.
 
@@ -531,7 +531,7 @@ The coil system cooling object to operate the coil entering water (fluid) temper
 
 \subsubsection{Wrap Around Water Coil Heat Recovery Mode}\label{wrap-around-water-coil-heat-recovery-mode}
 
-This coil system may also be used to model a wrap-around water coil heat recovery system where a water coil system object is in one air stream (e.g., the outdoor air stream) while another cooling coil object is in a seperate air stream (e.g., exhaust air stream). The two water coils are connected in series on the demand side of a plant loop where the CoilSystem:Cooling:Water object is upstream of the Coil:Cooling:Water object. For wrap-around heat recovery coils, the supply side of the plant will typically have only a pump to circulate the water.\par
+This coil system may also be used to model a wrap-around water coil heat recovery system where a water coil system object is in one air stream (e.g., the outdoor air stream) while another cooling coil object is in a separate air stream (e.g., exhaust air stream). The two water coils are connected in series on the demand side of a plant loop where the CoilSystem:Cooling:Water object is upstream of the Coil:Cooling:Water object. For wrap-around heat recovery coils, the supply side of the plant will typically have only a pump to circulate the water.\par
 
 The CoilSystemCooling:Water object is the main controller for the heat recovery loop. Neither this object or other coils in the heat recovery loop require an external controller (Ref: \hyperref[controllerwatercoil]{Controller:WaterCoil}). Do not specify a controller for this object or the associated water coil elsewhere in the input. This object checks that the water coil entering water (fluid) temperature to coil entering air temperature absolute difference is greater than the user specified temperature offset, otherwise the system is disabled. The water loop temperature entering the coil system's coil will be maintained between the entering air temperatures of the water coils (e.g., midway between the outdoor air temperature and exhaust air temperature if the coils are used in the outdoor air system). The coil system will be disabled if the plant loop water temperature falls below the minimum allowed heat recovery loop water temperature (Ref. field \hyperref[field-minimum-water-loop-temperature-for-heat-recovery]{Minimum Water Loop Temperature For Heat Recover}). Figure~\ref{fig:wrap-around-water-coil-heat-recovery-system-in-outdoor-air-system} shows a wrap-around heat recovery coil system in the outdoor air and relief air streams of the outdoor air system.
 
@@ -2048,13 +2048,13 @@ This model requires five (5) curves as follows:
 \item
   The total cooling capacity modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The curve is normalized to 1 at 19.44$^\circ$C indoor wet-bulb temperature and 35$^\circ$C outdoor dry-bulb temperature. The output of this curve is multiplied by the gross rated total cooling capacity to give the gross total cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 \item
-  The total cooling capacity modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the gross rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the gross total cooling capacity at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+  The total cooling capacity modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the gross rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the gross total cooling capacity at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 \item
   The energy input ratio (EIR) modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The curve is normalized to 1 at 19.44$^\circ$C indoor wet-bulb temperature and 35$^\circ$C outdoor dry-bulb temperature. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 \item
-  The energy input ratio (EIR) modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+  The energy input ratio (EIR) modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The curve is normalized to have the value of 1.0 when the actual air flow rate equals the rated air flow rate. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating. This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 \item
-  The part load fraction correlation (function of part load ratio) is a curve or a lookup table with the independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The curve should be normalized to a value of 1.0 when the part-load ratio equals 1.0 (i.e., the compressor(s) run continuously for the simulation timestep). This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+  The part load fraction correlation (function of part load ratio) is a curve or a lookup table with the independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The curve should be normalized to a value of 1.0 when the part-load ratio equals 1.0 (i.e., the compressor(s) run continuously for the simulation timestep). This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 \end{enumerate}
 
 The curves are simply specified by name. Curve inputs are described in the curve manager section of this document (see Performance Curves in this document).
@@ -2135,7 +2135,7 @@ The name of a performance curve (Ref: Performance Curves) that parameterizes the
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-2}
 
-This alpha field defines the name of a performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. This curve is typically a quadratic or cubic but any curve or table with one independent variablecan be used.
+This alpha field defines the name of a performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the effective EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. This curve is typically a quadratic or cubic but any curve or table with one independent variable can be used.
 
 The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 \textless{}= PLR \textless{} 1), the following rules apply:
 
@@ -3065,7 +3065,7 @@ Coil:Cooling:DX:MultiSpeed,
   HPACCOOLEIRFT Speed 4,           !- Speed 4 Energy Input Ratio Modifier Curve (temperature)
   HPACCOOLEIRFF Speed 4,           !- Speed 4 Energy Input Ratio Modifier Curve (flow fraction)
   HPACCOOLPLFFPLR Speed 1,         !- Speed 4 Part Load Fraction Correlation (part load ratio)
-  1000.0,                          !- Speed 4 ominal Time for Condensate Removal to Begin {s}
+  1000.0,                          !- Speed 4 Nominal Time for Condensate Removal to Begin {s}
   1.5,                             !- Speed 4 Ratio of Initial Moisture Evaporation Rate and Steady-state Capacity {dimensionless}
   3.0,                             !- Speed 4 Maximum ON/OFF Cycling Rate {cycles/hr}
   45.0,                            !- Speed 4 Latent Capacity Time Constant {s}
@@ -4645,11 +4645,11 @@ This is the fuel consumption of the DX coil unit in Joules for the timestep bein
 
 \paragraph{Heating Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-power-w-1}
 
-This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
+This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. When a companion cooling coil exits, the crankcase heater power of the companion cool coil is also reported in this variable.
 
 \paragraph{Heating Coil Crankcase Heater Electricity Energy {[}J{]}}\label{heating-coil-crankcase-heater-electric-energy-j-1}
 
-This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is alos reported in this variable.
+This is the electricity consumption of the DX coil compressor's crankcase heater in Joules for the timestep being reported. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects). When a companion cooling coil exits, the crankcase heater power of the companion cool coil is also reported in this variable.
 
 \paragraph{Heating Coil Runtime Fraction {[]}}
 
@@ -4782,7 +4782,7 @@ This numeric field defines the total, full load gross heating capacity in watts 
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Gross Rated Heating COP}\label{field-speed-x-reference-unit-gross-rated-heating-cop}
 
-This numeric field defines the coefficient of performance (COP = gross heating capacityin watts divided by electrical power input in watts) of the heating coil unit at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here must be greater than 0. The input power includes power for the compressor(s), the outdoor coil fan and accessories, but does not include the power consumption of the indoor supply air fan. The gross COP should NOT account for the supply air fan.
+This numeric field defines the coefficient of performance (COP = gross heating capacity in watts divided by electrical power input in watts) of the heating coil unit at rated conditions for Speed \textless{}x\textgreater{} operation. The value entered here must be greater than 0. The input power includes power for the compressor(s), the outdoor coil fan and accessories, but does not include the power consumption of the indoor supply air fan. The gross COP should NOT account for the supply air fan.
 
 \paragraph{Field: Speed \textless{}x\textgreater{} Reference Unit Rated Air Flow Rate}\label{field-speed-x-reference-unit-rated-air-flow-rate-1}
 
@@ -5256,7 +5256,7 @@ These outputs are the parasitic electric power and consumption associated with t
 
 The CoilSystem:Cooling:DX object is a virtual container component that consists of a DX cooling coil component and its associated controls, as shown in the Figure below. This control object supports several different types of DX cooling coils (see field Cooling Coil Object Type).
 
-This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan. CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} . It requires one or more setpoint manager (see SetpointManager:*) objects to specify temperature and/or humidity setpoints (unless it is used in a \hyperref[zonehvacoutdoorairunit]{ZoneHVAC:OutdoorAirUnit} which has its own temperature setpoints). This object is the one that is listed in the Branch or equipment list object rather than the coil itself. A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. \hyperref[fanconstantvolume]{Fan:ConstantVolume} and \hyperref[fanvariablevolume]{Fan:VariableVolume}). Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in arloop branches where the air flow to capacity ratio range is between 100 300 cfm/ton. 100\% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying YES to the input field Use Outdoor Air DX Cooling Coil . If this optional input field is left blank or specified as NO , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} then it is treated as 100\% DOAS DX cooling coil only if the choice input field Use Outdoor Air DX Cooling Coil is set too YES . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
+This component may be used as a cooling coil in constant volume or variable volume systems, as blow through or draw through, with or without humidity controls. Unlike AirLoopHVAC:Unitary system types, this component controls only the DX coil, not the supply fan. CoilSystem:Cooling:DX is added to a system by placing it in an air loop branch (see Branch object) or in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} . It requires one or more setpoint manager (see SetpointManager:*) objects to specify temperature and/or humidity setpoints (unless it is used in a \hyperref[zonehvacoutdoorairunit]{ZoneHVAC:OutdoorAirUnit} which has its own temperature setpoints). This object is the one that is listed in the Branch or equipment list object rather than the coil itself. A constant volume or variable volume fan is modeled separately from this cooling system. These are the only fan types allowed for this system type (ref. \hyperref[fanconstantvolume]{Fan:ConstantVolume} and \hyperref[fanvariablevolume]{Fan:VariableVolume}). Cycling fan operation is not available with this model. The CoilSystem:Cooling:DX object can also be placed on dedicated outdoor air system (DOAS) airloop branches or in airloop branches where the air flow to capacity ratio range is between 100 300 cfm/ton. 100\% DOAS DX cooling coils operate in lower flow to capacity ratio range compared to regular DX cooling coils. The CoilSystem:Cooling:DX is selected to operate in DOAS application or in low flow to capacity ratio range by specifying YES to the input field Use Outdoor Air DX Cooling Coil . If this optional input field is left blank or specified as NO , then the coil is modeled as regular DX cooling coil. If the CoilSystem:Cooling:DX object is in an \hyperref[airloophvacoutdoorairsystemequipmentlist]{AirLoopHVAC:OutdoorAirSystem:EquipmentList} or in a \hyperref[zonehvacoutdoorairunitequipmentlist]{ZoneHVAC:OutdoorAirUnit:EquipmentList} then it is treated as 100\% DOAS DX cooling coil only if the choice input field Use Outdoor Air DX Cooling Coil is set too YES . All the control options of the regular DX cooling coils are available to DOAS DX coils as well. Heating DX coils in DOAS airloop operate at the same flow to capacity ratio limits as the DOAS DX cooling coils.
 
 \begin{figure}[hbtp] % fig 138
 \centering
@@ -5687,7 +5687,7 @@ This alpha field defines the heating operation in the combined space heating and
 
 This alpha field defines the water heating operation in the combined space heating and water heating with desuperheating (SCDWH) mode in an ASIHP, which must be given. The power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted for by the heating coil part.
 
-\paragraph{Field: SCWH Mode Minimum Indoor Temperature to Allow  Overcooling}\label{Field-SCWH-Minimum-In-Overcooling-ASIHP}
+\paragraph{Field: SCWH Mode Minimum Indoor Temperature to Allow Overcooling}\label{Field-SCWH-Minimum-In-Overcooling-ASIHP}
 
 This numeric field defines an indoor air temperature [C] above which indoor overcooling is allowed in the cooling operation, i.e., allowing running the SCWH mode to cool down the indoor air below the thermostat setting temperature, and iterate the compressor speed to match the water heating load. It has to be noted that both the indoor temperature and ambient temperature lower bound settings have to be satisfied when allowing indoor overcooling by running the SCWH mode.
 
@@ -6852,7 +6852,7 @@ nThis output is also added to a meter with Resource Type = Electricity, End Use 
 This output variable is the ratio of the part-load capacity to the steady state capacity of the DX coil.
 
 \paragraph{HVAC,Average,Cooling Coil Air Mass Flow Rate {[}kg/s{]}}\label{vshpwhheating-output-cooling-coil-air-mass-flow-rate}
-The output variable is the average air mass flow rate going through the evporator over the timestep being reported.
+The output variable is the average air mass flow rate going through the evaporator over the timestep being reported.
 
 \paragraph{HVAC,Average,Cooling Coil Air Inlet Temperature {[}C{]}}\label{vshpwhheating-output-cooling-coil-air-inlet-temperature}
 The output variable is the average entering air dry-bulb temperature over the timestep being reported.
@@ -6976,7 +6976,7 @@ This numeric field defines the estimated parameter \textbf{compressor power loss
 This numeric field defines the estimated parameter of the \textbf{compressor's efficiency}. The compressor efficiency is formulated as the equation below:
 
 \begin{equation}
-\eta  = \frac{{{{\dot W}_{Theoritical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
+\eta  = \frac{{{{\dot W}_{Theoretical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
 \end{equation}
 
 This field was previously know as Parameter 5.
@@ -7109,7 +7109,7 @@ This numeric field contains the gross rated total cooling capacity of the heat p
 
 \paragraph{Field: Gross Rated Sensible Cooling Capacity}\label{field-gross-rated-sensible-cooling-capacity}
 
-This numeric field contains the gross rated sensible capacity of the heat pump in W. This field is autosizable. The gross rated sensible cooling capacity shouldnot account for the effect of supply air fan heat.
+This numeric field contains the gross rated sensible capacity of the heat pump in W. This field is autosizable. The gross rated sensible cooling capacity should not account for the effect of supply air fan heat.
 
 \paragraph{Field: Rated Cooling Coefficient of Performance}\label{field-rated-cooling-coefficient-of-performance}
 
@@ -7961,7 +7961,7 @@ This numeric field defines the estimated parameter \textbf{compressor power loss
 This numeric field defines the estimated parameter of the \textbf{compressor's efficiency}. The compressor efficiency is formulated as the equation below:
 
 \begin{equation}
-\eta  = \frac{{{{\dot W}_{Theoritical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
+\eta  = \frac{{{{\dot W}_{Theoretical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}
 \end{equation}
 
 This field was previously know as Parameter 4.
@@ -9103,7 +9103,7 @@ This field is the name of system node that serves as the outlet to the condenser
 
 This field is the rate of air flow through the condenser section, in m\(^{3}\)/s. The model assumes constant, single-speed condenser fans. The flow rate is not used to determine coil operation but is used to determine the conditions leaving the condenser section. This field is required, for both air-cooled and evaporatively-cooled condenser types.
 
-This field is autocalulatable. When autocalculated, the design flow rate is determined using the sizing factor in the following input field.
+This field is autocalculatable. When autocalculated, the design flow rate is determined using the sizing factor in the following input field.
 
 \paragraph{Field: Condenser Air Flow Sizing Factor}\label{field-condenser-air-flow-sizing-factor}
 
