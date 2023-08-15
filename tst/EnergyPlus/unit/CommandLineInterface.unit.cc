@@ -321,11 +321,11 @@ TEST_F(CommandLineInterfaceFixture, WeatherFileDoesNotExists)
         const int exitcode =
             processArgsHelper({flag, expectedParams.inputWeatherFilePath.generic_string(), expectedParams.inputFilePath.generic_string()});
         EXPECT_EQ(static_cast<int>(ReturnCodes::Failure), exitcode);
-        compare_cout_stream("");
-        compare_cerr_stream(delimited_string({
-            "--weather: File does not exist: WRONG.epw",
-            "Run with --help for more information.",
+        compare_cout_stream(delimited_string({
+            "ERROR: Could not find weather file: /home/julien/Software/Others/EnergyPlus-build-release/tst/EnergyPlus/unit/WRONG.epw.",
+            "Type 'energyplus --help' for usage.",
         }));
+        compare_cerr_stream("");
     }
 }
 

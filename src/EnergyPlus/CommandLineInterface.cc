@@ -153,7 +153,6 @@ Built on Platform: {}
                      state.dataGlobal->outputEpJSONConversionOnly,
                      "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation");
 
-        // TODO: make it an enum instead?
         std::string suffixType = "L";
         std::string const suffixHelp = R"help(Suffix style for output file names (default: L)
    L: Legacy (e.g., eplustbl.csv)
@@ -192,10 +191,12 @@ Built on Platform: {}
             });
 
         state.files.inputWeatherFilePath.filePath = "in.epw";
+        // Note: we can't do check(CLI::ExistingFile) here since passing a non-existing /path/to/myfile.epw file
+        // when there exists a /path/to/myfile.stat would mean the Weather File Statistics are still parsed and reported to the tabular output
+        // We still report a message + fail later if DDOnlySimulation is false
         app.add_option("-w,--weather", state.files.inputWeatherFilePath.filePath, "Weather file path (default: in.epw in current directory)")
             ->required(false)
-            ->option_text("EPW")
-            ->check(CLI::ExistingFile);
+            ->option_text("EPW");
 
         bool runExpandObjects = false;
         app.add_flag("-x,--expandobjects", runExpandObjects, "Run ExpandObjects prior to simulation");
