@@ -308,40 +308,6 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature is taken directly from the weather data.
 
-\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-001}
-
-This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate}. (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image295.png}
-\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate}}
-\end{figure}
-
-\paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant-000}
-
-This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant}. (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image296.png}
-\caption{Suggested values for heat pump time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant}}
-\end{figure}
-
-\paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use-000}
-
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are shown in Figure~\ref{fig:suggested-values-for-fraction-of-on-cycle-power-use}. (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image297.png}
-\caption{Suggested values for fraction of on cycle power use \protect \label{fig:suggested-values-for-fraction-of-on-cycle-power-use}}
-\end{figure}
-
-\paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time-000}
-
-This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
-
 \paragraph{Field: Ancillary On-Cycle Electric Power}\label{field-ancillary-on-cycle-electric-power}
 
 This field defines ancillary electrical power (W) consumed during the on-cycle period (i.e., when the cooling or heating coil is operating). The model assumes that this ancillary power does not contribute to heating the supply air. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
@@ -436,10 +402,6 @@ AirLoopHVAC:UnitarySystem,
   50,                          !- Maximum Supply Air Temperature {C}
   21,                          !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                            !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                            !- Maximum Cycling Rate {cycles/hr}
-  ,                            !- Heat Pump Time Constant {s}
-  ,                            !- Fraction of On-Cycle Power Use
-  ,                            !- Heat Pump Fan Delay Time {s}
   ,                            !- Ancillary On-Cycle Electric Power {W}
   ,                            !- Ancillary Off-Cycle Electric Power {W}
   ,                            !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -2523,40 +2485,6 @@ This alpha field contains the identifying name given to the WaterToAirHeatPump c
 
 This numeric value allows the user to determine how close the air side has to be controlled. Lower the value of convergence better the control of air side conditions and less the zone temperature fluctuations. However in a poorly designed system, a lower convergence might result in warning errors which are caused due to the iteration limit for run time fraction calculation is limited to 20.
 
-\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-1-000}
-
-This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image305.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant-1}
-
-This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image306.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use-1}
-
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image307.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time-1}
-
-This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
-
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-3}
 
 This is the object type of the supplemental heating coil. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (AirLoop Unitary Water to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. The valid choices are:
@@ -2663,10 +2591,6 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
       Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
       Heat Pump Cooling Mode,  !- Cooling Coil Name
       0.001,                   !- Cooling Convergence
-      2.5, !- Maximum Cycling Rate {cycles/hr}
-      60, !- Heat Pump Time Constant {s}
-      0.01, !- Fraction of On-Cycle Power Use
-      60,    !- Heat Pump Fan Delay Time {s}
       Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
       Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
       50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}

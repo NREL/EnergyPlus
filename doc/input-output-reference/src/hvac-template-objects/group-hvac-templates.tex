@@ -679,7 +679,7 @@ There are three coil types available:
 \end{itemize}
 
 The default is \emph{ChilledWater}.
- 
+
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name}
 
 Usually set to blank, which allows the cooling coil to be available anytime the system is operating. If a schedule name is specified, it defines when the coil is available. This is most often used when cooling is only available seasonally. A schedule value of one indicates that the cooling coil can be on during a given time period. A value of zero denotes that the cooling coil cannot be used during that time period.
@@ -733,7 +733,7 @@ This alpha field specifies the name of a \hyperref[designspecificationzoneairdis
 This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are:
 \begin{itemize}
 \item
-  \emph{ConstantFanVariableFlow}: The fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement. 
+  \emph{ConstantFanVariableFlow}: The fan speed is held constant to produce a fixed air flow rate whenever the unit is scheduled on. The hot water or chilled flow rate is varied so that the unit output matches the zone heating or cooling requirement.
 \item
   \emph{CyclingFan}: The fan speed is chosen so that the unit capacity is greater than or equal to the heating / cooling load and the fan is cycled to match unit output with the load.
 \item
@@ -743,9 +743,9 @@ This input denotes how the unit's output is controlled in order to meet zone hea
 \item
   \emph{MultiSpeedFan}: The water flow rate is at full flow when there is load or fully closed when there is no load and the supply air flow rate is varied by varying the fan speed in order to match the load.
 \item
-  \emph{ASHRAE90VariableFan}: The fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio. 
+  \emph{ASHRAE90VariableFan}: The fan air flow rate is reduced according to the low speed supply air flow ratio when the zone sensible load is less than the zone sensible load multiplied by the low speed supply air flow ratio.
 \end{itemize}
-  
+
 The default is \emph{ConstantFanVariableFlow} except when a Dedicated Outdoor Air System is specified (see above) the default is  \emph{CyclingFan}.
 
 \paragraph{Field: Low Speed Supply Air Flow Ratio}\label{field-low-speed-supply-air-flow-ratio}
@@ -1489,23 +1489,13 @@ This numeric field contains the maximum on-off cycling rate for the compressor, 
 \caption{}
 \end{figure}
 
-\paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant}
+\paragraph{Field: Latent Capacity Time Constant}\label{field-heat-pump-time-constant}
 
 This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
 
 \begin{figure}[htbp]
 \centering
 \includegraphics{media/image606.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use}
-
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image607.png}
 \caption{}
 \end{figure}
 
@@ -1636,8 +1626,7 @@ HVACTemplate:Zone:WaterToAirHeatPump,
   ,                !- Supplemental Heating Coil Availability Schedule Name
   autosize,                !- Supplemental Heating Coil Capacity {W}
   2.5,                     !- Maximum Cycling Rate {cycles/hr}
-  60,                      !- Heat Pump Time Constant {s}
-  0.01,                    !- Fraction of On-Cycle Power Use
+  60,                      !- Latent Capacity Time Constant {s}
   60,                      !- Heat Pump Fan Delay Time {s}
   ,                        !- Dedicated Outdoor Air System Name
   Electric,                !- Supplemental Heating Coil Type
