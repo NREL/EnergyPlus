@@ -529,14 +529,16 @@ namespace BoilerSteam {
                         OutputReportPredefined::PreDefTableEntry(state,
                                                                  state.dataOutRptPredefined->pdchBoilerPlantloopName,
                                                                  this->Name,
-                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name);
+                                                                 this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name
+                                                                                            : "N/A");
                         OutputReportPredefined::PreDefTableEntry(state,
                                                                  state.dataOutRptPredefined->pdchBoilerPlantloopBranchName,
                                                                  this->Name,
-                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
-                                                                     .LoopSide(this->plantLoc.loopSideNum)
-                                                                     .Branch(this->plantLoc.branchNum)
-                                                                     .Name);
+                                                                 this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum)
+                                                                                                  .LoopSide(this->plantLoc.loopSideNum)
+                                                                                                  .Branch(this->plantLoc.branchNum)
+                                                                                                  .Name
+                                                                                            : "N/A");
                         OutputReportPredefined::PreDefTableEntry(
                             state, state.dataOutRptPredefined->pdchBoilerMinPLR, this->Name, this->MinPartLoadRat);
                         OutputReportPredefined::PreDefTableEntry(state,
