@@ -1547,6 +1547,12 @@ This optional alpha input field defines the user-defined name of the second evap
 
 This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object defined elsewhere. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input field \emph{Design Supply Air Flow Rate} in Evaporative Cooler zone HVAC object. The scaled design supply air flow rates in turn is used to size capacity of the unit.
 
+\paragraph{Field: Shut Off Relative Humidity}\label{shut-off-relative-humidity}
+
+This is an optional field. When the relative humidity of the zone is above this
+threshold, the evaporative cooler is shut off. This intends to prevent direct
+evaporative coolers from adding too much moisture into the zone.
+
 An example input object follows.
 
 \begin{lstlisting}

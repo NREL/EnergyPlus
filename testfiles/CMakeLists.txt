@@ -282,6 +282,7 @@ add_simulation_test(IDF_FILE EMSUserDefined5ZoneAirCooled.idf EPW_FILE USA_IL_Ch
 add_simulation_test(IDF_FILE EMSUserDefinedWindACAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE EMSWindowShadeControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE EarthTubeSimpleTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE EarthTubeVerticalTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE EcoroofOrlando.idf EPW_FILE USA_FL_Orlando.Intl.AP.722050_TMY3.epw)
 add_simulation_test(IDF_FILE EcoroofOrlando_NoSitePrec.idf EPW_FILE USA_FL_Orlando.Intl.AP.722050_TMY3.epw)
 add_simulation_test(IDF_FILE ElectricChiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -543,7 +544,14 @@ add_simulation_test(IDF_FILE RetailPackagedTESCoil.idf EPW_FILE USA_IL_Chicago-O
 add_simulation_test(IDF_FILE RoomAirflowNetwork.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SeriesActiveBranch.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithPVandBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
-add_simulation_test(IDF_FILE ShopWithPVandLiIonBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
+# this file is failing on our debug check due to a NaN inside SSC
+# the code is actually working as designed, but there are checks that
+# rely on a NaN calculation as a sentinel value, which is triggering a FPE in our debug build
+# for release builds it is working fine, and so it is included in normal builds and regression builds
+# but for debug builds I am disabling it
+if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  add_simulation_test(IDF_FILE ShopWithPVandLiIonBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
+endif ()
 add_simulation_test(IDF_FILE ShopWithPVandStorage.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithSimplePVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithBIPVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
@@ -573,6 +581,7 @@ add_simulation_test(IDF_FILE Standard621SimplifiedProcedure_VAVterminal.idf EPW_
 add_simulation_test(IDF_FILE SteamSystemAutoSize.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StormWindow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StripMallZoneEvapCooler.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
+add_simulation_test(IDF_FILE StripMallZoneEvapCoolerRHcutoff.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 add_simulation_test(IDF_FILE StripMallZoneEvapCoolerAutosized.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 add_simulation_test(IDF_FILE SuperMarketDetailed_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE SuperMarket_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)

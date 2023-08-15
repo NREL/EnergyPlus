@@ -439,7 +439,7 @@ namespace HVACUnitaryBypassVAV {
 
             thisCBVAV.OutAirSchPtr = ScheduleManager::GetScheduleIndex(state, Alphas(3)); // convert schedule name to pointer (index number)
             if (thisCBVAV.OutAirSchPtr != 0) {
-                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.OutAirSchPtr, "<", 0.0, ">", 1.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.OutAirSchPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("The schedule values in {} must be 0 to 1.", cAlphaFields(3)));
                     ErrorsFound = true;
@@ -602,7 +602,7 @@ namespace HVACUnitaryBypassVAV {
 
             // required field must be Key=Fan:ConstantVolume, Fan:OnOff or Fan:SystemModel and read in as upper case
             std::string fanTypeString = Alphas(10);
-            thisCBVAV.FanType = static_cast<DataHVACGlobals::FanType>(getEnumerationValue(DataHVACGlobals::fanTypeNamesUC, fanTypeString));
+            thisCBVAV.FanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, fanTypeString));
             thisCBVAV.FanName = Alphas(11);
             int fanOutletNode(0);
 
@@ -630,7 +630,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             // required field must be Key=BlowThrough or DrawThrough and read in as BLOWTHROUGH or DRAWTHROUGH
-            thisCBVAV.FanPlace = static_cast<DataHVACGlobals::FanLoc>(getEnumerationValue(DataHVACGlobals::fanLocNamesUC, Alphas(12)));
+            thisCBVAV.FanPlace = static_cast<DataHVACGlobals::FanLoc>(getEnumValue(DataHVACGlobals::fanLocNamesUC, Alphas(12)));
 
             if (thisCBVAV.FanPlace == DataHVACGlobals::FanLoc::DrawThrough) {
                 if (thisCBVAV.SplitterOutletAirNode != fanOutletNode) {
@@ -693,7 +693,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             std::string thisCoolCoilType = Alphas(14);
-            thisCBVAV.CoolCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumerationValue(DataHVACGlobals::coilTypeNamesUC, thisCoolCoilType));
+            thisCBVAV.CoolCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumValue(DataHVACGlobals::coilTypeNamesUC, thisCoolCoilType));
             thisCBVAV.DXCoolCoilName = Alphas(15);
 
             if (thisCBVAV.CoolCoilType == DataHVACGlobals::CoilType::DXCoolingSingleSpeed) {
@@ -786,7 +786,7 @@ namespace HVACUnitaryBypassVAV {
 
             thisCBVAV.FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(13)); // convert schedule name to pointer (index number)
             if (thisCBVAV.FanOpModeSchedPtr != 0) {
-                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.FanOpModeSchedPtr, "<", 0.0, ">", 1.0)) {
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, thisCBVAV.FanOpModeSchedPtr, ">=", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));
                     ShowContinueError(state, format("The schedule values in {} must be 0 to 1.", cAlphaFields(13)));
                     ShowContinueError(state, "A value of 0 represents cycling fan mode, any other value up to 1 represents constant fan mode.");
@@ -850,7 +850,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             std::string thisHeatCoilType = Alphas(16);
-            thisCBVAV.HeatCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumerationValue(DataHVACGlobals::coilTypeNamesUC, thisHeatCoilType));
+            thisCBVAV.HeatCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumValue(DataHVACGlobals::coilTypeNamesUC, thisHeatCoilType));
             thisCBVAV.HeatCoilName = Alphas(17);
 
             DXCoilErrFlag = false;
