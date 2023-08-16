@@ -5068,7 +5068,7 @@
     charging,                !- Name
     -.2765,                  !- Coefficient1 C1
     -93.27,                  !- Coefficient2 C2
-    0.0068,                  !- Coefficient3 C3
+    0.68,                    !- Coefficient3 C3
     0,                       !- Minimum Value of x
     1,                       !- Maximum Value of x
     -100,                    !- Minimum Curve Output
@@ -5080,7 +5080,7 @@
     discharging,             !- Name
     0.0899,                  !- Coefficient1 C1
     -98.24,                  !- Coefficient2 C2
-    -.0082,                  !- Coefficient3 C3
+    -.82,                    !- Coefficient3 C3
     0,                       !- Minimum Value of x
     1,                       !- Maximum Value of x
     -100,                    !- Minimum Curve Output

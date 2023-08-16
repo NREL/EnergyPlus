@@ -2140,9 +2140,9 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
       Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
       Air Loop Outlet Node,         !- Coil_Air_Outlet_Node
       ,                      !- Coil_Temp_Setpoint_Node
-      100,                   !- Parasitic Electric Load {W}
+      100,                   !- On Cycle Parasitic Electric Load {W}
       PLFCurveforGasFurnace, !- Part load fraction correlation (function of part load ratio)
-      10;                    !- Parasitic Gas Load {W}
+      10;                    !- Off Cycle Parasitic Fuel Load {W}
 
 
   Curve:Cubic,
@@ -2317,9 +2317,9 @@ AirLoopHVAC:UnitaryHeatOnly,
       Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
       Air Loop Outlet Node,        !- Coil_Air_Outlet_Node
       ,                            !- Coil_Temp_Setpoint_Node
-      100,                         !- Parasitic Electric Load {W}
+      100,                         !- On Cycle Parasitic Electric Load {W}
       PLFCurveforUnitarySystem,    !- Part load fraction correlation (function of part load ratio)
-      10;                          !- Parasitic Gas Load {W}
+      10;                          !- Off Cycle Parasitic Fuel Load {W}
 
 
   Curve:Cubic,

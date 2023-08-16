@@ -1186,7 +1186,7 @@ NOTE: When the heating source is a Refrigeration Compressor rack, the heat rejec
 
 This optional alpha field defines the name of the HVAC system node used for temperature-based control (e.g., controlling the heating coil's outlet air dry-bulb temperature to a setpoint). If the desuperheater heating coil is temperature controlled through the use of a Set Point Manager, then the control node specified in the Set Point Manager will be entered here. If the desuperheater heating coil is controlled based on a certain heating load to be met (e.g., using this heating coil as part of \hyperref[airloophvacunitaryfurnaceheatcool]{AirLoopHVAC:Unitary:Furnace:HeatCool} for high humidity control), this field should be left blank.
 
-\paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load}
+\paragraph{Field: On Cycle Parasitic Electric Load}\label{field-parasitic-electric-load}
 
 This optional numeric field defines the parasitic electric load (in Watts) due to control valves or other devices specific to the desuperheater heating coil. The load is applied whenever the coil is heating the air. The model assumes that this electric load is small and does not contribute to heating the air.
 
@@ -1195,15 +1195,15 @@ Following is an example input for a desuperheater heating coil.
 \begin{lstlisting}
 
 Coil:Heating:Desuperheater,
-  DesuperheaterCoil,                                   !- Coil Name
-  FanAndCoilAvailSched,                             !- Availability Schedule
-  0.3,                                                               !- Heat Reclaim Recovery Efficiency
-  Cooling Coil Air Outlet Node,             !- Coil Air Inlet Node Name
-  Air Loop Outlet Node,                             !- Coil Air Outlet Node Name
+  DesuperheaterCoil,           !- Coil Name
+  FanAndCoilAvailSched,        !- Availability Schedule
+  0.3,                         !- Heat Reclaim Recovery Efficiency
+  Cooling Coil Air Outlet Node, !- Coil Air Inlet Node Name
+  Air Loop Outlet Node,        !- Coil Air Outlet Node Name
   Coil:Cooling:DX:SingleSpeed, !- Heating Source Type
-  Furnace ACDXCoil 1,                                 !- Heating Source Name
-  ,                                                                     !- Coil Temperature Setpoint Node Name
-  0.1;                                                               !- Parasitic Electric Load {W}
+  Furnace ACDXCoil 1,          !- Heating Source Name
+  ,                            !- Coil Temperature Setpoint Node Name
+  0.1;                         !- On Cycle Parasitic Electric Load {W}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-4-006}
@@ -1759,7 +1759,7 @@ The name of the air outlet from the coil, i.e. Heating Coil Air Outlet Node.
 
 If the coil is used in the air loop simulation directly on a branch and is temperature controlled using a Set Point Manager, then the node that is the control node needs to be specified here. If the coil is used in an air terminal unit or other parent object (ZoneHVAC: or AirloopHVAC:), the coil is controlled by the parent object and the temperature set point node name is not required.
 
-\paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-1}
+\paragraph{Field: On Cycle Parasitic Electric Load}\label{field-parasitic-electric-load-1}
 
 This is the parasitic electric load associated with the coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1779,7 +1779,7 @@ A typical part load fraction correlation for a conventional gas heating coil (e.
        PLF = 0.8 + 0.2(PLR)
 \end{lstlisting}
 
-\paragraph{Field: Parasitic Fuel Load}\label{field-parasitic-gas-load}
+\paragraph{Field: Off Cycle Parasitic Fuel Load}\label{field-parasitic-gas-load}
 
 This numeric field is the parasitic fuel load associated with the coil's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the heating coil is not operating.
 
@@ -1791,7 +1791,7 @@ This numeric field is the parasitic fuel load associated with the coil's operati
 \item
   HVAC,Average,Heating Coil Heating Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Gas Energy {[}J{]}
+  HVAC,Sum,Heating Coil <Fuel Type> Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil <Fuel Type> Rate {[}W{]}
 \item
@@ -1884,7 +1884,7 @@ A typical part load fraction correlation for a conventional gas heating coil (e.
        PLF = 0.8 + 0.2(PLR)
 \end{lstlisting}
 
-\paragraph{Field: Parasitic Gas Load}\label{field-parasitic-gas-load-1}
+\paragraph{Field: Off Cycle Parasitic Gas Load}\label{field-parasitic-gas-load-1}
 
 This numeric field is the parasitic gas load associated with the gas coil's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the gas heating coil is not operating.
 
@@ -1896,7 +1896,7 @@ This is user inputted stage 1 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 1 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 1 Parasitic Electric Load}\label{field-stage-1-parasitic-electric-load}
+\paragraph{Field: Stage 1 On Cycle Parasitic Electric Load}\label{field-stage-1-parasitic-electric-load}
 
 This is the stage 1 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1908,7 +1908,7 @@ This is user inputted stage 2 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 2 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 2 Parasitic Electric Load}\label{field-stage-2-parasitic-electric-load}
+\paragraph{Field: Stage 2 On Cycle Parasitic Electric Load}\label{field-stage-2-parasitic-electric-load}
 
 This is the stage 2 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1920,7 +1920,7 @@ This is user inputted stage 3 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 3 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 3 Parasitic Electric Load}\label{field-stage-3-parasitic-electric-load}
+\paragraph{Field: Stage 3 On Cycle Parasitic Electric Load}\label{field-stage-3-parasitic-electric-load}
 
 This is the stage 3 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1932,7 +1932,7 @@ This is user inputted stage 4 gas burner efficiency (decimal, not percent) and i
 
 This is the stage 4 capacity of the coil (W). This controlled coil will only provide the needed capacity to meet the control criteria whether it is temperature or capacity controlled. This field is autosizable.
 
-\paragraph{Field: Stage 4 Parasitic Electric Load}\label{field-stage-4-parasitic-electric-load}
+\paragraph{Field: Stage 4 On Cycle Parasitic Electric Load}\label{field-stage-4-parasitic-electric-load}
 
 This is the stage 4 parasitic electric load associated with the gas coil operation, such as an inducer fan, etc. This will be modified by the PLR (or coil runtime fraction if a part-load fraction correlation is provided in the next input field) to reflect the time of operation in a simulation timestep.
 
@@ -1941,23 +1941,23 @@ An example in IDF form:
 \begin{lstlisting}
 
 Coil:Heating:Gas:MultiStage,
-  Heat Pump Heating Coil 1,                 !- Name
-  FanAndCoilAvailSched,                         !- Availability Schedule Name
-  Heating Coil Air Inlet Node,           !- Air Inlet Node Name
+  Heat Pump Heating Coil 1,          !- Name
+  FanAndCoilAvailSched,              !- Availability Schedule Name
+  Heating Coil Air Inlet Node,       !- Air Inlet Node Name
   SuppHeating Coil Air Inlet Node,   !- Air Outlet Node Name
-  ,                                               !- Temp Setpoint node name
-  ,                                               !- Part Load Fraction Correlation Curve Name
-  ,                                               !- Parasitic Gas Load
-  3,                                             !- Number of Speeds
-  0.92,                                       !- Speed 1 Gas burner Efficiency
-  Autosize,                               !- Speed 1 Nominal Capacity {W}
-  ,                                               !- Stage 1 Parasitic Electric Load {W}
-  0.88,                                       !- Speed 2 Gas burner Efficiency
-  Autosize,                               !- Speed 2 Nominal Capacity {W}
-  ,                                               !- Stage 2 Parasitic Electric Load {W}
-  0.84,                                       !- Speed 3 Gas burner Efficiency
-  Autosize,                               !- Speed 3 Nominal Capacity {W}
-  ;                                               !- Stage 3 Parasitic Electric Load {W}
+  ,                                  !- Temp Setpoint node name
+  ,                                  !- Part Load Fraction Correlation Curve Name
+  ,                                  !- Off Cycle Parasitic Gas Load
+  3,                                 !- Number of Speeds
+  0.92,                              !- Speed 1 Gas burner Efficiency
+  Autosize,                          !- Speed 1 Nominal Capacity {W}
+  ,                                  !- Stage 1 On Cycle Parasitic Electric Load {W}
+  0.88,                              !- Speed 2 Gas burner Efficiency
+  Autosize,                          !- Speed 2 Nominal Capacity {W}
+  ,                                  !- Stage 2 On Cycle Parasitic Electric Load {W}
+  0.84,                              !- Speed 3 Gas burner Efficiency
+  Autosize,                          !- Speed 3 Nominal Capacity {W}
+  ;                                  !- Stage 3 On Cycle Parasitic Electric Load {W}
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-10-002}
@@ -2014,24 +2014,6 @@ This field is the parasitic gas consumption of the heating coil in Joules over t
 \paragraph{Heating Coil Parasitic Gas Consumption Rate {[}W{]}}\label{heating-coil-parasitic-gas-consumption-rate-w}
 
 This field is the average parasitic gas consumption rate of the heating coil (e.g., standing pilot light) in Watts over the timestep being reported. The model assumes that the parasitic load is present only for the portion of the simulation timestep where the gas heating coil is not operating.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 \subsection{Coil:Cooling:DX:SingleSpeed}\label{coilcoolingdxsinglespeed}
 
@@ -2260,32 +2242,32 @@ Following is an example input for a Coil:Cooling:DX:SingleSpeed coil.
 \begin{lstlisting}
 
 Coil:Cooling:DX:SingleSpeed,
-  Zone1WindACDXCoil,        ! Coil Name
-  FanAndCoilAvailSched,     ! Availability Schedule
-  10548,                    ! Gross Rated Total Cooling Capacity
-  0.75,                     ! Gross Rated Sensible Heat Ratio
-  3.0,                      ! Gross Rated Cooling COP
-  0.637,                    ! Rated Air Flow Rate (m3/s)
-  773.3,                    ! 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  934.4,                    ! 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  Zone1WindACFanOutletNode, ! Coil Air Inlet Node
-  Zone1WindACAirOutletNode, ! Coil Air Outlet Node
-  WindACCoolCapFT,          ! Total Cooling Capacity Modifier Curve (function of temperature)
-  WindACCoolCapFFF,         ! Total Cooling Capacity Modifier Curve (function of flow fraction)
-  WindACEIRFT,              ! Energy Input Ratio Modifier Curve (function of temperature)
-  WindACEIRFFF,             ! Energy Input Ratio Modifier Curve (function of flow fraction)
-  WindACPLFFPLR,            ! Part Load Fraction Correlation (function of part load ratio)
-  1000.,                    ! Nominal Time for Condensate Removal to Begin {s}
-  1.5,                      ! Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
-  3.0,                      ! Maximum ON/OFF Cycling Rate {cycles/hr}
-  45.0,                     ! Latent Capacity Time Constant {s}
-  ,                         ! Condenser Air Inlet Node Name
-  AirCooled,                ! Condenser Type
-  ,                         ! Evaporative Condenser Effectiveness
-  ,                         ! Evaporative Condenser Air Volume Flow Rate {m3/s}
-  ,                         ! Evaporative Condenser Pump Rated Power Consumption {W}
-  30.,                      ! Crankcase Heater Capacity {W}
-  10.;                      ! Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
+  Zone1WindACDXCoil,        !- Coil Name
+  FanAndCoilAvailSched,     !- Availability Schedule
+  10548,                    !- Gross Rated Total Cooling Capacity
+  0.75,                     !- Gross Rated Sensible Heat Ratio
+  3.0,                      !- Gross Rated Cooling COP
+  0.637,                    !- Rated Air Flow Rate (m3/s)
+  773.3,                    !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  934.4,                    !- 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  Zone1WindACFanOutletNode, !- Coil Air Inlet Node
+  Zone1WindACAirOutletNode, !- Coil Air Outlet Node
+  WindACCoolCapFT,          !- Total Cooling Capacity Modifier Curve (function of temperature)
+  WindACCoolCapFFF,         !- Total Cooling Capacity Modifier Curve (function of flow fraction)
+  WindACEIRFT,              !- Energy Input Ratio Modifier Curve (function of temperature)
+  WindACEIRFFF,             !- Energy Input Ratio Modifier Curve (function of flow fraction)
+  WindACPLFFPLR,            !- Part Load Fraction Correlation (function of part load ratio)
+  1000.,                    !- Nominal Time for Condensate Removal to Begin {s}
+  1.5,                      !- Ratio of Initial Moisture Evaporation Rate and Steady-state Latent Capacity
+  3.0,                      !- Maximum ON/OFF Cycling Rate {cycles/hr}
+  45.0,                     !- Latent Capacity Time Constant {s}
+  ,                         !- Condenser Air Inlet Node Name
+  AirCooled,                !- Condenser Type
+  ,                         !- Evaporative Condenser Effectiveness
+  ,                         !- Evaporative Condenser Air Volume Flow Rate {m3/s}
+  ,                         !- Evaporative Condenser Pump Rated Power Consumption {W}
+  30.,                      !- Crankcase Heater Capacity {W}
+  10.;                      !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}
 \end{lstlisting}
 
 \subsection{Coil:Cooling:DX:TwoSpeed}\label{coilcoolingdxtwospeed}
@@ -4618,9 +4600,9 @@ COIL:Heating:DX:MultiSpeed,
 \item
   HVAC,Sum,Heating Coil Defrost Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Defrost Gas Rate {[}W{]}
+  HVAC,Average,Heating Coil Defrost NaturalGas Rate {[}W{]}
 \item
-  HVAC,Sum,Heating Coil Defrost Gas Energy {[}J{]}
+  HVAC,Sum,Heating Coil Defrost NaturalGas Energy {[}J{]}
 \item
   HVAC,Average,Heating Coil Crankcase Heater Electricity Rate {[}W{]}
 \item

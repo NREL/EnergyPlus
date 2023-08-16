@@ -3164,9 +3164,9 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
         "  this_is_an_air_inlet_name, ! A4 , \field Air Inlet Node Name",
         "  this_is_outlet, ! A5 , \field Air Outlet Node Name",
         "  other_name, ! A6 , \field Temperature Setpoint Node Name",
-        "  0.3, ! field Parasitic Electric Load",
+        "  0.3, ! field On Cycle Parasitic Electric Load",
         "  curve_blah_name, ! Part Load Fraction Correlation Curve Name",
-        "  0.344; ! field Parasitic Fuel Load",
+        "  0.344; ! field Off Cycle Parasitic Fuel Load",
         " ",
         "Coil:Heating:Fuel,",
         "  the second name, ! A1 , \field Name",
@@ -3177,9 +3177,9 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
         "  this_is_an_air_inlet_name2, ! A4 , \field Air Inlet Node Name",
         "  this_is_outlet2, ! A5 , \field Air Outlet Node Name",
         "  other_name2, ! A6 , \field Temperature Setpoint Node Name",
-        "  0.4, ! field Parasitic Electric Load",
+        "  0.4, ! field On Cycle Parasitic Electric Load",
         "  curve_blah_name2, ! Part Load Fraction Correlation Curve Name",
-        "  0.444; ! field Parasitic Fuel Load",
+        "  0.444; ! field Off Cycle Parasitic Fuel Load",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));

@@ -105,13 +105,13 @@ The following blocks of outputs are for steam and fuel-driven chillers
 
 \begin{itemize}
     \item
-    HVAC,Average,Chiller Gas Rate {[}W{]}
+    HVAC,Average,Chiller NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Chiller Gas Energy {[}J{]}
+    HVAC,Sum,Chiller NaturalGas Energy {[}J{]}
     \item
-    HVAC,Average,Chiller Gas Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,Chiller NaturalGas Mass Flow Rate {[}kg/s{]}
     \item
-    HVAC,Sum,Chiller Gas Mass {[}kg{]}
+    HVAC,Sum,Chiller NaturalGas Mass {[}kg{]}
 \end{itemize}
 
 For steam absorption chillers:
@@ -2649,11 +2649,11 @@ One of the following blocks will be applicable based on fuel type:
 
 \begin{itemize}
     \item
-    HVAC,Average,Chiller Gas Rate {[}W{]}
+    HVAC,Average,Chiller NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Chiller Gas Energy {[}J{]}
+    HVAC,Sum,Chiller NaturalGas Energy {[}J{]}
     \item
-    HVAC,Average,Chiller Gas Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,Chiller NaturalGas Mass Flow Rate {[}kg/s{]}
     \item
     HVAC,Average,Chiller Propane Rate {[}W{]}
     \item
@@ -4166,7 +4166,7 @@ This numeric field contains the outlet temperature upper limit. If this field is
 
 This choice field determines how the boiler operates with respect to the intended fluid flow through the device.~ There are three different choices for specifying operating modes for the intended flow behavior:~ ``NotModulated,'' ``ConstantFlow,'' and ``LeavingSetpointModulated.''~ NotModulated is useful for either variable or constant speed pumping arrangements where the boiler is passive in the sense that although it makes a nominal request for its design flow rate it can operate at varying flow rates.~ ConstantFlow is useful for constant speed pumping arrangements where the boiler's request for flow is more strict and can increase the overall loop flow.~ LeavingSetpointModulated changes the boiler model to internally vary the flow rate so that the temperature leaving the boiler matches a setpoint.~ In all cases the operation of the external plant system can also impact the flow through the boiler -- for example if the relative sizes and operation are such that flow is restricted and the requests cannot be met.~~ The default, if not specified, is NotModulated.
 
-\paragraph{Field: Parasitic Electric Load}\label{field-parasitic-electric-load-000}
+\paragraph{Field: On Cycle Parasitic Electric Load}\label{field-parasitic-electric-load-000}
 
 This optional numeric field contains the parasitic electric power (W) consumed by a forced draft fan or other electrical device associated with the boiler. This parasitic electric load is consumed whenever the boiler is operating, and the model assumes that this parasitic power does not contribute to heating the water. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
 
@@ -4177,6 +4177,10 @@ This optional numeric field allows the user to specify a sizing factor for this 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-10}
 
 This optional field allows you to specify a user-defined end-use subcategory, e.g., ``Process''. A new meter for reporting is created for each unique subcategory (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} objects). Any text may be used here to further subcategorize the end-uses in the ABUPS End Uses by Subcategory table and in the LEED Summary EAp2-4/5 Performance Rating Method Compliance table. If this field is omitted or blank, the boiler will be assigned to the ``General'' end-use subcategory.
+
+\paragraph{Field: Off Cycle Parasitic Fuel Load}\label{field-boiler-parasitic-fuel-load}
+
+This optional field is the parasitic fuel load associated with the boiler's operation (Watts), such as a standing pilot light. The model assumes that this parasitic load is consumed only for the portion of the simulation timestep where the boiler is not operating.
 
 An example of this statement in an IDF is:
 
@@ -4197,7 +4201,7 @@ An example of this statement in an IDF is:
       Boiler Outlet Node,  !- Boiler Water Outlet Node
       80,                  !- Temp Upper Limit Water Outlet {C}
       ConstantFlow,        !- Boiler Flow Mode
-      25.0;                !- Parasitic Electric Load {W}
+      25.0;                !- On Cycle Parasitic Electric Load {W}
 
 
     Curve:Biquadratic,
@@ -4252,13 +4256,17 @@ Electric:
     HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
-Gas:
+NaturalGas:
 
 \begin{itemize}
     \item
-    HVAC,Average,Boiler Gas Rate {[}W{]}
+    HVAC,Average,Boiler NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Boiler Gas Energy {[}J{]}
+    HVAC,Sum,Boiler NaturalGas Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary NaturalGas Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary NaturalGas Energy {[}J{]}
 \end{itemize}
 
 Propane:
@@ -4268,6 +4276,10 @@ Propane:
     HVAC,Average,Boiler Propane Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Propane Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Propane Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Propane Energy {[}J{]}
 \end{itemize}
 
 FuelOilNo1:
@@ -4277,6 +4289,10 @@ FuelOilNo1:
     HVAC,Average,Boiler FuelOilNo1 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler FuelOilNo1 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary FuelOilNo1 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary FuelOilNo1 Energy {[}J{]}
 \end{itemize}
 
 FuelOilNo2:
@@ -4286,6 +4302,10 @@ FuelOilNo2:
     HVAC,Average,Boiler FuelOilNo2 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler FuelOilNo2 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary FuelOilNo2 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary FuelOilNo2 Energy {[}J{]}
 \end{itemize}
 
 Coal:
@@ -4295,6 +4315,10 @@ Coal:
     HVAC,Average,Boiler Coal Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Coal Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Coal Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Coal Energy {[}J{]}
 \end{itemize}
 
 Diesel:
@@ -4304,6 +4328,10 @@ Diesel:
     HVAC,Average,Boiler Diesel Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Diesel Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Diesel Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Diesel Energy {[}J{]}
 \end{itemize}
 
 Gasoline:
@@ -4313,6 +4341,10 @@ Gasoline:
     HVAC,Average,Boiler Gasoline Rate {[}W{]}
     \item
     HVAC,Sum,Boiler Gasoline Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary Gasoline Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary Gasoline Energy {[}J{]}
 \end{itemize}
 
 OtherFuel1:
@@ -4322,6 +4354,10 @@ OtherFuel1:
     HVAC,Average,Boiler OtherFuel1 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler OtherFuel1 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary OtherFuel1 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary OtherFuel1 Energy {[}J{]}
 \end{itemize}
 
 OtherFuel2:
@@ -4331,6 +4367,10 @@ OtherFuel2:
     HVAC,Average,Boiler OtherFuel2 Rate {[}W{]}
     \item
     HVAC,Sum,Boiler OtherFuel2 Energy {[}J{]}
+    \item
+    HVAC,Average,Boiler Ancillary OtherFuel2 Rate {[}W{]}
+    \item
+    HVAC,Sum,Boiler Ancillary OtherFuel2 Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Boiler Heating Rate {[}W{]}}\label{boiler-heating-rate-w}
@@ -4514,13 +4554,13 @@ Electric:
     HVAC,Sum,Boiler Electricity Energy {[}J{]}
 \end{itemize}
 
-Gas:
+NaturalGas:
 
 \begin{itemize}
     \item
-    HVAC,Average,Boiler Gas Rate {[}W{]}
+    HVAC,Average,Boiler NaturalGas Rate {[}W{]}
     \item
-    HVAC,Sum,Boiler Gas Energy {[}J{]}
+    HVAC,Sum,Boiler NaturalGas Energy {[}J{]}
 \end{itemize}
 
 Propane:
@@ -5736,7 +5776,7 @@ The output variables for the fuel-fired (or gas-fired) absorption heat pump syst
 This is the load side heat transfer rate for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Load Side Heating Transfer Energy [J]}
-This is the accumulated value of the load side heat transfer energy for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
+This is the accumulated value for the load side heat transfer energy for the fuel-fired absorption heat pump. The value will be positive for the heating mode, and negative for the cooling mode.
 
 \paragraph{Fuel-fired Absorption HeatPump Fuel Rate [W]}
 This is the fuel consumption rate in [W] of the fuel-fired absorption heat pump. 

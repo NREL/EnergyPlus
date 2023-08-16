@@ -4544,9 +4544,9 @@
     Front_Entry Unit Heater Post Fan Node,  !- Air Inlet Node Name
     Front_Entry Unit Heater Inlet Node Name,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     ,                        !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYSYSTEM ===========
 
