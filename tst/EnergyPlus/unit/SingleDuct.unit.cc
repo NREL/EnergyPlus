@@ -2021,7 +2021,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "    HeatSys1 Supply Equipment Outlet Node, !- Boiler Water Outlet Node Name",
         "    95.0,                    !- Water Outlet Upper Temperature Limit{ C }",
         "    LeavingSetpointModulated, !- Boiler Flow Mode",
-        "    0.0000,                  !- Parasitic Electric Load{ W }",
+        "    0.0000,                  !- On Cycle Parasitic Electric Load{ W }",
         "    0.3000;                  !- Sizing Factor",
 
         "  Curve:Cubic,",

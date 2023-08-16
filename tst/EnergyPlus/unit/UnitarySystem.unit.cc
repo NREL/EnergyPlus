@@ -1500,14 +1500,14 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
           Zone 2 Inlet Node,              !- Air Outlet Node Name
           ,                               !- Temperature Setpoint Node Name
           Quadratic,                      !- Part Load Fraction Correlation Curve Name
-          10,                             !- Parasitic Gas Load{ W }
+          10,                             !- Off Cycle Parasitic Gas Load{ W }
           2,                              !- Number of Stages
           0.8,                            !- Stage 1 Gas Burner Efficiency{ W / W }
           7689.33,                        !- Stage 1 Nominal Capacity{ W }
-          100,                            !- Stage 1 Parasitic Electric Load{ W }
+          100,                            !- Stage 1 On Cycle Parasitic Electric Load{ W }
           0.8,                            !- Stage 2 Gas Burner Efficiency{ W / W }
           15378.66,                       !- Stage 2 Nominal Capacity{ W }
-          100;                            !- Stage 2 Parasitic Electric Load{ W }
+          100;                            !- Stage 2 On Cycle Parasitic Electric Load{ W }
         ScheduleTypeLimits,
           Any Number;                     !- Name
         Schedule:Compact,
@@ -3311,14 +3311,14 @@ Coil:Heating:Gas:MultiStage,
   Zone 2 Inlet Node,              !- Air Outlet Node Name
   ,                               !- Temperature Setpoint Node Name
   Quadratic,                      !- Part Load Fraction Correlation Curve Name
-  10,                             !- Parasitic Gas Load{ W }
+  10,                             !- Off Cycle Parasitic Gas Load{ W }
   2,                              !- Number of Stages
   0.8,                            !- Stage 1 Gas Burner Efficiency{ W / W }
   7689.33,                        !- Stage 1 Nominal Capacity{ W }
-  100,                            !- Stage 1 Parasitic Electric Load{ W }
+  100,                            !- Stage 1 On Cycle Parasitic Electric Load{ W }
   0.8,                            !- Stage 2 Gas Burner Efficiency{ W / W }
   15378.66,                       !- Stage 2 Nominal Capacity{ W }
-  100;                            !- Stage 2 Parasitic Electric Load{ W }
+  100;                            !- Stage 2 On Cycle Parasitic Electric Load{ W }
 
 ScheduleTypeLimits,
   Any Number;                     !- Name
@@ -15783,9 +15783,9 @@ Dimensionless;	!- Output Unit Type
     Sys 1 Furnace DX Cool Cooling Coil Outlet,  !- Air Inlet Node Name
     Sys 1 Furnace DX Cool Heating Coil Outlet,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0,                       !- Parasitic Electric Load {W}
+    0,                       !- On Cycle Parasitic Electric Load {W}
     Sys 1 Furnace DX Cool Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
   Curve:Cubic,
     Sys 1 Furnace DX Cool Heating Coil PLF-FPLR,  !- Name
@@ -17114,9 +17114,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
       Furnace DX Cool Cooling Coil Outlet,  !- Air Inlet Node Name
       East Zone Inlet Node,    !- Air Outlet Node Name
       ,                        !- Temperature Setpoint Node Name
-      0,                       !- Parasitic Electric Load {W}
+      0,                       !- On Cycle Parasitic Electric Load {W}
       Furnace DX Cool Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-      0;                       !- Parasitic Fuel Load {W}
+      0;                       !- Off Cycle Parasitic Fuel Load {W}
 
     Curve:Cubic,
       Furnace DX Cool Heating Coil PLF-FPLR,  !- Name
@@ -17420,9 +17420,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
       Furnace DX Cool Cooling Coil Outlet,  !- Air Inlet Node Name
       East Zone Inlet Node,    !- Air Outlet Node Name
       ,                        !- Temperature Setpoint Node Name
-      0,                       !- Parasitic Electric Load {W}
+      0,                       !- On Cycle Parasitic Electric Load {W}
       Furnace DX Cool Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-      0;                       !- Parasitic Fuel Load {W}
+      0;                       !- Off Cycle Parasitic Fuel Load {W}
 
     Curve:Cubic,
       Furnace DX Cool Heating Coil PLF-FPLR,  !- Name
@@ -18725,7 +18725,7 @@ Coil:Heating:Desuperheater,
   Refrigeration:CompressorRack,   !- Heating Source Type
   SelfContainedDisplay,           !- Heating Source Name
   ,                               !- Coil Temperature Setpoint Node Name
-  0.1;                            !- Parasitic Electric Load {W}
+  0.1;                            !- On Cycle Parasitic Electric Load {W}
 
 ScheduleTypeLimits,
   Any Number;                     !- Name
@@ -20660,14 +20660,14 @@ Coil:Heating:Gas:MultiStage,
   Zone 2 Inlet Node,              !- Air Outlet Node Name
   ,                               !- Temperature Setpoint Node Name
   Quadratic,                      !- Part Load Fraction Correlation Curve Name
-  10,                             !- Parasitic Gas Load{ W }
+  10,                             !- Off Cycle Parasitic Gas Load{ W }
   1,                              !- Number of Stages
   0.8,                            !- Stage 1 Gas Burner Efficiency{ W / W }
   7689.33,                        !- Stage 1 Nominal Capacity{ W }
-  100,                            !- Stage 1 Parasitic Electric Load{ W }
+  100,                            !- Stage 1 On Cycle Parasitic Electric Load{ W }
   0.8,                            !- Stage 2 Gas Burner Efficiency{ W / W }
   15378.66,                       !- Stage 2 Nominal Capacity{ W }
-  100;                            !- Stage 2 Parasitic Electric Load{ W }
+  100;                            !- Stage 2 On Cycle Parasitic Electric Load{ W }
 
 )IDF";
 
