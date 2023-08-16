@@ -1714,7 +1714,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
         "    DH Water Outlet Node,    !- Boiler Water Outlet Node Name",
         "    100.0,                   !- Water Outlet Upper Temperature Limit {C}",
         "    NotModulated,            !- Boiler Flow Mode",
-        "    4770.00,                 !- Parasitic Electric Load {W}",
+        "    4770.00,                 !- On Cycle Parasitic Electric Load {W}",
         "    1.00;                    !- Sizing Factor",
 
         "  Curve:Linear,",

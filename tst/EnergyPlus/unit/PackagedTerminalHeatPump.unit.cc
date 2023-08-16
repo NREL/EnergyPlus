@@ -155,10 +155,6 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         "    Lobby_ZN_1_FLR_2 WSHP Heating Mode,                        !- Heating Coil Name",
         "    Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Cooling Coil Object Type",
         "    Lobby_ZN_1_FLR_2 WSHP Cooling Mode,                        !- Cooling Coil Name",
-        "    2.5,                  !- Maximum Cycling Rate {cycles/hr}",
-        "    60.0,                 !- Heat Pump Time Constant {s}",
-        "    0.01,                 !- Fraction of On-Cycle Power Use",
-        "    60,                   !- Heat Pump Fan Delay Time {s}",
         "    Coil:Heating:Electric,                    !- Supplemental Heating Coil Object Type",
         "    Lobby_ZN_1_FLR_2 WSHP Supp Heating Coil,  !- Supplemental Heating Coil Name",
         "    50.0,                 !- Maximum Supply Air Temperature from Supplemental Heater {C}",
@@ -182,6 +178,9 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
         "    Autosize,             !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                  !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                  !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    2.5,                  !- Maximum Cycling Rate {cycles/hr}",
+        "    60.0,                 !- Latent Capacity Time Constant {s}",
+        "    60,                   !- Fan Delay Time {s}",
         "    0,                    !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}",
         "    PLF Curve,            !- Energy Part Load Fraction Curve Name",
         "    4682.3964854,         !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
@@ -4756,7 +4755,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
             ThermostatWithMinimumRuntime, !- Cycling Run Time Control Type
             300,                     !- Cycling Run Time
             SPACE1-1;                !- Control Zone or Zone List Name
-	
+
           OutdoorAir:Mixer,
         	PTACOAMixer,             !- Name
         	PTACOAMixerOutletNode,   !- Mixed Air Node Name

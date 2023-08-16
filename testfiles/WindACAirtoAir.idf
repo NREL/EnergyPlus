@@ -1654,6 +1654,9 @@
     AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate
+    ,                        !- Latent Capacity Time Constant
+    ,                        !- Fan Delay Time
     HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
