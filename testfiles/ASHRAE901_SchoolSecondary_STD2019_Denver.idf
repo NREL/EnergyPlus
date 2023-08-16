@@ -23673,10 +23673,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -23728,10 +23724,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -23783,10 +23775,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -23838,10 +23826,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -23893,10 +23877,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}

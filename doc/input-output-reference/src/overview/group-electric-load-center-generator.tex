@@ -1,6 +1,6 @@
 \section{Group -- Electric Load Center-Generator Specifications}\label{group-electric-load-center-generator-specifications}
 
-This group of input objects is related to electric power serving the facility. EnergyPlus has models for various types of electric generators and power conditioning devices that might be part of the electric power system serving the building being modeled. Buildings with simple utility electric power service will not necesarily need any of the models in this group. All EnergyPlus models that have any electric power consumption are assumed to have a straightforward connection to utility grid service and no extra input is needed. The models in this group of inputs are useful for facilities that more complex electric power service such as:
+This group of input objects is related to electric power serving the facility. EnergyPlus has models for various types of electric generators and power conditioning devices that might be part of the electric power system serving the building being modeled. Buildings with simple utility electric power service will not necessarily need any of the models in this group. All EnergyPlus models that have any electric power consumption are assumed to have a straightforward connection to utility grid service and no extra input is needed. The models in this group of inputs are useful for facilities that more complex electric power service such as:
 
 \begin{itemize}
 \tightlist
@@ -228,7 +228,7 @@ This alpha field contains the identifying name for the electric load center.
 
 \paragraph{Field: Generator List Name}\label{field-generator-list-name}
 
-This alpha field contains the identifying name for the list of generators in the set defined in an \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} object. All the generators connected to this load center need to be of the same type in terms of all AC or all DC. Currently the only DC generators are photovoltaic panels, the others are all AC. A facility with both AC and DC generators will need to use seperate ElectricLoadCenter:Distribution objects. The generator list named here can only be associated with one load center. This field can be left blank if there are no generators.
+This alpha field contains the identifying name for the list of generators in the set defined in an \hyperref[electricloadcentergenerators]{ElectricLoadCenter:Generators} object. All the generators connected to this load center need to be of the same type in terms of all AC or all DC. Currently the only DC generators are photovoltaic panels, the others are all AC. A facility with both AC and DC generators will need to use separate ElectricLoadCenter:Distribution objects. The generator list named here can only be associated with one load center. This field can be left blank if there are no generators.
 
 \paragraph{Field: Generator Operation Scheme Type}\label{field-generator-operation-scheme-type}
 

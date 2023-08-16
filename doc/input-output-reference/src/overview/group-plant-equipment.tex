@@ -605,11 +605,11 @@ This choice field determines how the chiller operates with respect to the intend
 
 \paragraph{Field: Generator Heat Input Function of Part Load Ratio Curve Name}\label{field-generator-heat-input-function-of-part-load-ratio-curve-name}
 
-This required alpha field specifies the name of the curve used to determine the heat input to the chiller. The curve is a quadratic or cubic curve which characterizes the heat input as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal capacity and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of heat input required for the given operating conditons.
+This required alpha field specifies the name of the curve used to determine the heat input to the chiller. The curve is a quadratic or cubic curve which characterizes the heat input as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal capacity and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of heat input required for the given operating conditions.
 
 \paragraph{Field: Pump Electric Input Function of Part Load Ratio Curve Name}\label{field-pump-electric-input-function-of-part-load-ratio-curve-name}
 
-This alpha field specifies the name of the curve used to determine the pump electrical input to the chiller. The curve is a quadratic or cubic curve which characterizes the pump electrical power as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal pumping power and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of pumping power required for the given operating conditons.
+This alpha field specifies the name of the curve used to determine the pump electrical input to the chiller. The curve is a quadratic or cubic curve which characterizes the pump electrical power as a function of chiller part-load ratio. The curve output is multiplied by the chiller's nominal pumping power and operating part-load ratio or minimum part-load ratio, whichever is greater, to determine the amount of pumping power required for the given operating conditions.
 
 \paragraph{Field: Generator Inlet Node Name}\label{field-generator-inlet-node-name-1}
 
@@ -649,7 +649,7 @@ This numeric field specifies the chiller's design generator \emph{fluid} flow ra
 
 \paragraph{Field: Temperature Lower Limit Generator Inlet}\label{field-temperature-lower-limit-generator-inlet}
 
-This numeric field specifies the lower limit of the generator's entering water temperature. This field is not used iif the Generator Fluid Type is specified as steam.
+This numeric field specifies the lower limit of the generator's entering water temperature. This field is not used if the Generator Fluid Type is specified as steam.
 
 \paragraph{Field: Degree of Subcooling in Steam Generator}\label{field-degree-of-subcooling-in-steam-generator-1}
 
@@ -1567,7 +1567,7 @@ Most of these chiller output variables are defined above under ``Generic Chiller
 
 \paragraph{Minimum Part Load Ratio {[]}}\label{chiller205-minimum-plr}
 
-This is the raio of minimum capacity to maximum capacity, under which the chiller cycling (where the amount of power remains constant to produce smaller loads than this fraction) occurs.
+This is the ratio of minimum capacity to maximum capacity, under which the chiller cycling (where the amount of power remains constant to produce smaller loads than this fraction) occurs.
 
 \paragraph{Chiller Condenser Inlet Temperature ~{[}C{]}}\label{chiller205-condenser-inlet-temperature-c}
 
@@ -1685,7 +1685,7 @@ This alpha field determines what type of condenser will be modeled with this chi
 
 \paragraph{Field: Condenser Fan Power Ratio}\label{field-condenser-fan-power-ratio}
 
-This field is used to model condenser fan power associated with air-cooled or evaporatively-cooled condensers (for cooling towers, refer to Group - Condenser Equipment). Enter the ratio of the condenser fan power to the reference chiller cooling capacity in W/W. If this input is greater than 0, the condenser fan power is modeled seperatly from compressor power. In addition, if condenser fan power is modeled using this input, the reference COP and ``Electric Input to Cooling Output Ratio Function of'' performance curves should not include condenser fan power.
+This field is used to model condenser fan power associated with air-cooled or evaporatively-cooled condensers (for cooling towers, refer to Group - Condenser Equipment). Enter the ratio of the condenser fan power to the reference chiller cooling capacity in W/W. If this input is greater than 0, the condenser fan power is modeled separately from compressor power. In addition, if condenser fan power is modeled using this input, the reference COP and ``Electric Input to Cooling Output Ratio Function of'' performance curves should not include condenser fan power.
 
 \paragraph{Field: Fraction of Compressor Electric Power Rejected by Condenser}\label{field-fraction-of-compressor-electric-power-rejected-by-condenser}
 
@@ -1737,7 +1737,7 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 \paragraph{Field: Heat Recovery Leaving Temperature Setpoint Node Name}\label{field-heat-recovery-leaving-temperature-setpoint-node-name-1}
 
-This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
+This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluids.
 
 \paragraph{Field: End-Use Subcategory}
 
@@ -2125,7 +2125,7 @@ This field is optional.~ It can be used to control heat recovery operation of th
 
 \paragraph{Field: Heat Recovery Leaving Temperature Setpoint Node Name}\label{field-heat-recovery-leaving-temperature-setpoint-node-name-2}
 
-This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluilds.
+This field is optional.~ It can be used to refine the model and controls for heat recovery operation of the chiller.~ The node named here should have a setpoint placed on it by a setpoint manager.~ If the plant loop's demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.~ If the plant loop's demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.~ When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller's that are able to produce relatively higher temperature heated fluids.
 
 \paragraph{Field: End-Use Subcategory}\label{end-use-subcategory-12}
 
@@ -5270,7 +5270,7 @@ HeatPump:WaterToWater:ParameterEstimation:Heating,
       3998,                    !- Source Side Heat Transfer Coefficient {W/K}
       .012544,                 !- Piston Displacement {m3/s}
       .05469,                  !- Compressor Clearance Factor %
-      92156.2,                 !- Compressor Suction And Dischrage Pressure Drop {Pa}
+      92156.2,                 !- Compressor Suction And Discharge Pressure Drop {Pa}
       4.8907,                  !- Superheating {C}
       2803.9,                  !- Constant Part Of Electro Mechanical Power Losses {W}
       .699,                    !- Loss Factor
@@ -5657,7 +5657,7 @@ For HeatPump:AirToWater:FuelFired:Cooling object, the choices for this field sho
 
 \paragraph{Field: Normalized Capacity Function of Temperature Curve Name}
 
-This field is the curve name of the normalized capacity function of the two independent temperature variables. The maximum capacity is adjusted from the rated conditions, and represents what the actual capacity the heat pump can achieve under the outdoor air temperature (either drybulb or wetbuld depending on the previous input field choice), and the water temperature (either leaving condenser/evaporator or entering condenser/evaporator depending on the previous input field choice).
+This field is the curve name of the normalized capacity function of the two independent temperature variables. The maximum capacity is adjusted from the rated conditions, and represents what the actual capacity the heat pump can achieve under the outdoor air temperature (either drybulb or wetbulb depending on the previous input field choice), and the water temperature (either leaving condenser/evaporator or entering condenser/evaporator depending on the previous input field choice).
 
 \paragraph{Field: Fuel Energy Input Ratio Function of Temperature Curve name}
 
@@ -6393,7 +6393,7 @@ This numeric field contains the compressor power during simultaneous cooling-hea
     Ratio = \frac{{Powe{r_{@Tchw,l = 6.67C,Tcond,l = 51.67C}}}}{{Powe{r_{@Tchw,l = 6.67C,Tcond,l = 35.0C}}}}
 \end{equation}
 
-The default value is 1.5. This field is used to determine full load compressor power at the simultaneous cooling-heating mode's reference chilled water leaving and condenser water leaving temperatures. Note: In heating-only mode, the chilled water leaving temperature floats so the EIRFT curve is used to modify the simultaneouos cooling-heating full load compressor power value.
+The default value is 1.5. This field is used to determine full load compressor power at the simultaneous cooling-heating mode's reference chilled water leaving and condenser water leaving temperatures. Note: In heating-only mode, the chilled water leaving temperature floats so the EIRFT curve is used to modify the simultaneous cooling-heating full load compressor power value.
 
 \subsubsection{Field: Reference Heating Mode Leaving Chilled Water Temperature}\label{field-reference-heating-mode-leaving-chilled-water-temperature}
 
