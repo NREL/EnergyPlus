@@ -395,7 +395,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     } // end loop over controlled spaces
 
     if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-        // Auto-assign the system node name for spaces that do not have a SpaceHVAC:EquipmentConnections input
+        // Auto-assign the system node name for spaces in controlled zones that do not have a SpaceHVAC:EquipmentConnections input
         for (auto &thisZone : state.dataHeatBal->Zone) {
             if (!thisZone.IsControlled) continue;
             int spaceCount = 0;

@@ -2881,7 +2881,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             auto &thisZone = state.dataHeatBal->Zone(zoneNum);
             state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).setUpOutputVars(state, DataStringGlobals::zonePrefix, thisZone.Name);
-            if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                     state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).setUpOutputVars(
                         state, DataStringGlobals::spacePrefix, state.dataHeatBal->space(spaceNum).Name);
@@ -2895,7 +2895,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
             bool attachMeters = !state.dataHeatBal->doSpaceHeatBalanceSimulation;
             state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).setUpOutputVars(
                 state, DataStringGlobals::zonePrefix, thisZone.Name, staged, attachMeters, thisZone.Multiplier, thisZone.ListMultiplier);
-            if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
                 // If doSpaceHeatBalanceSimulation then meter spaces, not zones
                 attachMeters = state.dataHeatBal->doSpaceHeatBalanceSimulation;
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
@@ -2909,7 +2909,7 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                 }
             }
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum).setUpOutputVars(state, DataStringGlobals::zonePrefix, thisZone.Name);
-            if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
                 for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
                     state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum).setUpOutputVars(
                         state, DataStringGlobals::spacePrefix, state.dataHeatBal->space(spaceNum).Name);

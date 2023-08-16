@@ -297,7 +297,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
 
     // Following used for reporting
     state.dataHeatBal->ZnAirRpt.allocate(state.dataGlobal->NumOfZones);
-    if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
         state.dataHeatBal->spaceAirRpt.allocate(state.dataGlobal->numSpaces);
     }
 
@@ -305,7 +305,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         std::string_view name = state.dataHeatBal->Zone(Loop).Name;
         auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(Loop);
         thisZnAirRpt.setUpOutputVars(state, DataStringGlobals::zonePrefix, name);
-        if (state.dataHeatBal->doSpaceHeatBalanceSizing || state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
             for (int spaceNum : state.dataHeatBal->Zone(Loop).spaceIndexes) {
                 state.dataHeatBal->spaceAirRpt(spaceNum).setUpOutputVars(
                     state, DataStringGlobals::spacePrefix, state.dataHeatBal->space(spaceNum).Name);
