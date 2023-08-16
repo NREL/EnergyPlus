@@ -109,7 +109,7 @@ Return nodes without an outdoor air inlet are not adjusted. The remaining return
 
 \subsubsection{Allocation of Excess Exhaust Flow}\label{allocation-of-excess-exhaust-flow}
 
-If the total (unbalanced) exhaust fan flow exceeds the supply flow in a given zone, this exhaust flow can be made up with outdoor air by any air loop serving the zone and the return air in other zones on the same air loop(s) will be reduced proportionally. First, the amount of excess exhaust for all zones on a given air loop is totalled.  If a zone with excess exhuast is served by more than one air loop, the exhaust is shared by each air loop in proportion to the maximum available outdoor air for a given air loop.
+If the total (unbalanced) exhaust fan flow exceeds the supply flow in a given zone, this exhaust flow can be made up with outdoor air by any air loop serving the zone and the return air in other zones on the same air loop(s) will be reduced proportionally. First, the amount of excess exhaust for all zones on a given air loop is totaled.  If a zone with excess exhaust is served by more than one air loop, the exhaust is shared by each air loop in proportion to the maximum available outdoor air for a given air loop.
 
 \begin{equation}
 {\dot m_{ExcessExh,i}} = {\sum\nolimits_{j} {\frac{\dot m_{ExcessExh,j} * \dot m_{MaxOA,i}} {\dot m_{TotOA,j}} }}
@@ -234,7 +234,7 @@ Also checks that the zone total return air mass flow rate does not exceed the ai
 
 \subsection{Infiltration Flow Rate Adjustments}\label{infiltration-flow-rate-adjustments}
 
-There are three options for the treatement of infiltration in the zone air mass balance: None, AddInfiltrationFlow, and AdjustInfiltrationFlow. There are also two options to specify which zones are included in the infiltration adjustments: AllZones or MixingSourceZonesOnly.
+There are three options for the treatment of infiltration in the zone air mass balance: None, AddInfiltrationFlow, and AdjustInfiltrationFlow. There are also two options to specify which zones are included in the infiltration adjustments: AllZones or MixingSourceZonesOnly.
 
 If a zone is excluded from infiltration adjustments, then the base infiltration rate specified by the Infiltration:* object(s) in the zone is assumed to be self-balanced, and infiltration is not included in the mass flow calculations for that zone.
 
@@ -244,7 +244,7 @@ If a zone is included in the infiltration adjustment, the infiltration air mass 
 {\dot m_{Inf-required}} = MAX\left( {0.0,\,{{\dot m}_{XS}} + {{\dot m}_{EX}} + {{\dot m}_{R}} - {{\dot m}_S}  - {\dot m_{XR,\,new}}} \right)
 \end{equation}
 
-This infiltration air mass flow rate calculated is either added to the base infiltration air flow, which is calculated from user inputs, or overrides the base infiltration air flow depending on user choice. For AddInfiltrationFlow, the zoneinfiltration flow rate is:
+This infiltration air mass flow rate calculated is either added to the base infiltration air flow, which is calculated from user inputs, or overrides the base infiltration air flow depending on user choice. For AddInfiltrationFlow, the zone infiltration flow rate is:
 
 \begin{equation}
 {\dot m_{Inf}} = {\dot m_{Inf-base}} + {\dot m_{Inf-required}}

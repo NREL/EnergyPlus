@@ -308,40 +308,6 @@ This numeric field defines the outdoor air dry-bulb temperature above which the 
 
 This alpha field specifies the name of the outdoor node which controls the operation of the supplemental heating coil. If this field is left blank, the outdoor temperature is based solely on the weather data. If this field is not blank, the node name specified must also be listed in an \hyperref[outdoorairnode]{OutdoorAir:Node} object where the height of the node is taken into consideration when calculating outdoor temperature from the weather data. Alternately, the node name must be specified in an \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object where the outdoor temperature is taken directly from the weather data.
 
-\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-001}
-
-This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown in Figure~\ref{fig:suggested-values-for-maximum-cycling-rate}. (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image295.png}
-\caption{Suggested values for maximum cycling rate \protect \label{fig:suggested-values-for-maximum-cycling-rate}}
-\end{figure}
-
-\paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant-000}
-
-This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown in Figure~\ref{fig:suggested-values-for-heat-pump-time-constant}. (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image296.png}
-\caption{Suggested values for heat pump time constant \protect \label{fig:suggested-values-for-heat-pump-time-constant}}
-\end{figure}
-
-\paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use-000}
-
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are shown in Figure~\ref{fig:suggested-values-for-fraction-of-on-cycle-power-use}. (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image297.png}
-\caption{Suggested values for fraction of on cycle power use \protect \label{fig:suggested-values-for-fraction-of-on-cycle-power-use}}
-\end{figure}
-
-\paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time-000}
-
-This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
-
 \paragraph{Field: Ancillary On-Cycle Electric Power}\label{field-ancillary-on-cycle-electric-power}
 
 This field defines ancillary electrical power (W) consumed during the on-cycle period (i.e., when the cooling or heating coil is operating). The model assumes that this ancillary power does not contribute to heating the supply air. The minimum value for this field is 0.0, and the default value is also 0.0 if the field is left blank.
@@ -436,10 +402,6 @@ AirLoopHVAC:UnitarySystem,
   50,                          !- Maximum Supply Air Temperature {C}
   21,                          !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                            !- Outdoor Dry-Bulb Temperature Sensor Node Name
-  ,                            !- Maximum Cycling Rate {cycles/hr}
-  ,                            !- Heat Pump Time Constant {s}
-  ,                            !- Fraction of On-Cycle Power Use
-  ,                            !- Heat Pump Fan Delay Time {s}
   ,                            !- Ancillary On-Cycle Electric Power {W}
   ,                            !- Ancillary Off-Cycle Electric Power {W}
   ,                            !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -728,7 +690,7 @@ The allowed cooling and heating coil types are restricted to the following combi
 
 \paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
 
-This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. This fraction is usually set to the mimumum of heating and cooling operation lowest speed supply air flow fraction. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating high speed supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
+This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. This fraction is usually set to the minimum of heating and cooling operation lowest speed supply air flow fraction. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating high speed supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
 
 \paragraph{Field Group: Heating and Cooling Speeds 1 to 10}\label{field-group-heating-and-cooling-speeds-1-to-10}
 
@@ -899,7 +861,7 @@ As shown in the example below, correct specification of the heat/cool furnace re
   terminal unit (\hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}) for each zone served by the furnace
 \end{enumerate}
 
-Note: the furnace's fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-energyplus-heatcool-furnace}) when CoolReheat is selected as the dehujmidificaiton control type. In addition, the volumetric air flow rate specified in the terminal air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
+Note: the furnace's fan, cooling coil, heating coil and optional reheat coil must be connected in the air loop according to the configuration shown above (Figure~\ref{fig:schematic-of-energyplus-heatcool-furnace}) when CoolReheat is selected as the dehumidification control type. In addition, the volumetric air flow rate specified in the terminal air unit for the controlling zone should properly reflect the fractional volumetric air flow rate specified in the furnace object.
 
 \begin{lstlisting}
 
@@ -921,7 +883,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   Furnace Heating Coil 1, !- Heating coil name
   Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
   Furnace ACDXCoil 1,     !- Cooling coil name
-  None;                   !- Dehumidificatioin Control Type
+  None;                   !- Dehumidification Control Type
 
 
   Coil:Heating:Fuel,
@@ -1403,7 +1365,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         Air Loop Outlet Node,        ! Heat Pump air outlet  node
         1.3,                  !- Cooling Supply Air Flow Rate {m3/s}
         1.3,                  !- Heating Supply Air Flow Rate {m3/s}
-        0.0,                  !- No Load Suuply Air Flow Rate {m3/s}
+        0.0,                  !- No Load Supply Air Flow Rate {m3/s}
         East Zone,                   ! Controlling zone or thermostat location
         Fan:OnOff,            ! Supply air fan type
         Supply Fan 1,                ! Supply air fan name –- same name used in fan object
@@ -2178,9 +2140,9 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
       Heating Coil Air Inlet Node,  !- Coil_Air_Inlet_Node
       Air Loop Outlet Node,         !- Coil_Air_Outlet_Node
       ,                      !- Coil_Temp_Setpoint_Node
-      100,                   !- Parasitic Electric Load {W}
+      100,                   !- On Cycle Parasitic Electric Load {W}
       PLFCurveforGasFurnace, !- Part load fraction correlation (function of part load ratio)
-      10;                    !- Parasitic Gas Load {W}
+      10;                    !- Off Cycle Parasitic Fuel Load {W}
 
 
   Curve:Cubic,
@@ -2243,7 +2205,7 @@ This output variable is the ratio of actual air mass flow rate through the furna
 
 \subsection{AirLoopHVAC:UnitaryHeatOnly}\label{airloophvacunitaryheatonly}
 
-The AirLoopHVAC:UnitaryHeatOnly is identical to the \hyperref[airloophvacunitaryfurnaceheatonly]{AirLoopHVAC:Unitary:Furnace:HeatOnly} model. The heat-only unitary system is a ``virtual'' component that consists of a fan component (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through unitary system configuraion is shown in the Figure below.
+The AirLoopHVAC:UnitaryHeatOnly is identical to the \hyperref[airloophvacunitaryfurnaceheatonly]{AirLoopHVAC:Unitary:Furnace:HeatOnly} model. The heat-only unitary system is a ``virtual'' component that consists of a fan component (OnOff or ConstantVolume) and a Gas or Electric heating coil component. The blow through unitary system configuration is shown in the Figure below.
 
 \begin{figure}[hbtp] % fig 121
 \centering
@@ -2355,9 +2317,9 @@ AirLoopHVAC:UnitaryHeatOnly,
       Heating Coil Air Inlet Node, !- Coil_Air_Inlet_Node
       Air Loop Outlet Node,        !- Coil_Air_Outlet_Node
       ,                            !- Coil_Temp_Setpoint_Node
-      100,                         !- Parasitic Electric Load {W}
+      100,                         !- On Cycle Parasitic Electric Load {W}
       PLFCurveforUnitarySystem,    !- Part load fraction correlation (function of part load ratio)
-      10;                          !- Parasitic Gas Load {W}
+      10;                          !- Off Cycle Parasitic Fuel Load {W}
 
 
   Curve:Cubic,
@@ -2523,40 +2485,6 @@ This alpha field contains the identifying name given to the WaterToAirHeatPump c
 
 This numeric value allows the user to determine how close the air side has to be controlled. Lower the value of convergence better the control of air side conditions and less the zone temperature fluctuations. However in a poorly designed system, a lower convergence might result in warning errors which are caused due to the iteration limit for run time fraction calculation is limited to 20.
 
-\paragraph{Field: Maximum Cycling Rate}\label{field-maximum-cycling-rate-1-000}
-
-This numeric field contains the maximum on-off cycling rate for the compressor, which occurs at 50\% run time fraction. Suggested values are shown below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image305.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Heat Pump Time Constant}\label{field-heat-pump-time-constant-1}
-
-This numeric field contains the time constant for the cooling coil's capacity to reach steady state after startup. Suggested values are shown below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image306.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Fraction of On-Cycle Power Use}\label{field-fraction-of-on-cycle-power-use-1}
-
-This numeric field contains the fraction of on-cycle power use to adjust the part load fraction based on the off-cycle power consumption due to crankcase heaters, controls, fans, and etc. Suggested value values are below (Henderson et al. 1999):
-
-\begin{figure}[htbp]
-\centering
-\includegraphics{media/image307.png}
-\caption{}
-\end{figure}
-
-\paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time-1}
-
-This numeric field contains the time delay for the heat pump supply air fan to shut off after the compressor cycles off in seconds. This value can be obtained from the manufacturer or the heat pump catalog. Enter a value of zero when the heat pump's fan operating mode is continuous. Suggested value is 60 seconds.
-
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-3}
 
 This is the object type of the supplemental heating coil. The hot water and steam heating coils require specifying plant loop, branches, and connectors objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or \hyperref[controllerwatercoil]{Controller:WaterCoil} object. The parent object (AirLoop Unitary Water to Air Heat Pump) itself provides the ``controller'' function of modulating water flow. The valid choices are:
@@ -2623,7 +2551,7 @@ This alpha input field contains the type of dehumidification control. The follow
 
 \textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. The excess cooling beyond the cooling set point temperature is offset by the supplemental heating coil.
 
-The default is \textbf{None}. For \textbf{CoolReheat} dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in WaterToAir HeatPumps. When dehumidification control is active the heating and the reheat load due to extra dehumidification are met with supplemetal heating coil. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to~ extra dehumidification. The dehumidification control type CoolReheat works only with \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} cooling coil type.
+The default is \textbf{None}. For \textbf{CoolReheat} dehumidification control modes, the maximum humidity setpoint is required. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} object. When extra dehumidification is required, the system may not be able to meet the humidity setpoint if its full capacity is not adequate. Supplemental heating coil (supplemental heating coil type and name) is a required input in WaterToAir HeatPumps. When dehumidification control is active the heating and the reheat load due to extra dehumidification are met with supplemental heating coil. The supplemental heating coil capacity must be adequate enough to meet the heating coil load and offset the excess cooling load due to~ extra dehumidification. The dehumidification control type CoolReheat works only with \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} cooling coil type.
 
 \paragraph{Field: Heat Pump Coil Water Flow Mode}\label{field-heat-pump-coil-water-flow-mode-000}
 
@@ -2638,7 +2566,7 @@ This field specifies the way in which water flow through the heat pump coils wil
   CyclingOnDemand
 \end{itemize}
 
-\textbf{Cycling} varies water flow through the coil based on the heat pump Part Load Ratio.~ This control method is appropriate for modeling heat pumps that are outfitted with a soleniod valve which allows water to flow through the coil only when the compressor is active. This is the default for EnergyPlus V8 and later.
+\textbf{Cycling} varies water flow through the coil based on the heat pump Part Load Ratio.~ This control method is appropriate for modeling heat pumps that are outfitted with a solenoid valve which allows water to flow through the coil only when the compressor is active. This is the default for EnergyPlus V8 and later.
 
 \textbf{Constant} provides a constant water flow regardless of heat pump operation.~ Remember that EnergyPlus has two coils (a heating coil and a cooling coil) to approximate the operation of one coil that can operate in either heating mode or cooling mode.~ Therefore, when the water flow mode is constant, there will be full flow through either the heating coil or the cooling coil, but not both at the same time.
 
@@ -2663,10 +2591,6 @@ AirLoopHVAC:UnitaryHeatPump:WaterToAir,
       Coil:Cooling:WaterToAirHeatPump:ParameterEstimation,  !- Cooling Coil Object Type
       Heat Pump Cooling Mode,  !- Cooling Coil Name
       0.001,                   !- Cooling Convergence
-      2.5, !- Maximum Cycling Rate {cycles/hr}
-      60, !- Heat Pump Time Constant {s}
-      0.01, !- Fraction of On-Cycle Power Use
-      60,    !- Heat Pump Fan Delay Time {s}
       Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type
       Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
       50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -3030,7 +2954,7 @@ This choice field defines the cooling or heating priority control mode for the u
   LoadPriority
 \end{itemize}
 
-If CoolingPriority is selected, the system operates to meet the cooling load if any zone served by this system (air loop) requires cooling. If no zones require cooling, then the system operates in heating mode if needed. If HeatingPriority is selected, the system operates to meet the heating load if any zone requires heating. If no zones require heating, then the system operates in cooling mode if needed. If ZonePriority is selected, the system operates based on the maximum number of zones requiring either heating or cooling. If the number of zones requiring cooling is greater than the number of zones requiring heating, then the system operates in cooling mode. If the number of zones requiring heating is greater than the number of zones requiring cooling, then the system operates in heating mode. If the number of zones requiring cooling equals the number of zones requiring heating, then the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating) sets the cooling or heating operating mode for the system during that simulation timestep. If LoadPriority is selected, the system operates based on the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating). If the toal load for zones requiring cooling is greater than the toal load for zones requiring heating, then the system operates in cooling mode. Similar logic is used for heating mode selection. If the toal cooling load equals the toal heating load, then cooling or heating operation reverts to the total number of zones requiring cooling or heating (and if equal reverts to cooling mode if the cooling load is non-zero, otherwise, heating mode.
+If CoolingPriority is selected, the system operates to meet the cooling load if any zone served by this system (air loop) requires cooling. If no zones require cooling, then the system operates in heating mode if needed. If HeatingPriority is selected, the system operates to meet the heating load if any zone requires heating. If no zones require heating, then the system operates in cooling mode if needed. If ZonePriority is selected, the system operates based on the maximum number of zones requiring either heating or cooling. If the number of zones requiring cooling is greater than the number of zones requiring heating, then the system operates in cooling mode. If the number of zones requiring heating is greater than the number of zones requiring cooling, then the system operates in heating mode. If the number of zones requiring cooling equals the number of zones requiring heating, then the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating) sets the cooling or heating operating mode for the system during that simulation timestep. If LoadPriority is selected, the system operates based on the largest combined load (i.e., the sum of the cooling loads for zones requiring cooling compared to the sum of the heating loads for zones that require heating). If the total load for zones requiring cooling is greater than the total load for zones requiring heating, then the system operates in cooling mode. Similar logic is used for heating mode selection. If the total cooling load equals the total heating load, then cooling or heating operation reverts to the total number of zones requiring cooling or heating (and if equal reverts to cooling mode if the cooling load is non-zero, otherwise, heating mode.
 
 \paragraph{Field: Minimum Outlet Air Temperature During Cooling Operation}\label{field-minimum-outlet-air-temperature-during-cooling-operation}
 
