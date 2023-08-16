@@ -106,8 +106,6 @@ namespace HVACUnitaryBypassVAV {
 
     struct CBVAVData
     {
-        // Members
-        // input data
         std::string Name;                      // Name of unit
         std::string UnitType;                  // Type of unit
         std::string Sched;                     // Availability schedule name
@@ -146,9 +144,6 @@ namespace HVACUnitaryBypassVAV {
         Real64 HeatingSpeedRatio = 1.0;                                      // Fan speed ratio in heating mode
         Real64 CoolingSpeedRatio = 1.0;                                      // Fan speed ratio in cooling mode
         Real64 NoHeatCoolSpeedRatio = 1.0;                                   // Fan speed ratio when no cooling or heating
-        Real64 MaxONOFFCyclesperHourCycling = 4.0;                           // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstantCycling = 0.0;                                  // Heat pump time constant [s]
-        Real64 FanDelayTimeCycling = 0.0;                                    // Fan delay time, time delay for the HP's fan to
         bool CheckFanFlow = true;                                            // Check fan volumetric flow versus system flow in init routine.
         std::string DXCoolCoilName;                                          // Name of DX cooling coil
         DataHVACGlobals::CoilType CoolCoilType = DataHVACGlobals::CoilType::Invalid;
@@ -324,6 +319,7 @@ namespace HVACUnitaryBypassVAV {
 struct HVACUnitaryBypassVAVData : BaseGlobalStruct
 {
 
+    // TODO: Try to eliminate these global-ish variables.  Just use data stored right in the component instances.
     int NumCBVAV = 0;                    // Number of CBVAV systems in input file
     Real64 CompOnMassFlow = 0.0;         // System air mass flow rate w/ compressor ON
     Real64 OACompOnMassFlow = 0.0;       // OA mass flow rate w/ compressor ON
@@ -341,7 +337,8 @@ struct HVACUnitaryBypassVAVData : BaseGlobalStruct
     EPVector<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
     bool GetInputFlag = true; // Flag set to make sure you get input once
 
-    bool MyOneTimeFlag = true;    // Initialization flag
+    bool MyOneTimeFlag = true; // Initialization flag
+    // TODO: Get rid of these arrays, make them bools in the data structure and probably get rid of one time flag
     Array1D_bool MyEnvrnFlag;     // Used for initializations each begin environment flag
     Array1D_bool MySizeFlag;      // Used for sizing CBVAV inputs one time
     Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
