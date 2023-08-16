@@ -535,7 +535,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(19:29)=InArgs(15:25)
                 OutArgs(30) = ''  ! new speed 1 2017 rated field
                 OutArgs(31) = ''  ! new speed 1 2023 rated field
-                OutArgs(32:42)=InArgs(26:35)
+                OutArgs(32:41)=InArgs(26:35)
                 OutArgs(42)='' ! new speed 2 2017 rated field
                 OutArgs(43)='' ! new speed 2 2023 rated field
                 OutArgs(44:53)=InArgs(36:45)
@@ -563,6 +563,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(138)='' ! new speed 10 2017 rated field
                 OutArgs(139)='' ! new speed 10 2023 rated field
                 OutArgs(140:149)=InArgs(116:125)
+                CurArgs = CurArgs + 1
                 ! But then only modify CurArgs based on the number of fields
                 IF (CurArgs >= 29) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
                 IF (CurArgs >= 39) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
