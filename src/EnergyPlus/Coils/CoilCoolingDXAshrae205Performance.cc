@@ -144,149 +144,11 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
 
-#if 0
-    if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
-        Real64 totalCoolingRate;
-        Real64 sensNorRate;
-        Real64 sensSubRate;
-        Real64 sensRehRate;
-        Real64 latRate;
-        Real64 SysNorSHR;
-        Real64 SysSubSHR;
-        Real64 SysRehSHR;
-        Real64 HumRatNorOut;
-        Real64 TempNorOut;
-        Real64 EnthalpyNorOut;
-        Real64 modeRatio;
+    this->calculate(
+        state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    this->OperatingMode = 1;
 
-        this->calculate(
-            state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
-
-        // this->OperatingMode = 1;
-        CalcComponentSensibleLatentOutput(
-            outletNode.MassFlowRate, inletNode.Temp, inletNode.HumRat, outletNode.Temp, outletNode.HumRat, sensNorRate, latRate, totalCoolingRate);
-        if (totalCoolingRate > 1.0E-10) {
-            this->OperatingMode = 1;
-            this->NormalSHR = sensNorRate / totalCoolingRate;
-            this->powerUse = this->normalMode.OpModePower;
-            this->RTF = this->normalMode.OpModeRTF;
-            this->wasteHeatRate = this->normalMode.OpModeWasteHeat;
-        }
-
-        if ((PLR != 0.0) && (LoadSHR != 0.0)) {
-            if (totalCoolingRate == 0.0) {
-                SysNorSHR = 1.0;
-            } else {
-                SysNorSHR = sensNorRate / totalCoolingRate;
-            }
-            HumRatNorOut = outletNode.HumRat;
-            TempNorOut = outletNode.Temp;
-            EnthalpyNorOut = outletNode.Enthalpy;
-            this->recoveredEnergyRate = sensNorRate;
-
-            if (LoadSHR < SysNorSHR) {
-                outletNode.MassFlowRate = inletNode.MassFlowRate;
-                this->calculate(state,
-                                this->alternateMode,
-                                inletNode,
-                                outletNode,
-                                PLR,
-                                speedNum,
-                                speedRatio,
-                                fanOpMode,
-                                condInletNode,
-                                condOutletNode,
-                                singleMode);
-                CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
-                                                  inletNode.Temp,
-                                                  inletNode.HumRat,
-                                                  outletNode.Temp,
-                                                  outletNode.HumRat,
-                                                  sensSubRate,
-                                                  latRate,
-                                                  totalCoolingRate);
-                SysSubSHR = sensSubRate / totalCoolingRate;
-                if (LoadSHR < SysSubSHR) {
-                    outletNode.MassFlowRate = inletNode.MassFlowRate;
-                    this->calculate(state,
-                                    this->alternateMode2,
-                                    inletNode,
-                                    outletNode,
-                                    PLR,
-                                    speedNum,
-                                    speedRatio,
-                                    fanOpMode,
-                                    condInletNode,
-                                    condOutletNode,
-                                    singleMode);
-                    CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
-                                                      inletNode.Temp,
-                                                      inletNode.HumRat,
-                                                      outletNode.Temp,
-                                                      outletNode.HumRat,
-                                                      sensRehRate,
-                                                      latRate,
-                                                      totalCoolingRate);
-                    SysRehSHR = sensRehRate / totalCoolingRate;
-                    if (LoadSHR > SysRehSHR) {
-                        modeRatio = (LoadSHR - SysNorSHR) / (SysRehSHR - SysNorSHR);
-                        this->OperatingMode = 3;
-                        outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
-                        outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
-                        outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
-                        this->ModeRatio = modeRatio;
-                        // update other reporting terms
-                        this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModePower;
-                        this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeRTF;
-                        this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode2.OpModeWasteHeat;
-                        this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
-                    } else {
-                        this->ModeRatio = 1.0;
-                        this->OperatingMode = 3;
-                        this->recoveredEnergyRate = (this->recoveredEnergyRate - sensRehRate) * this->ModeRatio;
-                    }
-                } else {
-                    modeRatio = (LoadSHR - SysNorSHR) / (SysSubSHR - SysNorSHR);
-                    this->OperatingMode = 2;
-                    // process outlet conditions and total output
-                    outletNode.HumRat = HumRatNorOut * (1.0 - modeRatio) + modeRatio * outletNode.HumRat;
-                    outletNode.Enthalpy = EnthalpyNorOut * (1.0 - modeRatio) + modeRatio * outletNode.Enthalpy;
-                    outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
-                    this->ModeRatio = modeRatio;
-                    // update other reporting terms
-                    this->powerUse = this->normalMode.OpModePower * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModePower;
-                    this->RTF = this->normalMode.OpModeRTF * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeRTF;
-                    this->wasteHeatRate = this->normalMode.OpModeWasteHeat * (1.0 - modeRatio) + modeRatio * this->alternateMode.OpModeWasteHeat;
-                    this->recoveredEnergyRate = (this->recoveredEnergyRate - sensSubRate) * this->ModeRatio;
-                }
-            } else {
-                this->ModeRatio = 0.0;
-                this->OperatingMode = 1;
-                this->recoveredEnergyRate = 0.0;
-            }
-            // Check for saturation error and modify temperature at constant enthalpy
-            Real64 tsat = Psychrometrics::PsyTsatFnHPb(state, outletNode.Enthalpy, inletNode.Press, RoutineName);
-            if (outletNode.Temp < tsat) {
-                outletNode.Temp = tsat;
-                outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, tsat, outletNode.Enthalpy);
-            }
-        }
-    } else if (useAlternateMode == DataHVACGlobals::coilEnhancedMode) {
-        this->calculate(
-            state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
-        this->OperatingMode = 2;
-        this->powerUse = this->alternateMode.OpModePower;
-        this->RTF = this->alternateMode.OpModeRTF;
-        this->wasteHeatRate = this->alternateMode.OpModeWasteHeat;
-    } else {
-        this->calculate(
-            state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
-        this->OperatingMode = 1;
-        this->powerUse = this->normalMode.OpModePower;
-        this->RTF = this->normalMode.OpModeRTF;
-        this->wasteHeatRate = this->normalMode.OpModeWasteHeat;
-    }
-
+    #if 0
     // calculate crankcase heater operation
     if (state.dataEnvrn->OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
         this->crankcaseHeaterPower = this->crankcaseHeaterCap;
@@ -308,6 +170,8 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
             this->basinHeaterPower = max(0.0, this->evapCondBasinHeatCap * (this->evapCondBasinHeatSetpoint - state.dataEnvrn->OutDryBulbTemp));
         }
     }
+    #endif //if 0
+
     this->basinHeaterPower *= (1.0 - this->RTF);
     this->electricityConsumption = this->powerUse * reportingConstant;
 
@@ -319,7 +183,6 @@ void CoilCoolingDX205Performance::simulate(EnergyPlus::EnergyPlusData &state,
         this->powerUse = 0.0;
         this->electricityConsumption = 0.0;
     }
-#endif // #if 0
 }
 
 void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
@@ -425,32 +288,40 @@ void CoilCoolingDX205Performance::calculate(EnergyPlus::EnergyPlusData &state,
             outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, tsat, outletNode.Enthalpy);
         }
     }
-#if 0
     if ((speedNum > 1) && (speedRatio < 1.0)) {
 
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
         auto lowerspeed = max(speedNum - 1, 1);
 
-        auto lowerspeed_mass_flow_rate = state.dataHVACGlobal->MSHPMassFlowRateLow; // * capacity ratio of speeds?
+        const auto &[gross_capacity_lower_speed, gross_sensible_capacity_lower_speed, power_lower_speed] = representation->performance.performance_map_cooling
+                                                    .calculate_performance(outdoor_coil_entering_dry_bulb_temperature, // TODO convert to Kelvin
+                                                                           indoor_coil_entering_relative_humidity,
+                                                                           indoor_coil_entering_dry_bulb_temperature, // TODO convert to Kelvin
+                                                                           air_mass_flow_rate, // use prior mfr, because we need resulting capacity to calculate the current one!
+                                                                           lowerspeed,
+                                                                           ambient_pressure,
+                                                                           this->interpolation_type);
 
-        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
+        auto mass_flow_rate_lowerspeed = state.dataHVACGlobal->MSHPMassFlowRateLow * gross_capacity_lower_speed / gross_total_capacity;
+
+        // Sets outletNode Enthalpy, Temp, HumRat, Press:
+        calculate_output_nodes(
+            state, inletNode, outletNode, gross_capacity_lower_speed, gross_sensible_capacity_lower_speed, mass_flow_rate_lowerspeed);
+        //lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 
         Real64 outSpeed1HumRat = outletNode.HumRat;
         Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
 
-        outletNode.HumRat = (outSpeed1HumRat * speedRatio * thisspeed.AirMassFlow + (1.0 - speedRatio) * outletNode.HumRat * lowerspeed.AirMassFlow) /
+        outletNode.HumRat = (outSpeed1HumRat * speedRatio * air_mass_flow_rate + (1.0 - speedRatio) * outletNode.HumRat * mass_flow_rate_lowerspeed) /
                             inletNode.MassFlowRate;
         outletNode.Enthalpy =
-            (outSpeed1Enthalpy * speedRatio * thisspeed.AirMassFlow + (1.0 - speedRatio) * outletNode.Enthalpy * lowerspeed.AirMassFlow) /
+            (outSpeed1Enthalpy * speedRatio * air_mass_flow_rate + (1.0 - speedRatio) * outletNode.Enthalpy * mass_flow_rate_lowerspeed) /
             inletNode.MassFlowRate;
-        // outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
-        // outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
-        powerUse += (1.0 - thisspeed.RTF) * lowerspeed.fullLoadPower;
-        RTF = 1.0; // if we are on greater than 1 speed, RTF *must* be 1
+        powerUse += (1.0 - RTF) * power_lower_speed;
+        RTF = 1.0; // if we are on greater than 1 speed, RTF *must* be 1 // TODO?
     }
-#endif
 }
 
 void CoilCoolingDX205Performance::calculate_output_nodes(EnergyPlusData &state,

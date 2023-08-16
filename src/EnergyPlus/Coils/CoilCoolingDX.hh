@@ -78,7 +78,8 @@ struct CoilCoolingDXInputSpecification
 struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
-    static std::shared_ptr<CoilCoolingDXPerformanceBase> makePerformanceSubclass(EnergyPlus::EnergyPlusData &state, const std::string& name);
+    static std::shared_ptr<CoilCoolingDXPerformanceBase> makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
+                                                                                 const std::string &performance_object_name);
     static int factory(EnergyPlusData &state, std::string const &coilName);
     static void getInput(EnergyPlusData &state);
     static void clear_state();
@@ -174,6 +175,9 @@ struct CoilCoolingDX
 
     void setToHundredPercentDOAS();
     bool isHundredPercentDOAS = false;
+
+    private:
+    static bool findPerformanceSubclass(EnergyPlus::EnergyPlusData &state, const std::string &object_to_find, const std::string &idd_performance_name);
 };
 
 struct CoilCoolingDXData : BaseGlobalStruct

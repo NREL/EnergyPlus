@@ -82,36 +82,18 @@ using namespace EnergyPlus;
 std::shared_ptr<CoilCoolingDXPerformanceBase> CoilCoolingDX::makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
                                                                                      const std::string &performance_object_name)
 {
-    const auto &ip = state.dataInputProcessing->inputProcessor;
-
     const auto &a205_object_name = CoilCoolingDX205Performance::object_name;
     const auto &curve_fit_object_name = CoilCoolingDXCurveFitPerformance::object_name;
 
-    if (ip->getNumObjectsFound(state, a205_object_name) > 0)
+    if (findPerformanceSubclass(state, a205_object_name, performance_object_name))
     {
-        auto const &json_dict_coil205 = ip->epJSON.find(a205_object_name).value();
-        for (auto &instance : json_dict_coil205.items()) {
-            std::string const &performance205_name = instance.key();
-            auto const &performance205_fields = instance.value();
-            if (performance205_name == performance_object_name) {
-                //ip->markObjectAsUsed(a205_object_name, performance205_name);
-                return std::make_shared<CoilCoolingDX205Performance>(state, performance_object_name);
-            }
-        }
+        return std::make_shared<CoilCoolingDX205Performance>(state, performance_object_name);
+    }
+    else if (findPerformanceSubclass(state, curve_fit_object_name, performance_object_name)) {
+        return std::make_shared<CoilCoolingDXCurveFitPerformance>(state, performance_object_name);
     }
 
-    else if (ip->getNumObjectsFound(state, curve_fit_object_name) > 0) {
-        auto const &json_dict_coil_curve = ip->epJSON.find(curve_fit_object_name).value();
-        for (auto &instance : json_dict_coil_curve.items()) {
-            std::string const &performance_name = EnergyPlus::UtilityRoutines::makeUPPER(instance.key());
-            auto const &performance_fields = instance.value();
-            if (performance_name == performance_object_name) {
-                // ip->markObjectAsUsed(curve_fit_object_name, performance_name);
-                return std::make_shared<CoilCoolingDXCurveFitPerformance>(state, performance_object_name);
-            }
-        }
-    }
-
+    ShowFatalError(state, "Could not find Coil:Cooling:DX:Performance object with name: " + performance_object_name);
     return nullptr;
 }
 
@@ -1106,4 +1088,23 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
         }
     }
     state.dataCoilCooingDX->stillNeedToReportStandardRatings = false;
+}
+
+bool CoilCoolingDX::findPerformanceSubclass(EnergyPlus::EnergyPlusData &state,
+                                            const std::string &object_to_find,
+                                            const std::string &idd_performance_name)
+{
+    const auto &ip = state.dataInputProcessing->inputProcessor;
+
+    if (ip->getNumObjectsFound(state, object_to_find) > 0) { // e.g. "Coil::Cooling::DX::CurveFit::Performance"
+        auto const &json_dict_performance = ip->epJSON.find(object_to_find).value();
+        for (auto &instance : json_dict_performance.items()) {
+            std::string const &performance_name = EnergyPlus::UtilityRoutines::makeUPPER(instance.key());
+            if (performance_name == idd_performance_name) { // e.g. "Heat Pump ACDXCoil 1 Performance"
+                // ip->markObjectAsUsed(object_to_find, performance_name);
+                return true;
+            }
+        }
+    }
+    return false;
 }
