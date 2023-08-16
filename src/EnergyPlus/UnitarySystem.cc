@@ -11976,7 +11976,6 @@ namespace UnitarySystems {
             }
         } break;
         case DataHVACGlobals::Coil_HeatingWaterToAirHPSimple: {
-            }
 
             WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                             blankString,
