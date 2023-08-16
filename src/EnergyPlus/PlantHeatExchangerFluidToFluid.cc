@@ -2564,8 +2564,6 @@ void HeatExchangerStruct::findSteamLoopFlow(EnergyPlusData &state, Real64 Target
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate steam side flow rate to hit a target leaving temperature
 
-    static constexpr std::string_view RoutineName("findSteamLoopFlow");
-
     Real64 WaterMdot = state.dataLoopNodes->Node(this->SupplySideLoop.inletNodeNum).MassFlowRate;
     this->calculateSteamToWaterHX(state, WaterMdot);
     TargetWaterLoopLeavingTemp = this->SupplySideLoop.OutletTemp;

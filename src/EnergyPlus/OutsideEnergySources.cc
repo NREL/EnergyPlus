@@ -493,11 +493,6 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                 MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             }
         } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on MyLoad
-            Real64 SatTemp = FluidProperties::GetSatTemperatureRefrig(state,
-                                                                      state.dataPlnt->PlantLoop(LoopNum).FluidName,
-                                                                      state.dataEnvrn->StdBaroPress,
-                                                                      state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
-                                                                      RoutineName);
             Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                           this->InletTemp,
