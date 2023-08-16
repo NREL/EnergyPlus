@@ -2105,7 +2105,9 @@ namespace OutputProcessor {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2001
-        //       MODIFIED       na
+        //       MODIFIED       August 2023 by Karen Walkerman
+        //                          to update only if the simulation is not in warmup
+        //                          as bug fix to issue 9589
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -2117,6 +2119,11 @@ namespace OutputProcessor {
         // from calling program.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        if (state.dataGlobal->WarmupFlag) {
+            return;
+        }
+
         auto &op = state.dataOutputProcessor;
 
         if (!op->MeterValue.allocated()) {
@@ -2197,77 +2204,6 @@ namespace OutputProcessor {
         }
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             op->MeterValue(Meter) = 0.0; // Ready for next update
-        }
-    }
-
-    void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   June 2015
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Resets the accumulating meter values. Needed after warmup period is over to
-        // reset the totals on meters so that they are not accumulated over the warmup period
-
-        // METHODOLOGY EMPLOYED:
-        // Cycle through the meters and reset all accumulating values
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op = state.dataOutputProcessor;
-
-        for (auto &m : op->EnergyMeters) {
-            m.HRValue = 0.0;
-
-            m.DYValue = 0.0;
-            m.DYMaxVal = MaxSetValue;
-            m.DYMaxValDate = 0;
-            m.DYMinVal = MinSetValue;
-            m.DYMinValDate = 0;
-
-            m.MNValue = 0.0;
-            m.MNMaxVal = MaxSetValue;
-            m.MNMaxValDate = 0;
-            m.MNMinVal = MinSetValue;
-            m.MNMinValDate = 0;
-
-            m.YRValue = 0.0;
-            m.YRMaxVal = MaxSetValue;
-            m.YRMaxValDate = 0;
-            m.YRMinVal = MinSetValue;
-            m.YRMinValDate = 0;
-
-            m.SMValue = 0.0;
-            m.SMMaxVal = MaxSetValue;
-            m.SMMaxValDate = 0;
-            m.SMMinVal = MinSetValue;
-            m.SMMinValDate = 0;
-
-            m.FinYrSMValue = 0.0;
-            m.FinYrSMMaxVal = MaxSetValue;
-            m.FinYrSMMaxValDate = 0;
-            m.FinYrSMMinVal = MinSetValue;
-            m.FinYrSMMinValDate = 0;
-        }
-
-        for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
-            auto &rVar = op->RVariableTypes(Loop).VarPtr;
-            if (rVar.frequency == ReportingFrequency::Monthly || rVar.frequency == ReportingFrequency::Yearly ||
-                rVar.frequency == ReportingFrequency::Simulation) {
-                rVar.StoreValue = 0.0;
-                rVar.NumStored = 0;
-            }
-        }
-
-        for (int Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
-            auto &iVar = op->IVariableTypes(Loop).VarPtr;
-            if (iVar.frequency == ReportingFrequency::Monthly || iVar.frequency == ReportingFrequency::Yearly ||
-                iVar.frequency == ReportingFrequency::Simulation) {
-                iVar.StoreValue = 0;
-                iVar.NumStored = 0;
-            }
         }
     }
 
