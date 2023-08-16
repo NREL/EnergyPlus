@@ -111,16 +111,14 @@ namespace Boilers {
         int EfficiencyCurvePtr = 0;                                  // Index to efficiency curve
         Real64 TempUpLimitBoilerOut = 0.0;                           // C - Boiler outlet maximum temperature limit
         Real64 ParasiticElecLoad = 0.0;                              // W - Parasitic electric power (e.g. forced draft fan)
-        Real64 ParasiticFuelLoad = 0.0;                              // parasitic fuel load associated with the boiler
-        // (standing pilot light) [J]
-        Real64 ParasiticFuelRate = 0.0; // avg. parasitic fuel consumption rate with the gas boiler
-        // (standing pilot light) [J]
-        Real64 ParasiticFuelCapacity = 0.0; // capacity of parasitic fuel consumption rate, input by user [W]
-        int EffCurveOutputError = 0;        // efficiency curve output <=0 recurring warning error counter
-        int EffCurveOutputIndex = 0;        // efficiency curve output <=0 recurring warning error message index
-        int CalculatedEffError = 0;         // calculated efficiency >1.1 recurring warning error counter
-        int CalculatedEffIndex = 0;         // calculated efficiency >1.1 recurring warning error message index
-        bool IsThisSized = false;           // TRUE if sizing is done
+        Real64 ParasiticFuelConsumption = 0.0; // parasitic fuel consumption associated with the boiler (standing pilot light) [J]
+        Real64 ParasiticFuelRate = 0.0;        // avg. parasitic fuel consumption rate with the gas boiler (standing pilot light) [W]
+        Real64 ParasiticFuelCapacity = 0.0;    // capacity of parasitic fuel consumption rate, input by user [W]
+        int EffCurveOutputError = 0;           // efficiency curve output <=0 recurring warning error counter
+        int EffCurveOutputIndex = 0;           // efficiency curve output <=0 recurring warning error message index
+        int CalculatedEffError = 0;            // calculated efficiency >1.1 recurring warning error counter
+        int CalculatedEffIndex = 0;            // calculated efficiency >1.1 recurring warning error message index
+        bool IsThisSized = false;              // TRUE if sizing is done
         // Operational fault parameters
         bool FaultyBoilerFoulingFlag = false;   // True if the boiler has fouling fault
         int FaultyBoilerFoulingIndex = 0;       // Index of the fault object corresponding to the boiler

@@ -4366,7 +4366,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     // Water / steam boiler
     for (int iBoiler = 1; iBoiler <= (int)state.dataBoilers->Boiler.size(); ++iBoiler) {
         state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
-            state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticFuelLoad +
+            state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticFuelConsumption +
             state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
     }
 
@@ -4419,7 +4419,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
 
         if (thisCoil.HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
             thisCoil.HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
-            state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCoil.FuelUseLoad + thisCoil.ParasiticFuelLoad - thisCoil.HeatingCoilLoad;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCoil.FuelUseLoad + thisCoil.ParasiticFuelConsumption - thisCoil.HeatingCoilLoad;
         }
     }
 

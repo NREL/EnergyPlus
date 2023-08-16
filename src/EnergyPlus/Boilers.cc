@@ -457,7 +457,7 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
         SetupOutputVariable(state,
                             format("Boiler Ancillary {} Energy", sFuelType),
                             OutputProcessor::Unit::J,
-                            this->ParasiticFuelLoad,
+                            this->ParasiticFuelConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
@@ -1014,7 +1014,7 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
     this->BoilerEnergy = this->BoilerLoad * ReportingConstant;
     this->FuelConsumed = this->FuelUsed * ReportingConstant;
     this->ParasiticElecConsumption = this->ParasiticElecPower * ReportingConstant;
-    this->ParasiticFuelLoad = this->ParasiticFuelRate * ReportingConstant;
+    this->ParasiticFuelConsumption = this->ParasiticFuelRate * ReportingConstant;
 }
 
 } // namespace EnergyPlus::Boilers
