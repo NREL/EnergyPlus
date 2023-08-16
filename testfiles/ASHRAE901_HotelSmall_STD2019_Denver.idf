@@ -25252,9 +25252,9 @@
     SAC_FrontOffice Supply Fan Outlet,  !- Air Inlet Node Name
     SAC_FrontOffice Heating Coil Outlet,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     SAC Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
   Coil:Heating:Fuel,
     SAC_FrontLounge Heating Coil,  !- Name
@@ -25265,9 +25265,9 @@
     SAC_FrontLounge Supply Fan Outlet,  !- Air Inlet Node Name
     SAC_FrontLounge Heating Coil Outlet,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     SAC Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
   Coil:Heating:Fuel,
     SAC_MeetingRoom Heating Coil,  !- Name
@@ -25278,9 +25278,9 @@
     SAC_MeetingRoom Supply Fan Outlet,  !- Air Inlet Node Name
     SAC_MeetingRoom Heating Coil Outlet,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     SAC Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
   Coil:Heating:Fuel,
     SAC_Exc_EmpLge_RestRm Heating Coil,  !- Name
@@ -25291,9 +25291,9 @@
     SAC_Exc_EmpLge_RestRm Supply Fan Outlet,  !- Air Inlet Node Name
     SAC_Exc_EmpLge_RestRm Heating Coil Outlet,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     SAC Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYSYSTEM ===========
 

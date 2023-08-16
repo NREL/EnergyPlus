@@ -1333,16 +1333,16 @@ namespace WaterToAirHeatPumpSimple {
         Real64 VolFlowRate;
         Real64 CoolCapAtPeak;                  // Load on the cooling coil at cooling design conditions
         Real64 HeatCapAtPeak;                  // Load on the heating coil at heating design conditions
-        Real64 PeakTotCapTempModFac = 0.0;     // Peak total cooling capacity curve modifier
-        Real64 RatedTotCapTempModFac = 0.0;    // Rated total cooling capacity curve modifier
-        Real64 PeakHeatCapTempModFac = 0.0;    // Peak heating capacity curve modifier
+        Real64 PeakTotCapTempModFac = 1.0;     // Peak total cooling capacity curve modifier
+        Real64 RatedTotCapTempModFac = 1.0;    // Rated total cooling capacity curve modifier
+        Real64 PeakHeatCapTempModFac = 1.0;    // Peak heating capacity curve modifier
         Real64 DesignEntWaterTemp;             // Design entering coil water temperature
         Real64 SensCapAtPeak;                  // Sensible load on the cooling coil at cooling design conditions
-        Real64 PeakSensCapTempModFac = 0.0;    // Peak sensible cooling capacity curve modifier
-        Real64 RatedSensCapTempModFac = 0.0;   // Rated sensible cooling capacity curve modifier
-        Real64 RatedHeatCapTempModFac = 0.0;   // Rated heating capacity curve modifier
-        Real64 RatedCoolPowerTempModFac = 0.0; // Rated cooling power curve modifier
-        Real64 RatedHeatPowerTempModFac = 0.0; // Rated heating power curve modifier
+        Real64 PeakSensCapTempModFac = 1.0;    // Peak sensible cooling capacity curve modifier
+        Real64 RatedSensCapTempModFac = 1.0;   // Rated sensible cooling capacity curve modifier
+        Real64 RatedHeatCapTempModFac = 1.0;   // Rated heating capacity curve modifier
+        Real64 RatedCoolPowerTempModFac = 1.0; // Rated cooling power curve modifier
+        Real64 RatedHeatPowerTempModFac = 1.0; // Rated heating power curve modifier
         Real64 RatedCapCoolTotalDesCDD;        // Rated total cooling coil capacity determined at cooling design conditions
         constexpr Real64 Tref(283.15);         // Refrence Temperature for performance curves,10C [K]
         int TimeStepNumAtMax;
@@ -3997,7 +3997,8 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false;
         }
 
-        if (CoilType == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" || CoilType == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
+        if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") ||
+            UtilityRoutines::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT")) {
             WhichCoil = UtilityRoutines::FindItemInList(CoilName, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP);
             if (WhichCoil != 0) {
                 CoilAirFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).RatedAirVolFlowRate;

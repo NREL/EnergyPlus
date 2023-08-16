@@ -9014,10 +9014,10 @@ DO iZone = 1, numCompactZoneVAV
     CALL AddToObjFld('Air Inlet Node Name', base + vzNameOff,' Damper Outlet')
     CALL AddToObjFld('Air Outlet Node Name', base + vzNameOff,' Supply Inlet')
     CALL AddToObjStr('Temperature Setpoint Node Name','')
-    CALL AddToObjStr('Parasitic Electric Load {W}', '0')
+    CALL AddToObjStr('On Cycle Parasitic Electric Load {W}', '0')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
         base + vzNameOff,' Reheat Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + vzNameOff,' Reheat Coil PLF-FPLR')
@@ -9532,10 +9532,10 @@ DO iZone = 1, numCompactZoneFPVAV
     END IF
     CALL AddToObjFld('Air Outlet Node Name', base + fpvzNameOff,' Supply Inlet')
     CALL AddToObjStr('Temperature Setpoint Node Name','')
-    CALL AddToObjStr('Parasitic Electric Load {W}', '0')
+    CALL AddToObjStr('On Cycle Parasitic Electric Load {W}', '0')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
         base + fpvzNameOff,' Reheat Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + fpvzNameOff,' Reheat Coil PLF-FPLR')
@@ -9950,10 +9950,10 @@ DO iZone = 1, numCompactZoneHCVAV
     CALL AddToObjFld('Air Inlet Node Name', base + hcvzNameOff,' Damper Outlet')
     CALL AddToObjFld('Air Outlet Node Name', base + hcvzNameOff,' Supply Inlet')
     CALL AddToObjStr('Temperature Setpoint Node Name','')
-    CALL AddToObjStr('Parasitic Electric Load {W}', '0')
+    CALL AddToObjStr('On Cycle Parasitic Electric Load {W}', '0')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
         base + hcvzNameOff,' Reheat Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + hcvzNameOff,' Reheat Coil PLF-FPLR')
@@ -10923,10 +10923,10 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjFld('Air Inlet Node Name', base + vsAirHandlerNameOff,' Cooling Coil Outlet')
     CALL AddToObjFld('Air Outlet Node Name', base + vsAirHandlerNameOff,' Heating Coil Outlet')
     CALL AddToObjFld('Coil Temp Setpoint Node', base + vsAirHandlerNameOff,' Heating Coil Outlet')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + vsHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + vsHeatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + vsAirHandlerNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC ~ line 461
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Heating Coil PLF-FPLR')
@@ -11335,10 +11335,10 @@ DO iSys = 1, numCompactSysVAV
     END IF
     CALL AddToObjFld('Air Outlet Node Name', base + vsAirHandlerNameOff,' Preheat Coil Outlet')
     CALL AddToObjFld('Coil Temp Setpoint Node', base + vsAirHandlerNameOff,' Preheat Coil Outlet')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + vsPreheatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + vsPreheatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + vsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC ~ line 670
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
@@ -12590,10 +12590,10 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjFld('Air Inlet Node Name', base +pvavsAirHandlerNameOff,' Cooling Coil Outlet')
     CALL AddToObjFld('Air Outlet Node Name', base + pvavsAirHandlerNameOff,' Heating Coil Outlet')
     CALL AddToObjFld('Coil Temp Setpoint Node', base + pvavsAirHandlerNameOff,' Heating Coil Outlet')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + pvavsHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + pvavsHeatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + pvavsAirHandlerNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !Object ==> Curve:Cubic
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' Heating Coil PLF-FPLR')
@@ -14095,10 +14095,10 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjFld('Air Inlet Node Name', base + usAirHandlerNameOff, TRIM(heatCoilInlet))
     CALL AddToObjFld('Air Outlet Node Name', base + usAirHandlerNameOff, TRIM(heatCoilOutlet))
     CALL AddToObjStr('Coil Temp Setpoint Node','')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + usHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + usHeatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + usAirHandlerNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Heating Coil PLF-FPLR')
@@ -14152,7 +14152,7 @@ DO iSys = 1, numCompactSysUnit
       CALL AddToObjStr('Heating Source Object Type','Coil:Cooling:DX:SingleSpeed')
       CALL AddToObjFld('Heating Source Name', base + usAirHandlerNameOff,' Cooling Coil')
       CALL AddToObjStr('Temperature Setpoint Node Name','')
-      CALL AddToObjStr('Parasitic Electric Load {W}','',.TRUE.)
+      CALL AddToObjStr('On Cycle Parasitic Electric Load {W}','',.TRUE.)
     ELSE IF (dehumidCtrlKind .EQ. dehumidCoolRhtHtgCoil) THEN
       IF (heatCoilKind .EQ. hcElectric) THEN
         CALL CreateNewObj('Coil:Heating:Electric')
@@ -14173,10 +14173,10 @@ DO iSys = 1, numCompactSysUnit
         CALL AddToObjFld('Air Inlet Node Name', base + usAirHandlerNameOff,TRIM(reheatCoilInlet))
         CALL AddToObjFld('Air Outlet Node Name', base + usAirHandlerNameOff,TRIM(reheatCoilOutlet))
         CALL AddToObjStr('Coil Temp Setpoint Node','')
-        CALL AddToObjFld('Parasitic Electric Load {W}', base + usHeatParasiticOff,'')
+        CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + usHeatParasiticOff,'')
         CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
            base + usAirHandlerNameOff,' Reheat Coil PLF-FPLR')
-        CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+        CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
 
         CALL CreateNewObj('Curve:Cubic')
         CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Reheat Coil PLF-FPLR')
@@ -15108,10 +15108,10 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff, TRIM(supheatCoilInlet))
     CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff, TRIM(supheatCoilOutlet))
     CALL AddToObjStr('Coil Temp Setpoint Node','')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + uhpsSuppHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + uhpsSuppHeatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + uhpsAirHandlerNameOff,' Sup Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !Object ==> Curve:Cubic
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' Sup Heating Coil PLF-FPLR')
@@ -17216,10 +17216,10 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(heatCoilInlet))
     CALL AddToObjFld('Air Outlet Node Name', base + ussAirHandlerNameOff, TRIM(heatCoilOutlet))
     CALL AddToObjStr('Coil Temp Setpoint Node','')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + ussHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + ussHeatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + ussAirHandlerNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !Object ==> Curve:Cubic
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Heating Coil PLF-FPLR')
@@ -17275,7 +17275,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Temperature Setpoint Node Name','')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
        base + ussAirHandlerNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0')
+    CALL AddToObjStr('Off Cycle Parasitic Gas Load {W}','0')
     CALL AddToObjFld('Number of Stages', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Stage 1 Gas Burner Efficiency {W/W}', base + ussHeatEfficiencyOff,' ')
     IF (isHeatCapAutosize) THEN
@@ -17283,7 +17283,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     ELSE
       CALL AddToObjNum('Stage 1 Nominal Capacity {W}',CapPerSpeed)
     END IF
-    CALL AddToObjFld('Stage 1 Parasitic Electric Load {W}', base + ussHeatParasiticOff,' ',isNumSpeedOne)
+    CALL AddToObjFld('Stage 1 On Cycle Parasitic Electric Load {W}', base + ussHeatParasiticOff,' ',isNumSpeedOne)
     IF (.NOT. isNumSpeedOne) THEN
       DO iSpd = 2, numSpeeds
         iSpdChar = IntToStr(iSpd)
@@ -17293,7 +17293,7 @@ DO iSys = 1, numCompactSysUnitarySystem
         ELSE
           CALL AddToObjNum('Stage '//TRIM(iSpdChar)//' Nominal Capacity {W}',CapPerSpeed*iSpd)
         END IF
-        CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' Parasitic Electric Load {W}', base + ussHeatParasiticOff,' ', &
+        CALL AddToObjFld('Speed '//TRIM(iSpdChar)//' On Cycle Parasitic Electric Load {W}', base + ussHeatParasiticOff,' ', &
          (iSpd == numSpeeds))
       END DO
     END IF
@@ -17690,10 +17690,10 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(supheatCoilInlet))
     CALL AddToObjFld('Air Outlet Node Name', base + ussAirHandlerNameOff, TRIM(supheatCoilOutlet))
     CALL AddToObjStr('Coil Temp Setpoint Node','')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + ussSuppReHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + ussSuppReHeatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + ussAirHandlerNameOff,' Sup Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !Object ==> Curve:Cubic
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Sup Heating Coil PLF-FPLR')
@@ -17742,7 +17742,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Heating Source Object Type',TRIM(coolCoilObjectType))
     CALL AddToObjStr('Heating Source Name', TRIM(coolCoilObjectName))
     CALL AddToObjStr('Temperature Setpoint Node Name','')
-    CALL AddToObjStr('Parasitic Electric Load {W}','',.TRUE.)
+    CALL AddToObjStr('On Cycle Parasitic Electric Load {W}','',.TRUE.)
   END IF
   ! Return fan
   IF ((isReturnFanYes) .AND. (supFanKind .EQ. sfkVAV)) THEN
@@ -18868,10 +18868,10 @@ DO iZone = 1, numCompactZoneConstVol
       END IF
       CALL AddToObjFld('Air Outlet Node Name', base + cvzNameOff,' Supply Inlet')
       CALL AddToObjStr('Temperature Setpoint Node Name','')
-      CALL AddToObjStr('Parasitic Electric Load {W}', '0')
+      CALL AddToObjStr('On Cycle Parasitic Electric Load {W}', '0')
       CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
          base + cvzNameOff,' Reheat Coil PLF-FPLR')
-      CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+      CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
       !CURVE:CUBIC
       CALL CreateNewObj('Curve:Cubic')
       CALL AddToObjFld('Name', base + cvzNameOff,' Reheat Coil PLF-FPLR')
@@ -19814,10 +19814,10 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Air Inlet Node Name',  TRIM(heatCoilInlet))
     CALL AddToObjStr('Air Outlet Node Name',  TRIM(heatCoilOutlet))
     CALL AddToObjStr('Temperature Setpoint Node Name', TRIM(heatCoilOutlet))
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + cvsHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + cvsHeatParasiticOff,' ')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
        base + cvsAirHandlerNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !***Curve:Cubic
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Heating Coil PLF-FPLR')
@@ -20200,10 +20200,10 @@ DO iSys = 1, numCompactSysConstVol
     END IF
     CALL AddToObjFld('Air Outlet Node Name', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
     CALL AddToObjFld('Coil Temp Setpoint Node', base + cvsAirHandlerNameOff,' Preheat Coil Outlet')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + cvsPreheatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + cvsPreheatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + cvsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC ~ line 670
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
@@ -21853,10 +21853,10 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjStr('Air Inlet Node Name',  TRIM(heatCoilInlet))
     CALL AddToObjStr('Air Outlet Node Name',  TRIM(heatCoilOutlet))
     CALL AddToObjStr('Temperature Setpoint Node Name', TRIM(heatCoilOutlet))
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + ddsHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + ddsHeatParasiticOff,' ')
     CALL AddToObjFld('Part Load Fraction Correlation Curve Name',   &
        base + ddsAirHandlerNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC ~ line 461
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Heating Coil PLF-FPLR')
@@ -22404,10 +22404,10 @@ DO iSys = 1, numCompactSysDualDuct
     END IF
     CALL AddToObjFld('Air Outlet Node Name', base + ddsAirHandlerNameOff,' Preheat Coil Outlet')
     CALL AddToObjFld('Coil Temp Setpoint Node', base + ddsAirHandlerNameOff,' Preheat Coil Outlet')
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + ddsPreheatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + ddsPreheatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + ddsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !CURVE:CUBIC ~ line 670
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' Preheat Coil PLF-FPLR')
@@ -25248,10 +25248,10 @@ IF (.NOT. isBaseboardNone) THEN
         CALL AddToObjFld('Air Outlet Node Name', base + ptaczNameOff,' PTAC Supply Inlet')
       END IF
       CALL AddToObjStr('Coil Temp Setpoint Node','')
-      CALL AddToObjFld('Parasitic Electric Load {W}', base + ptaczHeatParasiticOff,'')
+      CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + ptaczHeatParasiticOff,'')
       CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
          base + ptaczNameOff,' PTAC Heating Coil PLF-FPLR')
-      CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+      CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
       !CURVE:CUBIC ~ line 227
       CALL CreateNewObj('Curve:Cubic')
       CALL AddToObjFld('Name', base + ptaczNameOff,' PTAC Heating Coil PLF-FPLR')
@@ -25957,10 +25957,10 @@ DO iZone = 1, numCompactPTHP
       END IF
       CALL AddToObjFld('Air Outlet Node Name', base + pthpzNameOff,' PTHP Supply Inlet')
       CALL AddToObjStr('Coil Temp Setpoint Node','')
-      CALL AddToObjFld('Parasitic Electric Load {W}', base + pthpzSuppHeatParasiticOff,'')
+      CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + pthpzSuppHeatParasiticOff,'')
       CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
          base + pthpzNameOff,' PTHP Supp Heating Coil PLF-FPLR')
-      CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+      CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
       !CURVE:CUBIC ~ line 316
       CALL CreateNewObj('Curve:Cubic')
       CALL AddToObjFld('Name', base + pthpzNameOff,' PTHP Supp Heating Coil PLF-FPLR')
@@ -26181,7 +26181,7 @@ DO iBoiler = 1, numCompactBoiler
     ELSE
       CALL AddToObjStr('Boiler Flow Mode','ConstantFlow')
     END IF
-    CALL AddToObjStr('Parasitic Electric Load {W}','0')
+    CALL AddToObjStr('On Cycle Parasitic Electric Load {W}','0')
     CALL AddToObjFld('Sizing Factor', base + blrSizeFactorOff,'',.TRUE.)
 
     IF (isBoilerCondHotWater) THEN
@@ -32449,7 +32449,7 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjStr('Heating Source Object Type',TRIM(dxCoilObjectType))
     CALL AddToObjFld('Heating Source Name', base + doasNameOff,' Cooling Coil')
     CALL AddToObjStr('Temperature Setpoint Node Name',TRIM(reheatCoilOutlet))
-    CALL AddToObjStr('Parasitic Electric Load {W}','',.TRUE.)
+    CALL AddToObjStr('On Cycle Parasitic Electric Load {W}','',.TRUE.)
   ENDIF
 
   IF (heatCoilType .EQ. ctHotWater) THEN
@@ -32514,10 +32514,10 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjStr('Air Inlet Node Name',  TRIM(heatCoilInlet))
     CALL AddToObjStr('Air Outlet Node Name',  TRIM(heatCoilOutlet))
     CALL AddToObjStr('Coil Temp Setpoint Node', TRIM(heatCoilOutlet))
-    CALL AddToObjFld('Parasitic Electric Load {W}', base + doasHeatParasiticOff,' ')
+    CALL AddToObjFld('On Cycle Parasitic Electric Load {W}', base + doasHeatParasiticOff,' ')
     CALL AddToObjFld('Part load fraction correlation (function of part load ratio)',   &
        base + doasNameOff,' Heating Coil PLF-FPLR')
-    CALL AddToObjStr('Parasitic Gas Load {W}','0',.TRUE.)
+    CALL AddToObjStr('Off Cycle Parasitic Fuel Load {W}','0',.TRUE.)
     !***Curve:Cubic
     CALL CreateNewObj('Curve:Cubic')
     CALL AddToObjFld('Name', base + doasNameOff,' Heating Coil PLF-FPLR')

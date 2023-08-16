@@ -5265,9 +5265,9 @@
     PSZ-Office Supply Fan Outlet,  !- Air Inlet Node Name
     PSZ-Office Heating Coil Outlet,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     PSZ-Office Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0.0;                     !- Parasitic Fuel Load {W}
+    0.0;                     !- Off Cycle Parasitic Fuel Load {W}
 
   Coil:Heating:Fuel,
     PSZ-Fine Storage Heating Coil,  !- Name
@@ -5278,9 +5278,9 @@
     PSZ-Fine Storage Supply Fan Outlet,  !- Air Inlet Node Name
     PSZ-Fine Storage Heating Coil Outlet,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     PSZ-Fine Storage Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0.0;                     !- Parasitic Fuel Load {W}
+    0.0;                     !- Off Cycle Parasitic Fuel Load {W}
 
   Coil:Heating:Fuel,
     Zone3UnitHeaterHeatingCoil,  !- Name
@@ -5291,9 +5291,9 @@
     Zone3UnitHeaterFanOutletNode,  !- Air Inlet Node Name
     Zone3UnitHeaterAirOutletNode,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     ,                        !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYSYSTEM ===========
 
