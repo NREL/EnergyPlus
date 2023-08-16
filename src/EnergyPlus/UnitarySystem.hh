@@ -988,7 +988,6 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool getInputOnceFlag = true;
     bool getMSHPInputOnceFlag = true;
-    bool reportVariablesAreSetup = false;
 
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
@@ -1025,7 +1024,6 @@ struct UnitarySystemsData : BaseGlobalStruct
         initUnitarySystemsQActual = 0.0;
         getMSHPInputOnceFlag = true;
         getInputOnceFlag = true;
-        reportVariablesAreSetup = false;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         getInputFlag = true;
