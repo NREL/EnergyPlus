@@ -119,7 +119,7 @@ struct CoilCoolingDXCurveFitPerformance
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;
     Real64 crankcaseHeaterPower = 0.0;
-    Real64 crankcaseHeaterCapacityCurveIndex = 0.0;
+    int crankcaseHeaterCapacityCurveIndex = 0;
     Real64 crankcaseHeaterElectricityConsumption = 0.0;
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
