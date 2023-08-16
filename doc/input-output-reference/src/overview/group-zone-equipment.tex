@@ -455,18 +455,18 @@ The method used to control this piece of zone equipment.
 
 Name of the space which controls this piece of zone equipment (i.e. the space where the thermostat is located). Only used with SingleSpace thermostat control method.
 
-\paragraph{Field: Space Sizing Basis}\label{field-seqsplitter-space-sizing-basis}
+\paragraph{Field: Space Fraction Method}\label{field-seqsplitter-space-sizing-basis}
 
-The basis used to autosize the space output fractions. The choices are: DesignCoolingLoad, DesignHeatingLoad, FloorArea, Volume, and PerimeterLength. The default is DesignCoolingLoad.
+The method used to autosize the space fractions. The choices are: DesignCoolingLoad, DesignHeatingLoad, FloorArea, Volume, and PerimeterLength. The default is DesignCoolingLoad.
 For example, if there are 3 Spaces listed below, the Space Output Fractions will be sized to Space1DesignCoolingLoad / Sum(Space1thru3DesignCoolingLoad).
 
 \paragraph{Field: Space \textless{}x\textgreater{} Name}\label{field-seqsplitter-space-name}
 
 Name of a space to receive a portion of the output from this piece of zone equipment.
 
-\paragraph{Field: Space \textless{}x\textgreater{} Output Fraction}\label{field-seqsplitter-space-output-fraction}
+\paragraph{Field: Space \textless{}x\textgreater{} Fraction}\label{field-seqsplitter-space-output-fraction}
 
-Fraction of this zone equipment output or airflow distributed to this space. May be autosized using the Space Sizing Basis. The default is autosize.
+Fraction of this zone equipment output or airflow distributed to this space. May be autosized using the Space Fraction Method. The default is autosize.
 
 \paragraph{Field: Space \textless{}x\textgreater{} Supply Node Name}\label{field-seqsplitter-space-supply-node-name}
 

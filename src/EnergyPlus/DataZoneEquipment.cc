@@ -1196,7 +1196,7 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         }
     }
     thisZeqSplitter.spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis(
-        getEnumValue(spaceEquipSizingBasisNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_sizing_basis")));
+        getEnumValue(spaceEquipSizingBasisNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_fraction_method")));
 
     auto extensibles = objectFields.find("spaces");
     auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
@@ -1215,7 +1215,7 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
                 ShowContinueError(state, format("Space Name={} not found.", spaceName));
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             } else {
-                thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_output_fraction");
+                thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_fraction");
                 thisZeqSpace.spaceInletNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_supply_node_name"),

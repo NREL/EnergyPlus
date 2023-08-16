@@ -2519,15 +2519,15 @@ SpaceHVAC:ZoneEquipmentSplitter,
     Zone 5 In Node,          !- Zone Equipment Outlet Node Name
     Ideal,                   !- Thermostat Control Method
     ,                        !- Control Space Name
-    DesignLoad,              !- Space Sizing Basis
+    ,                        !- Space Fraction Method
     Space 5 Office,          !- Space 1 Name
-    0.6,                     !- Space 1 Output Fraction {dimensionless}
+    0.6,                     !- Space 1 Fraction {dimensionless}
     Space 5 Office In Node,  !- Space 1 Supply Node Name
     Space 5 Conference,      !- Space 2 Name
-    0.2,                     !- Space 2 Output Fraction {dimensionless}
+    0.2,                     !- Space 2 Fraction {dimensionless}
     Space 5 Conference In Node,  !- Space 2 Supply Node Name
     Zone 5-Remainder,        !- Space 3 Name
-    0.2,                     !- Space 3 Output Fraction {dimensionless}
+    0.2,                     !- Space 3 Fraction {dimensionless}
     Zone 5-Remainder In Node;  !- Space 3 Supply Node Name
 
   SpaceHVAC:EquipmentConnections,
