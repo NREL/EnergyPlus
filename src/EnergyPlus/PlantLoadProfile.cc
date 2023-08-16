@@ -131,7 +131,8 @@ void PlantProfileData::simulate(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     // This is a very simple simulation.  InitPlantProfile does the work of getting the scheduled load and flow rate.
-    // Flow is requested and the actual available flow is set.  The outlet temperature is calculated.
+    // Flow is requested and the actual available flow is set.  As for water loops, the outlet temperature is calculated. As for steam loops, the mass
+    // flow rate of steam and the outlet temperature are calculated.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static constexpr std::string_view RoutineName("SimulatePlantProfile");
@@ -140,7 +141,6 @@ void PlantProfileData::simulate(EnergyPlusData &state,
     this->InitPlantProfile(state);
 
     if (this->FluidType == PlantLoopFluidType::Water) {
-
         if (this->MassFlowRate > 0.0) {
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -153,10 +153,8 @@ void PlantProfileData::simulate(EnergyPlusData &state,
             DeltaTemp = 0.0;
         }
         this->OutletTemp = this->InletTemp - DeltaTemp;
-
     } else if (this->FluidType == PlantLoopFluidType::Steam) {
-
-        if ((this->MassFlowRate > 0.0) && (this->Power > 0.0)) {
+        if (this->MassFlowRate > 0.0) {
             Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                           this->InletTemp,
@@ -170,14 +168,14 @@ void PlantProfileData::simulate(EnergyPlusData &state,
                                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                            RoutineName);
             Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-            Real64 TempWaterAtmPress = FluidProperties::GetSatTemperatureRefrig(state,
-                                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                                DataEnvironment::StdPressureSeaLevel,
-                                                                                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                                                RoutineName);
+            Real64 SatTemp = FluidProperties::GetSatTemperatureRefrig(state,
+                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
+                                                                      DataEnvironment::StdPressureSeaLevel,
+                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
+                                                                      RoutineName);
             Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                    TempWaterAtmPress,
+                                                                    SatTemp,
                                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                     RoutineName);
 
@@ -192,7 +190,7 @@ void PlantProfileData::simulate(EnergyPlusData &state,
             // Here Degree of Subcooling is used to calculate hot water return temperature.
 
             // Calculating Water outlet temperature
-            this->OutletTemp = TempWaterAtmPress - this->LoopSubcoolReturn;
+            this->OutletTemp = SatTemp - this->LoopSubcoolReturn;
         } else {
             this->Power = 0.0;
         }
