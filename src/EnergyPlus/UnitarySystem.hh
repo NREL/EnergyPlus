@@ -134,10 +134,6 @@ namespace UnitarySystems {
         Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation = 21.0;
         std::string outdoor_dry_bulb_temperature_sensor_node_name;
         std::string heat_pump_coil_water_flow_mode;
-        Real64 maximum_cycling_rate = 2.5;
-        Real64 heat_pump_time_constant = 60.0;
-        Real64 fraction_of_on_cycle_power_use = 0.01;
-        Real64 heat_pump_fan_delay_time = 60.0;
         Real64 ancillary_on_cycle_electric_power = 0.0;
         Real64 ancillary_off_cycle_electric_power = 0.0;
         Real64 design_heat_recovery_water_flow_rate = 0.0;
@@ -323,10 +319,6 @@ namespace UnitarySystems {
         Real64 m_MaxOATSuppHeat = 0.0;
         Real64 m_MinOATCompressorCooling = 0.0;
         Real64 m_MinOATCompressorHeating = 0.0;
-        Real64 m_MaxONOFFCyclesperHour = 0.0;
-        Real64 m_HPTimeConstant = 0.0;
-        Real64 m_OnCyclePowerFraction = 0.0;
-        Real64 m_FanDelayTime = 0.0;
         Real64 m_AncillaryOnPower = 0.0;
         Real64 m_AncillaryOffPower = 0.0;
         Real64 m_DesignHRWaterVolumeFlow = 0.0;
@@ -359,7 +351,6 @@ namespace UnitarySystems {
         PlantLocation m_SuppCoilPlantLoc;
         int m_SuppCoilFluidOutletNodeNum = 0;
 
-        Real64 m_WSHPRuntimeFrac = 0.0;
         Real64 m_CompPartLoadRatio = 0.0;
         Real64 m_CoolingCoilSensDemand = 0.0;
         Real64 m_CoolingCoilLatentDemand = 0.0;
@@ -853,11 +844,6 @@ namespace UnitarySystems {
         void calcPassiveSystem(EnergyPlusData &state,
                                int const AirLoopNum,         // Index to air loop
                                bool const FirstHVACIteration // True when first HVAC iteration
-        );
-
-        void heatPumpRunFrac(Real64 const PLR,   // part load ratio
-                             bool &errFlag,      // part load factor out of range flag
-                             Real64 &RuntimeFrac // the required run time fraction to meet part load
         );
 
         void setSpeedVariables(EnergyPlusData &state,

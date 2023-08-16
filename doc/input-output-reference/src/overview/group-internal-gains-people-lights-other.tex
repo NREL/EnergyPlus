@@ -689,7 +689,7 @@ This field is the ``predicted percentage of dissatisfied'' (PPD) calculated usin
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD}\label{zone-thermal-comfort-ashrae55-ankle-draft-ppd}
 
-This field is the ``ppredicted percentage of dissatisfied'' (PPD) on draft at ankle level. It is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m). 
+This field is the ``predicted percentage of dissatisfied'' (PPD) on draft at ankle level. It is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m). 
 
 \subsubsection{Outputs}\label{outputs-1-014}
 
@@ -1555,7 +1555,7 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 \paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-3-000}
 
-Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} obejct). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
+Allows you to specify a user-defined end-use subcategory, e.g., ``Cooking'', ``Clothes Drying'', etc. A new meter for reporting is created for each unique subcategory~ (ref: \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the equipment will be assigned to the ``General'' end-use subcategory. Any text may be used here to categorize the end-uses in the ABUPS End Uses by Subcategory table and the LEED Summary table EAp2-4/5 Performance Rating Method Compliance.
 
 IDF Examples:
 
@@ -1891,9 +1891,9 @@ Each type of equipment object has output variables for individual objects and fo
 
 \begin{itemize}
 \item
-  Zone,Average,Gas Equipment Gas Rate {[}W{]}
+  Zone,Average,Gas Equipment NaturalGas Rate {[}W{]}
 \item
-  Zone,Sum,Gas Equipment Gas Energy {[}J{]}
+  Zone,Sum,Gas Equipment NaturalGas Energy {[}J{]}
 \item
   Zone,Sum,Gas Equipment Radiant Heating Energy {[}J{]}
 \item
@@ -1915,9 +1915,9 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Gas Equipment Total Heating Rate {[}W{]}
 \item
-  Zone,Average,Space Gas Equipment Gas Rate {[}W{]}
+  Zone,Average,Space Gas Equipment NaturalGas Rate {[}W{]}
 \item
-  Zone,Sum,Space Gas Equipment Gas Energy {[}J{]}
+  Zone,Sum,Space Gas Equipment NaturalGas Energy {[}J{]}
 \item
   Zone,Sum,Space Gas Equipment Radiant Heating Energy {[}J{]}
 \item
@@ -1939,9 +1939,9 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Space Gas Equipment Total Heating Rate {[}W{]}
 \item
-  Zone,Average,Zone Gas Equipment Gas Rate {[}W{]}
+  Zone,Average,Zone Gas Equipment NaturalGas Rate {[}W{]}
 \item
-  Zone,Sum,Zone Gas Equipment Gas Energy {[}J{]}
+  Zone,Sum,Zone Gas Equipment NaturalGas Energy {[}J{]}
 \item
   Zone,Sum,Zone Gas Equipment Radiant Heating Energy {[}J{]}
 \item
@@ -3775,7 +3775,7 @@ This output is the average generic contaminant decay rate from each Surface\-Con
 
 \paragraph{Generic Air Contaminant Decay Model Generation Emission Start Elapsed Time {[}s{]}}\label{generic-air-contaminant-decay-model-generation-emission-start-elapsed-time-s}
 
-This output is the decay time since the start of emission. The start time is either at the beginning of each run period, including design day simulations, or the time when the egenration schedule value is zero.
+This output is the decay time since the start of emission. The start time is either at the beginning of each run period, including design day simulations, or the time when the generation schedule value is zero.
 
 \subsection{Surface\-Contaminant\-Source\-And\-Sink:\-Generic:\-Boundary\-Layer\-Diffusion}\label{surfacecontaminantsourceandsinkgenericboundarylayerdiffusion}
 
