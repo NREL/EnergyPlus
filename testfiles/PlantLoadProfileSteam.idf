@@ -64,7 +64,6 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
 
- ! CHICAGO_IL_USA Annual Heating 99%, MaxDB=-17.3°C
   SizingPeriod:DesignDay,
     CHICAGO Ann Htg 99% Condns DB,  !- Name
     1,                       !- Month
@@ -98,7 +97,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    12,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -113,8 +112,8 @@
     NO,                      !- Do System Sizing Calculation
     NO,                      !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    YES,                     !- Run Simulation for Weather File Run Periods
-    YES,                     !- Do HVAC Sizing Simulation for Sizing Periods
+    NO,                     !- Run Simulation for Weather File Run Periods
+    NO,                     !- Do HVAC Sizing Simulation for Sizing Periods
     1;                       !- Maximum Number of HVAC Sizing Simulation Passes
 
   PlantLoop,
@@ -345,10 +344,8 @@
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
     UNTIL: 4:00,8000,        !- Field 3
-    UNTIL: 8:00,6000,        !- Field 5
-    UNTIL: 9:00,0,           !- Field 7
-    UNTIL: 12:00,6000,       !- Field 9
-    UNTIL: 24:00,10000;      !- Field 11
+    UNTIL: 12:00,6000,       !- Field 4
+    UNTIL: 24:00,10000;      !- Field 5
 
   Schedule:Compact,
     Load Profile 1 Flow Frac Schedule,  !- Name
@@ -380,6 +377,13 @@
   Output:Variable,*,Boiler Heating Rate,Hourly;
 
   Output:Variable,*,Boiler Steam Efficiency,Hourly;
+  
+  Output:Variable,*,Boiler Steam Mass Flow Rate,Hourly;
+
+  Output:Variable,*,Boiler Steam Inlet Temperature,Hourly;
+
+  Output:Variable,*,Boiler Steam Outlet Temperature,Hourly;
+
 
   Output:Variable,Main Loop,Plant Supply Side Heating Demand Rate,Hourly;
 

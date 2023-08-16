@@ -1767,7 +1767,7 @@
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,107.00;     !- Field 3
+    Until: 24:00,108.00;     !- Field 3
 
   Schedule:Compact,
     PLANTONSCHED,            !- Name
@@ -3464,6 +3464,44 @@
   Output:Variable,VAV SYS 1 Cooling Coil Outlet,System Node Setpoint Temperature,hourly;
 
   Output:Variable,VAV SYS 1 Mixed Air Outlet,System Node Temperature,hourly;
+
+	Output:Variable,SPACE1-1 Supply Inlet,System Node Temperature,hourly;
+	
+	Output:Variable,SPACE2-1 Supply Inlet,System Node Temperature,hourly;
+	
+	Output:Variable,SPACE3-1 Supply Inlet,System Node Temperature,hourly;
+	
+	Output:Variable,SPACE4-1 Supply Inlet,System Node Temperature,hourly;
+	
+	Output:Variable,SPACE5-1 Supply Inlet,System Node Temperature,hourly;
+	
+	Output:Variable,VAV SYS 1 Heating Coil Outlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE1-1 Reheat Coil Steam Inlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE1-1 Reheat Coil Steam Outlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE2-1 Reheat Coil Steam Inlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE2-1 Reheat Coil Steam Outlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE3-1 Reheat Coil Steam Inlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE3-1 Reheat Coil Steam Outlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE4-1 Reheat Coil Steam Inlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE4-1 Reheat Coil Steam Outlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE5-1 Reheat Coil Steam Inlet, System Node Temperature,hourly;
+	
+	Output:Variable,SPACE5-1 Reheat Coil Steam Outlet, System Node Temperature,hourly;
+		
+  Output:Variable,DistrictHeating Steam Plant,Plant Supply Side Inlet Mass Flow Rate,hourly;
+	
+	Output:Variable,DistrictHeating Steam Plant,Plant Supply Side Inlet Temperature,hourly;
+	
+  Output:Variable,DistrictHeating Steam Plant,Plant Supply Side Outlet Temperature,hourly;
 
   Output:Meter,Fans:Electricity,Hourly;
 

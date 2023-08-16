@@ -515,6 +515,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
             PlantUtilities::SetComponentFlowRate(state, SteamMdot, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
             this->MassFlowRate = state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRate;
             this->OutletTemp = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+            // Like the assumption in Boiler:Steam, assume that it can meet the steam loop setpoint
             this->OutletSteamQuality = 1.0;
             MyLoad = this->MassFlowRate * LatentHeatSteam;
             state.dataLoopNodes->Node(this->OutletNodeNum).Quality = this->OutletSteamQuality;
