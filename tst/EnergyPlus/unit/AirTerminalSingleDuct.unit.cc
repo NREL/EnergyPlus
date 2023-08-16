@@ -765,9 +765,9 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVAirTerminals_GetInputs)
         "      CBP Rht Outlet Node,     !- Air Inlet Node Name",
         "      Node 8,                  !- Air Outlet Node Name",
         "      ,                        !- Temperature Setpoint Node Name",
-        "      0,                       !- Parasitic Electric Load {W}",
+        "      0,                       !- On Cycle Parasitic Electric Load {W}",
         "      ,                        !- Part Load Fraction Correlation Curve Name",
-        "      0;                       !- Parasitic Fuel Load {W}",
+        "      0;                       !- Off Cycle Parasitic Fuel Load {W}",
 
         "   ZoneHVAC:AirDistributionUnit,",
         "     ADU VAV No Rht,                         !- Name",
@@ -1367,9 +1367,9 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
         "     CBP Rht Outlet Node,     !- Air Inlet Node Name",
         "     Node 8,                  !- Air Outlet Node Name",
         "     ,                        !- Temperature Setpoint Node Name",
-        "     0,                       !- Parasitic Electric Load {W}",
+        "     0,                       !- On Cycle Parasitic Electric Load {W}",
         "     ,                        !- Part Load Fraction Correlation Curve Name",
-        "     0;                       !- Parasitic Fuel Load {W}",
+        "     0;                       !- Off Cycle Parasitic Fuel Load {W}",
 
         "   Schedule:Compact,",
         "     TurndownMinAirFlowSch1,     !- Name",
@@ -1720,9 +1720,9 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
         "     CBP Rht Outlet Node,       !- Air Inlet Node Name",
         "     Node 8,                    !- Air Outlet Node Name",
         "     ,                          !- Temperature Setpoint Node Name",
-        "     0,                         !- Parasitic Electric Load {W}",
+        "     0,                         !- On Cycle Parasitic Electric Load {W}",
         "     ,                          !- Part Load Fraction Correlation Curve Name",
-        "     0;                         !- Parasitic Fuel Load {W}",
+        "     0;                         !- Off Cycle Parasitic Fuel Load {W}",
 
     });
 
