@@ -1993,7 +1993,6 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
 
     int VarSpeedCoilNum = 1;
     int CyclingScheme = 1;
-    Real64 RuntimeFrac = 0.0;
     Real64 SensLoad = 100.0;
     Real64 LatentLoad = 100.0;
     Real64 OnOffAirFlowRatio = 0.5;
