@@ -664,6 +664,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
           No,                             !- Apply Part Load Fraction to Speeds Greater than 1
           No,                             !- Apply Latent Degradation to Speeds Greater than 1
           0,                              !- Crankcase Heater Capacity{ W }
+          ,                               !- Crankcase Heater Capacity Function of Temperature Curve Name
           10,                             !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
           0,                              !- Basin Heater Capacity{ W / K }
           2,                              !- Basin Heater Setpoint Temperature{ C }
@@ -1152,6 +1153,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
           No,                             !- Apply Part Load Fraction to Speeds Greater than 1
           No,                             !- Apply Latent Degradation to Speeds Greater than 1
           0,                              !- Crankcase Heater Capacity{ W }
+          ,                               !- Crankcase Heater Capacity Function of Temperature Curve Name
           10,                             !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
           0,                              !- Basin Heater Capacity{ W / K }
           2,                              !- Basin Heater Setpoint Temperature{ C }
@@ -3579,6 +3581,7 @@ Coil:Cooling:DX:VariableSpeed,
   AirCooled,                      !- Condenser Type
   ,                               !- Evaporative Condenser Pump Rated Power Consumption{ W }
   200.0,                          !- Crankcase Heater Capacity{ W }
+  ,                               !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                           !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
   ,                               !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   ,                               !- Supply Water Storage Tank Name
@@ -3727,6 +3730,7 @@ Coil:Heating:DX:VariableSpeed,
   ,                               !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
   5.0,                            !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
   200.0,                          !- Crankcase Heater Capacity {W}
+,                                 !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   Resistive,                      !- Defrost Strategy
   TIMED,                          !- Defrost Control
@@ -6288,6 +6292,7 @@ Coil:Heating:DX:VariableSpeed,
   ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
   5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
   200.0,                   !- Crankcase Heater Capacity {W}
+  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   Resistive,               !- Defrost Strategy
   TIMED,                   !- Defrost Control
@@ -6668,6 +6673,7 @@ Coil:Cooling:DX:VariableSpeed,
   AirCooled, !- Condenser Type
   , !- Evaporative Condenser Pump Rated Power Consumption{ W }
   200.0, !- Crankcase Heater Capacity{ W }
+  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
   , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   , !- Supply Water Storage Tank Name
@@ -7162,6 +7168,7 @@ Coil:Cooling:DX:VariableSpeed,
   AirCooled, !- Condenser Type
   , !- Evaporative Condenser Pump Rated Power Consumption{ W }
   200.0, !- Crankcase Heater Capacity{ W }
+  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
   , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   , !- Supply Water Storage Tank Name
@@ -8154,6 +8161,7 @@ Coil:Cooling:DX:MultiSpeed,
   No,                                                      !- Apply Part Load Fraction to Speeds Greater than 1
   No,                                                      !- Apply Latent Degradation to Speeds Greater than 1
   0.0,                                                     !- Crankcase Heater Capacity {W}
+  ,                                                        !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                                                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   ,                                                        !- Basin Heater Capacity {W/K}
   ,                                                        !- Basin Heater Setpoint Temperature {C}
@@ -8572,6 +8580,7 @@ Coil:Cooling:DX:MultiSpeed,
   No,                      !- Apply Part Load Fraction to Speeds Greater than 1
   No,                      !- Apply Latent Degradation to Speeds Greater than 1
   0.0,                     !- Crankcase Heater Capacity {W}
+  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   ,                        !- Basin Heater Capacity {W/K}
   ,                        !- Basin Heater Setpoint Temperature {C}
@@ -8654,6 +8663,7 @@ Coil:Heating:DX:VariableSpeed,
   ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
   5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
   200.0,                   !- Crankcase Heater Capacity {W}
+  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   Resistive,               !- Defrost Strategy
   TIMED,                   !- Defrost Control
@@ -8810,7 +8820,8 @@ Coil:Heating:DX:VariableSpeed,
       Temperature,             !- Input Unit Type for X
       Temperature,             !- Input Unit Type for Y
       Dimensionless;           !- Output Unit Type
-
+)IDF"
+                                             R"IDF(
 Coil:Heating:Fuel,
   Humidistat Reheat Coil 1, !- Name
   FanAndCoilAvailSched, !- Availability Schedule Name
@@ -10617,6 +10628,7 @@ Coil:Heating:DX:MultiSpeed,
   -8.0,                    !- Minimum Outdoor Dry - Bulb Temperature for Compressor Operation{ C }
   -5.0,                    !- Outdoor Dry - Bulb Temperature to Turn On Compressor{ C }
   200.0,                   !- Crankcase Heater Capacity{ W }
+  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                    !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
   ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
   7.22,                    !- Maximum Outdoor Dry - Bulb Temperature for Defrost Operation{ C }
@@ -11185,6 +11197,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         "  -8.0, !- Minimum Outdoor Dry - Bulb Temperature for Compressor Operation{ C }",
         "  -5.0, !- Outdoor Dry - Bulb Temperature to Turn On Compressor{ C }",
         "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         "  HPACDefrostCAPFT, !- Defrost Energy Input Ratio Function of Temperature Curve Name",
         "  7.22, !- Maximum Outdoor Dry - Bulb Temperature for Defrost Operation{ C }",
@@ -11552,6 +11565,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         "  No, !- Apply Part Load Fraction to Speeds Greater than 1",
         "  No, !- Apply Latent Degradation to Speeds Greater than 1",
         "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         "  , !- Basin Heater Capacity{ W / K }",
         "  , !- Basin Heater Setpoint Temperature{ C }",
@@ -12243,6 +12257,7 @@ Coil:Cooling:DX:MultiSpeed,
   No,                      !- Apply Part Load Fraction to Speeds Greater than 1
   No,                      !- Apply Latent Degradation to Speeds Greater than 1
   0.0,                     !- Crankcase Heater Capacity {W}
+  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   ,                        !- Basin Heater Capacity {W/K}
   ,                        !- Basin Heater Setpoint Temperature {C}
@@ -12320,6 +12335,7 @@ Coil:Heating:DX:MultiSpeed,
   -8.0, !- Minimum Outdoor Dry - Bulb Temperature for Compressor Operation{ C }
   -5.0, !- Outdoor Dry - Bulb Temperature to Turn On Compressor{ C }
   200.0, !- Crankcase Heater Capacity{ W }
+  ,      !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
   HPACDefrostCAPFT, !- Defrost Energy Input Ratio Function of Temperature Curve Name
   7.22, !- Maximum Outdoor Dry - Bulb Temperature for Defrost Operation{ C }
@@ -15325,6 +15341,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Name
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -16672,6 +16689,7 @@ Coil:Cooling:DX:VariableSpeed,
   AirCooled,                      !- Condenser Type
   ,                               !- Evaporative Condenser Pump Rated Power Consumption{ W }
   200.0,                          !- Crankcase Heater Capacity{ W }
+  ,                               !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                           !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
   ,                               !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   ,                               !- Supply Water Storage Tank Name
@@ -16754,6 +16772,7 @@ Coil:Heating:DX:VariableSpeed,
   ,                               !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
   5.0,                            !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
   200.0,                          !- Crankcase Heater Capacity {W}
+  ,                               !- Crankcase Heater Capacity Function of Temperature Curve Name
   10.0,                           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   Resistive,                      !- Defrost Strategy
   TIMED,                          !- Defrost Control
@@ -16955,6 +16974,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
     Coil:Cooling:DX:CurveFit:Performance,
       Furnace DX Cool Cooling Coil Performance,  !- Name
       0.0,                     !- Crankcase Heater Capacity {W}
+      ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
       ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
       10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
       ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -17261,6 +17281,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     Coil:Cooling:DX:CurveFit:Performance,
       Furnace DX Cool Cooling Coil Performance,  !- Name
       0.0,                     !- Crankcase Heater Capacity {W}
+      ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
       ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
       10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
       ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -18021,6 +18042,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Supply Water Storage Tank Name
     ;                        !- Condensate Collection Water Storage Tank Name
@@ -20277,6 +20299,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_LowerSpeedFlowSizingTest)
   Coil:Cooling:DX:CurveFit:Performance,
     DX ClgCoil Performance,          !- Name
     0,                               !- Crankcase Heater Capacity {W}
+    ,                                !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                                !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                              !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                                !- Unit Internal Static Air Pressure {Pa}
@@ -20557,6 +20580,7 @@ Coil:Cooling:DX:MultiSpeed,
   No,                             !- Apply Part Load Fraction to Speeds Greater than 1
   No,                             !- Apply Latent Degradation to Speeds Greater than 1
   0,                              !- Crankcase Heater Capacity{ W }
+  ,                               !- Crankcase Heater Capacity Function of Temperature Curve Name
   10,                             !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }
   0,                              !- Basin Heater Capacity{ W / K }
   2,                              !- Basin Heater Setpoint Temperature{ C }

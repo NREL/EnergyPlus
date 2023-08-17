@@ -383,6 +383,7 @@
     HPPlantAirInletNode,     !- Evaporator Air Inlet Node Name
     HPPlantAirOutletNode,    !- Evaporator Air Outlet Node Name
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}
     WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects
     HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name

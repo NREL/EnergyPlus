@@ -219,6 +219,7 @@ TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -410,6 +411,7 @@ TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
         idf_lines.push_back("    HPWH Air Inlet " + i_str + ",          !- Evaporator Air Inlet Node Name");
         idf_lines.push_back("    HPWH Coil Outlet Fan Inlet " + i_str + ",  !- Evaporator Air Outlet Node Name");
         idf_lines.push_back("    0,                       !- Crankcase Heater Capacity {W}");
+        idf_lines.push_back("    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name");
         idf_lines.push_back("    10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}");
         idf_lines.push_back("    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects");
         idf_lines.push_back("    HPWH-Htg-Cap-fT,         !- Heating Capacity Function of Temperature Curve Name");
@@ -671,6 +673,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
         "    HPWH Air Inlet Node_1,   !- Evaporator Air Inlet Node Name",
         "    HPWH CoilAirOutlet FanAirInlet_1,  !- Evaporator Air Outlet Node Name",
         "    0,                       !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    0,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWH-Cap-fT,             !- Heating Capacity Function of Temperature Curve Name",
@@ -893,6 +896,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1175,6 +1179,7 @@ TEST_F(EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning)
         "    Zone4WaterInletNode,     !- Condenser Water Inlet Node Name",
         "    Zone4WaterOutletNode,    !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -1341,6 +1346,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
         "    HPWHWaterInletNode,      !- Condenser Water Inlet Node Name",
         "    HPWHWaterOutletNode,     !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -2283,8 +2289,9 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
         "  Autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
-        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         ",",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  0,                       !- Basin Heater Capacity {W/K}",
@@ -2855,6 +2862,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
         "  No,                                     !- Apply Part Load Fraction to Speeds Greater than 1",
         "  No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
         "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  ,                                       !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  12.7777777777778,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  0,                                      !- Basin Heater Capacity {W/K}",
         "  2,                                      !- Basin Heater Setpoint Temperature {C}",
@@ -3604,8 +3612,9 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
         "  Autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
         "  Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}"
         "  50,                      !- Crankcase Heater Capacity {W}",
-        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         ",",
+        "  10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "  ,                        !- Supply Water Storage Tank Name",
         "  ,                        !- Condensate Collection Water Storage Tank Name",
         "  0,                       !- Basin Heater Capacity {W/K}",
@@ -3865,6 +3874,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  HPWHPumped Tank Outlet - Condenser Inlet,  !- Condenser Water Inlet Node Name",
         "  HPWHPumped Condenser Outlet - Tank Inlet,  !- Condenser Water Outlet Node Name",
         "  100,                     !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  5,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHPumped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4104,6 +4114,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  HPWHWrapped Air Inlet Node,  !- Evaporator Air Inlet Node Name",
         "  HPWHWrapped Evap Outlet - Fan Inlet,  !- Evaporator Air Outlet Node Name",
         "  0,                       !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHWrapped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4331,6 +4342,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         "    HPWHWaterInletNode,      !- Condenser Water Inlet Node Name",
         "    HPWHWaterOutletNode,     !- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHHeatingCapFTemp,     !- Heating Capacity Function of Temperature Curve Name",
@@ -4622,6 +4634,7 @@ TEST_F(EnergyPlusFixture, HPWH_Wrapped_Stratified_Simultaneous)
         "  HPWHWrapped Air Inlet Node,  !- Evaporator Air Inlet Node Name",
         "  HPWHWrapped Evap Outlet - Fan Inlet,  !- Evaporator Air Outlet Node Name",
         "  0,                       !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10,                      !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHWrapped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
@@ -4871,6 +4884,7 @@ TEST_F(EnergyPlusFixture, HPWH_Pumped_Stratified_Simultaneous)
         "  HPWHPumped Tank Outlet - Condenser Inlet,  !- Condenser Water Inlet Node Name",
         "  HPWHPumped Condenser Outlet - Tank Inlet,  !- Condenser Water Outlet Node Name",
         "  100,                     !- Crankcase Heater Capacity {W}",
+        "  ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  5,                       !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "  WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "  HPWHPumped DXCoil HeatingCapFT,  !- Heating Capacity Function of Temperature Curve Name",
