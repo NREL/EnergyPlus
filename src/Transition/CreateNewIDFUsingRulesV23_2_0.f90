@@ -532,6 +532,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! manipulate all the speeds regardless of CurArgs count
                 OutArgs(13:17)=InArgs(10:14)
                 OutArgs(18) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
+                CurArgs = CurArgs + 1
                 OutArgs(19:29)=InArgs(15:25)
                 OutArgs(30) = ''  ! new speed 1 2017 rated field
                 OutArgs(31) = ''  ! new speed 1 2023 rated field
@@ -563,7 +564,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(138)='' ! new speed 10 2017 rated field
                 OutArgs(139)='' ! new speed 10 2023 rated field
                 OutArgs(140:149)=InArgs(116:125)
-                CurArgs = CurArgs + 1
                 ! But then only modify CurArgs based on the number of fields
                 IF (CurArgs >= 29) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
                 IF (CurArgs >= 39) CurArgs = CurArgs + 2  ! only do this speed if we have that many inputs
@@ -606,6 +606,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! manipulate all the speeds regardless of CurArgs count
                 OutArgs(1:13)=InArgs(1:13)
                 OutArgs(14) = ''  ! new Crankcase Heater Capacity Function of Temperature Curve Name field
+                CurArgs = CurArgs + 1
                 OutArgs(15:22)=InArgs(14:21)
                 OutArgs(23) = ''  ! new speed 1 2017 rated field
                 OutArgs(24) = ''  ! new speed 1 2023 rated field
@@ -636,7 +637,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(97:103)=InArgs(78:84)
                 OutArgs(104)='' ! new speed 10 2017 rated field
                 OutArgs(105)='' ! new speed 10 2023 rated field
-                CurArgs = CurArgs + 1
                 OutArgs(106:CurArgs+21)=InArgs(85:CurArgs)
                 ! But then only modify CurArgs based on the number of fields
                 IF (CurArgs .GE. 22) CurArgs = CurArgs + 2  ! this will always trigger for speed 1
