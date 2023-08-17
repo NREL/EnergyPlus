@@ -127,6 +127,15 @@ The name corresponding to a Coil:Cooling:DX:CurveFit:OperatingMode object. Opera
 
 If there are 3 operating modes, it represents a subcool-reheat mode coil. The Operating Mode 1 represents a base operating mode coil. The Operating Mode 2 represents a subcool mode coil with lower SHR than the Operating Mode 1. The Operating Mode 3 represents a reheat mode coil with lower SHR than the Operating Mode 2. All 3 operation modes work together to represent a subcool reheat coil model. The operation procedure is described in \ref{coilcoolingdx}  
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-0}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 \subsection{Coil:Cooling:DX:CurveFit:OperatingMode}\label{coilcoolingdxcurvefitoperatingmode}
 
 This object defines DX cooling coil performance for a single operating mode at rated conditions. Each operating mode may have one or more speeds, which are defined using the Coil:Cooling:DX:CurveFit:Speed object. Each operation mode can reference a maximum of 10 Coil:Cooling:DX:CurveFit:Speed objects.
