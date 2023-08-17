@@ -415,7 +415,7 @@ SpaceHVAC:EquipmentConnections,
 \subsection{SpaceHVAC:ZoneEquipmentSplitter}\label{spacehvaczoneequipmentsplitter}
 
 The SpaceHVAC:ZoneEquipmentSplitter object distributes the output from a piece of zone equipment to one or more Spaces in the Zone.
-If any equipment in a zone has a SpaceHVAC:ZoneEquipmentSplitter, then all equipment in the Zone must have one..
+If any equipment in a zone has a SpaceHVAC:ZoneEquipmentSplitter, then all equipment in the Zone must have one.
 
 \subsubsection{Inputs}\label{inputs-1-052-seqsplitter}
 
@@ -473,19 +473,82 @@ Fraction of this zone equipment output or airflow distributed to this space. May
 The name of a SpaceHVAC:EquipmentConnections Inlet Node Name that takes a fraction of the airflow from the Zone Equipment Output Node.
 Not used for non-airflow zone equipment.
 
-Name of a space to receive a portion of the output from this piece of zone equipment.
+An example of this statement in an IDF is:
+
+\begin{lstlisting}
+
+SpaceHVAC:ZoneEquipmentSplitter,
+    Zone 5 ATU Space Splitter,  !- Name
+    Zone 5,                  !- Zone Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment Object Type
+    Zone 5 ATU,              !- Zone Equipment Name
+    Zone 5 In Node,          !- Zone Equipment Outlet Node Name
+    Ideal,                   !- Thermostat Control Method
+    ,                        !- Control Space Name
+    ,                        !- Space Fraction Method
+    Space 5 Office,          !- Space 1 Name
+    0.6,                     !- Space 1 Fraction {dimensionless}
+    Space 5 Office In Node,  !- Space 1 Supply Node Name
+    Space 5 Conference,      !- Space 2 Name
+    0.2,                     !- Space 2 Fraction {dimensionless}
+    Space 5 Conference In Node,  !- Space 2 Supply Node Name
+    Zone 5-Remainder,        !- Space 3 Name
+    0.2,                     !- Space 3 Fraction {dimensionless}
+    Zone 5-Remainder In Node;  !- Space 3 Supply Node Name
+\end{lstlisting}
+
+\subsection{SpaceHVAC:ZoneEquipmentMixer}\label{spacehvaczoneequipmentmixer}
+
+The SpaceHVAC:ZoneEquipmentMixer object mixes the airflow from one or more Spaces into a piece of zone equipment.
+
+\subsubsection{Inputs}\label{inputs-1-052-seqmixer}
+
+\paragraph{Field: Name}\label{field-seqmixer-name-015}
+
+Name of the mixer object.
+
+\paragraph{Field: Zone Name}\label{field-seqmixer-zone-name}
+
+Name of the zone served by the zone HVAC equipment.
+
+\paragraph{Field: Zone Equipment Inlet Node Name}\label{field-seqmixer-zone-equipment-inlet-node-name}
+
+Name of the zone equipment inlet node that is supplied by the Space Nodes.
+
+\paragraph{Field: Space Fraction Method}\label{field-seqmixer-space-sizing-basis}
+
+The method used to autosize the space fractions. The choices are: DesignCoolingLoad, DesignHeatingLoad, FloorArea, Volume, and PerimeterLength. The default is DesignCoolingLoad.
+For example, if there are 3 Spaces listed below, the Space Output Fractions will be sized to Space1DesignCoolingLoad / Sum(Space1thru3DesignCoolingLoad).
+
+\paragraph{Field: Space \textless{}x\textgreater{} Name}\label{field-seqmixer-space-name}
+
+Name of a space to supply air to this piece of zone equipment.
+
+\paragraph{Field: Space \textless{}x\textgreater{} Fraction}\label{field-seqmixer-space-output-fraction}
+
+Fraction of this zone equipment output or airflow distributed to this space. May be autosized using the Space Fraction Method. The default is autosize.
+
+\paragraph{Field: Space \textless{}x\textgreater{} Node Name}\label{field-seqmixer-space-node-name}
+
+The name of a SpaceHVAC:EquipmentConnections Exhaust Node Name that sends a fraction of the airflow to the Zone Equipment Output Node.
 
 An example of this statement in an IDF is:
 
 \begin{lstlisting}
 
-SpaceHVAC:EquipmentConnections,
-      SPACE3-1,              !- Space Name
-      SPACE3-1 In Nodes,     !- Space Air Inlet Node or NodeList Name
-      ,                      !- Space Air Exhaust Node or NodeList Name
-      SPACE3-1 Node,         !- Space Air Node Name
-      SPACE3-1 Out Node,     !- Space Return Air Node or NodeList Name
-      ,                      !- Space Return Air Node 1 Flow Rate Fraction Schedule Name
-      ;                      !- Space Return Air Node 1 Flow Rate Basis Node or NodeList Name
+SpaceHVAC:ZoneEquipmentMixer,
+    Zone 5 ATU Space Mixer,  !- Name
+    Zone 5,                  !- Zone Name
+    Zone 5 In Node,          !- Zone Equipment Inlet Node Name
+    ,                        !- Space Fraction Method
+    Space 5 Office,          !- Space 1 Name
+    0.6,                     !- Space 1 Fraction {dimensionless}
+    Space 5 Office In Node,  !- Space 1 Node Name
+    Space 5 Conference,      !- Space 2 Name
+    0.2,                     !- Space 2 Fraction {dimensionless}
+    Space 5 Conference In Node,  !- Space 2 Node Name
+    Zone 5-Remainder,        !- Space 3 Name
+    0.2,                     !- Space 3 Fraction {dimensionless}
+    Zone 5-Remainder In Node;  !- Space 3 Node Name
 \end{lstlisting}
 

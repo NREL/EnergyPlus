@@ -477,9 +477,10 @@ void GetZoneEquipmentData(EnergyPlusData &state)
 
     EndUniqueNodeCheck(state, "ZoneHVAC:EquipmentConnections");
 
-    CurrentModuleObject = "SpaceHVAC:ZoneEquipmentSplitter";
     auto &ip = state.dataInputProcessing->inputProcessor;
-    auto const instances = ip->epJSON.find(CurrentModuleObject);
+
+    CurrentModuleObject = "SpaceHVAC:ZoneEquipmentSplitter";
+    auto instances = ip->epJSON.find(CurrentModuleObject);
     if (instances != ip->epJSON.end()) {
         auto const &objectSchemaProps = ip->getObjectSchemaProps(state, CurrentModuleObject);
         auto &instancesValue = instances.value();
@@ -511,6 +512,42 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             }
 
             processZoneEquipSplitterInput(state, CurrentModuleObject, zeqSplitterNum, zoneNum, objectSchemaProps, objectFields, thisZeqSplitter);
+        }
+    } // end loop over zone equipment splitters
+
+    CurrentModuleObject = "SpaceHVAC:ZoneEquipmentMixer";
+    instances = ip->epJSON.find(CurrentModuleObject);
+    if (instances != ip->epJSON.end()) {
+        auto const &objectSchemaProps = ip->getObjectSchemaProps(state, CurrentModuleObject);
+        auto &instancesValue = instances.value();
+        int numZoneEqMixers = instancesValue.size();
+        state.dataZoneEquip->zoneEquipMixer.resize(numZoneEqMixers);
+        int zeqMixerNum = -1;
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            ++zeqMixerNum;
+            auto const &objectFields = instance.value();
+            auto &thisZeqMixer = state.dataZoneEquip->zoneEquipMixer[zeqMixerNum];
+            thisZeqMixer.Name = UtilityRoutines::makeUPPER(instance.key());
+            ip->markObjectAsUsed(CurrentModuleObject, instance.key());
+
+            std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
+            int zoneNum = UtilityRoutines::FindItemInList(zoneName, state.dataHeatBal->Zone);
+            if (zoneNum == 0) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZeqMixer.Name));
+                ShowContinueError(state, format("..Zone Name={} not found, remaining items for this object not processed.", zoneName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                continue;
+            }
+            if (!state.dataHeatBal->Zone(zoneNum).IsControlled) {
+                ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisZeqMixer.Name));
+                ShowContinueError(
+                    state,
+                    format("..Zone Name={} is not a controlled zone. A ZoneHVAC:EquipmentConfiguration object is required for this zone.", zoneName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+                continue;
+            }
+
+            processZoneEquipMixerInput(state, CurrentModuleObject, zeqMixerNum, zoneNum, objectSchemaProps, objectFields, thisZeqMixer);
         }
     } // end loop over zone equipment splitters
 
@@ -1230,6 +1267,65 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         }
     }
 }
+
+void processZoneEquipMixerInput(EnergyPlusData &state,
+                                std::string_view zeqMixerModuleObject,
+                                int const zeqMixerNum,
+                                int const zoneNum,
+                                InputProcessor::json const objectSchemaProps,
+                                InputProcessor::json const objectFields,
+                                DataZoneEquipment::ZoneEquipmentMixer &thisZeqMixer)
+
+{
+    static constexpr std::string_view RoutineName("processZoneEquipMixerInput: "); // include trailing blank space
+    auto &ip = state.dataInputProcessing->inputProcessor;
+    bool objectIsParent = true;
+    thisZeqMixer.zoneEquipInletNodeNum = GetOnlySingleNode(state,
+                                                           ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_outlet_node_name"),
+                                                           state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                                           DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer,
+                                                           thisZeqMixer.Name,
+                                                           DataLoopNode::NodeFluidType::Air,
+                                                           DataLoopNode::ConnectionType::Outlet,
+                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           objectIsParent);
+
+    thisZeqMixer.spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis(
+        getEnumValue(spaceEquipSizingBasisNamesUC, ip->getAlphaFieldValue(objectFields, objectSchemaProps, "space_fraction_method")));
+
+    auto extensibles = objectFields.find("spaces");
+    auto const &extensionSchemaProps = objectSchemaProps["spaces"]["items"]["properties"];
+    if (extensibles != objectFields.end()) {
+        auto &extensiblesArray = extensibles.value();
+        int const numSpaces = extensiblesArray.size();
+        thisZeqMixer.spaces.resize(numSpaces);
+        int spaceCount = -1;
+        for (auto &extensibleInstance : extensiblesArray) {
+            ++spaceCount;
+            auto &thisZeqSpace = thisZeqMixer.spaces[spaceCount];
+            std::string const spaceName = ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_name");
+            thisZeqSpace.spaceIndex = UtilityRoutines::FindItemInList(spaceName, state.dataHeatBal->space);
+            if (thisZeqSpace.spaceIndex == 0) {
+                ShowSevereError(state, format("{}{}={}", RoutineName, zeqMixerModuleObject, thisZeqMixer.Name));
+                ShowContinueError(state, format("Space Name={} not found.", spaceName));
+                state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
+            } else {
+                thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_fraction");
+                thisZeqSpace.spaceInletNodeNum =
+                    GetOnlySingleNode(state,
+                                      ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_supply_node_name"),
+                                      state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
+                                      DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer,
+                                      thisZeqMixer.Name,
+                                      DataLoopNode::NodeFluidType::Air,
+                                      DataLoopNode::ConnectionType::Outlet,
+                                      NodeInputManager::CompFluidStream::Primary,
+                                      objectIsParent);
+            }
+        }
+    }
+}
+
 bool CheckZoneEquipmentList(EnergyPlusData &state,
                             std::string_view const ComponentType, // Type of component
                             std::string_view const ComponentName, // Name of component

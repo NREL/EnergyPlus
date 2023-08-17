@@ -450,7 +450,7 @@ namespace DataZoneEquipment {
         Real64 SequentialCoolingFraction(EnergyPlusData &state, int equipNum);
     };
 
-    struct ZoneEquipSplitterSpace
+    struct ZoneEquipSplitterMixerSpace
     {
         int spaceIndex = 0;          // Index to a space
         Real64 outputFraction = 0.0; // Fraction of equipment output (either flow or heating/cooling) to this space
@@ -466,7 +466,15 @@ namespace DataZoneEquipment {
         DataZoneEquipment::ZoneEquipTstatControl tstatControl = DataZoneEquipment::ZoneEquipTstatControl::Invalid;
         int controlSpaceIndex = 0;
         DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
-        std::vector<ZoneEquipSplitterSpace> spaces;
+        std::vector<ZoneEquipSplitterMixerSpace> spaces;
+    };
+
+    struct ZoneEquipmentMixer
+    {
+        std::string Name;
+        int zoneEquipInletNodeNum = 0;
+        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
+        std::vector<ZoneEquipSplitterMixerSpace> spaces;
     };
 
     struct ControlList
@@ -546,6 +554,14 @@ namespace DataZoneEquipment {
                                        InputProcessor::json const objectFields,
                                        DataZoneEquipment::ZoneEquipmentSplitter &thisZeqSplitter);
 
+    void processZoneEquipMixerInput(EnergyPlusData &state,
+                                    std::string_view zeqMixerModuleObject,
+                                    int const zeqMixerNum,
+                                    int const zoneNum,
+                                    InputProcessor::json const objectSchemaProps,
+                                    InputProcessor::json const objectFields,
+                                    DataZoneEquipment::ZoneEquipmentMixer &thisZeqMixer);
+
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
                                 std::string_view ComponentName, // Name of component
@@ -601,6 +617,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<ExhaustAirSystemManager::ExhaustAir> ExhaustAirSystem;
     Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
     std::vector<DataZoneEquipment::ZoneEquipmentSplitter> zoneEquipSplitter;
+    std::vector<DataZoneEquipment::ZoneEquipmentMixer> zoneEquipMixer;
 
     void clear_state() override
     {

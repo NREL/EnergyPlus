@@ -421,6 +421,7 @@ namespace DataLoopNode {
         ZonePropertyLocalEnvironment,
         SpaceHVACEquipmentConnections,
         SpaceHVACZoneEquipmentSplitter,
+        SpaceHVACZoneEquipmentMixer,
         Num,
     };
 
