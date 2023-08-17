@@ -2468,7 +2468,6 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.loopSideNum = DataPlant::LoopSideLocation::Supply;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.branchNum = 2;
     state->dataPlantHXFluidToFluid->FluidHX(1).OtherCompSupplySideLoop.compNum = 1;
-    state->dataPlantHXFluidToFluid->FluidHX(1).Type = DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg;
 
     state->dataPlantHXFluidToFluid->NumberOfPlantFluidHXs = 1;
 
