@@ -6789,6 +6789,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
