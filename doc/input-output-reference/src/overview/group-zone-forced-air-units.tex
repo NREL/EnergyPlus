@@ -2986,6 +2986,10 @@ For this zone heat pump,there are two types of WaterToAirHeatPump coil model all
   \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \end{itemize}
 
+When the inputs of the last two fields (Design Specification Multispeed Object Type and Design Specification Multispeed Fan Object Name) are entered, a multiuspeed fan with different air flow rates is applied.  The fan speed number is determined by zone load. The fan air flow cycles between adjacent speeds based on the cooling / heating capacity (or coordinate with the cooling / heating coil stage for variable speed water to air coils). When Coil:Cooling:WaterToAirHeatPump:EquationFit and Coil:Heating:WaterToAirHeatPump:EquationFit are used, the water flow rate in the coils remain the same.
+
+When there are no inputs of the last two fields, a multispeed fan may be also applied if the Fan:SysmModel is selected as fan type, and Discrete is selected as Speed Control Method and the Number of Speeds is greater than 1 in the Fan:SystemMode object. 
+
 \begin{figure}[hbtp] % fig 113
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image288.png}
@@ -3053,6 +3057,8 @@ This numeric field defines the outdoor air flow rate through the heat pump in cu
 \paragraph{Field: Supply Air Fan Object Type}\label{field-supply-air-fan-object-type-7}
 
 This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanonoff]{Fan:OnOff}.
+
+If Fan:SystemModel is entered and there are no inputs of last two fields: Design Specification Multispeed Object Type and Design Specification Multispeed Object Name, a multispeed fan may be also applied if the input of Number Of Speed in the Fan:SystemModel is greater than 1.
 
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-6}
 
@@ -3190,6 +3196,20 @@ This field specifies the way in which water flow through the heat pump coils wil
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-8}
 
 This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+
+\paragraph{Field: Design Specification Multispeed Object Type}\label{field-design-specification-multispeed-object-type-2}
+
+This optional alpha field contains the identifying type for the design specification multispeed object. This field is only needed when multispeed fan is applied. The only available type is:
+
+\begin{itemize}
+\tightlist
+\item
+  \hyperref[unitarysystemperformancemultispeed]{UnitarySystemPerformance:Multispeed}
+\end{itemize}
+ 
+\paragraph{Field: Design Specification Multispeed Object Name}\label{field-design-specification-multispeed-object-name-2}
+
+This optional alpha field contains the identifying name for the design specification multispeed object. This field is only needed when multispeed fan is applied.
 
 Examples of IDF use:
 
@@ -3332,6 +3352,12 @@ ZoneHVAC:WaterToAirHeatPump,
   HVAC,Average,Zone Water to Air Heat Pump Compressor Part Load Ratio {[]}
 \item
   HVAC,Average,Zone Water to Air Heat Pump Fan Availability Status {[]}
+\item
+  HVAC,Average,Unitary System Water Coil Multispeed Fan Cycling Ratio {[]}
+\item
+  HVAC,Average,Unitary System Water Coil Multispeed Fan Speed Ratio {[]}
+\item
+  HVAC,Average,Unitary System Water Coil Multispeed Fan Speed Level {[]}
 \end{itemize}
 
 \paragraph{Zone Water to Air Heat Pump Total Heating Rate {[}W{]}}\label{zone-water-to-air-heat-pump-total-heating-rate-w}
@@ -3401,6 +3427,18 @@ This output field is the part-load ratio of the compressor used by the DX coils 
 \paragraph{Zone Water to Air Heat Pump Fan Availability Status {[]}}\label{zone-water-to-air-heat-pump-fan-availability-status}
 
 This is the availability status of the zone water source heat pump~ fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the zone water source heat pump~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
+
+\paragraph{Unitary System Water Coil Multispeed Fan Cycling Ratio {[]}}\label{unitary-system-water-coil-multispeed-fan-cycling-ratio}
+
+This output variable is only available with a multispeed fan of zone water source heat pump. It is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the zone water source heat pump heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the zone water source heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the zone water source heat pump operates at speeds above 1.
+
+\paragraph{Unitary System Water Coil Multispeed Fan Speed Ratio {[]}}\label{unitary-system-water-coil-multispeed-fan-speed-ratio}
+
+This output variable is only available with a multispeed fan of zone water source heat pump. It is the ratio of time in a system timestep that the fan is at rated speed between two consecutive speed numbers ( [Fanr Speed - Fan speed at Speed i-1] / Fan speed at Speed i - Fan speed at Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
+
+\paragraph{Unitary System Water Coil Multispeed Fan Speed Level {[]}}\label{unitary-system-water-coil-multispeed-fan-speed-level}
+
+This output variable is only available with a multispeed fan of zone water source heat pump. It ts the maximum speed needed when the zone water source heat pump operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the zone water source heat pump operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the zone water source heat pump operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the zone water source heat pump operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a multiple speed fan.
 
 \subsection{ZoneHVAC:Dehumidifier:DX}\label{zonehvacdehumidifierdx}
 
@@ -3926,6 +3964,11 @@ This is the availability status of the Stand Alone ERV~ fan. This status flag is
 
 Terminal units with variable refrigerant flow compound HVAC object are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} objects). The VRF terminal unit may be used as zone, air loop or outside air system equipment. The VRF terminal unit compound object contains an optional outdoor air mixer, a DX cooling coil, a DX heating coil, a supply fan (optional for air loop and outdoor air system equipment), and an optional supplemental heating coil object.
 
+When the inputs of the last two fields (Design Specification Multispeed Object Type and Design Specification Multispeed Fan Object Name) are entered, a multiuspeed fan with different air flow rates is applied to Coil:Cooling:DX:VariableRefrigerantFlow and Coil:Heating:DX:VariableRefrigerantFlow.  The fan speed number is determined by zone load. The fan air flow cycles between adjacent speeds based on the cooling / heating capacity (or coordinate with the cooling / heating coil stage for variable speed water to air coils). However, the water flow rate in the coils remain the same while air flow rate varies with speed.
+
+When there are no inputs of the last two fields, a multispeed fan may be also applied if the Fan:SysmModel is selected as fan type, and Discrete is selected as Speed Control Method and the Number of Speeds is greater than 1 in the Fan:SystemMode object. 
+
+
 \begin{callout}
 Note: The terminal unit may be used in the air loop and/or outdoor air system, however, at this time only constant flow (or limited variation within the limits allowed for DX coils) through the unit is allowed. Using a wide range of outdoor air flow rates will cause the DX coil model to fail. For example, if the minimum outdoor air flow rate is allowed to fall near 0, the DX coil model will calculate very low, even very negative, coil outlet temperatures. This can cause psychrometric warnings to occur and cause the simulation to end prematurely.
 \end{callout}
@@ -3939,6 +3982,8 @@ This VRF terminal unit can be controlled based on a load or set point. When the 
 The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. An optional supplemental heating coil can also be added to the terminal unit to provide additional heating when the main DX heating coil could not meet the entire heating load of a zone during cold outdoor conditions. The Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating.
 
 A supply air fan can be modeled as either draw through or blow through. The supply air fan is required for zone equipment and optional for air loop and outdoor air system equipment. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanconstantvolume]{Fan:ConstantVolume} if \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanvariablevolume]{Fan:VariableVolume} if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
+
+Multispeed fan operation is available to both coils as\textit{\hyperref[coilcoolingdxvariablerefrigerantflow]{Coil:Cooling:DX:VariableRefrigerantFlow}} and \textit{\hyperref[coilheatingdxvariablerefrigerantflow]{Coil:Heating:DX:VariableRefrigerantFlow}}. There are two ways to accomplish multispeed fan operation. The first way is to input last two fields: Design Specification Multispeed Object Type and Design Specification Multispeed Object Name.The object allows users to input multiple speed fan flow fractions for both heating and cooling. It also allows users to input the supply air flow ratio with no load. 
 
 \subsubsection{Inputs}\label{inputs-14-018}
 
@@ -4074,6 +4119,21 @@ This numeric field defines the maximum outdoor dry-bulb temperature in degrees C
 
 This alpha field is only used when this VRF terminal unit is used as air loop equipment with load based operational control. When the terminal unit is used in an air loop and this terminal unit is load controlled, this zone's thermostat will control operation. When this terminal unit is used in an air loop and is set point controlled, this field must be blank (i.e., when the controlling zone name is present the system will be load controlled).
 
+\paragraph{Field: Design Specification Multispeed Object Type}\label{field-design-specification-multispeed-object-type-3}
+
+This optional alpha field contains the identifying type for the design specification multispeed object. This field is only needed when multispeed fan is applied. The only available type is:
+
+\begin{itemize}
+\tightlist
+\item
+  \hyperref[unitarysystemperformancemultispeed]{UnitarySystemPerformance:Multispeed}
+\end{itemize}
+ 
+\paragraph{Field: Design Specification Multispeed Object Name}\label{field-design-specification-multispeed-object-name-3}
+
+This optional alpha field contains the identifying name for the design specification multispeed object. This field is only needed when multispeed fan is applied.
+
+
 Following is an example input for a ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object.
 
 \begin{lstlisting}
@@ -4149,6 +4209,12 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   HVAC,Sum,Zone VRF Air Terminal Heating Electricity Energy {[}J{]}
 \item
   HVAC,Average, Zone VRF Air Terminal Fan Availability Status {[]}
+\item
+  HVAC,Average, Zone VRF Air Terminal Multispeed Fan Cycling Ratio {[]}
+\item
+  HVAC,Average, Zone VRF Air Terminal Multispeed Fan Speed Ratio {[]}
+\item
+  HVAC,Average, Zone VRF Air Terminal Multispeed Fan Speed Level {[]}
 \end{itemize}
 
 \paragraph{Zone VRF Air Terminal Total Cooling Rate {[}W{]}}\label{zone-vrf-air-terminal-total-cooling-rate-w}
@@ -4218,6 +4284,18 @@ This output field is the electricity consumption of the zone terminal unit in Jo
 \paragraph{Zone VRF Air Terminal Fan Availability Status {[]}}\label{zone-vrf-air-terminal-fan-availability-status}
 
 This is the availability status of the Zone Terminal Unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the Zone Terminal Unit object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
+
+\paragraph{Zone VRF Air Terminal Multispeed Fan Cycling Ratio {[]}}\label{zone-vrf-air-terminal-multispeed-fan-cycling-ratio}
+
+This output variable is only available with a multispeed fan for COIL:Cooling:DX:VariableRefrigerantFlow and COIL:Heatling:DX:VariableRefrigerantFlow. It is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the zone VRF terminal heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the zone water source heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the zone VRF terminal operates at speeds above 1.
+
+\paragraph{Zone VRF Air Terminal Multispeed Fan Speed Ratio {[]}}\label{zone-vrf-air-terminal-multispeed-fan-speed-ratio}
+
+This output variable is only available with a multispeed fan  for COIL:Cooling:DX:VariableRefrigerantFlow and COIL:Heatling:DX:VariableRefrigerantFlow. It is the ratio of time in a system timestep that the fan is at rated speed between two consecutive speed numbers ( [Fanr Speed - Fan speed at Speed i-1] / Fan speed at Speed i - Fan speed at Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
+
+\paragraph{Zone VRF Air Terminal Multispeed Fan Speed Level {[]}}\label{zone-vrf-air-terminal-multispeed-fan-speed-level}
+
+This output variable is only available with a multispeed fan  for COIL:Cooling:DX:VariableRefrigerantFlow and COIL:Heatling:DX:VariableRefrigerantFlow. It ts the maximum speed needed when the zone VRF terminal operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the zone VRF terminal operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the zone VRF terminal operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the zone VRF terminal operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a multiple speed fan.
 
 \subsection{ZoneHVAC:HybridUnitaryHVAC}\label{zonehvac-hybridunitaryhvac}
 
