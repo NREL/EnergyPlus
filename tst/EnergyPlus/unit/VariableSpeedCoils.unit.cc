@@ -6708,4 +6708,250 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedWaterVolFlowRate(2), 0.0008201726);
 }
 
+TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
+{
+    // Unit Test for PR 10109 that addresses Issue 10108
+
+    std::string const idf_objects = delimited_string({
+
+        "  Curve:Biquadratic,",
+        "    HPACHeatCapFT,           !- Name",
+        "    0.8529681407,            !- Coefficient1 Constant",
+        "    -0.0004847169,           !- Coefficient2 x",
+        "    -0.0000010693,           !- Coefficient3 x**2",
+        "    0.0185542164,            !- Coefficient4 y",
+        "    0.0000872425,            !- Coefficient5 y**2",
+        "    -0.0000166868,           !- Coefficient6 x*y",
+        "    17.78,                   !- Minimum Value of x",
+        "    23.33,                   !- Maximum Value of x",
+        "    -28.89,                  !- Minimum Value of y",
+        "    17.22,                   !- Maximum Value of y",
+        "    0.3799,                  !- Minimum Curve Output",
+        "    1.1896,                  !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HPACHeatCapFFF,          !- Name",
+        "    0.84,                    !- Coefficient1 Constant",
+        "    0.16,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0.5,                     !- Minimum Value of x",
+        "    1.5;                     !- Maximum Value of x",
+
+        "  Curve:Biquadratic,",
+        "    HPACHeatEIRFT,           !- Name",
+        "    0.7077081462,            !- Coefficient1 Constant",
+        "    0.0148163478,            !- Coefficient2 x",
+        "    0.0002622589,            !- Coefficient3 x**2",
+        "    -0.0113239622,           !- Coefficient4 y",
+        "    0.0002939277,            !- Coefficient5 y**2",
+        "    -0.0003605284,           !- Coefficient6 x*y",
+        "    17.78,                   !- Minimum Value of x",
+        "    23.33,                   !- Maximum Value of x",
+        "    -28.89,                  !- Minimum Value of y",
+        "    17.22,                   !- Maximum Value of y",
+        "    0.8266,                  !- Minimum Curve Output",
+        "    2.0277,                  !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Quadratic,",
+        "    HPACHeatEIRFFF,          !- Name",
+        "    1.3824,                  !- Coefficient1 Constant",
+        "    -0.4336,                 !- Coefficient2 x",
+        "    0.0512,                  !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "  Curve:Quadratic,",
+        "    HPACHeatPLFFPLR,         !- Name",
+        "    0.75,                    !- Coefficient1 Constant",
+        "    0.25,                    !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Minimum Value of x",
+        "    1.0;                     !- Maximum Value of x",
+
+        "  Coil:Heating:DX:VariableSpeed,",
+        "    Heating Coil VariableSpeed,     !- Name",
+        "    Zone1PTHPDXCoolCoilOutletNode,  !- Indoor Air Inlet Node Name",
+        "    Zone1PTHPDXHeatCoilOutletNode,  !- Indoor Air Outlet Node Name",
+        "    10,                      !- Number of Speeds {dimensionless}",
+        "    10,                      !- Nominal Speed Level {dimensionless}",
+        "    7200.0,                  !- Rated Heating Capacity At Selected Nominal Speed Level {w}",
+        "    0.4,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    HPACHeatPLFFPLR,         !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name",
+        "   -60.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
+        "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
+        "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    TIMED,                   !- Defrost Control",
+        "    0.166667,                !- Defrost Time Period Fraction",
+        "    7200,                    !- Resistive Defrost Heater Capacity {W}",
+        "    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 7 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 7 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 8 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 8 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 9 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 9 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF,          !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {w}",
+        "    5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {dimensionless}",
+        "    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}",
+        "    773.3,                   !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    HPACHeatCapFT,           !- Speed 10 Heating Capacity Function of Temperature Curve Name",
+        "    HPACHeatCapFFF,          !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name",
+        "    HPACHeatEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
+        "    HPACHeatEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    // get coil inputs
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+
+    state->dataVariableSpeedCoils->GetCoilsInputFlag = false;
+
+    // Setting predefined tables is needed though
+    OutputReportPredefined::SetPredefinedTables(*state);
+    // Set up some environmental parameters
+    state->dataEnvrn->OutDryBulbTemp = -5.0;
+    state->dataEnvrn->OutHumRat = 0.0009;
+    state->dataEnvrn->OutBaroPress = 99000.0;
+    state->dataEnvrn->OutWetBulbTemp =
+        Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 270.0;
+    state->dataEnvrn->StdRhoAir = 1.1;
+    // set coil parameters
+    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+    int DXCoilNum = 1;
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
+    int constexpr SpeedCal = 1;
+    Real64 SensLoad = 1000.0; // 0.0;
+    Real64 LatentLoad = 0.0;
+    Real64 PartLoadFrac = 0.7; // 0.0;
+    Real64 OnOffAirFlowRatio = 1.0;
+    Real64 SpeedRatio = 1.0;
+
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.2;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.2;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = 0.2;
+    state->dataEnvrn->OutDryBulbTemp = -5.0;
+
+    VariableSpeedCoils::SimVariableSpeedCoils(*state,
+                                              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                              DXCoilNum,
+                                              DataHVACGlobals::ContFanCycCoil,
+                                              DataHVACGlobals::CompressorOperation::On, // compressor on/off. 0 = off; 1= on
+                                              0.7,
+                                              1,
+                                              0.2,
+                                              1000,
+                                              0,
+                                              1);
+
+    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 908.10992432432420, 1e-3);
+
+    // Now simulate the coil with "CompressorOperation" command to be "Off":
+    // In this case, the "DefrostPower" need to be cleared to be zero if done correctly;
+    // Otherwise the problem reported in Issue 10108 will show up.
+
+    VariableSpeedCoils::SimVariableSpeedCoils(*state,
+                                              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                              DXCoilNum,
+                                              DataHVACGlobals::ContFanCycCoil,
+                                              DataHVACGlobals::CompressorOperation::Off, // compressor on/off. 0 = off; 1= on
+                                              0.7,
+                                              1,
+                                              0.2,
+                                              1000,
+                                              0,
+                                              1);
+
+    // Without the current PR (PR 10109), the DefrostPower would remain 908.1 and fail the following test:
+    EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 0.0, 1e-3);
+}
+
 } // namespace EnergyPlus
