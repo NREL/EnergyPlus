@@ -1,16 +1,16 @@
-Implement steam features
+Implement steam features: Part 1
 ================
 
 **Dareum Nam, NREL**
 
  - Initial NFP Original Date: 12/3/2020
- - Final NFP Revision Date: 8/8/2022
+ - Final NFP Revision Date: 8/16/2023
 
 ## Justification for New Feature ##
 
 It is common for university campuses and cities like New York to use steam to heat hot water loops. Often, steam energy is transferred at the building to a hot water system via a heat exchanger. Currently, EnergyPlus users can make both steam and hot water systems, but cannot link them together. This forces modelers to use HW boilers/systems to approximate the steam systems, which isn’t accurate and reduces confidence in the energy model. The request for a steam to water heat exchanger came from Bractlet. Also, there have been several upvotes on the new feature request regarding steam to water heat exchanger from EnergyPlus Github.
 In addition, the current EnergyPlus does not allow to use of district heating steam (except for `SteamEquipment`) and `LoadProfile:Plant` in a steam loop. 
-This PR enables EnergyPlus to simulate `HeatExchanger:SteamToWater`, `DistrictHeatingSteam`, and `LoadProfile:Plant` in a steam loop.
+This PR enables EnergyPlus to simulate `DistrictHeatingSteam`, and `LoadProfile:Plant` in a steam loop. (`HeatExchanger:SteamToWater` is going to be available in Part 2.)
 
 ## E-mail and Conference Call Conclusions ##
 
@@ -48,7 +48,7 @@ The current steam loop in EnergyPlus has five objects: steam boiler, steam pipe,
 
 6. Steam coils are designed with steam traps, which only allow condensed steam to leave the coil; hence the steam always condenses and leaves the coil at a quality of 0
 
-These assumptions are applied to the new objects: `LoadProfile:Plant` in a steam loop, `DistrictHeatingSteam`, and `HeatExchanger:SteamToWater`. If CoolProp is implemented in the future, the steam systems can be renewed with an enthalpy-based system.
+These assumptions are applied to the new objects: `LoadProfile:Plant` in a steam loop, and `DistrictHeatingSteam`. If CoolProp is implemented in the future, the steam systems can be renewed with an enthalpy-based system.
 
 ## Approach ##
 
@@ -61,34 +61,6 @@ The current DistrictHeating or DistrictCooling calculates the output capacity re
 The DistrictHeatingSteam calculates the required output capacity based on the latent heat at the given saturation temperature.
 The current object name and meter names of DistrictHeating are changed to DistrictHeatingWater. Also, the current meter names of Steam are changed to DistrictHeatingSteam.
 
-3. `HeatExchanger:SteamToWater` :
-The current `HeatExchanger:FluidToFluid` is a hydronic heat exchanger that can be used to couple two hydronic plant or condenser loops. Heat exchanger performance modeling uses classic effectiveness-NTU correlations. The heat exchanger model correlations determine a heat transfer effectiveness value, ε, which is a function of heat exchanger UA, the mass flow rates through boths sides, and the specific heat of the fluids in the streams. The effectiveness-NTU Method can be described following equations.
-
-![eqns1](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns1.PNG)
-
-The fluid with the smaller heat capacity rate will experience a larger temperature change maximum temperature difference.
-
-![eqns2](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqns2.PNG)
-
-The heat exchanger model correlations determine a heat transfer effectiveness value, ε. The effectiveness relations for each heat exchanger type are shown below.
-
-![table1](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_table1.PNG)
-
-Steam to water heat exchanger is used to couple a steam loop and a hot water loop. Figure 1 describes the loop structure with a steam to water heat exchanger.
-
-![figure1](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_figure1.PNG)
-
-In `HeatExchanger:FluidToFluid`, `Loop Supply Side` indicates that the heat exchanger is situated on the supply side of a loop. `Loop Demand Side` indicates that it is on the demand side of a loop. So from the point of view of the heat exchanger component itself, the `Loop Demand Side` acts like a supply source for the `Loop Supply Side` which acts like a demand to the component. Therefore, in the case of steam to water heat exchanger, water is the `Loop Supply Side`  and steam is the `Loop Demand Side`.
-If one of the fluids in a heat exchanger undergoes a phase-change process, like steam in a steam to water heat exchanger, the following effectiveness relation reduces to
-
-![eqn3](https://github.com/NREL/EnergyPlus/blob/AddThreeSteamModulesWithNTUMethod/design/FY2021/steamwork_eqn3.PNG)
-
-regardless of the type of heat exchanger. According to the Fundamentals of thermal-fluid sciences by Yunus A Çengel,
-> The heat capacity rate of a fluid during a phase-change process must approach infinity 
-> since the temperature change is practically zero, That is, C goes to infinity when 
-> deltaT goes 0, so that the heat transfer rate (m_dot * Cp * delta T) is a finite quantity. 
-> Therefore, in heat exchanger analysis, a phase-change fluid is conveniently modeled as a
-> fluid whose heat capacity rate is infinity.
 
 ## Testing/Validation/Data Sources ##
 
@@ -176,108 +148,6 @@ DistrictHeatingSteam,
        \object-list ScheduleNames
 ```
 
-```sh
-HeatExchanger:SteamToWater,
-        \memo A steam to water heat exchanger designed to couple the steam loop to the water loop
-   A1 , \field Name
-        \required-field
-        \reference-class-name validPlantEquipmentTypes
-        \reference validPlantEquipmentNames
-        \reference-class-name validCondenserEquipmentTypes
-        \reference validCondenserEquipmentNames
-        \reference-class-name validBranchEquipmentTypes
-        \reference validBranchEquipmentNames
-   A2 , \field Availability Schedule Name
-        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
-        \note If this field is blank, the system is always available.
-        \note default is that heat exchanger is on
-        \type object-list
-        \object-list ScheduleNames
-   A3 , \field Steam Inlet Node Name
-        \type node
-        \required-field
-   A4 , \field Steam Outlet Node Name
-        \type node
-        \required-field
-   N1 , \field Steam Side Design Flow Rate
-        \type real
-        \required-field
-        \minimum> 0.0
-        \units m3/s
-        \ip-units gal/min
-        \autosizable
-   A5 , \field Water Inlet Node Name
-        \type node
-        \required-field
-        \note This connection is to the supply side of a water loop and is the inlet to the heat exchanger
-   A6 , \field Water Outlet Node Name
-        \type node
-        \required-field
-        \note This connection is to the supply side of a water loop
-   N2 , \field Water Side Design Flow Rate
-        \type real
-        \required-field
-        \minimum> 0.0
-        \units m3/s
-        \ip-units gal/min
-        \autosizable
-   N3 , \field Heat Exchanger U-Factor Times Area Value
-        \type real
-        \units W/K
-        \minimum> 0.0
-        \autosizable
-        \required-field
-   A7 , \field Control Type
-        \type choice
-        \key UncontrolledOn
-        \key OperationSchemeModulated
-        \key OperationSchemeOnOff
-        \key HeatingSetpointModulated
-        \key HeatingSetpointOnOff
-        \default UncontrolledOn
-   A8 , \field Heat Exchanger Setpoint Node Name
-        \note Setpoint node is needed with any Control Type that is "*Setpoint*"
-        \type node
-   N4 , \field Minimum Temperature Difference to Activate Heat Exchanger
-        \note Tolerance between control temperatures used to determine if heat exchanger should run.
-        \type real
-        \minimum 0.0
-        \maximum 50
-        \default 0.01
-        \units deltaC
-   A9, \field Heat Transfer Metering End Use Type
-        \note This field controls end use reporting for heat transfer meters
-        \type choice
-        \key FreeCooling
-        \key HeatRecovery
-        \key HeatRejection
-        \key HeatRecoveryForCooling
-        \key HeatRecoveryForHeating
-        \key LoopToLoop
-        \default LoopToLoop
-   N5 , \field Sizing Factor
-        \note Multiplies the autosized flow rates for this device
-        \type real
-        \minimum> 0.0
-        \default 1.0
-   N6 , \field Operation Minimum Temperature Limit
-        \note Lower limit on inlet temperatures, heat exchanger will not operate if either inlet is below this limit
-        \type real
-        \units C
-   N7 , \field Operation Maximum Temperature Limit
-        \note Upper limit on inlet temperatures, heat exchanger will not operate if either inlet is above this limit
-        \type real
-        \units C
-   N8 , \field Degree of SubCooling
-        \units C
-        \minimum 1.0
-        \maximum 5.0
-   N9 ; \field Degree of Loop SubCooling
-        \units C
-        \minimum 10.0
-        \default 20.0
-```
-
 ## Engineering Reference ##
 
 
@@ -290,4 +160,5 @@ Transition is needed: The current object name and meter names of DistrictHeating
 
 - Engineering Reference, EnergyPlus™ Version 22.1.0 Documentation
 - Çengel, Yunus A., Robert H. Turner, and John M. Cimbala. 2008. Fundamentals of thermal-fluid sciences. Boston: McGraw-Hill.
+- Rahul J. Chillar. 2005. Development and implementation of a steam loop in the building energy simulation program EnergyPlus. University of Illinois at Urbana-Champaign, Master Thesis
 

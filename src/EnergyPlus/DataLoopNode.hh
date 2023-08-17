@@ -305,7 +305,6 @@ namespace DataLoopNode {
         HeatExchangerAirToAirSensibleAndLatent,
         HeatExchangerDesiccantBalancedFlow,
         HeatExchangerFluidToFluid,
-        HeatExchangerSteamToWater,
         HeatPumpFuelFiredCooling,
         HeatPumpFuelFiredHeating,
         HeatPumpPlantLoopEIRCooling,

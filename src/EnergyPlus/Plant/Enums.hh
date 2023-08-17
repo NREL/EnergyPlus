@@ -207,7 +207,6 @@ enum class PlantEquipmentType
     HeatPumpFuelFiredCooling,
     HeatPumpFuelFiredHeating,
     PurchSteam,
-    SteamToWaterPlantHtExchg,
     Num
 };
 

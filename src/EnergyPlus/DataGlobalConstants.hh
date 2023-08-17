@@ -143,8 +143,6 @@ namespace Constant {
         OtherFuel1,
         OtherFuel2,
         DistrictCooling,
-        DistrictHeating,
-        Steam,
         DistrictHeatingWater,
         DistrictHeatingSteam,
         Num

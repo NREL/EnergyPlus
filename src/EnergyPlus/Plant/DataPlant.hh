@@ -185,8 +185,7 @@ namespace DataPlant {
         "HeatPump:PlantLoop:EIR:Heating",
         "HeatPump:AirToWater:FuelFired:Cooling",
         "HeatPump:AirToWater:FuelFired:Heating",
-        "DistrictHeating:Steam",
-        "HeatExchanger:SteamToWater"};
+        "DistrictHeating:Steam"};
 
     static constexpr std::array<std::string_view, static_cast<size_t>(PlantEquipmentType::Num)> PlantEquipTypeNamesUC{
         "BOILER:HOTWATER",
@@ -288,8 +287,7 @@ namespace DataPlant {
         "HEATPUMP:PLANTLOOP:EIR:HEATING",
         "HEATPUMP:AIRTOWATER:FUELFIRED:COOLING",
         "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING",
-        "DISTRICTHEATING:STEAM",
-        "HEATEXCHANGER:STEAMTOWATER"};
+        "DISTRICTHEATING:STEAM"};
 
     static constexpr std::array<LoopType, static_cast<size_t>(PlantEquipmentType::Num)> ValidLoopEquipTypes{
         LoopType::Plant, //	"Boiler:HotWater"
@@ -389,8 +387,7 @@ namespace DataPlant {
         LoopType::Plant, //	"ZoneHVAC:CoolingPanel:RadiantConvective:Water"
         LoopType::Both,  //	"HeatPump:PlantLoop:EIR:Cooling"
         LoopType::Both,  //	"HeatPump:PlantLoop:EIR:Heating"
-        LoopType::Both,  //	"DistrictHeating:Steam"
-        LoopType::Both   //	"HeatExchanger:SteamToWater"
+        LoopType::Both  //	"DistrictHeating:Steam"
     };
 } // namespace DataPlant
 

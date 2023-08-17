@@ -1232,15 +1232,6 @@ void GetPlantInput(EnergyPlusData &state)
                         this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
                         break;
                     }
-                    case PlantEquipmentType::SteamToWaterPlantHtExchg: {
-                        if (LoopSideNum == LoopSideLocation::Demand) {
-                            this_comp.CurOpSchemeType = OpScheme::Demand;
-                        } else if (LoopSideNum == LoopSideLocation::Supply) {
-                            this_comp.CurOpSchemeType = OpScheme::FreeRejection;
-                        }
-                        this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(state, CompNames(CompNum));
-                        break;
-                    }
                     case PlantEquipmentType::Generator_MicroTurbine: {
                         if (LoopSideNum == LoopSideLocation::Demand) {
                             this_comp.CurOpSchemeType = OpScheme::Demand;
@@ -4187,16 +4178,6 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
                     } break;
                     case DataPlant::PlantEquipmentType::FluidToFluidPlantHtExchg: { //          = 84
-                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                        if (LoopSideCtr == LoopSideLocation::Demand) {
-                            this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;
-                            this_component.HowLoadServed = DataPlant::HowMet::NoneDemand;
-                        } else {
-                            this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
-                            this_component.HowLoadServed = DataPlant::HowMet::PassiveCap;
-                        }
-                    } break;
-                    case DataPlant::PlantEquipmentType::SteamToWaterPlantHtExchg: { //
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         if (LoopSideCtr == LoopSideLocation::Demand) {
                             this_component.FlowPriority = DataPlant::LoopFlowStatus::NeedyAndTurnsLoopOn;

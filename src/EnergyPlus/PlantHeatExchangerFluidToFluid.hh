@@ -75,7 +75,6 @@ namespace PlantHeatExchangerFluidToFluid {
         CounterFlow,
         ParallelFlow,
         Ideal,
-        PhaseChangeProcess, // one of the fluids in a HX undergoes a phase-change process, like steam
         Num
     };
 
@@ -130,18 +129,12 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 InletTemp;                      // current inlet fluid temperature [C]
         Real64 InletMassFlowRate;              // current inlet mass flow rate [kg/s]
         Real64 OutletTemp;                     // component outlet temperature [C]
-        Real64 InletQuality;
-        Real64 OutletQuality;
-        Real64 InletEnthalpy;
-        Real64 OutletEnthalpy;
-        Real64 InletSteamPress;
-        Real64 LoopLoss;
 
         // Default Constructor
         PlantConnectionStruct()
             : inletNodeNum(0), outletNodeNum(0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0),
               DesignVolumeFlowRateWasAutoSized(false), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletTemp(0.0), InletMassFlowRate(0.0),
-              OutletTemp(0.0), InletQuality(1.0), OutletQuality(1.0), InletEnthalpy(0.0), OutletEnthalpy(0.0)
+              OutletTemp(0.0)
         {
         }
     };
@@ -161,7 +154,6 @@ namespace PlantHeatExchangerFluidToFluid {
     {
         // Members
         std::string Name;
-        DataPlant::PlantEquipmentType Type;
         int AvailSchedNum;
         FluidHXType HeatExchangeModelType;
         Real64 UA;
@@ -191,8 +183,6 @@ namespace PlantHeatExchangerFluidToFluid {
         bool MyOneTimeFlag;
         bool MyFlag;
         bool MyEnvrnFlag;
-        Real64 DegOfSubcooling;   // In case of steam to water HX: Degree of subcooling in steam outlet
-        Real64 LoopSubcoolReturn; // In case of steam to water HX: Loop subcooling for steam return
 
         // Default Constructor
         HeatExchangerStruct()
@@ -201,7 +191,7 @@ namespace PlantHeatExchangerFluidToFluid {
               MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
               HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
               DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
-              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true), DegOfSubcooling(0.0), LoopSubcoolReturn(0.0)
+              MyOneTimeFlag(true), MyFlag(true), MyEnvrnFlag(true)
         {
         }
 
@@ -226,15 +216,9 @@ namespace PlantHeatExchangerFluidToFluid {
 
         void calculate(EnergyPlusData &state, Real64 SupSideMdot, Real64 DmdSideMdot);
 
-        void calculateSteamToWaterHX(EnergyPlusData &state, Real64 const SupSideMdot);
-
         void control(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration);
 
-        void controlSteamToWaterHX(EnergyPlusData &state, Real64 MyLoad, bool FirstHVACIteration);
-
         void findDemandSideLoopFlow(EnergyPlusData &state, Real64 TargetSupplySideLoopLeavingTemp, HXAction HXActionMode);
-
-        void findSteamLoopFlow(EnergyPlusData &state, Real64 TargetWaterLoopLeavingTemp);
 
         void oneTimeInit(EnergyPlusData &state) override;
     };
@@ -245,17 +229,14 @@ namespace PlantHeatExchangerFluidToFluid {
 
 struct PlantHeatExchangerFluidToFluidData : BaseGlobalStruct
 {
+
     int NumberOfPlantFluidHXs = 0;
-    int NumberOfSteamToWaterHXs = 0;
-    int NumberOfHXs = 0;
     bool GetInput = true;
     EPVector<PlantHeatExchangerFluidToFluid::HeatExchangerStruct> FluidHX;
 
     void clear_state() override
     {
         this->NumberOfPlantFluidHXs = 0;
-        this->NumberOfSteamToWaterHXs = 0;
-        this->NumberOfHXs = 0;
         this->GetInput = true;
         this->FluidHX.deallocate();
     }
