@@ -714,7 +714,6 @@ void SizeZoneEquipment(EnergyPlusData &state)
         sizeZoneSpaceEquipmentPart1(state, zoneEquipConfig, calcZoneSizing, zoneSysEnergyDemand, zoneSysMoistureDemand, zone, ControlledZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
-                // SpaceHB ToDo: For now allocate by space volume frac
                 sizeZoneSpaceEquipmentPart1(state,
                                             zoneEquipConfig,
                                             state.dataSize->CalcSpaceSizing(state.dataSize->CurOverallSimDay, spaceNum),
@@ -739,7 +738,6 @@ void SizeZoneEquipment(EnergyPlusData &state)
             state, zoneEquipConfig, state.dataSize->CalcZoneSizing(state.dataSize->CurOverallSimDay, ControlledZoneNum), ControlledZoneNum);
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
-                // SpaceHB ToDo: For now allocate by space volume frac
                 sizeZoneSpaceEquipmentPart2(
                     state, zoneEquipConfig, state.dataSize->CalcSpaceSizing(state.dataSize->CurOverallSimDay, spaceNum), ControlledZoneNum, spaceNum);
             }
@@ -3112,11 +3110,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     //     the type of system being simulated.
     // 3.  Calculate zone energy requirements
 
-    bool SupPathInletChanged(false);
-    Real64 SysOutputProvided; // sensible output delivered by zone equipment (W)
-    Real64 LatOutputProvided; // latent output delivered by zone equipment (kg/s)
-    Real64 AirSysOutput;
-    Real64 NonAirSysOutput;
+    bool SupPathInletChanged = false;
+    Real64 SysOutputProvided = 0.0; // sensible output delivered by zone equipment (W)
+    Real64 LatOutputProvided = 0.0; // latent output delivered by zone equipment (kg/s)
+    Real64 AirSysOutput = 0.0;
+    Real64 NonAirSysOutput = 0.0;
 
     // Determine flow rate and temperature of supply air based on type of damper
 
@@ -3195,12 +3193,13 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         zoneEquipConfig.ZoneExhBalanced = 0.0;
         zoneEquipConfig.PlenumMassFlow = 0.0;
         state.dataSize->CurZoneEqNum = ControlledZoneNum;
-        if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->SysSizingCalc) {
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing) {
             for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
                 auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
                 thisSpaceHB.NonAirSystemResponse = 0.0;
                 thisSpaceHB.SysDepZoneLoads = 0.0;
                 auto &thisSpaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(spaceNum);
+                if (!thisSpaceEquipConfig.IsControlled) continue;
                 thisSpaceEquipConfig.ZoneExh = 0.0;
                 thisSpaceEquipConfig.ZoneExhBalanced = 0.0;
                 thisSpaceEquipConfig.PlenumMassFlow = 0.0;
@@ -3222,6 +3221,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             const int EquipPtr = state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipPtr;
             SysOutputProvided = 0.0;
             LatOutputProvided = 0.0;
+            NonAirSysOutput = 0.0;
             state.dataSize->DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
 
             // Reset ZoneEqSizing data (because these may change from one equipment type to the next)
@@ -3295,7 +3295,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                                         ControlledZoneNum,
                                                                         zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += NonAirSysOutput;
                 SysOutputProvided = NonAirSysOutput + AirSysOutput;
             } break;
 
@@ -3416,7 +3415,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                     SysOutputProvided,
                                                     zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += SysOutputProvided;
+                NonAirSysOutput = SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
 
@@ -3428,7 +3427,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                           SysOutputProvided,
                                                           zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += SysOutputProvided;
+                NonAirSysOutput = SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
 
@@ -3440,7 +3439,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                 SysOutputProvided,
                                                 zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += SysOutputProvided;
+                NonAirSysOutput = SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
 
@@ -3451,7 +3450,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                         SysOutputProvided,
                                                         zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += SysOutputProvided;
+                NonAirSysOutput = SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
 
@@ -3463,7 +3462,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                     SysOutputProvided,
                                                     zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += SysOutputProvided;
+                NonAirSysOutput = SysOutputProvided;
                 LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
             } break;
 
@@ -3562,7 +3561,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                             SysOutputProvided,
                                                             zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += SysOutputProvided;
+                NonAirSysOutput = SysOutputProvided;
                 LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
             } break;
 
@@ -3575,7 +3574,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                    LatOutputProvided,
                                                    zoneEquipList.EquipIndex(EquipPtr));
 
-                thisZoneHB.NonAirSystemResponse += SysOutputProvided;
+                NonAirSysOutput = SysOutputProvided;
             } break;
 
             case ZoneEquipType::UserDefinedHVACForcedAir: {
@@ -3626,12 +3625,13 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             }
 
             // If SpaceHVAC is active and this equipment has a space splitter, distribute the equipment output and update the spaces
-            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->SysSizingCalc &&
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
                 zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
                 auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)];
                 for (auto &space : thisZeqSplitter.spaces) {
                     Real64 spaceSysOutputProvided = SysOutputProvided * space.outputFraction;
                     Real64 spaceLatOutputProvided = LatOutputProvided * space.outputFraction;
+                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(space.spaceIndex).NonAirSystemResponse += NonAirSysOutput;
                     if (thisZeqSplitter.zoneEquipOutletNodeNum > 0 && space.spaceInletNodeNum > 0) {
                         auto &equipOutletNode = state.dataLoopNodes->Node(thisZeqSplitter.zoneEquipOutletNodeNum);
                         auto &spaceInletNode = state.dataLoopNodes->Node(space.spaceInletNodeNum);
@@ -3650,6 +3650,8 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                                state.dataZoneEnergyDemand->spaceSysMoistureDemand(space.spaceIndex),
                                                EquipTypeNum);
                 }
+            } else {
+                thisZoneHB.NonAirSystemResponse += NonAirSysOutput;
             }
             // Space HVAC TODO: For now, update both spaces and zone, but ultimately update one or the other
             updateSystemOutputRequired(state,
@@ -3662,14 +3664,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             state.dataSize->CurTermUnitSizingNum = 0;
         } // zone equipment loop
-        if (state.dataHeatBal->doSpaceHeatBalance) {
-            for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
-                // SpaceHB ToDo: For now allocate by space volume frac
-                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).NonAirSystemResponse =
-                    thisZoneHB.NonAirSystemResponse * state.dataHeatBal->space(spaceNum).fracZoneVolume;
-            }
-        }
-    } // End of controlled zone loop
+    }     // End of controlled zone loop
     state.dataSize->CurZoneEqNum = 0;
     state.dataZoneEquipmentManager->FirstPassZoneEquipFlag = false;
 
