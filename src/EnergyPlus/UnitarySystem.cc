@@ -1324,16 +1324,16 @@ namespace UnitarySystems {
         UnitarySys::getPackagedTerminalUnitData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
         UnitarySys::getUnitarySystemInputData(state, objectName, ZoneEquipment, ZoneOAUnitNum, errorsFound);
 
+        if (errorsFound) {
+            ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
+        }
+
         // all systems should have been processed at this point? I think so, so don't need to if test this call?
         if (int(state.dataUnitarySystems->unitarySys.size()) == state.dataUnitarySystems->numUnitarySystems &&
             state.dataZoneEquip->ZoneEquipInputsFilled) {
-            if (UtilityRoutines::SameString(state.dataUnitarySystems->unitarySys[state.dataUnitarySystems->numUnitarySystems - 1].Name, objectName)) {
+            if (state.dataUnitarySystems->setupOutputOnce) {
                 setupAllOutputVars(state, state.dataUnitarySystems->numUnitarySystems);
             }
-        }
-
-        if (errorsFound) {
-            ShowFatalError(state, "getUnitarySystemInputData: previous errors cause termination. Check inputs");
         }
     }
 
@@ -17838,6 +17838,7 @@ namespace UnitarySystems {
                                    "setupAllOutputVar: Developer error. All report variables must be set up here after all systems are read in.");
                 }
             }
+            state.dataUnitarySystems->setupOutputOnce = false;
         } else {
             ShowSevereError(state,
                             "setupAllOutputVar: Developer error. Should never get here. Remove when confortable that UnitarySys::allocateUnitarySys "

@@ -993,6 +993,7 @@ struct UnitarySystemsData : BaseGlobalStruct
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
     bool getInputFlag = true;
+    bool setupOutputOnce = true;
 
     void clear_state() override
     {
@@ -1024,6 +1025,7 @@ struct UnitarySystemsData : BaseGlobalStruct
         initUnitarySystemsQActual = 0.0;
         getMSHPInputOnceFlag = true;
         getInputOnceFlag = true;
+        setupOutputOnce = true;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         getInputFlag = true;
