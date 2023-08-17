@@ -884,6 +884,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "    ,                      !- Evaporative Condenser Air Flow Rate",
         "    ,                      !- Evaporative Condenser Pump Rated Power Consumption",
         "    0.0,                   !- Crankcase Heater Capacity",
+        "    ,                      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "  Coil:Heating:Fuel,",
@@ -2097,6 +2098,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "    ,                        !- Evaporative Condenser Air Flow Rate",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption",
         "    0.0,                     !- Crankcase Heater Capacity",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0;                    !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "  Coil:Heating:Fuel,",

@@ -83,6 +83,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    AirCooled,               !- Condenser Type",
          "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
          "    ,                        !- Crankcase Heater Capacity {W}",
+         "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
          "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
          "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
          "    ,                        !- Supply Water Storage Tank Name",
@@ -2593,6 +2594,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
@@ -2720,6 +2722,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -2900,6 +2903,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -3075,6 +3079,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Cooling)
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -3177,6 +3182,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Heating)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
@@ -3311,6 +3317,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_AWHP)
         "    HPOutdoorWaterInletNode, !- Condenser Water Inlet Node Name",
         "    HPOutdoorWaterOutletNode,!- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name",
@@ -3953,6 +3960,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_Initialization)
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -4149,8 +4157,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 144);
-    EXPECT_EQ(NumAlphas, 49);
+    EXPECT_EQ(TotalArgs, 145);
+    EXPECT_EQ(NumAlphas, 50);
     EXPECT_EQ(NumNumbers, 95);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
@@ -4180,6 +4188,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedHeating_Initialization)
                           "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
                           "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
                           "    200.0,                   !- Crankcase Heater Capacity {W}",
+                          "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
                           "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
                           "    Resistive,               !- Defrost Strategy",
                           "    TIMED,                   !- Defrost Control",

@@ -12236,6 +12236,7 @@ DO iSys = 1, numCompactSysPVAV
       END IF
       CALL AddToObjFld('Air Outlet Node Name', base + pvavsAirHandlerNameOff,' Cooling Coil Outlet')
       CALL AddToObjStr('Crankcase Heater Capacity','')
+      CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater','')
       CALL AddToObjStr('Number of Capacity Stages','2')
       CALL AddToObjStr('Number of Enhanced Dehumidification Modes','1')
@@ -14253,6 +14254,7 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjStr('Evaporative Condenser Air Flow Rate','')
     CALL AddToObjStr('Evaporative Condenser Pump Rated Power Consumption','0')
     CALL AddToObjStr('Crankcase Heater Capacity','0')
+    CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
     CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation','10',.TRUE.)
     !CURVE:BIQUADRATIC
     CALL CreateNewObj('Curve:Biquadratic')
@@ -15022,6 +15024,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjStr('Outdoor Dry-Bulb Temperature to Turn On Compressor','')
   CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}', base + uhpsHPDefrMaxODBOff,'')
   CALL AddToObjStr('Crankcase Heater Capacity {W}','0')
+  CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
   CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}','0')
   CALL AddToObjFld('Defrost Strategy', base + uhpsHPDefrStrategyOff,'')
   CALL AddToObjFld('Defrost Control', base + uhpsHPDefrCtrlTypeOff,'')
@@ -15182,6 +15185,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjStr('Evaporative Condenser Air Flow Rate','')
   CALL AddToObjStr('Evaporative Condenser Pump Rated Power Consumption','0')
   CALL AddToObjStr('Crankcase Heater Capacity','0')
+  CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
   CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation','10',.TRUE.)
   !Object ==> Curve:Biquadratic
   CALL CreateNewObj('Curve:Biquadratic')
@@ -16232,6 +16236,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Evaporative Condenser Air Flow Rate','')
       CALL AddToObjStr('Evaporative Condenser Pump Rated Power Consumption','0')
       CALL AddToObjStr('Crankcase Heater Capacity','0')
+      CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation','10',.TRUE.)
       !Object ==> Curve:Biquadratic
       CALL CreateNewObj('Curve:Biquadratic')
@@ -16446,6 +16451,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjFld('Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Air Outlet Node Name',base + ussAirHandlerNameOff, TRIM(coolCoilUnitOutlet))
       CALL AddToObjStr('Crankcase Heater Capacity','')
+      CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater','')
       CALL AddToObjStr('Number of Capacity Stages','2')
       IF (coolCoilKind .EQ. ccTwoStageHumidControlDX) THEN
@@ -16801,6 +16807,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Evaporative Condenser Air Flow Rate','')
       CALL AddToObjStr('Evaporative Condenser Pump Rated Power Consumption','0')
       CALL AddToObjStr('Crankcase Heater Capacity','0')
+      CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation','10',.TRUE.)
       !***Curve:Biquadratic
       CALL CreateNewObj('Curve:Biquadratic')
@@ -16892,6 +16899,7 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Apply Part Load Fraction to Speeds Greater than 1','No')
       CALL AddToObjStr('Apply Latent Degradation to Speeds Greater than 1','No')
       CALL AddToObjStr('Crankcase Heater Capacity {W}','0.0')
+      CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}','10.0')
       CALL AddToObjStr('Basin Heater Capacity {W/K}','')
       CALL AddToObjStr('Basin Heater Setpoint Temperature {C}','')
@@ -17355,6 +17363,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Outdoor Dry-Bulb Temperature to Turn On Compressor','')
     CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}', base + ussHPDefrMaxODBOff,'')
     CALL AddToObjStr('Crankcase Heater Capacity {W}','0')
+    CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
     CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}','0')
     CALL AddToObjFld('Defrost Strategy', base + ussHPDefrStrategyOff,'')
     CALL AddToObjFld('Defrost Control', base + ussHPDefrCtrlTypeOff,'')
@@ -17432,6 +17441,7 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}', base + ussHPHeatMinODBOff,'')
     CALL AddToObjStr('Outdoor Dry-Bulb Temperature to Turn On Compressor','')
     CALL AddToObjStr('Crankcase Heater Capacity {W}','0.0')
+    CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
     CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}','10.0')
     CALL AddToObjFld('Defrost Energy Input Ratio Function of Temperature Curve Name',base + ussAirHandlerNameOff, &
                      ' Heat Coil Defr-FT')
@@ -25152,6 +25162,7 @@ IF (.NOT. isBaseboardNone) THEN
   CALL AddToObjStr('Evaporative Condenser Air Flow Rate','')
   CALL AddToObjStr('Evaporative Condenser Pump Rated Power Consumption','0')
   CALL AddToObjStr('Crankcase Heater Capacity','0')
+  CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
   CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation','10',.TRUE.)
   !CURVE:BIQUADRATIC ~ line 141
   CALL CreateNewObj('Curve:Biquadratic')
@@ -25769,6 +25780,7 @@ DO iZone = 1, numCompactPTHP
   CALL AddToObjStr('Evaporative Condenser Air Flow Rate','')
   CALL AddToObjStr('Evaporative Condenser Pump Rated Power Consumption','0')
   CALL AddToObjStr('Crankcase Heater Capacity','0')
+  CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
   CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation','10',.TRUE.)
   !CURVE:BIQUADRATIC ~ line 149
   CALL CreateNewObj('Curve:Biquadratic')
@@ -25853,6 +25865,7 @@ DO iZone = 1, numCompactPTHP
   CALL AddToObjStr('Outdoor Dry-Bulb Temperature to Turn On Compressor','')
   CALL AddToObjFld('Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}', base + pthpzHPDefrMaxODBOff,'')
   CALL AddToObjStr('Crankcase Heater Capacity {W}','0')
+  CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
   CALL AddToObjStr('Maximum Outdoor Dry-bulb Temperature for Crankcase Heater Operation {C}','0')
   CALL AddToObjFld('Defrost Strategy', base + pthpzHPDefrTypeOff,'')
   CALL AddToObjFld('Defrost Control', base + pthpzHPDefrCtrlTypeOff,'')
@@ -31968,6 +31981,7 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Air Inlet Node Name', TRIM(coolCoilUnitInlet))
       CALL AddToObjStr('Air Outlet Node Name',TRIM(coolCoilUnitOutlet))
       CALL AddToObjStr('Crankcase Heater Capacity','')
+      CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater','')
       CALL AddToObjStr('Number of Capacity Stages','2')
       IF (coolCoilKind .EQ. ccTwoStageHumidControlDX) THEN
@@ -32342,6 +32356,7 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Evaporative Condenser Air Flow Rate','')
       CALL AddToObjStr('Evaporative Condenser Pump Rated Power Consumption','0')
       CALL AddToObjStr('Crankcase Heater Capacity','0')
+      CALL AddToObjStr('Crankcase Heater Capacity Function of Temperature Curve Name','')
       CALL AddToObjStr('Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation','10',.TRUE.)
       !***Curve:Biquadratic
       CALL CreateNewObj('Curve:Biquadratic')

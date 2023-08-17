@@ -2972,6 +2972,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Name
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -3717,6 +3718,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 2 Furnace DX Cool Cooling Coil Performance,  !- Name
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -4077,6 +4079,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 3 Heat Pump Air Source Cooling Coil Performance,  !- Name
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -4208,6 +4211,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     0,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     Timed,                   !- Defrost Control
@@ -4519,6 +4523,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 4 Heat Pump Air Source Cooling Coil Performance,  !- Name
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -4650,6 +4655,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     0,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     Timed,                   !- Defrost Control
@@ -4961,6 +4967,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 5 Furnace DX Cool Cooling Coil Performance,  !- Name
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}

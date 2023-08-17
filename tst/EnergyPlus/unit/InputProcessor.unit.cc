@@ -3577,6 +3577,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
         "  AirCooled, !- Condenser Type",
         "  , !- Evaporative Condenser Pump Rated Power Consumption{ W }",
         "  200.0, !- Crankcase Heater Capacity{ W }",
+        "  heaterCapCurve,      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "  10.0, !- Maximum Outdoor Dry - Bulb Temperature for Crankcase Heater Operation{ C }",
         "  , !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation",
         "  , !- Supply Water Storage Tank Name",
@@ -3704,6 +3705,13 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
         "  CoolCapFFF, !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
         "  COOLEIRFT, !- Speed 10 Energy Input Ratio Function of Temperature Curve Name",
         "  COOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+        "Curve:Linear,",
+        "heaterCapCurve,          !- Name",
+        "10.0,                    !- Coefficient1 Constant",
+        "-2.0,                      !- Coefficient2 x",
+        "-10.0,                    !- Minimum Value of x",
+        "70;                      !- Maximum Value of x",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3740,13 +3748,14 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_EQ(49, NumAlphas);
+    EXPECT_EQ(50, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"FURNACE ACDXCOIL 1",
                                                              "DX COOLING COIL AIR INLET NODE",
                                                              "HEATING COIL AIR INLET NODE",
                                                              "PLFFPLR",
                                                              "",
                                                              "AIRCOOLED",
+                                                             "HEATERCAPCURVE",
                                                              "",
                                                              "",
                                                              "",
@@ -3792,9 +3801,9 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
                                                              "COOLEIRFFF"}),
                                    Alphas));
     EXPECT_TRUE(compare_containers(
-        std::vector<bool>({false, false, false, false, true,  false, true,  true,  true,  false, false, false, false, false, false, false, false,
+        std::vector<bool>({false, false, false, false, true,  false, false, true,  true,  true,  false, false, false, false, false, false, false,
                            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-                           false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}),
+                           false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}),
         lAlphaBlanks));
 
     EXPECT_EQ(95, NumNumbers);
