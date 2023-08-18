@@ -3149,7 +3149,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 // if flow rate has been specified by a manager, set it to the specified value
                 thisOAController.MixMassFlow =
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac * state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
-                state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate = thisOAController.MixMassFlow - thisOAController.ExhMassFlow;
+                // state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate = thisOAController.MixMassFlow - thisOAController.ExhMassFlow;
             } else {
                 thisOAController.MixMassFlow = state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
 
