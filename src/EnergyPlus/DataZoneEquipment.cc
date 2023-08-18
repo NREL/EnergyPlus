@@ -1292,7 +1292,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
     bool found = false;
     auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
     for (int exhNodeNum : thisZoneEquipConfig.ExhaustNode) {
-        if (thisZeqMixer.zoneEquipInletNodeNum = exhNodeNum) {
+        if (thisZeqMixer.zoneEquipInletNodeNum == exhNodeNum) {
             found = true;
             break;
         }
@@ -1340,7 +1340,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
                 bool found = false;
                 auto &thisSpaceEquipConfig = state.dataZoneEquip->spaceEquipConfig(thisZeqSpace.spaceIndex);
                 for (int exhNodeNum : thisSpaceEquipConfig.ExhaustNode) {
-                    if (thisZeqSpace.spaceNodeNum = exhNodeNum) {
+                    if (thisZeqSpace.spaceNodeNum == exhNodeNum) {
                         found = true;
                         break;
                     }
