@@ -210,11 +210,12 @@ namespace VariableSpeedCoils {
         Real64 DefrostPower;            // power used during defrost
         Real64 DefrostConsumption;      // energy used during defrost
         // crankcase heater
-        bool ReportCoolingCoilCrankcasePower; // logical determines if the cooling coil crankcase heater power is reported
-        Real64 CrankcaseHeaterCapacity;       // total crankcase heater capacity [W]
-        Real64 CrankcaseHeaterPower;          // report variable for average crankcase heater power [W]
-        Real64 MaxOATCrankcaseHeater;         // maximum OAT for crankcase heater operation [C]
-        Real64 CrankcaseHeaterConsumption;    // report variable for total crankcase heater energy consumption [J]
+        bool ReportCoolingCoilCrankcasePower;  // logical determines if the cooling coil crankcase heater power is reported
+        Real64 CrankcaseHeaterCapacity;        // total crankcase heater capacity [W]
+        Real64 CrankcaseHeaterPower;           // report variable for average crankcase heater power [W]
+        int CrankcaseHeaterCapacityCurveIndex; // Crankcase heater power-temperature curve or table index
+        Real64 MaxOATCrankcaseHeater;          // maximum OAT for crankcase heater operation [C]
+        Real64 CrankcaseHeaterConsumption;     // report variable for total crankcase heater energy consumption [J]
         // condenser evaporative precooling
         int CondenserInletNodeNum;                          // Node number of outdoor condenser
         DataHeatBalance::RefrigCondenserType CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
@@ -310,15 +311,15 @@ namespace VariableSpeedCoils {
               SpeedNumReport(0.0), SpeedRatioReport(0.0), DefrostStrategy(0), DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0),
               OATempCompressorOn(0.0), MaxOATDefrost(0.0), DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0),
               HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0), DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true),
-              CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0),
-              CondenserInletNodeNum(0), CondenserType(DataHeatBalance::RefrigCondenserType::Air), ReportEvapCondVars(false),
-              EvapCondPumpElecNomPower(0.0), EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0),
-              EvapWaterConsump(0.0), BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),
-              BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataHVACGlobals::MaxSpeedLevels, 0.0), EvapCondEffect(DataHVACGlobals::MaxSpeedLevels, 0.0),
-              MSRatedEvapCondVolFlowPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0), EvapWaterSupplyMode(101), EvapWaterSupTankID(0),
-              EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
-              CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0), SourceAirMassFlowRate(0.0), InletSourceAirTemp(0.0),
-              InletSourceAirEnthalpy(0.0),
+              CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0), CrankcaseHeaterCapacityCurveIndex(0), MaxOATCrankcaseHeater(0.0),
+              CrankcaseHeaterConsumption(0.0), CondenserInletNodeNum(0), CondenserType(DataHeatBalance::RefrigCondenserType::Air),
+              ReportEvapCondVars(false), EvapCondPumpElecNomPower(0.0), EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0),
+              EvapCondPumpElecConsumption(0.0), EvapWaterConsump(0.0), BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
+              BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0), BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              EvapCondEffect(DataHVACGlobals::MaxSpeedLevels, 0.0), MSRatedEvapCondVolFlowPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0),
+              EvapWaterSupplyMode(101), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0),
+              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0),
+              SourceAirMassFlowRate(0.0), InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
               // begin varibles for HPWH
               RatedCapWH(0.0),                  // Rated water heating Capacity [W]
               InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects

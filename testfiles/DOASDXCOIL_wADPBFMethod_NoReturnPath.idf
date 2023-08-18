@@ -2469,6 +2469,7 @@
     DOAS Supply Fan Outlet,  !- Air Inlet Node Name
     DOAS Cooling Coil Outlet,!- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     1,                       !- Number of Enhanced Dehumidification Modes

@@ -2237,6 +2237,15 @@ The name of a quadratic or cubic normalized curve (Ref: Performance Curves) that
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed. This is an optional input field specified only when user desires to reject the condenser heat into a zone. The heat rejected is modeled as sensible internal gain of a secondary zone.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for a Coil:Cooling:DX:SingleSpeed coil.
 
 \begin{lstlisting}
@@ -2709,6 +2718,15 @@ This numeric field contains the set point temperature ($^\circ$C) for the basin 
 
 This alpha field contains the name of the basin heater operating schedule. This field only applies for Condenser Type = EvaporativelyCooled. The basin heater operating schedule is assumed to be an on/off schedule and the heater is available to operate any time the schedule value is greater than 0. The basin heater operates when scheduled on and the outdoor air dry-bulb temperature is below the set point temperature described in the previous field. If this field is left blank, the basin heater is available to operate throughout the simulation. Regardless of this schedule, the basin heater may only operate when the DX coil is off.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-1}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example IDF use of the object:
 
 \begin{lstlisting}
@@ -2953,6 +2971,15 @@ The rated power of the evaporative condenser water pump in Watts at Speed \textl
 \paragraph{Field: Zone Name for Condenser Placement}\label{field-zone-name-for-condenser-placement-2}
 
 This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed. This is an optional input field specified only when user desires to reject the condenser heat into a zone. The heat rejected is modeled as sensible internal gain of a secondary zone.
+
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-2}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for this multispeed DX cooling coil.
 
@@ -4225,6 +4252,15 @@ This input field is name of sensible heat ratio modifier biquadratic curve. The 
 
 This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field. If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-4}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for the object.
 
 \begin{lstlisting}
@@ -4512,6 +4548,15 @@ This input field is name of sensible heat ratio modifier biquadratic curve. The 
 \paragraph{Field: Speed \textless{}x\textgreater{} Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}\label{field-speed-x-sensible-heat-ratio-modifier-function-of-flow-fraction-curve-name}
 
 This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field. If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
+
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-5}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for a multi-speed heating DX coil.
 
@@ -6029,6 +6074,15 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
        PLF = 1.0 + 0.0(PLR)
 \end{lstlisting}
 
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-7}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
+
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Pumped! object:
 
 \begin{lstlisting}
@@ -6238,6 +6292,15 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 \begin{lstlisting}
        PLF = 1.0 + 0.0(PLR)
 \end{lstlisting}
+
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{outdoor-temperature-dependent-crankcase-heater-capacity-curve-name-8}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:Wrapped! object:
 
@@ -6598,6 +6661,15 @@ The output of this curve is multiplied by the rated COP at this specific speed a
 
 This alpha field specifies the name of a \textbf{quadratic} or \textbf{cubic} performance curve object (ref: Performance Curves) that defines the variation in DX coil heating COP as a function of the ratio of actual water flow rate through the condenser to the rated condenser water flow rate.
 The output of this curve is multiplied by the rated COP at this specific speed and the output from the two other heating COP modifier curves (function of temperature and function of air flow fraction) to give the DX coil heating COP at the specific inlet fluid temperatures and flow rates at which the coil is operating. The curve should be normalized to have the value of 1.0 at the rated condenser water flow rate (water flow fraction of 1.0). If this field is left blank, the heating COP remains constant (curve value assumed to be 1.0 for all water flow rates).
+
+\paragraph{Field: Crankcase Heater Capacity Function of Temperature Curve Name}\label{vshpwhheating-outdoor-temperature-dependent-crankcase-heater-capacity-curve-name}
+
+The name of a normalized Curve:* or Table:Lookup object encoding the
+relationship between the crankcase heater capacity and the outdoor air
+temperature. This curve can be any uni-variate curve or table. The output of
+this curve is multiplied by the value in the field ``Crankcase Heater Capacity'.
+If this field is missing or empty, constant crankcase heater capacity will be
+assumed.
 
 Following is an example input for the \lstinline!Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed! object:
 
