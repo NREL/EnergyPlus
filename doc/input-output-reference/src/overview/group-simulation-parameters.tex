@@ -548,7 +548,7 @@ This is the rate of generic air contaminant added (or subtracted) to a zone from
 
 \subsection{ShadowCalculation}\label{shadowcalculation}
 
-This object is used to control some details of EnergyPlus's solar, shadowing and daylighting models. There are two basic methods available for the calculations. In order to speed up the calculations, shadowing calculations (sun position, etc.) for the default method are performed over a period of days. Note that this value may be very important for determining the amount of sun entering your building and by inference the amount of cooling or heating load needed for maintaining the building. Though termed ``shadowing'' calculations, it in affect determines the sun position for a particular day in a weather file period simulation. (Each design day will use the date of the design day object). Even though weather file data contains the amount of solar radiation, the internal calculation of sun position will govern how that affects various parts of the building. By default, the calculations are done for every 20 days throughout a weather run period; an average solar position is chosen and the solar factors (such as sunlit areas of surfaces) remain the same for that number of days. When more integrated calculations are needed for controlling dynamic windows or shades, a second method is available where solar calculations are performed at each zone timestep.
+This object is used to control some details of EnergyPlus's solar, shadowing and daylighting models. There are two basic methods available for the calculations. In order to speed up the calculations, shadowing calculations (sun position, etc.) for the default method are performed over a period of days. Note that this value may be very important for determining the amount of sun entering your building and by inference the amount of cooling or heating load needed for maintaining the thermostatic setpoint temperature(s) of the building. Though termed ``shadowing'' calculations, it in effect determines the sun position for a particular day in a weather file period simulation. (Each design day will use the date of the design day object.) Even though weather file data contains the amount of solar radiation, the internal calculation of sun position will govern how that affects various parts of the building. By default, the calculations are done for every 20 days throughout a weather run period; an average solar position is chosen and the solar factors (such as sunlit areas of surfaces) remain the same for that number of days. When more integrated calculations are needed for controlling dynamic windows or shades, a second method is available where solar calculations are performed at each zone timestep.
 
 This object also allows setting up global flags to import and export exterior shading calculations results. This enables importing pre-calculated results of the shading fractions for each exterior building surface from external simulation tools. This also enables reusing the shading results for parametric runs which usually do not change external shading.
 
@@ -562,13 +562,11 @@ Select between CPU-based polygon clipping method, the GPU-based pixel counting m
 
 Choices are:
 \begin{enumerate}
-    \item PolygonClipping
+    \item PolygonClipping (default)
     \item PixelCounting
     \item Scheduled
     \item Imported
 \end{enumerate}
-
-Default: PolygonClipping
 
 If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping. Unlike PolygonClipping, PixelCounting has no limitations related to zone concavity when used with any ``FullInterior'' solar distribution options (i.e., it can accommodate both concave and convex zones equally).
 
@@ -576,7 +574,7 @@ Use of the PixelCounting method requires some overhead in passing instructions b
 
 Some computers have multiple GPUs. In this case, the highest performance GPU is not always used by default. You may want to select which GPU is used when running EnergyPlus by setting the graphics performance preferences on your computer.
 
-If \textbf{Scheduled} is chosen, the External Shading Fraction Schedule Name is required in \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
+If \textbf{Scheduled} is chosen, the Sunlit Fraction Schedule Name is required in \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}. The values entered using this schedule name are then used to determine what the fraction of the surface referenced by the SurfaceProperty:LocalEnvironment input is sunlit. If any surfaces does not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects or no schedule is assigned in the Sunlit Fraction Schedule Name field, no shading is assigned on those surfaces or, in other words, the surface is assumed to be in full sun (sunlit fraction equal to 1).
 
 If \textbf{Imported} is chosen, the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
 

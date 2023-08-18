@@ -8289,23 +8289,24 @@ namespace SurfaceGeometry {
                     SurfLocalEnv.SurfPtr = SurfNum;
                 }
 
-                // Assign External Shading Schedule number
+                // Assign Sunlit Fraction Schedule number
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    int ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-                    if (ExtShadingSchedNum == 0) {
+                    int SunlitFracSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                    if (SunlitFracSchedNum == 0) {
                         ShowSevereError(state,
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                                RoutineName,
                                                cCurrentModuleObject,
                                                SurfLocalEnv.Name,
                                                state.dataIPShortCut->cAlphaFieldNames(3)));
-                        ShowContinueError(state,
-                                          format("{} entered value = \"{}\", no corresponding shading schedule has been found in the input file.",
-                                                 state.dataIPShortCut->cAlphaFieldNames(3),
-                                                 state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowContinueError(
+                            state,
+                            format("{} entered value = \"{}\", no corresponding sunlit fraction schedule has been found in the input file.",
+                                   state.dataIPShortCut->cAlphaFieldNames(3),
+                                   state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     } else {
-                        SurfLocalEnv.ExtShadingSchedPtr = ExtShadingSchedNum;
+                        SurfLocalEnv.SunlitFracSchedPtr = SunlitFracSchedNum;
                     }
                 }
 
@@ -8390,9 +8391,9 @@ namespace SurfaceGeometry {
                     if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
                         surface.SurfLinkedOutAirNode = SurfLocalEnv.OutdoorAirNodePtr;
                     }
-                    if (SurfLocalEnv.ExtShadingSchedPtr != 0) {
+                    if (SurfLocalEnv.SunlitFracSchedPtr != 0) {
                         surface.SurfSchedExternalShadingFrac = true;
-                        surface.SurfExternalShadingSchInd = SurfLocalEnv.ExtShadingSchedPtr;
+                        surface.SurfExternalShadingSchInd = SurfLocalEnv.SunlitFracSchedPtr;
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         surface.SurfHasSurroundingSurfProperty = true;
