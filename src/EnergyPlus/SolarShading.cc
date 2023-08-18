@@ -464,6 +464,7 @@ void GetShadowingInput(EnergyPlusData &state)
         if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Scheduled")) {
             state.dataSysVars->shadingMethod = ShadingMethod::Scheduled;
             state.dataIPShortCut->cAlphaArgs(aNum) = "Scheduled";
+            checkScheduledSurfacePresent(state);
         } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(aNum), "Imported")) {
             if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
                 state.dataSysVars->shadingMethod = ShadingMethod::Imported;
@@ -800,6 +801,37 @@ void GetShadowingInput(EnergyPlusData &state)
           state.dataIPShortCut->cAlphaArgs(5),
           state.dataIPShortCut->cAlphaArgs(6),
           state.dataIPShortCut->cAlphaArgs(7));
+}
+
+void checkScheduledSurfacePresent(EnergyPlusData &state)
+{
+    // User has chosen "Scheduled" for sunlit fraction so check to see which surfaces don't have a schedule
+    int numNotDef = 0;
+    int constexpr maxErrMessages = 50;
+    auto &surfData = state.dataSurface;
+    for (int surfNum = 1; surfNum <= surfData->TotSurfaces; ++surfNum) {
+        auto &thisSurf = surfData->Surface(surfNum);
+        if ((thisSurf.Class == SurfaceClass::Shading || thisSurf.Class == SurfaceClass::Detached_F || thisSurf.Class == SurfaceClass::Detached_B ||
+             thisSurf.Class == SurfaceClass::Overhang || thisSurf.Class == SurfaceClass::Fin))
+            continue; // skip shading surfaces
+        if (!thisSurf.SurfSchedExternalShadingFrac) {
+            numNotDef += 1;
+            if (numNotDef == 1) {
+                ShowWarningError(
+                    state,
+                    format("ShadowCalculation specified Schedule for the Shading Calculation Method but no schedule provided for {}", thisSurf.Name));
+                ShowContinueError(
+                    state, "When Schedule is selected for the Shading Calculation Method and no schedule is provided for a particular surface,");
+                ShowContinueError(
+                    state, "EnergyPlus will assume that the surface is not shaded.  Use SurfaceProperty:LocalEnvironment to specify a schedule");
+                ShowContinueError(state, "for sunlit fraction if this was not desired.  Otherwise, this surface will not be shaded at all.");
+            } else if (numNotDef <= maxErrMessages) {
+                ShowWarningError(state, format("No schedule was provided for {} either.  See above error message for more details", thisSurf.Name));
+            }
+        }
+    }
+    if (numNotDef > maxErrMessages)
+        ShowContinueError(state, format("This message is only shown for the first {} occurrences of this issue.", maxErrMessages));
 }
 
 void AllocateModuleArrays(EnergyPlusData &state)

@@ -1268,7 +1268,7 @@ namespace DataSurfaces {
         // Members
         std::string Name;
         int SurfPtr = 0;             // surface pointer
-        int ExtShadingSchedPtr = 0;  // schedule pointer
+        int SunlitFracSchedPtr = 0;  // schedule pointer
         int SurroundingSurfsPtr = 0; // schedule pointer
         int OutdoorAirNodePtr = 0;   // outdoor air node pointer
         int GroundSurfsPtr = 0;      // pointer to multiple ground surfaces object
