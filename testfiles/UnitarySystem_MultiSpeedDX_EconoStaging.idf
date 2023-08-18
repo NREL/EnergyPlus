@@ -2397,10 +2397,6 @@
     Autosize,                !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -2450,6 +2446,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Name
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -2859,10 +2856,6 @@
     Autosize,                !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -2912,6 +2905,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 2 Furnace DX Cool Cooling Coil Performance,  !- Name
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -3307,10 +3301,6 @@
     Autosize,                !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -3443,6 +3433,7 @@
     -8,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Sys 3 Heat Pump Air Source Heat Coil Defr-FT,  !- Defrost Energy Input Ratio Function of Temperature Curve Name
     5,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
@@ -3839,10 +3830,6 @@
     Autosize,                !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -3975,6 +3962,7 @@
     -8,                      !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Sys 4 Heat Pump Air Source Heat Coil Defr-FT,  !- Defrost Energy Input Ratio Function of Temperature Curve Name
     5,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
@@ -4371,10 +4359,6 @@
     Autosize,                !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -4424,6 +4408,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Sys 5 Furnace DX Cool Cooling Coil Performance,  !- Name
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -4768,6 +4753,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}
@@ -4870,11 +4856,15 @@
     ,                        !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     ,                        !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     ,                        !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate
+    ,                        !- Latent Capacity Time Constant
+    ,                        !- Fan Delay Time
     Sys 4 Heat Pump Air Source Heat Coil PLF,  !- Energy Part Load Fraction Curve Name
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     -25,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
@@ -4929,9 +4919,7 @@
     Sys 4 Heat Pump Air Source Cool Coil Cap-FT,  !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
     Sys 4 Heat Pump Air Source Cool Coil Cap-FF,  !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     Sys 4 Heat Pump Air Source Cool Coil EIR-FT,  !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
-    Sys 4 Heat Pump Air Source Cool Coil EIR-FF,  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
-    ,                        !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
-    ;                        !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    Sys 4 Heat Pump Air Source Cool Coil EIR-FF;  !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Output:Variable,Sys 1 Furnace DX Cool Unitary System,Unitary System DX Coil Speed Level,timestep;
 
@@ -5036,4 +5024,7 @@
   Output:Variable,*,Unitary System Fan Part Load Ratio,timestep;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,timestep;
-
+  
+  Output:Variable,*,Cooling Coil Air Outlet Temperature,timestep; !- HVAC Average [C]
+  
+  Output:Variable,*,Cooling Coil Air Outlet Humidity Ratio,timestep; !- HVAC Average [kgWater/kgDryAir]
