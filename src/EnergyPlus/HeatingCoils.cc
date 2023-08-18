@@ -642,7 +642,7 @@ namespace HeatingCoils {
             heatingCoil.HeatingCoilModel = "Fuel";
             heatingCoil.HCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
 
-            heatingCoil.FuelType = static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, Alphas(3)));
+            heatingCoil.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, Alphas(3)));
             if (!(heatingCoil.FuelType == Constant::eFuel::NaturalGas || heatingCoil.FuelType == Constant::eFuel::Propane ||
                   heatingCoil.FuelType == Constant::eFuel::Diesel || heatingCoil.FuelType == Constant::eFuel::Gasoline ||
                   heatingCoil.FuelType == Constant::eFuel::FuelOilNo1 || heatingCoil.FuelType == Constant::eFuel::FuelOilNo2 ||
@@ -784,7 +784,7 @@ namespace HeatingCoils {
             SetupOutputVariable(state,
                                 "Heating Coil Ancillary " + sFuelType + " Energy",
                                 OutputProcessor::Unit::J,
-                                heatingCoil.ParasiticFuelLoad,
+                                heatingCoil.ParasiticFuelConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
@@ -982,7 +982,7 @@ namespace HeatingCoils {
             SetupOutputVariable(state,
                                 "Heating Coil Ancillary NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                heatingCoil.ParasiticFuelLoad,
+                                heatingCoil.ParasiticFuelConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
@@ -2915,7 +2915,7 @@ namespace HeatingCoils {
         heatingCoil.FuelUseLoad *= TimeStepSysSec;
         heatingCoil.ElecUseLoad *= TimeStepSysSec;
 
-        heatingCoil.ParasiticFuelLoad = heatingCoil.ParasiticFuelRate * TimeStepSysSec;
+        heatingCoil.ParasiticFuelConsumption = heatingCoil.ParasiticFuelRate * TimeStepSysSec;
 
         std::string coilObjClassName;
         switch (heatingCoil.HCoilType_Num) {

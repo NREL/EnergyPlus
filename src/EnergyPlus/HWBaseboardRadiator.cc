@@ -253,8 +253,7 @@ namespace HWBaseboardRadiator {
             2); //  get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AllFracsSummed; // Sum of the fractions radiant
-        int BaseboardNum;      // Baseboard number
+        int BaseboardNum; // Baseboard number
         int BaseboardDesignNum;
         int NumAlphas;  // Number of Alphas for each GetobjectItem call
         int NumNumbers; // Number of Numbers for each GetobjectItem call
@@ -304,7 +303,7 @@ namespace HWBaseboardRadiator {
 
             // Determine HW radiant baseboard heating design capacity sizing method
             thisHWBaseboardDesign.HeatingCapMethod = static_cast<DataSizing::DesignSizingType>(
-                getEnumerationValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
+                getEnumValue(DataSizing::DesignSizingTypeNamesUC, state.dataIPShortCut->cAlphaArgs(iHeatCAPMAlphaNum)));
             if (thisHWBaseboardDesign.HeatingCapMethod == DataSizing::DesignSizingType::CapacityPerFloorArea) {
                 if (!state.dataIPShortCut->lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
                     thisHWBaseboardDesign.ScaledHeatingCapacity = state.dataIPShortCut->rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -595,8 +594,7 @@ namespace HWBaseboardRadiator {
             }
 
             // Remaining fraction is added to the zone as convective heat transfer
-            AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
-            if (AllFracsSummed > MaxFraction) {
+            if (HWBaseboardDesignDataObject.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", Fraction Radiant was higher than the allowable maximum.",
                                         RoutineName,
@@ -605,7 +603,7 @@ namespace HWBaseboardRadiator {
                 HWBaseboardDesignDataObject.FracRadiant = MaxFraction;
                 thisHWBaseboard.FracConvect = 0.0;
             } else {
-                thisHWBaseboard.FracConvect = 1.0 - AllFracsSummed;
+                thisHWBaseboard.FracConvect = 1.0 - HWBaseboardDesignDataObject.FracRadiant;
             }
 
             thisHWBaseboard.TotSurfToDistrib = NumNumbers - 4;
@@ -631,9 +629,9 @@ namespace HWBaseboardRadiator {
             thisHWBaseboard.FracDistribToSurf = 0.0;
 
             thisHWBaseboard.ZonePtr =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBWater, thisHWBaseboard.Name);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardWater, thisHWBaseboard.Name);
 
-            AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
+            Real64 AllFracsSummed = HWBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= thisHWBaseboard.TotSurfToDistrib; ++SurfNum) {
                 thisHWBaseboard.SurfacePtr(SurfNum) =
                     HeatBalanceIntRadExchange::GetRadiantSystemSurface(state,
@@ -664,7 +662,7 @@ namespace HWBaseboardRadiator {
                     thisHWBaseboard.TotSurfToDistrib = MinFraction;
                 }
                 if (thisHWBaseboard.SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(thisHWBaseboard.SurfacePtr(SurfNum)) = true;
+                    state.dataSurface->surfIntConv(thisHWBaseboard.SurfacePtr(SurfNum)).getsRadiantHeat = true;
                 }
 
                 AllFracsSummed += thisHWBaseboard.FracDistribToSurf(SurfNum);
