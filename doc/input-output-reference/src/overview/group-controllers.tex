@@ -295,6 +295,10 @@ This choice field determines if specialized control is used to optimize the use 
 
 An Example IDF specification:
 
+\paragraph{Field: Economizer Staging Operation}\label{field-economizer-staging-operation}
+
+This input is only applicable when the controller is used on an air loop that includes an \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} with multiple cooling speeds. When modeling an \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} with multiple cooling speeds, (as specified in a [unitarysystemperformancemultispeed]{UnitarySystemPerformance:Multispeed}), \textbf{EconomizerFirst} runs the economizer at all speeds, all the way to the highest cooling speed before mechanical cooling is used to meet the load. \textbf{InterlockedWithMechanicalCooling} runs the economizer at the cooling speed chosen by the \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}. Use \textbf{EconomizerFirst} to model typical economizer operation for multi-speed packaged single-zone equipment with sensible load control (\textbf{Control Type} input of the \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} should be set to \textbf{Load}) and \textbf{InterlockedWithMechanicalCooling} otherwise (default input). \textbf{EconomizerFirst} works with both continuously operating and cycling fans but the approach it uses to determine at which speed the system should run to meet the load is the same. At each timestep, the system flow rate is chosen based on the lowest speed available speed that can meet the load assuming economizer-only operation, the outdoor air fraction to meet the load the load is then calculated (limits imposed by other inputs of the controller are applied).
+
 \begin{lstlisting}
 
 Controller:OutdoorAir,
