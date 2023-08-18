@@ -454,7 +454,7 @@ namespace DataZoneEquipment {
     {
         int spaceIndex = 0;          // Index to a space
         Real64 outputFraction = 0.0; // Fraction of equipment output (either flow or heating/cooling) to this space
-        int spaceInletNodeNum = 0;   // Space Inlet Node number (zero if not airflow equipment)
+        int spaceNodeNum = 0;        // Space Inlet Node number (zero if not airflow equipment)
     };
 
     struct ZoneEquipmentSplitter
@@ -556,7 +556,6 @@ namespace DataZoneEquipment {
 
     void processZoneEquipMixerInput(EnergyPlusData &state,
                                     std::string_view zeqMixerModuleObject,
-                                    int const zeqMixerNum,
                                     int const zoneNum,
                                     InputProcessor::json const objectSchemaProps,
                                     InputProcessor::json const objectFields,
