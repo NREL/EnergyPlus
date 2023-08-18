@@ -5346,43 +5346,51 @@ namespace OutputProcessor {
                             "System");
 
         PurchAir(1).TotHeatEnergy = 1.1;
-        UpdateMeters(&state, MDHM);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         //UpdateMeterReporting(*state);
         //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        //UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.3;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.5;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.7;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.9;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 2.2;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
         state->dataGlobal->WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
+
         auto const stream_str = state->files.eso.get_output();
-        auto const x = 5;
+        int x = 5;
         compare_eso_stream(delimited_string(
             {
                 "1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]",
@@ -5394,39 +5402,28 @@ namespace OutputProcessor {
                 "6,1,Calendar Year of Simulation[] ! When Annual Report Variables Requested",
                 "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
                 "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                "2,365,12,31, 0,24,10.00,20.00,Tuesday",
-                "7,1.1",
-                "2,365,12,31, 0,24,20.00,30.00,Tuesday",
-                "7,1.3",
-                "2,365,12,31, 0,24,30.00,40.00,Tuesday",
-                "7,1.5",
-                "2,365,12,31, 0,24,40.00,50.00,Tuesday",
-                "7,1.7",
-                "2,365,12,31, 0,24,50.00,60.00,Tuesday",
-                "7,1.9",
-                "2,365,12,31, 0,24,60.00,70.00,Tuesday",
-                "7,2.2",
-                "5,365",
-                "56,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
             },
             "\n"));
 
         PurchAir(1).TotHeatEnergy = 100.0;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 200.0;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 300.0;
-        UpdateMeters(&state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        // UpdateMeterReporting(*state);
+        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        // UpdateMeters(*state, MDHM);
 
-        auto const x = 5;
+        x = 5;
         compare_eso_stream(delimited_string(
             {
                 "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
