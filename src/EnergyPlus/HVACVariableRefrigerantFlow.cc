@@ -11444,7 +11444,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
             // Required load is beyond the max system capacity
 
             Q_h_TU_PL = CompEvaporatingCAPSpdMax;
-            TU_HeatingLoad = CompEvaporatingCAPSpdMax;
+            // TU_HeatingLoad = CompEvaporatingCAPSpdMax;
             this->TUHeatingLoad = TU_HeatingLoad;
             h_IU_cond_out = GetSatEnthalpyRefrig(
                 state,

@@ -17209,6 +17209,7 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
                                                    state.dataDXCoils->DXCoil(thisDXCoil.CompanionUpstreamDXCoil).CoolingCoilRuntimeFraction));
         }
 
+        OutletAirEnthalpy = min(OutletAirEnthalpy, FullLoadOutAirEnth);
         thisDXCoil.OutletAirTemp = OutletAirTemp;
         thisDXCoil.OutletAirHumRat = OutletAirHumRat;
         thisDXCoil.OutletAirEnthalpy = OutletAirEnthalpy;
