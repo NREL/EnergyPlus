@@ -23,6 +23,7 @@
 // (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
 //     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
 //     used to endorse or promote products derived from this software without specific prior
+//     written permission.
 //
 // (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
 //     without changes from the version obtained under this License, or (ii) Licensee makes a
