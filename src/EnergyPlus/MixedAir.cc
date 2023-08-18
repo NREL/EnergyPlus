@@ -821,7 +821,7 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
                         }
                     }
                 }
-                if (sensLoadCtrlUnitarySystemFound == false) {
+                if (!sensLoadCtrlUnitarySystemFound) {
                     ShowWarningError(
                         state,
                         format(

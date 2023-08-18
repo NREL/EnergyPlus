@@ -9531,7 +9531,7 @@ namespace UnitarySystems {
                                     TempSysOutput = TempSensOutput;
                                 }
                                 TempMinPLR = TempMaxPLR;
-                                while ((TempSysOutput - TempLoad) < 0.0 && TempMinPLR > 0.025) {
+                                while ((TempSysOutput - TempLoad) < 0.0 && TempMinPLR > 0.025) { // lower limit might be changed to 0.005 without adverse affect
                                     // pull upper limit of HeatingPLR down to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
                                     TempMaxPLR = TempMinPLR;
                                     // find minimum limit of HeatingPLR
