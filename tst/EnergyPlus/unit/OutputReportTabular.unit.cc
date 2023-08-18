@@ -2261,6 +2261,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "   ,                      !- Evaporative Condenser Air Flow Rate",
         "   autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
         "   0.0,                   !- Crankcase Heater Capacity",
+        "   ,                      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "Coil:Heating:Fuel,",
@@ -8495,7 +8496,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
     bool fFScheduleUsed;
     int ffScheduleIndex;
 
-    PollutionModule::GetFuelFactorInfo(*state, "Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    PollutionModule::GetFuelFactorInfo(*state, Constant::eFuel::Steam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
 
     EXPECT_EQ(curSourceFactor, 1.2);
 }
@@ -11640,7 +11641,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                             "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_total = execAndReturnFirstDouble(query_total);
-    EXPECT_EQ(return_val_total, 515.19);
+    EXPECT_EQ(return_val_total, 598.2);
 
     // get the sensible instant 'DOAS Direct to Zone' cooling peak load component
     std::string query_sensible_instant("SELECT Value From TabularDataWithStrings"
@@ -11650,7 +11651,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                                        "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_sensible_instant = execAndReturnFirstDouble(query_sensible_instant);
-    EXPECT_EQ(return_val_sensible_instant, 517.05);
+    EXPECT_EQ(return_val_sensible_instant, 600.28);
 }
 
 TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)

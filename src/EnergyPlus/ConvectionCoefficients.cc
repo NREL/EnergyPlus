@@ -388,7 +388,8 @@ void InitExtConvCoeff(EnergyPlusData &state,
                       Real64 &HExt,                               // Convection coefficient to exterior air
                       Real64 &HSky,                               // "Convection" coefficient to sky temperature
                       Real64 &HGround,                            // "Convection" coefficient to ground temperature
-                      Real64 &HAir                                // Radiation to Air Component
+                      Real64 &HAir,                               // Radiation to Air Component
+                      Real64 &HSrdSurf                            // Radiation to surrounding surfaces
 )
 {
 
@@ -432,6 +433,7 @@ void InitExtConvCoeff(EnergyPlusData &state,
     Real64 TSurf = TempExt + Constant::KelvinConv;
     Real64 TSky = state.dataEnvrn->SkyTempKelvin;
     Real64 TGround = TAir;
+    HSrdSurf = 0.0;
 
     if (surface.SurfHasSurroundingSurfProperty) {
         int SrdSurfsNum = surface.SurfSurroundingSurfacesNum;
@@ -439,6 +441,7 @@ void InitExtConvCoeff(EnergyPlusData &state,
             TSky = ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) +
                    Constant::KelvinConv;
         }
+        HSrdSurf = SurroundingSurfacesRadCoeffAverage(state, SurfNum, TSurf, AbsExt);
     }
     if (surface.UseSurfPropertyGndSurfTemp) {
         int gndSurfsNum = surface.SurfPropertyGndSurfIndex;
@@ -6534,6 +6537,19 @@ void ShowSevereScheduleOutOfRange(EnergyPlusData &state,
     ShowContinueError(state, format("{} = {} contains an out-of-range value", fieldName, fieldVal));
     ShowContinueError(state, format("Low/high limits = [>={:.9R}, <={:.1R}].", lo, hi));
     if (!msg.empty()) ShowContinueError(state, msg);
+}
+
+Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state, int const SurfNum, Real64 const TSurfK, Real64 const AbsExt)
+{
+    // compute exterior surfaces LW radiation transfer coefficient to surrounding surfaces
+    // the surface.SrdSurfTemp is weighed by surrounding surfaces view factor
+    Real64 HSrdSurf = 0.0;
+    auto &surface = state.dataSurface->Surface(SurfNum);
+    Real64 SrdSurfsTK = surface.SrdSurfTemp + Constant::KelvinConv;
+    if (TSurfK != SrdSurfsTK) {
+        HSrdSurf = Constant::StefanBoltzmann * AbsExt * surface.ViewFactorSrdSurfs * (pow_4(TSurfK) - pow_4(SrdSurfsTK)) / (TSurfK - SrdSurfsTK);
+    }
+    return HSrdSurf;
 }
 
 } // namespace EnergyPlus::Convect

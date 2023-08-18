@@ -2872,7 +2872,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
     //                  + gatherTotalsBEPS(5)*sourceFactorSteam  & !steam
     //                                          ) / largeConversionFactor
 
-    GetFuelFactorInfo(state, "NaturalGas", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::NaturalGas, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorNaturalGas = curSourceFactor;
         ort->fuelfactorsused(2) = true;
@@ -2885,7 +2885,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(2) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "FuelOilNo2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::FuelOilNo2, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorFuelOil2 = curSourceFactor;
         ort->fuelfactorsused(7) = true;
@@ -2898,7 +2898,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(11) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "FuelOilNo1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::FuelOilNo1, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorFuelOil1 = curSourceFactor;
         ort->fuelfactorsused(6) = true;
@@ -2911,7 +2911,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(10) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Coal", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Coal, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorCoal = curSourceFactor;
         ort->fuelfactorsused(5) = true;
@@ -2924,7 +2924,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(9) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Electricity", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Electricity, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorElectric = curSourceFactor;
         ort->fuelfactorsused(1) = true;
@@ -2937,7 +2937,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(1) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Gasoline", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Gasoline, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorGasoline = curSourceFactor;
         ort->fuelfactorsused(3) = true;
@@ -2950,7 +2950,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(6) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Propane", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Propane, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorPropane = curSourceFactor;
         ort->fuelfactorsused(8) = true;
@@ -2963,7 +2963,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(12) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Diesel", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Diesel, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorDiesel = curSourceFactor;
         ort->fuelfactorsused(4) = true;
@@ -2976,7 +2976,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(8) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "DistrictCooling", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::DistrictCooling, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->ffUsed(3) = true;
     }
@@ -2986,7 +2986,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(3) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "DistrictHeating", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::DistrictHeating, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->ffUsed(4) = true;
     }
@@ -2996,7 +2996,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(4) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::Steam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->ffUsed(5) = true;
     }
@@ -3006,7 +3006,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(5) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "OtherFuel1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::OtherFuel1, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorOtherFuel1 = curSourceFactor;
         ort->fuelfactorsused(11) = true; // should be source number
@@ -3019,7 +3019,7 @@ void GetInputFuelAndPollutionFactors(EnergyPlusData &state)
         ort->ffSchedIndex(13) = ffScheduleIndex;
     }
 
-    GetFuelFactorInfo(state, "OtherFuel2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    GetFuelFactorInfo(state, Constant::eFuel::OtherFuel2, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
     if (fuelFactorUsed) {
         ort->sourceFactorOtherFuel2 = curSourceFactor;
         ort->fuelfactorsused(12) = true; // should be source number
@@ -4365,9 +4365,9 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
 
     // Water / steam boiler
     for (int iBoiler = 1; iBoiler <= (int)state.dataBoilers->Boiler.size(); ++iBoiler) {
-        state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed +
-                                                         state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption -
-                                                         state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
+        state.dataHeatBal->SysTotalHVACRejectHeatLoss +=
+            state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticFuelConsumption +
+            state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
     }
 
     // DX Coils air to air
@@ -4419,7 +4419,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
 
         if (thisCoil.HCoilType_Num == DataHVACGlobals::Coil_HeatingGas_MultiStage ||
             thisCoil.HCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) {
-            state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCoil.FuelUseLoad + thisCoil.ParasiticFuelLoad - thisCoil.HeatingCoilLoad;
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCoil.FuelUseLoad + thisCoil.ParasiticFuelConsumption - thisCoil.HeatingCoilLoad;
         }
     }
 
