@@ -2105,9 +2105,7 @@ namespace OutputProcessor {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   April 2001
-        //       MODIFIED       August 2023 by Karen Walkerman
-        //                          to update only if the simulation is not in warmup
-        //                          as bug fix to issue 9589
+        //       MODIFIED       na
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
