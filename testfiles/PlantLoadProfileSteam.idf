@@ -343,9 +343,9 @@
     Any Number,              !- Schedule Type Limits Name
     THROUGH: 12/31,          !- Field 1
     FOR: AllDays,            !- Field 2
-    UNTIL: 4:00,8000,        !- Field 3
-    UNTIL: 12:00,6000,       !- Field 4
-    UNTIL: 24:00,10000;      !- Field 5
+    UNTIL: 7:00,2000,        !- Field 3
+    UNTIL: 17:00,10000,      !- Field 4
+    UNTIL: 24:00,6000;       !- Field 5
 
   Schedule:Compact,
     Load Profile 1 Flow Frac Schedule,  !- Name
@@ -384,10 +384,7 @@
 
   Output:Variable,*,Boiler Steam Outlet Temperature,Hourly;
 
-
   Output:Variable,Main Loop,Plant Supply Side Heating Demand Rate,Hourly;
-
-  Output:Variable,Main Loop,Plant Supply Side Unmet Demand Rate,Hourly;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

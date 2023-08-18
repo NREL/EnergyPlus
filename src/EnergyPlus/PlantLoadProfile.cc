@@ -154,7 +154,7 @@ void PlantProfileData::simulate(EnergyPlusData &state,
         }
         this->OutletTemp = this->InletTemp - DeltaTemp;
     } else if (this->FluidType == PlantLoopFluidType::Steam) {
-        if (this->MassFlowRate > 0.0) {
+        if (this->MassFlowRate > 0.0 && this->Power > 0.0) {
             Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                           this->InletTemp,
