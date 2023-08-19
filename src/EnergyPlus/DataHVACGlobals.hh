@@ -173,6 +173,23 @@ namespace DataHVACGlobals {
     int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
 
+    enum class EconomizerStagingType
+    // OA Controller Economizer Staging
+    {
+        Invalid = -1,
+        EconomizerFirst,                  // system air flow rate and economizer is ramped-up before using mechanical cooling
+        InterlockedWithMechanicalCooling, // economizer operation (flow rate) depends on the cooling speed chosen by the system
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeUC = {
+        "ECONOMIZERFIRST",
+        "INTERLOCKEDWITHMECHANICALCOOLING",
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeCC = {
+        "EconomizerFirst",
+        "InterlockedWithMechanicalCooling",
+    };
+
     // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);
     // Furnace/Unitary System Types
@@ -460,6 +477,8 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 MSHPWasteHeat = 0.0;             // Waste heat
     Real64 PreviousTimeStep = 0.0;          // The time step length at the previous time step
     bool ShortenTimeStepSysRoomAir = false; // Logical flag that triggers shortening of system time step
+    // For multispeed unitary systems
+    Real64 MSUSEconoSpeedNum = 0; // Economizer speed
 
     Real64 deviationFromSetPtThresholdHtg = -0.2; // heating threshold for reporting setpoint deviation
     Real64 deviationFromSetPtThresholdClg = 0.2;  // cooling threshold for reporting setpoint deviation
