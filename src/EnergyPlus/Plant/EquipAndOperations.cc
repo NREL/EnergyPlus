@@ -916,12 +916,6 @@ namespace DataPlant {
         this->Report.PrimaryPlantHeatingLoad = HW_Qdot;
     }
 
-    // void ChillerHeaterSupervisoryOperationData::DetermineCurrentDedicatedHeatRecovWWHHPCapacities(EnergyPlusData &state)
-    // do a test call to see what capacity any dedicated heat recovery WWHP could provide if run at the current time
-    // {
-    //
-    // }
-
     void ChillerHeaterSupervisoryOperationData::ProcessSupervisoryControlLogicForAirSourcePlants(EnergyPlusData &state)
     {
         // this routine decides which of three modes the plants should operate in,  Heating Only, Cooling Only, Simultaneous Heating and Cooling.
