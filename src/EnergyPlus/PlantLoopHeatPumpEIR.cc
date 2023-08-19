@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -93,7 +94,13 @@ void EIRPlantLoopHeatPump::simulate(
 
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state, FirstHVACIteration);
-        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
+        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) {                           // condenser side
+            Real64 sourceQdotArg = 0.0;                                                                 // TRANE, pass negative if heat pump heating
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {                 // TRANE
+                sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone; // TRANE
+            } else {                                                                                    // TRANE
+                sourceQdotArg = this->sourceSideHeatTransfer;                                           // TRANE
+            }                                                                                           // TRANE
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->sourceSidePlantLoc.loopNum,
                                                                 this->sourceSidePlantLoc.loopSideNum,
