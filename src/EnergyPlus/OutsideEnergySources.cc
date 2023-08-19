@@ -461,6 +461,8 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     int const LoopNum = this->plantLoc.loopNum;
     Real64 const LoopMinTemp = state.dataPlnt->PlantLoop(LoopNum).MinTemp;
     Real64 const LoopMaxTemp = state.dataPlnt->PlantLoop(LoopNum).MaxTemp;
+    Real64 const LoopMinMdot = state.dataPlnt->PlantLoop(LoopNum).MinMassFlowRate;
+    Real64 const LoopMaxMdot = state.dataPlnt->PlantLoop(LoopNum).MaxMassFlowRate;
 
     //  apply power limit from input
     Real64 CapFraction = ScheduleManager::GetCurrentScheduleValue(state, this->CapFractionSchedNum);
@@ -507,13 +509,23 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                                                                            RoutineName);
             Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
             Real64 SteamMdot = MyLoad / LatentHeatSteam;
-            PlantUtilities::SetComponentFlowRate(state, SteamMdot, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
-            this->MassFlowRate = state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRate;
+            this->MassFlowRate = SteamMdot;
+            PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
             this->OutletTemp = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
             // Like the assumption in Boiler:Steam, assume that it can meet the steam loop setpoint
             this->OutletSteamQuality = 1.0;
-            MyLoad = this->MassFlowRate * LatentHeatSteam;
             state.dataLoopNodes->Node(this->OutletNodeNum).Quality = this->OutletSteamQuality;
+            // apply loop limits on mass flow rate result to keep in check
+            if (this->MassFlowRate < LoopMinMdot) {
+                this->MassFlowRate = max(this->MassFlowRate, LoopMinMdot);
+                PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
+                MyLoad = this->MassFlowRate * LatentHeatSteam;
+            }
+            if (this->MassFlowRate > LoopMaxMdot) {
+                this->MassFlowRate = min(this->MassFlowRate, LoopMaxMdot);
+                PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
+                MyLoad = this->MassFlowRate * LatentHeatSteam;
+            }
         }
     } else {
         this->OutletTemp = this->InletTemp;
