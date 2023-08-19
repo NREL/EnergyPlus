@@ -2711,7 +2711,7 @@ void ComputeTariff(EnergyPlusData &state)
 
     Real64 annualAggregate;
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite)) {
+    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite || state.files.outputControl.json)) {
         state.dataOutRptTab->WriteTabularFiles = false;
         return;
     }
