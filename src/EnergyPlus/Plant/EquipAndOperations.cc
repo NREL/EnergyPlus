@@ -158,7 +158,7 @@ namespace DataPlant {
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
             for (int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum) {
-                auto &this_op_scheme(this_plant_loop.OpScheme(OpNum));
+                auto const &this_op_scheme(this_plant_loop.OpScheme(OpNum));
                 if (this_op_scheme.Type == OpScheme::ChillerHeaterSupervisory) {
                     this->PlantLoopIndicesBeingSupervised(LoopNum) = LoopNum;
                 }
@@ -373,7 +373,6 @@ namespace DataPlant {
                 }
             }
         }
-        int HWPlantIndex = 0;
         if (this->PlantOps.NumHeatingOnlyEquipLists > 0) {
             for (int equipListNum = 1; equipListNum <= this->PlantOps.NumHeatingOnlyEquipLists; ++equipListNum) {
 
@@ -444,7 +443,6 @@ namespace DataPlant {
                                          .NodeNumOut;
                     this_equip.DemandNodeNum = inletNode;
                     this_equip.SetPointNodeNum = outletNode;
-                    HWPlantIndex = this_equip.LoopNumPtr;
                     state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                         .LoopSide(this_equip.LoopSideNumPtr)
                         .Branch(this_equip.BranchNumPtr)
@@ -656,10 +654,10 @@ namespace DataPlant {
                                                    .Branch(1)
                                                    .TotalComponents;
                  ++numComps) {
-                auto &this_Comp(state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex)
-                                    .LoopSide(DataPlant::LoopSideLocation::Supply)
-                                    .Branch(1)
-                                    .Comp(numComps));
+                auto const &this_Comp(state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex)
+                                          .LoopSide(DataPlant::LoopSideLocation::Supply)
+                                          .Branch(1)
+                                          .Comp(numComps));
                 if (this_Comp.Type == DataPlant::PlantEquipmentType::ChilledWaterTankMixed ||
                     this_Comp.Type == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
                     // assume tank is on chilled water return for use as a buffer tank, use the outlet of the tank instead of the inlet when
@@ -673,10 +671,10 @@ namespace DataPlant {
             this->PlantOps.PrimaryHWLoopSupInletNode =
                 state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
         }
-        bool founditCooling = false;
-        bool founditHeating = false;
         // process dedicated heat recovery water to water heatpumps to control
         if (this->PlantOps.DedicatedHR_ChWRetControl_Input && this->PlantOps.DedicatedHR_HWRetControl_Input) {
+            bool founditCooling = false;
+            bool founditHeating = false;
             for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
                 std::string const thisPLHPName = UtilityRoutines::makeUPPER(thisHP.name);
                 // find cooling side heat pump
@@ -1575,7 +1573,6 @@ namespace DataPlant {
             for (int BoilerNum = 1; BoilerNum <= this->PlantOps.numBoilers; ++BoilerNum) {
                 // determine if primary or secondary setpoint in use
                 Real64 HWsetpt = 0.0;
-                bool IsAuxiliaryBoiler = false;
                 if (this->SecondaryPlantLoopIndicesBeingSupervised(this->PlantBoilerComps(BoilerNum).loopNum) >
                     0) { // appears to be on secondary loop, supplemental boiler
                     HWsetpt = min(this->Setpoint.SecHW,
@@ -1583,7 +1580,6 @@ namespace DataPlant {
                                       state)); // Assume if OA reset is lower than setting for secondary HW loop, then use the lower of the two
                 } else {                       // primary loop, auxiliary boiler
                     HWsetpt = DetermineHWSetpointOARest(state);
-                    IsAuxiliaryBoiler = true;
                 }
 
                 HWsetpt = HWsetpt - this->TempReset.BoilerTemperatureOffset;
