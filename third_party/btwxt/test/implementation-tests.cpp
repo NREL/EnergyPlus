@@ -158,6 +158,22 @@ TEST_F(CubicImplementationFixture, get_cubic_spacing_ratios)
     }
 }
 
+TEST_F(CubicImplementationFixture, null_checking_calculations)
+{
+    std::vector<double> table_with_null = {std::numeric_limits<double>::quiet_NaN(), 3, 1.5, 1,
+                                         5, 4, 2, 1,
+                                         8, 6, 3, 2,
+                                         10, 8, 4, 2};
+    
+    GridPointDataSet dataset_with_null(table_with_null);
+    interpolator.add_grid_point_data_set(dataset_with_null);
+
+    target = {7, 3};
+    interpolator.set_target(target);
+    auto result = interpolator.get_results();
+    EXPECT_TRUE(std::isnan(result[2]));
+}
+
 TEST_F(EmptyGridImplementationFixture, locate_coordinates)
 {
     grid = {{1, 2, 3, 4, 5}, {1, 2, 3, 4, 5, 6, 7}};

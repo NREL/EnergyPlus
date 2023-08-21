@@ -50,11 +50,6 @@ class RegularGridInterpolator {
         const std::vector<std::vector<double>>& grid_point_data_vectors,
         const std::shared_ptr<Courierr::Courierr>& logger = std::make_shared<BtwxtLogger>());
 
-    RegularGridInterpolator(const RegularGridInterpolator& source);
-
-    RegularGridInterpolator(const RegularGridInterpolator& source,
-                            const std::shared_ptr<Courierr::Courierr>& logger);
-
     RegularGridInterpolator(
         const std::vector<std::vector<double>>& grid_axis_vectors,
         const std::vector<GridPointDataSet>& grid_point_data_sets,
@@ -67,6 +62,11 @@ class RegularGridInterpolator {
 
     ~RegularGridInterpolator();
 
+    RegularGridInterpolator(const RegularGridInterpolator& source);
+
+    RegularGridInterpolator(const RegularGridInterpolator& source,
+                            const std::shared_ptr<Courierr::Courierr>& logger);
+
     RegularGridInterpolator& operator=(const RegularGridInterpolator& source);
 
     std::size_t add_grid_point_data_set(const std::vector<double>& grid_point_data_vector,
@@ -74,7 +74,31 @@ class RegularGridInterpolator {
 
     std::size_t add_grid_point_data_set(const GridPointDataSet& grid_point_data_set);
 
-    // Get results
+    void set_axis_extrapolation_method(std::size_t axis_index, Method method);
+
+    void set_axis_interpolation_method(std::size_t axis_index, Method method);
+
+    void set_axis_extrapolation_limits(std::size_t axis_index,
+                                       const std::pair<double, double>& extrapolation_limits);
+
+    std::size_t get_number_of_dimensions();
+
+    // Public normalization methods
+    double normalize_grid_point_data_set_at_target(std::size_t data_set_index,
+                                                   const double scalar = 1.0);
+
+    double normalize_grid_point_data_set_at_target(std::size_t data_set_index,
+                                                   const std::vector<double>& target,
+                                                   const double scalar = 1.0);
+
+    void normalize_grid_point_data_sets_at_target(double scalar = 1.0);
+
+    void normalize_grid_point_data_sets_at_target(const std::vector<double>& target,
+                                                  const double scalar = 1.0);
+
+     std::string write_data();
+
+   // Get results
     void set_target(const std::vector<double>& target);
 
     double get_value_at_target(const std::vector<double>& target, std::size_t data_set_index);
@@ -102,34 +126,11 @@ class RegularGridInterpolator {
 
     std::vector<double> operator()() { return get_values_at_target(); }
 
-    void normalize_grid_point_data_sets_at_target(double scalar = 1.0);
-
-    void normalize_grid_point_data_sets_at_target(const std::vector<double>& target,
-                                                  const double scalar = 1.0);
-
-    double normalize_grid_point_data_set_at_target(std::size_t data_set_index,
-                                                   const double scalar = 1.0);
-
-    double normalize_grid_point_data_set_at_target(std::size_t data_set_index,
-                                                   const std::vector<double>& target,
-                                                   const double scalar = 1.0);
-
     const std::vector<double>& get_target();
 
     [[nodiscard]] const std::vector<TargetBoundsStatus>& get_target_bounds_status() const;
 
     void clear_target();
-
-    void set_axis_interpolation_method(std::size_t axis_index, Method method);
-
-    void set_axis_extrapolation_method(std::size_t axis_index, Method method);
-
-    void set_axis_extrapolation_limits(std::size_t axis_index,
-                                       const std::pair<double, double>& extrapolation_limits);
-
-    std::size_t get_number_of_dimensions();
-
-    std::string write_data();
 
     void set_logger(const std::shared_ptr<Courierr::Courierr>& logger,
                     bool set_grid_axes_loggers = false);
