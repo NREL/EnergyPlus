@@ -784,7 +784,7 @@ namespace HeatingCoils {
             SetupOutputVariable(state,
                                 "Heating Coil Ancillary " + sFuelType + " Energy",
                                 OutputProcessor::Unit::J,
-                                heatingCoil.ParasiticFuelLoad,
+                                heatingCoil.ParasiticFuelConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
@@ -982,7 +982,7 @@ namespace HeatingCoils {
             SetupOutputVariable(state,
                                 "Heating Coil Ancillary NaturalGas Energy",
                                 OutputProcessor::Unit::J,
-                                heatingCoil.ParasiticFuelLoad,
+                                heatingCoil.ParasiticFuelConsumption,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 heatingCoil.Name,
@@ -3004,7 +3004,7 @@ namespace HeatingCoils {
         heatingCoil.FuelUseLoad *= TimeStepSysSec;
         heatingCoil.ElecUseLoad *= TimeStepSysSec;
 
-        heatingCoil.ParasiticFuelLoad = heatingCoil.ParasiticFuelRate * TimeStepSysSec;
+        heatingCoil.ParasiticFuelConsumption = heatingCoil.ParasiticFuelRate * TimeStepSysSec;
 
         std::string coilObjClassName;
         switch (heatingCoil.HCoilType_Num) {
