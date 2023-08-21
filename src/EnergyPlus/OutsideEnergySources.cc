@@ -508,13 +508,11 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                            RoutineName);
             Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-            Real64 SteamMdot = MyLoad / LatentHeatSteam;
-            this->MassFlowRate = SteamMdot;
+            this->MassFlowRate = MyLoad / LatentHeatSteam;
             PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
-            this->OutletTemp = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
             // Like the assumption in Boiler:Steam, assume that it can meet the steam loop setpoint
-            this->OutletSteamQuality = 1.0;
-            state.dataLoopNodes->Node(this->OutletNodeNum).Quality = this->OutletSteamQuality;
+            this->OutletTemp = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+            this->OutletSteamQuality = 0.0;
             // apply loop limits on mass flow rate result to keep in check
             if (this->MassFlowRate < LoopMinMdot) {
                 this->MassFlowRate = max(this->MassFlowRate, LoopMinMdot);
@@ -526,6 +524,8 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                 PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
                 MyLoad = this->MassFlowRate * LatentHeatSteam;
             }
+            // Like the assumption in Boiler:Steam, assume that saturated steam is leaving the district heating steam plant
+            state.dataLoopNodes->Node(this->OutletNodeNum).Quality = 1.0;
         }
     } else {
         this->OutletTemp = this->InletTemp;
