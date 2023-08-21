@@ -242,6 +242,7 @@ add_simulation_test(IDF_FILE DOAToUnitarySystem.idf EPW_FILE USA_FL_Miami.Intl.A
 add_simulation_test(IDF_FILE DOAToUnitVentilator.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DOAToVRF.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE DOAToWaterToAirHPInlet.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE DOAToWaterToAirHPInlet_MultispeedFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DOAToWaterToAirHPSupply.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DXCoilSystemAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE DaylightingDeviceShelf.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -282,6 +283,7 @@ add_simulation_test(IDF_FILE EMSUserDefined5ZoneAirCooled.idf EPW_FILE USA_IL_Ch
 add_simulation_test(IDF_FILE EMSUserDefinedWindACAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE EMSWindowShadeControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE EarthTubeSimpleTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE EarthTubeVerticalTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE EcoroofOrlando.idf EPW_FILE USA_FL_Orlando.Intl.AP.722050_TMY3.epw)
 add_simulation_test(IDF_FILE EcoroofOrlando_NoSitePrec.idf EPW_FILE USA_FL_Orlando.Intl.AP.722050_TMY3.epw)
 add_simulation_test(IDF_FILE ElectricChiller.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -344,6 +346,7 @@ add_simulation_test(IDF_FILE HVACStandAloneERV_Economizer.idf EPW_FILE USA_IL_Ch
 add_simulation_test(IDF_FILE HeaderedPumpsConSpeed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeaderedPumpsVarSpeed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPump.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE HeatPump_variableCrankcaseHeaterCapacity.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpAirToAirWithRHcontrol.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpCycFanWithEcono.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -355,6 +358,7 @@ add_simulation_test(IDF_FILE HeatPumpSecondaryCoil.idf EPW_FILE USA_IL_Chicago-O
 add_simulation_test(IDF_FILE HeatPumpSimpleDCV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpVRP_DCV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpVSAS.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE HeatPumpVSAS_variableCrankcaseHeaterCapacity.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpWaterHeater.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpWaterHeaterStratified.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE HeatPumpWaterToAir.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -543,7 +547,14 @@ add_simulation_test(IDF_FILE RetailPackagedTESCoil.idf EPW_FILE USA_IL_Chicago-O
 add_simulation_test(IDF_FILE RoomAirflowNetwork.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE SeriesActiveBranch.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithPVandBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
-add_simulation_test(IDF_FILE ShopWithPVandLiIonBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
+# this file is failing on our debug check due to a NaN inside SSC
+# the code is actually working as designed, but there are checks that
+# rely on a NaN calculation as a sentinel value, which is triggering a FPE in our debug build
+# for release builds it is working fine, and so it is included in normal builds and regression builds
+# but for debug builds I am disabling it
+if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  add_simulation_test(IDF_FILE ShopWithPVandLiIonBattery.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
+endif ()
 add_simulation_test(IDF_FILE ShopWithPVandStorage.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithSimplePVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 add_simulation_test(IDF_FILE ShopWithBIPVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
@@ -573,6 +584,7 @@ add_simulation_test(IDF_FILE Standard621SimplifiedProcedure_VAVterminal.idf EPW_
 add_simulation_test(IDF_FILE SteamSystemAutoSize.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StormWindow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE StripMallZoneEvapCooler.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
+add_simulation_test(IDF_FILE StripMallZoneEvapCoolerRHcutoff.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 add_simulation_test(IDF_FILE StripMallZoneEvapCoolerAutosized.idf EPW_FILE USA_CO_Boulder-Broomfield-Jefferson.County.AP.724699_TMY3.epw)
 add_simulation_test(IDF_FILE SuperMarketDetailed_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE SuperMarket_DesuperHeatingCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
@@ -663,6 +675,7 @@ add_simulation_test(IDF_FILE VariableRefrigerantFlow_wSuppHeater_5Zone.idf EPW_F
 add_simulation_test(IDF_FILE VentilatedSlab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE VentilatedSlab_SeriesSlabs.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE VentilationSimpleTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE VRFMultispeedFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterHeaterDHWPlantLoop.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterHeaterHeatPumpStratifiedTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterHeaterHeatPumpWrappedCondenser.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
@@ -734,6 +747,7 @@ add_simulation_test(IDF_FILE WCE_DoubleClear_BSDF.idf EPW_FILE USA_IL_Chicago-OH
 add_simulation_test(IDF_FILE WCE_Interior_VB_-45_deg.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE _5ZoneAirCooled_annual.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ANNUAL_SIMULATION)
 add_simulation_test(IDF_FILE _5ZoneAirCooled_LeapYear_annual.idf EPW_FILE MadeUpLeapYear.epw ANNUAL_SIMULATION)
+add_simulation_test(IDF_FILE UnitarySystem_MultiSpeedDX_EconoStaging.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ANNUAL_SIMULATION)
 
 # ASHRAE 90.1-2019 DOE commercial prototype models
 add_simulation_test(IDF_FILE ASHRAE901_ApartmentHighRise_STD2019_Denver.idf EPW_FILE USA_CO_Denver-Aurora-Buckley.AFB.724695_TMY3.epw)

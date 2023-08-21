@@ -82,7 +82,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataCondenserLoopTowers = std::make_unique<CondenserLoopTowersData>();
     this->dataConstruction = std::make_unique<ConstructionData>();
     this->dataContaminantBalance = std::make_unique<ContaminantBalanceData>();
-    this->dataConvectionCoefficient = std::make_unique<ConvectionCoefficientsData>();
+    this->dataConvect = std::make_unique<ConvectionCoefficientsData>();
     this->dataConvergeParams = std::make_unique<ConvergParamsData>();
     this->dataCoolTower = std::make_unique<CoolTowerData>();
     this->dataCostEstimateManager = std::make_unique<CostEstimateManagerData>();
@@ -226,8 +226,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataRetAirPathMrg = std::make_unique<ReturnAirPathMgr>();
     this->dataExhAirSystemMrg = std::make_unique<ExhaustAirSystemMgr>();
     this->dataExhCtrlSystemMrg = std::make_unique<ExhaustControlSystemMgr>();
-    this->dataRoomAirMod = std::make_unique<RoomAirModelData>();
-    this->dataRoomAirModelMgr = std::make_unique<RoomAirModelManagerData>();
+    this->dataRoomAir = std::make_unique<RoomAirModelData>();
     this->dataRoomAirModelTempPattern = std::make_unique<RoomAirModelUserTempPatternData>();
     this->dataRoomAirflowNetModel = std::make_unique<RoomAirModelAirflowNetworkData>();
     this->dataRootFinder = std::make_unique<RootFindingData>();
@@ -270,7 +269,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataTarcogShading = std::make_unique<TarcogShadingData>();
     this->dataTimingsData = std::make_unique<DataTimingsData>();
     this->dataTranspiredCollector = std::make_unique<TranspiredCollectorData>();
-    this->dataUCSDShared = std::make_unique<UCSDSharedData>();
     this->dataUFADManager = std::make_unique<UFADManagerData>();
     this->dataUnitHeaters = std::make_unique<UnitHeatersData>();
     this->dataUnitVentilators = std::make_unique<UnitVentilatorsData>();
@@ -340,7 +338,7 @@ void EnergyPlusData::clear_state()
     this->dataCondenserLoopTowers->clear_state();
     this->dataConstruction->clear_state();
     this->dataContaminantBalance->clear_state();
-    this->dataConvectionCoefficient->clear_state();
+    this->dataConvect->clear_state();
     this->dataConvergeParams->clear_state();
     this->dataCoolTower->clear_state();
     this->dataCostEstimateManager->clear_state();
@@ -484,8 +482,7 @@ void EnergyPlusData::clear_state()
     this->dataRetAirPathMrg->clear_state();
     this->dataExhAirSystemMrg->clear_state();
     this->dataExhCtrlSystemMrg->clear_state();
-    this->dataRoomAirMod->clear_state();
-    this->dataRoomAirModelMgr->clear_state();
+    this->dataRoomAir->clear_state();
     this->dataRoomAirModelTempPattern->clear_state();
     this->dataRoomAirflowNetModel->clear_state();
     this->dataRootFinder->clear_state();
@@ -528,7 +525,6 @@ void EnergyPlusData::clear_state()
     this->dataTarcogShading->clear_state();
     this->dataTimingsData->clear_state();
     this->dataTranspiredCollector->clear_state();
-    this->dataUCSDShared->clear_state();
     this->dataUFADManager->clear_state();
     this->dataUnitHeaters->clear_state();
     this->dataUnitVentilators->clear_state();

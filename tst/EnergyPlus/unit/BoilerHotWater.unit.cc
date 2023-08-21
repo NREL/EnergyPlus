@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
         "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
         "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
         "  NotModulated,            !- Boiler Flow Mode",
-        "  ,                        !- Parasitic Electric Load {W}",
+        "  ,                        !- On Cycle Parasitic Electric Load {W}",
         "  1;                       !- Sizing Factor",
     });
 
@@ -190,7 +190,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
     EXPECT_EQ(AutoSize, state->dataBoilers->Boiler(1).VolFlowRate);
 
     // Additional tests for fuel type input
-    EXPECT_TRUE(compare_enums(state->dataBoilers->Boiler(1).FuelType, Constant::eResource::NaturalGas));
+    EXPECT_TRUE(compare_enums(state->dataBoilers->Boiler(1).FuelType, Constant::eFuel::NaturalGas));
 }
 
 TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
         "  Node boiler 1 outlet,    !- Boiler Water Outlet Node Name",
         "  99.9,                    !- Water Outlet Upper Temperature Limit {C}",
         "  NotModulated,            !- Boiler Flow Mode",
-        "  ,                        !- Parasitic Electric Load {W}",
+        "  ,                        !- On Cycle Parasitic Electric Load {W}",
         "  1;                       !- Sizing Factor",
 
         "Curve:Quadratic,",

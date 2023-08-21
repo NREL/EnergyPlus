@@ -134,10 +134,6 @@ namespace UnitarySystems {
         Real64 maximum_outdoor_dry_bulb_temperature_for_supplemental_heater_operation = 21.0;
         std::string outdoor_dry_bulb_temperature_sensor_node_name;
         std::string heat_pump_coil_water_flow_mode;
-        Real64 maximum_cycling_rate = 2.5;
-        Real64 heat_pump_time_constant = 60.0;
-        Real64 fraction_of_on_cycle_power_use = 0.01;
-        Real64 heat_pump_fan_delay_time = 60.0;
         Real64 ancillary_on_cycle_electric_power = 0.0;
         Real64 ancillary_off_cycle_electric_power = 0.0;
         Real64 design_heat_recovery_water_flow_rate = 0.0;
@@ -323,10 +319,6 @@ namespace UnitarySystems {
         Real64 m_MaxOATSuppHeat = 0.0;
         Real64 m_MinOATCompressorCooling = 0.0;
         Real64 m_MinOATCompressorHeating = 0.0;
-        Real64 m_MaxONOFFCyclesperHour = 0.0;
-        Real64 m_HPTimeConstant = 0.0;
-        Real64 m_OnCyclePowerFraction = 0.0;
-        Real64 m_FanDelayTime = 0.0;
         Real64 m_AncillaryOnPower = 0.0;
         Real64 m_AncillaryOffPower = 0.0;
         Real64 m_DesignHRWaterVolumeFlow = 0.0;
@@ -359,7 +351,6 @@ namespace UnitarySystems {
         PlantLocation m_SuppCoilPlantLoc;
         int m_SuppCoilFluidOutletNodeNum = 0;
 
-        Real64 m_WSHPRuntimeFrac = 0.0;
         Real64 m_CompPartLoadRatio = 0.0;
         Real64 m_CoolingCoilSensDemand = 0.0;
         Real64 m_CoolingCoilLatentDemand = 0.0;
@@ -382,6 +373,12 @@ namespace UnitarySystems {
         Real64 m_CoolingCycRatio = 0.0;
         Real64 m_CoolingSpeedRatio = 0.0;
         int m_CoolingSpeedNum = 0;
+
+        int m_EconoSpeedNum = 0;
+        Real64 m_EconoPartLoadRatio = 0;
+        Real64 m_LowSpeedEconOutput = 0;
+        Real64 m_LowSpeedEconRuntime = 0;
+
         Real64 m_HeatingCycRatio = 0.0;
         Real64 m_HeatingSpeedRatio = 0.0;
         int m_HeatingSpeedNum = 0;
@@ -489,7 +486,7 @@ namespace UnitarySystems {
 
     public:
         // SZVAV variables
-        DataZoneEquipment::ZoneEquip ZoneEqType = DataZoneEquipment::ZoneEquip::Invalid;
+        DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::Invalid;
         SimAirServingZones::CompType AirloopEqType = SimAirServingZones::CompType::Invalid;
         int MaxIterIndex = 0;
         int RegulaFalsiFailedIndex = 0;
@@ -530,7 +527,11 @@ namespace UnitarySystems {
         Real64 CoilSHR = 0.0;                   // Load sensible heat ratio with humidity control
         int temperatureOffsetControlStatus = 0; // water side economizer status flag, also report variable
         int OAMixerIndex = -1;                  // index to zone equipment OA mixer
-        bool OAMixerExists = false;             // true if OA mixer is connected to inlet of UnitarySystem
+        int OASysIndex = -1;                    // index to OA system
+        int OAControllerIndex = -1;             // index to OA controller
+        DataHVACGlobals::EconomizerStagingType OAControllerEconomizerStagingType =
+            DataHVACGlobals::EconomizerStagingType::InterlockedWithMechanicalCooling; // economizer staging operation type
+        bool OAMixerExists = false;                                                   // true if OA mixer is connected to inlet of UnitarySystem
 
         //    private:
         // private members not initialized in constructor
@@ -855,11 +856,6 @@ namespace UnitarySystems {
                                bool const FirstHVACIteration // True when first HVAC iteration
         );
 
-        void heatPumpRunFrac(Real64 const PLR,   // part load ratio
-                             bool &errFlag,      // part load factor out of range flag
-                             Real64 &RuntimeFrac // the required run time fraction to meet part load
-        );
-
         void setSpeedVariables(EnergyPlusData &state,
                                bool const SensibleLoad,   // True when meeting a sensible load (not a moisture load)
                                Real64 const PartLoadRatio // operating PLR
@@ -937,6 +933,17 @@ namespace UnitarySystems {
                       Real64 &latOutputProvided    // latent output at supply air node
                       ) override;
 
+        Real64 getFanDeltaTemp(EnergyPlusData &state, bool const firstHVACIteration, Real64 const massFlowRate, Real64 const airFlowRatio);
+
+        void setEconomizerStagingOperationSpeed(EnergyPlusData &state, bool const firstHVACIteration, Real64 const zoneLoad);
+
+        void calcMixedTempAirSPforEconomizerStagingOperation(EnergyPlusData &state,
+                                                             int const airLoopNum,
+                                                             bool const firstHVACIteration,
+                                                             Real64 const zoneLoad);
+
+        void manageEconomizerStagingOperation(EnergyPlusData &state, int const airLoopNum, bool const firstHVACIteration, Real64 const zoneLoad);
+
         void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) override;
         int getAirInNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
         int getAirOutNode(EnergyPlusData &state, std::string_view UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
@@ -1002,12 +1009,12 @@ struct UnitarySystemsData : BaseGlobalStruct
 
     bool getInputOnceFlag = true;
     bool getMSHPInputOnceFlag = true;
-    bool reportVariablesAreSetup = false;
 
     std::vector<UnitarySystems::UnitarySys> unitarySys;
     std::vector<UnitarySystems::DesignSpecMSHP> designSpecMSHP;
 
     bool getInputFlag = true;
+    bool setupOutputOnce = true;
 
     void clear_state() override
     {
@@ -1039,7 +1046,7 @@ struct UnitarySystemsData : BaseGlobalStruct
         initUnitarySystemsQActual = 0.0;
         getMSHPInputOnceFlag = true;
         getInputOnceFlag = true;
-        reportVariablesAreSetup = false;
+        setupOutputOnce = true;
         unitarySys.clear();
         if (designSpecMSHP.size() > 0) designSpecMSHP.clear();
         getInputFlag = true;
