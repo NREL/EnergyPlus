@@ -46,7 +46,6 @@ libtk205/vendor/json/.github
 libtk205/vendor/json/.gitmodules
 libtk205/vendor/json/benchmarks
 libtk205/vendor/json/doc
-libtk205/vendor/json/doc
 libtk205/vendor/json/test
 libtk205/vendor/json/third_party
 libtk205/vendor/json/.*
