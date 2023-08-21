@@ -6539,6 +6539,10 @@ namespace PlantChillers {
                                             state.dataIPShortCut->cAlphaArgs(8)));
                 }
             }
+
+            // set default design condenser in and evaporator out temperatures
+            thisChiller.TempDesCondIn = 29.44; // Degree Celsius, or 85 Degree Fahrenheit
+            thisChiller.TempDesEvapOut = 6.67; // Degree Celsius, or 44 Degree Fahrenheit
         }
 
         if (ErrorsFound) {
