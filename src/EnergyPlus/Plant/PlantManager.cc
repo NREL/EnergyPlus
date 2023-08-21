@@ -3134,14 +3134,6 @@ void SizePlantLoop(EnergyPlusData &state,
                                                              state.dataOutRptPredefined->pdchPLCLMinLoopFlowRate,
                                                              state.dataPlnt->PlantLoop(LoopNum).Name,
                                                              state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
-                    // OutputReportPredefined::PreDefTableEntry(state,
-                    //                                          state.dataOutRptPredefined->pdchPLCLTotPumpPwrOnLoop,
-                    //                                          state.dataPlnt->PlantLoop(LoopNum).Name,
-                    //                                          state.dataPlnt->PlantLoop(LoopNum).UsePressureForPumpCalcs);
-                    // OutputReportPredefined::PreDefTableEntry(state,
-                    //                                          state.dataOutRptPredefined->pdchPLCLBranchName,
-                    //                                          state.dataPlnt->PlantLoop(LoopNum).Name,
-                    //                                          state.dataPlnt->PlantLoop(LoopNum).Name);
                     // end std 229 plantloop equipment summary new table
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
