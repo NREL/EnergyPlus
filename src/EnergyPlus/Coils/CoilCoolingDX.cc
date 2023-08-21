@@ -93,7 +93,7 @@ std::shared_ptr<CoilCoolingDXPerformanceBase> CoilCoolingDX::makePerformanceSubc
         return std::make_shared<CoilCoolingDXCurveFitPerformance>(state, performance_object_name);
     }
 
-    ShowFatalError(state, format("Could not find Coil:Cooling:DX:Performance object with name: ", performance_object_name));
+    ShowFatalError(state, format("Could not find Coil:Cooling:DX:Performance object with name: {}", performance_object_name));
     return nullptr;
 }
 

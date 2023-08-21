@@ -93,7 +93,7 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
         if (!UtilityRoutines::SameString(name_to_find, thisObjectName)) {
             continue;
         } else {
-            ShowFatalError(state, "Could not find Coil:Cooling:DX:Performance object with name: " + name_to_find);
+            ShowFatalError(state, format("Could not find Coil:Cooling:DX:Performance object with name: {}", name_to_find));
         }
 
 
@@ -120,8 +120,7 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
 
         if (errorsFound) {
             ShowFatalError(state,
-                           format(routineName, "Errors found in getting ", this->object_name,
-                               " input. Preceding condition(s) causes termination."));
+                           format("{} Errors found in getting {} input. Preceding condition(s) causes termination.", std::string{routineName}, this->object_name));
         }
     }
 }
