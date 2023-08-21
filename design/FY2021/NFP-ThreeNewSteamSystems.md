@@ -32,6 +32,9 @@ EnergyPlus Technicalities Call on 2/9/2022
 - `SteamEquipment` should go on the same meter as this `DistrictHeatingSteam`
 - As for Steam to Water Heat Exchanger, we stick with two explicit objects because it's better from the user standpoint.
 
+EnergyPlus NREL internal meeting on 8/18/2023
+- As for meter names, `DistrictHeatingSteam` should be reverted to `steam` (due to steam as `Generator Heat Source Type` of `Chiller:Absorption` and `Chiller:Absorption:Indirect`, where the generator inlet and outlet nodes are connected to a steam loop with Boiler:Steam)
+
 ## Overview ##
 
 The current steam loop in EnergyPlus has five objects: steam boiler, steam pipe, steam to air coil, steam baseboard radiator, and condensate pump. The steam loop has several assumptions that help simplify loop complexity and increase usability.
@@ -56,10 +59,10 @@ These assumptions are applied to the new objects: `LoadProfile:Plant` in a steam
 The current LoadProfile:Plant calculates the outlet water temperature based on the inlet water temperature from the plant loop and user inputs for the scheduled plant load and the requested flow rate. 
 In the new LoadProfile:Plant, there are three additional input fields: Plant Loop Fluid Type (Water or steam); Degree of SubCooling (optional input for steam loop); and Degree of Loop SubCooling (optional input for steam loop). The new LoadProfile:Plant in a steam loop calculates the steam outlet mass flow rate based on the scheduled plant load and user inputs of degree of subcooling, because the inlet steam temperature and the outlet steam temperature before the steam trap are fixed to saturation temperature according to the assumption.
 
-2. `DistrictHeatingSteam` :
+2. `DistrictHeating:Steam` :
 The current DistrictHeating or DistrictCooling calculates the output capacity required from the inlet temperature to the setpoint temperature for the loop with the given mass flow rate in Watts.
 The DistrictHeatingSteam calculates the required output capacity based on the latent heat at the given saturation temperature.
-The current object name and meter names of DistrictHeating are changed to DistrictHeatingWater. Also, the current meter names of Steam are changed to DistrictHeatingSteam.
+The current object name and meter names of DistrictHeating are changed to DistrictHeatingWater.
 
 
 ## Testing/Validation/Data Sources ##
@@ -110,12 +113,12 @@ LoadProfile:Plant,
        \key Steam
        \default Water
   N2 , \field Degree of SubCooling
-       \note optional, in case of steam loop
+       \note This field is used only when Plant Loop Fluid Type=Steam.
        \units C
        \minimum 1.0
        \default 5.0
   N3 ; \field Degree of Loop SubCooling
-       \note optional, in case of steam loop
+       \note This field is used only when Plant Loop Fluid Type=Steam.
        \units C
        \minimum 10.0
        \default 20.0

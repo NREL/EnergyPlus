@@ -651,7 +651,7 @@ void BLASTAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "DistrictHeatingSteam",
+                                fluidNameSteam,
                                 "Cooling",
                                 {},
                                 "Plant");

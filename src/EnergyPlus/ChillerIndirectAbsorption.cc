@@ -743,7 +743,7 @@ void IndirectAbsorberSpecs::setupOutputVars(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "DistrictHeatingSteam",
+                                fluidNameSteam,
                                 "Cooling",
                                 {},
                                 "Plant");
