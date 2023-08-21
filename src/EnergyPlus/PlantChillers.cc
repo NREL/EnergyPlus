@@ -5376,6 +5376,73 @@ namespace PlantChillers {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:CombustionTurbine");
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->COP);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCap);
+
+            // std 229 new Chillers table
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:CombustionTurbine");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCap);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->COP); // Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->NomCap); // did not find rated cap
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->COP); // did not find rated eff or cop ; also Eff == COP?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+                                                     this->Name,
+                                                     this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CWPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CWPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+                                                     this->Name,
+                                                     this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum)
+                                                                                        .LoopSide(this->CDPlantLoc.loopSideNum)
+                                                                                        .Branch(this->CDPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, Constant::eResourceNames[static_cast<int>(this->FuelType)]);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondIn); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempDesEvapOut); // Rated==Ref?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondIn);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempDesEvapOut);
+
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                     this->Name,
+                                                     this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                     this->Name,
+                                                     this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName,
+                                                     this->Name,
+                                                     this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum)
+                                                                                        .LoopSide(this->HRPlantLoc.loopSideNum)
+                                                                                        .Branch(this->HRPlantLoc.branchNum)
+                                                                                        .Name
+                                                                                  : "N/A");
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
         }
 
         if (ErrorsFound) {
