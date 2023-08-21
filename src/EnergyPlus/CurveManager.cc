@@ -57,8 +57,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // Third-party Headers
-#include <fast_float/fast_float.h>
 #include <courierr/courierr.h>
+#include <fast_float/fast_float.h>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
@@ -112,14 +112,18 @@ namespace Curve {
 
     std::shared_ptr<EPlusLogging> BtwxtManager::btwxt_logger{{std::make_shared<EPlusLogging>()}};
 
-    void EPlusLogging::error(const std::string_view message) {
-        const std::pair<EnergyPlusData *, std::string>& contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
+    void EPlusLogging::error(const std::string_view message)
+    {
+        const std::pair<EnergyPlusData *, std::string> &contextPair =
+            *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
         std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
         ShowSevereError(*contextPair.first, fullMessage);
         ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
     }
-    void EPlusLogging::warning(const std::string_view message) {
-        const std::pair<EnergyPlusData *, std::string>& contextPair = *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
+    void EPlusLogging::warning(const std::string_view message)
+    {
+        const std::pair<EnergyPlusData *, std::string> &contextPair =
+            *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
         std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
         ShowWarningError(*contextPair.first, fullMessage);
     }
@@ -2255,11 +2259,10 @@ namespace Curve {
                                                   BtwxtManager::btwxt_logger);
 
                             auto gridIndex = // (AUTO_OK_OBJ)
-                                    state.dataCurveManager->btwxtManager.addGrid(Alphas(1), gridAxes);
+                                state.dataCurveManager->btwxtManager.addGrid(Alphas(1), gridAxes);
                             thisCurve->TableIndex = gridIndex;
                             thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
-                        }
-                        catch (Btwxt::BtwxtException &e) {
+                        } catch (Btwxt::BtwxtException &e) {
                             ShowSevereError(state, "GridAxis construction error.");
                         }
                     }
@@ -2402,7 +2405,8 @@ namespace Curve {
                         min_val = min(min_val, min_grid_value);
                         max_val = max(max_val, max_grid_value);
 
-                        gridAxes.emplace_back(axis, "", extrapMethod, interpMethod, std::pair<double, double>{min_val, max_val}, BtwxtManager::btwxt_logger);
+                        gridAxes.emplace_back(
+                            axis, "", extrapMethod, interpMethod, std::pair<double, double>{min_val, max_val}, BtwxtManager::btwxt_logger);
 
                     } else {
                         // Independent variable does not exist

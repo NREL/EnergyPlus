@@ -223,12 +223,17 @@ namespace Curve {
         std::size_t numColumns = 0u;
     };
 
-    class EPlusLogging : public Courierr::Courierr {
+    class EPlusLogging : public Courierr::Courierr
+    {
     public:
         void error(const std::string_view message) override;
         void warning(const std::string_view message) override;
-        void info(const std::string_view)  override {}
-        void debug(const std::string_view) override {}
+        void info(const std::string_view) override
+        {
+        }
+        void debug(const std::string_view) override
+        {
+        }
     };
 
     // Container for Btwxt N-d Objects
@@ -242,7 +247,8 @@ namespace Curve {
             gridMap.emplace(indVarListName, grids.size() - 1);
             return static_cast<int>(grids.size()) - 1;
         }
-        void setLoggingContext(void* context) {
+        void setLoggingContext(void *context)
+        {
             for (auto &btwxt : grids) {
                 btwxt.get_logger()->set_message_context(context); // TODO: set_context can be its own function
             }

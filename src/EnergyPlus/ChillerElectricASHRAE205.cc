@@ -143,8 +143,8 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
         }
         std::pair<EnergyPlusData *, std::string> callbackPair{&state,
                                                               format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
-        thisChiller.Representation =
-            std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlus::Curve::EPlusLogging>()));
+        thisChiller.Representation = std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(
+            RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlus::Curve::EPlusLogging>()));
         if (nullptr == thisChiller.Representation) {
             ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
             ErrorsFound = true;
