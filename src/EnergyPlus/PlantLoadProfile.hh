@@ -97,7 +97,6 @@ namespace PlantLoadProfile {
         Real64 MassFlowRate;            // Mass flow rate (kg/s)
         Real64 DegOfSubcooling = 0.0;   // Degree of subcooling in steam outlet
         Real64 LoopSubcoolReturn = 0.0; // Loop subcooling for steam return
-        Real64 OutletSteamQuality = 0.0;
         bool EMSOverrideMassFlow;
         Real64 EMSMassFlowValue;
         // Report variables

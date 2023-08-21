@@ -182,7 +182,7 @@ void PlantProfileData::simulate(EnergyPlusData &state,
             // Steam Mass Flow Rate Required
             this->MassFlowRate = this->Power / (LatentHeatSteam + this->DegOfSubcooling * CpWater);
             PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
-            this->OutletSteamQuality = 0.0;
+            state.dataLoopNodes->Node(this->OutletNode).Quality = 0.0;
             // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
             // This is required for outlet water temperature, otherwise it will be saturation temperature.
             // Steam Trap drains off all the Water formed.
