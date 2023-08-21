@@ -41,5 +41,16 @@ libtk205/.github
 libtk205/examples
 libtk205/test
 libtk205/vendor/btwxt
-libtk205/vendor/json
 libtk205/vendor/courierr
+libtk205/vendor/json/.github
+libtk205/vendor/json/.gitmodules
+libtk205/vendor/json/benchmarks
+libtk205/vendor/json/doc
+libtk205/vendor/json/doc
+libtk205/vendor/json/test
+libtk205/vendor/json/third_party
+libtk205/vendor/json/.*
+libtk205/vendor/json/*.md
+libtk205/vendor/json/*.build
+libtk205/vendor/json/*.cff
+libtk205/vendor/json/*.yml
