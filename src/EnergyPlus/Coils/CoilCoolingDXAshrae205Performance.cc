@@ -120,8 +120,8 @@ CoilCoolingDX205Performance::CoilCoolingDX205Performance(EnergyPlus::EnergyPlusD
 
         if (errorsFound) {
             ShowFatalError(state,
-                           std::string{routineName} + "Errors found in getting " + this->object_name +
-                               " input. Preceding condition(s) causes termination.");
+                           format(routineName, "Errors found in getting ", this->object_name,
+                               " input. Preceding condition(s) causes termination."));
         }
     }
 }

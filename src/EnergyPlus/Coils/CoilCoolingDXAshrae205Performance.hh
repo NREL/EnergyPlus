@@ -66,7 +66,7 @@ struct CoilCoolingDX205Performance : public CoilCoolingDXPerformanceBase
 {
     CoilCoolingDX205Performance(EnergyPlus::EnergyPlusData &state, const std::string &name_to_find);
 
-    inline static const std::string object_name = "Coil:DX:ASHRAE205:Performance";
+    static constexpr std::string_view object_name = "Coil:DX:ASHRAE205:Performance";
 
     std::shared_ptr<tk205::rs0004_ns::RS0004> representation; // ASHRAE205 representation instance
     Btwxt::Method interpolation_type{Btwxt::Method::linear};

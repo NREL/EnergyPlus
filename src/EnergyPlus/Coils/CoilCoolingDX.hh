@@ -177,7 +177,7 @@ struct CoilCoolingDX
     bool isHundredPercentDOAS = false;
 
     private:
-    static bool findPerformanceSubclass(EnergyPlus::EnergyPlusData &state, const std::string &object_to_find, const std::string &idd_performance_name);
+    static bool findPerformanceSubclass(EnergyPlus::EnergyPlusData &state, const std::string_view object_to_find, const std::string &idd_performance_name);
 };
 
 struct CoilCoolingDXData : BaseGlobalStruct

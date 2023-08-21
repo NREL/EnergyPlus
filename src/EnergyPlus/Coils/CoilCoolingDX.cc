@@ -82,8 +82,8 @@ using namespace EnergyPlus;
 std::shared_ptr<CoilCoolingDXPerformanceBase> CoilCoolingDX::makePerformanceSubclass(EnergyPlus::EnergyPlusData &state,
                                                                                      const std::string &performance_object_name)
 {
-    const auto &a205_object_name = CoilCoolingDX205Performance::object_name;
-    const auto &curve_fit_object_name = CoilCoolingDXCurveFitPerformance::object_name;
+    const auto a205_object_name = CoilCoolingDX205Performance::object_name;
+    const auto curve_fit_object_name = CoilCoolingDXCurveFitPerformance::object_name;
 
     if (findPerformanceSubclass(state, a205_object_name, performance_object_name))
     {
@@ -93,7 +93,7 @@ std::shared_ptr<CoilCoolingDXPerformanceBase> CoilCoolingDX::makePerformanceSubc
         return std::make_shared<CoilCoolingDXCurveFitPerformance>(state, performance_object_name);
     }
 
-    ShowFatalError(state, "Could not find Coil:Cooling:DX:Performance object with name: " + performance_object_name);
+    ShowFatalError(state, format("Could not find Coil:Cooling:DX:Performance object with name: ", performance_object_name));
     return nullptr;
 }
 
@@ -1091,13 +1091,13 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state)
 }
 
 bool CoilCoolingDX::findPerformanceSubclass(EnergyPlus::EnergyPlusData &state,
-                                            const std::string &object_to_find,
+                                            const std::string_view object_to_find,
                                             const std::string &idd_performance_name)
 {
     const auto &ip = state.dataInputProcessing->inputProcessor;
 
     if (ip->getNumObjectsFound(state, object_to_find) > 0) { // e.g. "Coil::Cooling::DX::CurveFit::Performance"
-        auto const &json_dict_performance = ip->epJSON.find(object_to_find).value();
+        auto const &json_dict_performance = ip->epJSON.find(std::string(object_to_find)).value();
         for (auto &instance : json_dict_performance.items()) {
             std::string const &performance_name = EnergyPlus::UtilityRoutines::makeUPPER(instance.key());
             if (performance_name == idd_performance_name) { // e.g. "Heat Pump ACDXCoil 1 Performance"
