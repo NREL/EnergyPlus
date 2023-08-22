@@ -588,7 +588,7 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        reportVarPrefix + "Rate",
+                        "District " + heatingOrCooling + " Rate",
                         OutputProcessor::Unit::W,
                         this->EnergyRate,
                         OutputProcessor::SOVTimeStepType::System,
