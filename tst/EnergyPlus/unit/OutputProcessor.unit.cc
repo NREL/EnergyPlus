@@ -5346,37 +5346,38 @@ namespace OutputProcessor {
                             "System");
 
         PurchAir(1).TotHeatEnergy = 1.1;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeterReporting(*state);
+        UpdateMeters(*state, MDHM);
         //UpdateMeterReporting(*state);
         //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         //UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.3;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.5;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.7;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.9;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 2.2;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
@@ -5384,7 +5385,7 @@ namespace OutputProcessor {
         state->dataGlobal->WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
@@ -5406,19 +5407,19 @@ namespace OutputProcessor {
             "\n"));
 
         PurchAir(1).TotHeatEnergy = 100.0;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 200.0;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 300.0;
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        UpdateMeters(*state, MDHM);
         // UpdateMeterReporting(*state);
         // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
         // UpdateMeters(*state, MDHM);
