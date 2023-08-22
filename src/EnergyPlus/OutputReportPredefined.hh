@@ -438,7 +438,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
     int pdstPLCL = 0;
-    int pdchPLCLName = 0;            // name
     int pdchPLCLType = 0;            // type (PlantLoop or CondenserLoop)
     int pdchPLCLProvHeat = 0;        // provides heating
     int pdchPLCLProvCool = 0;        // provides cooling
@@ -447,7 +446,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     // Std 229 Air Terminal Table in Equipment Summary
     int pdstAirTerm = 0;
-    int pdchAirTermName = 0;           // name
     int pdchAirTermZoneName = 0;       // Zone Name
     int pdchAirTermMinFlow = 0;        // Minimum Flow
     int pdchAirTermMinOutdoorFlow = 0; // Minimum Outdoor Flow

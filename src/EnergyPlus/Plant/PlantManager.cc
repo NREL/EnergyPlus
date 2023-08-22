@@ -3092,10 +3092,6 @@ void SizePlantLoop(EnergyPlusData &state,
             }
             if (Finalize) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    OutputReportPredefined::PreDefTableEntry(state,
-                                                             state.dataOutRptPredefined->pdchPLCLName,
-                                                             state.dataPlnt->PlantLoop(LoopNum).Name,
-                                                             state.dataPlnt->PlantLoop(LoopNum).Name);
                     if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         BaseSizer::reportSizerOutput(state,
                                                      "PlantLoop",

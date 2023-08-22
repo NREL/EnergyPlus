@@ -5482,8 +5482,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         }
 
         // begin std 229 air terminal new table
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermName, thisTUFZSizing.ADUName, thisTUFZSizing.ADUName);
-
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermZoneName,
                                                  thisTUFZSizing.ADUName,

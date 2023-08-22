@@ -512,7 +512,6 @@ namespace OutputReportPredefined {
         // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
         s->pdstPLCL = newPreDefSubTable(state, s->pdrEquip, "PlantLoop or CondenserLoop");
 
-        s->pdchPLCLName = newPreDefColumn(state, s->pdstPLCL, "Name");
         s->pdchPLCLType = newPreDefColumn(state, s->pdstPLCL, "Type");
         s->pdchPLCLProvHeat = newPreDefColumn(state, s->pdstPLCL, "Provides Heating");
         s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "Provides Cooling");
@@ -522,7 +521,6 @@ namespace OutputReportPredefined {
         // Std 229 Air Terminal Table in Equipment Summary
         s->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");
 
-        s->pdchAirTermName = newPreDefColumn(state, s->pdstAirTerm, "Name");
         s->pdchAirTermZoneName = newPreDefColumn(state, s->pdstAirTerm, "Zone Name");
         s->pdchAirTermMinFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow");
         s->pdchAirTermMinOutdoorFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow");
