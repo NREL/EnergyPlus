@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include <performance_map_base.h>
-#include "grid-axis.h"
+#include <btwxt/grid-axis.h>
 
 // ------------------------------------------------------------------------------------------------
 /// @class GridVariablesBase grid_variables_base.h
