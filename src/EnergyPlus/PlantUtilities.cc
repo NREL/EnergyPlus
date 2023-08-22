@@ -1024,9 +1024,10 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
             state.dataLoopNodes->Node(OutletNodeNum).Temp =
                 state.dataLoopNodes->Node(InletNodeNum).Temp + ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
         }
-        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(InletNodeNum)
-                .MassFlowRate; // if condenser is on inlet branch, the outlet node needs to be updated or can get splitter/mixer failures
+        // see 10133
+        // state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
+        //    state.dataLoopNodes->Node(InletNodeNum)
+        //        .MassFlowRate; // if condenser is on inlet branch, the outlet node needs to be updated or can get splitter/mixer failures
 
         // set sim flag for this loop
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
@@ -1034,13 +1035,14 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
         // set sim flag on connected loops to true because this side changed
         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected > 0) {
             for (ConnectLoopNum = 1; ConnectLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected; ++ConnectLoopNum) {
-                // if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopDemandsOnRemote) {
-                // full chiller model is not really run when called from the condenser side and the chiller evap loop puts demand on the condenser
-                // loop, so this logic is flawed, remove if statement so evap side gets simulated again
-                OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopNum;
-                OtherLoopSide = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopSideNum;
-                state.dataPlnt->PlantLoop(OtherLoopNum).LoopSide(OtherLoopSide).SimLoopSideNeeded = true;
-                // }
+                // see 10133
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopDemandsOnRemote) {
+                    // full chiller model is not really run when called from the condenser side and the chiller evap loop puts demand on the condenser
+                    // loop, so this logic is flawed, remove if statement so evap side gets simulated again
+                    OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopNum;
+                    OtherLoopSide = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopSideNum;
+                    state.dataPlnt->PlantLoop(OtherLoopNum).LoopSide(OtherLoopSide).SimLoopSideNeeded = true;
+                }
             }
         }
 
@@ -1115,9 +1117,10 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
             state.dataLoopNodes->Node(OutletNodeNum).Temp =
                 state.dataLoopNodes->Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
         }
-        state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(InletNodeNum).MassFlowRate; // if heat recovery bundle is on inlet branch, the mass flow needs to be
-        // updated or get splitter/mixer failures
+        // see 10133
+        // state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
+        //    state.dataLoopNodes->Node(InletNodeNum).MassFlowRate; // if heat recovery bundle is on inlet branch, the mass flow needs to be
+        //// updated or get splitter/mixer failures
 
         // set sim flag for this loop
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
@@ -1125,13 +1128,14 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
         // set sim flag on connected loops to true because this side changed
         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected > 0) {
             for (ConnectLoopNum = 1; ConnectLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected; ++ConnectLoopNum) {
-                // if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopDemandsOnRemote) {
-                // full chiller model is not really run when called from the heat recovery side and the chiller evap loop puts demand on the heat
-                // recovery loop, so this logic is flawed, remove if statement so evap side gets simulated again
-                OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopNum;
-                OtherLoopSide = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopSideNum;
-                state.dataPlnt->PlantLoop(OtherLoopNum).LoopSide(OtherLoopSide).SimLoopSideNeeded = true;
-                // }
+                // see 10133
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopDemandsOnRemote) {
+                    // full chiller model is not really run when called from the heat recovery side and the chiller evap loop puts demand on the heat
+                    // recovery loop, so this logic is flawed, remove if statement so evap side gets simulated again
+                    OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopNum;
+                    OtherLoopSide = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopSideNum;
+                    state.dataPlnt->PlantLoop(OtherLoopNum).LoopSide(OtherLoopSide).SimLoopSideNeeded = true;
+                }
             }
         }
 
