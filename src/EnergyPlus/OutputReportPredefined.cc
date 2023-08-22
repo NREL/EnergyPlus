@@ -515,21 +515,21 @@ namespace OutputReportPredefined {
         s->pdchPLCLName = newPreDefColumn(state, s->pdstPLCL, "Name");
         s->pdchPLCLType = newPreDefColumn(state, s->pdstPLCL, "Type (PlantLoop or CondenserLoop)");
         s->pdchPLCLProvHeat = newPreDefColumn(state, s->pdstPLCL, "Provides Heating");
-        s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "Provides Hooling");
+        s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "Provides Cooling");
         s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate [m3/s]");
         s->pdchPLCLMinLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Minimum Loop Flow Rate [m3/s]");
 
-        // Std 229 AirTerminal Table in Equipment Summary
+        // Std 229 Air Terminal Table in Equipment Summary
         s->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");
 
         s->pdchAirTermName = newPreDefColumn(state, s->pdstAirTerm, "Name");
         s->pdchAirTermZoneName = newPreDefColumn(state, s->pdstAirTerm, "Zone Name");
         s->pdchAirTermMinFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow");
         s->pdchAirTermMinOutdoorFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow");
-        s->pdchAirTermSupCoolingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply cooling setpoint");
-        s->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply heating setpoint");
-        s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating capacity");
-        s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling capacity");
+        s->pdchAirTermSupCoolingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Cooling Setpoint");
+        s->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Heating Setpoint");
+        s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating Capacity");
+        s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling Capacity");
 
         // Std 229 Air Heat Recovery
         s->pdstAirHR = newPreDefSubTable(state, s->pdrEquip, "Air Heat Recovery");
