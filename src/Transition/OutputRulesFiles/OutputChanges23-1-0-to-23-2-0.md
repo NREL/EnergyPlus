@@ -21,6 +21,9 @@ This work started since 2022 aims to develop a script that creates a JSON file c
 Since each EnergyPlus IDF file could generate an RMD file, the Ruleset Checking Tool will be able to see if the changes between the RMD files correspond to rules in the ruleset by looking at both the baseline and proposed RMD file. The work in the current stage prioritize the support on the selection of baseline HVAC system in Appendix G which includes changes to or new EnergyPlus reports:
 
 #### Adding reporting entries to existing tabular reports
+
+New variables related to Std 229 are appendeded to the right of the following existing tables:
+
 - Equipment Summary - Heating Coils
 - Equipment Summary - DX Heating Coils
 - Equipment Summary - Fans
@@ -28,7 +31,10 @@ Since each EnergyPlus IDF file could generate an RMD file, the Ruleset Checking 
 - Component Sizing Summary - PlantLoop
 
 #### Adding additional central plant and equipment reports
-- Equipment Summary Coils and Connections
+
+The following new tables or subtables are created:
+
+- Equipment Summary Coil Connections
 - Equipment Summary - Chillers
 - Equipment Summary - Boiler
 - Equipment Summary - Fluid Coolers
