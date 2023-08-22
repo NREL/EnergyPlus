@@ -674,9 +674,35 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(20:CurArgs+1)=InArgs(19:CurArgs)
                 CurArgs = CurArgs + 1
 
-              ! If your original object starts with D, insert the rules here
+              ! If your original object starts with D, insert the rules here              
+              CASE('DISTRICTHEATING')
+                nodiff=.false.
+                ObjectName='DistrictHeating:Water'
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
 
               ! If your original object starts with E, insert the rules here
+              CASE('ENERGYMANAGEMENTSYSTEM:METEREDOUTPUTVARIABLE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(5) == "DISTRICTHEATING" .OR. OutArgs(5) == "DistrictHeating" .OR. OutArgs(5) == "districtheating") THEN
+                     OutArgs(5) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(5) == "STEAM" .OR. OutArgs(5) == "Steam" .OR. OutArgs(5) == "steam") THEN
+                     OutArgs(5) = "DistrictHeatingSteam"
+                 END IF
+
+              CASE('EXTERIOR:FUELEQUIPMENT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                     OutArgs(2) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                     OutArgs(2) = "DistrictHeatingSteam"
+                 END IF
 
               ! If your original object starts with F, insert the rules here
 
@@ -887,8 +913,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with N, insert the rules here
 
               ! If your original object starts with O, insert the rules here
+              CASE('OTHEREQUIPMENT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                     OutArgs(2) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                     OutArgs(2) = "DistrictHeatingSteam"
+                 END IF
 
               ! If your original object starts with P, insert the rules here
+              CASE('PYTHONPLUGIN:OUTPUTVARIABLE')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(6) == "DISTRICTHEATING" .OR. OutArgs(6) == "DistrictHeating" .OR. OutArgs(6) == "districtheating") THEN
+                     OutArgs(6) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(6) == "STEAM" .OR. OutArgs(6) == "Steam" .OR. OutArgs(6) == "steam") THEN
+                     OutArgs(6) = "DistrictHeatingSteam"
+                 END IF
 
               ! If your original object starts with R, insert the rules here
 
@@ -901,8 +947,69 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with V, insert the rules here
 
               ! If your original object starts with W, insert the rules here
+              CASE('WATERHEATER:MIXED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(11) == "DISTRICTHEATING" .OR. OutArgs(11) == "DistrictHeating" .OR. OutArgs(11) == "districtheating") THEN
+                     OutArgs(11) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(11) == "STEAM" .OR. OutArgs(11) == "Steam" .OR. OutArgs(11) == "steam") THEN
+                     OutArgs(11) = "DistrictHeatingSteam"
+                 END IF
+                 IF (OutArgs(15) == "DISTRICTHEATING" .OR. OutArgs(15) == "DistrictHeating" .OR. OutArgs(15) == "districtheating") THEN
+                     OutArgs(15) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(15) == "STEAM" .OR. OutArgs(15) == "Steam" .OR. OutArgs(15) == "steam") THEN
+                     OutArgs(15) = "DistrictHeatingSteam"
+                 END IF
+                 IF (OutArgs(18) == "DISTRICTHEATING" .OR. OutArgs(18) == "DistrictHeating" .OR. OutArgs(18) == "districtheating") THEN
+                     OutArgs(18) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(18) == "STEAM" .OR. OutArgs(18) == "Steam" .OR. OutArgs(18) == "steam") THEN
+                     OutArgs(18) = "DistrictHeatingSteam"
+                 END IF
+
+              CASE('WATERHEATER:STRATIFIED')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(17) == "DISTRICTHEATING" .OR. OutArgs(17) == "DistrictHeating" .OR. OutArgs(17) == "districtheating") THEN
+                     OutArgs(17) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(17) == "STEAM" .OR. OutArgs(17) == "Steam" .OR. OutArgs(17) == "steam") THEN
+                     OutArgs(17) = "DistrictHeatingSteam"
+                 END IF
+                 IF (OutArgs(24) == "DISTRICTHEATING" .OR. OutArgs(24) == "DistrictHeating" .OR. OutArgs(24) == "districtheating") THEN
+                     OutArgs(24) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(24) == "STEAM" .OR. OutArgs(24) == "Steam" .OR. OutArgs(24) == "steam") THEN
+                     OutArgs(24) = "DistrictHeatingSteam"
+                 END IF
 
               ! If your original object starts with Z, insert the rules here
+              CASE('ZONEHVAC:HYBRIDUNITARYHVAC')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(20) == "DISTRICTHEATING" .OR. OutArgs(20) == "DistrictHeating" .OR. OutArgs(20) == "districtheating") THEN
+                     OutArgs(20) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(20) == "STEAM" .OR. OutArgs(20) == "Steam" .OR. OutArgs(20) == "steam") THEN
+                     OutArgs(20) = "DistrictHeatingSteam"
+                 END IF
+                 IF (OutArgs(21) == "DISTRICTHEATING" .OR. OutArgs(21) == "DistrictHeating" .OR. OutArgs(21) == "districtheating") THEN
+                     OutArgs(21) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(21) == "STEAM" .OR. OutArgs(21) == "Steam" .OR. OutArgs(21) == "steam") THEN
+                     OutArgs(21) = "DistrictHeatingSteam"
+                 END IF
+                 IF (OutArgs(22) == "DISTRICTHEATING" .OR. OutArgs(22) == "DistrictHeating" .OR. OutArgs(22) == "districtheating") THEN
+                     OutArgs(22) = "DistrictHeatingWater"
+                 END IF
+                 IF (OutArgs(22) == "STEAM" .OR. OutArgs(22) == "Steam" .OR. OutArgs(22) == "steam") THEN
+                     OutArgs(22) = "DistrictHeatingSteam"
+                 END IF
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1127,6 +1234,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.
+                IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                    OutArgs(2) = "DistrictHeatingWater"
+                END IF
+                IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                    OutArgs(2) = "DistrictHeatingSteam"
+                END IF
                 CurVar=4
                 DO Var=4,CurArgs,2
                   UCRepVarName=MakeUPPERCase(InArgs(Var))
@@ -1235,6 +1348,12 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.
+                IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                    OutArgs(2) = "DistrictHeatingWater"
+                END IF
+                IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                    OutArgs(2) = "DistrictHeatingSteam"
+                END IF
                 CurVar=4   ! In case Source Meter would change
                 DO Var=4,CurArgs,2
                   UCRepVarName=MakeUPPERCase(InArgs(Var))

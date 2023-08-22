@@ -33,7 +33,7 @@ EnergyPlus Technicalities Call on 2/9/2022
 - As for Steam to Water Heat Exchanger, we stick with two explicit objects because it's better from the user standpoint.
 
 EnergyPlus NREL internal meeting on 8/18/2023
-- As for meter names, `DistrictHeatingSteam` should be reverted to `steam` (due to steam as `Generator Heat Source Type` of `Chiller:Absorption` and `Chiller:Absorption:Indirect`, where the generator inlet and outlet nodes are connected to a steam loop with Boiler:Steam)
+- As for meter names, `DistrictHeatingSteam` should be reverted to `Steam` (due to steam as `Generator Heat Source Type` of `Chiller:Absorption` and `Chiller:Absorption:Indirect`, where the generator inlet and outlet nodes are connected to a steam loop with Boiler:Steam)
 
 ## Overview ##
 

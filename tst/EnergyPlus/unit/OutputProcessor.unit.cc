@@ -1179,7 +1179,7 @@ namespace OutputProcessor {
             {"WELLWATER", "WellWater"},
             {"CONDENSATE", "Condensate"},
             {"ENERGYTRANSFER", "EnergyTransfer"},
-            {"DISTRICTHEATINGSTEAM", "Steam"}, // As far as Meter name, "Steam" covers both "DistrictHeatingSteam" and "Steam"
+            {"DISTRICTHEATINGSTEAM", "Steam"}, // As far as Meter  Key, "Steam" covers both "DistrictHeatingSteam" and "Steam"
             {"DISTRICTCOOLING", "DistrictCooling"},
             {"DISTRICTHEATINGWATER", "DistrictHeatingWater"},
             {"ELECTRICITYPRODUCED", "ElectricityProduced"},
