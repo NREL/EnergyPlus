@@ -1448,19 +1448,14 @@ namespace OutputProcessor {
         std::string const meterType = UtilityRoutines::makeUPPER(UserInputResourceType);
 
         int eMeterResource = getEnumValue(Constant::eResourceNamesUC, meterType);
-        if (meterType == "STEAM") {
-            eMeterResource = static_cast<int>(Constant::eResource::DistrictHeatingSteam);
-        }
 
         if (eMeterResource == static_cast<int>(Constant::eResource::Invalid)) {
             ShowSevereError(state, format("GetStandardMeterResourceType: Illegal OutResourceType (for Meters) Entered={}", UserInputResourceType));
             ErrorsFound = true;
             return;
-        } else if (eMeterResource == static_cast<int>(Constant::eResource::DistrictHeatingSteam)) {
-            OutResourceType = "Steam";
-        } else {
-            OutResourceType = Constant::eResourceNames[eMeterResource];
-        };
+        }
+
+        OutResourceType = Constant::eResourceNames[eMeterResource];
     }
 
     void AddMeter(EnergyPlusData &state,
