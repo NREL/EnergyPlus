@@ -5495,35 +5495,11 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, thisTUFZSizing.ADUName, thisTUFZSizing.MinOA);
 
-        int DesCoolSetPtSize = thisTUFZSizing.DesCoolSetPtSeq.size();
-        if (DesCoolSetPtSize == 1) {
-            OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, thisTUFZSizing.DesCoolSetPtSeq(1));
-        } else if (DesCoolSetPtSize > 1) {
-            std::string tmpCoolSetPts;
-            for (int vecLoop = 1; vecLoop <= DesCoolSetPtSize; ++vecLoop) {
-                tmpCoolSetPts += format("{:.2R}; ", thisTUFZSizing.DesCoolSetPtSeq(vecLoop));
-            }
-            OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, tmpCoolSetPts);
-        } else {
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, "N/A");
-        }
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, thisTUFZSizing.CoolDesTemp);
 
-        int DesHeatSetPtSize = thisTUFZSizing.DesHeatSetPtSeq.size();
-        if (DesHeatSetPtSize == 1) {
-            OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, thisTUFZSizing.DesHeatSetPtSeq(1));
-        } else if (DesHeatSetPtSize > 1) {
-            std::string tmpHeatSetPts;
-            for (int vecLoop = 1; vecLoop <= DesHeatSetPtSize; ++vecLoop) {
-                tmpHeatSetPts += format("{:.2R}; ", thisTUFZSizing.DesHeatSetPtSeq(vecLoop));
-            }
-            OutputReportPredefined::PreDefTableEntry(
-                state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, tmpHeatSetPts);
-        } else {
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, "N/A");
-        }
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, thisTUFZSizing.HeatDesTemp);
 
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermHeatingCap,
