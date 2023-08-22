@@ -467,7 +467,7 @@ namespace OutputReportPredefined {
         s->pdchChillerRatedEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Rated Entering Condenser Temperature [C]");
         s->pdchChillerRatedLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Rated Leaving Evaporator Temperature [C]");
         s->pdchChillerRefEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Reference Entering Condenser Temperature [C]");
-        s->pdchChillerRefLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Reference Leaving Evaporator Temperature [c]");
+        s->pdchChillerRefLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Reference Leaving Evaporator Temperature [C]");
         s->pdchChillerDesSizeRefCHWFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Chilled Water Flow Rate [kg/s]");
         s->pdchChillerDesSizeRefCondFluidFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Condenser Fluid Flow Rate [kg/s]");
         s->pdchChillerPlantloopName = newPreDefColumn(state, s->pdstChiller, "Plantloop Name");
