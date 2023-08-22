@@ -452,9 +452,6 @@ namespace OutputReportPredefined {
         s->pdchSWHRecEff = newPreDefColumn(state, s->pdstSWH, "Recovery Efficiency [W/W]");
         s->pdchSWHEnFac = newPreDefColumn(state, s->pdstSWH, "Energy Factor");
 
-        // Std 229 HVAC Topology new table
-        // s->pdstHVACTopo = newPreDefSubTable(state, s->pdrEquip, "HVAC Topology");
-
         // Std 229 Chillers in Equipment Summary
         s->pdstChiller = newPreDefSubTable(state, s->pdrEquip, "Chillers");
 
@@ -465,10 +462,6 @@ namespace OutputReportPredefined {
         s->pdchChillerRatedEff = newPreDefColumn(state, s->pdstChiller, "Rated Efficiency [W/W]");
         s->pdchChillerIPLVinSI = newPreDefColumn(state, s->pdstChiller, "IPLV in SI Units [W/W]");
         s->pdchChillerIPLVinIP = newPreDefColumn(state, s->pdstChiller, "IPLV in IP Units [Btu/W-h]");
-        s->pdchChillerPlantloopName = newPreDefColumn(state, s->pdstChiller, "Plantloop Name");
-        s->pdchChillerPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Plantloop Branch Name");
-        s->pdchChillerCondLoopName = newPreDefColumn(state, s->pdstChiller, "Condenser Loop Name");
-        s->pdchChillerCondLoopBranchName = newPreDefColumn(state, s->pdstChiller, "Condenser Loop Branch Name");
         s->pdchChillerMinPLR = newPreDefColumn(state, s->pdstChiller, "Minimum Part Load Ratio");
         s->pdchChillerFuelType = newPreDefColumn(state, s->pdstChiller, "Fuel Type");
         s->pdchChillerRatedEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Rated Entering Condenser Temperature");
@@ -477,6 +470,10 @@ namespace OutputReportPredefined {
         s->pdchChillerRefLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Reference Leaving Evaporator Temperature");
         s->pdchChillerDesSizeRefCHWFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Chilled Water Flow Rate");
         s->pdchChillerDesSizeRefCondFluidFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Condenser Fluid Flow Rate");
+        s->pdchChillerPlantloopName = newPreDefColumn(state, s->pdstChiller, "Plantloop Name");
+        s->pdchChillerPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Plantloop Branch Name");
+        s->pdchChillerCondLoopName = newPreDefColumn(state, s->pdstChiller, "Condenser Loop Name");
+        s->pdchChillerCondLoopBranchName = newPreDefColumn(state, s->pdstChiller, "Condenser Loop Branch Name");
         s->pdchChillerHeatRecPlantloopName = newPreDefColumn(state, s->pdstChiller, "Heat Recovery Plantloop Name");
         s->pdchChillerHeatRecPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Heat Recovery Plantloop Branch Name");
         s->pdchChillerRecRelCapFrac = newPreDefColumn(state, s->pdstChiller, "Recovery Relative Capacity Fraction");
@@ -489,18 +486,16 @@ namespace OutputReportPredefined {
         s->pdchBoilerRefEff = newPreDefColumn(state, s->pdstBoiler, "Reference Efficiency[W/W]");
         s->pdchBoilerRatedCap = newPreDefColumn(state, s->pdstBoiler, "Rated Capacity [W]");
         s->pdchBoilerRatedEff = newPreDefColumn(state, s->pdstBoiler, "Rated Efficiency [W/W]");
-        s->pdchBoilerPlantloopName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Name");
-        s->pdchBoilerPlantloopBranchName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Branch Name");
         s->pdchBoilerMinPLR = newPreDefColumn(state, s->pdstBoiler, "Minimum Part Load Ratio");
         s->pdchBoilerFuelType = newPreDefColumn(state, s->pdstBoiler, "Fuel Type");
         s->pdchBoilerParaElecLoad = newPreDefColumn(state, s->pdstBoiler, "Parasitic Electric Load");
+        s->pdchBoilerPlantloopName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Name");
+        s->pdchBoilerPlantloopBranchName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Branch Name");
 
         // Std 229 cooling towers and fluid coolers Table in Equipment Summary
         s->pdstCTFC = newPreDefSubTable(state, s->pdrEquip, "Cooling Towers and Fluid Coolers");
 
         s->pdchCTFCType = newPreDefColumn(state, s->pdstCTFC, "Type");
-        s->pdchCTFCCondLoopName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Name");
-        s->pdchCTFCCondLoopBranchName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Branch Name");
         s->pdchCTFCFluidType = newPreDefColumn(state, s->pdstCTFC, "Fluid Type");
         s->pdchCTFCRange = newPreDefColumn(state, s->pdstCTFC, "Range");
         s->pdchCTFCApproach = newPreDefColumn(state, s->pdstCTFC, "Approach");
@@ -508,6 +503,8 @@ namespace OutputReportPredefined {
         s->pdchCTFCDesInletAirWBT = newPreDefColumn(state, s->pdstCTFC, "Design Inlet Air Wet-Bulb Temperature");
         s->pdchCTFCDesWaterFlowRate = newPreDefColumn(state, s->pdstCTFC, "Design Water Flow Rate");
         s->pdchCTFCLevWaterSPTemp = newPreDefColumn(state, s->pdstCTFC, "Leaving Water Setpoint Temperature");
+        s->pdchCTFCCondLoopName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Name");
+        s->pdchCTFCCondLoopBranchName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Branch Name");
 
         // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
         s->pdstPLCL = newPreDefSubTable(state, s->pdrEquip, "PlantLoop or CondenserLoop");
@@ -810,8 +807,8 @@ namespace OutputReportPredefined {
         s->pdchCoilZoneNames_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Zone Name(s)");
         s->pdchCoilSupFanName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Name for HVAC");
         s->pdchCoilSupFanType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Type for HVAC");
-        s->pdchCoilPlantName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Name for Coil");
         s->pdchCoilAirloopName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Airloop Name");
+        s->pdchCoilPlantName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Name for Coil");
         s->pdchCoilPlantloopName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Loop Name");
 
         // System Summary Report
