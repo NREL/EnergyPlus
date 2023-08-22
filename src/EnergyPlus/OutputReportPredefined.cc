@@ -464,12 +464,12 @@ namespace OutputReportPredefined {
         s->pdchChillerIPLVinIP = newPreDefColumn(state, s->pdstChiller, "IPLV in IP Units [Btu/W-h]");
         s->pdchChillerMinPLR = newPreDefColumn(state, s->pdstChiller, "Minimum Part Load Ratio");
         s->pdchChillerFuelType = newPreDefColumn(state, s->pdstChiller, "Fuel Type");
-        s->pdchChillerRatedEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Rated Entering Condenser Temperature");
-        s->pdchChillerRatedLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Rated Leaving Evaporator Temperature");
-        s->pdchChillerRefEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Reference Entering Condenser Temperature");
-        s->pdchChillerRefLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Reference Leaving Evaporator Temperature");
-        s->pdchChillerDesSizeRefCHWFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Chilled Water Flow Rate");
-        s->pdchChillerDesSizeRefCondFluidFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Condenser Fluid Flow Rate");
+        s->pdchChillerRatedEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Rated Entering Condenser Temperature [C]");
+        s->pdchChillerRatedLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Rated Leaving Evaporator Temperature [C]");
+        s->pdchChillerRefEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Reference Entering Condenser Temperature [C]");
+        s->pdchChillerRefLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Reference Leaving Evaporator Temperature [c]");
+        s->pdchChillerDesSizeRefCHWFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Chilled Water Flow Rate [kg/s]");
+        s->pdchChillerDesSizeRefCondFluidFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Condenser Fluid Flow Rate [kg/s]");
         s->pdchChillerPlantloopName = newPreDefColumn(state, s->pdstChiller, "Plantloop Name");
         s->pdchChillerPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Plantloop Branch Name");
         s->pdchChillerCondLoopName = newPreDefColumn(state, s->pdstChiller, "Condenser Loop Name");
@@ -488,7 +488,7 @@ namespace OutputReportPredefined {
         s->pdchBoilerRatedEff = newPreDefColumn(state, s->pdstBoiler, "Rated Efficiency [W/W]");
         s->pdchBoilerMinPLR = newPreDefColumn(state, s->pdstBoiler, "Minimum Part Load Ratio");
         s->pdchBoilerFuelType = newPreDefColumn(state, s->pdstBoiler, "Fuel Type");
-        s->pdchBoilerParaElecLoad = newPreDefColumn(state, s->pdstBoiler, "Parasitic Electric Load");
+        s->pdchBoilerParaElecLoad = newPreDefColumn(state, s->pdstBoiler, "Parasitic Electric Load [W]");
         s->pdchBoilerPlantloopName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Name");
         s->pdchBoilerPlantloopBranchName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Branch Name");
 
@@ -497,12 +497,12 @@ namespace OutputReportPredefined {
 
         s->pdchCTFCType = newPreDefColumn(state, s->pdstCTFC, "Type");
         s->pdchCTFCFluidType = newPreDefColumn(state, s->pdstCTFC, "Fluid Type");
-        s->pdchCTFCRange = newPreDefColumn(state, s->pdstCTFC, "Range");
-        s->pdchCTFCApproach = newPreDefColumn(state, s->pdstCTFC, "Approach");
-        s->pdchCTFCDesFanPwr = newPreDefColumn(state, s->pdstCTFC, "Design Fan Power");
-        s->pdchCTFCDesInletAirWBT = newPreDefColumn(state, s->pdstCTFC, "Design Inlet Air Wet-Bulb Temperature");
-        s->pdchCTFCDesWaterFlowRate = newPreDefColumn(state, s->pdstCTFC, "Design Water Flow Rate");
-        s->pdchCTFCLevWaterSPTemp = newPreDefColumn(state, s->pdstCTFC, "Leaving Water Setpoint Temperature");
+        s->pdchCTFCRange = newPreDefColumn(state, s->pdstCTFC, "Range [C]");
+        s->pdchCTFCApproach = newPreDefColumn(state, s->pdstCTFC, "Approach [C]");
+        s->pdchCTFCDesFanPwr = newPreDefColumn(state, s->pdstCTFC, "Design Fan Power [W]");
+        s->pdchCTFCDesInletAirWBT = newPreDefColumn(state, s->pdstCTFC, "Design Inlet Air Wet-Bulb Temperature [C]");
+        s->pdchCTFCDesWaterFlowRate = newPreDefColumn(state, s->pdstCTFC, "Design Water Flow Rate [m3/s]");
+        s->pdchCTFCLevWaterSPTemp = newPreDefColumn(state, s->pdstCTFC, "Leaving Water Setpoint Temperature [C]");
         s->pdchCTFCCondLoopName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Name");
         s->pdchCTFCCondLoopBranchName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Branch Name");
 
@@ -519,12 +519,12 @@ namespace OutputReportPredefined {
         s->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");
 
         s->pdchAirTermZoneName = newPreDefColumn(state, s->pdstAirTerm, "Zone Name");
-        s->pdchAirTermMinFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow");
-        s->pdchAirTermMinOutdoorFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow");
-        s->pdchAirTermSupCoolingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Cooling Setpoint");
-        s->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Heating Setpoint");
-        s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating Capacity");
-        s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling Capacity");
+        s->pdchAirTermMinFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow [m3/s]");
+        s->pdchAirTermMinOutdoorFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow [m3/s]");
+        s->pdchAirTermSupCoolingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Cooling Setpoint [C]");
+        s->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Heating Setpoint [C]");
+        s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating Capacity [W]");
+        s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling Capacity [W]");
 
         // Std 229 Air Heat Recovery
         s->pdstAirHR = newPreDefSubTable(state, s->pdrEquip, "Air Heat Recovery");
