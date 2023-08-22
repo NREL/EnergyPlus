@@ -586,14 +586,6 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
-
-    SetupOutputVariable(state,
-                        "District " + heatingOrCooling + " Rate",
-                        OutputProcessor::Unit::W,
-                        this->EnergyRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
-                        this->Name);
     SetupOutputVariable(state,
                         reportVarPrefix + "Inlet Temperature",
                         OutputProcessor::Unit::C,
