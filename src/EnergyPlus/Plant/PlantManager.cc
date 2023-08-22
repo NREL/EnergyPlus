@@ -3848,8 +3848,6 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                     } break;
                     case DataPlant::PlantEquipmentType::PurchSteam: { //
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
-                        this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
-                        this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
                     } break;
                     case DataPlant::PlantEquipmentType::TS_IceDetailed: { //                   = 28
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
