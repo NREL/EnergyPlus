@@ -424,7 +424,7 @@ namespace OutputReportPredefined {
         s->pdchFanDesDay = newPreDefColumn(state, s->pdstFan, "Design Day Name for Fan Sizing Peak");
         s->pdchFanPkTime = newPreDefColumn(state, s->pdstFan, "Date/Time for Fan Sizing Peak");
         // Std 229 Predef outputs for Fans
-        s->pdchFanPurpose = newPreDefColumn(state, s->pdstFan, "Purpose (Supply, Return, Exhaust, Relief)");
+        s->pdchFanPurpose = newPreDefColumn(state, s->pdstFan, "Purpose");
         s->pdchFanAutosized = newPreDefColumn(state, s->pdstFan, "Is Autosized");
         s->pdchFanMotorEff = newPreDefColumn(state, s->pdstFan, "Motor Efficiency");
         s->pdchFanMotorHeatToZoneFrac = newPreDefColumn(state, s->pdstFan, "Motor Heat to Zone Fraction");
@@ -513,7 +513,7 @@ namespace OutputReportPredefined {
         s->pdstPLCL = newPreDefSubTable(state, s->pdrEquip, "PlantLoop or CondenserLoop");
 
         s->pdchPLCLName = newPreDefColumn(state, s->pdstPLCL, "Name");
-        s->pdchPLCLType = newPreDefColumn(state, s->pdstPLCL, "Type (PlantLoop or CondenserLoop)");
+        s->pdchPLCLType = newPreDefColumn(state, s->pdstPLCL, "Type");
         s->pdchPLCLProvHeat = newPreDefColumn(state, s->pdstPLCL, "Provides Heating");
         s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "Provides Cooling");
         s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate [m3/s]");

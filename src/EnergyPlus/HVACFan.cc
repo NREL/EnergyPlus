@@ -309,7 +309,8 @@ namespace HVACFan {
         m_objSizingFlag = false;
 
         // Std 229 Fans (HVACFan.cc)
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPurpose, name, m_fanType); // purpose? not the same
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanPurpose, name, "N/A"); // m_fanType); // purpose? not the same
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchFanAutosized, name, m_designAirVolFlowRateWasAutosized ? "Yes" : "No");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, name, m_motorEff);

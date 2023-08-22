@@ -1441,7 +1441,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, fan.FanName, fan.DesignPointFEI);
 
     // Std 229 Fans (Fans.cc)
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPurpose, fan.FanName, fan.FanType); // purpose? not the same
+    OutputReportPredefined::PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchFanPurpose, fan.FanName, "N/A"); // fan.FanType); // purpose? not the same
     OutputReportPredefined::PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchFanAutosized,
                                              fan.FanName,

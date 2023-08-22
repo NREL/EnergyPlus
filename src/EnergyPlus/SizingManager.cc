@@ -5504,8 +5504,7 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         } else if (DesCoolSetPtSize > 1) {
             std::string tmpCoolSetPts;
             for (int vecLoop = 1; vecLoop <= DesCoolSetPtSize; ++vecLoop) {
-                tmpCoolSetPts += thisTUFZSizing.DesCoolSetPtSeq(vecLoop);
-                tmpCoolSetPts += "; ";
+                tmpCoolSetPts += (std::to_string(thisTUFZSizing.DesCoolSetPtSeq(vecLoop)) + "; ");
             }
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, tmpCoolSetPts);
@@ -5520,8 +5519,7 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         } else if (DesHeatSetPtSize > 1) {
             std::string tmpHeatSetPts;
             for (int vecLoop = 1; vecLoop <= DesHeatSetPtSize; ++vecLoop) {
-                tmpHeatSetPts += thisTUFZSizing.DesHeatSetPtSeq(vecLoop);
-                tmpHeatSetPts += "; ";
+                tmpHeatSetPts += (std::to_string(thisTUFZSizing.DesHeatSetPtSeq(vecLoop)) + "; ");
             }
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, tmpHeatSetPts);
