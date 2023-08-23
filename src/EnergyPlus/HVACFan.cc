@@ -308,26 +308,17 @@ namespace HVACFan {
 
         m_objSizingFlag = false;
 
-        // Std 229 Fans (HVACFan)
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPurpose, name, m_fanType); // purpose? not the same
-        // OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanOccOp, name, m_fanType_Num);   // ?
-        // OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanUnoccOp, name, m_fanType_Num); // ?
-        // OutputReportPredefined::PreDefTableEntry(
-        //     state, state.dataOutRptPredefined->pdchFanLockOutAtCenHeat, name, name); // lock out for cental heat ?
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAutosized, name, m_designAirVolFlowRateWasAutosized);
+        // Std 229 Fans (HVACFan.cc)
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanPurpose, name, "N/A"); // m_fanType); // purpose? not the same
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanAutosized, name, m_designAirVolFlowRateWasAutosized ? "Yes" : "No");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, name, m_motorEff);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, name, m_motorInAirFrac);
-        // OutputReportPredefined::PreDefTableEntry(
-        //     state, state.dataOutRptPredefined->pdchFanMotorLossZoneName, name, m_zoneNum);                             // convert to zone name
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchFanAirLoopName,
                                                  name,
-                                                 AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name
-                                                                : "N/A"); // airloop name needed?
-        // OutputReportPredefined::PreDefTableEntry(state,
-        //                                          state.dataOutRptPredefined->pdchFanAirBranchName,
-        //                                          name,
-        //                                          state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(1).Name); // branch name needed?
+                                                 AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name : "N/A");
     }
 
     Real64 FanSystem::report_fei(

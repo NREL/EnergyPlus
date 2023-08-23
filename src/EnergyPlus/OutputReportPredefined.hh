@@ -244,15 +244,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFanPkTime = 0;
     // Standard 229 Predef outputs for Fans
     int pdchFanPurpose = 0;
-    int pdchFanOccOp = 0;
-    int pdchFanUnoccOp = 0;
-    int pdchFanLockOutAtCenHeat = 0;
     int pdchFanAutosized = 0;
     int pdchFanMotorEff = 0;
     int pdchFanMotorHeatToZoneFrac = 0;
-    int pdchFanMotorLossZoneName = 0;
     int pdchFanAirLoopName = 0;
-    int pdchFanAirBranchName = 0;
 
     // Pump subtable
     int pdstPump = 0;
@@ -354,9 +349,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilHSPFIP;    // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
     int pdchDXHeatCoilRegionNum; // Region number for which HSPF is calculated
     // Standard 229 Predef outputs for DX Heating Coils
-    int pdchDXHeatCoilMinOADBTforCompOp; // 2023-06-22: initialization to zero?
+    int pdchDXHeatCoilMinOADBTforCompOp;
     int pdchDXHeatCoilAirloopName;
-    int pdchDXHeatCoilAirloopBranchName;
 
     // TODO: As not inlcuded in clearState() , Confirm and update
     // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
@@ -377,10 +371,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     // Standard 229 Predef outputs for Heating Coils
     int pdchHeatCoilUsedAsSupHeat = 0;
     int pdchHeatCoilAirloopName = 0;
-    int pdchHeatCoilAirloopBranchName = 0;
     int pdchHeatCoilPlantloopName = 0;
-    int pdchHeatCoilPlantloopBranchName = 0;
-    int pdchHeatCoilSupHeatHighShutoffTemp = 0;
 
     // SWH subtable
     int pdstSWH = 0;
@@ -390,9 +381,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchSWHThEff = 0;
     int pdchSWHRecEff = 0;
     int pdchSWHEnFac = 0;
-
-    // std 229 HVAC Topology new table
-    int pdstHVACTopo = 0;
 
     // Std 229 Chiller Table in Equipment Summary
     int pdstChiller = 0;
@@ -447,40 +435,21 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
     int pdstPLCL = 0;
-    int pdchPLCLName = 0;             // name
-    int pdchPLCLType = 0;             // type (PlantLoop or CondenserLoop)
-    int pdchPLCLProvHeat = 0;         // provides heating
-    int pdchPLCLProvCool = 0;         // provides cooling
-    int pdchPLCLMaxLoopFlowRate = 0;  // Maximum Loop Flow Rate
-    int pdchPLCLMinLoopFlowRate = 0;  // Minimum Loop Flow Rate
-    int pdchPLCLTotPumpPwrOnLoop = 0; // Total pump power on loop
-    int pdchPLCLBranchName = 0;       // Branch name
+    int pdchPLCLType = 0;            // type (PlantLoop or CondenserLoop)
+    int pdchPLCLProvHeat = 0;        // provides heating
+    int pdchPLCLProvCool = 0;        // provides cooling
+    int pdchPLCLMaxLoopFlowRate = 0; // Maximum Loop Flow Rate
+    int pdchPLCLMinLoopFlowRate = 0; // Minimum Loop Flow Rate
 
-    // Std 229 AirTerminal Table in Equipment Summary
+    // Std 229 Air Terminal Table in Equipment Summary
     int pdstAirTerm = 0;
-    int pdchAirTermName = 0;                  // name
-    int pdchAirTermTypeOfInputObj = 0;        // type of input object
-    int pdchAirTermHeatReheatCoilObjType = 0; // Heat/Reheat Coil Object Type
-    int pdchAirTermZoneName = 0;              // Zone Name
-    int pdchAirTermHWPlantloopName = 0;       // Hot Water Plant Loop Name
-    int pdchAirTermHWPlantBranchName = 0;     // Hot Water Plant Branch Name
-    int pdchAirTermCHWCoilOjbType = 0;        // Chilled Water Coil Object Type
-    int pdchAirTermCHWPlantloopName = 0;      // Chilled Water Plant Loop Name
-    int pdchAirTermCHWPlantBranchName = 0;    // Chilled Water Plant Branch Name
-    int pdchAirTermFanObjType = 0;            // Fan Object Type
-    int pdchAirTermFanName = 0;               // Fan Name
-    int pdchAirTermPriAirFlowRate = 0;        // Primary Air Flow Rate
-    int pdchAirTermSecAirFlowRate = 0;        // Secondary Air Flow Rate
-    int pdchAirTermMinFlow = 0;               // Minimum Flow
-    int pdchAirTermMinFlowSchName = 0;        // Minimum Flow Schedule Name
-    int pdchAirTermMaxFlowDuringReheat = 0;   // Maximum Flow During Reheat
-    int pdchAirTermMinOutdoorFlow = 0;        // Minimum Outdoor Flow
-    int pdchAirTermMinOutdoorFlowSchName = 0; // Minimum Outdoor Flow Schedule Name
-    int pdchAirTermSupCoolingSP = 0;          // Supply cooling setpoint
-    int pdchAirTermSupHeatingSP = 0;          // Supply heating setpoint
-    int pdchAirTermTempControl = 0;           // Temperature control
-    int pdchAirTermHeatingCap = 0;            // Heating capacity
-    int pdchAirTermCoolingCap = 0;            // Cooling capacity
+    int pdchAirTermZoneName = 0;       // Zone Name
+    int pdchAirTermMinFlow = 0;        // Minimum Flow
+    int pdchAirTermMinOutdoorFlow = 0; // Minimum Outdoor Flow
+    int pdchAirTermSupCoolingSP = 0;   // Supply cooling setpoint
+    int pdchAirTermSupHeatingSP = 0;   // Supply heating setpoint
+    int pdchAirTermHeatingCap = 0;     // Heating capacity
+    int pdchAirTermCoolingCap = 0;     // Cooling capacity
 
     // Std 229 Air Heat Recovery
     int pdstAirHR = 0;
@@ -790,13 +759,9 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchCoilZoneNames_CCs = 0;
     int pdchCoilSupFanName_CCs = 0;
     int pdchCoilSupFanType_CCs = 0;
-    int pdchCoilPlantName_CCs = 0;                 // Plant Name for Coil*
-    int pdchCoilAirloopName_CCs = 0;               // Airloop Name
-    int pdchCoilAirloopBranchName_CCs = 0;         // Airloop Branch Name
-    int pdchCoilLocCountOnAirloopBranch_CCs = 0;   // Location count on Airloop Branch
-    int pdchCoilPlantloopName_CCs = 0;             // Plant Loop Name
-    int pdchCoilPlantBranchName_CCs = 0;           // Plant Branch Name
-    int pdchCoilLocCountOnPlantloopBranch_CCs = 0; // Location count on Plantloop Branch
+    int pdchCoilPlantName_CCs = 0;     // Plant Name for Coil*
+    int pdchCoilAirloopName_CCs = 0;   // Airloop Name
+    int pdchCoilPlantloopName_CCs = 0; // Plant Loop Name
 
     // Coil Sizing Summary (subset of Coil Selection Table)
     int pdst2CoilSummaryCoilSelection = 0;
@@ -860,8 +825,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDCVZoneADEffCooling = 0;
     int pdchDCVZoneADEffHeating = 0;
     int pdchDCVZoneADEffSchName = 0;
-    // Standard 229 Predef outputs for DCV using Controller:MechanicalVentilation
-    int pdchDCVTypeCO2ZoneOrOther = 0;
 
     int pdstSimpleComfort = 0;
     int pdchSCwinterClothes = 0;

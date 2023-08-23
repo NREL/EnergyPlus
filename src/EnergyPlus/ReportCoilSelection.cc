@@ -150,7 +150,10 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
                                                      state.dataOutRptPredefined->pdchHeatCoilAirloopName,
                                                      c->coilName_,
                                                      c->airloopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name : "N/A");
-            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilPlantloopName, c->coilName_, c->plantLoopName);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchHeatCoilPlantloopName,
+                                                     c->coilName_,
+                                                     c->waterLoopNum > 0 ? state.dataPlnt->PlantLoop(c->waterLoopNum).Name : "N/A");
         }
         // end std 229 existing heating coil table adding new variables
 

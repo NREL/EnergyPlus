@@ -2306,7 +2306,7 @@ void PumpDataForTable(EnergyPlusData &state, int const NumPump)
     PreDefTableEntry(state, thisReport->pdchPumpEndUse, equipName, thisPump.EndUseSubcategoryName);
     PreDefTableEntry(state, thisReport->pdchMotEff, equipName, thisPump.MotorEffic);
     // Std 229
-    PreDefTableEntry(state, thisReport->pdchPumpAutosized, equipName, thisPump.NomVolFlowRateWasAutoSized);
+    PreDefTableEntry(state, thisReport->pdchPumpAutosized, equipName, thisPump.NomVolFlowRateWasAutoSized ? "Yes" : "No");
     PreDefTableEntry(state,
                      thisReport->pdchPumpPlantloopName,
                      equipName,
