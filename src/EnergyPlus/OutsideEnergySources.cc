@@ -429,7 +429,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state, format("{}", typeName), this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+            BaseSizer::reportSizerOutput(state, typeName, this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
         }
     }
     if (ErrorsFound) {
