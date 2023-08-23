@@ -392,7 +392,7 @@ namespace InternalHeatGains {
                             if (thisPeopleInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state, format("{}Zone floor area is zero when allocating People loads to Spaces.", RoutineName));
                                     ShowContinueError(state,
@@ -415,8 +415,8 @@ namespace InternalHeatGains {
                         } else if (peopleMethod == "PEOPLE/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisPeople.NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisPeople.NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 People will result.",
@@ -448,8 +448,8 @@ namespace InternalHeatGains {
                         } else if (peopleMethod == "AREA/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) > 0.0) {
-                                    thisPeople.NumberOfPeople = state.dataHeatBal->space(spaceNum).floorArea / IHGNumbers(3);
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisPeople.NumberOfPeople = state.dataHeatBal->space(spaceNum).FloorArea / IHGNumbers(3);
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 People will result.",
@@ -505,7 +505,7 @@ namespace InternalHeatGains {
                     }
 
                     if (spaceNum > 0) {
-                        state.dataHeatBal->space(spaceNum).totOccupants += thisPeople.NumberOfPeople;
+                        state.dataHeatBal->space(spaceNum).TotOccupants += thisPeople.NumberOfPeople;
                         // Note that min/max occupants are non-coincident
                         state.dataHeatBal->space(spaceNum).minOccupants += thisPeople.NomMinNumberPeople;
                         state.dataHeatBal->space(spaceNum).maxOccupants += thisPeople.NomMaxNumberPeople;
@@ -1292,7 +1292,7 @@ namespace InternalHeatGains {
                             if (thisLightsInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state, format("{}Zone floor area is zero when allocating Lights loads to Spaces.", RoutineName));
                                     ShowContinueError(
@@ -1314,8 +1314,8 @@ namespace InternalHeatGains {
                         } else if (lightingLevel == "WATTS/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisLights.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisLights.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 Lights will result.",
@@ -1346,8 +1346,8 @@ namespace InternalHeatGains {
                         } else if (lightingLevel == "WATTS/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisLights.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisLights.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Lights will result.",
                                                                 RoutineName,
@@ -1577,7 +1577,7 @@ namespace InternalHeatGains {
                 // send values to predefined lighting summary report
                 liteName = state.dataHeatBal->Lights(lightsNum).Name;
                 Real64 mult = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
-                Real64 spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                Real64 spaceArea = state.dataHeatBal->space(spaceNum).FloorArea;
                 state.dataInternalHeatGains->sumArea += spaceArea * mult;
                 state.dataInternalHeatGains->sumPower += state.dataHeatBal->Lights(lightsNum).DesignLevel * mult;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, state.dataHeatBal->Zone(zoneNum).Name);
@@ -1730,7 +1730,7 @@ namespace InternalHeatGains {
                             if (thisElecEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
                                         state, format("{}Zone floor area is zero when allocating ElectricEquipment loads to Spaces.", RoutineName));
@@ -1753,8 +1753,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneElectric.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneElectric.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(
                                             state,
@@ -1787,8 +1787,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneElectric.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneElectric.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(
                                             state,
                                             format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Electric Equipment will result.",
@@ -1974,7 +1974,7 @@ namespace InternalHeatGains {
                             if (thisGasEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}Zone floor area is zero when allocating GasEquipment loads to Spaces.", RoutineName));
@@ -1997,8 +1997,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneGas.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneGas.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 Gas Equipment will result.",
@@ -2030,8 +2030,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneGas.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneGas.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Gas Equipment will result.",
                                                                 RoutineName,
@@ -2238,7 +2238,7 @@ namespace InternalHeatGains {
                             if (thisHWEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
                                         state, format("{}Zone floor area is zero when allocating HotWaterEquipment loads to Spaces.", RoutineName));
@@ -2261,8 +2261,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneHWEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneHWEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(
                                             state,
@@ -2295,8 +2295,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneHWEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneHWEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(
                                             state,
                                             format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Hot Water Equipment will result.",
@@ -2474,7 +2474,7 @@ namespace InternalHeatGains {
                             if (thisStmEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}Zone floor area is zero when allocating SteamEquipment loads to Spaces.", RoutineName));
@@ -2497,8 +2497,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             if (spaceNum > 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneStmEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneStmEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(
                                             state,
@@ -2531,8 +2531,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneStmEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneStmEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Steam Equipment will result.",
                                                                 RoutineName,
@@ -2742,7 +2742,7 @@ namespace InternalHeatGains {
                             if (thisOthEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}Zone floor area is zero when allocating OtherEquipment loads to Spaces.", RoutineName));
@@ -2766,8 +2766,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             DesignLevelFieldNumber = 2;
                             if (spaceNum > 0) {
-                                thisZoneOthEq.DesignLevel = IHGNumbers(DesignLevelFieldNumber) * state.dataHeatBal->space(spaceNum).floorArea;
-                                if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) && !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
+                                thisZoneOthEq.DesignLevel = IHGNumbers(DesignLevelFieldNumber) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) && !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                     ShowWarningError(state,
                                                      format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 Other Equipment will result.",
                                                             RoutineName,
@@ -2968,7 +2968,7 @@ namespace InternalHeatGains {
                             if (thisITEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
                                         state,
@@ -3003,8 +3003,8 @@ namespace InternalHeatGains {
                             if (thisZoneITEq.ZonePtr != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
                                     if (spaceNum > 0) {
-                                        thisZoneITEq.DesignTotalPower = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).floorArea;
-                                        if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        thisZoneITEq.DesignTotalPower = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                        if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                             !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                             ShowWarningError(
                                                 state,

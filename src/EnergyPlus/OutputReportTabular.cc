@@ -11794,7 +11794,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             spaceTableBody(colZoneName, spaceTableRowNum) = curZone.Name;
             spaceTableBody(colSpaceType, spaceTableRowNum) = curSpace.spaceType;
             spaceTableBody(colEnclName, spaceTableRowNum) = state.dataViewFactor->EnclSolInfo(curSpace.solarEnclosureNum).Name;
-            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
+            spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
             // Conditioned or not
             if (curZone.SystemZoneNodeNumber > 0) {
                 spaceTableBody(colConditioned, spaceTableRowNum) = "Yes";
@@ -11813,23 +11813,23 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             }
             // lighting density
             spaceTableBody(colMultipliers, spaceTableRowNum) = RealToStr(mult, 2);
-            if (curSpace.floorArea > 0) {
+            if (curSpace.FloorArea > 0) {
                 spaceTableBody(colSpaceLighting, spaceTableRowNum) =
-                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.floorArea, 4);
+                    RealToStr(state.dataOutRptTab->Wm2_unitConv * spaceTotLighting(spaceNum) / curSpace.FloorArea, 4);
             } else {
                 spaceTableBody(colSpaceLighting, spaceTableRowNum) = RealToStr(0.0, 4);
             }
             // people density
             if (spaceTotPeople(spaceNum) > 0) {
                 spaceTableBody(colSpacePeople, spaceTableRowNum) =
-                    RealToStr(curSpace.floorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
+                    RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST / spaceTotPeople(spaceNum), 2);
             } else {
                 spaceTableBody(colSpacePeople, spaceTableRowNum) = RealToStr(0.0, 2);
             }
             // plug and process density
-            if (curSpace.floorArea > 0) {
+            if (curSpace.FloorArea > 0) {
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) =
-                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.floorArea, 4);
+                    RealToStr(spaceTotPlugProcess(spaceNum) * state.dataOutRptTab->Wm2_unitConv / curSpace.FloorArea, 4);
             } else {
                 spaceTableBody(colSpacePlugProcess, spaceTableRowNum) = RealToStr(0.0, 4);
             }
@@ -11838,15 +11838,15 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
 
             // If not part of total, goes directly to this row
             if (!useSpaceFloorArea) {
-                spaceTypeNotTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
-                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.floorArea;
+                spaceTypeNotTotArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->notpartTotal) += mult * curSpace.FloorArea;
                 state.dataOutRptTab->zstLight(state.dataOutRptTab->notpartTotal) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(state.dataOutRptTab->notpartTotal) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(state.dataOutRptTab->notpartTotal) += mult * spaceTotPlugProcess(spaceNum);
             } else {
                 // Add it to the 'Total'
-                spaceTypeTotArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
-                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.floorArea;
+                spaceTypeTotArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
+                state.dataOutRptTab->zstArea(state.dataOutRptTab->grandTotal) += mult * curSpace.FloorArea;
                 state.dataOutRptTab->zstLight(state.dataOutRptTab->grandTotal) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(state.dataOutRptTab->grandTotal) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(state.dataOutRptTab->grandTotal) += mult * spaceTotPlugProcess(spaceNum);
@@ -11854,14 +11854,14 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
                 // Subtotal between cond/unconditioned
                 int condUncondTotalIndex;
                 if (spaceIsCond) {
-                    spaceTypeCondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    spaceTypeCondArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
                     condUncondTotalIndex = state.dataOutRptTab->condTotal;
 
                 } else {
-                    spaceTypeUncondArea(curSpace.spaceTypeNum) += curSpace.floorArea * mult;
+                    spaceTypeUncondArea(curSpace.spaceTypeNum) += curSpace.FloorArea * mult;
                     condUncondTotalIndex = state.dataOutRptTab->uncondTotal;
                 }
-                state.dataOutRptTab->zstArea(condUncondTotalIndex) += mult * curSpace.floorArea;
+                state.dataOutRptTab->zstArea(condUncondTotalIndex) += mult * curSpace.FloorArea;
                 state.dataOutRptTab->zstLight(condUncondTotalIndex) += mult * spaceTotLighting(spaceNum);
                 state.dataOutRptTab->zstPeople(condUncondTotalIndex) += mult * spaceTotPeople(spaceNum);
                 state.dataOutRptTab->zstPlug(condUncondTotalIndex) += mult * spaceTotPlugProcess(spaceNum);
@@ -14886,9 +14886,10 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
                 if (allocated(state.dataSize->CalcFinalZoneSizing)) {
-                    coolDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).CoolDDNum;
+                    auto const &thisCalcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(iZone);
+                    coolDesSelected = thisCalcFinalZoneSizing.CoolDDNum;
                     ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
-                    timeCoolMax = state.dataSize->CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
+                    timeCoolMax = thisCalcFinalZoneSizing.TimeStepNumAtCoolMax;
                     ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
 
                     GetDelaySequences(state,
@@ -14922,9 +14923,9 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                     state.dataRptCoilSelection->coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(
                         iZone, ZoneCoolCompLoadTables(iZone).cells(LoadCompCol::Latent, LoadCompRow::GrdTot));
 
-                    heatDesSelected = state.dataSize->CalcFinalZoneSizing(iZone).HeatDDNum;
+                    heatDesSelected = thisCalcFinalZoneSizing.HeatDDNum;
                     ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
-                    timeHeatMax = state.dataSize->CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
+                    timeHeatMax = thisCalcFinalZoneSizing.TimeStepNumAtHeatMax;
                     ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
 
                     GetDelaySequences(state,
@@ -15752,10 +15753,10 @@ void CollectPeakZoneConditions(
 
     if (timeOfMax != 0) {
 
-        auto &zone = state.dataHeatBal->Zone(zoneIndex);
-        auto &calcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(zoneIndex);
+        auto const &thisZone = state.dataHeatBal->Zone(zoneIndex);
+        auto const &thisCalcFinalZoneSizing = state.dataSize->CalcFinalZoneSizing(zoneIndex);
 
-        Real64 mult = zone.Multiplier * zone.ListMultiplier;
+        Real64 mult = thisZone.Multiplier * thisZone.ListMultiplier;
         if (mult == 0.0) mult = 1.0;
 
         if (isCooling) {
@@ -15766,53 +15767,53 @@ void CollectPeakZoneConditions(
                                                 state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
-                compLoad.peakDateHrMin = state.dataSize->CoolPeakDateHrMin(zoneIndex);
+                compLoad.peakDateHrMin = thisCalcFinalZoneSizing.CoolPeakDateHrMin;
             }
 
             // Outside Dry Bulb Temperature
-            compLoad.outsideDryBulb = calcFinalZoneSizing.CoolOutTempSeq(timeOfMax);
+            compLoad.outsideDryBulb = thisCalcFinalZoneSizing.CoolOutTempSeq(timeOfMax);
 
             // Outside Wet Bulb Temperature
             // use standard air pressure because air pressure is not tracked with sizing data
-            if (calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) < 1.0 && calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) > 0.0) {
+            if (thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) < 1.0 && thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax) > 0.0) {
                 compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                                                                         calcFinalZoneSizing.CoolOutTempSeq(timeOfMax),
-                                                                         calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax),
+                                                                         thisCalcFinalZoneSizing.CoolOutTempSeq(timeOfMax),
+                                                                         thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax),
                                                                          state.dataEnvrn->StdBaroPress);
             }
 
             // Outside Humidity Ratio at Peak
-            compLoad.outsideHumRatio = calcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax);
+            compLoad.outsideHumRatio = thisCalcFinalZoneSizing.CoolOutHumRatSeq(timeOfMax);
 
             // Zone Dry Bulb Temperature
-            compLoad.zoneDryBulb = calcFinalZoneSizing.CoolZoneTempSeq(timeOfMax);
+            compLoad.zoneDryBulb = thisCalcFinalZoneSizing.CoolZoneTempSeq(timeOfMax);
 
             // Zone Relative Humdity
             // use standard air pressure because air pressure is not tracked with sizing data
             compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
-                                                                calcFinalZoneSizing.CoolZoneTempSeq(timeOfMax),
-                                                                calcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax),
+                                                                thisCalcFinalZoneSizing.CoolZoneTempSeq(timeOfMax),
+                                                                thisCalcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax),
                                                                 state.dataEnvrn->StdBaroPress);
 
             // Zone Humidity Ratio at Peak
-            compLoad.zoneHumRatio = calcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax);
+            compLoad.zoneHumRatio = thisCalcFinalZoneSizing.CoolZoneHumRatSeq(timeOfMax);
 
             // Peak Design Sensible Load
-            compLoad.peakDesSensLoad = calcFinalZoneSizing.DesCoolLoad / mult; // change sign
+            compLoad.peakDesSensLoad = thisCalcFinalZoneSizing.DesCoolLoad / mult; // change sign
 
             // Design Peak Load
             compLoad.designPeakLoad = state.dataSize->FinalZoneSizing(zoneIndex).DesCoolLoad / mult;
 
             // Supply air temperature
-            if (calcFinalZoneSizing.ZnCoolDgnSAMethod == DataSizing::SupplyAirTemperature) {
-                compLoad.supAirTemp = calcFinalZoneSizing.CoolDesTemp;
+            if (thisCalcFinalZoneSizing.ZnCoolDgnSAMethod == DataSizing::SupplyAirTemperature) {
+                compLoad.supAirTemp = thisCalcFinalZoneSizing.CoolDesTemp;
             } else {
-                Real64 DeltaTemp = -std::abs(calcFinalZoneSizing.CoolDesTempDiff);
-                compLoad.supAirTemp = DeltaTemp + calcFinalZoneSizing.ZoneTempAtCoolPeak;
+                Real64 DeltaTemp = -std::abs(thisCalcFinalZoneSizing.CoolDesTempDiff);
+                compLoad.supAirTemp = DeltaTemp + thisCalcFinalZoneSizing.ZoneTempAtCoolPeak;
             }
 
             // Main fan air flow
-            compLoad.mainFanAirFlow = calcFinalZoneSizing.DesCoolVolFlow;
+            compLoad.mainFanAirFlow = thisCalcFinalZoneSizing.DesCoolVolFlow;
 
         } else {
             // Time of Peak Load
@@ -15822,64 +15823,64 @@ void CollectPeakZoneConditions(
                                                 state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
                                                 state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(state, timeOfMax));
             } else {
-                compLoad.peakDateHrMin = state.dataSize->HeatPeakDateHrMin(zoneIndex);
+                compLoad.peakDateHrMin = thisCalcFinalZoneSizing.HeatPeakDateHrMin;
             }
 
             // Outside Dry Bulb Temperature
-            compLoad.outsideDryBulb = calcFinalZoneSizing.HeatOutTempSeq(timeOfMax);
+            compLoad.outsideDryBulb = thisCalcFinalZoneSizing.HeatOutTempSeq(timeOfMax);
 
             // Outside Wet Bulb Temperature
             // use standard air pressure because air pressure is not tracked with sizing data
-            if (calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) < 1.0 && calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) > 0.0) {
+            if (thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) < 1.0 && thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax) > 0.0) {
                 compLoad.outsideWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state,
-                                                                         calcFinalZoneSizing.HeatOutTempSeq(timeOfMax),
-                                                                         calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax),
+                                                                         thisCalcFinalZoneSizing.HeatOutTempSeq(timeOfMax),
+                                                                         thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax),
                                                                          state.dataEnvrn->StdBaroPress);
             }
 
             // Outside Humidity Ratio at Peak
-            compLoad.outsideHumRatio = calcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax);
+            compLoad.outsideHumRatio = thisCalcFinalZoneSizing.HeatOutHumRatSeq(timeOfMax);
 
             // Zone Dry Bulb Temperature
-            compLoad.zoneDryBulb = calcFinalZoneSizing.HeatZoneTempSeq(timeOfMax);
+            compLoad.zoneDryBulb = thisCalcFinalZoneSizing.HeatZoneTempSeq(timeOfMax);
 
             // Zone Relative Humdity
             // use standard air pressure because air pressure is not tracked with sizing data
             compLoad.zoneRelHum = Psychrometrics::PsyRhFnTdbWPb(state,
-                                                                calcFinalZoneSizing.HeatZoneTempSeq(timeOfMax),
-                                                                calcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax),
+                                                                thisCalcFinalZoneSizing.HeatZoneTempSeq(timeOfMax),
+                                                                thisCalcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax),
                                                                 state.dataEnvrn->StdBaroPress);
 
             // Zone Humidity Ratio at Peak
-            compLoad.zoneHumRatio = calcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax);
+            compLoad.zoneHumRatio = thisCalcFinalZoneSizing.HeatZoneHumRatSeq(timeOfMax);
 
             // Peak Design Sensible Load
-            compLoad.peakDesSensLoad = -calcFinalZoneSizing.DesHeatLoad / mult; // change sign
+            compLoad.peakDesSensLoad = -thisCalcFinalZoneSizing.DesHeatLoad / mult; // change sign
 
             // Design Peak Load
             compLoad.designPeakLoad = -state.dataSize->FinalZoneSizing(zoneIndex).DesHeatLoad / mult;
 
             // Supply air temperature
-            if (calcFinalZoneSizing.ZnHeatDgnSAMethod == DataSizing::SupplyAirTemperature) {
-                compLoad.supAirTemp = calcFinalZoneSizing.HeatDesTemp;
+            if (thisCalcFinalZoneSizing.ZnHeatDgnSAMethod == DataSizing::SupplyAirTemperature) {
+                compLoad.supAirTemp = thisCalcFinalZoneSizing.HeatDesTemp;
             } else {
-                Real64 DeltaTemp = -std::abs(calcFinalZoneSizing.HeatDesTempDiff);
-                compLoad.supAirTemp = DeltaTemp + calcFinalZoneSizing.ZoneTempAtHeatPeak;
+                Real64 DeltaTemp = -std::abs(thisCalcFinalZoneSizing.HeatDesTempDiff);
+                compLoad.supAirTemp = DeltaTemp + thisCalcFinalZoneSizing.ZoneTempAtHeatPeak;
             }
 
             // Main fan air flow
-            compLoad.mainFanAirFlow = calcFinalZoneSizing.DesHeatVolFlow;
+            compLoad.mainFanAirFlow = thisCalcFinalZoneSizing.DesHeatVolFlow;
         }
 
         // Outside air flow
-        compLoad.outsideAirFlow = calcFinalZoneSizing.MinOA;
+        compLoad.outsideAirFlow = thisCalcFinalZoneSizing.MinOA;
 
         // outside air %
         if (compLoad.mainFanAirFlow != 0.) {
             compLoad.outsideAirRatio = compLoad.outsideAirFlow / compLoad.mainFanAirFlow;
         }
 
-        compLoad.floorArea = zone.FloorArea;
+        compLoad.floorArea = thisZone.FloorArea;
 
         if (compLoad.floorArea != 0.) {
             // airflow per floor area
@@ -15893,7 +15894,7 @@ void CollectPeakZoneConditions(
             compLoad.airflowPerTotCap = compLoad.mainFanAirFlow / compLoad.designPeakLoad;
 
             // floor area per capacity
-            compLoad.areaPerTotCap = zone.FloorArea / compLoad.designPeakLoad;
+            compLoad.areaPerTotCap = thisZone.FloorArea / compLoad.designPeakLoad;
         }
 
         // Number of people
