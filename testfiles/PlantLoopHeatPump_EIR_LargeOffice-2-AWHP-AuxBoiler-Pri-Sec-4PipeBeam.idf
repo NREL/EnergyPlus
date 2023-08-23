@@ -209,7 +209,9 @@
 
   ConvergenceLimits,
     2,                       !- Minimum System Timestep {minutes}
-    25;                      !- Maximum HVAC Iterations
+    25,                      !- Maximum HVAC Iterations
+    4,                       !- Minimum Plant Iterations
+    12;                      !- Maximum Plant Iterations
 
   ShadowCalculation,
     PolygonClipping,         !- Shading Calculation Method
@@ -8645,8 +8647,8 @@ Curve:Biquadratic,
 
   Curve:Quadratic,
     EIRCurveFuncPLR,         !- Name
-    0.0,                     !- Coefficient1 Constant
-    1.0,                     !- Coefficient2 x
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x

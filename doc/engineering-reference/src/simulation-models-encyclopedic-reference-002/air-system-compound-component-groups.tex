@@ -2887,13 +2887,13 @@ EIRFT = {f(T_{out,\;load}, T_{in,\;source})}
 EIRFPLR = {f(PLR_{operating})}
 \end{equation}
 \begin{equation}
-Power = \frac{\dot{Q}_{avail}}{COP_{ref}} \times EIRFT \times EIRFPLR \times Multipler_{heating,\; power} \times CyclingRatio
+Power = \frac{\dot{Q}_{load}}{COP_{ref}} \times EIRFT \times EIRFPLR \times Multipler_{heating,\; power} \times CyclingRatio
 \end{equation}
 \begin{equation}
 Energy = Power \times TimeStepInSeconds
 \end{equation}
 \begin{equation}
-{\dot{Q}_{source} = (\dot{Q}_{avail} \pm Power) \times PLR_{operating}}
+{\dot{Q}_{source} = (\dot{Q}_{load} \pm Power) \times CyclingRatio}
 \end{equation}
 \begin{equation}
 T{out,\;source} = T_{in,\;source} \pm \frac{\dot{Q}_{source}}{\dot{m}_{source} \times C_{p,\;source}}
