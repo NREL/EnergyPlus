@@ -51,6 +51,7 @@
 // EnergyPlus headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/XingGroundTemperatureModel.hh>
@@ -97,7 +98,7 @@ std::shared_ptr<XingGroundTempsModel> XingGroundTempsModel::XingGTMFactory(Energ
             thisModel->objectName = state.dataIPShortCut->cAlphaArgs(1);
             thisModel->objectType = objType;
             thisModel->groundThermalDiffisivity =
-                state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3));
+                state.dataIPShortCut->rNumericArgs(1) / (state.dataIPShortCut->rNumericArgs(2) * state.dataIPShortCut->rNumericArgs(3)) * Constant::SecsInDay;
             thisModel->aveGroundTemp = state.dataIPShortCut->rNumericArgs(4);
             thisModel->surfTempAmplitude_1 = state.dataIPShortCut->rNumericArgs(5);
             thisModel->surfTempAmplitude_2 = state.dataIPShortCut->rNumericArgs(6);
