@@ -6600,8 +6600,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
-
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
     state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
@@ -7114,7 +7112,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     auto &finalZoneSizing = state->dataSize->CalcFinalZoneSizing(1);
     finalZoneSizing.CoolDDNum = coolDDNum;
     finalZoneSizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
     finalZoneSizing.CoolOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.CoolOutTempSeq(coolTimeOfMax) = 38.;
@@ -7133,7 +7130,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int heatTimeOfMax = 4;
     finalZoneSizing.HeatDDNum = heatDDNum;
     finalZoneSizing.TimeStepNumAtHeatMax = heatTimeOfMax;
-    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
     finalZoneSizing.HeatOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.HeatOutTempSeq(heatTimeOfMax) = -17.4;
@@ -10782,8 +10778,8 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
 
-    state->dataHeatBal->space(1).floorArea = 100.0;
-    state->dataHeatBal->space(2).floorArea = 100.0;
+    state->dataHeatBal->space(1).FloorArea = 100.0;
+    state->dataHeatBal->space(2).FloorArea = 100.0;
 
     OutputReportTabular::writeVeriSumSpaceTables(*state, produceTabular, produceSQLite);
 

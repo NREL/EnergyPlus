@@ -14,3 +14,8 @@ Missing unit is added to the EIO ystem Sizing Informationg table "User Design Ca
 
 See pull request [#9967](https://github.com/NREL/EnergyPlus/pull/9967) for more details.
 
+### Space Sizing Output in EIO and Tables
+When `ZoneAirHeatBalanceAlgorithm` "Do Space Heat Balance for Sizing" = Yes, zone sizing is also done for all spaces. The HVAC Sizing Summary table report will include subtables for Space Sensible Cooling and Heating as well as for Zone Sensible Cooling and Heating. Space Sizing will also be reported to the eio output.
+
+See pull request [#9982](https://github.com/NREL/EnergyPlus/pull/9982) for more details.
+
