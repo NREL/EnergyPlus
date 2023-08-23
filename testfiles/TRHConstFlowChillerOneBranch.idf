@@ -2123,7 +2123,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,District Heating Rate,timestep;
+  Output:Variable,*,District Heating Water Rate,timestep;
 
   Output:Variable,*,Chiller Electricity Rate,timestep;
 

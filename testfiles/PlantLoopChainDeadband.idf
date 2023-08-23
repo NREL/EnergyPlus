@@ -1308,7 +1308,7 @@
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,Hourly;
 
-  Output:Variable,*,District Heating Rate,Hourly;
+  Output:Variable,*,District Heating Water Rate,Hourly;
 
-  Output:Variable,*,District Cooling Rate,Hourly;
+  Output:Variable,*,District Cooling Water Rate,Hourly;
 

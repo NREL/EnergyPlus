@@ -1812,7 +1812,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,District Heating Rate,timestep;
+  Output:Variable,*,District Heating Water Rate,timestep;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,timestep;
 

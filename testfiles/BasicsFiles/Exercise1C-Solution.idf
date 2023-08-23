@@ -526,7 +526,7 @@
 
   Output:Variable,*,Zone Air Temperature,Hourly;
 
-  Output:Meter,DistrictHeating:Facility,Hourly;
+  Output:Meter,DistrictHeatingWater:Facility,Hourly;
 
   Output:Meter,DistrictCooling:Facility,Hourly;
 

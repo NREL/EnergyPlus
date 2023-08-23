@@ -2234,9 +2234,9 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,District Cooling Rate,timestep;
+  Output:Variable,*,District Cooling Water Rate,timestep;
 
-  Output:Variable,*,District Heating Rate,timestep;
+  Output:Variable,*,District Heating Water Rate,timestep;
 
   Output:Variable,*,Zone Radiant HVAC Heating Rate,timestep;
 

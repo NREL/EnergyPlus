@@ -2395,7 +2395,7 @@
 
   Output:Variable,*,Heat Exchanger Exhaust Air Bypass Mass Flow Rate,hourly;
 
-  Output:Variable,*,District Heating Rate,hourly;
+  Output:Variable,*,District Heating Water Rate,hourly;
 
   Output:Variable,*,Heat Exchanger Defrost Time Fraction,hourly;
 

@@ -332,9 +332,9 @@
 
   Output:Variable,*,Plant Load Profile Heat Transfer Energy,Detailed;
 
-  Output:Variable,*,District Cooling Chilled Water Rate,Detailed;
+  Output:Variable,*,District Cooling Water Rate,Detailed;
 
-  Output:Variable,*,District Cooling Chilled Water Energy,Detailed;
+  Output:Variable,*,District Cooling Water Energy,Detailed;
 
   Output:Meter,Cooling:DistrictCooling,Daily;
 

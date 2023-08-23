@@ -367,9 +367,9 @@
 
   Output:Variable,*,Plant Load Profile Heat Transfer Energy,Hourly;
 
-  Output:Variable,*,District Heating Hot Water Rate,Hourly;
+  Output:Variable,*,District Heating Water Rate,Hourly;
 
-  Output:Variable,*,District Heating Hot Water Energy,Hourly;
+  Output:Variable,*,District Heating Water Energy,Hourly;
 
   Output:Meter,Heating:DistrictHeatingWater,Daily;
 
