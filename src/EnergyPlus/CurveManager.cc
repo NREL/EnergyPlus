@@ -2406,7 +2406,7 @@ namespace Curve {
                         max_val = max(max_val, max_grid_value);
 
                         gridAxes.emplace_back(
-                            axis, "", extrapMethod, interpMethod, std::pair<double, double>{min_val, max_val}, BtwxtManager::btwxt_logger);
+                            axis, "", interpMethod, extrapMethod, std::pair<double, double>{min_val, max_val}, BtwxtManager::btwxt_logger);
 
                     } else {
                         // Independent variable does not exist
