@@ -143,14 +143,16 @@ Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     Real64 PL_2 = phaseShift_2;        // Phase shift of surface temperature
 
     int n = 1;
-    Real64 term1 = -depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
-    Real64 term2 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_1) - depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
+    Real64 gamma1 = std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
+    Real64 exp1 = -depth * gamma1;
+    Real64 cos1 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_1) - depth * gamma1;
 
     n = 2;
-    Real64 term3 = -depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
-    Real64 term4 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_2) - depth * std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
+    Real64 gamma2 = std::sqrt((n * Constant::Pi) / (groundThermalDiffisivity * tp));
+    Real64 exp2 = -depth * gamma2;
+    Real64 cos2 = (2 * Constant::Pi * n) / tp * (simTimeInDays - PL_2) - depth * gamma2;
 
-    Real64 summation = std::exp(term1) * Ts_1 * std::cos(term2) + std::exp(term3) * Ts_2 * std::cos(term4);
+    Real64 summation = std::exp(exp1) * Ts_1 * std::cos(cos1) + std::exp(exp2) * Ts_2 * std::cos(cos2);
 
     return aveGroundTemp - summation;
 }
