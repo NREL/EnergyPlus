@@ -5347,47 +5347,39 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 1.1;
         UpdateMeterReporting(*state);
-        UpdateMeters(*state, MDHM);
-        //UpdateMeterReporting(*state);
-        //UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         //UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.3;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-        // UpdateMeters(*state, MDHM);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+        //UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.5;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.7;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 1.9;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 2.2;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         state->dataGlobal->WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         auto const stream_str = state->files.eso.get_output();
@@ -5403,25 +5395,29 @@ namespace OutputProcessor {
                 "6,1,Calendar Year of Simulation[] ! When Annual Report Variables Requested",
                 "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
                 "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                "5,365",
+                "5,365",
+                "5,365",
+                "5,365",
+                "5,365",
+                "5,365",
+                "5,365",
             },
             "\n"));
 
         PurchAir(1).TotHeatEnergy = 100.0;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 200.0;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         PurchAir(1).TotHeatEnergy = 300.0;
-        UpdateMeters(*state, MDHM);
-        // UpdateMeterReporting(*state);
-        // UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
+        UpdateMeterReporting(*state);
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
         // UpdateMeters(*state, MDHM);
 
         x = 5;
