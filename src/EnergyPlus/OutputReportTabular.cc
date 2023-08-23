@@ -16640,7 +16640,7 @@ void WriteReportHeaders(EnergyPlusData &state,
                 tbl_stream << "</" << ort->prevReportName << ">\n"; // close the last element if it was used.
             }
             tbl_stream << "<" << ConvertToElementTag(modifiedReportName) << ">\n";
-            tbl_stream << "  <for>" << objectName << "</for>\n";
+            tbl_stream << "  <for>" << ConvertToEscaped(objectName) << "</for>\n";
             ort->prevReportName = ConvertToElementTag(modifiedReportName); // save the name for next time
         }
     }
