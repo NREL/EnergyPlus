@@ -3172,6 +3172,16 @@ void SizePlantLoop(EnergyPlusData &state,
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
         FluidDensity = GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Constant::InitConvTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+        if (PlantSizNum > 0 && allocated(state.dataSize->PlantSizData)) { // method only works if sizing delta T is avaiable
+            Real64 cp = GetSpecificHeatGlycol(state,
+                                              state.dataPlnt->PlantLoop(LoopNum).FluidName,
+                                              Constant::InitConvTemp,
+                                              state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
+                                              RoutineName);
+            Real64 DesignPlantCapacity =
+                cp * FluidDensity * state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * state.dataSize->PlantSizData(PlantSizNum).DeltaT;
+            state.dataSize->PlantSizData(PlantSizNum).DesCapacity = DesignPlantCapacity; // store it for later use in scaling
+        }
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
         FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else {
