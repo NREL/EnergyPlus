@@ -34,7 +34,7 @@ If dehumidification controls are active, the leaving humidity ratio resulting fr
 
 \paragraph{Step 2a -- Humidity Control = MultiMode}\label{step-2a-humidity-control-multimode}
 
-If the humidity control type is MultiMode, then the coil's enhanced dehumidification mode is activated when the coil type is Coil:Cooling:DX:TwoStageWithHumidityControlMode and Step 1 above is repeated to meet the sensible load using the coil performance resulting from the enhanced dehumidificaiton mode. This is a semi-passive approach to dehumidification which may fall short or may exceed the dehumidification requirement.
+If the humidity control type is MultiMode, then the coil's enhanced dehumidification mode is activated when the coil type is Coil:Cooling:DX:TwoStageWithHumidityControlMode and Step 1 above is repeated to meet the sensible load using the coil performance resulting from the enhanced dehumidification mode. This is a semi-passive approach to dehumidification which may fall short or may exceed the dehumidification requirement.
 
 \paragraph{Step 2b -- Humidity Control = CoolReheat}\label{step-2b-humidity-control-coolreheat}
 
@@ -69,7 +69,7 @@ UnitarySystemCoolingLoad = \frac{{ControlZoneCoolingLoad}}{{ControlZoneAirFlowFr
 \label{eq:UnitarySystemCoolingLoad}
 \end{equation}
 
-If the supply air fan operating mode schedule requests cycling fan operation, the model first checks for the presence of an ecomomizer in the outside air system serving the unitary system's air loop (Ref. AirLoopHVAC:OutdoorAirSystem). If an outside air system is not present or if an air-side economizer is not used, the unitary system's compressor is used to meet the unitary system cooling load. If an air-side economizer is used and is active (i.e., economizer controls indicate that conditions are favorable to increase the outside air flow rate), the unitary system will try to meet the cooling load by operating only the supply air fan. If the fan is able to satisfy the unitary system cooling load, the compressor remains off for the entire simulation time step. If the operation of the fan alone is unable to meet the entire cooling load, then the compressor is enabled and additional calculations are performed to determine the compressor's part-load ratio.
+If the supply air fan operating mode schedule requests cycling fan operation, the model first checks for the presence of an economizer in the outside air system serving the unitary system's air loop (Ref. AirLoopHVAC:OutdoorAirSystem). If an outside air system is not present or if an air-side economizer is not used, the unitary system's compressor is used to meet the unitary system cooling load. If an air-side economizer is used and is active (i.e., economizer controls indicate that conditions are favorable to increase the outside air flow rate), the unitary system will try to meet the cooling load by operating only the supply air fan. If the fan is able to satisfy the unitary system cooling load, the compressor remains off for the entire simulation time step. If the operation of the fan alone is unable to meet the entire cooling load, then the compressor is enabled and additional calculations are performed to determine the compressor's part-load ratio.
 
 The model then calculates the unitary system's sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions and when the cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is configured to run continuously regardless of coil operation, then the sensible cooling energy rate will probably not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat), the cooling coil, and the heating and reheat coil (simply to pass the air properties and mass flow rate from its inlet node to its outlet node). For each of these cases (full load and cooling coil OFF), the sensible cooling energy rate delivered by the unitary system is calculated as follows:
 
@@ -659,7 +659,7 @@ When the predicted zone air temperature is above the heating setpoint and if the
 \caption{Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint \protect \label{fig:supplemental-heating-coil-load-when-predicted}}
 \end{figure}
 
-If a heating load exists (Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-001}), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the unitary system operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
+If a heating load exists (Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-001}), the supplemental heating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the unitary system operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
 \begin{figure}[hbtp] % fig 220
 \centering
@@ -828,7 +828,7 @@ where:
 
 \emph{h\(_{out,coil~off}\)} is the enthalpy of air exiting the furnace with the heating coil OFF (J/kg)
 
-\(\Delta_{sen,full~load}\) is the ensible load difference between the system output node and the zone inlet node at full-load conditions.
+\(\Delta_{sen,full~load}\) is the sensible load difference between the system output node and the zone inlet node at full-load conditions.
 
 \begin{equation}
   \begin{array}{rl}
@@ -909,7 +909,7 @@ If EnergyPlus determines that the furnace must supply cooling to the control zon
 Furnace~Cooling~Load = \frac{{Control~Zone~Cooling~Load}}{{Control~Zone~Air~Flow~Fraction}}
 \end{equation}
 
-If the supply air fan operating mode schedule requests cycling fan operation, the model first checks for the presence of an ecomomizer in the outside air system serving the furnace's air loop (Ref. AirLoopHVAC:OutdoorAirSystem). If an outside air system is not present or if an air-side economizer is not used, the furnace's compressor is used to meet the furnace cooling load. If an air-side economizer is used and is active (i.e., economizer controls indicate that conditions are favorable to increase the outside air flow rate), the furnace will try to meet the cooling load by operating only the supply air fan. If the fan is able to satisfy the furnace cooling load, the compressor remains off for the entire simulation time step. If the operation of the fan alone is unable to meet the entire cooling load, then the compressor is enabled and additional calculations are performed to determine the compressor's part-load ratio.
+If the supply air fan operating mode schedule requests cycling fan operation, the model first checks for the presence of an economizer in the outside air system serving the furnace's air loop (Ref. AirLoopHVAC:OutdoorAirSystem). If an outside air system is not present or if an air-side economizer is not used, the furnace's compressor is used to meet the furnace cooling load. If an air-side economizer is used and is active (i.e., economizer controls indicate that conditions are favorable to increase the outside air flow rate), the furnace will try to meet the cooling load by operating only the supply air fan. If the fan is able to satisfy the furnace cooling load, the compressor remains off for the entire simulation time step. If the operation of the fan alone is unable to meet the entire cooling load, then the compressor is enabled and additional calculations are performed to determine the compressor's part-load ratio.
 
 The model then calculates the furnace's sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is configured to run continuously regardless of coil operation, then the sensible cooling energy rate will probably not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat), the DX cooling coil, and the heating coil (simply to pass the air properties and mass flow rate from its inlet node to its outlet node). For each of these cases (full load and DX cooling coil OFF), the sensible cooling energy rate delivered by the furnace is calculated as follows:
 
@@ -1346,7 +1346,7 @@ If EnergyPlus determines that the heat pump must supply cooling to the control z
 Heat~Pump~Cooling~Load = \frac{{Control~Zone~Cooling~Load}}{{Control~Zone~Air~Flow~Fraction}}
 \end{equation}
 
-If the supply air fan operating mode schedule requests cycling fan operation, the model first checks for the presence of an ecomomizer in the outside air system serving the heat pump's air loop (Ref. AirLoopHVAC:OutdoorAirSystem). If an outside air system is not present or if an air-side economizer is not used, the heat pump's compressor is used to meet the heat pump cooling load. If an air-side economizer is used and is active (i.e., economizer controls indicate that conditions are favorable to increase the outside air flow rate), the heat pump will try to meet the cooling load by operating only the supply air fan. If the fan is able to satisfy the heat pump cooling load, the compressor remains off for the entire simulation time step. If the operation of the fan alone is unable to meet the entire cooling load, then the compressor is enabled and additional calculations are performed to determine the compressor's part-load ratio.
+If the supply air fan operating mode schedule requests cycling fan operation, the model first checks for the presence of an economizer in the outside air system serving the heat pump's air loop (Ref. AirLoopHVAC:OutdoorAirSystem). If an outside air system is not present or if an air-side economizer is not used, the heat pump's compressor is used to meet the heat pump cooling load. If an air-side economizer is used and is active (i.e., economizer controls indicate that conditions are favorable to increase the outside air flow rate), the heat pump will try to meet the cooling load by operating only the supply air fan. If the fan is able to satisfy the heat pump cooling load, the compressor remains off for the entire simulation time step. If the operation of the fan alone is unable to meet the entire cooling load, then the compressor is enabled and additional calculations are performed to determine the compressor's part-load ratio.
 
 The model then calculates the heat pump's sensible cooling energy rate delivered to the zones being served when the system runs at full-load conditions and when the DX cooling coil is OFF. If the supply air fan cycles with the compressor, then the sensible cooling energy rate is zero when the cooling coil is OFF. However if the fan is scheduled to run continuously regardless of coil operation, then the sensible cooling energy rate will not be zero when the cooling coil is OFF. Calculating the sensible cooling energy rate involves modeling the supply air fan (and associated fan heat) and the DX cooling coil. The DX heating coil and the supplemental heating coil are also modeled, but only to pass the air properties and mass flow rate from their inlet nodes to their outlet nodes. For each of these cases (full load and DX cooling coil OFF), the sensible cooling energy rate delivered by the heat pump is calculated as follows:
 
@@ -1565,7 +1565,7 @@ In the above equations, the following definitions apply:
 
 \(PL{R_{MIN}}\) is the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
 
-When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-002}. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the heatpump's cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the heat pump DX cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (see Figure~\ref{fig:flows-of-warmup-convergence-checks}), the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
+When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-002}. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the heatpump's cooling coil, the supplemental heating coil is used to offset the excess sensible capacity provided by the heat pump DX cooling coil. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (see Figure~\ref{fig:flows-of-warmup-convergence-checks}), the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the unit (with LatentPartLoadRatio). In this case, the supplemental heating coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
 \begin{figure}[hbtp] % fig 228
 \centering
@@ -1573,7 +1573,7 @@ When the predicted zone air temperature is above the heating setpoint and if the
 \caption{Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint \protect \label{fig:supplemental-heating-coil-load-when-predicted-002}}
 \end{figure}
 
-If a heating load exists (Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-003}), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
+If a heating load exists (Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-003}), the supplemental heating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
 \begin{figure}[hbtp] % fig 229
 \centering
@@ -1928,7 +1928,7 @@ where \({{{\dot m}_{Zone~Inlet}}}\) is the air mass flow rate in the supply inle
 
 For this case where speed 1 operation was able to meet the required heating load, the speed ratio is set to zero and speed number is equal to 1.
 
-Finally, if the heat pump's heating output at full load for Speed 1 is insufficient to meet the entire heatling load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the heat pump is estimated:
+Finally, if the heat pump's heating output at full load for Speed 1 is insufficient to meet the entire heating load, the Cycling ratio (PartLoadRatio) is set equal to 1.0 (compressor and fan are not cycling). Then the heating speed is increased and the delivered sensible capacity is calculated. If the full load sensible capacity at Speed n is greater than or equal to the sensible load, the speed ratio for the heat pump is estimated:
 
 \begin{equation}
 Speed~Ratio = \frac{{ABS(Heat~Pump~Heating~Load - AddedFanHeat - Full~Heat~Outpu{t_{Speedn-1}})}}{{ABS(Full~Heat~Outpu{t_{Speedn}} - Full~Heat~Outpu{t_{Speedn-1}})}}
@@ -2014,7 +2014,7 @@ If dehumidification controls are active, the leaving humidity ratio resulting fr
 \paragraph{Step 2a -- Humidity Control = MultiMode}\label{step-2a-humidity-control-multimode-1}
 
 If the humidity control type is MultiMode, then the coil's enhanced dehumidification mode is activated when the coil type is Coil:Cooling:DX:TwoStageWithHumidityControlMode or the heat exchanger is activated when the coil type is \\
-CoilSystem:Cooling:DX:CoolingHeatExchangerAssisted and Step 1 above is repeated to meet the sensible load using the coil performance resulting from the enhanced dehumidificaiton mode. This is a semi-passive approach to dehumidification which may fall short or may exceed the dehumidification requirement. If the user has specified Run on Latent Load = Yes in the CoilSystem:Cooling:DX object, and there is no sensible load to be met, then the system will try to meet the entire dehumidification load. If dehumidification mode should not be active when there is no sensible load, then choose Run on Latent Load = No.
+CoilSystem:Cooling:DX:CoolingHeatExchangerAssisted and Step 1 above is repeated to meet the sensible load using the coil performance resulting from the enhanced dehumidification mode. This is a semi-passive approach to dehumidification which may fall short or may exceed the dehumidification requirement. If the user has specified Run on Latent Load = Yes in the CoilSystem:Cooling:DX object, and there is no sensible load to be met, then the system will try to meet the entire dehumidification load. If dehumidification mode should not be active when there is no sensible load, then choose Run on Latent Load = No.
 
 \paragraph{Step 2b -- Humidity Control = CoolReheat}\label{step-2b-humidity-control-coolreheat-1}
 
@@ -2254,7 +2254,7 @@ The generalized least square method is used to generate the coefficients. This m
 
 \subsubsection{High Humidity Control with WaterToAir HeatPump Equation Fit model}\label{high-humidity-control-with-watertoair-heatpump-equation-fit-model}
 
-The specific configuration of the WaterToAir HeatPump with supplemental heating coil is shown above (see Figure~\ref{fig:source-side-and-load-side-configuration-of-a}). This figure shows the fan placement when a blow through fan is specified. If a draw through fan is specified, the fan is located between the heating coil and the reheat coil. The system is controlled to keep the high relative humidity in the control zone from exceeding the setpoint specified in the object ZoneControl:Humidistat. When high humidity control is specified and the compressor operates, the heatpump always operates at the cooling air flow rate when a zone heating load is present as determined by the zone thermostat. High humidity control is specified as either None, or CoolReheat in the Dehumidification Control Type input field. CoolReheat is specified when a DX cooling coil is used to over-cool the supply air stream in order to meet the zone latent load. In this case, a supplemental heating coil will ensure the zone temperature does not fall below the zone heating temperature set point. If the dehumidification control type is selected as None, the WaterToAir HeatPump uns only to meet the sensible cooling load. A supplemental heating coil is required for all dehumidification control types.
+The specific configuration of the WaterToAir HeatPump with supplemental heating coil is shown above (see Figure~\ref{fig:source-side-and-load-side-configuration-of-a}). This figure shows the fan placement when a blow through fan is specified. If a draw through fan is specified, the fan is located between the heating coil and the reheat coil. The system is controlled to keep the high relative humidity in the control zone from exceeding the setpoint specified in the object ZoneControl:Humidistat. When high humidity control is specified and the compressor operates, the heatpump always operates at the cooling air flow rate when a zone heating load is present as determined by the zone thermostat. High humidity control is specified as either None, or CoolReheat in the Dehumidification Control Type input field. CoolReheat is specified when a DX cooling coil is used to over-cool the supply air stream in order to meet the zone latent load. In this case, a supplemental heating coil will ensure the zone temperature does not fall below the zone heating temperature set point. If the dehumidification control type is selected as None, the WaterToAir HeatPump runs only to meet the sensible cooling load. A supplemental heating coil is required for all dehumidification control types.
 
 The model first calculates the \emph{PartLoadRatio} required meeting the sensible cooling load.~ The heatpump's sensible cooling load is determined from the control zone sensible cooling load to the cooling setpoint and the control zone air flow fraction to maintain the dry-bulb temperature setpoint in the control zone:
 
@@ -2306,7 +2306,7 @@ where:
 
 \(PL{R_{MIN}}\) is the minimum part-load ratio, which is usually 0.0. For the case when the latent capacity degradation model is used (Ref: DX Cooling Coil Model), this value is the minimum part-load ratio at which the cooling coil will dehumidify the air.
 
-When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-004}. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the heatpump's cooling coil, the supplemental coil is used to offset the excess sensible capacity provided by the unit. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (see Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-004}),~ the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the heat pump (with LatentPartLoadRatio). In this case, thesupplemental heating coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
+When the predicted zone air temperature is above the heating setpoint and if there is a dehumidification load, the supplemental heating coil load is required to offset the excess cooling as shown in Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-004}. If the model determines that the LatentPartLoadRatio is to be used as the operating part-load ratio of the heatpump's cooling coil, the supplemental coil is used to offset the excess sensible capacity provided by the unit. The model first checks the sensible load that exists for the current simulation time step (predicted zone temperature with no HVAC operation compared to the thermostat setpoint temperatures). If a sensible cooling load or no sensible cooling or heating load exists (see Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-004}),~ the model calculates the difference between the sensible heating load required to reach or maintain the heating dry-bulb temperature setpoint and the actual sensible cooling energy rate delivered by the heat pump (with LatentPartLoadRatio). In this case, the supplemental heating coil is used to offset the excess sensible cooling energy provided by the DX cooling coil (if any) that could have caused an overshoot of the heating dry-bulb temperature setpoint. Note that when a humidistat is used and high humidity control is required, the zone dry-bulb temperature will typically move toward the heating temperature setpoint when a high moisture (latent) load exists.
 
 \begin{figure}[hbtp] % fig 236
 \centering
@@ -2314,7 +2314,7 @@ When the predicted zone air temperature is above the heating setpoint and if the
 \caption{Supplemental heating coil load when predicted zone air temperature is above the heating Setpoint \protect \label{fig:supplemental-heating-coil-load-when-predicted-004}}
 \end{figure}
 
-If a heating load exists (Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-005}), the supplementalheating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
+If a heating load exists (Figure~\ref{fig:supplemental-heating-coil-load-when-predicted-005}), the supplemental heating coil is used to meet the heating coil load and at the same time offset the entire sensible cooling energy rate of the DX cooling coil (to meet the humidistat setpoint). Note that when a heating load exists and high humidity control is required, the heat pump operates at the user-specified cooling air flow rate for the entire simulation time step. As with the fan, and DX cooling coil, report variables associated with supplemental heating coil performance (e.g., heating coil energy, heating coil rate, heating coil gas or electric energy, heating coil runtime fraction, etc.) are managed in the supplemental (heating) coil object.
 
 \begin{figure}[hbtp] % fig 237
 \centering
@@ -2502,7 +2502,7 @@ The parameter definition include:
 \begin{figure}[hbtp] % fig 240
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image5306.png}
-\caption{Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Mmodel implementation (Jin 2002) \protect \label{fig:information-flowchart-for-water-to-water-heat}}
+\caption{Information Flowchart for Water-To-Water Heat Pump Parameter Estimation Model implementation (Jin 2002) \protect \label{fig:information-flowchart-for-water-to-water-heat}}
 \end{figure}
 
 where:
@@ -2584,12 +2584,12 @@ This section describes the EIR formulated model for fuel-fired plant loop absorp
 The underlying fuel-fired absorption heat pump model uses equation-fit models based on manufacturer data. The implemented model is as follows: 
 
 \subsubsection{Equipment Capacity}
-The heating and cooling capacities are derived from the nominal (rated) capacity and a capacity function of tempereatures. 
+The heating and cooling capacities are derived from the nominal (rated) capacity and a capacity function of temperatures. 
 \begin{equation}
 \mathrm{GAHP Heating/Cooling Capacity} = \mathrm{Rated Capacity} \times \mathrm{CAPFT}
 \end{equation}
 
-The temperatures used for the equation model are the ambient air temperature ($T_{mathrm{amb}}$) and the returning (or entering) water temeprature ($T_{\mathrm{ret}}$) of the load side.
+The temperatures used for the equation model are the ambient air temperature ($T_{mathrm{amb}}$) and the returning (or entering) water temperature ($T_{\mathrm{ret}}$) of the load side.
 \begin{equation}
 \mathrm{CAPFT} = a_1 \times T_{\mathrm{amb}} + b_1 \times T_{\mathrm{amb}}^{2} + c_1 \times T_{\mathrm{ret}} + d_1 \times T_{\mathrm{ret}}^{2} + e_1 \times T_{\mathrm{amb}} \times T_{\mathrm{ret}} + f_1
 \end{equation}
@@ -2601,14 +2601,14 @@ Part Load Ratio is the ratio for the actual heating/cooling load over the curren
 \end{equation}
 
 \subsubsection{Fuel Use}
-The fuel usage is calculated using the folloiwing formula, taking consideration of the load capacity, nominal COP, and the various adjustment factors (temperature, PLR, Defrosting, and Cycling Ratio):
+The fuel usage is calculated using the following formula, taking consideration of the load capacity, nominal COP, and the various adjustment factors (temperature, PLR, Defrosting, and Cycling Ratio):
 
 \begin{equation}
 \mathrm{Fuel Use} = \frac{\mathrm{Load} \times \mathrm{EIRFT} \times \mathrm{EIRFPLR} \times \mathrm{EIRDEFROST}}{\mathrm{COP}_\mathrm{nominal} \times \mathrm{CRF}}
 \end{equation}
 
 \subsubsection{EIR Temperature Adjustment}
-A typical EIR temperature correction function will involve two independent temperature variables---the ambient air temperature ($T_{mathrm{amb}}$) and the returning (or entering) water temeprature ($T_{\mathrm{ret}}$) of the load side. 
+A typical EIR temperature correction function will involve two independent temperature variables---the ambient air temperature ($T_{mathrm{amb}}$) and the returning (or entering) water temperature ($T_{\mathrm{ret}}$) of the load side. 
 \begin{equation}
 \mathrm{EIRFT} = a_2 \times Tamb + b_2 \times T_{\mathrm{amb}}^{2} + c_2 \times T_{\mathrm{ret}}^{2} + d_2 \times T_{\mathrm{ret}}^{2} + e_2 \times T_{\mathrm{amb}} \times T_{\mathrm{ret}} + f_2
 \end{equation}
@@ -2620,7 +2620,7 @@ The EIR PLR correction function is a cubic function that takes the PLR as the so
 \end{equation}
 
 \subsubsection{Defrosting Adjustment (Heating mode only)}
-If the defrost control type is OnDemand, then the defrost fuel use correction is modeled using the ambient air temperature as the independent varable. The inputs allows a cubic (or lower order) function. For example, one possible curve correlation can look like the following:  
+If the defrost control type is OnDemand, then the defrost fuel use correction is modeled using the ambient air temperature as the independent variable. The inputs allows a cubic (or lower order) function. For example, one possible curve correlation can look like the following:  
 \begin{equation}
 \mathrm{EIRDEFROST} = -0.0011 \times T_{\mathrm{amb}}^{2} - 0.006 \times T_{\mathrm{amb}} + 1.0317, \mathrm{for} -8.89^{\circ}\mathrm{C} \leq T_{\mathrm{amb}} \leq 3.33^{\circ}\mathrm{C} 
 \end{equation}
@@ -2637,12 +2637,12 @@ where $\mathrm{CRF}$ is the Cycling Ratio Factor; and $\mathrm{CR}$ is the Cycli
 \mathrm{CR} = \frac{\mathrm{PLR}}{\mathrm{PLR}_{\mathrm{min}}}, \mathrm{for} 0.2 \leq \mathrm{PLR} \leq 0.25
 \end{equation}
 
-Please note that since the object is based on curve inputs, the user also has the flexibility of defining the curves by themselves---e.g. from the capactity function of temperature to the defrost EIR corrections. 
+Please note that since the object is based on curve inputs, the user also has the flexibility of defining the curves by themselves---e.g. from the capacity function of temperature to the defrost EIR corrections. 
 
 \subsubsection{Electricty Use}
 
-The electricity use for the fuel-fired absorption heat pump is modeled using EIR (Electricity based relation) input curves. The two part of electricity use is the ``auxiliary electricty'' and the ``standby electricity'':
+The electricity use for the fuel-fired absorption heat pump is modeled using EIR (Electricity based relation) input curves. The two part of electricity use is the ``auxiliary electricity'' and the ``standby electricity'':
 \begin{equation}
-\mathrm{Electricity use} = \mathrm{Norminal Auxilary Power} \times \mathrm{EIR}_{\mathrm{auxiliary}} + \mathrm{Electricty}_{\mathrm{Standby}},
+\mathrm{Electricity use} = \mathrm{Norminal Auxiliary Power} \times \mathrm{EIR}_{\mathrm{auxiliary}} + \mathrm{Electricty}_{\mathrm{Standby}},
 \end{equation}
-where $\mathrm{EIR}_{\mathrm{auxiliary}}$ are supplied by the curve input, and $\mathrm{Norminal Auxilary Power}$ and $\mathrm{Electricty}_{\mathrm{Standby}}$ are supplied by the equipment standby electricity inputs. 
+where $\mathrm{EIR}_{\mathrm{auxiliary}}$ are supplied by the curve input, and $\mathrm{Norminal Auxiliary Power}$ and $\mathrm{Electricty}_{\mathrm{Standby}}$ are supplied by the equipment standby electricity inputs. 
