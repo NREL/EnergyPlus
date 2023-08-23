@@ -364,14 +364,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
     bool ErrorsFound(false); // If errors detected in input
 
     // Type name string variable to collapse the sizing for cooling and heating into one block
-    std::string typeName;
-    if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
-        typeName = "Cooling";
-    } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchHotWater) {
-        typeName = "HeatingWater";
-    } else { // DataPlant::PlantEquipmentType::PurchSteam
-        typeName = "HeatingSteam";
-    }
+    std::string_view typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(this->EnergyType)];
 
     auto &loop = state.dataPlnt->PlantLoop(this->plantLoc.loopNum);
     int const PltSizNum = loop.PlantSizNum;
@@ -380,19 +373,19 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
         if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater ||
             this->EnergyType == DataPlant::PlantEquipmentType::PurchHotWater) {
             Real64 const rho =
-                FluidProperties::GetDensityGlycol(state, loop.FluidName, Constant::InitConvTemp, loop.FluidIndex, format("SizeDistrict{}", typeName));
-            Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(
-                state, loop.FluidName, Constant::InitConvTemp, loop.FluidIndex, format("SizeDistrict{}", typeName));
+                FluidProperties::GetDensityGlycol(state, loop.FluidName, Constant::InitConvTemp, loop.FluidIndex, format("Size {}", typeName));
+            Real64 const Cp =
+                FluidProperties::GetSpecificHeatGlycol(state, loop.FluidName, Constant::InitConvTemp, loop.FluidIndex, format("Size {}", typeName));
             NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
         } else { // this->EnergyType == DataPlant::TypeOf_PurchSteam
             Real64 const tempSteam = FluidProperties::GetSatTemperatureRefrig(
-                state, loop.FluidName, state.dataEnvrn->StdBaroPress, loop.FluidIndex, format("SizeDistrict{}", typeName));
+                state, loop.FluidName, state.dataEnvrn->StdBaroPress, loop.FluidIndex, format("Size {}", typeName));
             Real64 const rhoSteam =
-                FluidProperties::GetSatDensityRefrig(state, loop.FluidName, tempSteam, 1.0, loop.FluidIndex, format("SizeDistrict{}", typeName));
+                FluidProperties::GetSatDensityRefrig(state, loop.FluidName, tempSteam, 1.0, loop.FluidIndex, format("Size {}", typeName));
             Real64 const EnthSteamDry =
-                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, tempSteam, 1.0, loop.FluidIndex, format("SizeDistrict{}", typeName));
+                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, tempSteam, 1.0, loop.FluidIndex, format("Size {}", typeName));
             Real64 const EnthSteamWet =
-                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, tempSteam, 0.0, loop.FluidIndex, format("SizeDistrict{}", typeName));
+                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, tempSteam, 0.0, loop.FluidIndex, format("Size {}", typeName));
             Real64 const LatentHeatSteam = EnthSteamDry - EnthSteamWet;
             NomCapDes = rhoSteam * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * LatentHeatSteam;
         }
@@ -400,18 +393,17 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
             if (this->NomCapWasAutoSized) {
                 this->NomCap = NomCapDes;
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(state, format("District{}", typeName), this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
+                    BaseSizer::reportSizerOutput(state, typeName, this->Name, "Design Size Nominal Capacity [W]", NomCapDes);
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport) {
-                    BaseSizer::reportSizerOutput(
-                        state, format("District{}", typeName), this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
+                    BaseSizer::reportSizerOutput(state, typeName, this->Name, "Initial Design Size Nominal Capacity [W]", NomCapDes);
                 }
             } else { // Hard-size with sizing data
                 if (this->NomCap > 0.0 && NomCapDes > 0.0) {
                     Real64 const NomCapUser = this->NomCap;
                     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                         BaseSizer::reportSizerOutput(state,
-                                                     format("District{}", typeName),
+                                                     typeName,
                                                      this->Name,
                                                      "Design Size Nominal Capacity [W]",
                                                      NomCapDes,
@@ -419,7 +411,7 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
                                                      NomCapUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
-                                ShowMessage(state, format("SizeDistrict{}: Potential issue with equipment sizing for {}", typeName, this->Name));
+                                ShowMessage(state, format("Size {}: Potential issue with equipment sizing for {}", typeName, this->Name));
                                 ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                 ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NomCapDes));
                                 ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -432,12 +424,12 @@ void OutsideEnergySourceSpecs::size(EnergyPlusData &state)
         }
     } else {
         if (this->NomCapWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            ShowSevereError(state, format("Autosizing of District {} nominal capacity requires a loop Sizing:Plant object", typeName));
-            ShowContinueError(state, format("Occurs in District{} object={}", typeName, this->Name));
+            ShowSevereError(state, format("Autosizing of {} nominal capacity requires a loop Sizing:Plant object", typeName));
+            ShowContinueError(state, format("Occurs in {} object={}", typeName, this->Name));
             ErrorsFound = true;
         }
         if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && state.dataPlnt->PlantFinalSizesOkayToReport) {
-            BaseSizer::reportSizerOutput(state, format("District{}", typeName), this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+            BaseSizer::reportSizerOutput(state, format("{}", typeName), this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
         }
     }
     if (ErrorsFound) {
