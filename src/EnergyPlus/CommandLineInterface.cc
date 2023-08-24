@@ -194,9 +194,10 @@ Built on Platform: {}
         // Note: we can't do check(CLI::ExistingFile) here since passing a non-existing /path/to/myfile.epw file
         // when there exists a /path/to/myfile.stat would mean the Weather File Statistics are still parsed and reported to the tabular output
         // We still report a message + fail later if DDOnlySimulation is false
-        app.add_option("-w,--weather", state.files.inputWeatherFilePath.filePath, "Weather file path (default: in.epw in current directory)")
-            ->required(false)
-            ->option_text("EPW");
+        auto *weatherPathOpt =
+            app.add_option("-w,--weather", state.files.inputWeatherFilePath.filePath, "Weather file path (default: in.epw in current directory)")
+                ->required(false)
+                ->option_text("EPW");
 
         bool runExpandObjects = false;
         app.add_flag("-x,--expandobjects", runExpandObjects, "Run ExpandObjects prior to simulation");
@@ -540,7 +541,7 @@ state.dataStrGlobals->inputFilePath='{}',
             }
         }
 
-        if (!state.dataGlobal->DDOnlySimulation) {
+        if ((weatherPathOpt->count() > 0) && !state.dataGlobal->DDOnlySimulation) {
             if (!FileSystem::fileExists(state.files.inputWeatherFilePath.filePath)) {
                 DisplayString(
                     state,
