@@ -10968,10 +10968,10 @@ void WaterThermalTankData::SizeTankForDemandSide(EnergyPlusData &state)
         case Constant::eFuel::FuelOilNo1:
         case Constant::eFuel::FuelOilNo2:
         case Constant::eFuel::Propane:
-        case Constant::eFuel::Steam:
         case Constant::eFuel::OtherFuel1:
         case Constant::eFuel::OtherFuel2:
-        case Constant::eFuel::DistrictHeating:
+        case Constant::eFuel::DistrictHeatingWater:
+        case Constant::eFuel::DistrictHeatingSteam:
             FuelTypeIsLikeGas = true;
             break;
         default: // FuelTypeIsLikeGas stays false
@@ -11699,10 +11699,10 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
             case Constant::eFuel::FuelOilNo1:
             case Constant::eFuel::FuelOilNo2:
             case Constant::eFuel::Propane:
-            case Constant::eFuel::Steam:
             case Constant::eFuel::OtherFuel1:
             case Constant::eFuel::OtherFuel2:
-            case Constant::eFuel::DistrictHeating:
+            case Constant::eFuel::DistrictHeatingWater:
+            case Constant::eFuel::DistrictHeatingSteam:
                 FuelTypeIsLikeGas = true;
                 break;
             default: // FuelTypeIsLikeGas stays false

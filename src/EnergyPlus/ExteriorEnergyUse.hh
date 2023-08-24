@@ -77,9 +77,9 @@ namespace ExteriorEnergyUse {
         PropaneUse,
         GasolineUse,
         DieselUse,
-        SteamUse,
         DistrictCoolUse,
-        DistrictHeatUse,
+        DistrictHeatWaterUse,
+        DistrictHeatSteamUse,
         OtherFuel1Use,
         OtherFuel2Use,
         Num

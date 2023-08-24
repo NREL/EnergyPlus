@@ -1141,8 +1141,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchLeedPerfOtherFuel2Dem = 0;
     int pdchLeedPerfDisClEneUse = 0;
     int pdchLeedPerfDisClDem = 0;
-    int pdchLeedPerfDisHtEneUse = 0;
-    int pdchLeedPerfDisHtDem = 0;
+    int pdchLeedPerfDisHtWtrEneUse = 0;
+    int pdchLeedPerfDisHtWtrDem = 0;
+    int pdchLeedPerfDisHtStEneUse = 0;
+    int pdchLeedPerfDisHtStDem = 0;
 
     int pdstLeedEneUseSum = 0;
     int pdchLeedEusUnt = 0;

@@ -19,3 +19,21 @@ When `ZoneAirHeatBalanceAlgorithm` "Do Space Heat Balance for Sizing" = Yes, zon
 
 See pull request [#9982](https://github.com/NREL/EnergyPlus/pull/9982) for more details.
 
+
+### Output:Variables, Output:Meter, Output:Meter:MeterFileOnly, Output:Table:Monthly
+
+*FuelType* changed:
+ (a) "District Heating" to "District Heating Water"
+ (b) "DistrictHeating" to "DistrictHeatingWater"
+ (c) "Steam" to "District Heating Steam"
+ (d) "Steam" to "DistrictHeatingSteam"
+
+ See [9260](https://github.com/NREL/EnergyPlus/pull/9260)
+
+### Table output headings moving from:
+ (a) "District Heating" to "District Heating Water"
+ (b) "DistrictHeating" to "DistrictHeatingWater"
+ (c) "Steam" to "District Heating Steam"
+ (d) "Steam" to "DistrictHeatingSteam"
+
+ See [9260](https://github.com/NREL/EnergyPlus/pull/9260)

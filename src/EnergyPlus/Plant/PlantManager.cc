@@ -1206,6 +1206,11 @@ void GetPlantInput(EnergyPlusData &state)
                             OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchHotWater, CompNames(CompNum));
                         break;
                     }
+                    case PlantEquipmentType::PurchSteam: {
+                        this_comp.compPtr =
+                            OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchSteam, CompNames(CompNum));
+                        break;
+                    }
                     case PlantEquipmentType::TS_IceSimple: {
                         this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));
                         break;
@@ -3850,6 +3855,9 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
+                    } break;
+                    case DataPlant::PlantEquipmentType::PurchSteam: { //
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                     } break;
                     case DataPlant::PlantEquipmentType::TS_IceDetailed: { //                   = 28
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
