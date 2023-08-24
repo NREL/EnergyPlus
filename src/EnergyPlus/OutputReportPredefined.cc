@@ -438,6 +438,26 @@ namespace OutputReportPredefined {
 
         s->pdrSizing = newPreDefReport(state, "HVACSizingSummary", "Size", "HVAC Sizing Summary");
 
+        s->pdstSpaceClSize = newPreDefSubTable(state, s->pdrSizing, "Space Sensible Cooling");
+
+        s->pdchSpClCalcDesLd = newPreDefColumn(state, s->pdstSpaceClSize, "Calculated Design Load [W]");
+        s->pdchSpClUserDesLd = newPreDefColumn(state, s->pdstSpaceClSize, "User Design Load [W]");
+        s->pdchSpClUserDesLdPerArea = newPreDefColumn(state, s->pdstSpaceClSize, "User Design Load per Area [W/m2]");
+        s->pdchSpClCalcDesAirFlow = newPreDefColumn(state, s->pdstSpaceClSize, "Calculated Design Air Flow [m3/s]");
+        s->pdchSpClUserDesAirFlow = newPreDefColumn(state, s->pdstSpaceClSize, "User Design Air Flow [m3/s]");
+        s->pdchSpClDesDay = newPreDefColumn(state, s->pdstSpaceClSize, "Design Day Name");
+        s->pdchSpClPkTime = newPreDefColumn(state, s->pdstSpaceClSize, "Date/Time Of Peak {TIMESTAMP}");
+        s->pdchSpClPkTstatTemp = newPreDefColumn(state, s->pdstSpaceClSize, "Thermostat Setpoint Temperature at Peak Load [C]");
+        s->pdchSpClPkIndTemp = newPreDefColumn(state, s->pdstSpaceClSize, "Indoor Temperature at Peak Load [C]");
+        s->pdchSpClPkIndHum = newPreDefColumn(state, s->pdstSpaceClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpClPkOATemp = newPreDefColumn(state, s->pdstSpaceClSize, "Outdoor Temperature at Peak Load [C]");
+        s->pdchSpClPkOAHum = newPreDefColumn(state, s->pdstSpaceClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpClPkOAMinFlow = newPreDefColumn(state, s->pdstSpaceClSize, "Minimum Outdoor Air Flow Rate [m3/s]");
+        s->pdchSpClPkDOASHeatGain = newPreDefColumn(state, s->pdstSpaceClSize, "Heat Gain Rate from DOAS [W]");
+        addFootNoteSubTable(state,
+                            s->pdstSpaceClSize,
+                            "The Design Load is the space sensible load only. It does not include any system effects or ventilation loads.");
+
         s->pdstZoneClSize = newPreDefSubTable(state, s->pdrSizing, "Zone Sensible Cooling");
 
         s->pdchZnClCalcDesLd = newPreDefColumn(state, s->pdstZoneClSize, "Calculated Design Load [W]");
@@ -456,6 +476,27 @@ namespace OutputReportPredefined {
         s->pdchZnClPkDOASHeatGain = newPreDefColumn(state, s->pdstZoneClSize, "Heat Gain Rate from DOAS [W]");
         addFootNoteSubTable(
             state, s->pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
+
+        s->pdstSpaceHtSize = newPreDefSubTable(state, s->pdrSizing, "Space Sensible Heating");
+
+        s->pdchSpHtCalcDesLd = newPreDefColumn(state, s->pdstSpaceHtSize, "Calculated Design Load [W]");
+        s->pdchSpHtUserDesLd = newPreDefColumn(state, s->pdstSpaceHtSize, "User Design Load [W]");
+        s->pdchSpHtUserDesLdPerArea = newPreDefColumn(state, s->pdstSpaceHtSize, "User Design Load per Area [W/m2]");
+        s->pdchSpHtCalcDesAirFlow = newPreDefColumn(state, s->pdstSpaceHtSize, "Calculated Design Air Flow [m3/s]");
+        s->pdchSpHtUserDesAirFlow = newPreDefColumn(state, s->pdstSpaceHtSize, "User Design Air Flow [m3/s]");
+        s->pdchSpHtDesDay = newPreDefColumn(state, s->pdstSpaceHtSize, "Design Day Name");
+        s->pdchSpHtPkTime = newPreDefColumn(state, s->pdstSpaceHtSize, "Date/Time Of Peak {TIMESTAMP}");
+        s->pdchSpHtPkTstatTemp = newPreDefColumn(state, s->pdstSpaceHtSize, "Thermostat Setpoint Temperature at Peak Load [C]");
+        s->pdchSpHtPkIndTemp = newPreDefColumn(state, s->pdstSpaceHtSize, "Indoor Temperature at Peak Load [C]");
+        s->pdchSpHtPkIndHum = newPreDefColumn(state, s->pdstSpaceHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpHtPkOATemp = newPreDefColumn(state, s->pdstSpaceHtSize, "Outdoor Temperature at Peak Load [C]");
+        s->pdchSpHtPkOAHum = newPreDefColumn(state, s->pdstSpaceHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpHtPkOAMinFlow = newPreDefColumn(state, s->pdstSpaceHtSize, "Minimum Outdoor Air Flow Rate [m3/s]");
+        s->pdchSpHtPkDOASHeatGain = newPreDefColumn(state, s->pdstSpaceHtSize, "Heat Gain Rate from DOAS [W]");
+        addFootNoteSubTable(state,
+                            s->pdstSpaceHtSize,
+                            "The Design Load is the space sensible load only. It does not include any system effects or ventilation loads.");
+
         s->pdstZoneHtSize = newPreDefSubTable(state, s->pdrSizing, "Zone Sensible Heating");
 
         s->pdchZnHtCalcDesLd = newPreDefColumn(state, s->pdstZoneHtSize, "Calculated Design Load [W]");
@@ -474,6 +515,7 @@ namespace OutputReportPredefined {
         s->pdchZnHtPkDOASHeatGain = newPreDefColumn(state, s->pdstZoneHtSize, "Heat Gain Rate from DOAS [W]");
         addFootNoteSubTable(
             state, s->pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
+
         s->pdstSystemSize = newPreDefSubTable(state, s->pdrSizing, "System Design Air Flow Rates");
 
         s->pdchSysSizCalcClAir = newPreDefColumn(state, s->pdstSystemSize, "Calculated cooling [m3/s]");
@@ -1192,8 +1234,10 @@ namespace OutputReportPredefined {
         s->pdchLeedPerfOtherFuel2Dem = newPreDefColumn(state, s->pdstLeedPerf, "Other Fuel 2 Demand [W]");
         s->pdchLeedPerfDisClEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Cooling Use [GJ]");
         s->pdchLeedPerfDisClDem = newPreDefColumn(state, s->pdstLeedPerf, "District Cooling Demand [W]");
-        s->pdchLeedPerfDisHtEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Use [GJ]");
-        s->pdchLeedPerfDisHtDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Demand [W]");
+        s->pdchLeedPerfDisHtWtrEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Water Use [GJ]");
+        s->pdchLeedPerfDisHtWtrDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Water Demand [W]");
+        s->pdchLeedPerfDisHtStEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Steam Use [GJ]");
+        s->pdchLeedPerfDisHtStDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Steam Demand [W]");
 
         s->pdstLeedEneUseSum = newPreDefSubTable(state, s->pdrLeed, "EAp2-6. Energy Use Summary");
         // Multiple columns with rows of:

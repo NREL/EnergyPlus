@@ -102,6 +102,7 @@ set(test_src
     EconomicTariff.unit.cc
     ElectricBaseboardRadiator.unit.cc
     ElectricPowerServiceManager.unit.cc
+    EquipAndOperations.unit.cc
     EvaporativeCoolers.unit.cc
     EvaporativeFluidCoolers.unit.cc
     ExhaustSystem.unit.cc

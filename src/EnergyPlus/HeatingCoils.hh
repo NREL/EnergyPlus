@@ -114,20 +114,18 @@ namespace HeatingCoils {
         int AirOutletNodeNum = 0;
         int TempSetPointNodeNum = 0; // If applicable this is the node number that the temp setpoint exists.
         int Control = 0;
-        int PLFCurveIndex = 0;          // Index for part-load factor curve index for gas heating coil
-        Real64 ParasiticElecLoad = 0.0; // parasitic electric load associated with the gas heating coil
-        Real64 ParasiticFuelLoad = 0.0; // parasitic fuel load associated with the gas heating coil
-        // (standing pilot light) [J]
-        Real64 ParasiticFuelRate = 0.0; // avg. parasitic fuel consumption rate with the gas heating coil
-        // (standing pilot light) [J]
-        Real64 ParasiticFuelCapacity = 0.0;                        // capacity of parasitic fuel consumption rate, input by user [W]
-        Real64 RTF = 0.0;                                          // Heater runtime fraction, including PLF curve impacts
-        int RTFErrorIndex = 0;                                     // used in recurring error warnings
-        int RTFErrorCount = 0;                                     // used in recurring error warnings
-        int PLFErrorIndex = 0;                                     // used in recurring error warnings
-        int PLFErrorCount = 0;                                     // used in recurring error warnings
-        std::string ReclaimHeatingCoilName;                        // Name of reclaim heating coil
-        int ReclaimHeatingSourceIndexNum = 0;                      // Index to reclaim heating source (condenser) of a specific type
+        int PLFCurveIndex = 0;                 // Index for part-load factor curve index for gas heating coil
+        Real64 ParasiticElecLoad = 0.0;        // parasitic electric load associated with the gas heating coil
+        Real64 ParasiticFuelConsumption = 0.0; // parasitic fuel consumption associated with the gas heating coil (standing pilot light) [J]
+        Real64 ParasiticFuelRate = 0.0;        // avg. parasitic fuel consumption rate with the gas heating coil (standing pilot light) [W]
+        Real64 ParasiticFuelCapacity = 0.0;    // capacity of parasitic fuel consumption rate, input by user [W]
+        Real64 RTF = 0.0;                      // Heater runtime fraction, including PLF curve impacts
+        int RTFErrorIndex = 0;                 // used in recurring error warnings
+        int RTFErrorCount = 0;                 // used in recurring error warnings
+        int PLFErrorIndex = 0;                 // used in recurring error warnings
+        int PLFErrorCount = 0;                 // used in recurring error warnings
+        std::string ReclaimHeatingCoilName;    // Name of reclaim heating coil
+        int ReclaimHeatingSourceIndexNum = 0;  // Index to reclaim heating source (condenser) of a specific type
         HeatObjTypes ReclaimHeatingSource = HeatObjTypes::Invalid; // The source for the Reclaim Heating Coil
         int NumOfStages = 0;                                       // Number of speeds
         Array1D<Real64> MSNominalCapacity;                         // Nominal Capacity MS AC Furnace [W]

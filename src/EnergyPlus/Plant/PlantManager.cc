@@ -1206,6 +1206,11 @@ void GetPlantInput(EnergyPlusData &state)
                             OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchHotWater, CompNames(CompNum));
                         break;
                     }
+                    case PlantEquipmentType::PurchSteam: {
+                        this_comp.compPtr =
+                            OutsideEnergySources::OutsideEnergySourceSpecs::factory(state, PlantEquipmentType::PurchSteam, CompNames(CompNum));
+                        break;
+                    }
                     case PlantEquipmentType::TS_IceSimple: {
                         this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));
                         break;
@@ -3172,6 +3177,16 @@ void SizePlantLoop(EnergyPlusData &state,
     if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
         FluidDensity = GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(LoopNum).FluidName, Constant::InitConvTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+        if (PlantSizNum > 0 && allocated(state.dataSize->PlantSizData)) { // method only works if sizing delta T is avaiable
+            Real64 cp = GetSpecificHeatGlycol(state,
+                                              state.dataPlnt->PlantLoop(LoopNum).FluidName,
+                                              Constant::InitConvTemp,
+                                              state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
+                                              RoutineName);
+            Real64 DesignPlantCapacity =
+                cp * FluidDensity * state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * state.dataSize->PlantSizData(PlantSizNum).DeltaT;
+            state.dataSize->PlantSizData(PlantSizNum).DesCapacity = DesignPlantCapacity; // store it for later use in scaling
+        }
     } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
         FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     } else {
@@ -3840,6 +3855,9 @@ void SetupBranchControlTypes(EnergyPlusData &state)
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                         this_component.FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
                         this_component.HowLoadServed = DataPlant::HowMet::ByNominalCapHiOutLimit;
+                    } break;
+                    case DataPlant::PlantEquipmentType::PurchSteam: { //
+                        this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;
                     } break;
                     case DataPlant::PlantEquipmentType::TS_IceDetailed: { //                   = 28
                         this_component.FlowCtrl = DataBranchAirLoopPlant::ControlType::Active;

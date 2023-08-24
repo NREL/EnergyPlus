@@ -7026,13 +7026,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(1).spaceNames[1], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).radiantEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).radiantEnclosureNum, 1);
-    Real64 enclArea = state->dataHeatBal->space(1).floorArea + state->dataHeatBal->space(3).floorArea;
+    Real64 enclArea = state->dataHeatBal->space(1).FloorArea + state->dataHeatBal->space(3).FloorArea;
     EXPECT_EQ(state->dataViewFactor->EnclRadInfo(1).FloorArea, enclArea);
 
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).Name, "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclRadInfo(2).spaceNames[0], "Space 2"));
     EXPECT_EQ(state->dataHeatBal->space(2).radiantEnclosureNum, 2);
-    enclArea = state->dataHeatBal->space(2).floorArea;
+    enclArea = state->dataHeatBal->space(2).FloorArea;
     EXPECT_EQ(state->dataViewFactor->EnclRadInfo(2).FloorArea, enclArea);
 
     EXPECT_EQ(state->dataViewFactor->NumOfSolarEnclosures, 2);
@@ -7041,7 +7041,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(1).spaceNames[1], "Space 3"));
     EXPECT_EQ(state->dataHeatBal->space(1).solarEnclosureNum, 1);
     EXPECT_EQ(state->dataHeatBal->space(3).solarEnclosureNum, 1);
-    enclArea = state->dataHeatBal->space(1).floorArea + state->dataHeatBal->space(3).floorArea;
+    enclArea = state->dataHeatBal->space(1).FloorArea + state->dataHeatBal->space(3).FloorArea;
     Real64 enclExtWindowArea = state->dataHeatBal->space(1).extWindowArea + state->dataHeatBal->space(3).extWindowArea;
     EXPECT_EQ(state->dataViewFactor->EnclSolInfo(1).ExtWindowArea, enclExtWindowArea);
     Real64 enclTotSurfArea = state->dataHeatBal->space(1).totalSurfArea + state->dataHeatBal->space(3).totalSurfArea;
@@ -7050,7 +7050,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).Name, "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(state->dataViewFactor->EnclSolInfo(2).spaceNames[0], "Space 2"));
     EXPECT_EQ(state->dataHeatBal->space(2).solarEnclosureNum, 2);
-    enclArea = state->dataHeatBal->space(2).floorArea;
+    enclArea = state->dataHeatBal->space(2).FloorArea;
     EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).FloorArea, enclArea);
     enclExtWindowArea = state->dataHeatBal->space(2).extWindowArea;
     EXPECT_EQ(state->dataViewFactor->EnclSolInfo(2).ExtWindowArea, enclExtWindowArea);
@@ -9745,18 +9745,18 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     EXPECT_EQ(state->dataHeatBal->space(1).Name, "SPACE 1A");
     EXPECT_NEAR(state->dataHeatBal->space(1).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(1).calcFloorArea, 1.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(1).floorArea, 10.0, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->space(1).FloorArea, 10.0, 0.001);
 
     EXPECT_EQ(state->dataHeatBal->space(2).Name, "SPACE 1B");
     EXPECT_NEAR(state->dataHeatBal->space(2).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(2).calcFloorArea, 2.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(2).floorArea, 20.0, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->space(2).FloorArea, 20.0, 0.001);
 
     EXPECT_EQ(state->dataHeatBal->Zone(1).Name, "ZONE 1");
     EXPECT_NEAR(state->dataHeatBal->Zone(1).UserEnteredFloorArea, 30.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(1).CalcFloorArea, 3.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->Zone(1).FloorArea, 30.0, 0.001);
-    Real64 zone1Area = state->dataHeatBal->space(1).floorArea + state->dataHeatBal->space(2).floorArea;
+    Real64 zone1Area = state->dataHeatBal->space(1).FloorArea + state->dataHeatBal->space(2).FloorArea;
     EXPECT_NEAR(state->dataHeatBal->Zone(1).FloorArea, zone1Area, 0.001);
 
     // Zone 3 consists of Space 3, user-entered floor area is blank
@@ -9768,7 +9768,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     EXPECT_EQ(state->dataHeatBal->space(3).Name, "SPACE 3");
     EXPECT_NEAR(state->dataHeatBal->space(3).userEnteredFloorArea, 5.0, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(3).calcFloorArea, 1.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(3).floorArea, 5.0, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->space(3).FloorArea, 5.0, 0.001);
 
     // Zone 2 consists of auto-generated Space 4, user-entered floor area is 20.0
     // Space 4 has a floor surface of area 1.0, user-entered floor is blank
@@ -9779,7 +9779,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_ZoneAndSpaceAreas)
     EXPECT_EQ(state->dataHeatBal->space(4).Name, "ZONE 2");
     EXPECT_NEAR(state->dataHeatBal->space(4).userEnteredFloorArea, Constant::AutoCalculate, 0.001);
     EXPECT_NEAR(state->dataHeatBal->space(4).calcFloorArea, 1.0, 0.001);
-    EXPECT_NEAR(state->dataHeatBal->space(4).floorArea, 20.0, 0.001);
+    EXPECT_NEAR(state->dataHeatBal->space(4).FloorArea, 20.0, 0.001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneFloorAreaTest)
