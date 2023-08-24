@@ -136,13 +136,40 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
 
     // make calls to fill out predefined tabular report entries for each coil selection report object
     for (auto &c : coilSelectionDataObjs) {
+
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilType, c->coilName_, c->coilObjName);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLocation, c->coilName_, c->coilLocation);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType, c->coilName_, c->typeHVACname);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACName, c->coilName_, c->userNameforHVACsystem);
 
+        // begin std 229 existing heating coil table adding new variables
+        if (c->isHeating) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchHeatCoilUsedAsSupHeat, c->coilName_, c->isSupplementalHeater ? "Yes" : "No");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchHeatCoilAirloopName,
+                                                     c->coilName_,
+                                                     c->airloopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchHeatCoilPlantloopName,
+                                                     c->coilName_,
+                                                     c->waterLoopNum > 0 ? state.dataPlnt->PlantLoop(c->waterLoopNum).Name : "N/A");
+        }
+        // end std 229 existing heating coil table adding new variables
+
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilName_CCs, c->coilName_, c->coilName_);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilType_CCs, c->coilName_, c->coilObjName);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilLoc_CCs, c->coilName_, c->coilLocation);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACType_CCs, c->coilName_, c->typeHVACname);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilHVACName_CCs, c->coilName_, c->userNameforHVACsystem);
+        // end of std 229 New coil connections table entries
+
         if (c->zoneName.size() == 1) {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, c->zoneName[0]);
+            // begin std 229 New coil connections table entries
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneNames_CCs, c->coilName_, c->zoneName[0]);
+            // end of std 229 New coil connections table entries
         } else if (c->zoneName.size() > 1) {
             // make list of zone names
             std::string tmpZoneList;
@@ -150,8 +177,14 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
                 tmpZoneList += c->zoneName[vecLoop] + "; ";
             }
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, tmpZoneList);
+            // begin std 229 New coil connections table entries
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneNames_CCs, c->coilName_, tmpZoneList);
+            // end of std 229 New coil connections table entries
         } else {
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneName, c->coilName_, "N/A");
+            // begin std 229 New coil connections table entries
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilZoneNames_CCs, c->coilName_, "N/A");
+            // end of std 229 New coil connections table entries
         }
 
         OutputReportPredefined::PreDefTableEntry(
@@ -185,7 +218,16 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
 
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchFanAssociatedWithCoilName, c->coilName_, c->fanAssociatedWithCoilName);
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchCoilSupFanName_CCs, c->coilName_, c->fanAssociatedWithCoilName);
+        // end of std 229 New coil connections table entries
+
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAssociatedWithCoilType, c->coilName_, c->fanTypeName);
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilSupFanType_CCs, c->coilName_, c->fanTypeName);
+        // end of std 229 New coil connections table entries
+
         if (c->fanSizeMaxAirVolumeFlow == -999.0 || c->fanSizeMaxAirVolumeFlow == -99999.0) {
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchFanAssociatedVdotSize, c->coilName_, c->fanSizeMaxAirVolumeFlow, 1);
@@ -200,6 +242,15 @@ void ReportCoilSelection::writeCoilSelectionOutput(EnergyPlusData &state)
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchFanAssociatedMdotSize, c->coilName_, c->fanSizeMaxAirMassFlow, 8);
         }
+
+        // begin std 229 New coil connections table entries
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilPlantName_CCs, c->coilName_, c->plantLoopName);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchCoilAirloopName_CCs,
+                                                 c->coilName_,
+                                                 c->airloopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoilPlantloopName_CCs, c->coilName_, c->plantLoopName);
+        // end of std 229 New coil connections table entries
 
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchCoilDDnameSensIdealPeak, c->coilName_, c->desDayNameAtSensPeak);

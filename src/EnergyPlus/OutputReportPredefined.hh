@@ -242,6 +242,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFanPwrPerFlow = 0;
     int pdchFanDesDay = 0;
     int pdchFanPkTime = 0;
+    // Standard 229 Predef outputs for Fans
+    int pdchFanPurpose = 0;
+    int pdchFanAutosized = 0;
+    int pdchFanMotorEff = 0;
+    int pdchFanMotorHeatToZoneFrac = 0;
+    int pdchFanAirLoopName = 0;
 
     // Pump subtable
     int pdstPump = 0;
@@ -253,6 +259,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchPumpPwrPerFlow = 0;
     int pdchPumpEndUse = 0;
     int pdchMotEff = 0;
+    // Standard 229 Predef outputs for Pumps
+    int pdchPumpAutosized = 0;
+    int pdchPumpPlantloopName = 0;
+    int pdchPumpPlantloopBranchName = 0;
 
     // Cooling coil subtable
     int pdstCoolCoil = 0;
@@ -338,6 +348,9 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchDXHeatCoilHSPFSI;    // HSPF value in SI unit at AHRI std. 340/360 conditions [W/W]
     int pdchDXHeatCoilHSPFIP;    // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
     int pdchDXHeatCoilRegionNum; // Region number for which HSPF is calculated
+    // Standard 229 Predef outputs for DX Heating Coils
+    int pdchDXHeatCoilMinOADBTforCompOp;
+    int pdchDXHeatCoilAirloopName;
 
     // TODO: As not inlcuded in clearState() , Confirm and update
     // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
@@ -355,6 +368,10 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchHeatCoilDesCap = 0;
     int pdchHeatCoilNomCap = 0;
     int pdchHeatCoilNomEff = 0;
+    // Standard 229 Predef outputs for Heating Coils
+    int pdchHeatCoilUsedAsSupHeat = 0;
+    int pdchHeatCoilAirloopName = 0;
+    int pdchHeatCoilPlantloopName = 0;
 
     // SWH subtable
     int pdstSWH = 0;
@@ -364,6 +381,87 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchSWHThEff = 0;
     int pdchSWHRecEff = 0;
     int pdchSWHEnFac = 0;
+
+    // Std 229 Chiller Table in Equipment Summary
+    int pdstChiller = 0;
+    int pdchChillerType = 0;                        // Type
+    int pdchChillerRefCap = 0;                      // Reference Capacity[W]
+    int pdchChillerRefEff = 0;                      // Reference Efficiency [W/W]
+    int pdchChillerRatedCap = 0;                    // Rated Capacity [W]
+    int pdchChillerRatedEff = 0;                    // Rated Efficiency [W/W]
+    int pdchChillerIPLVinSI = 0;                    // IPLV in SI Units [W/W]
+    int pdchChillerIPLVinIP = 0;                    // IPLV in IP Units [Btu/W-h]
+    int pdchChillerPlantloopName = 0;               // Plantloop name
+    int pdchChillerPlantloopBranchName = 0;         // Plantloop branch name
+    int pdchChillerCondLoopName = 0;                // Condenser loop name
+    int pdchChillerCondLoopBranchName = 0;          // Condenser loop branch name
+    int pdchChillerMinPLR = 0;                      // Minimum part load ratio
+    int pdchChillerFuelType = 0;                    // Fuel type
+    int pdchChillerRatedEntCondTemp = 0;            // Rated entering condenser temperature
+    int pdchChillerRatedLevEvapTemp = 0;            // Rated leaving evaporator temperature
+    int pdchChillerRefEntCondTemp = 0;              // Reference entering condenser temperature
+    int pdchChillerRefLevEvapTemp = 0;              // Reference leaving evaporator temperature
+    int pdchChillerDesSizeRefCHWFlowRate = 0;       // Design Size Reference Chilled Water Flow Rate
+    int pdchChillerDesSizeRefCondFluidFlowRate = 0; // Design Size Reference Condenser Fluid Flow Rate
+    int pdchChillerHeatRecPlantloopName = 0;        // Heat recovery Plantloop name
+    int pdchChillerHeatRecPlantloopBranchName = 0;  // Heat recovery Plantloop branch name
+    int pdchChillerRecRelCapFrac = 0;               // Recovery Relative Capacity Fraction
+
+    // Std 229 Boiler Table in Equipment Summary
+    int pdstBoiler = 0;
+    int pdchBoilerType = 0;                // Type
+    int pdchBoilerRefCap = 0;              // Reference Capacity [W]
+    int pdchBoilerRefEff = 0;              // Reference Efficiency [W/W]
+    int pdchBoilerRatedCap = 0;            // Rated Capacity [W]
+    int pdchBoilerRatedEff = 0;            // Rated Efficiency [W/W]
+    int pdchBoilerPlantloopName = 0;       // Plantloop name
+    int pdchBoilerPlantloopBranchName = 0; // Plantloop branch name
+    int pdchBoilerMinPLR = 0;              // Minimum part load ratio
+    int pdchBoilerFuelType = 0;            // Fuel type
+    int pdchBoilerParaElecLoad = 0;        // Parasitic electric load
+
+    // Std 229 cooling towers and fluid coolers Table in Equipment Summary
+    int pdstCTFC = 0;
+    int pdchCTFCType = 0;               // Type
+    int pdchCTFCCondLoopName = 0;       // Condenser loop name
+    int pdchCTFCCondLoopBranchName = 0; // Condenser loop branch name
+    int pdchCTFCFluidType = 0;          // Fluid type
+    int pdchCTFCRange = 0;              // Range
+    int pdchCTFCApproach = 0;           // Approach
+    int pdchCTFCDesFanPwr = 0;          // Design Fan Power
+    int pdchCTFCDesInletAirWBT = 0;     // Design inlet air wet-bulb temperature
+    int pdchCTFCDesWaterFlowRate = 0;   // Design Water Flow Rate
+    int pdchCTFCLevWaterSPTemp = 0;     // Leaving water setpoint temperature
+
+    // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
+    int pdstPLCL = 0;
+    int pdchPLCLType = 0;            // type (PlantLoop or CondenserLoop)
+    int pdchPLCLProvHeat = 0;        // provides heating
+    int pdchPLCLProvCool = 0;        // provides cooling
+    int pdchPLCLMaxLoopFlowRate = 0; // Maximum Loop Flow Rate
+    int pdchPLCLMinLoopFlowRate = 0; // Minimum Loop Flow Rate
+
+    // Std 229 Air Terminal Table in Equipment Summary
+    int pdstAirTerm = 0;
+    int pdchAirTermZoneName = 0;       // Zone Name
+    int pdchAirTermMinFlow = 0;        // Minimum Flow
+    int pdchAirTermMinOutdoorFlow = 0; // Minimum Outdoor Flow
+    int pdchAirTermSupCoolingSP = 0;   // Supply cooling setpoint
+    int pdchAirTermSupHeatingSP = 0;   // Supply heating setpoint
+    int pdchAirTermHeatingCap = 0;     // Heating capacity
+    int pdchAirTermCoolingCap = 0;     // Cooling capacity
+
+    // Std 229 Air Heat Recovery
+    int pdstAirHR = 0;
+    int pdchAirHRInputObjName = 0;              // name
+    int pdchAirHRInputObjType = 0;              // input object type
+    int pdchAirHRPlateOrRotary = 0;             // plate/rotary
+    int pdchAirHRSenEffAt100PerHeatAirFlow = 0; // Sensible Effectiveness at 100% Heating Air Flow
+    int pdchAirHRSenEffAt100PerCoolAirFlow = 0; // Sensible Effectiveness at 100% Cooling Air Flow
+    int pdchAirHRLatEffAt100PerHeatAirFlow = 0; // Latent Effectiveness at 100% Heating Air Flow
+    int pdchAirHRLatEffAt100PerCoolAirFlow = 0; // Latent Effectiveness at 100% Cooling Air Flow
+    int pdchAirHRExhaustAirflow = 0;            // Exhaust airflow
+    int pdchAirHROutdoorAirflow = 0;            // Outdoor airflow
 
     // Envelope Report
     int pdrEnvelope = 0;
@@ -680,6 +778,20 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchMoistAirSpecificHeat = 0;
     int pdchDryAirSpecificHeat = 0;
     int pdchStandRhoAir = 0;
+
+    // Std 229 Coil Connections
+    int pdstCoilConnections = 0;
+    int pdchCoilName_CCs = 0;
+    int pdchCoilType_CCs = 0;
+    int pdchCoilLoc_CCs = 0;
+    int pdchCoilHVACType_CCs = 0;
+    int pdchCoilHVACName_CCs = 0;
+    int pdchCoilZoneNames_CCs = 0;
+    int pdchCoilSupFanName_CCs = 0;
+    int pdchCoilSupFanType_CCs = 0;
+    int pdchCoilPlantName_CCs = 0;     // Plant Name for Coil*
+    int pdchCoilAirloopName_CCs = 0;   // Airloop Name
+    int pdchCoilPlantloopName_CCs = 0; // Plant Loop Name
 
     // Coil Sizing Summary (subset of Coil Selection Table)
     int pdst2CoilSummaryCoilSelection = 0;
