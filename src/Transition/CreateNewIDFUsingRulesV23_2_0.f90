@@ -479,6 +479,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with A, insert the rules here
 
               ! If your original object starts with B, insert the rules here
+              CASE('BRANCH')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  ! Check 3, 7, 11, ... every fourth
+                  OutArgs = InArgs
+                  DO Num3 = 3, CurArgs, 4
+                      IF (SameString(InArgs(Num3), "DISTRICTHEATING")) THEN
+                          OutArgs(Num3) = "DistrictHeating:Water"
+                          nodiff = .FALSE.
+                      END IF
+                  END DO
 
               ! If your original object starts with C, insert the rules here
               CASE('COIL:COOLING:DX:TWOSPEED')
@@ -686,10 +696,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (OutArgs(5) == "DISTRICTHEATING" .OR. OutArgs(5) == "DistrictHeating" .OR. OutArgs(5) == "districtheating") THEN
+                 IF (SameString(OutArgs(5), "DISTRICTHEATING")) THEN
                      OutArgs(5) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(5) == "STEAM" .OR. OutArgs(5) == "Steam" .OR. OutArgs(5) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(5), "STEAM")) THEN
                      OutArgs(5) = "DistrictHeatingSteam"
                  END IF
 
@@ -697,10 +706,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                 IF (SameString(OutArgs(2), "DISTRICTHEATING")) THEN
                      OutArgs(2) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(2), "STEAM")) THEN
                      OutArgs(2) = "DistrictHeatingSteam"
                  END IF
 
@@ -917,10 +925,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                 IF (SameString(OutArgs(2), "DISTRICTHEATING")) THEN
                      OutArgs(2) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(2), "STEAM")) THEN
                      OutArgs(2) = "DistrictHeatingSteam"
                  END IF
 
@@ -929,12 +936,33 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (OutArgs(6) == "DISTRICTHEATING" .OR. OutArgs(6) == "DistrictHeating" .OR. OutArgs(6) == "districtheating") THEN
+                 IF (SameString(OutArgs(6), "DISTRICTHEATING")) THEN
                      OutArgs(6) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(6) == "STEAM" .OR. OutArgs(6) == "Steam" .OR. OutArgs(6) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(6), "STEAM")) THEN
                      OutArgs(6) = "DistrictHeatingSteam"
                  END IF
+
+              CASE('PLANTEQUIPMENTLIST')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  ! Check 2, 4, 6, ... every even
+                  OutArgs = InArgs
+                  DO Num3 = 2, CurArgs, 2
+                      IF (SameString(InArgs(Num3), "DISTRICTHEATING")) THEN
+                          OutArgs(Num3) = "DistrictHeating:Water"
+                          nodiff = .FALSE.
+                      END IF
+                  END DO
+
+              CASE('PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  ! Check 2, 8, 14, ... every sixth
+                  OutArgs = InArgs
+                  DO Num3 = 2, CurArgs, 6
+                      IF (SameString(InArgs(Num3), "DISTRICTHEATING")) THEN
+                          OutArgs(Num3) = "DistrictHeating:Water"
+                          nodiff = .FALSE.
+                      END IF
+                  END DO
 
               ! If your original object starts with R, insert the rules here
 
@@ -951,22 +979,19 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (OutArgs(11) == "DISTRICTHEATING" .OR. OutArgs(11) == "DistrictHeating" .OR. OutArgs(11) == "districtheating") THEN
+                 IF (SameString(OutArgs(11), "DISTRICTHEATING")) THEN
                      OutArgs(11) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(11) == "STEAM" .OR. OutArgs(11) == "Steam" .OR. OutArgs(11) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(11), "STEAM")) THEN
                      OutArgs(11) = "DistrictHeatingSteam"
                  END IF
-                 IF (OutArgs(15) == "DISTRICTHEATING" .OR. OutArgs(15) == "DistrictHeating" .OR. OutArgs(15) == "districtheating") THEN
+                 IF (SameString(OutArgs(15), "DISTRICTHEATING")) THEN
                      OutArgs(15) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(15) == "STEAM" .OR. OutArgs(15) == "Steam" .OR. OutArgs(15) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(15), "STEAM")) THEN
                      OutArgs(15) = "DistrictHeatingSteam"
                  END IF
-                 IF (OutArgs(18) == "DISTRICTHEATING" .OR. OutArgs(18) == "DistrictHeating" .OR. OutArgs(18) == "districtheating") THEN
+                 IF (SameString(OutArgs(18), "DISTRICTHEATING")) THEN
                      OutArgs(18) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(18) == "STEAM" .OR. OutArgs(18) == "Steam" .OR. OutArgs(18) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(18), "STEAM")) THEN
                      OutArgs(18) = "DistrictHeatingSteam"
                  END IF
 
@@ -974,16 +999,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (OutArgs(17) == "DISTRICTHEATING" .OR. OutArgs(17) == "DistrictHeating" .OR. OutArgs(17) == "districtheating") THEN
+                 IF (SameString(OutArgs(17), "DISTRICTHEATING")) THEN
                      OutArgs(17) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(17) == "STEAM" .OR. OutArgs(17) == "Steam" .OR. OutArgs(17) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(17), "STEAM")) THEN
                      OutArgs(17) = "DistrictHeatingSteam"
                  END IF
-                 IF (OutArgs(24) == "DISTRICTHEATING" .OR. OutArgs(24) == "DistrictHeating" .OR. OutArgs(24) == "districtheating") THEN
+                 IF (SameString(OutArgs(24), "DISTRICTHEATING")) THEN
                      OutArgs(24) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(24) == "STEAM" .OR. OutArgs(24) == "Steam" .OR. OutArgs(24) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(24), "STEAM")) THEN
                      OutArgs(24) = "DistrictHeatingSteam"
                  END IF
 
@@ -992,25 +1015,21 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
                  OutArgs(1:CurArgs)=InArgs(1:CurArgs)
-                 IF (OutArgs(20) == "DISTRICTHEATING" .OR. OutArgs(20) == "DistrictHeating" .OR. OutArgs(20) == "districtheating") THEN
+                 IF (SameString(OutArgs(20), "DISTRICTHEATING")) THEN
                      OutArgs(20) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(20) == "STEAM" .OR. OutArgs(20) == "Steam" .OR. OutArgs(20) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(20), "STEAM")) THEN
                      OutArgs(20) = "DistrictHeatingSteam"
                  END IF
-                 IF (OutArgs(21) == "DISTRICTHEATING" .OR. OutArgs(21) == "DistrictHeating" .OR. OutArgs(21) == "districtheating") THEN
+                 IF (SameString(OutArgs(21), "DISTRICTHEATING")) THEN
                      OutArgs(21) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(21) == "STEAM" .OR. OutArgs(21) == "Steam" .OR. OutArgs(21) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(21), "STEAM")) THEN
                      OutArgs(21) = "DistrictHeatingSteam"
                  END IF
-                 IF (OutArgs(22) == "DISTRICTHEATING" .OR. OutArgs(22) == "DistrictHeating" .OR. OutArgs(22) == "districtheating") THEN
+                 IF (SameString(OutArgs(22), "DISTRICTHEATING")) THEN
                      OutArgs(22) = "DistrictHeatingWater"
-                 END IF
-                 IF (OutArgs(22) == "STEAM" .OR. OutArgs(22) == "Steam" .OR. OutArgs(22) == "steam") THEN
+                 ELSE IF (SameString(OutArgs(22), "STEAM")) THEN
                      OutArgs(22) = "DistrictHeatingSteam"
                  END IF
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
@@ -1234,10 +1253,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.
-                IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                IF (SameString(OutArgs(2), "DISTRICTHEATING")) THEN
                     OutArgs(2) = "DistrictHeatingWater"
-                END IF
-                IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                ELSE IF (SameString(OutArgs(2), "STEAM")) THEN
                     OutArgs(2) = "DistrictHeatingSteam"
                 END IF
                 CurVar=4
@@ -1348,10 +1366,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.
-                IF (OutArgs(2) == "DISTRICTHEATING" .OR. OutArgs(2) == "DistrictHeating" .OR. OutArgs(2) == "districtheating") THEN
+                IF (SameString(OutArgs(2), "DISTRICTHEATING")) THEN
                     OutArgs(2) = "DistrictHeatingWater"
-                END IF
-                IF (OutArgs(2) == "STEAM" .OR. OutArgs(2) == "Steam" .OR. OutArgs(2) == "steam") THEN
+                ELSE IF (SameString(OutArgs(2), "STEAM")) THEN
                     OutArgs(2) = "DistrictHeatingSteam"
                 END IF
                 CurVar=4   ! In case Source Meter would change
