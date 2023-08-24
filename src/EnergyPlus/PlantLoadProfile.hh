@@ -65,27 +65,38 @@ struct EnergyPlusData;
 
 namespace PlantLoadProfile {
 
+    enum class PlantLoopFluidType
+    {
+        Invalid = -1,
+        Water,
+        Steam,
+        Num
+    };
+
     struct PlantProfileData : public PlantComponent
     {
         virtual ~PlantProfileData() = default;
 
         // Members
-        std::string Name;                   // Name of Plant Load Profile object
-        DataPlant::PlantEquipmentType Type; // Plant Side Connection: 'Type' assigned in DataPlant
-        PlantLocation plantLoc;             // water plant loop component location object
-        bool Init;                          // Flag for initialization:  TRUE means do the init
-        bool InitSizing;                    // Flag for initialization of plant sizing
+        std::string Name;                                           // Name of Plant Load Profile object
+        DataPlant::PlantEquipmentType Type;                         // Plant Side Connection: 'Type' assigned in DataPlant
+        PlantLocation plantLoc;                                     // plant loop component location object
+        PlantLoopFluidType FluidType = PlantLoopFluidType::Invalid; // plant loop fluid type: water or steam
+        bool Init;                                                  // Flag for initialization:  TRUE means do the init
+        bool InitSizing;                                            // Flag for initialization of plant sizing
         int InletNode;
         Real64 InletTemp; // Inlet temperature (C)
         int OutletNode;
-        Real64 OutletTemp;        // Outlet temperature (C)
-        int LoadSchedule;         // Pointer to schedule object
-        bool EMSOverridePower;    // if true, then EMS is calling to override power level
-        Real64 EMSPowerValue;     // value EMS is directing to use for power [W]
-        Real64 PeakVolFlowRate;   // Peak volumetric flow rate, also water consumption rate (m3/s)
-        int FlowRateFracSchedule; // Pointer to schedule object
-        Real64 VolFlowRate;       // Volumetric flow rate (m3/s)
-        Real64 MassFlowRate;      // Mass flow rate (kg/s)
+        Real64 OutletTemp;              // Outlet temperature (C)
+        int LoadSchedule;               // Pointer to schedule object
+        bool EMSOverridePower;          // if true, then EMS is calling to override power level
+        Real64 EMSPowerValue;           // value EMS is directing to use for power [W]
+        Real64 PeakVolFlowRate;         // Peak volumetric flow rate, also water consumption rate (m3/s)
+        int FlowRateFracSchedule;       // Pointer to schedule object
+        Real64 VolFlowRate;             // Volumetric flow rate (m3/s)
+        Real64 MassFlowRate;            // Mass flow rate (kg/s)
+        Real64 DegOfSubcooling = 0.0;   // Degree of subcooling in steam outlet
+        Real64 LoopSubcoolReturn = 0.0; // Loop subcooling for steam return
         bool EMSOverrideMassFlow;
         Real64 EMSMassFlowValue;
         // Report variables

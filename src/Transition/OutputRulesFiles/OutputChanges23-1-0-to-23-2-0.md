@@ -43,3 +43,29 @@ The following new tables or subtables are created:
 - Equipment Summary - Air Heat Recovery
 
 See Pull Request [#10051] (https://github.com/NREL/EnergyPlus/pull/10051) for more details about the NFP; and [#10143] (https://github.com/NREL/EnergyPlus/pull/10143) for details about current implementations.
+
+### Space Sizing Output in EIO and Tables
+
+When `ZoneAirHeatBalanceAlgorithm` "Do Space Heat Balance for Sizing" = Yes, zone sizing is also done for all spaces. The HVAC Sizing Summary table report will include subtables for Space Sensible Cooling and Heating as well as for Zone Sensible Cooling and Heating. Space Sizing will also be reported to the eio output.
+
+See pull request [#9982](https://github.com/NREL/EnergyPlus/pull/9982) for more details.
+
+
+### Output:Variables, Output:Meter, Output:Meter:MeterFileOnly, Output:Table:Monthly
+
+*FuelType* changed:
+ (a) "District Heating" to "District Heating Water"
+ (b) "DistrictHeating" to "DistrictHeatingWater"
+ (c) "Steam" to "District Heating Steam"
+ (d) "Steam" to "DistrictHeatingSteam"
+
+ See [9260](https://github.com/NREL/EnergyPlus/pull/9260)
+
+### Table output headings moving from:
+
+ (a) "District Heating" to "District Heating Water"
+ (b) "DistrictHeating" to "DistrictHeatingWater"
+ (c) "Steam" to "District Heating Steam"
+ (d) "Steam" to "DistrictHeatingSteam"
+
+ See [9260](https://github.com/NREL/EnergyPlus/pull/9260)
