@@ -5281,15 +5281,11 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_UpdateMeters)
     {
         std::string const idf_objects = delimited_string({
-            "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
-            "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,hourly;",
+            "Output:Meter,Electricity:Facility,timestep;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        // Setup so that UpdateDataandReport can be called.
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -5314,123 +5310,57 @@ namespace OutputProcessor {
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
+
         // OutputProcessor::TimeValue.allocate(2);
+
         auto timeStep = 1.0 / 6;
+
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 10;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 10;
-
-        int MDHM; // Month,Day,Hour,Minute
-        General::EncodeMonDayHrMin(MDHM, state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, state->dataGlobal->HourOfDay, 10);
-
-        state->dataGlobal->WarmupFlag = true;
-
-        ReportOutputFileHeaders(*state);
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         GetReportVariableInput(*state);
-        Array1D<ZonePurchasedAir> PurchAir; // Used to specify purchased air parameters
-        PurchAir.allocate(1);
+        Real64 light_consumption = 999;
         SetupOutputVariable(*state,
-                            "Zone Ideal Loads Supply Air Total Heating Energy",
+                            "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
-                            PurchAir(1).TotHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
+                            light_consumption,
+                            OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
-                            PurchAir(1).Name,
+                            "SPACE1-1 LIGHTS 1",
                             {},
-                            "DISTRICTHEATING",
-                            "Heating",
-                            {},
-                            "System");
-
-        PurchAir(1).TotHeatEnergy = 1.1;
+                            "Electricity",
+                            "InteriorLights",
+                            "GeneralLights",
+                            "Building",
+                            "SPACE1-1",
+                            1,
+                            1);
+        state->dataGlobal->WarmupFlag = true;
         UpdateMeterReporting(*state);
         UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        //UpdateMeters(*state, MDHM);
 
-        PurchAir(1).TotHeatEnergy = 1.3;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        //UpdateMeters(*state, MDHM);
-
-        PurchAir(1).TotHeatEnergy = 1.5;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
-
-        PurchAir(1).TotHeatEnergy = 1.7;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
-
-        PurchAir(1).TotHeatEnergy = 1.9;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
-
-        PurchAir(1).TotHeatEnergy = 2.2;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
+        compare_eso_stream(delimited_string(
+            {
+                "2,1,Electricity:Facility [J] !TimeStep",
+                ",365,12,31, 0,24,50.00,60.00,Tuesday",
+                "2,0.0",
+            },
+            "\n"));
 
         state->dataGlobal->WarmupFlag = false;
-
-        PurchAir(1).TotHeatEnergy = 2.4;
         UpdateMeterReporting(*state);
         UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
 
-        auto const stream_str = state->files.eso.get_output();
-        int x = 5;
         compare_eso_stream(delimited_string(
             {
-                "1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]",
-                "2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType",
-                "3,5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables "
-                "Requested",
-                "4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested",
-                "5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested",
-                "6,1,Calendar Year of Simulation[] ! When Annual Report Variables Requested",
-                "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-                "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                "5,365",
-                "5,365",
-                "5,365",
-                "5,365",
-                "5,365",
-                "5,365",
-                "5,365",
+                ",365,12,31, 0,24, 0.00,10.00,Tuesday",
+                "2,999.0",
             },
             "\n"));
 
-        PurchAir(1).TotHeatEnergy = 100.0;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
-
-        PurchAir(1).TotHeatEnergy = 200.0;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
-
-        PurchAir(1).TotHeatEnergy = 300.0;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        // UpdateMeters(*state, MDHM);
-
-        x = 5;
-        compare_eso_stream(delimited_string(
-            {
-                "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
-                "7,100.0",
-                "2,365,12,31, 0,24,10.00,20.00,Tuesday",
-                "7,200.0",
-                "5,365",
-                "56,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
-            },
-            "\n"));
     }
 
     TEST_F(EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
