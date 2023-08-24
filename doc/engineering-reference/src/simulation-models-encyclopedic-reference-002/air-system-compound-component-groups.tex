@@ -2069,14 +2069,14 @@ If dehumidifier is operating:
 \begin{equation}
   \begin{array}{rl}
     PLR_{exhaust} &= \frac{\dot{m}_{exhaust}}{\rho_{Std}\dot{V}_{exhaust,max}} \\
-    P_{exhaust} &= P_{exhaust,max} \cdot ExhFanModFac
+    P_{exhaust} &= P_{exhaust,max} \times ExhFanModFac
   \end{array}
 \end{equation}
 
 If dehumidifier is not operating, but companion coil is operating:
 
 \begin{equation}
-  P_{exhaust} = P_{exhaust,max} \cdot PLR_{companion~coil}
+  P_{exhaust} = P_{exhaust,max} \times PLR_{companion~coil}
 \end{equation}
 
 where:
@@ -2134,7 +2134,7 @@ After all of the desiccant dehumidifier components are modeled at the appropriat
 \begin{equation}
   \begin{array}{rl}
     \dot{m}_{water~removed,Proc} & = \dot{m}_{Proc,in} \PB{w_{Proc,in} - w_{Proc,out}} \\
-    m_{water~removed,Proc}       & = \dot{m}_{water~removed,Proc} \cdot TimeStepSys \cdot 3600
+    m_{water~removed,Proc}       & = \dot{m}_{water~removed,Proc} \times TimeStepSys \times 3600
   \end{array}
 \end{equation}
 
@@ -2557,25 +2557,350 @@ Murugappan, Arun. 2002.~ Implementing Ground Source Heat Pump and Ground Loop He
 
 \subsection{EIR Formulated Plant Loop Heat Pump Model}\label{eir-plant-loop-heat-pump-model}
 
-This section describes the EIR formulated model for plant loop heat pumps, which can be configured as either a water-source or air-source object. (Object names: HeatPump:PlantLoop:EIR:Cooling \& HeatPump:PlantLoop:EIR:Heating). In general, these heat pump objects are treated the same as the other heat pump models by the plant loop.  Even though a heat pump is generally a single load coil and a single source coil with a reversing valve, in EnergyPlus, the paradigm is to split the operation into two separate coils, a heating and a cooling.  It is certainly possible to connect the load side of both of these to a single plant loop if the controls are established properly.  For water-source operation the source side of the coils are often placed on a single loop with some form of condensing supply, either a ground loop heat exchanger or a cooling tower (or a combination of the two). For air-source operation, the outdoor air node is used on the source-side inlet node.
+This section describes the EIR formulated model for plant loop heat pumps, which can be configured as either a water-source or air-source object. (Object names: HeatPump:PlantLoop:EIR:Cooling \& HeatPump:PlantLoop:EIR:Heating). The heating component has multiple defrost models to choose from and water outlet temperature minimum and maximum inputs to further control the unit, if desired. In general, these heat pump objects are treated the same as the other heat pump models by the plant loop.  Even though a heat pump is generally a single load coil and a single source coil with a reversing valve, in EnergyPlus, the paradigm is to split the operation into two separate coils, one for heating and another for cooling.  It is certainly possible to connect the load side of both of these to a single plant loop if the controls are established properly.  For water-source operation the source side of the coils are often placed on a single loop with some form of condensing supply, either a ground loop heat exchanger or a cooling tower (or a combination of the two). For air-source operation, the outdoor air node is used on the source-side inlet node. This is a typical congifiguration for chillers/boilers or heat pumps conditioning water loops that serve chilled or hot water coils.
 
-Note that this component is currently a constant flow device (it will always request its full design flow from the plant), with a future addition planned to make it respond to outlet setpoint in order to vary the flow request.
+For advanced plant configurations the heat pump could be connected to a cold and hot plant loop to move energy from one plant to another. This is a form of heat recovery that is used to meet small plant loads in one plant loop (e.g., heating) while the other plant loop is active (e.g., cooling). The activation of a heat recovery heat pump in this manner will reduce the active cooling plant load while meeting the heating plant load which improves the overall plant efficiency. In Energyplus the plants are separate and therefore the load side of one coil is connected to one loop (e.g., cooling) while the source side is connected to the other loop (e.g., heating). The corresponding coil would be connect in the opposite fashion where the load side is connected to the other loop (e.g., heating) while the source side is connected to the original loop (e.g., cooling). Given the constraints of a single mixer and splitter for a given plant loop this connection can be challenging. One possible connection option is to connect one coil's load side to the plant inlet branch while the source side is connected to the other plant's demand side outlet branch. Only 1 or the other coil is operating while the idle coil operates as a pass-through unit. The following figure shows the HeatPump:PlantLoop:EIR coils configured as typical air-cooled plant equipment on the supply side of each plant in parallel branches where a cooling and heating coil are considered a single heat pump (i.e., 2-pipe units AWHP-1, 2 and 3. These could also be 4-pipe units connected to a condenser or ground source loop.). Also shown is a 4-pipe water-to-water heat pump connected between the plant loops in a heat recovery configuration (as of V22.3). A heat pipe configured this way would required that both plant loops have flow and specialized controls to determine which coil operates (see PlantEquipmentOperation:ChillerHeaterChangeover). An important connection criteria for the 4-pipe heat recovery configuration is to connect the load side of the heat pump to the plant supply side inlet and the source side to the demand side outlet. The model will check whether there is a connection to the plant in this fashion and use that information to decide whether to add the heat pump water flow rates during plant sizing since this configuration should not increase plant design water flow rate.
 
-The bookkeeping part of the heat pump code with regards to flow requests and nodal conditions is identical to other water-to-water heat pump components, so this section will only briefly discuss the mathematical formulation of the model.
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/ChillerHeaterPlantLoopEIRSchematic.png}
+\caption{Schematic of the Cold and Hot water loops using Heat Pumps \protect \label{fig:schematic-of-the-energyplus-cold-and-hot-plant-loop-heat-pumps}}
+\end{figure}
 
-Once load and source flow rates have been established for the component using the SetComponentFlowRate interface to the plant, and inlet temperatures for each side have been read, a function calculates the response of the unit to these conditions.  The process to evaluate the outlet state is as follows:
+Note that this component is a constant or variable flow device (it will either request its full design flow from the plant or flow proportional to the operating part-load ratio). The heat pump can respond to a load or outlet node setpoint.
+
+The bookkeeping part of the plant heat pump model with regards to flow requests and nodal conditions is similar to other water-to-water heat pump components. This section will briefly describe the mathematical formulation of the model and then itemize more detailed calculations.
+
+Once load and source water flow rates have been established for the component, using the SetComponentFlowRate interface to the plant, and inlet temperatures for each side have been read, a model function calculates the response of the unit to these conditions. The process to evaluate the outlet state is as follows:
 
 \begin{enumerate}
-	\item Retrieve load side outlet temperature setpoint
-    \item Take the reference power usage as $P_{reference}$
-	\item Evaluate the capacity modifier function using the source inlet temperature and the load side setpoint temperature as the projected outlet temperature ($f_{cap} = f(T_{out,load,set}, T_{in,src}) $)
-	\item Calculate available load side capacity using the reference value and the modifier ($\dot{q}_{load,avail} = \dot{q}_{reference} \cdot f_{cap}$)
-	\item Calculate the part load ratio using the current plant-dispatched load (constrained between zero and one) ($PLR = \frac{\dot{q}_{plant}}{\dot{q}_{avail}}$)
-	\item Calculate the actual operating load side heat transfer and the load side outlet temperature ($\dot{q}_{load} = \dot{q}_{avail}PLR$, $T_{out,load} = T_{in,load} \pm \frac{\dot{q}_{load}}{\dot{m}_{load}C_{p,load}}) $) -- note the plus/minus refers to how the value will be added in heating mode and subtracted in cooling mode.  This is required because the sign convention is not consistent and a positive value for calculated heat rate will be obtained for both units under normal conditions.
-	\item Evaluate power usage by evaluating the EIR curves using the source inlet temperature, actual load side outlet temperature, and the current part load ratio ($f_{eir,t} = f(T_{out,load,set}, T_{in,src})$, $f_{eir,plr} = f(PLR)$, $P = P_{reference} f_{eir,t} f_{eir,plr}$)
-	\item Perform an energy balance on the unit to determine the source side heat transfer rate and the source side outlet temperature ($q_{src} = q_{load} \pm P$, $T_{out,src} = T_{in,src} \pm \frac{\dot{q}_{src}}{\dot{m}_{src}C_{p,src}} $) -- again the plus/minus refers to the different behavior between cooling and heating mode.
+      \item Determine the operating water flow rate of the heat pump. Constant water flow heat pumps will operating at the design water flow rate and variable speed water flow heat pumps will operate at a water flow rate proportional to operating part-load ratio. In addition, if a heat pump is configured as a heat recovery unit (see figure) then the water flow rate is set as pass-through when the unit is off.
+	\item If set point controlled, retrieve the load side temperature setpoint to determine the load on the heat pump. If load controlled, directly use the load passed to the model. 
+	\item Evaluate the capacity modifier function using the load side setpoint temperature as the projected outlet temperature and the source inlet temperature ($CAPFT = f(T_{out,load,set}, T_{in,source}) $)
+     \item Evaluate source outlet temperature limits and defrost operation, if selected, to determine the impact on operating capacity
+	\item Calculate available load side capacity using the reference value and the modifier ($\dot{Q}_{avail} = \dot{Q}_{ref} \times CAPFT$)
+	\item Calculate the part load ratio using the current plant-dispatched load (constrained between zero and one) ($PLR = \frac{\dot{Q}_{plant}}{\dot{Q}_{avail}}$)
+	\item Calculate the actual operating load side heat transfer and the load side outlet temperature ($\dot{Q}_{load} = \dot{Q}_{avail}PLR$, $T_{out,load} = T_{in,load} \pm \frac{\dot{Q}_{load}}{\dot{m}_{load}C_{p,load}}) $) -- note the plus/minus refers to how the value will be added in heating mode and subtracted in cooling mode.
+     \item Take the reference power usage as $P_{ref}$ = $Q_{ref}$ divided by $COP_{ref}$
+	\item Evaluate power usage by evaluating the EIR curves using the target load side outlet temperature, source inlet temperature, and the current part load ratio ($EIRFT = f(T_{out,load,set}, T_{in,source})$, $EIRFPLR = f(PLR)$, $P = P_{ref} \times EIRFT \times EIRFPLR$)
+	\item Perform an energy balance on the unit to determine the source side heat transfer rate and the source side outlet temperature ($\dot{Q}_{source} = \dot{Q}_{load} \pm P$, $T_{out,source} = T_{in,source} \pm \frac{\dot{Q}_{source}}{\dot{m}_{source}C_{p,source}} $) -- again the plus/minus refers to the different behavior between cooling and heating mode.
 \end{enumerate}
 
+The following sections identify model calculations in more detail:
+
+\subsubsection{Water Flow Rate Initialization}\label{eir-air-to-water-heat-pumps-water-flow-rate-initialization}
+The heat pump initially sets the load and source side water flow rates to either an off condition, a pass-through condition, or the design values to allow other plant components (e.g., pumps, boilers, coils, etc.) to operate if needed. If the plant is operating, the water flow rate is set according to logical progression from the initial iteration to the final iteration of a specific time step.
+
+\begin{equation}
+\dot{m}_{load} = \dot{m}_{rated}
+\end{equation}
+\begin{equation}
+\dot{m}_{source} = \dot{m}_{source}
+\end{equation}
+On subsequent iterations, the flow rate is also set to the design values, however, if the pump is variable speed the load and source side water flow rates are set proportional to the operating part-load ratio from the previous iteration. When a load-side branch pump is used the load-side flow is also limited to the minimum pump flow rate. If the heat pump is air-cooled the source side flow is set to design without multiplying by operating part-load ratio. If the heat pump is off and is configured as a heat recovery heat pump connected to the supply side inlet and demand side outlet then the heat pump will allow the plant water to flow through the heat pump when the heat pump is off. For heat pumps that are connected to a parallel branch on the plant supply side (see figure for 2-pipe AWHPs) then the water flow rate is set to 0 when the heat pump is off.\\
+
+When the heat pump is off and conncted to the plant supply side only:
+
+\begin{equation}
+\dot{m}_{load} = 0
+\end{equation}
+\begin{equation}
+\dot{m}_{source} = 0\;\; (water-cooled\;only)
+\end{equation}
+
+When the heat pump is off and conncted to the plant supply side and plant demand side (heat recovery configuration):
+
+\begin{equation}
+\dot{m}_{load} = \dot{m}_{inlet,\;load}
+\end{equation}
+\begin{equation}
+\dot{m}_{source} =  \dot{m}_{inlet,\;source}\;\; (water-cooled\;only)
+\end{equation}
+
+When the heat pump is on, regardless where the heat pump is connected, and the water flow rate is selected as constant flow:
+
+\begin{equation}
+\dot{m}_{load} = \dot{m}_{load,\; rated}
+\end{equation}
+\begin{equation}
+\dot{m}_{source} = \dot{m}_{source,\; rated}\;\; (water-cooled\;only)
+\end{equation}
+
+When the heat pump is on, regardless where the heat pump is connected, and the water flow rate is selected as variable flow:
+
+\begin{equation}
+\dot{m}_{load} = \dot{m}_{load,\; rated} \times PLR_{operating},\;{(PLR_{min} \le PLR_{operating} \le 1)}\;\; (\dot{m} \ge VS_{branchpump,\; minflow})
+\end{equation}
+\begin{equation}
+\dot{m}_{source} = \dot{m}_{source,\; rated} \times PLR_{operating},\;{(PLR_{min} \le PLR_{operating} \le 1)}\;\; (water-cooled\;only)
+\end{equation}
+
+\subsubsection{Operating Set Point}\label{eir-air-to-water-heat-pumps-operating-set-point}
+If the plant loop operating scheme is set point based the loop set point is used. For component based controls the component outlet set point is used otherwise the plant loop set point is used. For dual set point control the lower set point is used for cooling and the higher set point is used for heating. In the following equations the operating set point temperature is $T_{setpoint}$.
+
+\subsubsection{Heat Pump Performance Calculations}\label{eir-air-to-water-heat-pumps-heat-pump-performance-calculations}
+Calculations begin by determing the operating capacity of the heat pump. The capacity of the heat pump is a function of the load-side outlet temperature and the source-side inlet temperature. The heat pump is assumed to meet the load-side temperature set point and therefore the load-side outlet temperature is assumed to be the set point temperature.
+\begin{equation}
+CAPFT = f(T_{setpoint}, T_{source,\; inlet})
+\end{equation}
+\begin{equation}
+\dot{Q}_{avail} = \dot{Q}_{ref} \times CAPFT
+\end{equation}
+
+\subsubsection{Dry Outdoor Coil Calculations (Heating mode only)}\label{eir-air-to-water-heat-pumps-dry-coil-calculations}
+For air-cooled heat pumps a dry coil correction factor, if used, is applied for heating operation. As the moisture content of the ambient air changes the heating capacity also changes. This change in performance is limited to an ambient relative humidity range of 60 - 90\% where below 60\% the outdoor coil is dry and reduces heating capacity and above 90\% the coil is fully wet and yields full heating capacity. In the following equations, below 60\% relative humidity the $Factor_{correction} = Factor_{correction,\;dry}$ and above 90\% relative humidity the $Factor_{correction} = 1$. These calculations apply only to heating operation.
+\begin{equation}
+RH_{range} = 90 - 60
+\end{equation}
+\begin{equation}
+Factor_{correction,\;dry} = f(T_{ambient})
+\end{equation}
+\begin{equation}
+%Real64 semiDryFactor = dryCorrectionFactor + (1.0 - dryCorrectionFactor) * ((RH90 - state.dataEnvrn->OutRelHum) / rangeRH);
+Factor_{correction} = Factor_{correction,\;dry} + (1 - Factor_{correction,\;dry}) \times (1 - \frac{90 - RH_{ambient}}{RH_{range}})
+\end{equation}
+\begin{equation}
+\dot{Q}_{avail} = \dot{Q}_{avail} \times Factor_{correction}
+\end{equation}
+\begin{equation}
+PLR = \frac{\dot{Q}_{load}}{\dot{Q}_{avail}}
+\end{equation}
+\begin{equation}
+T_{setpoint,\;min} = f(T_{ambient})
+\end{equation}
+\begin{equation}
+T_{setpoint,\;max} = f(T_{ambient})
+\end{equation}
+\begin{equation}
+T_{setpoint} = T_{setpoint,\;min} \le T_{setpoint} \le T_{setpoint,\;max}
+\end{equation}
+Since the capacity as a function of temperature (CAPFT) relies on $T_{setpoint}$ the above performance calculations are repeated. If the Minimum/Maximum Supply Water Temperature Curves are not used or the water temp limits are not exceeded then the calculations proceed without repeating.
+
+\subsubsection{Part Load Ratio Calculations}\label{eir-air-to-water-heat-pumps-part-load-ratio-calculations}
+The heat pump operates to meet a load or temperature set point and therefore will operate at less than full capacity for most operating hours. The heat pump will run the entire time step to the point where the part-load ratio (PLR) is below the minimum part-load ratio provided by the user. Below this point the heat pump will cycle on and off to meet the load.
+\begin{equation}
+CyclingRatio = 1
+\end{equation}
+\begin{equation}
+PLR_{operating} = PLR
+\end{equation}
+\begin{equation}
+CyclingRatio = \frac{PLR_{operating}}{PLR_{min}}, {(PLR_{operating}\le PLR_{min})}
+\end{equation}
+\begin{equation}
+PLR = PLR_{min}, {(PLR_{operating}\le PLR_{min})}
+\end{equation}
+\begin{equation}
+PLR_{operating} = PLR \times CyclingRatio, {(PLR_{operating}\le PLR_{min})}
+\end{equation}
+
+
+\subsubsection{Defrost Model Description (Heating mode only)}\label{eir-air-to-water-heat-pumps-defrost-model-description}
+The plant heat pump as 3 Heat Pump Defrost Control types which will impact heat pump heating capacity. The valid choices are None, Timed, OnDemand or TimedEmpirical. When None is selected these calculations are not performed and defrost operation will not impact energy use. Otherwise, one of the following calculation sets are executed if the outdoor ambient temperature is less than or equal to the user entered Maximum Outdoor Dry Bulb Temperature For Defrost Operation. The defrost model reports are set to 0 when defrost is not used or not active. These calculations apply only to heating operation.
+
+%                this->loadDueToDefrost = 0.0;
+%                this->defrostEnergyRate = 0.0;
+%                this->fractionalDefrostTime = 0.0;
+\begin{equation}
+\dot{Q}_{load,\; defrost} = {0}
+\end{equation}
+\begin{equation}
+\dot{Q}_{defrost} = {0}
+\end{equation}
+\begin{equation}
+Fraction_{defrost, time} = {0}
+\end{equation}
+When defrost is active the following calculations are performed according to the user selected defrost model:
+
+\begin{equation}
+% Real64 OutdoorCoilT = 0.82 * state.dataEnvrn->OutDryBulbTemp - 8.589;
+T_{defrost, coil} = {0.82 \times T_{ambient} - 8.589}
+\end{equation}
+\begin{equation}
+% Real64 OutdoorCoildw = max(1.0e-6, (state.dataEnvrn->OutHumRat - Psychrometrics::PsyWFnTdpPb(state, OutdoorCoilT, state.dataEnvrn->OutBaroPress)));
+{w_{defrost, coil} = w_{ambient} - w_{sat}}, where\; {w_{sat} = f(T_{dewpoint},\; Pressure_{ambient})}
+\end{equation}
+
+\subsubsection*{Timed Defrost Model:}\label{eir-air-to-water-heat-pumps-timed-defrost}
+
+%                this->fractionalDefrostTime = this->defrostTime; // DefrostTime in hours
+%                HeatingCapacityMultiplier = 0.909 - 107.33 * OutdoorCoildw;
+%                InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
+%                this->loadDueToDefrost =
+%                    (0.01 * this->fractionalDefrostTime) * (7.222 - state.dataEnvrn->OutDryBulbTemp) * (this->referenceCapacity / 1.01667);
+%                Real64 defrostEIRFT = 1.0 / this->referenceCOP;
+%                if (defrostEIRFTIndex > 0) {
+%                    defrostEIRFT = Curve::CurveValue(
+%                        state, this->defrostEIRFTIndex, max(15.555, state.dataEnvrn->OutWetBulbTemp), max(15.555, state.dataEnvrn->OutDryBulbTemp));
+%                }
+%                this->defrostEnergyRate = defrostEIRFT * (this->referenceCapacity / 1.01667) * this->fractionalDefrostTime;
+\begin{equation}
+Fraction_{defrost, time} = user\; input,\; Heat\; Pump\; Defrost\; Time\; Period\; Fraction
+\end{equation}
+\begin{equation}
+Multiplier_{heating,\; capacity} = {0.909 - 107.33 \times w_{defrost,\; coil}}
+\end{equation}
+\begin{equation}
+Multipler_{heating,\; power} = {0.90 - 36.45 \times w_{defrost,\; coil}}
+\end{equation}
+\begin{equation}
+\dot{Q}_{load,\; defrost} = {0.01 \times Fraction_{defrost,\; time} \times (7.222 - T_{ambient}) \times (\frac{Q_{ref}}{1.01667})}
+\end{equation}
+\begin{equation}
+EIRFT_{defrost} = \frac{1}{COP_{ref}}
+\end{equation}
+If the Defrost Energy Input Ratio Function of Temperature Curve has been entered by the user this curve will update the value of $EIRFT_{defrost}$. This performance curve is a function of outdoor wet-bulb temperature and outdoor dry-bulb temperature. If either of these outdoor temperatures are below 15.555 C, the minimum temperature of 15.555 C is used.
+\begin{equation}
+{EIRFT_{defrost} = f(T_{ambient,\; wetbulb}, T_{ambient})}
+\end{equation}
+\begin{equation}
+\dot{Q}_{defrost} = EIRFT_{defrost} \times \frac{Q_{ref}}{1.01667} \times Fraction_{defrost,\; time}
+\end{equation}
+
+\subsubsection*{On Demand Defrost Model:}\label{eir-air-to-water-heat-pumps-on-demand-defrost}
+%            this->fractionalDefrostTime = 1.0 / (1.0 + 0.01446 / OutdoorCoildw);
+%            HeatingCapacityMultiplier = 0.875 * (1.0 - this->fractionalDefrostTime);
+%            InputPowerMultiplier = 0.954 * (1.0 - this->fractionalDefrostTime);
+%            this->loadDueToDefrost =
+%                (0.01 * this->fractionalDefrostTime) * (7.222 - state.dataEnvrn->OutDryBulbTemp) * (this->referenceCapacity / 1.01667);
+%            Real64 defrostEIRFT = 0.0;
+%            if (defrostEIRFTIndex > 0) {
+%                defrostEIRFT = Curve::CurveValue(
+%                    state, this->defrostEIRFTIndex, max(15.555, state.dataEnvrn->OutWetBulbTemp), max(15.555, state.dataEnvrn->OutDryBulbTemp));
+%            }
+%            this->defrostEnergyRate = defrostEIRFT * (this->referenceCapacity / 1.01667) * this->fractionalDefrostTime;
+\begin{equation}
+Fraction_{defrost, time} = \frac{1}{1+\frac{0.01446}{w_{defrost,\; coil}}}
+\end{equation}
+\begin{equation}
+Multiplier_{heating,\; capacity} = {0.875 \times Fraction_{defrost,\; time}}
+\end{equation}
+\begin{equation}
+Multipler_{heating,\; power} = {0.954 \times (1 - Fraction_{defrost,\; time})}
+\end{equation}
+\begin{equation}
+\dot{Q}_{load,\; defrost} = {0.01 \times Fraction_{defrost,\; time} \times (7.222 - T_{ambient}) \times (\frac{\dot{Q}_{ref}}{1.01667})}
+\end{equation}
+\begin{equation}
+EIRFT_{defrost} = 0
+\end{equation}
+If the Defrost Energy Input Ratio Function of Temperature Curve has been entered by the user this curve will update $EIRFT_{defrost}$.  If either of these outdoor temperatures are below 15.555 C, the minimum temperature of 15.555 C is used.
+\begin{equation}
+{EIRFT_{defrost} = f(T_{ambient,\; wetbulb}, T_{ambient})}
+\end{equation}
+\begin{equation}
+\dot{Q}_{defrost} = EIRFT_{defrost} \times \frac{\dot{Q}_{ref}}{1.01667} \times Fraction_{defrost,\; time}
+\end{equation}
+
+\subsubsection*{Timed Empirical Defrost Model:}\label{eir-air-to-water-heat-pumps-timed-empirical-defrost}
+%            // cycles of defrost per hour
+%            Real64 thisHourDefrostCycles = Curve::CurveValue(state, this->defrostFreqCurveIndex, state.dataEnvrn->OutDryBulbTemp);
+%            // is directly proportional to the ratio of capacity used for that hour (PLR)
+%            thisHourDefrostCycles *= operatingPLR;
+%            // fraction of heat load per cycle of defrost
+%            Real64 thisHourDefrostHeatLoad = 0.0;
+%            if (this->defrostLoadCurveDims == 2) { // BiQuadratic
+%                thisHourDefrostHeatLoad =
+%                    Curve::CurveValue(state, this->defrostHeatLoadCurveIndex, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutDryBulbTemp);
+%            } else {
+%                thisHourDefrostHeatLoad = Curve::CurveValue(state, this->defrostHeatLoadCurveIndex, state.dataEnvrn->OutDryBulbTemp);
+%            }
+%            // heat load is applied to full load (not rated) and is proportional to defrost cycles per hour
+%            this->loadDueToDefrost = availableCapacity * thisHourDefrostHeatLoad * thisHourDefrostCycles;
+%            // electric input fraction due to defrost
+%            Real64 defrostHeatEnergyFraction = 0.0;
+%            if (this->defrostEnergyCurveDims == 2) { // BiQuadratic
+%                defrostHeatEnergyFraction =
+%                    Curve::CurveValue(state, this->defrostHeatEnergyCurveIndex, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutDryBulbTemp);
+%            } else {
+%                defrostHeatEnergyFraction = Curve::CurveValue(state, this->defrostHeatEnergyCurveIndex, state.dataEnvrn->OutDryBulbTemp);
+%            }
+%            // defrost energy rate is applied to rated power and is proportional to defrost cycles per hour
+%            this->defrostEnergyRate = (this->referenceCapacity / this->referenceCOP) * defrostHeatEnergyFraction * thisHourDefrostCycles;
+%
+%            // question on how these multipliers are accounted for with capacity and power (e.g., 1+ or 1-)
+%            InputPowerMultiplier = 1.0 + thisHourDefrostHeatLoad;
+%            HeatingCapacityMultiplier = 1.0 + (thisHourDefrostHeatLoad * thisHourDefrostCycles);
+%            this->fractionalDefrostTime = thisHourDefrostCycles * this->fractionalDefrostTime;
+The model for Timed Empirical Defrost uses a Timed Empirical Defrost Frequency Curve to determine the number of defrost cycles that occur each hour. The number of defrost cycles is multiplied by the operating part-load ratio to determine the defrost cycle frequency. The heat load due to defrost is also initialized to 0.
+\begin{equation}
+{Cycles_{defrost} = f(T_{ambient})} \times PLR_{operating}
+\end{equation}
+\begin{equation}
+Heat_{load,\; defrost} = 0
+\end{equation}
+The heat load per cycle of defrost is calculated based on a user provided performance curve. This curve can be either a univariate or bivariate using one of the following equations. If the Timed Empirical Defrost Heat Load Penalty Curve has been entered by the user this curve will update $Heat_{load,\; defrost}$ as:
+\begin{equation}
+Heat_{load,\; defrost} = f(T_{ambient})
+\end{equation}
+\begin{equation}
+Heat_{load,\; defrost} = f(T_{ambient,\;wetbulb})
+\end{equation}
+The heat load per cycle of defrost is applied to the available capacity and is proportional to the defrost cycle per hour as: 
+\begin{equation}
+\dot{Q}_{defrost} = \dot{Q}_{avail} \times Heat_{load,\; defrost} \times Cycles_{defrost}
+\end{equation}
+\begin{equation}
+Fraction_{heat,\; energy} = 0
+\end{equation}
+The defrost input energy fraction is calculated based on a user provided performance curve. This curve can be either a univariate or bivariate using one of the following equations. If the Timed Empirical Defrost Heat Input Energy Fraction Curve has been entered by the user this curve will update $Fraction_{heat,\; energy}$ as:
+\begin{equation}
+Fraction_{heat,\; energy} = f(T_{ambient})
+\end{equation}
+\begin{equation}
+Fraction_{heat,\; energy} = f(T_{ambient,\;wetbulb},\;T_{ambient})
+\end{equation}
+\begin{equation}
+DefrostPower = \frac{\dot{Q}_{ref}}{COP_{ref}} \times Fraction_{heat,\; energy} \times Cycles_{defrost}
+\end{equation}
+\begin{equation}
+Multiplier_{heating,\; capacity} = {1 + (Heat_{load,\; defrost} \times Cycles_{defrost})}
+\end{equation}
+\begin{equation}
+Multipler_{heating,\; power} = {(1 + Heat_{load,\; defrost})}
+\end{equation}
+\begin{equation}
+Fraction_{defrost, time} = user\; input, Heat\; Pump\; Defrost\; Time\; Period\; Fraction \times Cycles_{defrost}
+\end{equation}
+
+These defrost method calculations, if used, will result in an adjustment to the available heating capacity as:
+
+\begin{equation}
+\dot{Q}_{avail} *= Multiplier_{heating,\; capacity};
+\end{equation}
+
+\subsubsection{Final Calculation of Load and Energy, Power and Electricity, and Outlet Conditions}\label{eir-air-to-water-heat-pumps-final-calculations}
+The plus/minus in a few of the following equations differentiates behavior between cooling and heating.
+\begin{equation}
+\dot{Q}_{load} = \dot{Q}_{avail} \times PLR_{operating}
+\end{equation}
+\begin{equation}
+{Q}_{load} = \dot{Q}_{load} \times TimeStepInSeconds
+\end{equation}
+\begin{equation}
+T{out,\;load} = T_{in,\;load} \pm \frac{\dot{Q}_{load}}{\dot{m}_{load}} \times C_{p,\;load}
+\end{equation}
+\begin{equation}
+EIRFT = {f(T_{out,\;load}, T_{in,\;source})}
+\end{equation}
+\begin{equation}
+EIRFPLR = {f(PLR_{operating})}
+\end{equation}
+\begin{equation}
+Power = \frac{\dot{Q}_{load}}{COP_{ref}} \times EIRFT \times EIRFPLR \times Multipler_{heating,\; power} \times CyclingRatio
+\end{equation}
+\begin{equation}
+Energy = Power \times TimeStepInSeconds
+\end{equation}
+\begin{equation}
+{\dot{Q}_{source} = (\dot{Q}_{load} \pm Power) \times CyclingRatio}
+\end{equation}
+\begin{equation}
+T{out,\;source} = T_{in,\;source} \pm \frac{\dot{Q}_{source}}{\dot{m}_{source} \times C_{p,\;source}}
+\end{equation}
+\begin{equation}
+{Q}_{source} = \dot{Q}_{source} \times TimeStepInSeconds
+\end{equation}
 
 \subsection{Fuel-Fired Air to Water Heat Pumps}\label{fuel-fired-air-to-water-heat-pumps}
 

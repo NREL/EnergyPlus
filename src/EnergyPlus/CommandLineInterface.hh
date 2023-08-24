@@ -50,6 +50,7 @@
 
 // C++ Headers
 #include <string>
+#include <vector>
 
 // EnergyPlus Headers
 #include <EnergyPlus/api/EnergyPlusAPI.h>
@@ -72,7 +73,7 @@ namespace CommandLineInterface {
     };
 
     // Process command line arguments
-    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, int argc, const char *argv[]);
+    int ENERGYPLUSLIB_API ProcessArgs(EnergyPlusData &state, const std::vector<std::string> &args);
 
     void ReadINIFile(InputFile &inputFile,               // Unit number of the opened INI file
                      std::string const &Heading,         // Heading for the parameters ('[heading]')
