@@ -2301,8 +2301,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zsFinalSizing.DesCoolVolFlow = zsCalcFinalSizing.DesCoolVolFlow * TotCoolSizMult;
             zsFinalSizing.DesCoolMassFlow = zsCalcFinalSizing.DesCoolMassFlow * TotCoolSizMult;
             zsFinalSizing.DesCoolLoad = zsCalcFinalSizing.DesCoolLoad * TotCoolSizMult;
-            zsFinalSizing.CoolFlowSeq = zsCalcFinalSizing.CoolFlowSeq * TotCoolSizMult;
-            zsFinalSizing.CoolLoadSeq = zsCalcFinalSizing.CoolLoadSeq * TotCoolSizMult;
+            for (int i = 0; i < (int)zsFinalSizing.CoolFlowSeq.size(); ++i) {
+                zsFinalSizing.CoolFlowSeq[i] = zsCalcFinalSizing.CoolFlowSeq[i] * TotCoolSizMult;
+                zsFinalSizing.CoolLoadSeq[i] = zsCalcFinalSizing.CoolLoadSeq[i] * TotCoolSizMult;
+            }
             Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesCoolVolFlow;
             OAFrac = min(1.0, max(0.0, OAFrac));
             zsFinalSizing.DesCoolCoilInTemp =
@@ -2322,8 +2324,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizing.DesCoolVolFlow = calcZoneSizing.DesCoolVolFlow * TotCoolSizMult;
                 zoneSizing.DesCoolMassFlow = calcZoneSizing.DesCoolMassFlow * TotCoolSizMult;
                 zoneSizing.DesCoolLoad = calcZoneSizing.DesCoolLoad * TotCoolSizMult;
-                zoneSizing.CoolFlowSeq = calcZoneSizing.CoolFlowSeq * TotCoolSizMult;
-                zoneSizing.CoolLoadSeq = calcZoneSizing.CoolLoadSeq * TotCoolSizMult;
+                for (int i = 0; i < (int)zoneSizing.CoolFlowSeq.size(); ++i) {
+                    zoneSizing.CoolFlowSeq[i] = calcZoneSizing.CoolFlowSeq[i] * TotCoolSizMult;
+                    zoneSizing.CoolLoadSeq[i] = calcZoneSizing.CoolLoadSeq[i] * TotCoolSizMult;
+                }
                 Real64 OAFrac = zoneSizing.MinOA / zoneSizing.DesCoolVolFlow;
                 OAFrac = min(1.0, max(0.0, OAFrac));
                 zoneSizing.DesCoolCoilInTemp = OAFrac * desDayWeath.Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizing.ZoneTempAtCoolPeak;
@@ -2477,8 +2481,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zsFinalSizing.DesHeatVolFlow = zsCalcFinalSizing.DesHeatVolFlow * TotHeatSizMult;
             zsFinalSizing.DesHeatMassFlow = zsCalcFinalSizing.DesHeatMassFlow * TotHeatSizMult;
             zsFinalSizing.DesHeatLoad = zsCalcFinalSizing.DesHeatLoad * TotHeatSizMult;
-            zsFinalSizing.HeatFlowSeq = zsCalcFinalSizing.HeatFlowSeq * TotHeatSizMult;
-            zsFinalSizing.HeatLoadSeq = zsCalcFinalSizing.HeatLoadSeq * TotHeatSizMult;
+            for (int i = 0; i < (int)zsFinalSizing.HeatFlowSeq.size(); ++i) {
+                zsFinalSizing.HeatFlowSeq[i] = zsCalcFinalSizing.HeatFlowSeq[i] * TotHeatSizMult;
+                zsFinalSizing.HeatLoadSeq[i] = zsCalcFinalSizing.HeatLoadSeq[i] * TotHeatSizMult;
+            }
             Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesHeatVolFlow;
             OAFrac = min(1.0, max(0.0, OAFrac));
             zsFinalSizing.DesHeatCoilInTemp =
@@ -2497,8 +2503,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizingDD.DesHeatVolFlow = calcZoneSizing.DesHeatVolFlow * TotHeatSizMult;
                 zoneSizingDD.DesHeatMassFlow = calcZoneSizing.DesHeatMassFlow * TotHeatSizMult;
                 zoneSizingDD.DesHeatLoad = calcZoneSizing.DesHeatLoad * TotHeatSizMult;
-                zoneSizingDD.HeatFlowSeq = calcZoneSizing.HeatFlowSeq * TotHeatSizMult;
-                zoneSizingDD.HeatLoadSeq = calcZoneSizing.HeatLoadSeq * TotHeatSizMult;
+                for (int i = 0; i < (int)zoneSizingDD.HeatFlowSeq.size(); ++i) {
+                    zoneSizingDD.HeatFlowSeq[i] = calcZoneSizing.HeatFlowSeq[i] * TotHeatSizMult;
+                    zoneSizingDD.HeatLoadSeq[i] = calcZoneSizing.HeatLoadSeq[i] * TotHeatSizMult;
+                }
                 Real64 OAFrac = zoneSizingDD.MinOA / zoneSizingDD.DesHeatVolFlow;
                 OAFrac = min(1.0, max(0.0, OAFrac));
                 zoneSizingDD.DesHeatCoilInTemp =

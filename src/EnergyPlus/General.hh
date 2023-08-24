@@ -57,6 +57,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -96,6 +97,8 @@ namespace General {
             return X * (A(1) + X * (A(2) + X * (A(3) + X * (A(4) + X * (A(5) + X * A(6))))));
         }
     }
+
+    void MovingAvg(EPVector<Real64> &DataIn, int NumItemsInAvg);
 
     void MovingAvg(Array1D<Real64> &DataIn, int NumItemsInAvg);
 
