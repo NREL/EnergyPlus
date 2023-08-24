@@ -8789,6 +8789,15 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
         addFootNoteSubTable(state,
                             state.dataOutRptPredefined->pdstHeatCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
+
+        // std 229 existing table DX Heating coil new reporting variables
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchDXHeatCoilMinOADBTforCompOp, equipName, thisDXCoil.MinOATCompressor);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchDXHeatCoilAirloopName,
+                                                 equipName,
+                                                 thisDXCoil.AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(thisDXCoil.AirLoopNum).Name
+                                                                           : "N/A");
     } break;
     default:
         break;
