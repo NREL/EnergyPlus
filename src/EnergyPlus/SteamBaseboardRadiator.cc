@@ -292,7 +292,6 @@ namespace SteamBaseboardRadiator {
             2); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 AllFracsSummed;     // Sum of the fractions radiant
         int BaseboardNum;          // Baseboard number
         int BaseboardDesignNum(0); // Baseboard number
         int NumAlphas;             // Number of Alphas for each GetobjectItem call
@@ -658,8 +657,7 @@ namespace SteamBaseboardRadiator {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = MinSteamFlowRate;
             }
             // Remaining fraction is added to the zone as convective heat transfer
-            AllFracsSummed = SteamBaseboardDesignDataObject.FracRadiant;
-            if (AllFracsSummed > MaxFraction) {
+            if (SteamBaseboardDesignDataObject.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  format("{}{}=\"{}\", Fraction Radiant was higher than the allowable maximum.",
                                         RoutineName,
@@ -668,7 +666,7 @@ namespace SteamBaseboardRadiator {
                 SteamBaseboardDesignDataObject.FracRadiant = MaxFraction;
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracConvect = 0.0;
             } else {
-                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracConvect = 1.0 - AllFracsSummed;
+                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracConvect = 1.0 - SteamBaseboardDesignDataObject.FracRadiant;
             }
 
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib = NumNumbers - 3;
@@ -704,7 +702,8 @@ namespace SteamBaseboardRadiator {
             // search zone equipment list structure for zone index
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipTypeEnum(zoneEquipTypeNum) == DataZoneEquipment::ZoneEquip::BBSteam &&
+                    if (state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipType(zoneEquipTypeNum) ==
+                            DataZoneEquipment::ZoneEquipType::BaseboardSteam &&
                         state.dataZoneEquip->ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) ==
                             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID) {
                         state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
@@ -721,7 +720,7 @@ namespace SteamBaseboardRadiator {
                 continue;
             }
 
-            AllFracsSummed = SteamBaseboardDesignDataObject.FracDistribPerson;
+            Real64 AllFracsSummed = SteamBaseboardDesignDataObject.FracDistribPerson;
             for (SurfNum = 1; SurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 5);
                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) =

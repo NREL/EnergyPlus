@@ -24,8 +24,9 @@ New Object ConstructionProperty:InternalHeatSource
 New Field 1 (new A1) is modified by adding a suffix to the end "Heat Source".
 Field 2 (new A2) is the old Field 1 (old A1)
 Fields 3 thru 7 (new N1:N5) are the old Fields 2:6 (old N1:N5)
+If new Field 7 is blank, insert default 0.0. "Two-Dimensional Temperature Calculation Position"
 
-*The new Construction:InternalHeatSource object has 7 fields.*
+*The new ConstructionProperty:InternalHeatSource object has 7 fields.*
 
 New Object Construction
 New Field 1 (new A1) is the old Field 1 (old A1)
