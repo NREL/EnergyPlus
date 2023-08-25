@@ -6889,9 +6889,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    // get coil inputs
+
+    // Get coil inputs
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
+    // Set input processing flag
     state->dataVariableSpeedCoils->GetCoilsInputFlag = false;
 
     // Setting predefined tables is needed though
@@ -6905,33 +6907,37 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 270.0;
     state->dataEnvrn->StdRhoAir = 1.1;
-    // set coil parameters
-    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+
+    // Set coil parameters
     int DXCoilNum = 1;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
+    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+
     int constexpr SpeedCal = 1;
-    Real64 SensLoad = 1000.0; // 0.0;
+    Real64 SpeedRatio = 0.2;
+
+    Real64 SensLoad = 1000.0;
     Real64 LatentLoad = 0.0;
-    Real64 PartLoadFrac = 0.7; // 0.0;
+    Real64 PartLoadFrac = 0.7;
     Real64 OnOffAirFlowRatio = 1.0;
-    Real64 SpeedRatio = 1.0;
 
     state->dataLoopNodes->Node(1).MassFlowRate = 0.2;
     state->dataLoopNodes->Node(2).MassFlowRate = 0.2;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = 0.2;
     state->dataEnvrn->OutDryBulbTemp = -5.0;
 
+    // Run a compressor "On" scenario first
+    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
-                                              DataHVACGlobals::ContFanCycCoil,
-                                              DataHVACGlobals::CompressorOperation::On, // compressor on/off. 0 = off; 1= on
-                                              0.7,
-                                              1,
-                                              0.2,
-                                              1000,
-                                              0,
-                                              1);
+                                              CyclingScheme,
+                                              CompressorOp, // compressor on/off. 0 = off; 1= on
+                                              PartLoadFrac,
+                                              SpeedCal,
+                                              SpeedRatio,
+                                              SensLoad,
+                                              LatentLoad,
+                                              OnOffAirFlowRatio);
 
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 908.10992432432420, 1e-3);
 
@@ -6939,17 +6945,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     // In this case, the "DefrostPower" need to be cleared to be zero if done correctly;
     // Otherwise the problem reported in Issue 10108 will show up.
 
+    CompressorOp = DataHVACGlobals::CompressorOperation::Off;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
-                                              DataHVACGlobals::ContFanCycCoil,
-                                              DataHVACGlobals::CompressorOperation::Off, // compressor on/off. 0 = off; 1= on
-                                              0.7,
-                                              1,
-                                              0.2,
-                                              1000,
-                                              0,
-                                              1);
+                                              CyclingScheme,
+                                              CompressorOp, // compressor on/off. 0 = off; 1= on
+                                              PartLoadFrac,
+                                              SpeedCal,
+                                              SpeedRatio,
+                                              SensLoad,
+                                              LatentLoad,
+                                              OnOffAirFlowRatio);
 
     // Without the current PR (PR 10109), the DefrostPower would remain 908.1 and fail the following test:
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 0.0, 1e-3);
