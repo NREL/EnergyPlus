@@ -415,7 +415,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
         }
     } break;
     case UserDefinedPatternMode::SensibleCooling: {
-        Real64 CoolLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadCoolRate;
+        Real64 CoolLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).airSysCoolRate;
         if (CoolLoad >= twoGrad.UpperBoundHeatRateScale) {
             Grad = twoGrad.HiGradient;
 
@@ -434,7 +434,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
         }
     } break;
     case UserDefinedPatternMode::SensibleHeating: {
-        Real64 HeatLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadHeatRate;
+        Real64 HeatLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).airSysHeatRate;
         if (HeatLoad >= twoGrad.UpperBoundHeatRateScale) {
             Grad = twoGrad.HiGradient;
         } else if (HeatLoad <= twoGrad.LowerBoundHeatRateScale) {

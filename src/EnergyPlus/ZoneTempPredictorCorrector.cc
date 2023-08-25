@@ -4975,13 +4975,13 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
         Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, this->ZoneAirHumRatTemp, state.dataEnvrn->StdBaroPress);
         Real64 vaporPressureDiff = pSat - Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName);
         if (spaceNum > 0) {
-            sensibleLoad = state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).ZoneSNLoadHeatRate +
-                           state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).ZoneSNLoadCoolRate;
+            sensibleLoad = state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).airSysHeatRate +
+                           state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).airSysCoolRate;
             state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum).reportZoneAirSystemMoistureLoads(
                 state, LatentGain, sensibleLoad, vaporPressureDiff);
         } else {
-            sensibleLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadHeatRate +
-                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadCoolRate;
+            sensibleLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).airSysHeatRate +
+                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).airSysCoolRate;
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum).reportZoneAirSystemMoistureLoads(
                 state, LatentGain, sensibleLoad, vaporPressureDiff);
         }

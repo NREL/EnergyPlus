@@ -93,13 +93,13 @@ namespace DataZoneEnergyDemands {
         EPVector<Real64> SequencedOutputRequired;            // load required to meet setpoint by sequence [W] (multiplied)
         EPVector<Real64> SequencedOutputRequiredToHeatingSP; // load required to meet heating setpoint by sequence [W] (multiplied)
         EPVector<Real64> SequencedOutputRequiredToCoolingSP; // load required to meet cooling setpoint by sequence [W] (multiplied)
-        Real64 ZoneSNLoadPredictedRate = 0.0;                // Predicted sensible load [W] (unmultiplied)
-        Real64 ZoneSNLoadPredictedHSPRate = 0.0;             // Predicted sensible load to heating setpoint [W] (unmultiplied)
-        Real64 ZoneSNLoadPredictedCSPRate = 0.0;             // Predicted sensible load to cooling setpoint [W] (unmultiplied)
-        Real64 ZoneSNLoadHeatRate = 0.0;                     // sensible heating rate [W] (unmultiplied)
-        Real64 ZoneSNLoadCoolRate = 0.0;                     // sensible cooling rate [W] (unmultiplied)
-        Real64 ZoneSNLoadHeatEnergy = 0.0;                   // sensible heating energy [J] (unmultiplied)
-        Real64 ZoneSNLoadCoolEnergy = 0.0;                   // sensible cooling energy [J] (unmultiplied)
+        Real64 predictedRate = 0.0;                          // Predicted sensible load [W] (unmultiplied)
+        Real64 predictedHSPRate = 0.0;                       // Predicted sensible load to heating setpoint [W] (unmultiplied)
+        Real64 predictedCSPRate = 0.0;                       // Predicted sensible load to cooling setpoint [W] (unmultiplied)
+        Real64 airSysHeatRate = 0.0;                         // sensible heating rate [W] (unmultiplied)
+        Real64 airSysCoolRate = 0.0;                         // sensible cooling rate [W] (unmultiplied)
+        Real64 airSysHeatEnergy = 0.0;                       // sensible heating energy [J] (unmultiplied)
+        Real64 airSysCoolEnergy = 0.0;                       // sensible cooling energy [J] (unmultiplied)
 
         void beginEnvironmentInit() override;
 

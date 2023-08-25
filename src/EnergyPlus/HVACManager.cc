@@ -2205,10 +2205,10 @@ void UpdateZoneListAndGroupLoads(EnergyPlusData &state)
         for (ZoneNum = 1; ZoneNum <= zoneList.NumOfZones; ++ZoneNum) {
             auto const &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneList.Zone(ZoneNum));
             Mult = state.dataHeatBal->Zone(ZoneNum).Multiplier;
-            state.dataHeatBal->ZoneListSNLoadHeatEnergy(ListNum) += zoneSysEnergyDemand.ZoneSNLoadHeatEnergy * Mult;
-            state.dataHeatBal->ZoneListSNLoadCoolEnergy(ListNum) += zoneSysEnergyDemand.ZoneSNLoadCoolEnergy * Mult;
-            state.dataHeatBal->ZoneListSNLoadHeatRate(ListNum) += zoneSysEnergyDemand.ZoneSNLoadHeatRate * Mult;
-            state.dataHeatBal->ZoneListSNLoadCoolRate(ListNum) += zoneSysEnergyDemand.ZoneSNLoadCoolRate * Mult;
+            state.dataHeatBal->ZoneListSNLoadHeatEnergy(ListNum) += zoneSysEnergyDemand.airSysHeatEnergy * Mult;
+            state.dataHeatBal->ZoneListSNLoadCoolEnergy(ListNum) += zoneSysEnergyDemand.airSysCoolEnergy * Mult;
+            state.dataHeatBal->ZoneListSNLoadHeatRate(ListNum) += zoneSysEnergyDemand.airSysHeatRate * Mult;
+            state.dataHeatBal->ZoneListSNLoadCoolRate(ListNum) += zoneSysEnergyDemand.airSysCoolRate * Mult;
         } // ZoneNum
     }     // ListNum
 
