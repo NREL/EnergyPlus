@@ -90,6 +90,10 @@ public:
     {
     }
 
+    virtual void getCurrentPower([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] Real64 &power)
+    {
+    }
+
     ~PlantComponent() = default;
 };
 

@@ -2420,18 +2420,18 @@ namespace SurfaceGeometry {
                                 }
                             }
                         }
-                        thisSpace.floorArea = thisSpace.userEnteredFloorArea;
+                        thisSpace.FloorArea = thisSpace.userEnteredFloorArea;
                         thisSpace.hasFloor = true;
                     }
                 } else {
-                    thisSpace.floorArea = thisSpace.calcFloorArea;
+                    thisSpace.FloorArea = thisSpace.calcFloorArea;
                 }
             }
             ErrCount = 0;
             for (auto &thisZone : state.dataHeatBal->Zone) {
                 // Calculate zone floor area as sum of space floor areas
                 for (int spaceNum : thisZone.spaceIndexes) {
-                    thisZone.CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                    thisZone.CalcFloorArea += state.dataHeatBal->space(spaceNum).FloorArea;
                     thisZone.HasFloor |= state.dataHeatBal->space(spaceNum).hasFloor;
                 }
                 if (thisZone.UserEnteredFloorArea != Constant::AutoCalculate) {
@@ -2475,12 +2475,12 @@ namespace SurfaceGeometry {
                         if (thisZone.numSpaces == 1) {
                             // If the zone contains only one space, then set the Space area to the Zone area
                             int spaceNum = thisZone.spaceIndexes(1);
-                            state.dataHeatBal->space(spaceNum).floorArea = thisZone.FloorArea;
+                            state.dataHeatBal->space(spaceNum).FloorArea = thisZone.FloorArea;
                         } else if (thisZone.CalcFloorArea > 0.0) {
                             // Adjust space areas proportionately
                             Real64 areaRatio = thisZone.FloorArea / thisZone.CalcFloorArea;
                             for (int spaceNum : thisZone.spaceIndexes) {
-                                state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
+                                state.dataHeatBal->space(spaceNum).FloorArea *= areaRatio;
                             }
                         } else {
                             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -2503,11 +2503,11 @@ namespace SurfaceGeometry {
                 }
                 Real64 totSpacesFloorArea = 0.0;
                 for (int spaceNum : thisZone.spaceIndexes) {
-                    totSpacesFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                    totSpacesFloorArea += state.dataHeatBal->space(spaceNum).FloorArea;
                 }
                 if (totSpacesFloorArea > 0.0) {
                     for (int spaceNum : thisZone.spaceIndexes) {
-                        state.dataHeatBal->space(spaceNum).fracZoneFloorArea = state.dataHeatBal->space(spaceNum).floorArea / totSpacesFloorArea;
+                        state.dataHeatBal->space(spaceNum).fracZoneFloorArea = state.dataHeatBal->space(spaceNum).FloorArea / totSpacesFloorArea;
                     }
                 } // else leave fractions at zero
             }
@@ -2982,7 +2982,8 @@ namespace SurfaceGeometry {
                     ++state.dataHeatBal->Zone(zoneNum).numSpaces;
                     assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaceIndexes.size()));
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
-                    state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).Name =
+                        thisZone.Name + "-REMAINDER"; // Make UPPERcase so it can be referenced in input
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).isRemainderSpace = true;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
@@ -8289,23 +8290,24 @@ namespace SurfaceGeometry {
                     SurfLocalEnv.SurfPtr = SurfNum;
                 }
 
-                // Assign External Shading Schedule number
+                // Assign Sunlit Fraction Schedule number
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    int ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-                    if (ExtShadingSchedNum == 0) {
+                    int SunlitFracSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                    if (SunlitFracSchedNum == 0) {
                         ShowSevereError(state,
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                                RoutineName,
                                                cCurrentModuleObject,
                                                SurfLocalEnv.Name,
                                                state.dataIPShortCut->cAlphaFieldNames(3)));
-                        ShowContinueError(state,
-                                          format("{} entered value = \"{}\", no corresponding shading schedule has been found in the input file.",
-                                                 state.dataIPShortCut->cAlphaFieldNames(3),
-                                                 state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowContinueError(
+                            state,
+                            format("{} entered value = \"{}\", no corresponding sunlit fraction schedule has been found in the input file.",
+                                   state.dataIPShortCut->cAlphaFieldNames(3),
+                                   state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     } else {
-                        SurfLocalEnv.ExtShadingSchedPtr = ExtShadingSchedNum;
+                        SurfLocalEnv.SunlitFracSchedPtr = SunlitFracSchedNum;
                     }
                 }
 
@@ -8390,13 +8392,18 @@ namespace SurfaceGeometry {
                     if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
                         surface.SurfLinkedOutAirNode = SurfLocalEnv.OutdoorAirNodePtr;
                     }
-                    if (SurfLocalEnv.ExtShadingSchedPtr != 0) {
+                    if (SurfLocalEnv.SunlitFracSchedPtr != 0) {
                         surface.SurfSchedExternalShadingFrac = true;
-                        surface.SurfExternalShadingSchInd = SurfLocalEnv.ExtShadingSchedPtr;
+                        surface.SurfExternalShadingSchInd = SurfLocalEnv.SunlitFracSchedPtr;
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         surface.SurfHasSurroundingSurfProperty = true;
                         surface.SurfSurroundingSurfacesNum = SurfLocalEnv.SurroundingSurfsPtr;
+                        surface.ViewFactorSrdSurfs =
+                            state.dataSurface->SurroundingSurfsProperty(surface.SurfSurroundingSurfacesNum).SurfsViewFactorSum;
+                        if (surface.ViewFactorSrdSurfs == 0.0) {
+                            surface.SurfHasSurroundingSurfProperty = false;
+                        }
                     }
                     if (SurfLocalEnv.GroundSurfsPtr != 0) {
                         surface.IsSurfPropertyGndSurfacesDefined = true;
@@ -8512,6 +8519,7 @@ namespace SurfaceGeometry {
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).Name = state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor = state.dataIPShortCut->rNumericArgs(SurfLoop + 2);
                     SrdSurfsProp.SurroundingSurfs(SurfLoop).TempSchNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(SurfLoop * 2 + 3));
+                    SrdSurfsProp.SurfsViewFactorSum += SrdSurfsProp.SurroundingSurfs(SurfLoop).ViewFactor;
                 }
             }
         }
@@ -12593,7 +12601,7 @@ namespace SurfaceGeometry {
                 if (thisZone.numSpaces == 1) {
                     thisSpace.Volume = thisZone.Volume;
                 } else if (thisZone.geometricFloorArea > 0.0) {
-                    thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.geometricFloorArea;
+                    thisSpace.Volume = thisZone.Volume * thisSpace.FloorArea / thisZone.geometricFloorArea;
                 }
             }
             Real64 totSpacesVolume = 0.0;
@@ -15346,13 +15354,13 @@ namespace SurfaceGeometry {
                             thisEnclosure.Name = format("{} Enclosure {}", RadiantOrSolar, enclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(surf.spaceNum);
-                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).floorArea;
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).FloorArea;
                             otherSideEnclosureNum = enclosureNum;
                             int otherSideSpaceNum = state.dataSurface->Surface(surf.ExtBoundCond).spaceNum;
                             if (otherSideSpaceNum != surf.spaceNum) {
                                 thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(otherSideSpaceNum).Name);
                                 thisEnclosure.spaceNums.push_back(otherSideSpaceNum);
-                                thisEnclosure.FloorArea += state.dataHeatBal->space(otherSideSpaceNum).floorArea;
+                                thisEnclosure.FloorArea += state.dataHeatBal->space(otherSideSpaceNum).FloorArea;
                             }
                             if (radiantSetup) {
                                 state.dataHeatBal->space(surf.spaceNum).radiantEnclosureNum = thisSideEnclosureNum;
@@ -15375,7 +15383,7 @@ namespace SurfaceGeometry {
                             auto &thisEnclosure = Enclosures(thisSideEnclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(surf.spaceNum);
-                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).floorArea;
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).FloorArea;
                             if (radiantSetup) {
                                 state.dataHeatBal->space(surf.spaceNum).radiantEnclosureNum = thisSideEnclosureNum;
                             } else {
@@ -15389,7 +15397,7 @@ namespace SurfaceGeometry {
                             auto &thisEnclosure = Enclosures(thisSideEnclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
-                            thisEnclosure.FloorArea += state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).floorArea;
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).FloorArea;
                             if (radiantSetup) {
                                 state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).radiantEnclosureNum =
                                     otherSideEnclosureNum;
@@ -15521,7 +15529,7 @@ namespace SurfaceGeometry {
                     thisEnclosure.Name = zone.Name;
                     thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
                     thisEnclosure.spaceNums.push_back(spaceNum);
-                    thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
+                    thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).FloorArea;
                     thisEnclosure.ExtWindowArea = state.dataHeatBal->space(spaceNum).extWindowArea;
                     thisEnclosure.TotalSurfArea = state.dataHeatBal->space(spaceNum).totalSurfArea;
                 }
@@ -15539,7 +15547,7 @@ namespace SurfaceGeometry {
                     spaceEnclosureNum = curSpace.solarEnclosureNum;
                 }
                 if (spaceEnclosureNum == 0) {
-                    if (UtilityRoutines::SameString(curSpace.Name, state.dataHeatBal->Zone(curSpace.zoneNum).Name + "-Remainder")) {
+                    if (UtilityRoutines::SameString(curSpace.Name, state.dataHeatBal->Zone(curSpace.zoneNum).Name + "-REMAINDER")) {
                         // Search for existing enclosure with same name as the zone
                         spaceEnclosureNum = UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(curSpace.zoneNum).Name, Enclosures);
                     }
@@ -15557,7 +15565,7 @@ namespace SurfaceGeometry {
                     auto &thisEnclosure = Enclosures(spaceEnclosureNum);
                     thisEnclosure.spaceNames.push_back(curSpace.Name);
                     thisEnclosure.spaceNums.push_back(spaceNum);
-                    thisEnclosure.FloorArea += curSpace.floorArea;
+                    thisEnclosure.FloorArea += curSpace.FloorArea;
                     thisEnclosure.ExtWindowArea += curSpace.extWindowArea;
                     thisEnclosure.TotalSurfArea += curSpace.totalSurfArea;
                 }
@@ -15574,7 +15582,7 @@ namespace SurfaceGeometry {
                 thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
                 thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
                 thisEnclosure.spaceNums.push_back(spaceNum);
-                thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
+                thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).FloorArea;
                 if (radiantSetup) {
                     state.dataHeatBal->space(spaceNum).radiantEnclosureNum = spaceNum;
                 } else {
