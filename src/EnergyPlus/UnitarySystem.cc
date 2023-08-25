@@ -14013,89 +14013,97 @@ namespace UnitarySystems {
                 }
             }
         }
-        if (SolFla == -1) {
-            if (!state.dataGlobal->WarmupFlag) {
-                if (this->warnIndex.m_SensPLRIter < 1) {
-                    ++this->warnIndex.m_SensPLRIter;
-                    ShowWarningError(state,
-                                     format("{} - Iteration limit exceeded calculating part-load ratio for unit = {}", this->UnitType, this->Name));
-                    ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
-                    ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                    ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
-                } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        this->UnitType + " \"" + this->Name +
-                            "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.",
-                        this->warnIndex.m_SensPLRIterIndex,
-                        PartLoadFrac,
-                        PartLoadFrac);
+        if (FullOutput > 0.0) {
+            if (SolFla == -1) {
+                if (!state.dataGlobal->WarmupFlag) {
+                    if (this->warnIndex.m_SensPLRIter < 1) {
+                        ++this->warnIndex.m_SensPLRIter;
+                        ShowWarningError(
+                            state, format("{} - Iteration limit exceeded calculating part-load ratio for unit = {}", this->UnitType, this->Name));
+                        ShowContinueError(state, format("Estimated part-load ratio  = {:.3R}", (ReqOutput / FullOutput)));
+                        ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                        ShowContinueErrorTimeStamp(state,
+                                                   "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    } else {
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            this->UnitType + " \"" + this->Name +
+                                "\" - Iteration limit exceeded calculating sensible part-load ratio error continues. Sensible PLR statistics follow.",
+                            this->warnIndex.m_SensPLRIterIndex,
+                            PartLoadFrac,
+                            PartLoadFrac);
+                    }
+                }
+            } else if (SolFla == -2) {
+                PartLoadFrac = ReqOutput / FullOutput;
+                if (!state.dataGlobal->WarmupFlag) {
+                    if (this->warnIndex.m_SensPLRFail < 1) {
+                        ++this->warnIndex.m_SensPLRFail;
+                        ShowWarningError(state,
+                                         format("{} - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = {}",
+                                                this->UnitType,
+                                                this->Name));
+                        ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
+                        ShowContinueErrorTimeStamp(state,
+                                                   "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    } else {
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            this->UnitType + " \"" + this->Name +
+                                "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
+                            this->warnIndex.m_SensPLRFailIndex,
+                            PartLoadFrac,
+                            PartLoadFrac);
+                    }
                 }
             }
-        } else if (SolFla == -2) {
-            PartLoadFrac = ReqOutput / FullOutput;
-            if (!state.dataGlobal->WarmupFlag) {
-                if (this->warnIndex.m_SensPLRFail < 1) {
-                    ++this->warnIndex.m_SensPLRFail;
-                    ShowWarningError(state,
-                                     format("{} - sensible part-load ratio calculation failed: part-load ratio limits exceeded, for unit = {}",
-                                            this->UnitType,
-                                            this->Name));
-                    ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                    ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
-                } else {
-                    ShowRecurringWarningErrorAtEnd(
-                        state,
-                        this->UnitType + " \"" + this->Name +
-                            "\" - sensible part-load ratio calculation failed error continues. Sensible PLR statistics follow.",
-                        this->warnIndex.m_SensPLRFailIndex,
-                        PartLoadFrac,
-                        PartLoadFrac);
-                }
-            }
-        }
 
-        if (SolFlaLat == -1 && SolFla != -1) {
-            if (!state.dataGlobal->WarmupFlag) {
-                if (this->warnIndex.m_LatPLRIter < 1) {
-                    ++this->warnIndex.m_LatPLRIter;
-                    ShowWarningError(
-                        state, format("{} - Iteration limit exceeded calculating latent part-load ratio for unit = {}", this->UnitType, this->Name));
-                    ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", (ReqOutput / FullOutput)));
-                    ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
-                    ShowContinueErrorTimeStamp(state, "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+            if (SolFlaLat == -1 && SolFla != -1) {
+                if (!state.dataGlobal->WarmupFlag) {
+                    if (this->warnIndex.m_LatPLRIter < 1) {
+                        ++this->warnIndex.m_LatPLRIter;
+                        ShowWarningError(
+                            state,
+                            format("{} - Iteration limit exceeded calculating latent part-load ratio for unit = {}", this->UnitType, this->Name));
+                        ShowContinueError(state, format("Estimated part-load ratio   = {:.3R}", (ReqOutput / FullOutput)));
+                        ShowContinueError(state, format("Calculated part-load ratio = {:.3R}", PartLoadFrac));
+                        ShowContinueErrorTimeStamp(state,
+                                                   "The calculated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    }
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        this->UnitType + " \"" + this->Name +
+                            "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.",
+                        this->warnIndex.m_LatPLRIterIndex,
+                        PartLoadFrac,
+                        PartLoadFrac);
                 }
-                ShowRecurringWarningErrorAtEnd(
-                    state,
-                    this->UnitType + " \"" + this->Name +
-                        "\" - Iteration limit exceeded calculating latent part-load ratio error continues. Latent PLR statistics follow.",
-                    this->warnIndex.m_LatPLRIterIndex,
-                    PartLoadFrac,
-                    PartLoadFrac);
-            }
-        } else if (SolFlaLat == -2 && SolFla != -2) {
-            //               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
-            if (NoLoadHumRatOut - FullLoadHumRatOut != 0.0) {
-                PartLoadFrac = (NoLoadHumRatOut - DesOutHumRat) / (NoLoadHumRatOut - FullLoadHumRatOut);
-            } else {
-                PartLoadFrac = 1.0;
-            }
-            if (!state.dataGlobal->WarmupFlag) {
-                if (this->warnIndex.m_LatPLRFail < 1) {
-                    ++this->warnIndex.m_LatPLRFail;
-                    ShowWarningError(state,
-                                     format("{} - latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = {}",
-                                            this->UnitType,
-                                            this->Name));
-                    ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
-                    ShowContinueErrorTimeStamp(state, "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+            } else if (SolFlaLat == -2 && SolFla != -2) {
+                //               RegulaFalsi returns PLR = minPLR when a solution cannot be found, recalculate PartLoadFrac.
+                if (NoLoadHumRatOut - FullLoadHumRatOut != 0.0) {
+                    PartLoadFrac = (NoLoadHumRatOut - DesOutHumRat) / (NoLoadHumRatOut - FullLoadHumRatOut);
+                } else {
+                    PartLoadFrac = 1.0;
                 }
-                ShowRecurringWarningErrorAtEnd(state,
-                                               this->UnitType + " \"" + this->Name +
-                                                   "\" - latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
-                                               this->warnIndex.m_LatPLRFailIndex,
-                                               PartLoadFrac,
-                                               PartLoadFrac);
+                if (!state.dataGlobal->WarmupFlag) {
+                    if (this->warnIndex.m_LatPLRFail < 1) {
+                        ++this->warnIndex.m_LatPLRFail;
+                        ShowWarningError(state,
+                                         format("{} - latent part-load ratio calculation failed: part-load ratio limits exceeded, for unit = {}",
+                                                this->UnitType,
+                                                this->Name));
+                        ShowContinueError(state, format("Estimated part-load ratio = {:.3R}", PartLoadFrac));
+                        ShowContinueErrorTimeStamp(state,
+                                                   "The estimated part-load ratio will be used and the simulation continues. Occurrence info:");
+                    }
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        this->UnitType + " \"" + this->Name +
+                            "\" - latent part-load ratio calculation failed error continues. Latent PLR statistics follow.",
+                        this->warnIndex.m_LatPLRFailIndex,
+                        PartLoadFrac,
+                        PartLoadFrac);
+                }
             }
         }
         // Set the final results
