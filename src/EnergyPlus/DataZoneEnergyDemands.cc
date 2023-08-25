@@ -85,11 +85,11 @@ void ZoneSystemMoistureDemand::beginEnvironmentInit()
             this->SequencedOutputRequiredToDehumidSP(equipNum) = 0.0;
         }
     }
-    this->loadHeatEnergy = 0.0;
-    this->loadCoolEnergy = 0.0;
-    this->loadHeatRate = 0.0;
-    this->loadCoolRate = 0.0;
-    this->sensibleHeatRatio = 0.0;
+    this->airSysHeatEnergy = 0.0;
+    this->airSysCoolEnergy = 0.0;
+    this->airSysHeatRate = 0.0;
+    this->airSysCoolRate = 0.0;
+    this->airSysSensibleHeatRatio = 0.0;
     this->vaporPressureDifference = 0.0;
     this->predictedRate = 0.0;
     this->predictedHumSPRate = 0.0;
@@ -233,28 +233,28 @@ void ZoneSystemMoistureDemand::setUpOutputVars(EnergyPlusData &state,
         SetupOutputVariable(state,
                             format("{} Air System Latent Heating Energy", prefix),
                             OutputProcessor::Unit::J,
-                            this->loadHeatEnergy,
+                            this->airSysHeatEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name);
         SetupOutputVariable(state,
                             format("{} Air System Latent Cooling Energy", prefix),
                             OutputProcessor::Unit::J,
-                            this->loadCoolEnergy,
+                            this->airSysCoolEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name);
         SetupOutputVariable(state,
                             format("{} Air System Latent Heating Rate", prefix),
                             OutputProcessor::Unit::W,
-                            this->loadHeatRate,
+                            this->airSysHeatRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
         SetupOutputVariable(state,
                             format("{} Air System Latent Cooling Rate", prefix),
                             OutputProcessor::Unit::W,
-                            this->loadCoolRate,
+                            this->airSysCoolRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
@@ -262,7 +262,7 @@ void ZoneSystemMoistureDemand::setUpOutputVars(EnergyPlusData &state,
         SetupOutputVariable(state,
                             format("{} Air System Sensible Heat Ratio", prefix),
                             OutputProcessor::Unit::None,
-                            this->sensibleHeatRatio,
+                            this->airSysSensibleHeatRatio,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
@@ -358,16 +358,16 @@ void ZoneSystemMoistureDemand::reportZoneAirSystemMoistureLoads(EnergyPlusData &
                                                                 Real64 const sensibleLoad,
                                                                 Real64 const vaporPressureDiff)
 {
-    this->loadHeatRate = std::abs(min(latentGain, 0.0));
-    this->loadCoolRate = max(latentGain, 0.0);
-    this->loadHeatEnergy = this->loadHeatRate * state.dataHVACGlobal->TimeStepSysSec;
-    this->loadCoolEnergy = this->loadCoolRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->airSysHeatRate = std::abs(min(latentGain, 0.0));
+    this->airSysCoolRate = max(latentGain, 0.0);
+    this->airSysHeatEnergy = this->airSysHeatRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->airSysCoolEnergy = this->airSysCoolRate * state.dataHVACGlobal->TimeStepSysSec;
     if ((sensibleLoad + latentGain) != 0.0) {
-        this->sensibleHeatRatio = sensibleLoad / (sensibleLoad + latentGain);
+        this->airSysSensibleHeatRatio = sensibleLoad / (sensibleLoad + latentGain);
     } else if (sensibleLoad != 0.0) {
-        this->sensibleHeatRatio = 1.0;
+        this->airSysSensibleHeatRatio = 1.0;
     } else {
-        this->sensibleHeatRatio = 0.0;
+        this->airSysSensibleHeatRatio = 0.0;
     }
     this->vaporPressureDifference = vaporPressureDiff;
 }

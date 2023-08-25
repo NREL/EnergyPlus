@@ -135,11 +135,11 @@ namespace DataZoneEnergyDemands {
         Real64 predictedRate = 0.0;                          // Predicted moisture load to setpoint [kgWater/s] (unmultiplied)
         Real64 predictedHumSPRate = 0.0;                     // Predicted latent load to humidification setpoint [kgWater/s] (unmultiplied)
         Real64 predictedDehumSPRate = 0.0;                   // Predicted latent load to dehumidification setpoint [kgWater/s] (unmultiplied)
-        Real64 loadHeatRate = 0.0;                           // latent heating rate [W] (unmultiplied)
-        Real64 loadCoolRate = 0.0;                           // latent cooling rate [W] (unmultiplied)
-        Real64 loadHeatEnergy = 0.0;                         // latent heating energy [J] (unmultiplied)
-        Real64 loadCoolEnergy = 0.0;                         // latent cooling energy [J] (unmultiplied)
-        Real64 sensibleHeatRatio = 0.0;                      // zone load SHR []
+        Real64 airSysHeatRate = 0.0;                         // air system latent heating rate [W] (unmultiplied)
+        Real64 airSysCoolRate = 0.0;                         // air system latent cooling rate [W] (unmultiplied)
+        Real64 airSysHeatEnergy = 0.0;                       // air system latent heating energy [J] (unmultiplied)
+        Real64 airSysCoolEnergy = 0.0;                       // latent cooling energy [J] (unmultiplied)
+        Real64 airSysSensibleHeatRatio = 0.0;                // air system SHR []
         Real64 vaporPressureDifference = 0.0;                // vapor pressure depression [Pa]
 
         void beginEnvironmentInit() override;
