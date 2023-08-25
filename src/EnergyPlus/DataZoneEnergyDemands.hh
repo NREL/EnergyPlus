@@ -132,15 +132,15 @@ namespace DataZoneEnergyDemands {
         EPVector<Real64> SequencedOutputRequired;            // load required to meet setpoint by sequence [kgWater/s] (multiplied)
         EPVector<Real64> SequencedOutputRequiredToHumidSP;   // load required to meet humidify setpoint by sequence [kgWater/s] (multiplied)
         EPVector<Real64> SequencedOutputRequiredToDehumidSP; // load required to meet dehumidify setpoint by sequenc [kgWater/s] (multiplied)
-        Real64 ZoneMoisturePredictedRate = 0.0;              // Predicted moisture load to setpoint [kgWater/s] (unmultiplied)
-        Real64 ZoneMoisturePredictedHumSPRate = 0.0;         // Predicted latent load to humidification setpoint [kgWater/s] (unmultiplied)
-        Real64 ZoneMoisturePredictedDehumSPRate = 0.0;       // Predicted latent load to dehumidification setpoint [kgWater/s] (unmultiplied)
-        Real64 ZoneLTLoadHeatRate = 0.0;                     // latent heating rate [W] (unmultiplied)
-        Real64 ZoneLTLoadCoolRate = 0.0;                     // latent cooling rate [W] (unmultiplied)
-        Real64 ZoneLTLoadHeatEnergy = 0.0;                   // latent heating energy [J] (unmultiplied)
-        Real64 ZoneLTLoadCoolEnergy = 0.0;                   // latent cooling energy [J] (unmultiplied)
-        Real64 ZoneSensibleHeatRatio = 0.0;                  // zone load SHR []
-        Real64 ZoneVaporPressureDifference = 0.0;            // vapor pressure depression [Pa]
+        Real64 predictedRate = 0.0;                          // Predicted moisture load to setpoint [kgWater/s] (unmultiplied)
+        Real64 predictedHumSPRate = 0.0;                     // Predicted latent load to humidification setpoint [kgWater/s] (unmultiplied)
+        Real64 predictedDehumSPRate = 0.0;                   // Predicted latent load to dehumidification setpoint [kgWater/s] (unmultiplied)
+        Real64 loadHeatRate = 0.0;                           // latent heating rate [W] (unmultiplied)
+        Real64 loadCoolRate = 0.0;                           // latent cooling rate [W] (unmultiplied)
+        Real64 loadHeatEnergy = 0.0;                         // latent heating energy [J] (unmultiplied)
+        Real64 loadCoolEnergy = 0.0;                         // latent cooling energy [J] (unmultiplied)
+        Real64 sensibleHeatRatio = 0.0;                      // zone load SHR []
+        Real64 vaporPressureDifference = 0.0;                // vapor pressure depression [Pa]
 
         void beginEnvironmentInit() override;
 

@@ -85,15 +85,15 @@ void ZoneSystemMoistureDemand::beginEnvironmentInit()
             this->SequencedOutputRequiredToDehumidSP(equipNum) = 0.0;
         }
     }
-    this->ZoneLTLoadHeatEnergy = 0.0;
-    this->ZoneLTLoadCoolEnergy = 0.0;
-    this->ZoneLTLoadHeatRate = 0.0;
-    this->ZoneLTLoadCoolRate = 0.0;
-    this->ZoneSensibleHeatRatio = 0.0;
-    this->ZoneVaporPressureDifference = 0.0;
-    this->ZoneMoisturePredictedRate = 0.0;
-    this->ZoneMoisturePredictedHumSPRate = 0.0;
-    this->ZoneMoisturePredictedDehumSPRate = 0.0;
+    this->loadHeatEnergy = 0.0;
+    this->loadCoolEnergy = 0.0;
+    this->loadHeatRate = 0.0;
+    this->loadCoolRate = 0.0;
+    this->sensibleHeatRatio = 0.0;
+    this->vaporPressureDifference = 0.0;
+    this->predictedRate = 0.0;
+    this->predictedHumSPRate = 0.0;
+    this->predictedDehumSPRate = 0.0;
 }
 void ZoneSystemSensibleDemand::setUpOutputVars(EnergyPlusData &state,
                                                std::string_view prefix,
@@ -233,28 +233,28 @@ void ZoneSystemMoistureDemand::setUpOutputVars(EnergyPlusData &state,
         SetupOutputVariable(state,
                             format("{} Air System Latent Heating Energy", prefix),
                             OutputProcessor::Unit::J,
-                            this->ZoneLTLoadHeatEnergy,
+                            this->loadHeatEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name);
         SetupOutputVariable(state,
                             format("{} Air System Latent Cooling Energy", prefix),
                             OutputProcessor::Unit::J,
-                            this->ZoneLTLoadCoolEnergy,
+                            this->loadCoolEnergy,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             name);
         SetupOutputVariable(state,
                             format("{} Air System Latent Heating Rate", prefix),
                             OutputProcessor::Unit::W,
-                            this->ZoneLTLoadHeatRate,
+                            this->loadHeatRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
         SetupOutputVariable(state,
                             format("{} Air System Latent Cooling Rate", prefix),
                             OutputProcessor::Unit::W,
-                            this->ZoneLTLoadCoolRate,
+                            this->loadCoolRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
@@ -262,14 +262,14 @@ void ZoneSystemMoistureDemand::setUpOutputVars(EnergyPlusData &state,
         SetupOutputVariable(state,
                             format("{} Air System Sensible Heat Ratio", prefix),
                             OutputProcessor::Unit::None,
-                            this->ZoneSensibleHeatRatio,
+                            this->sensibleHeatRatio,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
         SetupOutputVariable(state,
                             format("{} Air Vapor Pressure Difference", prefix),
                             OutputProcessor::Unit::Pa,
-                            this->ZoneVaporPressureDifference,
+                            this->vaporPressureDifference,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             name);
@@ -280,21 +280,21 @@ void ZoneSystemMoistureDemand::setUpOutputVars(EnergyPlusData &state,
     SetupOutputVariable(state,
                         format("{} Predicted Moisture Load Moisture Transfer Rate", prefix),
                         OutputProcessor::Unit::kgWater_s,
-                        this->ZoneMoisturePredictedRate,
+                        this->predictedRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate", prefix),
                         OutputProcessor::Unit::kgWater_s,
-                        this->ZoneMoisturePredictedHumSPRate,
+                        this->predictedHumSPRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate", prefix),
                         OutputProcessor::Unit::kgWater_s,
-                        this->ZoneMoisturePredictedDehumSPRate,
+                        this->predictedDehumSPRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
@@ -358,26 +358,26 @@ void ZoneSystemMoistureDemand::reportZoneAirSystemMoistureLoads(EnergyPlusData &
                                                                 Real64 const sensibleLoad,
                                                                 Real64 const vaporPressureDiff)
 {
-    this->ZoneLTLoadHeatRate = std::abs(min(latentGain, 0.0));
-    this->ZoneLTLoadCoolRate = max(latentGain, 0.0);
-    this->ZoneLTLoadHeatEnergy = this->ZoneLTLoadHeatRate * state.dataHVACGlobal->TimeStepSysSec;
-    this->ZoneLTLoadCoolEnergy = this->ZoneLTLoadCoolRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->loadHeatRate = std::abs(min(latentGain, 0.0));
+    this->loadCoolRate = max(latentGain, 0.0);
+    this->loadHeatEnergy = this->loadHeatRate * state.dataHVACGlobal->TimeStepSysSec;
+    this->loadCoolEnergy = this->loadCoolRate * state.dataHVACGlobal->TimeStepSysSec;
     if ((sensibleLoad + latentGain) != 0.0) {
-        this->ZoneSensibleHeatRatio = sensibleLoad / (sensibleLoad + latentGain);
+        this->sensibleHeatRatio = sensibleLoad / (sensibleLoad + latentGain);
     } else if (sensibleLoad != 0.0) {
-        this->ZoneSensibleHeatRatio = 1.0;
+        this->sensibleHeatRatio = 1.0;
     } else {
-        this->ZoneSensibleHeatRatio = 0.0;
+        this->sensibleHeatRatio = 0.0;
     }
-    this->ZoneVaporPressureDifference = vaporPressureDiff;
+    this->vaporPressureDifference = vaporPressureDiff;
 }
 
 void ZoneSystemMoistureDemand::reportMoistLoadsZoneMultiplier(
     EnergyPlusData &state, int const zoneNum, Real64 const totalLoad, Real64 const loadToHumidifySetPoint, Real64 const loadToDehumidifySetPoint)
 {
-    this->ZoneMoisturePredictedRate = totalLoad;
-    this->ZoneMoisturePredictedHumSPRate = loadToHumidifySetPoint;
-    this->ZoneMoisturePredictedDehumSPRate = loadToDehumidifySetPoint;
+    this->predictedRate = totalLoad;
+    this->predictedHumSPRate = loadToHumidifySetPoint;
+    this->predictedDehumSPRate = loadToDehumidifySetPoint;
 
     Real64 zoneMultFac = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
 
