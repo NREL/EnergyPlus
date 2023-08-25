@@ -1463,11 +1463,9 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     thisZone.ListMultiplier = 1.0;
     thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
         *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
-    EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
-    EXPECT_NEAR(
-        thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP, thisZoneSysMoistureDemand.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
-    EXPECT_NEAR(
-        thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, thisZoneSysMoistureDemand.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, thisZoneSysMoistureDemand.predictedRate, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToHumidifyingSP, thisZoneSysMoistureDemand.predictedHumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(thisZoneSysMoistureDemand.OutputRequiredToDehumidifyingSP, thisZoneSysMoistureDemand.predictedDehumSPRate, AcceptableTolerance);
 
     // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier is still one
     thisZone.Multiplier = 7.0;
@@ -1475,11 +1473,11 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
         *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
     ExpectedResult = 1000.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedHumSPRate, AcceptableTolerance);
     ExpectedResult = 3000.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedDehumSPRate, AcceptableTolerance);
     ExpectedResult = 7000.0;
     EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 14000.0;
@@ -1493,11 +1491,11 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
         *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
     ExpectedResult = 1000.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedRate, AcceptableTolerance);
     ExpectedResult = 2000.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedHumSPRate, AcceptableTolerance);
     ExpectedResult = 3000.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedDehumSPRate, AcceptableTolerance);
     ExpectedResult = 7000.0;
     EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 14000.0;
@@ -1514,11 +1512,11 @@ TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
     thisZoneSysMoistureDemand.reportMoistLoadsZoneMultiplier(
         *state, zoneNum, totalOutputRequired, outputRequiredToHumidifyingSP, outputRequiredToDehumidifyingSP);
     ExpectedResult = 300.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedRate, AcceptableTolerance);
     ExpectedResult = 150.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedHumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedHumSPRate, AcceptableTolerance);
     ExpectedResult = 100.0;
-    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.ZoneMoisturePredictedDehumSPRate, AcceptableTolerance);
+    EXPECT_NEAR(ExpectedResult, thisZoneSysMoistureDemand.predictedDehumSPRate, AcceptableTolerance);
     ExpectedResult = 1800.0;
     EXPECT_NEAR(thisZoneSysMoistureDemand.TotalOutputRequired, ExpectedResult, AcceptableTolerance);
     ExpectedResult = 900.0;
@@ -1532,9 +1530,9 @@ TEST_F(EnergyPlusFixture, ReportSensibleLoadsZoneMultiplier_Test)
     int zoneNum = 1;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(zoneNum);
     auto &thisZoneSysEnergyDemand = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
-    Real64 &SingleZoneTotRate = thisZoneSysEnergyDemand.ZoneSNLoadPredictedRate;
-    Real64 &SingleZoneHeatRate = thisZoneSysEnergyDemand.ZoneSNLoadPredictedHSPRate;
-    Real64 &SingleZoneCoolRate = thisZoneSysEnergyDemand.ZoneSNLoadPredictedCSPRate;
+    Real64 &SingleZoneTotRate = thisZoneSysEnergyDemand.predictedRate;
+    Real64 &SingleZoneHeatRate = thisZoneSysEnergyDemand.predictedHSPRate;
+    Real64 &SingleZoneCoolRate = thisZoneSysEnergyDemand.predictedCSPRate;
     state->dataHeatBalFanSys->LoadCorrectionFactor.allocate(zoneNum);
     Real64 &CorrectionFactor = state->dataHeatBalFanSys->LoadCorrectionFactor(zoneNum);
     state->dataHeatBal->Zone.allocate(zoneNum);
