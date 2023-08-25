@@ -665,8 +665,7 @@ namespace HighTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHighTempRadSys->MyEnvrnFlag) {
-            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
-                auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(HTRnum);
+            for (auto &thisHTR : state.dataHighTempRadSys->HighTempRadSys) {
                 thisHTR.ZeroHTRSourceSumHATsurf = 0.0;
                 thisHTR.QHTRRadSource = 0.0;
                 thisHTR.QHTRRadSrcAvg = 0.0;
@@ -1101,8 +1100,7 @@ namespace HighTempRadiantSystem {
         if (state.dataHighTempRadSys->NumOfHighTempRadSys == 0) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
-        for (int RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
-            auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
+        for (auto &thisHTR : state.dataHighTempRadSys->HighTempRadSys) {
             thisHTR.QHTRRadSource = thisHTR.QHTRRadSrcAvg;
             if (thisHTR.QHTRRadSrcAvg != 0.0) HighTempRadSysOn = true;
         }
@@ -1147,9 +1145,8 @@ namespace HighTempRadiantSystem {
         dataHBFS->SurfQHTRadSys = 0.0;
         dataHBFS->ZoneQHTRadSysToPerson = 0.0;
 
-        for (int RadSysNum = 1; RadSysNum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++RadSysNum) {
-
-            auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
+        
+        for (auto &thisHTR : state.dataHighTempRadSys->HighTempRadSys) {
             int ZoneNum = thisHTR.ZonePtr;
 
             dataHBFS->ZoneQHTRadSysToPerson(ZoneNum) = thisHTR.QHTRRadSource * thisHTR.FracRadiant * thisHTR.FracDistribPerson;

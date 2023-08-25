@@ -1503,9 +1503,7 @@ namespace HWBaseboardRadiator {
         state.dataHeatBalFanSys->SurfQHWBaseboard = 0.0;
         state.dataHeatBalFanSys->ZoneQHWBaseboardToPerson = 0.0;
 
-        for (BaseboardNum = 1; BaseboardNum <= state.dataHWBaseboardRad->NumHWBaseboards; ++BaseboardNum) {
-
-            auto &thisHWBB = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+        for (auto &thisHWBB : state.dataHWBaseboardRad->HWBaseboard) {
             HWBaseboardDesignData const &HWBaseboardDesignDataObject =
                 state.dataHWBaseboardRad->HWBaseboardDesignObject(thisHWBB.DesignObjectPtr); // Contains the data for the design object
             int ZoneNum = thisHWBB.ZonePtr;
