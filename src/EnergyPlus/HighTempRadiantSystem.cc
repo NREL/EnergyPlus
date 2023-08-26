@@ -637,10 +637,6 @@ namespace HighTempRadiantSystem {
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ZoneNum; // Intermediate variable for keeping track of the zone number
-        int HTRnum;
-
         if (state.dataHighTempRadSys->firstTime) {
             state.dataHighTempRadSys->MySizeFlag.dimension(state.dataHighTempRadSys->NumOfHighTempRadSys, true);
             state.dataHighTempRadSys->firstTime = false;
@@ -649,12 +645,12 @@ namespace HighTempRadiantSystem {
         // need to check all units to see if they are on Zone Equipment List or issue warning
         if (!state.dataHighTempRadSys->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataHighTempRadSys->ZoneEquipmentListChecked = true;
-            for (HTRnum = 1; HTRnum <= state.dataHighTempRadSys->NumOfHighTempRadSys; ++HTRnum) {
-                if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", state.dataHighTempRadSys->HighTempRadSys(HTRnum).Name)) continue;
+            for (auto &thisHTRSys : state.dataHighTempRadSys->HighTempRadSys) {
+                if (CheckZoneEquipmentList(state, "ZoneHVAC:HighTemperatureRadiant", thisHTRSys.Name)) continue;
                 ShowSevereError(state,
                                 format("InitHighTempRadiantSystem: Unit=[ZoneHVAC:HighTemperatureRadiant,{}] is not on any ZoneHVAC:EquipmentList.  "
                                        "It will not be simulated.",
-                                       state.dataHighTempRadSys->HighTempRadSys(HTRnum).Name));
+                                       thisHTRSys.Name));
             }
         }
 
@@ -681,11 +677,10 @@ namespace HighTempRadiantSystem {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
             auto &thisHTR = state.dataHighTempRadSys->HighTempRadSys(RadSysNum);
-            ZoneNum = thisHTR.ZonePtr;
             thisHTR.ZeroHTRSourceSumHATsurf =
-                state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure out what part of the load the radiant system meets
-            thisHTR.QHTRRadSource = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
-            thisHTR.QHTRRadSrcAvg = 0.0;                            // Initialize this variable to zero (radiant system defaults to off)
+                state.dataHeatBal->Zone(thisHTR.ZonePtr).sumHATsurf(state); // Set this to figure out what part of the load the radiant system meets
+            thisHTR.QHTRRadSource = 0.0;                                    // Initialize this variable to zero (radiant system defaults to off)
+            thisHTR.QHTRRadSrcAvg = 0.0;                                    // Initialize this variable to zero (radiant system defaults to off)
             thisHTR.LastQHTRRadSrc = 0.0;     // At the beginning of a time step, reset to zero so average calculation can start again
             thisHTR.LastSysTimeElapsed = 0.0; // At the beginning of a time step, reset to zero so average calculation can start again
             thisHTR.LastTimeStepSys = 0.0;    // At the beginning of a time step, reset to zero so average calculation can start again
@@ -1145,7 +1140,6 @@ namespace HighTempRadiantSystem {
         dataHBFS->SurfQHTRadSys = 0.0;
         dataHBFS->ZoneQHTRadSysToPerson = 0.0;
 
-        
         for (auto &thisHTR : state.dataHighTempRadSys->HighTempRadSys) {
             int ZoneNum = thisHTR.ZonePtr;
 

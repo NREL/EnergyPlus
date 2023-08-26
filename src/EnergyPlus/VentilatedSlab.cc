@@ -1540,10 +1540,9 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->MyZoneEqFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
 
             // Initialize total areas for all radiant systems and dimension record keeping arrays
-            for (RadNum = 1; RadNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++RadNum) {
-                state.dataVentilatedSlab->VentSlab(RadNum).TotalSurfaceArea = 0.0;
-                auto &numRadSurfs = state.dataVentilatedSlab->VentSlab(RadNum).NumOfSurfaces;
-                auto &thisVentSlab = state.dataVentilatedSlab->VentSlab(RadNum);
+            for (auto &thisVentSlab : state.dataVentilatedSlab->VentSlab) {
+                thisVentSlab.TotalSurfaceArea = 0.0;
+                int numRadSurfs = thisVentSlab.NumOfSurfaces;
                 for (SurfNum = 1; SurfNum <= numRadSurfs; ++SurfNum) {
                     thisVentSlab.TotalSurfaceArea += state.dataSurface->Surface(thisVentSlab.SurfacePtr(SurfNum)).Area;
                 }

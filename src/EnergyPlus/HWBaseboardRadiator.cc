@@ -440,7 +440,6 @@ namespace HWBaseboardRadiator {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             HWBaseboardNumericFields.FieldNames.allocate(NumNumbers);
-            HWBaseboardNumericFields.FieldNames = "";
             HWBaseboardNumericFields.FieldNames = state.dataIPShortCut->cNumericFieldNames;
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
@@ -848,18 +847,16 @@ namespace HWBaseboardRadiator {
             state.dataHWBaseboardRad->SetLoopIndexFlag.dimension(NumHWBaseboards, true);
             state.dataHWBaseboardRad->MyOneTimeFlag = false;
 
-            for (int Loop = 1; Loop <= NumHWBaseboards; ++Loop) {
-                auto &hWBB = state.dataHWBaseboardRad->HWBaseboard;
+            for (auto &hWBB : state.dataHWBaseboardRad->HWBaseboard) {
                 // Air mass flow rate is obtained from the following linear equation (reset if autosize is used)
                 // m_dot = 0.0062 + 2.75e-05*q
-                hWBB(Loop).AirMassFlowRateStd = Constant + Coeff * hWBB(Loop).RatedCapacity;
-                hWBB(Loop).ZeroBBSourceSumHATsurf = 0.0;
-                hWBB(Loop).QBBRadSource = 0.0;
-                hWBB(Loop).QBBRadSrcAvg = 0.0;
-                hWBB(Loop).LastQBBRadSrc = 0.0;
-                hWBB(Loop).LastSysTimeElapsed = 0.0;
-                hWBB(Loop).LastTimeStepSys = 0.0;
-                hWBB(Loop).AirMassFlowRateStd = Constant + Coeff * hWBB(Loop).RatedCapacity;
+                hWBB.ZeroBBSourceSumHATsurf = 0.0;
+                hWBB.QBBRadSource = 0.0;
+                hWBB.QBBRadSrcAvg = 0.0;
+                hWBB.LastQBBRadSrc = 0.0;
+                hWBB.LastSysTimeElapsed = 0.0;
+                hWBB.LastTimeStepSys = 0.0;
+                hWBB.AirMassFlowRateStd = Constant + Coeff * hWBB.RatedCapacity;
             }
         }
 
@@ -1456,15 +1453,14 @@ namespace HWBaseboardRadiator {
         // one or more of the radiant systems was running.
 
         HWBaseboardSysOn = false;
-        auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard;
 
         // If there are no baseboards in this input file, just RETURN
         if (state.dataHWBaseboardRad->NumHWBaseboards == 0) return;
 
         // If there are baseboards, then we have to check to see if this was running at all...
-        for (int BaseboardNum = 1; BaseboardNum <= state.dataHWBaseboardRad->NumHWBaseboards; ++BaseboardNum) {
-            HWBaseboard(BaseboardNum).QBBRadSource = HWBaseboard(BaseboardNum).QBBRadSrcAvg;
-            if (HWBaseboard(BaseboardNum).QBBRadSrcAvg != 0.0) HWBaseboardSysOn = true;
+        for (auto &thisHWBaseboard : state.dataHWBaseboardRad->HWBaseboard) {
+            thisHWBaseboard.QBBRadSource = thisHWBaseboard.QBBRadSrcAvg;
+            if (thisHWBaseboard.QBBRadSrcAvg != 0.0) HWBaseboardSysOn = true;
         }
 
         DistributeBBRadGains(state); // QBBRadSource has been modified so we need to redistribute gains
@@ -1495,7 +1491,6 @@ namespace HWBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadSurfNum;           // Counter for surfaces receiving radiation from radiant heater
-        int BaseboardNum;         // Counter for the baseboard
         int SurfNum;              // Pointer to the Surface derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
