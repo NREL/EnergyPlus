@@ -75,11 +75,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    autosize,                !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
          "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
          "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+         "    ,                        !- Maximum Cycling Rate",
+         "    ,                        !- Latent Capacity Time Constant",
+         "    ,                        !- Fan Delay Time",
          "    PLF Curve Multi Compressor 30prcnt unloading,               !- Energy Part Load Fraction Curve Name",
          "    PSZ-AC_1:5 OA Node,           !- Condenser Air Inlet Node Name",
          "    AirCooled,               !- Condenser Type",
          "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
          "    ,                        !- Crankcase Heater Capacity {W}",
+         "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
          "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
          "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
          "    ,                        !- Supply Water Storage Tank Name",
@@ -91,8 +95,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.70,               !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
          "    4.328973,             !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
          "    1.396964,              !- Speed 1 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
-         "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
-         "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2017 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2023 Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate",
          "    ,                        !- Speed 1 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
          "    ,                        !- Speed 1 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
          "    5CapacityCurveIpakCS,         !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
@@ -103,8 +107,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.78,              !- Speed 2 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
          "    4.540061,             !- Speed 2 Reference Unit COP At Rated Conditions {dimensionless}",
          "    1.88779,              !- Speed 2 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
-         "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
-         "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2017 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2023 Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate",
          "    ,                        !- Speed 2 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
          "    ,                        !- Speed 2 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
          "    4CapacityCurve,          !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
@@ -115,8 +119,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.70,             !- Speed 3 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
          "    4.164418,             !- Speed 3 Reference Unit COP At Rated Conditions {dimensionless}",
          "    2.831685,              !- Speed 3 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
-         "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
-         "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2017 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2023 Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate",
          "    ,                        !- Speed 3 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
          "    ,                        !- Speed 3 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
          "    3CapacityCurveIpakCS,          !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
@@ -127,8 +131,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.62,              !- Speed 4 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
          "    3.469661,             !- Speed 4 Reference Unit COP At Rated Conditions {dimensionless}",
          "    3.553764,              !- Speed 4 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
-         "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
-         "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2017 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2023 Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate",
          "    ,                        !- Speed 4 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
          "    ,                        !- Speed 4 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
          "    2CapacityCurveIpakCS,          !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
@@ -139,8 +143,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.69,             !- Speed 5 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
          "    3.822957,             !- Speed 5 Reference Unit COP At Rated Conditions {dimensionless}",
          "    5.66336932,              !- Speed 5 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
-         "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
-         "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2017 Speed 5 Rated Evaporator Fan Power Per Volume Flow Rate",
+         "    ,                        !- 2023 Speed 5 Rated Evaporator Fan Power Per Volume Flow Rate",
          "    ,                        !- Speed 5 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
          "    ,                        !- Speed 5 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
          "    1CapacityCurveIpakCS,          !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
@@ -169,10 +173,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    Lobby_ZN_1_FLR_2 WSHP Heating Mode,  !- Heating Coil Name",
          "    Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit,  !- Cooling Coil Object Type",
          "    Lobby_ZN_1_FLR_2 WSHP Cooling Mode,  !- Cooling Coil Name",
-         "    2.5,                     !- Maximum Cycling Rate {cycles/hr}",
-         "    60.0,                    !- Heat Pump Time Constant {s}",
-         "    0.01,                    !- Fraction of On-Cycle Power Use",
-         "    60,                      !- Heat Pump Fan Delay Time {s}",
          "    Coil:Heating:Electric,        !- Supplemental Heating Coil Object Type",
          "    Lobby_ZN_1_FLR_2 WSHP Supp Heating Coil,  !- Supplemental Heating Coil Name",
          "    50.0,                    !- Maximum Supply Air Temperature from Supplemental Heater {C}",
@@ -199,14 +199,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    Autosize,                !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}",
          "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
          "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+         "    2.5,                     !- Maximum Cycling Rate {cycles/hr}",
+         "    60.0,                    !- Latent Capacity Time Constant {s}",
+         "    60,                      !- Fan Delay Time {s}",
          "    0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}",
          "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
          "    4682.3964854,            !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
          "    0.97,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    8.031554863,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.408706486,             !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}",
          "    10CoolingCapacityCurve     ,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
          "    10CoolingCAPFFCurve,      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -220,8 +221,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.96,                  !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    8.132826118,             !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.449293966,               !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}",
          "    9CoolingCapacityCurve,   !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
          "    9CoolingCAPFFCurve,      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -235,8 +234,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.95,                   !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    8.133952107,             !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.489881446,              !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}",
          "    8CoolingCapacityCurve,   !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
          "    8CoolingCAPFFCurve,      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -250,8 +247,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.91,                   !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    8.077619987,             !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.530468926,             !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}",
          "    7CoolingCapacityCurve,   !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
          "    7CoolingCAPFFCurve,      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -265,8 +260,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.871,                   !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    7.974604129,             !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.571056406,             !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}",
          "    6CoolingCapacityCurve,   !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
          "    6CoolingCAPFFCurve ,     !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -280,8 +273,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.816,                   !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    7.661685232,             !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.652231367,             !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}",
          "    5CoolingCapacityCurve,   !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
          "    5CoolingCAPFFCurve,      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -295,8 +286,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.784,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    7.257778666,             !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.732934379,             !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}",
          "    4CoolingCapacityCurve,   !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
          "    4CoolingCAPFFCurve,      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -310,8 +299,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.766,                   !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    6.804761759,             !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.81410934,             !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}",
          "    3CoolingCapacityCurve,   !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
          "    3CoolingCAPFFCurve,      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -325,8 +312,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    0.739,                   !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
          "    5.765971166,             !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}",
          "    0.891980668,             !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
-         "    773.3,                   !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-         "    934.4,                   !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
          "    0.0008201726 ,                  !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}",
          "    1CoolingCapacityCurve,   !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
          "    1CoolingCAPFFCurve,      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -2609,6 +2594,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
@@ -2728,11 +2714,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
         "    autosize,                !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    PSZ-AC_1:5 OA Node,      !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -2905,11 +2895,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         "    5.00,                    !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -3010,28 +3004,14 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     int DXCoilNum = 1;
     DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
     int constexpr SpeedCal = 1;
-    Real64 RuntimeFrac = 1.0;
     Real64 SensLoad = 0.0;
     Real64 LatentLoad = 0.0;
     Real64 PartLoadFrac = 0.0;
     Real64 OnOffAirFlowRatio = 1.0;
     Real64 SpeedRatio = 0.0;
-    Real64 MaxONOFFCyclesperHour(0.0);
-    Real64 HPTimeConstant(0.0);
-    Real64 FanDelayTime(0.0);
 
     // run coil init
-    VariableSpeedCoils::InitVarSpeedCoil(*state,
-                                         DXCoilNum,
-                                         MaxONOFFCyclesperHour,
-                                         HPTimeConstant,
-                                         FanDelayTime,
-                                         SensLoad,
-                                         LatentLoad,
-                                         CyclingScheme,
-                                         OnOffAirFlowRatio,
-                                         SpeedRatio,
-                                         SpeedCal);
+    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
@@ -3046,7 +3026,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
-        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+        *state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     ;
     // check coil outlet and inlet air conditions match
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
@@ -3071,7 +3051,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     // run the coil
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
-        *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+        *state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // check coil air outlet conditions
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, 5.23333, 0.00001);
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, 0.00810, 0.00001);
@@ -3091,11 +3071,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Cooling)
         "    5.00,                    !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -3198,6 +3182,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_ASHP_Heating)
         "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    Resistive,               !- Defrost Strategy",
         "    TIMED,                   !- Defrost Control",
@@ -3332,6 +3317,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_AWHP)
         "    HPOutdoorWaterInletNode, !- Condenser Water Inlet Node Name",
         "    HPOutdoorWaterOutletNode,!- Condenser Water Outlet Node Name",
         "    100.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    5.0,                     !- Maximum Ambient Temperature for Crankcase Heater Operation {C}",
         "    WetBulbTemperature,      !- Evaporator Air Temperature Type for Curve Objects",
         "    HPWHPLFFPLR,             !- Part Load Fraction Correlation Curve Name",
@@ -3527,14 +3513,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.00165,                 !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    2.5,                     !- Maximum Cycling Rate {cycles/hr}",
+        "    60.0,                    !- Latent Capacity Time Constant {s}",
+        "    60,                      !- Fan Delay Time {s}",
         "    0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}",
         "    VS Energy Part Load Fraction 1,  !- Energy Part Load Fraction Curve Name",
         "    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}",
         "    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3548,8 +3535,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3563,8 +3548,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3578,8 +3561,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3593,8 +3574,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3608,8 +3587,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3623,8 +3600,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3638,8 +3613,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3653,8 +3626,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3668,8 +3639,6 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RatedSource_Temp_WSHP_Cooling)
         "    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}",
         "    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.000381695,             !- Speed 10 Reference Unit Rated Water Flow Rate {m3/s}",
         "    TC VS Temp1 Test,        !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name",
         "    TC VS AirFrac Test,      !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -3983,11 +3952,15 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_Initialization)
         "    0.4,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name",
         "    ,                        !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    200.0,                   !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",
@@ -4184,9 +4157,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 141);
-    EXPECT_EQ(NumAlphas, 49);
-    EXPECT_EQ(NumNumbers, 92);
+    EXPECT_EQ(TotalArgs, 145);
+    EXPECT_EQ(NumAlphas, 50);
+    EXPECT_EQ(NumNumbers, 95);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     auto _name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
@@ -4215,6 +4188,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedHeating_Initialization)
                           "    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
                           "    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
                           "    200.0,                   !- Crankcase Heater Capacity {W}",
+                          "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
                           "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
                           "    Resistive,               !- Defrost Strategy",
                           "    TIMED,                   !- Defrost Control",
@@ -4405,14 +4379,15 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    Autosize,                !- Rated Water Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    0,                       !- Flag for Using Hot Gas Reheat, 0 or 1 {dimensionless}",
         "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
         "    4682.3964854,            !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {w}",
         "    0.97,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    8.031554863,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.408706486,             !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 1 Reference Unit Rated Water Flow Rate {m3/s}",
         "    10CoolingCapacityCurve     ,  !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
         "    10CoolingCAPFFCurve,      !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4426,8 +4401,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.96,                  !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    8.132826118,             !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.449293966,               !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    770.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 2 Reference Unit Rated Water Flow Rate {m3/s}",
         "    9CoolingCapacityCurve,   !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
         "    9CoolingCAPFFCurve,      !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4441,8 +4414,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.95,                   !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    8.133952107,             !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.489881446,              !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 3 Reference Unit Rated Water Flow Rate {m3/s}",
         "    8CoolingCapacityCurve,   !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
         "    8CoolingCAPFFCurve,      !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4456,8 +4427,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.91,                   !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    8.077619987,             !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.530468926,             !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 4 Reference Unit Rated Water Flow Rate {m3/s}",
         "    7CoolingCapacityCurve,   !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
         "    7CoolingCAPFFCurve,      !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4471,8 +4440,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.871,                   !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    7.974604129,             !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.571056406,             !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 5 Reference Unit Rated Water Flow Rate {m3/s}",
         "    6CoolingCapacityCurve,   !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
         "    6CoolingCAPFFCurve ,     !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4486,8 +4453,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.816,                   !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    7.661685232,             !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.652231367,             !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 6 Reference Unit Rated Water Flow Rate {m3/s}",
         "    5CoolingCapacityCurve,   !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name",
         "    5CoolingCAPFFCurve,      !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4501,8 +4466,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.784,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    7.257778666,             !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.732934379,             !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 7 Reference Unit Rated Water Flow Rate {m3/s}",
         "    4CoolingCapacityCurve,   !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name",
         "    4CoolingCAPFFCurve,      !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4516,8 +4479,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.766,                   !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    6.804761759,             !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.81410934,             !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 8 Reference Unit Rated Water Flow Rate {m3/s}",
         "    3CoolingCapacityCurve,   !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name",
         "    3CoolingCAPFFCurve,      !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -4531,8 +4492,6 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
         "    0.739,                   !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}",
         "    5.765971166,             !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}",
         "    0.891980668,             !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}",
-        "    773.3,                   !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
-        "    934.4,                   !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate [W/(m3/s)]",
         "    0.0008201726 ,                  !- Speed 9 Reference Unit Rated Water Flow Rate {m3/s}",
         "    1CoolingCapacityCurve,   !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name",
         "    1CoolingCAPFFCurve,      !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
@@ -6735,16 +6694,17 @@ TEST_F(EnergyPlusFixture, CoolingVariableSpeedEquationFit_Initialization)
     int NumAlphas = 0;
     int NumNumbers = 0;
     state->dataInputProcessing->inputProcessor->getObjectDefMaxArgs(*state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
-    EXPECT_EQ(TotalArgs, 164);
+    EXPECT_EQ(TotalArgs, 147);
     EXPECT_EQ(NumAlphas, 76);
-    EXPECT_EQ(NumNumbers, 88);
+    EXPECT_EQ(NumNumbers, 71);
     // get coil inputs
     EnergyPlus::VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     auto _name = state->dataVariableSpeedCoils->VarSpeedCoil(1).Name;
     EXPECT_EQ(_name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedAirVolFlowRate(2), 0.449293966);
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(1), 773.3);
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(2), 770.3);
+    // These don't apply to water source heat pumps, so commenting out the tests
+    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(1), 773.3);
+    // EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedEvaporatorFanPowerPerVolumeFlowRate2017(2), 770.3);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).MSRatedWaterVolFlowRate(2), 0.0008201726);
 }
 

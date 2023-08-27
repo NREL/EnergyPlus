@@ -229,7 +229,7 @@ namespace DataPlant {
         int firstBranchIndex = 1;
         for (int CompIndex = 1; CompIndex <= this->Branch(firstBranchIndex).TotalComponents; ++CompIndex) {
 
-            auto &this_component(this->Branch(firstBranchIndex).Comp(CompIndex));
+            auto const &this_component(this->Branch(firstBranchIndex).Comp(CompIndex));
 
             {
                 switch (this_component.CurOpSchemeType) {
@@ -296,7 +296,7 @@ namespace DataPlant {
                 // Now that we have the branch index, let's do the control type check over all the components
                 for (int CompIndex = 1; CompIndex <= this->Branch(BranchIndex).TotalComponents; ++CompIndex) {
 
-                    auto &this_component(this->Branch(BranchIndex).Comp(CompIndex));
+                    auto const &this_component(this->Branch(BranchIndex).Comp(CompIndex));
 
                     {
                         switch (this_component.CurOpSchemeType) {
@@ -446,8 +446,6 @@ namespace DataPlant {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompCounter;
         int BranchInletNode;
-        int ComponentInletNode;
-        int ComponentOutletNode;
         DataPlant::PlantEquipmentType ComponentType;
         Real64 MassFlowRateFound;
         Real64 MassFlow;
@@ -472,11 +470,11 @@ namespace DataPlant {
         //~ Loop across all component outlet nodes and update their mass flow and max avail
         for (CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
 
-            auto &this_comp(this_branch.Comp(CompCounter));
+            auto const &this_comp(this_branch.Comp(CompCounter));
 
             //~ Pick up some values for convenience
-            ComponentInletNode = this_comp.NodeNumIn;
-            ComponentOutletNode = this_comp.NodeNumOut;
+            int ComponentInletNode = this_comp.NodeNumIn;
+            int ComponentOutletNode = this_comp.NodeNumOut;
             MassFlowRateFound = state.dataLoopNodes->Node(ComponentOutletNode).MassFlowRate;
             ComponentType = this_comp.Type;
 
@@ -663,8 +661,8 @@ namespace DataPlant {
             auto &branch = this->Branch(branchNum);
             Real64 totalDispatchedLoadOnBranch = 0.0;
             for (int compNum = 1; compNum <= branch.TotalComponents; ++compNum) {
-                auto &component = branch.Comp(compNum);
-                auto &t = component.Type;
+                auto const &component = branch.Comp(compNum);
+                auto const &t = component.Type;
                 if (t == DataPlant::PlantEquipmentType::PumpConstantSpeed || t == DataPlant::PlantEquipmentType::PumpBankConstantSpeed ||
                     t == DataPlant::PlantEquipmentType::PumpVariableSpeed || t == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
                     // don't do anything
@@ -1006,7 +1004,7 @@ namespace DataPlant {
                             switch (component.Type) {
                             case DataPlant::PlantEquipmentType::PumpConstantSpeed:
                                 if (CompIndex > 0) {
-                                    auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
+                                    auto const &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                     if (ParallelBranchIndex >= 1) { // branch pump
                                         if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
                                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
@@ -1023,7 +1021,7 @@ namespace DataPlant {
                                 break;
                             case DataPlant::PlantEquipmentType::PumpBankConstantSpeed:
                                 if (CompIndex > 0) {
-                                    auto &this_pump(state.dataPumps->PumpEquip(CompIndex));
+                                    auto const &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                     if (ParallelBranchIndex >= 1) { // branch pump
                                         if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
                                             ThisBranchFlowRequestNeedIfOn =
@@ -1304,35 +1302,22 @@ namespace DataPlant {
         int constexpr LoopSideSingleBranch(1); // For readability
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumActiveBranches;        // Active branch counter
         Real64 ActiveFlowRate;        // The flow available when cycling through branches
         Real64 PassiveFlowRate;       // The flow available when cycling through branches
         Real64 FracFlow;              // The flow available when cycling through branches
         Real64 ThisBranchRequestFrac; // The request ratio
         Real64 totalMax;              // The flow available when cycling through branches
         Real64 FlowRemaining;         // The flow available when cycling through branches
-        int OutletNum;                // Splitter outlet
-        int MixerBranchOut;
-        int SplitterBranchIn;  // As the name implies
-        int SplitterBranchOut; // As the name implies
-        int LastNodeOnBranch;  // intermediate value used for better readabilty
-        int FirstNodeOnBranch; // intermediate value used for better readabilty
-        int BranchNum;         // intermediate value used for better readabilty
-        int iBranch;           // DO loop counter for cycling through branches
-        int NumSplitOutlets;   // As the name implies
+        int LastNodeOnBranch;         // intermediate value used for better readabilty
+        int FirstNodeOnBranch;        // intermediate value used for better readabilty
         Real64 BranchFlowReq;
         Real64 BranchMinAvail;
         Real64 BranchMaxAvail;
         Real64 ParallelBranchMaxAvail;
         Real64 ParallelBranchMinAvail;
         Real64 TotParallelBranchFlowReq;
-        int FirstNodeOnBranchIn;
-        int FirstNodeOnBranchOut;
         Real64 StartingFlowRate;
         Real64 ThisBranchRequest;
-        int CompCounter;
-        int CompInletNode;
-        int CompOutletNode;
 
         // If there is no splitter then there is no continuity to enforce.
         if (!this->Splitter.Exists) {
@@ -1342,7 +1327,7 @@ namespace DataPlant {
                 // The branch should just try to meet the request previously calculated.  This should be good,
                 // just need to make sure that during FlowUnlocked, no one constrained Min/Max farther.
                 // This would have been propagated down the branch, so we can check the outlet node min/max avail for this.
-                auto &this_single_branch(this->Branch(LoopSideSingleBranch));
+                auto const &this_single_branch(this->Branch(LoopSideSingleBranch));
                 LastNodeOnBranch = this_single_branch.NodeNumOut;
                 FirstNodeOnBranch = this_single_branch.NodeNumIn;
                 BranchMinAvail = state.dataLoopNodes->Node(LastNodeOnBranch).MassFlowRateMinAvail;
@@ -1364,7 +1349,7 @@ namespace DataPlant {
 
             // Zero out local variables
             TotParallelBranchFlowReq = 0.0;
-            NumSplitOutlets = this->Splitter.TotalOutletNodes;
+            int NumSplitOutlets = this->Splitter.TotalOutletNodes;
             if (NumSplitOutlets < 1) {
                 ShowSevereError(state, "Plant topology problem on \"" + this->loopSideDescription + "\"");
                 ShowContinueError(state, "Diagnostic error in PlantLoopSolver::ResolveParallelFlows.");
@@ -1372,15 +1357,15 @@ namespace DataPlant {
                 ShowFatalError(state, "Invalid plant topology causes program termination.");
             }
 
-            NumActiveBranches = 0;
+            int NumActiveBranches = 0;
             ParallelBranchMaxAvail = 0.0;
             ParallelBranchMinAvail = 0.0;
-            for (iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
+            for (int iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
 
-                BranchNum = this->Splitter.BranchNumOut(iBranch);
+                int BranchNum = this->Splitter.BranchNumOut(iBranch);
                 auto &this_branch(this->Branch(BranchNum));
-                SplitterBranchOut = this->Splitter.BranchNumOut(iBranch);
-                auto &this_splitter_outlet_branch(this->Branch(SplitterBranchOut));
+                int SplitterBranchOut = this->Splitter.BranchNumOut(iBranch);
+                auto const &this_splitter_outlet_branch(this->Branch(SplitterBranchOut));
                 LastNodeOnBranch = this_branch.NodeNumOut;
                 FirstNodeOnBranch = this_branch.NodeNumIn;
                 BranchFlowReq = this_branch.DetermineBranchFlowRequest(state);
@@ -1410,13 +1395,12 @@ namespace DataPlant {
                 ParallelBranchMinAvail += BranchMinAvail;
             }
             //            ! Find branch number and flow rates at splitter inlet
-            SplitterBranchIn = this->Splitter.BranchNumIn;
-            LastNodeOnBranch = this->Branch(SplitterBranchIn).NodeNumOut;
-            FirstNodeOnBranchIn = this->Branch(SplitterBranchIn).NodeNumIn;
+            int SplitterBranchIn = this->Splitter.BranchNumIn;
+            int FirstNodeOnBranchIn = this->Branch(SplitterBranchIn).NodeNumIn;
             //            ! Find branch number and flow rates at mixer outlet
-            MixerBranchOut = this->Mixer.BranchNumOut;
+            int MixerBranchOut = this->Mixer.BranchNumOut;
             LastNodeOnBranch = this->Branch(MixerBranchOut).NodeNumOut;
-            FirstNodeOnBranchOut = this->Branch(MixerBranchOut).NodeNumIn;
+            int FirstNodeOnBranchOut = this->Branch(MixerBranchOut).NodeNumIn;
 
             auto &first_branch_inlet_node(state.dataLoopNodes->Node(FirstNodeOnBranchIn));
             auto &last_branch_inlet_node(state.dataLoopNodes->Node(FirstNodeOnBranchOut));
@@ -1440,8 +1424,8 @@ namespace DataPlant {
 
             // Initialize flow on passive, bypass and uncontrolled parallel branches to zero.  For these branches
             // MinAvail is not enforced
-            for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+            for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                 FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                 if (this->Branch(SplitterBranchOut).controlType != DataBranchAirLoopPlant::ControlType::Active &&
                     this->Branch(SplitterBranchOut).controlType != DataBranchAirLoopPlant::ControlType::SeriesActive) {
@@ -1453,13 +1437,13 @@ namespace DataPlant {
 
             // IF SUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
             if (FlowRemaining < DataBranchAirLoopPlant::MassFlowTolerance) { // no flow available at all for splitter
-                for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                    SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
-                    for (CompCounter = 1; CompCounter <= this->Branch(SplitterBranchOut).TotalComponents; ++CompCounter) {
+                for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                    int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                    for (int CompCounter = 1; CompCounter <= this->Branch(SplitterBranchOut).TotalComponents; ++CompCounter) {
 
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
-                        CompInletNode = this->Branch(SplitterBranchOut).Comp(CompCounter).NodeNumIn;
-                        CompOutletNode = this->Branch(SplitterBranchOut).Comp(CompCounter).NodeNumOut;
+                        int CompInletNode = this->Branch(SplitterBranchOut).Comp(CompCounter).NodeNumIn;
+                        int CompOutletNode = this->Branch(SplitterBranchOut).Comp(CompCounter).NodeNumOut;
                         state.dataLoopNodes->Node(CompInletNode).MassFlowRate = 0.0;
                         state.dataLoopNodes->Node(CompInletNode).MassFlowRateMaxAvail = 0.0;
                         state.dataLoopNodes->Node(CompOutletNode).MassFlowRate = 0.0;
@@ -1470,8 +1454,8 @@ namespace DataPlant {
             } else if (FlowRemaining >= TotParallelBranchFlowReq) {
 
                 // 1) Satisfy flow demand of ACTIVE splitter outlet branches
-                for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                    SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                    int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                     if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Active ||
                         this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::SeriesActive) {
@@ -1491,8 +1475,8 @@ namespace DataPlant {
 
                 // 2) Distribute remaining flow to PASSIVE branches
                 totalMax = 0.0;
-                for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                    SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                    int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                     if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Passive) {
                         // Calculate the total max available
@@ -1501,8 +1485,8 @@ namespace DataPlant {
                 }
 
                 if (totalMax > 0) {
-                    for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                        SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                    for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                        int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                         if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Passive) {
                             FracFlow = FlowRemaining / totalMax;
@@ -1528,8 +1512,8 @@ namespace DataPlant {
                 if (FlowRemaining == 0.0) return;
 
                 // 3) Distribute remaining flow to the BYPASS
-                for (OutletNum = 1; OutletNum <= this->Splitter.TotalOutletNodes; ++OutletNum) {
-                    SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                for (int OutletNum = 1; OutletNum <= this->Splitter.TotalOutletNodes; ++OutletNum) {
+                    int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                     if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Bypass) {
                         state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate =
@@ -1546,8 +1530,8 @@ namespace DataPlant {
                 // that had a non-zero flow request. Try to leave branches off that wanted to be off.
                 if (NumActiveBranches > 0) {
                     ActiveFlowRate = FlowRemaining / NumActiveBranches; // denominator now only includes active branches that wanted to be "on"
-                    for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                        SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                    for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                        int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                         bool branchIsActive = this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Active;
                         bool branchIsSeriesActiveAndRequesting =
@@ -1572,8 +1556,8 @@ namespace DataPlant {
                     if (FlowRemaining == 0.0) return;
 
                     // 5)  Step 4) could have left ACTIVE branches < MaxAvail.  Check to makes sure all ACTIVE branches are at MaxAvail
-                    for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
-                        SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                    for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                        int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                         FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                         if (this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::Active ||
                             this->Branch(SplitterBranchOut).controlType == DataBranchAirLoopPlant::ControlType::SeriesActive) {
@@ -1592,8 +1576,8 @@ namespace DataPlant {
 
                 // 6) Adjust Inlet branch and outlet branch flow rates to match parallel branch rate
                 TotParallelBranchFlowReq = 0.0;
-                for (iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
-                    BranchNum = this->Splitter.BranchNumOut(iBranch);
+                for (int iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch) {
+                    int BranchNum = this->Splitter.BranchNumOut(iBranch);
                     FirstNodeOnBranch = this->Branch(BranchNum).NodeNumIn;
                     // calculate parallel branch flow rate
                     TotParallelBranchFlowReq += state.dataLoopNodes->Node(FirstNodeOnBranch).MassFlowRate;
@@ -1613,12 +1597,12 @@ namespace DataPlant {
                 return;
 
                 // IF INSUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
-            } else if (FlowRemaining < TotParallelBranchFlowReq) {
+            } else {
 
                 // 1) apportion flow based on requested fraction of total
-                for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
+                for (int OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
 
-                    SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
+                    int SplitterBranchOut = this->Splitter.BranchNumOut(OutletNum);
                     ThisBranchRequest = this->Branch(SplitterBranchOut).DetermineBranchFlowRequest(state);
                     FirstNodeOnBranch = this->Branch(SplitterBranchOut).NodeNumIn;
                     auto &this_splitter_outlet_branch(this->Branch(SplitterBranchOut));
@@ -1628,9 +1612,9 @@ namespace DataPlant {
 
                         // since we are calculating this fraction based on the total parallel request calculated above, we must mimic the logic to
                         // make sure the math works every time that means we must make the variable speed pump correction here as well.
-                        for (CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter) {
+                        for (int CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter) {
 
-                            auto &this_comp(this_splitter_outlet_branch.Comp(CompCounter));
+                            auto const &this_comp(this_splitter_outlet_branch.Comp(CompCounter));
 
                             // if this isn't a variable speed pump then just keep cycling
                             if ((this_comp.Type != PlantEquipmentType::PumpVariableSpeed) &&
@@ -1638,7 +1622,7 @@ namespace DataPlant {
                                 continue;
                             }
 
-                            CompInletNode = this_comp.NodeNumIn;
+                            int CompInletNode = this_comp.NodeNumIn;
                             ThisBranchRequest = max(ThisBranchRequest, state.dataLoopNodes->Node(CompInletNode).MassFlowRateRequest);
                         }
 
@@ -1774,7 +1758,6 @@ namespace DataPlant {
                 case OpScheme::CoolingRB: { //~ load range based
                     EncounteredLRBObjDuringPass1 = true;
                     goto components_end; // don't do any more components on this branch
-                    break;
                 }
                 default: // demand, etc.
                     branch.Comp(CompCounter).simulate(state, FirstHVACIteration);

@@ -89,3 +89,4 @@ dist
 # if you generate sphinx docs, it builds a dummy version of the schema in the idd folder, just ignore it
 /idd/Energy+.schema.epJSON
 /idd/Energy+.schema.epJSON.in
+design/FY2023/earth_tube_solution_space_diagram.pdf
