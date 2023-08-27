@@ -11368,6 +11368,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     Real64 SH_Comp;                  // Temperature difference between compressor inlet node and Tsuction [C]
     Real64 T_comp_in;                // temperature of refrigerant at compressor inlet, after piping loss (c) [C]
     Real64 TU_HeatingLoad;           // Heating load from terminal units, excluding heating loss [W]
+    Real64 TU_HeatingLoad_actual;    // TU_HeatingLoad trimed to maximum system capacity[W]
     Real64 TU_CoolingLoad;           // Cooling load from terminal units, excluding heating loss [W]
     Real64 Tdischarge;               // VRF Compressor discharge refrigerant temperature [C]
     Real64 Tsuction;                 // VRF compressor suction refrigerant temperature [C]
@@ -11436,6 +11437,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     }
     this->TUCoolingLoad = TU_CoolingLoad; // this is cooling coil load, not terminal unit load
     this->TUHeatingLoad = TU_HeatingLoad; // this is heating coil load, not terminal unit load
+    TU_HeatingLoad_actual = TU_HeatingLoad;
 
     // loop through TU's and calculate average inlet conditions for active coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
@@ -11783,9 +11785,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         if (Q_h_TU_PL > CompEvaporatingCAPSpdMax + CompEvaporatingPWRSpdMax) {
             // Required load is beyond the max system capacity
 
-            Q_h_TU_PL = CompEvaporatingCAPSpdMax;
-            // TU_HeatingLoad = CompEvaporatingCAPSpdMax;
-            this->TUHeatingLoad = TU_HeatingLoad;
             h_IU_cond_out = GetSatEnthalpyRefrig(
                 state,
                 this->RefrigerantName,
@@ -11795,7 +11794,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                 RoutineName); // Quality=0
             h_IU_cond_out_ave = h_IU_cond_out;
             SC_IU_merged = 5;
-            m_ref_IU_cond = TU_HeatingLoad / (h_IU_cond_in - h_IU_cond_out);
+            TU_HeatingLoad_actual = min(TU_HeatingLoad, CompEvaporatingCAPSpdMax + CompEvaporatingPWRSpdMax);
+            m_ref_IU_cond = TU_HeatingLoad_actual / (h_IU_cond_in - h_IU_cond_out);
 
         } else {
             for (NumTU = 1; NumTU <= NumTUInList; NumTU++) {
@@ -11951,7 +11951,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                               this->OUCoolingPWRFT(NumOfCompSpdInput),
                                               Tdischarge,
                                               Tsuction); // Include the piping loss, at the highest compressor speed
-        this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
+        this->PipingCorrectionHeating = TU_HeatingLoad_actual / (TU_HeatingLoad_actual + Pipe_Q_h);
         state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) =
             this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
 
