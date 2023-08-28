@@ -395,8 +395,8 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
                                                 : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).NonAirSystemResponse;
     auto &sysDepZoneLoads = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoads
                                            : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).SysDepZoneLoads;
-    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGain
-                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneLatentGain;
+    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain
+                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).latentGain;
     auto &zoneNodeNum =
         (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber;
     nonAirSystemResponse = 0.0;
@@ -5151,14 +5151,14 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                         state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
                     SumRetAirLatentGainRate = InternalHeatGains::SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
-                    thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
+                    thisZoneHB.latentGain += SumRetAirLatentGainRate;
                 }
             } else {
                 state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 SumRetAirLatentGainRate = InternalHeatGains::SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
-                thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
+                thisZoneHB.latentGain += SumRetAirLatentGainRate;
             }
 
             state.dataLoopNodes->Node(ReturnNode).Enthalpy =
@@ -5289,21 +5289,21 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     // Assign zone air temperature
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MixingMAT = thisZoneHB.MAT;
-        thisZoneHB.MixingHumRat = thisZoneHB.ZoneAirHumRat;
+        thisZoneHB.MixingHumRat = thisZoneHB.airHumRat;
         // This is only temporary fix for CR8867.  (L. Gu 8/12)
         if (SysTimestepLoop == 1) {
             thisZoneHB.MixingMAT = thisZoneHB.XMPT;
-            thisZoneHB.MixingHumRat = thisZoneHB.WZoneTimeMinusP;
+            thisZoneHB.MixingHumRat = thisZoneHB.WTimeMinusP;
         }
     }
     if (state.dataHeatBal->doSpaceHeatBalance) {
         for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
             thisSpaceHB.MixingMAT = thisSpaceHB.MAT;
-            thisSpaceHB.MixingHumRat = thisSpaceHB.ZoneAirHumRat;
+            thisSpaceHB.MixingHumRat = thisSpaceHB.airHumRat;
             // This is only temporary fix for CR8867.  (L. Gu 8/12)
             if (SysTimestepLoop == 1) {
                 thisSpaceHB.MixingMAT = thisSpaceHB.XMPT;
-                thisSpaceHB.MixingHumRat = thisSpaceHB.WZoneTimeMinusP;
+                thisSpaceHB.MixingHumRat = thisSpaceHB.WTimeMinusP;
             }
         }
     }

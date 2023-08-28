@@ -745,14 +745,14 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 Real64 SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, 0);
-                zoneHeatBal.ZoneLatentGain += SumRetAirLatentGainRate;
+                zoneHeatBal.latentGain += SumRetAirLatentGainRate;
             }
         } else {
             returnNode.HumRat = zoneNode.HumRat;
             state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
             // shouldn't the HVAC term be zeroed out then?
 
-            zoneHeatBal.ZoneLatentGain += SumAllReturnAirLatentGains(state, ZoneNum, returnNodeNum);
+            zoneHeatBal.latentGain += SumAllReturnAirLatentGains(state, ZoneNum, returnNodeNum);
         }
 
         returnNode.Enthalpy = PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);

@@ -3943,7 +3943,7 @@ namespace LowTempRadiantSystem {
             // conditions.
             this->CondCausedShutDown = false;
             DewPointTemp =
-                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRat, state.dataEnvrn->OutBaroPress);
 
             if ((this->OperatingMode == CoolingMode) && (variableFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 
@@ -5039,7 +5039,7 @@ namespace LowTempRadiantSystem {
             // conditions.
             this->CondCausedShutDown = false;
             DewPointTemp =
-                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ZonePtr).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->ZonePtr).airHumRat, state.dataEnvrn->OutBaroPress);
 
             if ((this->OperatingMode == CoolingMode) && (ConstantFlowDesignDataObject.CondCtrlType == CondContrlType::CondCtrlSimpleOff)) {
 

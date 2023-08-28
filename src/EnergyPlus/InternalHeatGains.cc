@@ -7670,10 +7670,10 @@ namespace InternalHeatGains {
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
 
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-            thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ); // Also sets space gains
+            thisZoneHB.latentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ); // Also sets space gains
             // Added for hybrid model
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                thisZoneHB.ZoneLatentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ); // Also sets space gains
+                thisZoneHB.latentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ); // Also sets space gains
             }
         }
 
@@ -7929,14 +7929,14 @@ namespace InternalHeatGains {
                         RecircFrac = state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac;
                     }
                     TRecirc = thisZoneHB.MAT;
-                    WRecirc = thisZoneHB.ZoneAirHumRat;
+                    WRecirc = thisZoneHB.airHumRat;
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletConnection::RoomAirModel) {
                     // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
                     TAirIn = thisZoneHB.MAT;
                     TSupply = TAirIn;
-                    WAirIn = thisZoneHB.ZoneAirHumRat;
+                    WAirIn = thisZoneHB.airHumRat;
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
                     if (state.dataHeatBal->ZoneITEq(Loop).inControlledZone) {
@@ -7946,7 +7946,7 @@ namespace InternalHeatGains {
                         TSupply = thisZoneHB.MAT;
                     }
                     TAirIn = thisZoneHB.MAT;
-                    WAirIn = thisZoneHB.ZoneAirHumRat;
+                    WAirIn = thisZoneHB.airHumRat;
                 }
             }
             TDPAirIn = PsyTdpFnWPb(state, WAirIn, state.dataEnvrn->StdBaroPress, RoutineName);
@@ -8791,10 +8791,10 @@ namespace InternalHeatGains {
         if (SumLatentGains) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
                 auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-                thisZoneHB.ZoneLatentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
+                thisZoneHB.latentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
                 // Added for the hybrid model
                 if (state.dataHybridModel->FlagHybridModel_PC) {
-                    thisZoneHB.ZoneLatentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
+                    thisZoneHB.latentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
                 }
             }
         }
@@ -9082,7 +9082,7 @@ namespace InternalHeatGains {
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
             }
-            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGain = SumLatentGainRate;
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain = SumLatentGainRate;
         }
 
         return SumLatentGainRate;
@@ -9106,7 +9106,7 @@ namespace InternalHeatGains {
                     SumLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                 }
             }
-            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGainExceptPeople = SumLatentGainRateExceptPeople;
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGainExceptPeople = SumLatentGainRateExceptPeople;
         }
 
         return SumLatentGainRateExceptPeople;

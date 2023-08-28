@@ -160,14 +160,14 @@ void ManageHVAC(EnergyPlusData &state)
         thisZoneHB.ZT = thisZoneHB.MAT;
         // save for use with thermal comfort control models (Fang, Pierce, and KSU)
         thisZoneHB.ZTAV = 0.0;
-        thisZoneHB.ZoneAirHumRatAvg = 0.0;
+        thisZoneHB.airHumRatAvg = 0.0;
     }
     if (state.dataHeatBal->doSpaceHeatBalance) {
         for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
             thisSpaceHB.ZT = thisSpaceHB.MAT;
             // save for use with thermal comfort control models (Fang, Pierce, and KSU)
             thisSpaceHB.ZTAV = 0.0;
-            thisSpaceHB.ZoneAirHumRatAvg = 0.0;
+            thisSpaceHB.airHumRatAvg = 0.0;
         }
     }
     state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver = 0.0;
@@ -390,12 +390,12 @@ void ManageHVAC(EnergyPlusData &state)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             thisZoneHB.ZTAV += thisZoneHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
-            thisZoneHB.ZoneAirHumRatAvg += thisZoneHB.ZoneAirHumRat * state.dataHVACGlobal->FracTimeStepZone;
+            thisZoneHB.airHumRatAvg += thisZoneHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
             if (state.dataHeatBal->doSpaceHeatBalance) {
                 for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
                     auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
                     thisSpaceHB.ZTAV += thisSpaceHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
-                    thisSpaceHB.ZoneAirHumRatAvg += thisSpaceHB.ZoneAirHumRat * state.dataHVACGlobal->FracTimeStepZone;
+                    thisSpaceHB.airHumRatAvg += thisSpaceHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
                 }
             }
             if (state.dataContaminantBalance->Contaminant.CO2Simulation)
@@ -545,12 +545,12 @@ void ManageHVAC(EnergyPlusData &state)
 
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.ZTAVComf = thisZoneHB.ZTAV;
-        thisZoneHB.ZoneAirHumRatAvgComf = thisZoneHB.ZoneAirHumRatAvg;
+        thisZoneHB.airHumRatAvgComf = thisZoneHB.airHumRatAvg;
     }
     if (state.dataHeatBal->doSpaceHeatBalance) {
         for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
             thisSpaceHB.ZTAVComf = thisSpaceHB.ZTAV;
-            thisSpaceHB.ZoneAirHumRatAvgComf = thisSpaceHB.ZoneAirHumRatAvg;
+            thisSpaceHB.airHumRatAvgComf = thisSpaceHB.airHumRatAvg;
         }
     }
 
@@ -2275,17 +2275,17 @@ void ReportInfiltrations(EnergyPlusData &state)
         }
 
         // Report infiltration latent gains and losses
-        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.MAT);
-        if (thisZoneHB.ZoneAirHumRat > state.dataEnvrn->OutHumRat) {
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
+        if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
 
             thisInfiltration.InfilLatentLoss =
-                thisInfiltration.InfilMdot * (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
+                thisInfiltration.InfilMdot * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentGain = 0.0;
 
         } else {
 
             thisInfiltration.InfilLatentGain =
-                thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.ZoneAirHumRat) * H2OHtOfVap * TimeStepSysSec;
+                thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
@@ -2299,8 +2299,7 @@ void ReportInfiltrations(EnergyPlusData &state)
             thisInfiltration.InfilTotalLoss = -TotalLoad;
         }
         // CR7751  second, calculate using indoor conditions for density property
-        AirDensity =
-            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRatAvg, RoutineName);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRatAvg, RoutineName);
         thisInfiltration.InfilVdotCurDensity = thisInfiltration.InfilMdot / AirDensity;
         thisInfiltration.InfilVolumeCurDensity = thisInfiltration.InfilVdotCurDensity * TimeStepSysSec;
         thisInfiltration.InfilAirChangeRate = thisInfiltration.InfilVolumeCurDensity / (TimeStepSys * thisZone.Volume);
@@ -2425,17 +2424,17 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         }
         // Report infiltration latent gains and losses
         CpAir = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
-        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.MAT);
-        if (thisZoneHB.ZoneAirHumRat > state.dataEnvrn->OutHumRat) {
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
+        if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
 
             znAirRpt.InfilLatentLoss =
-                thisZoneHB.MCPI / CpAir * (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
+                thisZoneHB.MCPI / CpAir * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
             znAirRpt.InfilLatentGain = 0.0;
 
         } else {
 
             znAirRpt.InfilLatentGain =
-                thisZoneHB.MCPI / CpAir * (state.dataEnvrn->OutHumRat - thisZoneHB.ZoneAirHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
+                thisZoneHB.MCPI / CpAir * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
             znAirRpt.InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
@@ -2455,8 +2454,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         znAirRpt.VentilMass = znAirRpt.VentilMdot * TimeStepSysSec;
 
         // CR7751  second, calculate using indoor conditions for density property
-        AirDensity =
-            Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRatAvg, RoutineName3);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRatAvg, RoutineName3);
         znAirRpt.InfilVdotCurDensity = znAirRpt.InfilMdot / AirDensity;
         znAirRpt.InfilVolumeCurDensity = znAirRpt.InfilVdotCurDensity * TimeStepSysSec;
         znAirRpt.InfilAirChangeRate = znAirRpt.InfilVolumeCurDensity / (TimeStepSys * zone.Volume);
@@ -2500,14 +2498,14 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                 if (VentZoneNum > 1) continue;
 
                 // Report ventilation latent gains and losses
-                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.ZoneAirHumRat, thisZoneHB.MAT);
-                if (thisZoneHB.ZoneAirHumRat > state.dataEnvrn->OutHumRat) {
+                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
+                if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
                     znAirRpt.VentilLatentLoss =
-                        znAirRpt.VentilMdot * (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
+                        znAirRpt.VentilMdot * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
                     znAirRpt.VentilLatentGain = 0.0;
                 } else {
                     znAirRpt.VentilLatentGain =
-                        znAirRpt.VentilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.ZoneAirHumRat) * H2OHtOfVap * TimeStepSysSec;
+                        znAirRpt.VentilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
                     znAirRpt.VentilLatentLoss = 0.0;
                 }
                 // Total ventilation losses and gains
@@ -2551,20 +2549,20 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                state.dataEnvrn->OutBaroPress,
                                                                (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0,
-                                                               (thisZoneHB.ZoneAirHumRat + fromZoneHB.ZoneAirHumRat) / 2.0,
+                                                               (thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0,
                                                                std::string());
-                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.ZoneAirHumRat + fromZoneHB.ZoneAirHumRat) / 2.0);
+                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0);
                 znAirRpt.MixVolume += mixing.DesiredAirFlowRate * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.MixVdotCurDensity += mixing.DesiredAirFlowRate * ADSCorrectionFactor;
                 znAirRpt.MixMass += mixing.DesiredAirFlowRate * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.MixMdot += mixing.DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
                 znAirRpt.MixVdotStdDensity += mixing.DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
                 mixSenLoad += mixing.DesiredAirFlowRate * AirDensity * CpAir * (thisZoneHB.MAT - fromZoneHB.MAT);
-                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.ZoneAirHumRat + fromZoneHB.ZoneAirHumRat) / 2.0,
-                                                            (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0);
+                H2OHtOfVap =
+                    Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0, (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0);
                 //        MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowzone*(ZoneAirHumRat(ZoneLoop)- &
                 //                     ZoneAirHumRat(mixing%FromZone))*H2OHtOfVap
-                mixLatLoad += mixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.ZoneAirHumRat - fromZoneHB.ZoneAirHumRat) * H2OHtOfVap;
+                mixLatLoad += mixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.airHumRat - fromZoneHB.airHumRat) * H2OHtOfVap;
             }
         }
 
@@ -2578,38 +2576,38 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                state.dataEnvrn->OutBaroPress,
                                                                (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0,
-                                                               (thisZoneHB.ZoneAirHumRat + fromZoneHB.ZoneAirHumRat) / 2.0,
+                                                               (thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0,
                                                                std::string());
-                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.ZoneAirHumRat + fromZoneHB.ZoneAirHumRat) / 2.0);
+                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0);
                 znAirRpt.MixVolume += crossMixing.DesiredAirFlowRate * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.MixVdotCurDensity += crossMixing.DesiredAirFlowRate * ADSCorrectionFactor;
                 znAirRpt.MixMass += crossMixing.DesiredAirFlowRate * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.MixMdot += crossMixing.DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
                 znAirRpt.MixVdotStdDensity += crossMixing.DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
                 mixSenLoad += crossMixing.DesiredAirFlowRate * AirDensity * CpAir * (thisZoneHB.MAT - fromZoneHB.MAT);
-                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.ZoneAirHumRat + fromZoneHB.ZoneAirHumRat) / 2.0,
-                                                            (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0);
+                H2OHtOfVap =
+                    Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + fromZoneHB.airHumRat) / 2.0, (thisZoneHB.MAT + fromZoneHB.MAT) / 2.0);
                 //       MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowzone*(ZoneAirHumRat(ZoneLoop)- &
                 //                     ZoneAirHumRat(crossMixing%FromZone))*H2OHtOfVap
-                mixLatLoad += crossMixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.ZoneAirHumRat - fromZoneHB.ZoneAirHumRat) * H2OHtOfVap;
+                mixLatLoad += crossMixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.airHumRat - fromZoneHB.airHumRat) * H2OHtOfVap;
             }
             if ((crossMixing.FromZone == ZoneLoop) && crossMixing.ReportFlag) {
                 auto const &mixingZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(crossMixing.ZonePtr);
                 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                state.dataEnvrn->OutBaroPress,
                                                                (thisZoneHB.MAT + mixingZoneHB.MAT) / 2.0,
-                                                               (thisZoneHB.ZoneAirHumRat + mixingZoneHB.ZoneAirHumRat) / 2.0,
+                                                               (thisZoneHB.airHumRat + mixingZoneHB.airHumRat) / 2.0,
                                                                std::string());
-                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.ZoneAirHumRat + mixingZoneHB.ZoneAirHumRat) / 2.0);
+                CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + mixingZoneHB.airHumRat) / 2.0);
                 znAirRpt.MixVolume += crossMixing.DesiredAirFlowRate * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.MixVdotCurDensity += crossMixing.DesiredAirFlowRate * ADSCorrectionFactor;
                 znAirRpt.MixMass += crossMixing.DesiredAirFlowRate * AirDensity * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.MixMdot += crossMixing.DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
                 znAirRpt.MixVdotStdDensity += crossMixing.DesiredAirFlowRate * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
                 mixSenLoad += crossMixing.DesiredAirFlowRate * AirDensity * CpAir * (thisZoneHB.MAT - mixingZoneHB.MAT);
-                H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.ZoneAirHumRat + mixingZoneHB.ZoneAirHumRat) / 2.0,
-                                                            (thisZoneHB.MAT + mixingZoneHB.MAT) / 2.0);
-                mixLatLoad += crossMixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.ZoneAirHumRat - mixingZoneHB.ZoneAirHumRat) * H2OHtOfVap;
+                H2OHtOfVap =
+                    Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + mixingZoneHB.airHumRat) / 2.0, (thisZoneHB.MAT + mixingZoneHB.MAT) / 2.0);
+                mixLatLoad += crossMixing.DesiredAirFlowRate * AirDensity * (thisZoneHB.airHumRat - mixingZoneHB.airHumRat) * H2OHtOfVap;
             }
         }
 
@@ -2630,10 +2628,10 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                             AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                            state.dataEnvrn->OutBaroPress,
                                                                            (thisZoneHB.MAT + zoneBHB.MAT) / 2.0,
-                                                                           (thisZoneHB.ZoneAirHumRat + zoneBHB.ZoneAirHumRat) / 2.0,
+                                                                           (thisZoneHB.airHumRat + zoneBHB.airHumRat) / 2.0,
                                                                            std::string());
-                            CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.ZoneAirHumRat + zoneBHB.ZoneAirHumRat) / 2.0);
-                            H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.ZoneAirHumRat + zoneBHB.ZoneAirHumRat) / 2.0,
+                            CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + zoneBHB.airHumRat) / 2.0);
+                            H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + zoneBHB.airHumRat) / 2.0,
                                                                         (thisZoneHB.MAT + zoneBHB.MAT) / 2.0);
                             znAirRpt.MixVolume += refDoorMixing.VolRefDoorFlowRate(j) * TimeStepSysSec * ADSCorrectionFactor;
                             znAirRpt.MixVdotCurDensity += refDoorMixing.VolRefDoorFlowRate(j) * ADSCorrectionFactor;
@@ -2642,8 +2640,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                             znAirRpt.MixVdotStdDensity +=
                                 refDoorMixing.VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
                             mixSenLoad += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * CpAir * (thisZoneHB.MAT - zoneBHB.MAT);
-                            mixLatLoad +=
-                                refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * (thisZoneHB.ZoneAirHumRat - zoneBHB.ZoneAirHumRat) * H2OHtOfVap;
+                            mixLatLoad += refDoorMixing.VolRefDoorFlowRate(j) * AirDensity * (thisZoneHB.airHumRat - zoneBHB.airHumRat) * H2OHtOfVap;
                         } // flow > 0
                     }     // J-1, numref connections
                 }         // zone A (zoneptr = zoneloop)
@@ -2659,10 +2656,10 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                                     AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                                    state.dataEnvrn->OutBaroPress,
                                                                                    (thisZoneHB.MAT + zoneAHB.MAT) / 2.0,
-                                                                                   (thisZoneHB.ZoneAirHumRat + zoneAHB.ZoneAirHumRat) / 2.0,
+                                                                                   (thisZoneHB.airHumRat + zoneAHB.airHumRat) / 2.0,
                                                                                    std::string());
-                                    CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.ZoneAirHumRat + zoneAHB.ZoneAirHumRat) / 2.0);
-                                    H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.ZoneAirHumRat + zoneAHB.ZoneAirHumRat) / 2.0,
+                                    CpAir = Psychrometrics::PsyCpAirFnW((thisZoneHB.airHumRat + zoneAHB.airHumRat) / 2.0);
+                                    H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb((thisZoneHB.airHumRat + zoneAHB.airHumRat) / 2.0,
                                                                                 (thisZoneHB.MAT + zoneAHB.MAT) / 2.0);
                                     znAirRpt.MixVolume += refDoorMixingA.VolRefDoorFlowRate(j) * TimeStepSysSec * ADSCorrectionFactor;
                                     znAirRpt.MixVdotCurDensity += refDoorMixingA.VolRefDoorFlowRate(j) * ADSCorrectionFactor;
@@ -2671,8 +2668,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                                     znAirRpt.MixVdotStdDensity +=
                                         refDoorMixingA.VolRefDoorFlowRate(j) * (AirDensity / state.dataEnvrn->StdRhoAir) * ADSCorrectionFactor;
                                     mixSenLoad += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * CpAir * (thisZoneHB.MAT - zoneAHB.MAT);
-                                    mixLatLoad += refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity *
-                                                  (thisZoneHB.ZoneAirHumRat - zoneAHB.ZoneAirHumRat) * H2OHtOfVap;
+                                    mixLatLoad +=
+                                        refDoorMixingA.VolRefDoorFlowRate(j) * AirDensity * (thisZoneHB.airHumRat - zoneAHB.airHumRat) * H2OHtOfVap;
                                 } // volflowrate > 0
                             }     // matezoneptr (zoneB) = Zonelooop
                         }         // NumRefDoorConnections
@@ -2721,13 +2718,13 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                     znAirRpt.OABalanceHeatGain = -thisZoneHB.MDotCPOA * (thisZoneHB.MAT - zone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
                 }
                 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
-                if (thisZoneHB.ZoneAirHumRat > state.dataEnvrn->OutHumRat) {
-                    znAirRpt.OABalanceLatentLoss = thisZoneHB.MDotOA * (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap *
-                                                   TimeStepSysSec * ADSCorrectionFactor;
+                if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
+                    znAirRpt.OABalanceLatentLoss =
+                        thisZoneHB.MDotOA * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
                     znAirRpt.OABalanceLatentGain = 0.0;
                 } else {
-                    znAirRpt.OABalanceLatentGain = thisZoneHB.MDotOA * (state.dataEnvrn->OutHumRat - thisZoneHB.ZoneAirHumRat) * H2OHtOfVap *
-                                                   TimeStepSysSec * ADSCorrectionFactor;
+                    znAirRpt.OABalanceLatentGain =
+                        thisZoneHB.MDotOA * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec * ADSCorrectionFactor;
                     znAirRpt.OABalanceLatentLoss = 0.0;
                 }
                 // Total ventilation losses and gains
@@ -2741,8 +2738,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                 }
                 znAirRpt.OABalanceMass = (thisZoneHB.MDotOA) * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.OABalanceMdot = (thisZoneHB.MDotOA) * ADSCorrectionFactor;
-                AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-                    state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRatAvg, std::string());
+                AirDensity =
+                    Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRatAvg, std::string());
                 znAirRpt.OABalanceVolumeCurDensity = (thisZoneHB.MDotOA / AirDensity) * TimeStepSysSec * ADSCorrectionFactor;
                 znAirRpt.OABalanceAirChangeRate = znAirRpt.OABalanceVolumeCurDensity / (TimeStepSys * zone.Volume);
                 znAirRpt.OABalanceVdotCurDensity = (thisZoneHB.MDotOA / AirDensity) * ADSCorrectionFactor;
@@ -2774,7 +2771,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
                              znAirRpt.SysOutletMass; // kg
         // I am not happy with these un-parenthesized divisions and multiplications.  Someone clean this up.
         znAirRpt.ExfilSensiLoss = znAirRpt.ExfilMass / TimeStepSysSec * (thisZoneHB.MAT - zone.OutDryBulbTemp) * CpAir; // W
-        znAirRpt.ExfilLatentLoss = znAirRpt.ExfilMass / TimeStepSysSec * (thisZoneHB.ZoneAirHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
+        znAirRpt.ExfilLatentLoss = znAirRpt.ExfilMass / TimeStepSysSec * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
         znAirRpt.ExfilTotalLoss = znAirRpt.ExfilLatentLoss + znAirRpt.ExfilSensiLoss;
 
         state.dataHeatBal->ZoneTotalExfiltrationHeatLoss += znAirRpt.ExfilTotalLoss * TimeStepSysSec;

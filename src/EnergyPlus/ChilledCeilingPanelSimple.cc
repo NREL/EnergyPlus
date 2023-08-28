@@ -1238,8 +1238,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     // iterate like in the low temperature radiant systems because the inlet water condition is known
     // not calculated.  So, we can deal with this upfront rather than after calculation and then more
     // iteration.
-    Real64 DewPointTemp = Psychrometrics::PsyTdpFnWPb(
-        state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+    Real64 DewPointTemp =
+        Psychrometrics::PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRat, state.dataEnvrn->OutBaroPress);
 
     if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 

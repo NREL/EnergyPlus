@@ -16166,7 +16166,7 @@ Dimensionless;	!- Output Unit Type
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     auto &zoneHeatBalance = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
-    zoneHeatBalance.ZoneAirHumRat = zoneNode.HumRat;
+    zoneHeatBalance.airHumRat = zoneNode.HumRat;
     zoneHeatBalance.MAT = zoneNode.Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
@@ -16222,7 +16222,7 @@ Dimensionless;	!- Output Unit Type
     mixedAirNode.Temp = 24.18496;    // 24C db
     mixedAirNode.HumRat = 0.0121542; // 17C wb
     mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
-    zoneHeatBalance.ZoneAirHumRat = state->dataLoopNodes->Node(1).HumRat;
+    zoneHeatBalance.airHumRat = state->dataLoopNodes->Node(1).HumRat;
     zoneHeatBalance.MAT = state->dataLoopNodes->Node(1).Temp;
 
     zoneSysEnergyDemand.RemainingOutputRequired = -397.162;
@@ -17610,7 +17610,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     state->dataLoopNodes->Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(1).Temp, state->dataLoopNodes->Node(1).HumRat);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = state->dataLoopNodes->Node(1).HumRat;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = state->dataLoopNodes->Node(1).HumRat;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = state->dataLoopNodes->Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
