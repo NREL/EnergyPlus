@@ -2087,7 +2087,6 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
         // calculate the ratio of air loop design flow to the sum of the zone design flows
         for (int AirLoopNum = 1; AirLoopNum <= numPrimaryAirSys; ++AirLoopNum) {
             auto &thisPrimaryAirSys = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
-            auto &thisAirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum);
             state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply = thisPrimaryAirSys.DesignVolFlowRate * state.dataEnvrn->StdRhoAir;
             state.dataAirLoop->AirLoopFlow(AirLoopNum).DesReturnFrac = thisPrimaryAirSys.DesignReturnFlowFraction;
         }
