@@ -24,7 +24,7 @@ jobs:
         include:
         - macos_dev_target: 10.15
           os: macos-11
-          allow_failure: true
+          allow_failure: false
         - macos_dev_target: 11.6
           os: macos-11
           allow_failure: false
