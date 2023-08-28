@@ -550,7 +550,7 @@
 
   Output:Variable,*,Zone Air Temperature,Monthly;
 
-  Output:Meter,DistrictHeating:Facility,Monthly;
+  Output:Meter,DistrictHeatingWater:Facility,Monthly;
 
   Output:Meter,DistrictCooling:Facility,Monthly;
 

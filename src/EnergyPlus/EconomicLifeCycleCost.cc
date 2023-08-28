@@ -1226,9 +1226,9 @@ void ExpressAsCashFlows(EnergyPlusData &state)
             case Constant::eResource::FuelOilNo2:
             case Constant::eResource::Propane:
             case Constant::eResource::EnergyTransfer:
-            case Constant::eResource::Steam:
             case Constant::eResource::DistrictCooling:
-            case Constant::eResource::DistrictHeating:
+            case Constant::eResource::DistrictHeatingWater:
+            case Constant::eResource::DistrictHeatingSteam:
             case Constant::eResource::ElectricityProduced:
             case Constant::eResource::ElectricityPurchased:
             case Constant::eResource::ElectricityNet:
