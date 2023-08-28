@@ -695,7 +695,7 @@ namespace ExhaustAirSystemManager {
         Real64 Tin = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisExhCtrl.ZoneNum).ZT;
         Real64 thisExhCtrlAvailScheVal = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum);
 
-        if (FlowRatio != 0.0) {
+        if (FlowRatio >= 0.0) {
             thisExhCtrl.BalancedFlow *= FlowRatio;
             thisExhCtrl.UnbalancedFlow *= FlowRatio;
 
