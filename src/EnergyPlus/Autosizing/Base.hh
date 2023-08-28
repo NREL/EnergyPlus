@@ -255,7 +255,7 @@ struct BaseSizer
     EPVector<DataSizing::ZoneEqSizingData> zoneEqSizing;
     EPVector<DataAirLoop::OutsideAirSysProps> outsideAirSys;
     EPVector<DataSizing::TermUnitSizingData> termUnitSizing;
-    EPVector<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
+    EPVector<DataSizing::TermUnitZoneSizingData> termUnitFinalZoneSizing;
     EPVector<DataSizing::ZoneSizingData> finalZoneSizing;
     EPVector<DataSizing::SystemSizingData> finalSysSizing;
     EPVector<DataSizing::PlantSizingData> plantSizData;
@@ -307,19 +307,19 @@ public:
                                   ObjexxFCL::Optional_string_const UsrDesc = _,
                                   ObjexxFCL::Optional<Real64 const> UsrValue = _);
 
-    Real64 setOAFracForZoneEqSizing(EnergyPlusData &state, Real64 desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
-    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 outAirFrac,
-                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                               DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
-                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 outAirFrac,
-                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                               DataSizing::ZoneSizingData const &finalZoneSizing);
-    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
-                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
-                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
+    static Real64 setOAFracForZoneEqSizing(const EnergyPlusData &state, Real64 desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    static Real64 setHeatCoilInletTempForZoneEqSizing(Real64 outAirFrac,
+                                                      DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                      DataSizing::ZoneSizingData const &finalZoneSizing);
+    static Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
+                                                        DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                        DataSizing::ZoneSizingData const &finalZoneSizing);
+    static Real64 setCoolCoilInletTempForZoneEqSizing(Real64 outAirFrac,
+                                                      DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                      DataSizing::ZoneSizingData const &finalZoneSizing);
+    static Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 outAirFrac,
+                                                        DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                        DataSizing::ZoneSizingData const &finalZoneSizing);
 };
 
 } // namespace EnergyPlus

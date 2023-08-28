@@ -159,6 +159,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
         "   ,                              !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}",
         "   5.0,                           !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}",
         "   200.0,                         !- Crankcase Heater Capacity {W}",
+        "   ,                              !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   0.0,                           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "   Resistive,                     !- Defrost Strategy",
         "   TIMED,                         !- Defrost Control",
@@ -729,8 +730,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
     state->dataGlobal->DoingSizing = true;
-    state->dataFans->LocalTurnFansOff = false;
-    state->dataFans->LocalTurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     auto &zSysEDemand(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1));

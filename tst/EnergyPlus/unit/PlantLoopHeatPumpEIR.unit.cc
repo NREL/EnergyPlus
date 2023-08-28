@@ -638,8 +638,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     Real64 constexpr expectedSourceRho = 983.2;
     Real64 const expectedLoadFlow = plantSizingLoadVolFlow;
     Real64 expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
-    Real64 const baseExpectedSourceFlow = plantSizingLoadVolFlow * 2.0;
-    Real64 expectedSourceFlow = baseExpectedSourceFlow * (expectedLoadRho * expectedLoadCp) / (expectedSourceRho * expectedSourceCp);
+    Real64 expectedSourceFlow = plantSizingLoadVolFlow * 2.0;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideWSHP(*state);
     EXPECT_NEAR(expectedLoadFlow, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
@@ -678,8 +677,9 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     thisCoolingPLHP->loadSideDesignVolFlowRate = expectedLoadFlow;
     thisCoolingPLHP->sourceSideDesignVolFlowRate = expectedSourceFlow;
     thisCoolingPLHP->referenceCapacity = expectedCapacity;
-    expectedSourceFlow = baseExpectedSourceFlow * (expectedSourceRho * expectedSourceCp) / (expectedLoadRho * expectedLoadCp);
-    expectedCapacity = expectedSourceRho * expectedLoadFlow * expectedSourceCp * plantSizingLoadDeltaT;
+    Real64 const designSourceSideHeatTransfer = expectedCapacity * (1 + 1 / thisHeatingPLHP->referenceCOP);
+    expectedSourceFlow = designSourceSideHeatTransfer / (state->dataSize->PlantSizData(2).DeltaT * expectedSourceCp * expectedSourceRho);
+    expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     thisHeatingPLHP->sizeLoadSide(*state);
     thisHeatingPLHP->sizeSrcSideWSHP(*state);
     EXPECT_NEAR(expectedLoadFlow, thisHeatingPLHP->loadSideDesignVolFlowRate, 0.0001);
@@ -1309,6 +1309,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
                                                       "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
+    bool firstHVACIteration = true;
     // set up the plant loops
     // first the load side
     state->dataPlnt->TotNumLoops = 2;
@@ -1354,7 +1355,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
 
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1362,7 +1363,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.2;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1371,7 +1372,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1381,7 +1382,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1391,7 +1392,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1401,7 +1402,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -1411,7 +1412,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesWSHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.13, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 }
@@ -2255,6 +2256,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
                                                       "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
+    bool firstHVACIteration = true;
     // set up the plant loops
     // first the load side
     state->dataPlnt->TotNumLoops = 1;
@@ -2290,14 +2292,14 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
 
     // call with run flag off, loose limits on node min/max
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, nonzero minimums
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.1, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2305,7 +2307,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     thisCoolingPLHP->running = false;
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.24, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2313,7 +2315,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2321,7 +2323,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.2, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 
@@ -2329,7 +2331,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -2337,7 +2339,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     thisCoolingPLHP->running = true;
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 }
@@ -2494,8 +2496,6 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     thisCoolingPLHP->loadSideDesignVolFlowRate = expectedLoadFlow;
     thisCoolingPLHP->sourceSideDesignVolFlowRate = expectedSourceFlow;
     thisCoolingPLHP->referenceCapacity = expectedCapacity;
-    expectedLoadCp = 4185;
-    expectedLoadRho = 983.2;
     expectedCapacity = expectedLoadRho * expectedLoadFlow * expectedLoadCp * plantSizingLoadDeltaT;
     expectedSourceLoad = expectedCapacity * (1 + 1 / COP);
     expectedSourceFlow = expectedSourceLoad / (expectedSourceCp * expectedSourceRho * plantSizingSrcDeltaT);
@@ -2734,7 +2734,7 @@ TEST_F(EnergyPlusFixture, TestSizing_AutosizedFlowWithCompanion_AirSource)
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
     Real64 expectedClgSourceFlow = 86.71;
-    Real64 expectedHtgSourceFlow = 85.00;
+    Real64 expectedHtgSourceFlow = 86.71;
     EXPECT_NEAR(expectedClgSourceFlow, thisCoolingPLHP->sourceSideDesignVolFlowRate, 0.1);
     EXPECT_NEAR(expectedHtgSourceFlow, thisHeatingPLHP->sourceSideDesignVolFlowRate, 0.1);
 }
@@ -2855,6 +2855,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
     thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
+    thisCoolingPLHP->sourceSidePlantLoc.loopNum = 2;
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node
@@ -2887,7 +2888,7 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     thisCoolingPLHP->doPhysics(*state, curLoad);
 
     EXPECT_NEAR(thisCoolingPLHP->loadSideOutletTemp, 12.00, 0.1);
-    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.66, 0.1);
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.90, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, CoolingMetering)
@@ -2970,23 +2971,19 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, Constant::ResourceType> ResourceTypes;             // ResourceTypes for each variable
+    Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                            // EndUses for each variable
     Array1D_string Groups(NumVariables);                             // Groups for each variable
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
-
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::ResourceType>(varN, Constant::ResourceType::None));
-    }
 
     GetMeteredVariables(
         *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), Constant::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), Constant::ResourceType::Electricity)); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes(2), Constant::eResource::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "COOLING");
     EXPECT_EQ(Groups(2), "PLANT");
 }
@@ -3071,23 +3068,19 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
     Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-    std::map<int, Constant::ResourceType> ResourceTypes;             // ResourceTypes for each variable
+    Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
     Array1D_string EndUses(NumVariables);                            // EndUses for each variable
     Array1D_string Groups(NumVariables);                             // Groups for each variable
     Array1D_string Names(NumVariables);                              // Variable Names for each variable
-
-    for (int varN = 1; varN <= NumVariables; ++varN) {
-        ResourceTypes.insert(std::pair<int, Constant::ResourceType>(varN, Constant::ResourceType::None));
-    }
 
     GetMeteredVariables(
         *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(1), Constant::ResourceType::EnergyTransfer)); // ENERGYTRANSFER
+    EXPECT_TRUE(compare_enums(ResourceTypes(1), Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "");
     EXPECT_EQ(Groups(1), "PLANT");
-    EXPECT_TRUE(compare_enums(ResourceTypes.at(2), Constant::ResourceType::Electricity)); // Electric
+    EXPECT_TRUE(compare_enums(ResourceTypes(2), Constant::eResource::Electricity)); // Electric
     EXPECT_EQ(EndUses(2), "HEATING");
     EXPECT_EQ(Groups(2), "PLANT");
 }
@@ -3118,6 +3111,7 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
                                                       "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
+    bool firstHVACIteration = true;
     // set up the plant loops
     // first the load side
     state->dataPlnt->TotNumLoops = 1;
@@ -3167,7 +3161,7 @@ TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideASHP(*state);
-    thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
+    thisCoolingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.14, thisCoolingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_TRUE(thisCoolingPLHP->running);
 }
@@ -3295,6 +3289,7 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
     thisCoolingPLHP->loadSidePlantLoc.branchNum = 1;
     thisCoolingPLHP->loadSidePlantLoc.compNum = 1;
     thisCoolingPLHP->loadSideNodes.outlet = 1;
+    thisCoolingPLHP->sourceSidePlantLoc.loopNum = 2;
 
     // the factory would've called GetOnlySingleNode for the in/out pairs on the PLHP, add another one for the loop
     // outlet setpoint node
@@ -3335,7 +3330,7 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
 
     EXPECT_NEAR(thisCoolingPLHP->loadSideOutletTemp, 12.095, 1e-3);
 
-    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 22.964, 1e-3);
+    EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 22.989, 1e-3);
 
     EXPECT_EQ(thisCoolingPLHP->eirModFPLRErrorIndex, 1);
 
@@ -3700,6 +3695,7 @@ TEST_F(EnergyPlusFixture, GAHP_Initialization_Test)
                                                       "  1;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
+    bool firstHVACIteration = true;
     // set up the plant loops
     // first the load side
     state->dataPlnt->TotNumLoops = 1;
@@ -3735,14 +3731,14 @@ TEST_F(EnergyPlusFixture, GAHP_Initialization_Test)
 
     // call with run flag off, loose limits on node min/max
     thisHeatingPLHP->running = false;
-    thisHeatingPLHP->setOperatingFlowRatesASHP(*state);
+    thisHeatingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisHeatingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisHeatingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, nonzero minimums
     state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).MassFlowRateMinAvail = 0.1;
     thisHeatingPLHP->running = false;
-    thisHeatingPLHP->setOperatingFlowRatesASHP(*state);
+    thisHeatingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.1, thisHeatingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisHeatingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -3750,7 +3746,7 @@ TEST_F(EnergyPlusFixture, GAHP_Initialization_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     thisHeatingPLHP->running = false;
-    thisHeatingPLHP->setOperatingFlowRatesASHP(*state);
+    thisHeatingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.24, thisHeatingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisHeatingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -3758,7 +3754,7 @@ TEST_F(EnergyPlusFixture, GAHP_Initialization_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisHeatingPLHP->running = true;
-    thisHeatingPLHP->setOperatingFlowRatesASHP(*state);
+    thisHeatingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisHeatingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0, thisHeatingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -3766,7 +3762,7 @@ TEST_F(EnergyPlusFixture, GAHP_Initialization_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     thisHeatingPLHP->running = true;
-    thisHeatingPLHP->setOperatingFlowRatesASHP(*state);
+    thisHeatingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.2, thisHeatingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(1.29, thisHeatingPLHP->sourceSideMassFlowRate, 0.1);
 
@@ -3774,7 +3770,7 @@ TEST_F(EnergyPlusFixture, GAHP_Initialization_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisHeatingPLHP->running = true;
-    thisHeatingPLHP->setOperatingFlowRatesASHP(*state);
+    thisHeatingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.0, thisHeatingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(0.0, thisHeatingPLHP->sourceSideMassFlowRate, 0.001);
 
@@ -3782,7 +3778,7 @@ TEST_F(EnergyPlusFixture, GAHP_Initialization_Test)
     state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).FlowLock = DataPlant::FlowLock::Locked;
     state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     thisHeatingPLHP->running = true;
-    thisHeatingPLHP->setOperatingFlowRatesASHP(*state);
+    thisHeatingPLHP->setOperatingFlowRatesASHP(*state, firstHVACIteration);
     EXPECT_NEAR(0.14, thisHeatingPLHP->loadSideMassFlowRate, 0.001);
     EXPECT_NEAR(1.29, thisHeatingPLHP->sourceSideMassFlowRate, 0.1);
 }

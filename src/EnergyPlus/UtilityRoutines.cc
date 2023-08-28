@@ -64,21 +64,21 @@ extern "C" {
 // EnergyPlus Headers
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+// #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
+// #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataTimings.hh>
+// #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DaylightingManager.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
+// #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
-#include <EnergyPlus/FileSystem.hh>
+// #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/IOFiles.hh>
+// #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -88,7 +88,6 @@ extern "C" {
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
 // Third Party Headers
 #include <fast_float/fast_float.h>
 
@@ -400,7 +399,7 @@ namespace UtilityRoutines {
 
     size_t case_insensitive_hasher::operator()(std::string_view const key) const noexcept
     {
-        std::string keyCopy = MakeUPPERCase(key);
+        std::string keyCopy = makeUPPER(key);
         return std::hash<std::string>()(keyCopy);
     }
 
@@ -451,131 +450,6 @@ namespace UtilityRoutines {
             }
             fsPerfLog.close();
         }
-    }
-
-    bool ValidateFuelType([[maybe_unused]] EnergyPlusData &state,
-                          std::string const &FuelTypeInput,
-                          std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound,
-                          bool const AllowSteamAndDistrict)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings
-
-        std::string const SELECT_CASE_var = UtilityRoutines::MakeUPPERCase(FuelTypeInput);
-
-        if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electricity";
-
-        } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "NaturalGas";
-
-        } else if (SELECT_CASE_var == "DIESEL") {
-            FuelTypeOutput = "Diesel";
-
-        } else if (SELECT_CASE_var == "GASOLINE") {
-            FuelTypeOutput = "Gasoline";
-
-        } else if (SELECT_CASE_var == "COAL") {
-            FuelTypeOutput = "Coal";
-
-        } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOilNo1";
-
-        } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOilNo2";
-
-        } else if (SELECT_CASE_var == "PROPANE") {
-            FuelTypeOutput = "Propane";
-
-        } else if (SELECT_CASE_var == "OTHERFUEL1") {
-            FuelTypeOutput = "OtherFuel1";
-
-        } else if (SELECT_CASE_var == "OTHERFUEL2") {
-            FuelTypeOutput = "OtherFuel2";
-
-        } else {
-            if (AllowSteamAndDistrict) {
-                if (SELECT_CASE_var == "STEAM") {
-                    FuelTypeOutput = "Steam";
-                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                    FuelTypeOutput = "DistrictHeating";
-                } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
-                    FuelTypeOutput = "DistrictCooling";
-                } else {
-                    FuelTypeErrorsFound = true;
-                }
-            } else {
-                FuelTypeErrorsFound = true;
-            }
-        }
-
-        return FuelTypeErrorsFound;
-    }
-
-    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput,
-                                                   std::string &FuelTypeOutput,
-                                                   Constant::ResourceType &FuelTypeNum,
-                                                   bool &FuelTypeErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with Constant::AssignResourceTypeNum() (Boilers.cc and boilerSteam.cc)
-
-        std::string const SELECT_CASE_var = FuelTypeInput;
-
-        if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electricity";
-            FuelTypeNum = Constant::AssignResourceTypeNum("ELECTRICITY");
-
-        } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "NaturalGas";
-            FuelTypeNum = Constant::AssignResourceTypeNum("NATURALGAS");
-
-        } else if (SELECT_CASE_var == "DIESEL") {
-            FuelTypeOutput = "Diesel";
-            FuelTypeNum = Constant::AssignResourceTypeNum("DIESEL");
-
-        } else if (SELECT_CASE_var == "GASOLINE") {
-            FuelTypeOutput = "Gasoline";
-            FuelTypeNum = Constant::AssignResourceTypeNum("GASOLINE");
-
-        } else if (SELECT_CASE_var == "COAL") {
-            FuelTypeOutput = "Coal";
-            FuelTypeNum = Constant::AssignResourceTypeNum("COAL");
-
-        } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOilNo1";
-            FuelTypeNum = Constant::AssignResourceTypeNum("FUELOILNO1");
-
-        } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOilNo2";
-            FuelTypeNum = Constant::AssignResourceTypeNum("FUELOILNO2");
-
-        } else if (SELECT_CASE_var == "PROPANE") {
-            FuelTypeOutput = "Propane";
-            FuelTypeNum = Constant::AssignResourceTypeNum("PROPANE");
-
-        } else if (SELECT_CASE_var == "OTHERFUEL1") {
-            FuelTypeOutput = "OtherFuel1";
-            FuelTypeNum = Constant::AssignResourceTypeNum("OTHERFUEL1");
-
-        } else if (SELECT_CASE_var == "OTHERFUEL2") {
-            FuelTypeOutput = "OtherFuel2";
-            FuelTypeNum = Constant::AssignResourceTypeNum("OTHERFUEL2");
-
-        } else {
-            FuelTypeErrorsFound = true;
-        }
-
-        return FuelTypeErrorsFound;
     }
 
     Real64 epElapsedTime()
@@ -762,6 +636,10 @@ int AbortEnergyPlus(EnergyPlusData &state)
         state.files.flushAll();
     }
 
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
+
     return EXIT_FAILURE;
 }
 
@@ -782,8 +660,8 @@ void CloseMiscOpenFiles(EnergyPlusData &state)
     // Use INQUIRE to determine if file is open.
 
     // Using/Aliasing
-    using DaylightingManager::CloseDFSFile;
-    using DaylightingManager::CloseReportIllumMaps;
+    using Dayltg::CloseDFSFile;
+    using Dayltg::CloseReportIllumMaps;
 
     CloseReportIllumMaps(state);
     CloseDFSFile(state);
@@ -897,9 +775,20 @@ int EndEnergyPlus(EnergyPlusData &state)
     // indicating that E+ finished its simulation
     if ((state.dataExternalInterface->NumExternalInterfaces > 0) && state.dataExternalInterface->haveExternalInterfaceBCVTB) CloseSocket(state, 1);
 
+    if (state.dataGlobal->fProgressPtr) {
+        state.dataGlobal->fProgressPtr(100);
+    }
+    if (state.dataGlobal->progressCallback) {
+        state.dataGlobal->progressCallback(100);
+    }
+
     if (state.dataGlobal->eplusRunningViaAPI) {
         state.files.flushAll();
     }
+
+    // The audit file seems to be held open in some cases, make sure it is closed before leaving.
+    // EnergyPlus can close through two paths: EndEnergyPlus and AbortEnergyPlus, so do the same thing there.
+    state.files.audit.close();
 
     return EXIT_SUCCESS;
 }
@@ -1757,6 +1646,26 @@ void ShowRecurringErrors(EnergyPlusData &state)
         }
         ShowMessage(state, "");
     }
+}
+
+void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, item not found", fieldName, fieldVal));
+}
+
+void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, invalid key", fieldName, fieldVal));
+}
+
+void ShowSevereEmptyField(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view depFieldName, std::string_view depFieldVal)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state,
+                      format("{} cannot be empty{}.", fieldName, depFieldName.empty() ? "" : format(" when {} = {}", depFieldName, depFieldVal)));
 }
 
 } // namespace EnergyPlus

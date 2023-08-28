@@ -3329,7 +3329,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "Branch,",
         "    Main Boiler HW Branch,   !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,         !- Component 1 Name",
         "    Purchased Heat Inlet Node, !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;   !- Component 1 Outlet Node Name",
@@ -3705,7 +3705,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
         "    0,                       !- Fraction of Motor Inefficiencies to Fluid Stream",
         "    INTERMITTENT;            !- Pump Control Type",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,          !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node, !- Hot Water Outlet Node Name",
@@ -3771,7 +3771,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
 
         "PlantEquipmentList,",
         "    Hot Water Loop All Equipment,           !- Name",
-        "    DistrictHeating,          !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,          !- Equipment 1 Object Type",
         "    Purchased Heating;        !- Equipment 1 Name",
 
         "PlantEquipmentList,",
@@ -3891,7 +3891,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     ASSERT_NEAR(-17.300, state->dataHeatRecovery->ExchCond(1).SupInTemp, 0.001); // Heat Recovery Exchanger Primary Air Inlet Temp
     ASSERT_GT(state->dataHeatRecovery->ExchCond(1).SupOutTemp,
               state->dataHeatRecovery->ExchCond(1).SupInTemp);                  // Heat Recovery Exchanger is On in heating mode
-    ASSERT_NEAR(23.000, state->dataHeatRecovery->ExchCond(1).SecInTemp, 0.001); // Heat Recovery Exchanger Secondary Air Inlet Temp
+    ASSERT_NEAR(22.947, state->dataHeatRecovery->ExchCond(1).SecInTemp, 0.001); // Heat Recovery Exchanger Secondary Air Inlet Temp
     ASSERT_LT(state->dataHeatRecovery->ExchCond(1).SecOutTemp,
               state->dataHeatRecovery->ExchCond(1).SecInTemp); // Heat Recovery Exchanger is On in heating mode
 
@@ -4249,7 +4249,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataMixedAir->OAController.allocate(OAContrllerNum);
     auto &thisOAController(state->dataMixedAir->OAController(OAContrllerNum));
     // initialize OA controller
-    thisOAController.ControllerType_Num = MixedAir::MixedAirControllerType::ControllerOutsideAir;
+    thisOAController.ControllerType = MixedAir::MixedAirControllerType::ControllerOutsideAir;
 
     int OASysNum = 1;
     state->dataAirLoop->OutsideAirSys.allocate(OASysNum);

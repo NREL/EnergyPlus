@@ -115,11 +115,9 @@ namespace HVACFan {
     }
 
     void FanSystem::simulate(EnergyPlusData &state,
-                             ObjexxFCL::Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction
-                                                                             // = current flow/ max design flow rate.  It is not exactly the same as
-                                                                             // the legacy speed ratio that was used with SimulateFanComponents.
-                             ObjexxFCL::Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
-                             ObjexxFCL::Optional_bool_const zoneCompTurnFansOff, // can be used as turn Fans OFF signal from ZoneHVAC component
+                             ObjexxFCL::Optional<Real64 const> flowFraction,  // when used, this directs the fan to set the flow at this flow fraction
+                                                                              // = current flow/ max design flow rate.  It is not exactly the same as
+                                                                              // the legacy speed ratio that was used with SimulateFanComponents.
                              ObjexxFCL::Optional<Real64 const> pressureRise,  // Pressure difference to use for DeltaPress, for rating DX coils at a
                                                                               // different pressure without entire duct system
                              ObjexxFCL::Optional<Real64 const> massFlowRate1, // Mass flow rate in operating mode 1 [kg/s]
@@ -130,26 +128,12 @@ namespace HVACFan {
     )
     {
 
-        m_objTurnFansOn = false;
-        m_objTurnFansOff = false;
-
         init(state);
 
         if (m_objSizingFlag) {
             return; // can't run calculations until sizing is completed
         }
 
-        if (present(zoneCompTurnFansOn) && present(zoneCompTurnFansOff)) {
-            // Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
-            // for ZoneHVAC components with system availability managers defined.
-            // The module-level flags get used in the other subroutines (e.g., SimSimpleFan,SimVariableVolumeFan and SimOnOffFan)
-            m_objTurnFansOn = zoneCompTurnFansOn;
-            m_objTurnFansOff = zoneCompTurnFansOff;
-        } else {
-            // Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-            m_objTurnFansOn = state.dataHVACGlobal->TurnFansOn;
-            m_objTurnFansOff = state.dataHVACGlobal->TurnFansOff;
-        }
         if (present(pressureRise) && present(massFlowRate1) && present(runTimeFraction1) && present(massFlowRate2) && present(runTimeFraction2) &&
             present(pressureRise2)) {
             Real64 flowRatio1 = massFlowRate1 / m_maxAirMassFlowRate;
@@ -323,6 +307,18 @@ namespace HVACFan {
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, name, m_endUseSubcategoryName);
 
         m_objSizingFlag = false;
+
+        // Std 229 Fans (HVACFan.cc)
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanPurpose, name, "N/A"); // m_fanType); // purpose? not the same
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanAutosized, name, m_designAirVolFlowRateWasAutosized ? "Yes" : "No");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, name, m_motorEff);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, name, m_motorInAirFrac);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchFanAirLoopName,
+                                                 name,
+                                                 AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name : "N/A");
     }
 
     Real64 FanSystem::report_fei(
@@ -367,17 +363,16 @@ namespace HVACFan {
 
     FanSystem::FanSystem(EnergyPlusData &state, std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
-          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false),
+          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), m_numSpeeds(0), fanIsSecondaryDriver(false),
           m_fanType_Num(0), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
           m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
-          m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0), m_numSpeeds(0),
+          m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0),
           m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0), m_outletAirTemp(0.0),
-          m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0), m_objTurnFansOn(false),
-          m_objTurnFansOff(false), m_objEnvrnFlag(true), m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0),
-          m_maxAirFlowRateEMSOverrideOn(false), m_maxAirFlowRateEMSOverrideValue(0.0), m_eMSFanPressureOverrideOn(false), m_eMSFanPressureValue(0.0),
-          m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
-          m_faultyFilterFlag(false), m_faultyFilterIndex(0),
+          m_inletAirHumRat(0.0), m_outletAirHumRat(0.0), m_inletAirEnthalpy(0.0), m_outletAirEnthalpy(0.0), m_objEnvrnFlag(true),
+          m_objSizingFlag(true), m_fanPower(0.0), m_fanEnergy(0.0), m_maxAirFlowRateEMSOverrideOn(false), m_maxAirFlowRateEMSOverrideValue(0.0),
+          m_eMSFanPressureOverrideOn(false), m_eMSFanPressureValue(0.0), m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0),
+          m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0), m_faultyFilterFlag(false), m_faultyFilterIndex(0),
 
           m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0)
     // oneTimePowerCurveCheck_( true )
@@ -830,8 +825,8 @@ namespace HVACFan {
             }
         }
 
-        if ((ScheduleManager::GetCurrentScheduleValue(state, availSchedIndex) > 0.0 || m_objTurnFansOn) && !m_objTurnFansOff &&
-            ((localAirMassFlow[0] + localAirMassFlow[1]) > 0.0)) {
+        if ((ScheduleManager::GetCurrentScheduleValue(state, availSchedIndex) > 0.0 || state.dataHVACGlobal->TurnFansOn) &&
+            !state.dataHVACGlobal->TurnFansOff && ((localAirMassFlow[0] + localAirMassFlow[1]) > 0.0)) {
             // fan is running
 
             for (int mode = 0; mode < localNumModes; ++mode) {

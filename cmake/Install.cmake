@@ -374,8 +374,7 @@ set(CPACK_RESOURCE_FILE_README "${PROJECT_BINARY_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${PROJECT_SOURCE_DIR}/idd/V22-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V23-1-0-Energy+.idd")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd")
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
@@ -670,7 +669,6 @@ if(BUILD_DOCS)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/ModuleDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/index.html" DESTINATION "./Documentation" COMPONENT Documentation)
 else()

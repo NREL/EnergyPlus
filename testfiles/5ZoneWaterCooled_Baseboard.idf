@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2254,7 +2254,7 @@
     autosize,                !- Heating Design Capacity {W}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     RIGHT-1,                 !- Surface 1 Name
-    0.4,                     !- Fraction of Radiant Energy to Surface 1
+    0.5,                     !- Fraction of Radiant Energy to Surface 1
     C2-1,                    !- Surface 2 Name
     0.2,                     !- Fraction of Radiant Energy to Surface 2
     SB25,                    !- Surface 3 Name
@@ -2271,7 +2271,7 @@
     autosize,                !- Heating Design Capacity {W}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     LEFT-1,                  !- Surface 1 Name
-    0.4,                     !- Fraction of Radiant Energy to Surface 1
+    0.5,                     !- Fraction of Radiant Energy to Surface 1
     C4-1,                    !- Surface 2 Name
     0.2,                     !- Fraction of Radiant Energy to Surface 2
     SB45,                    !- Surface 3 Name
@@ -2284,7 +2284,7 @@
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.001,                   !- Convergence Tolerance
     0.3,                     !- Fraction Radiant
-    0.3;                     !- Fraction of Radiant Energy Incident on People
+    0.2;                     !- Fraction of Radiant Energy Incident on People
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT ===========
 

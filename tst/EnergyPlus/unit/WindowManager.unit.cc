@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         state->dataSurface->Surface(1).Tilt = 180 - tiltSave;
         state->dataSurface->Surface(1).CosTilt = cos(state->dataSurface->Surface(winNum).Tilt * Constant::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(state->dataSurface->Surface(winNum).Tilt * Constant::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+        Convect::CalcISO15099WindowIntConvCoeff(
             *state,
             winNum,
             outSurfTemp,
@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         state->dataSurface->Surface(1).Tilt = tiltSave;
         state->dataSurface->Surface(1).CosTilt = cos(tiltSave * Constant::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(tiltSave * Constant::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+        Convect::CalcISO15099WindowIntConvCoeff(
             *state,
             winNum,
             inSurfTemp,
@@ -473,7 +473,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
@@ -2534,8 +2534,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
-    EXPECT_FALSE(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
 
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
@@ -2730,7 +2729,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
@@ -2834,6 +2833,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     // Calculate temperature based on supply flow rate
 
     HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
+
+    HeatBalanceSurfaceManager::GetSurroundingSurfacesTemperatureAverage(*state);
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
 

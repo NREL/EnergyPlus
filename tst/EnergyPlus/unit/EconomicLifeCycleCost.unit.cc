@@ -423,7 +423,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->numCashFlow = 1;
     state->dataEconLifeCycleCost->CashFlow.resize(state->dataEconLifeCycleCost->numCashFlow);
     state->dataEconLifeCycleCost->CashFlow[0].pvKind = PrValKind::Energy;
-    state->dataEconLifeCycleCost->CashFlow[0].Resource = Constant::ResourceType::Electricity;
+    state->dataEconLifeCycleCost->CashFlow[0].Resource = Constant::eResource::Electricity;
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount(1) = 100;
     state->dataEconLifeCycleCost->CashFlow[0].yrAmount(2) = 110;
@@ -434,7 +434,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->numResourcesUsed = 1;
 
     for (int year = 1; year <= state->dataEconLifeCycleCost->lengthStudyYears; ++year) {
-        std::array<Real64, static_cast<int>(Constant::ResourceType::Num)> yearMap;
+        std::array<Real64, static_cast<int>(Constant::eResource::Num)> yearMap;
         std::fill(yearMap.begin(), yearMap.end(), 0.0);
         state->dataEconLifeCycleCost->EscalatedEnergy[year] = yearMap;
     }
@@ -443,11 +443,11 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts(*state);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::ResourceType::Electricity)], 100., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::ResourceType::Electricity)], 110., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::ResourceType::Electricity)], 120., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::ResourceType::Electricity)], 130., 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::ResourceType::Electricity)], 140., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::eResource::Electricity)], 100., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::eResource::Electricity)], 110., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::eResource::Electricity)], 120., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::eResource::Electricity)], 130., 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::eResource::Electricity)], 140., 0.001);
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 100., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 110., 0.001);
@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
     state->dataEconLifeCycleCost->numUsePriceEscalation = 1;
     state->dataEconLifeCycleCost->UsePriceEscalation.allocate(state->dataEconLifeCycleCost->numUsePriceEscalation);
-    state->dataEconLifeCycleCost->UsePriceEscalation(1).resource = Constant::ResourceType::Electricity;
+    state->dataEconLifeCycleCost->UsePriceEscalation(1).resource = Constant::eResource::Electricity;
     state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation.allocate(state->dataEconLifeCycleCost->lengthStudyYears);
     state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(1) = 1.03;
     state->dataEconLifeCycleCost->UsePriceEscalation(1).Escalation(2) = 1.05;
@@ -469,11 +469,11 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
     state->dataEconLifeCycleCost->EscalatedTotEnergy = 0.0;
 
     ComputeEscalatedEnergyCosts(*state);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::ResourceType::Electricity)], 103.0, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::ResourceType::Electricity)], 115.5, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::ResourceType::Electricity)], 128.4, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::ResourceType::Electricity)], 144.3, 0.001);
-    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::ResourceType::Electricity)], 161.0, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(1)[static_cast<int>(Constant::eResource::Electricity)], 103.0, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(2)[static_cast<int>(Constant::eResource::Electricity)], 115.5, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(3)[static_cast<int>(Constant::eResource::Electricity)], 128.4, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(4)[static_cast<int>(Constant::eResource::Electricity)], 144.3, 0.001);
+    EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedEnergy.at(5)[static_cast<int>(Constant::eResource::Electricity)], 161.0, 0.001);
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(1), 103., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->EscalatedTotEnergy(2), 115.5, 0.001);
@@ -484,19 +484,19 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetMonthNumber)
 {
-    EXPECT_EQ(0, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("January")));
-    EXPECT_EQ(1, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("February")));
-    EXPECT_EQ(2, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("March")));
-    EXPECT_EQ(3, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("April")));
-    EXPECT_EQ(4, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("May")));
-    EXPECT_EQ(5, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("June")));
-    EXPECT_EQ(6, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("July")));
-    EXPECT_EQ(7, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("August")));
-    EXPECT_EQ(8, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("September")));
-    EXPECT_EQ(9, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("October")));
-    EXPECT_EQ(10, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("November")));
-    EXPECT_EQ(11, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("December")));
-    EXPECT_EQ(-1, getEnumerationValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::MakeUPPERCase("Hexember")));
+    EXPECT_EQ(0, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("January")));
+    EXPECT_EQ(1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("February")));
+    EXPECT_EQ(2, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("March")));
+    EXPECT_EQ(3, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("April")));
+    EXPECT_EQ(4, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("May")));
+    EXPECT_EQ(5, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("June")));
+    EXPECT_EQ(6, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("July")));
+    EXPECT_EQ(7, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("August")));
+    EXPECT_EQ(8, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("September")));
+    EXPECT_EQ(9, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("October")));
+    EXPECT_EQ(10, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("November")));
+    EXPECT_EQ(11, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("December")));
+    EXPECT_EQ(-1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("Hexember")));
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
@@ -513,7 +513,7 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
     state->dataEconTariff->numTariff = 1;
     state->dataEconTariff->tariff.allocate(1);
     state->dataEconTariff->tariff(1).isSelected = true;
-    state->dataEconTariff->tariff(1).resourceNum = Constant::ResourceType::Electricity;
+    state->dataEconTariff->tariff(1).resource = Constant::eResource::Electricity;
     state->dataEconTariff->tariff(1).ptTotal = 1;
     state->dataEconTariff->econVar.allocate(1);
     state->dataEconTariff->econVar(1).values.allocate(12);

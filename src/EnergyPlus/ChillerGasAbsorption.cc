@@ -61,6 +61,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -318,7 +319,6 @@ void GetGasAbsorberInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, Get_ErrorsFound);
 
         // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
         GlobalNames::VerifyUniqueChillerName(
@@ -514,9 +514,8 @@ void GetGasAbsorberInput(EnergyPlusData &state)
         thisChiller.SizFac = state.dataIPShortCut->rNumericArgs(17);
 
         // Validate fuel type input
-        bool FuelTypeError(false);
-        UtilityRoutines::ValidateFuelType(state, state.dataIPShortCut->cAlphaArgs(17), thisChiller.FuelType, FuelTypeError);
-        if (FuelTypeError) {
+        thisChiller.FuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, state.dataIPShortCut->cAlphaArgs(17)));
+        if (thisChiller.FuelType == Constant::eFuel::Invalid) {
             ShowSevereError(state, format("{}=\"{}\", invalid value", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17)));
             ShowContinueError(
@@ -532,6 +531,8 @@ void GetGasAbsorberInput(EnergyPlusData &state)
 
 void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
 {
+    std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
+
     SetupOutputVariable(state,
                         "Chiller Heater Evaporator Cooling Rate",
                         OutputProcessor::Unit::W,
@@ -593,7 +594,7 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         "Plant");
 
     SetupOutputVariable(state,
-                        "Chiller Heater " + this->FuelType + " Rate",
+                        format("Chiller Heater {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->FuelUseRate,
                         OutputProcessor::SOVTimeStepType::System,
@@ -601,7 +602,7 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         this->Name);
     // Do not include this on meters, this would duplicate the cool fuel and heat fuel
     SetupOutputVariable(state,
-                        "Chiller Heater " + this->FuelType + " Energy",
+                        format("Chiller Heater {} Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->FuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
@@ -609,21 +610,21 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Chiller Heater Cooling " + this->FuelType + " Rate",
+                        format("Chiller Heater Cooling {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->CoolFuelUseRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        "Chiller Heater Cooling " + this->FuelType + " Energy",
+                        format("Chiller Heater Cooling {} Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->CoolFuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        this->FuelType,
+                        sFuelType,
                         "Cooling",
                         {},
                         "Plant");
@@ -637,21 +638,21 @@ void GasAbsorberSpecs::setupOutputVariables(EnergyPlusData &state)
                         this->Name);
 
     SetupOutputVariable(state,
-                        "Chiller Heater Heating " + this->FuelType + " Rate",
+                        format("Chiller Heater Heating {} Rate", sFuelType),
                         OutputProcessor::Unit::W,
                         this->HeatFuelUseRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        "Chiller Heater Heating " + this->FuelType + " Energy",
+                        format("Chiller Heater Heating {} Energy", sFuelType),
                         OutputProcessor::Unit::J,
                         this->HeatFuelEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
                         {},
-                        this->FuelType,
+                        sFuelType,
                         "Heating",
                         {},
                         "Plant");
@@ -1397,6 +1398,58 @@ void GasAbsorberSpecs::size(EnergyPlusData &state)
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "ChillerHeater:Absorption:DirectFired");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->FuelCoolRatio);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->NomCoolingCap);
+
+        // std 229 new Chillers table
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerType, this->Name, "ChillerHeater:Absorption:DirectFired");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->NomCoolingCap);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->FuelCoolRatio);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->FuelCoolRatio); // did not find rated cap
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerRatedEff,
+                                                 this->Name,
+                                                 this->NomCoolingCap); // did not find rated eff or cop ; also Eff == COP?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                 this->Name,
+                                                 this->CWplantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+            this->Name,
+            this->CWplantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CWplantLoc.loopNum).LoopSide(this->CWplantLoc.loopSideNum).Branch(this->CWplantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                 this->Name,
+                                                 this->CDplantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            this->Name,
+            this->CDplantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CDplantLoc.loopNum).LoopSide(this->CDplantLoc.loopSideNum).Branch(this->CDplantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->MinPartLoadRat);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, Constant::eResourceNames[static_cast<int>(this->FuelType)]);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempDesCondReturn); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempDesCondReturn);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, "N/A");
+
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate, this->Name, this->DesEvapMassFlowRate);
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate, this->Name, this->DesCondMassFlowRate);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName, this->Name, "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, "N/A");
     }
 }
 

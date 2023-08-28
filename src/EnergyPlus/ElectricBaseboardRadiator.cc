@@ -218,9 +218,6 @@ namespace ElectricBaseboardRadiator {
             ElecBaseboardNumericFields(BaseboardNum).FieldNames.allocate(NumNumbers);
             ElecBaseboardNumericFields(BaseboardNum).FieldNames = "";
             ElecBaseboardNumericFields(BaseboardNum).FieldNames = state.dataIPShortCut->cNumericFieldNames;
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) {
-                continue;
-            }
 
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBaseboardName(
@@ -343,15 +340,14 @@ namespace ElectricBaseboardRadiator {
             }
 
             // Remaining fraction is added to the zone as convective heat transfer
-            Real64 AllFracsSummed = elecBaseboard.FracRadiant;
-            if (AllFracsSummed > MaxFraction) {
+            if (elecBaseboard.FracRadiant > MaxFraction) {
                 ShowWarningError(state,
                                  std::string{RoutineName} + cCurrentModuleObject + "=\"" + state.dataIPShortCut->cAlphaArgs(1) +
                                      "\", Fraction Radiant was higher than the allowable maximum.");
                 elecBaseboard.FracRadiant = MaxFraction;
                 elecBaseboard.FracConvect = 0.0;
             } else {
-                elecBaseboard.FracConvect = 1.0 - AllFracsSummed;
+                elecBaseboard.FracConvect = 1.0 - elecBaseboard.FracRadiant;
             }
 
             elecBaseboard.FracDistribPerson = state.dataIPShortCut->rNumericArgs(6);
@@ -389,9 +385,9 @@ namespace ElectricBaseboardRadiator {
             elecBaseboard.FracDistribToSurf = 0.0;
 
             elecBaseboard.ZonePtr =
-                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquip::BBElectric, elecBaseboard.EquipName);
+                DataZoneEquipment::GetZoneEquipControlledZoneNum(state, DataZoneEquipment::ZoneEquipType::BaseboardElectric, elecBaseboard.EquipName);
 
-            AllFracsSummed = elecBaseboard.FracDistribPerson;
+            Real64 AllFracsSummed = elecBaseboard.FracDistribPerson;
             for (int SurfNum = 1; SurfNum <= elecBaseboard.TotSurfToDistrib; ++SurfNum) {
                 elecBaseboard.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 3);
                 elecBaseboard.SurfacePtr(SurfNum) = HeatBalanceIntRadExchange::GetRadiantSystemSurface(
@@ -412,7 +408,7 @@ namespace ElectricBaseboardRadiator {
                     elecBaseboard.TotSurfToDistrib = MinFraction;
                 }
                 if (elecBaseboard.SurfacePtr(SurfNum) != 0) {
-                    state.dataSurface->SurfIntConvSurfGetsRadiantHeat(elecBaseboard.SurfacePtr(SurfNum)) = true;
+                    state.dataSurface->surfIntConv(elecBaseboard.SurfacePtr(SurfNum)).getsRadiantHeat = true;
                 }
 
                 AllFracsSummed += elecBaseboard.FracDistribToSurf(SurfNum);
@@ -602,13 +598,14 @@ namespace ElectricBaseboardRadiator {
             auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
             state.dataSize->DataScalableCapSizingON = false;
 
-            std::string CompType = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
-            std::string CompName = elecBaseboard.EquipName;
+            std::string_view const CompType = state.dataElectBaseboardRad->cCMO_BBRadiator_Electric;
+            std::string_view const CompName = elecBaseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = elecBaseboard.ZonePtr;
             int SizingMethod = DataHVACGlobals::HeatingCapacitySizing; // Integer representation of sizing method name (e.g., CoolingAirflowSizing)
             int FieldNum = 1;                                          // IDD numeric field number where input field description is found
-            std::string SizingString = state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
+            std::string const SizingString =
+                format("{} [W]", state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum));
             // capacity sizing methods (e.g., HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
             int CapSizingMethod = elecBaseboard.HeatingCapMethod;
             zoneEqSizing.SizingMethod(SizingMethod) = CapSizingMethod;

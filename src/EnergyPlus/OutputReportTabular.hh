@@ -613,7 +613,7 @@ namespace OutputReportTabular {
                        bool &desConditionlinepassed,
                        bool &heatingDesignlinepassed,
                        bool &coolingDesignlinepassed,
-                       bool &isKoppen,
+                       bool isKoppen,
                        bool &insideLiquidPrecipitation);
 
     void FillWeatherPredefinedEntries(EnergyPlusData &state);
@@ -1139,8 +1139,8 @@ struct OutputReportTabularData : BaseGlobalStruct
     Real64 sourceFactorElectric = 0.0;
     Real64 sourceFactorNaturalGas = 0.0;
     Real64 efficiencyDistrictCooling = 0.0;
-    Real64 efficiencyDistrictHeating = 0.0;
-    Real64 sourceFactorSteam = 0.0;
+    Real64 efficiencyDistrictHeatingWater = 0.0;
+    Real64 sourceFactorDistrictHeatingSteam = 0.0;
     Real64 sourceFactorGasoline = 0.0;
     Real64 sourceFactorDiesel = 0.0;
     Real64 sourceFactorCoal = 0.0;
@@ -1469,8 +1469,8 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->sourceFactorElectric = 0.0;
         this->sourceFactorNaturalGas = 0.0;
         this->efficiencyDistrictCooling = 0.0;
-        this->efficiencyDistrictHeating = 0.0;
-        this->sourceFactorSteam = 0.0;
+        this->efficiencyDistrictHeatingWater = 0.0;
+        this->sourceFactorDistrictHeatingSteam = 0.0;
         this->sourceFactorGasoline = 0.0;
         this->sourceFactorDiesel = 0.0;
         this->sourceFactorCoal = 0.0;

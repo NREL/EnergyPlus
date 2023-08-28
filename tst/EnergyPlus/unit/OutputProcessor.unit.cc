@@ -83,7 +83,7 @@ namespace OutputProcessor {
         Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-        std::map<int, Constant::ResourceType> ResourceTypes;             // ResourceTypes for each variable
+        Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
         Array1D_string EndUses(NumVariables);                            // EndUses for each variable
         Array1D_string Groups(NumVariables);                             // Groups for each variable
         Array1D_string Names(NumVariables);                              // Variable Names for each variable
@@ -93,10 +93,6 @@ namespace OutputProcessor {
         std::string NameOfComp = "FC-5-1B";
 
         int NumFound;
-
-        for (int varN = 1; varN <= NumVariables; ++varN) {
-            ResourceTypes.insert(std::pair<int, Constant::ResourceType>(varN, Constant::ResourceType::None));
-        }
 
         GetMeteredVariables(
             *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
@@ -1176,23 +1172,15 @@ namespace OutputProcessor {
                                                                  {"FUELOILNO2", "FuelOilNo2"},
                                                                  {"PROPANE", "Propane"},
                                                                  {"WATER", "Water"},
-                                                                 {"H2O", "Water"},
                                                                  {"ONSITEWATER", "OnSiteWater"},
-                                                                 {"WATERPRODUCED", "OnSiteWater"},
-                                                                 {"ONSITE WATER", "OnSiteWater"},
                                                                  {"MAINSWATER", "MainsWater"},
-                                                                 {"WATERSUPPLY", "MainsWater"},
                                                                  {"RAINWATER", "RainWater"},
-                                                                 {"PRECIPITATION", "RainWater"},
                                                                  {"WELLWATER", "WellWater"},
-                                                                 {"GROUNDWATER", "WellWater"},
                                                                  {"CONDENSATE", "Condensate"},
                                                                  {"ENERGYTRANSFER", "EnergyTransfer"},
-                                                                 {"ENERGYXFER", "EnergyTransfer"},
-                                                                 {"XFER", "EnergyTransfer"},
-                                                                 {"STEAM", "Steam"},
+                                                                 {"DISTRICTHEATINGSTEAM", "DistrictHeatingSteam"},
                                                                  {"DISTRICTCOOLING", "DistrictCooling"},
-                                                                 {"DISTRICTHEATING", "DistrictHeating"},
+                                                                 {"DISTRICTHEATINGWATER", "DistrictHeatingWater"},
                                                                  {"ELECTRICITYPRODUCED", "ElectricityProduced"},
                                                                  {"ELECTRICITYPURCHASED", "ElectricityPurchased"},
                                                                  {"ELECTRICITYSURPLUSSOLD", "ElectricitySurplusSold"},
@@ -1254,7 +1242,7 @@ namespace OutputProcessor {
     {
         std::map<std::string, int> const resource_map = {{"Electricity:Facility", 100},
                                                          {"NaturalGas:Facility", 101},
-                                                         {"DistricHeating:Facility", 102},
+                                                         {"DistricHeatingWater:Facility", 102},
                                                          {"DistricCooling:Facility", 103},
                                                          {"ElectricityNet:Facility", 104},
                                                          {"Electricity:Building", 201},
@@ -5293,9 +5281,9 @@ namespace OutputProcessor {
     {
         std::string const idf_objects = delimited_string({
             "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
+            "Output:Meter:MeterFileOnly,DistrictHeatingWater:HVAC,detailed;",
             "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,hourly;",
+            "Output:Meter:MeterFileOnly,DistrictHeatingWater:HVAC,hourly;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
@@ -5348,7 +5336,7 @@ namespace OutputProcessor {
                             OutputProcessor::SOVStoreType::Summed,
                             PurchAir(1).Name,
                             {},
-                            "DISTRICTHEATING",
+                            "DISTRICTHEATINGWATER",
                             "Heating",
                             {},
                             "System");
@@ -5876,7 +5864,7 @@ namespace OutputProcessor {
                                                           "CustomMeter1,               !- Name",
                                                           "Generic,                    !- Fuel Type",
                                                           ",                           !- Key Name 1",
-                                                          "DistrictHeating:Facility;   !- Variable or Meter 1 Name",
+                                                          "DistrictHeatingWater:Facility;   !- Variable or Meter 1 Name",
                                                           "Meter:Custom,",
                                                           "CustomMeter2,               !- Name",
                                                           "Generic,                    !- Fuel Type",
@@ -5894,7 +5882,7 @@ namespace OutputProcessor {
         EXPECT_FALSE(errors_found);
 
         std::string errMsg = delimited_string(
-            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATING:FACILITY\".",
+            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATINGWATER:FACILITY\".",
              "   **   ~~~   ** ...will not be shown with the Meter results.",
              "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
              "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another "

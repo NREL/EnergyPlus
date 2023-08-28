@@ -237,7 +237,7 @@ namespace DElightManagerF {
 
         // Loop through the Daylighting:Controls objects that use DElight checking for a host Zone
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+            if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
 
                 // Register Error if 0 DElight RefPts have been input for valid DElight object
                 if (znDayl.TotalDaylRefPoints == 0) {
@@ -252,8 +252,8 @@ namespace DElightManagerF {
                     ShowWarningError(state, format("Maximum of 100 Reference Points exceeded for daylighting zone using DElight ={}", znDayl.Name));
                     ShowWarningError(state, "  Only first 100 Reference Points included in DElight analysis");
                 }
-                znDayl.DaylRefPtAbsCoord.allocate(3, znDayl.TotalDaylRefPoints);
-                znDayl.DaylRefPtAbsCoord = 0.0;
+                znDayl.DaylRefPtAbsCoord.allocate(znDayl.TotalDaylRefPoints);
+                std::fill(znDayl.DaylRefPtAbsCoord.begin(), znDayl.DaylRefPtAbsCoord.end(), Vector3<Real64>(0.0));
 
                 // RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
                 znDayl.DaylIllumAtRefPt.allocate(znDayl.TotalDaylRefPoints);
@@ -273,7 +273,7 @@ namespace DElightManagerF {
         // Loop through the Daylighting:DElight objects searching for a match to the current Zone
 
         for (auto &znDayl : state.dataDaylightingData->daylightControl) {
-            if (znDayl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+            if (znDayl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
                 int const izone = UtilityRoutines::FindItemInList(znDayl.ZoneName, state.dataHeatBal->Zone);
                 if (izone != 0) {
 
@@ -489,7 +489,7 @@ namespace DElightManagerF {
                                 iHostedCFS = 0;
 
                                 // Loop through the input CFS objects searching for a match to the current Opaque Bounding Surface
-                                for (auto &cfs : state.dataDaylightingData->DElightComplexFene) {
+                                for (auto const &cfs : state.dataDaylightingData->DElightComplexFene) {
 
                                     // Does the current Opaque Bounding Surface host the current CFS object?
                                     if (surf.Name == cfs.surfName) {
@@ -595,7 +595,7 @@ namespace DElightManagerF {
                                         RefPt_WCS_Coord(2) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
                                     }
                                 }
-                                znDayl.DaylRefPtAbsCoord({1, 3}, refPt.indexToFracAndIllum) = RefPt_WCS_Coord({1, 3});
+                                znDayl.DaylRefPtAbsCoord(refPt.indexToFracAndIllum) = {RefPt_WCS_Coord(1), RefPt_WCS_Coord(2), RefPt_WCS_Coord(3)};
 
                                 // Validate that Reference Point coordinates are within the host Zone
                                 if (RefPt_WCS_Coord(1) < thisZone.MinimumX || RefPt_WCS_Coord(1) > thisZone.MaximumX) {
@@ -836,7 +836,7 @@ namespace DElightManagerF {
         // FUNCTION INFORMATION:
         //       AUTHOR         Robert J. Hitchcock
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       From UtilityRoutines::MakeUPPERCase( function by Linda K. Lawrie
+        //       MODIFIED       From UtilityRoutines::makeUPPER( function by Linda K. Lawrie
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:

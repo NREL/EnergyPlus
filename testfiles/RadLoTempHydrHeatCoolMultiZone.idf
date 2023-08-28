@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Timestep,6;
 
@@ -1692,7 +1692,7 @@
   Branch,
     Heating Purchased Hot Water Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
-    DistrictHeating,         !- Component 1 Object Type
+    DistrictHeating:Water,         !- Component 1 Object Type
     Purchased Heating,       !- Component 1 Name
     Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name
     Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name
@@ -1822,7 +1822,7 @@
 
   PlantEquipmentList,
     heating plant,           !- Name
-    DistrictHeating,         !- Equipment 1 Object Type
+    DistrictHeating:Water,         !- Equipment 1 Object Type
     Purchased Heating;       !- Equipment 1 Name
 
   Pump:VariableSpeed,
@@ -1841,7 +1841,7 @@
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
-  DistrictHeating,
+  DistrictHeating:Water,
     Purchased Heating,       !- Name
     Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name
     Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name
@@ -1989,9 +1989,9 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,District Cooling Rate,timestep;
+  Output:Variable,*,District Cooling Water Rate,timestep;
 
-  Output:Variable,*,District Heating Rate,timestep;
+  Output:Variable,*,District Heating Water Rate,timestep;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,timestep;
 

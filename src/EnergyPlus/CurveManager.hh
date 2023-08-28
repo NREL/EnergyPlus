@@ -70,6 +70,7 @@
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -249,7 +250,7 @@ namespace Curve {
 
     void BtwxtMessageCallback(Btwxt::MsgLevel messageType, std::string message, void *contextPtr);
 
-    void ResetPerformanceCurveOutput(EnergyPlusData &state);
+    void ResetPerformanceCurveOutput(const EnergyPlusData &state);
 
     Real64 CurveValue(EnergyPlusData &state,
                       int CurveIndex, // index of curve in curve array
@@ -306,9 +307,16 @@ namespace Curve {
 
     bool IsCurveOutputTypeValid(std::string const &InOutputType); // index of curve in curve array
 
+    void ShowErrorCurveDims(EnergyPlusData &state,
+                            ErrorObjectHeader const &eoh,
+                            std::string_view fieldName,
+                            std::string_view curveName,
+                            std::string_view validDims,
+                            int dim);
+
     bool CheckCurveDims(EnergyPlusData &state,
                         int CurveIndex,
-                        std::vector<int> validDims,
+                        std::vector<int> const &validDims,
                         std::string_view routineName,
                         std::string_view objectType,
                         std::string_view objectName,

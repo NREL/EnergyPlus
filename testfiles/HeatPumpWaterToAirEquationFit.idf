@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Building,                !- Name
@@ -2183,10 +2183,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Sys 1 Heat Pump Cooling Mode,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2219,8 +2215,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Sys 1 Heat Pump Heating Mode,  !- Name
@@ -2236,7 +2236,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Supply Fan 1,            !- Name
@@ -2448,10 +2449,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Sys 2 Heat Pump Cooling Mode,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 2,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2477,8 +2474,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Sys 2 Heat Pump Heating Mode,  !- Name
@@ -2494,7 +2495,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Supply Fan 2,            !- Name
@@ -2706,10 +2708,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Sys 3 Heat Pump Cooling Mode,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 3,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2735,8 +2733,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Sys 3 Heat Pump Heating Mode,  !- Name
@@ -2752,7 +2754,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Supply Fan 3,            !- Name
@@ -2964,10 +2967,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Sys 4 Heat Pump Cooling Mode,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 4,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -2993,8 +2992,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Sys 4 Heat Pump Heating Mode,  !- Name
@@ -3010,7 +3013,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Supply Fan 4,            !- Name
@@ -3222,10 +3226,6 @@
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Cooling Coil Object Type
     Sys 5 Heat Pump Cooling Mode,  !- Cooling Coil Name
     0.001,                   !- Cooling Convergence
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 5,  !- Supplemental Heating Coil Name
     50,                      !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -3251,8 +3251,12 @@
     TotCoolCapCurve,         !- Total Cooling Capacity Curve Name
     CoolSensCapCurve,        !- Sensible Cooling Capacity Curve Name
     CoolPowCurve,            !- Cooling Power Consumption Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
     0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    0;                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    2.5,                     !- Maximum Cycling Rate {cycles/hr}
+    60,                      !- Latent Capacity Time Constant {s}
+    60;                      !- Fan Delay Time {s}
 
   Coil:Heating:WaterToAirHeatPump:EquationFit,
     Sys 5 Heat Pump Heating Mode,  !- Name
@@ -3268,7 +3272,8 @@
     20.0,                    !- Rated Entering Air Dry-Bulb Temperature {C}
     1.0,                     !- Ratio of Rated Heating Capacity to Rated Cooling Capacity
     HeatCapCurve,            !- Heating Capacity Curve Name
-    HeatPowCurve;            !- Heating Power Consumption Curve Name
+    HeatPowCurve,            !- Heating Power Consumption Curve Name
+    HPACHEATPLFFPLR;         !- Part Load Fraction Correlation Curve Name
 
   Fan:OnOff,
     Supply Fan 5,            !- Name

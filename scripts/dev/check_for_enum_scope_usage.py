@@ -80,7 +80,7 @@ class EnumDeclaration:
     def __init__(self, file_path: Path, line_number: int, enum_name: str):
         self.file_path: Path = file_path
         self.line_number: int = line_number
-        self.enum_name: str = enum_name
+        self.enum_name: str = enum_name.strip()
         self.usages: List[PotentialUsage] = []
 
     def describe(self):
@@ -120,7 +120,7 @@ class SingleHeaderFile:
             enum_name = line[enum_index + 11:].strip()
 
             # find open brace, if it doesn't exist, assume it's on the next line
-            open_brace_index = line.find('{')
+            open_brace_index = enum_name.find('{')
             if open_brace_index != -1:
                 enum_name = enum_name[:open_brace_index]
 
@@ -197,10 +197,13 @@ class EnumScopeEvaluator:
             if len(e.usages) == 0:
                 apparent_enums_in_zero_source_files.append(e.describe())
             unique_files_in_usages: Set[str] = set()
-            for u in e.usages:
-                unique_files_in_usages.add(u.file_path.name)
-            if len(unique_files_in_usages) == 1:
-                apparent_enums_in_only_one_source_file.append(f"{e.describe()} in {next(iter(unique_files_in_usages))}")
+            # exceptions listed by <FILE>:<ENUM NAME>
+            exceptions = ["DataGlobalConstants.hh:ePollutant"]
+            if f"{e.file_path.name}:{e.enum_name}" not in exceptions:
+                for u in e.usages:
+                    unique_files_in_usages.add(u.file_path.name)
+                if len(unique_files_in_usages) == 1:
+                    apparent_enums_in_only_one_source_file.append(f"{e.describe()} in {next(iter(unique_files_in_usages))}")
 
         if verbose:
             print("Reporting results")

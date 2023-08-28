@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Single family House,     !- Name
@@ -1488,10 +1488,6 @@
     45.0,                    !- Maximum Supply Air Temperature {C}
     4.44444444444444,        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    2.5,                     !- Maximum Cycling Rate {cycles/hr}
-    60,                      !- Heat Pump Time Constant {s}
-    0.01,                    !- Fraction of On-Cycle Power Use
-    60,                      !- Heat Pump Fan Delay Time {s}
     0,                       !- Ancillary On-Cycle Electric Power {W}
     0,                       !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -1600,6 +1596,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
@@ -1799,6 +1796,7 @@
     -20,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     -8.8,                    !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     HPACDefrostCAPFT,        !- Defrost Energy Input Ratio Function of Temperature Curve Name
     7.22,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}

@@ -151,7 +151,6 @@ namespace ExteriorEnergyUse {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
             state.dataExteriorEnergyUse->ExteriorLights(Item).Name = state.dataIPShortCut->cAlphaArgs(1);
             state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(2));
@@ -297,7 +296,6 @@ namespace ExteriorEnergyUse {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataExteriorEnergyUse->UniqueExteriorEquipNames,
                                                      state.dataIPShortCut->cAlphaArgs(1),
@@ -458,7 +456,6 @@ namespace ExteriorEnergyUse {
                                                                      state.dataIPShortCut->lAlphaFieldBlanks,
                                                                      state.dataIPShortCut->cAlphaFieldNames,
                                                                      state.dataIPShortCut->cNumericFieldNames);
-            if (UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
             GlobalNames::VerifyUniqueInterObjectName(state,
                                                      state.dataExteriorEnergyUse->UniqueExteriorEquipNames,
                                                      state.dataIPShortCut->cAlphaArgs(1),
@@ -633,15 +630,15 @@ namespace ExteriorEnergyUse {
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Water")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::WaterUse;
             FuelTypeString = "Water";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Steam")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::SteamUse;
-            FuelTypeString = "Steam";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictCooling")) {
             FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictCoolUse;
             FuelTypeString = "DistrictCooling";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeating")) {
-            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatUse;
-            FuelTypeString = "DistrictHeating";
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeatingWater")) {
+            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatWaterUse;
+            FuelTypeString = "DistrictHeatingWater";
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "DistrictHeatingSteam")) {
+            FuelTypeNumber = ExteriorEnergyUse::ExteriorFuelUsage::DistrictHeatSteamUse;
+            FuelTypeString = "DistrictHeatingSteam";
         } else {
             ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, CurrentName));
             ShowFatalError(state, format("Heating source/fuel type not recognized. Check input field {}=\"{}", CurrentField, FuelTypeAlpha));

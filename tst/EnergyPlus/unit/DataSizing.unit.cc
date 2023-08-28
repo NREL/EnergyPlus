@@ -376,22 +376,22 @@ TEST_F(EnergyPlusFixture, OARequirements_calcDesignSpecificationOutdoorAir)
     state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
     std::string thisSpaceName = "SPACE 1A";
     int spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
-    state->dataHeatBal->space(spaceNum).floorArea = 100.0;
-    state->dataHeatBal->space(spaceNum).totOccupants = 10;
+    state->dataHeatBal->space(spaceNum).FloorArea = 100.0;
+    state->dataHeatBal->space(spaceNum).TotOccupants = 10;
     state->dataHeatBal->spaceIntGain(spaceNum).NOFOCC = 1;
     state->dataHeatBal->space(spaceNum).maxOccupants = 12;
 
     thisSpaceName = "SPACE 1B";
     spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
-    state->dataHeatBal->space(spaceNum).floorArea = 100.0;
+    state->dataHeatBal->space(spaceNum).FloorArea = 100.0;
 
     thisSpaceName = "SPACE 1C";
     spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
-    state->dataHeatBal->space(spaceNum).floorArea = 100.0;
+    state->dataHeatBal->space(spaceNum).FloorArea = 100.0;
 
     thisSpaceName = "SPACE 1D";
     spaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state->dataHeatBal->space);
-    state->dataHeatBal->space(spaceNum).floorArea = 100.0;
+    state->dataHeatBal->space(spaceNum).FloorArea = 100.0;
 
     std::string thisZoneName = "ZONE 2";
     zoneNum = UtilityRoutines::FindItemInList(thisZoneName, state->dataHeatBal->Zone);

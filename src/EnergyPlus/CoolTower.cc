@@ -184,7 +184,6 @@ namespace CoolTower {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Name = state.dataIPShortCut->cAlphaArgs(1);     // Name of cooltower
             state.dataCoolTower->CoolTowerSys(CoolTowerNum).Schedule = state.dataIPShortCut->cAlphaArgs(2); // Get schedule
             if (lAlphaBlanks(2)) {
@@ -234,7 +233,7 @@ namespace CoolTower {
 
             {
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType =
-                    static_cast<FlowCtrl>(getEnumerationValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
+                    static_cast<FlowCtrl>(getEnumValue(FlowCtrlNamesUC, state.dataIPShortCut->cAlphaArgs(5))); // Type of flow control
                 if (state.dataCoolTower->CoolTowerSys(CoolTowerNum).FlowCtrlType == FlowCtrl::Invalid) {
                     ShowSevereError(state,
                                     format("{}=\"{}\" invalid {}=\"{}\".",

@@ -252,7 +252,6 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
-        UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), state.dataIPShortCut->cCurrentModuleObject, ErrorsFound);
 
         // ErrorsFound will be set to True if problem was found, left untouched otherwise
         GlobalNames::VerifyUniqueChillerName(state,
@@ -445,8 +444,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                                                "Condenser (unknown?) Nodes");
         }
 
-        thisChiller.FlowMode =
-            static_cast<DataPlant::FlowMode>(getEnumerationValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+        thisChiller.FlowMode = static_cast<DataPlant::FlowMode>(getEnumValue(DataPlant::FlowModeNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
         if (thisChiller.FlowMode == DataPlant::FlowMode::Invalid) {
             ShowSevereError(state,
                             format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
@@ -1645,6 +1643,10 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
     } // Heat recovery active
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+
+        Real64 IPLVSI_rpt_std229 = 0.0;
+        Real64 IPLVIP_rpt_std229 = 0.0;
+
         if (this->IPLVFlag) {
             Real64 IPLVSI = 0.0;
             Real64 IPLVIP = 0.0;
@@ -1663,12 +1665,79 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
                                              ObjexxFCL::Optional<const Real64>(),
                                              ObjexxFCL::Optional_int_const(),
                                              ObjexxFCL::Optional<const Real64>());
+
+            IPLVSI_rpt_std229 = IPLVSI;
+            IPLVIP_rpt_std229 = IPLVIP;
+
             this->IPLVFlag = false;
         }
         // create predefined report
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechType, this->Name, "Chiller:Electric:EIR");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomEff, this->Name, this->RefCOP);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->RefCap);
+
+        // std 229 new Chillers table
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerType, this->Name, "Chiller:Electric:EIR");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefCap, this->Name, this->RefCap);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEff, this->Name, this->RefCOP); // Eff == COP?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedCap, this->Name, this->RefCap); // did not find rated cap
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEff, this->Name, this->RefCOP); // did not find rated eff or cop ; also Eff == COP?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinSI, this->Name, IPLVSI_rpt_std229);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerIPLVinIP, this->Name, IPLVIP_rpt_std229);
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerPlantloopName,
+                                                 this->Name,
+                                                 this->CWPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerPlantloopBranchName,
+            this->Name,
+            this->CWPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).Branch(this->CWPlantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerCondLoopName,
+                                                 this->Name,
+                                                 this->CDPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerCondLoopBranchName,
+            this->Name,
+            this->CDPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).LoopSide(this->CDPlantLoc.loopSideNum).Branch(this->CDPlantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerMinPLR, this->Name, this->ChillerEIRFPLRMin);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerFuelType, this->Name, "Electricity");
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedEntCondTemp, this->Name, this->TempRefCondIn); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRatedLevEvapTemp, this->Name, this->TempRefEvapOut); // Rated==Ref?
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefEntCondTemp, this->Name, this->TempRefCondIn);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchChillerRefLevEvapTemp, this->Name, this->TempRefEvapOut);
+
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCHWFlowRate,
+                                                 this->Name,
+                                                 this->EvapMassFlowRateMax); // flowrate Max==DesignSizeRef flowrate?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerDesSizeRefCondFluidFlowRate,
+                                                 this->Name,
+                                                 this->CondMassFlowRateMax); // Cond flowrate Max==DesignSizeRef Cond flowrate?
+        OutputReportPredefined::PreDefTableEntry(state,
+                                                 state.dataOutRptPredefined->pdchChillerHeatRecPlantloopName,
+                                                 this->Name,
+                                                 this->HRPlantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).Name : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchChillerHeatRecPlantloopBranchName,
+            this->Name,
+            this->HRPlantLoc.loopNum > 0
+                ? state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).LoopSide(this->HRPlantLoc.loopSideNum).Branch(this->HRPlantLoc.branchNum).Name
+                : "N/A");
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchChillerRecRelCapFrac, this->Name, this->HeatRecCapacityFraction);
     }
 
     if (ErrorsFound) {

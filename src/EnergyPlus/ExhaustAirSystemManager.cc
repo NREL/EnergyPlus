@@ -124,7 +124,7 @@ namespace ExhaustAirSystemManager {
                 ++exhSysNum;
                 auto const &objectFields = instance.value();
                 auto &thisExhSys = state.dataZoneEquip->ExhaustAirSystem(exhSysNum);
-                thisExhSys.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                thisExhSys.Name = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string zoneMixerName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_mixer_name");
@@ -156,7 +156,7 @@ namespace ExhaustAirSystemManager {
 
                 std::string centralFanType = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type");
                 int centralFanTypeNum = 0;
-                // getEnumerationValue()?
+                // getEnumValue()?
 
                 if (UtilityRoutines::SameString(centralFanType, "Fan:SystemModel")) {
                     centralFanTypeNum = DataHVACGlobals::FanType_SystemModelObject;
@@ -366,7 +366,7 @@ namespace ExhaustAirSystemManager {
 
         if (thisExhSys.CentralFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _, _, _);
+            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _);
 
             // Update report variables
             outletNode_Num = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->outletNodeNum;
@@ -474,7 +474,7 @@ namespace ExhaustAirSystemManager {
                 ++exhCtrlNum;
                 auto const &objectFields = instance.value();
                 auto &thisExhCtrl = state.dataZoneEquip->ZoneExhaustControlSystem(exhCtrlNum);
-                thisExhCtrl.Name = UtilityRoutines::MakeUPPERCase(instance.key());
+                thisExhCtrl.Name = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
 
                 std::string availSchName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "availability_schedule_name");
@@ -533,10 +533,10 @@ namespace ExhaustAirSystemManager {
                 thisExhCtrl.DesignExhaustFlowRate = designExhaustFlowRate;
 
                 std::string flowControlTypeName =
-                    UtilityRoutines::MakeUPPERCase(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type"));
-                // std::string flowControlTypeName = UtilityRoutines::MakeUPPERCase(fields.at("flow_control_type").get<std::string>());
+                    UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "flow_control_type"));
+                // std::string flowControlTypeName = UtilityRoutines::makeUPPER(fields.at("flow_control_type").get<std::string>());
                 thisExhCtrl.FlowControlOption =
-                    static_cast<ZoneExhaustControl::FlowControlType>(getEnumerationValue(flowControlTypeNamesUC, flowControlTypeName));
+                    static_cast<ZoneExhaustControl::FlowControlType>(getEnumValue(flowControlTypeNamesUC, flowControlTypeName));
 
                 std::string exhaustFlowFractionScheduleName =
                     ip->getAlphaFieldValue(objectFields, objectSchemaProps, "exhaust_flow_fraction_schedule_name");

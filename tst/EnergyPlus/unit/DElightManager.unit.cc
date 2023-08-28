@@ -71,7 +71,7 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DElightManagerF;
-using namespace EnergyPlus::DataDaylighting;
+using namespace EnergyPlus::Dayltg;
 
 TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Test)
 {

@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Building,                !- Name
@@ -2744,10 +2744,6 @@
     80,                      !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -2893,6 +2889,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     DX Clg Coil Performance, !- Name
     0.0,                     !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
