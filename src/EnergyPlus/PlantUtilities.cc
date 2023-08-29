@@ -62,6 +62,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus::PlantUtilities {
@@ -1023,6 +1024,10 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
             state.dataLoopNodes->Node(OutletNodeNum).Temp =
                 state.dataLoopNodes->Node(InletNodeNum).Temp + ModelCondenserHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
         }
+        // see 10133
+        // state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
+        //    state.dataLoopNodes->Node(InletNodeNum)
+        //        .MassFlowRate; // if condenser is on inlet branch, the outlet node needs to be updated or can get splitter/mixer failures
 
         // set sim flag for this loop
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
@@ -1030,7 +1035,10 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
         // set sim flag on connected loops to true because this side changed
         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected > 0) {
             for (ConnectLoopNum = 1; ConnectLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected; ++ConnectLoopNum) {
+                // see 10133
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopDemandsOnRemote) {
+                    // full chiller model is not really run when called from the condenser side and the chiller evap loop puts demand on the condenser
+                    // loop, so this logic is flawed, remove if statement so evap side gets simulated again
                     OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopNum;
                     OtherLoopSide = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopSideNum;
                     state.dataPlnt->PlantLoop(OtherLoopNum).LoopSide(OtherLoopSide).SimLoopSideNeeded = true;
@@ -1109,6 +1117,10 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
             state.dataLoopNodes->Node(OutletNodeNum).Temp =
                 state.dataLoopNodes->Node(InletNodeNum).Temp + ModelRecoveryHeatRate / (state.dataLoopNodes->Node(InletNodeNum).MassFlowRate * Cp);
         }
+        // see 10133
+        // state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate =
+        //    state.dataLoopNodes->Node(InletNodeNum).MassFlowRate; // if heat recovery bundle is on inlet branch, the mass flow needs to be
+        //// updated or get splitter/mixer failures
 
         // set sim flag for this loop
         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).SimLoopSideNeeded = true;
@@ -1116,7 +1128,10 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
         // set sim flag on connected loops to true because this side changed
         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected > 0) {
             for (ConnectLoopNum = 1; ConnectLoopNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).TotalConnected; ++ConnectLoopNum) {
+                // see 10133
                 if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopDemandsOnRemote) {
+                    // full chiller model is not really run when called from the heat recovery side and the chiller evap loop puts demand on the heat
+                    // recovery loop, so this logic is flawed, remove if statement so evap side gets simulated again
                     OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopNum;
                     OtherLoopSide = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide).Connected(ConnectLoopNum).LoopSideNum;
                     state.dataPlnt->PlantLoop(OtherLoopNum).LoopSide(OtherLoopSide).SimLoopSideNeeded = true;
@@ -1619,7 +1634,8 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
                              ObjexxFCL::Optional<Real64 const> HighLimitTemp,
                              ObjexxFCL::Optional_int CountMatchPlantLoops,
                              ObjexxFCL::Optional_int_const InletNodeNumber,
-                             ObjexxFCL::Optional_int_const SingleLoopSearch)
+                             ObjexxFCL::Optional_int_const SingleLoopSearch,
+                             ObjexxFCL::Optional_bool_const suppressErrors)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1704,7 +1720,12 @@ void ScanPlantLoopsForObject(EnergyPlusData &state,
         }
     }
 
-    if (!FoundComponent) {
+    bool skipErrors = false;
+    if (present(suppressErrors)) {
+        skipErrors = suppressErrors;
+    }
+
+    if (!FoundComponent && !skipErrors) {
         if (CompType != DataPlant::PlantEquipmentType::Invalid && CompType != DataPlant::PlantEquipmentType::Num) {
             if (!present(SingleLoopSearch)) {
                 ShowSevereError(state,
@@ -1908,8 +1929,8 @@ void ShowBranchesOnLoop(EnergyPlusData &state, int const LoopNum) // Loop number
 }
 
 int MyPlantSizingIndex(EnergyPlusData &state,
-                       std::string const &CompType,           // component description
-                       std::string_view CompName,             // user name of component
+                       std::string_view const CompType,       // component description
+                       std::string_view const CompName,       // user name of component
                        int const NodeNumIn,                   // component water inlet node
                        [[maybe_unused]] int const NodeNumOut, // component water outlet node
                        bool &ErrorsFound,                     // set to true if there's an error, unchanged otherwise
@@ -1997,6 +2018,56 @@ bool verifyTwoNodeNumsOnSamePlantLoop(EnergyPlusData &state, int const nodeIndex
         }
     }
     return (matchedIndexA == matchedIndexB) && (matchedIndexA != 0); // only return true if both are equal and non-zero
+}
+
+Real64
+MinFlowIfBranchHasVSPump(EnergyPlusData &state, PlantLocation const &plantLoc, bool &foundBranchPump, bool &foundLoopPump, bool const setFlowStatus)
+{
+    Real64 branchPumpMinFlowLimit = 0.0;
+
+    int NumCompsOnThisBranch = state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).TotalComponents;
+    for (int CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter) {
+        auto &component(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Comp(CompCounter));
+        if (component.Type == DataPlant::PlantEquipmentType::PumpVariableSpeed ||
+            component.Type == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
+            foundBranchPump = true;
+            if (component.CompNum > 0) branchPumpMinFlowLimit = state.dataPumps->PumpEquip(component.CompNum).MassFlowRateMin;
+            break;
+        }
+    }
+
+    if (!foundBranchPump) {
+        // second, if no branch pump, search for variable speed pump on inlet branch of supply side of this loop
+        int NumCompsOnInletBranch =
+            state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents;
+        for (int CompCounter = 1; CompCounter <= NumCompsOnInletBranch; ++CompCounter) {
+            auto &component(state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(CompCounter));
+            if (component.Type == DataPlant::PlantEquipmentType::PumpVariableSpeed ||
+                component.Type == DataPlant::PlantEquipmentType::PumpBankVariableSpeed) {
+                foundLoopPump = true;
+                if (component.CompNum > 0) branchPumpMinFlowLimit = state.dataPumps->PumpEquip(component.CompNum).MassFlowRateMin;
+                break;
+            }
+        }
+    }
+
+    if (setFlowStatus) {
+        if (branchPumpMinFlowLimit > 0.0 && foundBranchPump) {
+            state.dataPlnt->PlantLoop(plantLoc.loopNum)
+                .LoopSide(plantLoc.loopSideNum)
+                .Branch(plantLoc.branchNum)
+                .Comp(plantLoc.compNum)
+                .FlowPriority = DataPlant::LoopFlowStatus::NeedyIfLoopOn;
+        } else {
+            state.dataPlnt->PlantLoop(plantLoc.loopNum)
+                .LoopSide(plantLoc.loopSideNum)
+                .Branch(plantLoc.branchNum)
+                .Comp(plantLoc.compNum)
+                .FlowPriority = DataPlant::LoopFlowStatus::TakesWhatGets;
+        }
+    }
+
+    return branchPumpMinFlowLimit;
 }
 
 } // namespace EnergyPlus::PlantUtilities

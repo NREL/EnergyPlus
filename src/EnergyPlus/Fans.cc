@@ -570,7 +570,7 @@ void GetFanInput(EnergyPlusData &state)
         }
 
         if (NumAlphas > 6 && !lAlphaFieldBlanks(7)) {
-            thisFan.AvailManagerMode = static_cast<AvailabilityManagerCoupling>(getEnumerationValue(couplingsUC, cAlphaArgs(7)));
+            thisFan.AvailManagerMode = static_cast<AvailabilityManagerCoupling>(getEnumValue(couplingsUC, cAlphaArgs(7)));
             if (thisFan.AvailManagerMode == AvailabilityManagerCoupling::Invalid) {
                 ShowSevereError(state,
                                 format("{}{}: invalid {} entered ={} for {}={}",
@@ -1439,6 +1439,20 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorIn, fan.FanName, fan.MotInAirFrac);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEndUse, fan.FanName, fan.EndUseSubcategoryName);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanEnergyIndex, fan.FanName, fan.DesignPointFEI);
+
+    // Std 229 Fans (Fans.cc)
+    OutputReportPredefined::PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchFanPurpose, fan.FanName, "N/A"); // fan.FanType); // purpose? not the same
+    OutputReportPredefined::PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchFanAutosized,
+                                             fan.FanName,
+                                             fan.MaxAirFlowRateIsAutosizable ? "Yes" : "No"); // autosizable vs. autosized equivalent?
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, fan.FanName, fan.MotEff);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, fan.FanName, fan.MotInAirFrac);
+    OutputReportPredefined::PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchFanAirLoopName,
+                                             fan.FanName,
+                                             fan.AirLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(fan.AirLoopNum).Name : "N/A");
 
     if (fan.NVPerfNum > 0) {
         if (state.dataFans->NightVentPerf(fan.NVPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {

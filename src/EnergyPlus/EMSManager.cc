@@ -221,8 +221,9 @@ namespace EMSManager {
             state.dataGlobal->AnyEnergyManagementSystemInModel = false;
         }
 
+        // turn on EMS capability if we are running with an external HVAC manager or via API
         state.dataGlobal->AnyEnergyManagementSystemInModel =
-            state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager;
+            state.dataGlobal->AnyEnergyManagementSystemInModel || state.dataGlobal->externalHVACManager || state.dataGlobal->eplusRunningViaAPI;
 
         if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
 
@@ -855,7 +856,7 @@ namespace EMSManager {
                 state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).Name = cAlphaArgs(1);
 
                 state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint =
-                    static_cast<EMSCallFrom>(getEnumerationValue(EMSCallFromNamesUC, UtilityRoutines::MakeUPPERCase(cAlphaArgs(2))));
+                    static_cast<EMSCallFrom>(getEnumValue(EMSCallFromNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(2))));
                 ErrorsFound = ErrorsFound || (state.dataRuntimeLang->EMSProgramCallManager(CallManagerNum).CallingPoint == EMSCallFrom::Invalid);
 
                 int NumErlProgramsThisManager = NumAlphas - 2; // temporary size of Erl programs in EMSProgramCallManager
@@ -1619,6 +1620,21 @@ namespace EMSManager {
         return FoundControl;
     }
 
+    bool isScheduleManaged(EnergyPlusData &state, int const scheduleNum)
+    {
+        // Check if a specific schedule has an EMS or External Interface actuator assigned to it
+        static constexpr std::string_view cControlTypeName = "SCHEDULE VALUE";
+        std::string_view cSchedName = state.dataScheduleMgr->Schedule(scheduleNum).Name;
+
+        for (int Loop = 1; Loop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++Loop) {
+            if ((UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(Loop).UniqueIDName, cSchedName)) &&
+                (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(Loop).ControlTypeName, cControlTypeName))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void checkSetpointNodesAtEnd(EnergyPlusData &state)
     {
 
@@ -2084,9 +2100,9 @@ void SetupEMSActuator(EnergyPlusData &state,
     // push size of ActuatorVariable and add a new one.
     //  check for duplicates.
 
-    std::string const UpperCaseObjectType(UtilityRoutines::MakeUPPERCase(cComponentTypeName));
-    std::string const UpperCaseObjectName(UtilityRoutines::MakeUPPERCase(cUniqueIDName));
-    std::string const UpperCaseActuatorName(UtilityRoutines::MakeUPPERCase(cControlTypeName));
+    std::string const UpperCaseObjectType(UtilityRoutines::makeUPPER(cComponentTypeName));
+    std::string const UpperCaseObjectName(UtilityRoutines::makeUPPER(cUniqueIDName));
+    std::string const UpperCaseActuatorName(UtilityRoutines::makeUPPER(cControlTypeName));
 
     DataRuntimeLanguage::EMSActuatorKey const key(UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName);
 
@@ -2135,9 +2151,9 @@ void SetupEMSActuator(EnergyPlusData &state,
     // push size of ActuatorVariable and add a new one.
     //  check for duplicates.
 
-    std::string const UpperCaseObjectType(UtilityRoutines::MakeUPPERCase(cComponentTypeName));
-    std::string const UpperCaseObjectName(UtilityRoutines::MakeUPPERCase(cUniqueIDName));
-    std::string const UpperCaseActuatorName(UtilityRoutines::MakeUPPERCase(cControlTypeName));
+    std::string const UpperCaseObjectType(UtilityRoutines::makeUPPER(cComponentTypeName));
+    std::string const UpperCaseObjectName(UtilityRoutines::makeUPPER(cUniqueIDName));
+    std::string const UpperCaseActuatorName(UtilityRoutines::makeUPPER(cControlTypeName));
 
     DataRuntimeLanguage::EMSActuatorKey const key(UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName);
 
@@ -2186,9 +2202,9 @@ void SetupEMSActuator(EnergyPlusData &state,
     // push size of ActuatorVariable and add a new one.
     //  check for duplicates.
 
-    std::string const UpperCaseObjectType(UtilityRoutines::MakeUPPERCase(cComponentTypeName));
-    std::string const UpperCaseObjectName(UtilityRoutines::MakeUPPERCase(cUniqueIDName));
-    std::string const UpperCaseActuatorName(UtilityRoutines::MakeUPPERCase(cControlTypeName));
+    std::string const UpperCaseObjectType(UtilityRoutines::makeUPPER(cComponentTypeName));
+    std::string const UpperCaseObjectName(UtilityRoutines::makeUPPER(cUniqueIDName));
+    std::string const UpperCaseActuatorName(UtilityRoutines::makeUPPER(cControlTypeName));
 
     DataRuntimeLanguage::EMSActuatorKey const key(UpperCaseObjectType, UpperCaseObjectName, UpperCaseActuatorName);
 

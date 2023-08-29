@@ -148,10 +148,10 @@ namespace HeatBalanceIntRadExchange {
                   Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     );
 
-    void CalcFp(int const N,            // Number of surfaces
-                Array1D<Real64> &EMISS, // VECTOR OF SURFACE EMISSIVITIES
-                Array1D<Real64> &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1D<Real64> &Fp     // VECTOR OF OPPENHEIM RESISTNACE VALUES
+    void CalcFp(int const N,                  // Number of surfaces
+                Array1D<Real64> const &EMISS, // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> const &FMRT,  // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp           // VECTOR OF OPPENHEIM RESISTNACE VALUES
     );
 
     void CalcMatrixInverse(Array2<Real64> &A, // Matrix: Gets reduced to L\U form

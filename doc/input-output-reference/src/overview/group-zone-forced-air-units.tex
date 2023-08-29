@@ -146,7 +146,7 @@ The latent heat recovery effectiveness, where effectiveness is defined as the ch
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-000}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Heating Air Flow Rate and Maximum Cooling Air Flow Rate in a Ideal Load Air System zone HVAC object. The scaled maximum heating and cooling air flow rates are used to size the heating and cooling capacities.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Heating Air Flow Rate and Maximum Cooling Air Flow Rate in a Ideal Load Air System zone HVAC object. The scaled maximum heating and cooling air flow rates are used to size the heating and cooling capacities.
 
 An example of this object in an IDF is:
 
@@ -726,7 +726,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-1}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Four Pipe FanCoil zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 \paragraph{Field: Supply Air Fan Operating Mode Schedule Name}\label{field-supply-air-fan-operating-mode-schedule-name-000}
 
@@ -994,7 +994,7 @@ This field contains a schedule name (ref: Schedule) that should contain values f
 
 \paragraph{Field: Maximum Outdoor Air Flow Rate}\label{field-maximum-outdoor-air-flow-rate-1-000}
 
-This field allows the user to enter the maximum volumetric flow rate of outdoor air that can be brought into the unit ventilator system in m\(^{3}\)/sec.~This parameter should be some real number greater than zero. Note that the value for this parameter may be less than the maximum air flow rate of the unit ventilator and this may affect the maximum fraction of outdoor air within the control strategy defined above. This parameter is an absolute maximum and will supercede any scheduled fraction of the unit ventilator maximum airflow rate. If ``FixedAmount'' type is selected as the outdoor air control strategy, this field will be ignored and be automatically set to be equal to the minimum outdoor air flow rate specified in the field above.
+This field allows the user to enter the maximum volumetric flow rate of outdoor air that can be brought into the unit ventilator system in m\(^{3}\)/sec.~This parameter should be some real number greater than zero. Note that the value for this parameter may be less than the maximum air flow rate of the unit ventilator and this may affect the maximum fraction of outdoor air within the control strategy defined above. This parameter is an absolute maximum and will supersede any scheduled fraction of the unit ventilator maximum airflow rate. If ``FixedAmount'' type is selected as the outdoor air control strategy, this field will be ignored and be automatically set to be equal to the minimum outdoor air flow rate specified in the field above.
 
 \paragraph{Field: Maximum Outdoor Air Fraction or Temperature Schedule Name}\label{field-maximum-outdoor-air-fraction-or-temperature-schedule-name-000}
 
@@ -1113,7 +1113,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-2}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Unit Ventilator zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Unit Ventilator zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 An example input for a unit ventilator, including its constituent components, is shown below.
 
@@ -1365,7 +1365,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-3}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields \emph{Maximum Supply Air Flow Rate} in this Unit Heater zone HVAC object. The scaled maximum supply air flow rates is used to size Maximum Hot Water or Steam Flow Rate if specified as autosize. The scaled Maximum Air Flow Rate in turn is used to size heating capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields \emph{Maximum Supply Air Flow Rate} in this Unit Heater zone HVAC object. The scaled maximum supply air flow rates is used to size Maximum Hot Water or Steam Flow Rate if specified as autosize. The scaled Maximum Air Flow Rate in turn is used to size heating capacity of the unit.
 
 An example input for a unit heater, including its constituent components, is shown below.
 
@@ -1545,7 +1545,13 @@ This optional alpha input field defines the user-defined name of the second evap
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-4}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object defined elsewhere. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input field \emph{Design Supply Air Flow Rate} in Evaportaive Cooler zone HVAC object. The scaled design supply air flow rates in turn is used to size capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object defined elsewhere. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input field \emph{Design Supply Air Flow Rate} in Evaporative Cooler zone HVAC object. The scaled design supply air flow rates in turn is used to size capacity of the unit.
+
+\paragraph{Field: Shut Off Relative Humidity}\label{shut-off-relative-humidity}
+
+This is an optional field. When the relative humidity of the zone is above this
+threshold, the evaporative cooler is shut off. This intends to prevent direct
+evaporative coolers from adding too much moisture into the zone.
 
 An example input object follows.
 
@@ -1998,7 +2004,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-5}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Window Air Conditioner zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Window Air Conditioner zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling capacity of the unit.
 
 Following is an example input for the cycling window air conditioner, along with its constituent components.
 
@@ -2272,7 +2278,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-6}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner~ zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Packaged Terminal Air Conditioner~ zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-2}
 
@@ -2660,7 +2666,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-7}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this PTHP zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-3}
 
@@ -2980,6 +2986,10 @@ For this zone heat pump,there are two types of WaterToAirHeatPump coil model all
   \hyperref[coilheatingwatertoairheatpumpvariablespeedequationfit]{Coil:Heating:WaterToAirHeat\hyperref[pumpvariablespeed]{Pump:VariableSpeed}EquationFit}
 \end{itemize}
 
+When the inputs of the last two fields (Design Specification Multispeed Object Type and Design Specification Multispeed Fan Object Name) are entered, a multiuspeed fan with different air flow rates is applied.  The fan speed number is determined by zone load. The fan air flow cycles between adjacent speeds based on the cooling / heating capacity (or coordinate with the cooling / heating coil stage for variable speed water to air coils). When Coil:Cooling:WaterToAirHeatPump:EquationFit and Coil:Heating:WaterToAirHeatPump:EquationFit are used, the water flow rate in the coils remain the same.
+
+When there are no inputs of the last two fields, a multispeed fan may be also applied if the Fan:SysmModel is selected as fan type, and Discrete is selected as Speed Control Method and the Number of Speeds is greater than 1 in the Fan:SystemMode object. 
+
 \begin{figure}[hbtp] % fig 113
 \centering
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image288.png}
@@ -3048,6 +3058,8 @@ This numeric field defines the outdoor air flow rate through the heat pump in cu
 
 This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanonoff]{Fan:OnOff}.
 
+If Fan:SystemModel is entered and there are no inputs of last two fields: Design Specification Multispeed Object Type and Design Specification Multispeed Object Name, a multispeed fan may be also applied if the input of Number Of Speed in the Fan:SystemModel is greater than 1.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-6}
 
 This alpha field contains the identifying name given to the heat pump supply air fan, and should match the name specified in the corresponding fan object.
@@ -3100,7 +3112,7 @@ This numeric field contains the fraction of on-cycle power use to adjust the par
 
 \paragraph{Field: Heat Pump Fan Delay Time}\label{field-heat-pump-fan-delay-time-001}
 
-This numeric field contains the time delay in seconds for the heat pump supply air fan to shut off after compressor cycle off. This value can be obtained from the manufacturer or the heat pump catalog. Suggested value is 60 seconds. This value is disregared at times when the WaterToAirHeatPump's fan operating mode schedule value is greater than 0 (i.e., continuous fan mode).
+This numeric field contains the time delay in seconds for the heat pump supply air fan to shut off after compressor cycle off. This value can be obtained from the manufacturer or the heat pump catalog. Suggested value is 60 seconds. This value is disregarded at times when the WaterToAirHeatPump's fan operating mode schedule value is greater than 0 (i.e., continuous fan mode).
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-1-000}
 
@@ -3175,7 +3187,7 @@ This field specifies the way in which water flow through the heat pump coils wil
   CyclingOnDemand
 \end{itemize}
 
-\textbf{Cycling} varies water flow through the coil based on the heat pump Part Load Ratio. This control method is appropriate for modeling heat pumps that are outfitted with a soleniod valve which allows water to flow through the coil only when the compressor is active. This is the default for EnergyPlus V8 and later.
+\textbf{Cycling} varies water flow through the coil based on the heat pump Part Load Ratio. This control method is appropriate for modeling heat pumps that are outfitted with a solenoid valve which allows water to flow through the coil only when the compressor is active. This is the default for EnergyPlus V8 and later.
 
 \textbf{Constant} provides a constant water flow regardless of heat pump operation. Remember that EnergyPlus has two coils (a heating coil and a cooling coil) to approximate the operation of one coil that can operate in either heating mode or cooling mode. Therefore, when the water flow mode is constant, there will be full flow through either the heating coil or the cooling coil, but not both at the same time.
 
@@ -3183,7 +3195,21 @@ This field specifies the way in which water flow through the heat pump coils wil
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-8}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this Water To Air Heat Pump zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+
+\paragraph{Field: Design Specification Multispeed Object Type}\label{field-design-specification-multispeed-object-type-2}
+
+This optional alpha field contains the identifying type for the design specification multispeed object. This field is only needed when multispeed fan is applied. The only available type is:
+
+\begin{itemize}
+\tightlist
+\item
+  \hyperref[unitarysystemperformancemultispeed]{UnitarySystemPerformance:Multispeed}
+\end{itemize}
+ 
+\paragraph{Field: Design Specification Multispeed Object Name}\label{field-design-specification-multispeed-object-name-2}
+
+This optional alpha field contains the identifying name for the design specification multispeed object. This field is only needed when multispeed fan is applied.
 
 Examples of IDF use:
 
@@ -3208,10 +3234,6 @@ ZoneHVAC:WaterToAirHeatPump,
   Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
   Coil:Cooling:WaterToAirHeatPump:EquationFit, !- Cooling Coil Object Type
   Sys 1 Heat Pump Cooling Mode, !- Cooling Coil Name
-  2.5,                      !- Maximum Cycling Rate
-  60.0,                     !- Heat Pump Time Constant
-  0.01,                     !- Fraction of On-Cycle Power Use
-  60,                       !- Heat Pump Fan Delay Time
   Coil:Heating:Fuel,         !- Supplemental Heating Coil Object Type
   Heat Pump DX Supp Heating Coil 1, !- Supplemental Heating Coil Name
   60.0,                  !- Maximum Supply Air Temperature from Supplemental Heater {C}
@@ -3330,6 +3352,12 @@ ZoneHVAC:WaterToAirHeatPump,
   HVAC,Average,Zone Water to Air Heat Pump Compressor Part Load Ratio {[]}
 \item
   HVAC,Average,Zone Water to Air Heat Pump Fan Availability Status {[]}
+\item
+  HVAC,Average,Unitary System Water Coil Multispeed Fan Cycling Ratio {[]}
+\item
+  HVAC,Average,Unitary System Water Coil Multispeed Fan Speed Ratio {[]}
+\item
+  HVAC,Average,Unitary System Water Coil Multispeed Fan Speed Level {[]}
 \end{itemize}
 
 \paragraph{Zone Water to Air Heat Pump Total Heating Rate {[}W{]}}\label{zone-water-to-air-heat-pump-total-heating-rate-w}
@@ -3399,6 +3427,18 @@ This output field is the part-load ratio of the compressor used by the DX coils 
 \paragraph{Zone Water to Air Heat Pump Fan Availability Status {[]}}\label{zone-water-to-air-heat-pump-fan-availability-status}
 
 This is the availability status of the zone water source heat pump~ fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the zone water source heat pump~ object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List (with or without Hybrid Ventilation Manager), rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
+
+\paragraph{Unitary System Water Coil Multispeed Fan Cycling Ratio {[]}}\label{unitary-system-water-coil-multispeed-fan-cycling-ratio}
+
+This output variable is only available with a multispeed fan of zone water source heat pump. It is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the zone water source heat pump heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the zone water source heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the zone water source heat pump operates at speeds above 1.
+
+\paragraph{Unitary System Water Coil Multispeed Fan Speed Ratio {[]}}\label{unitary-system-water-coil-multispeed-fan-speed-ratio}
+
+This output variable is only available with a multispeed fan of zone water source heat pump. It is the ratio of time in a system timestep that the fan is at rated speed between two consecutive speed numbers ( [Fanr Speed - Fan speed at Speed i-1] / Fan speed at Speed i - Fan speed at Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
+
+\paragraph{Unitary System Water Coil Multispeed Fan Speed Level {[]}}\label{unitary-system-water-coil-multispeed-fan-speed-level}
+
+This output variable is only available with a multispeed fan of zone water source heat pump. It ts the maximum speed needed when the zone water source heat pump operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the zone water source heat pump operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the zone water source heat pump operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the zone water source heat pump operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a multiple speed fan.
 
 \subsection{ZoneHVAC:Dehumidifier:DX}\label{zonehvacdehumidifierdx}
 
@@ -3814,7 +3854,7 @@ ZoneHVAC:EnergyRecoveryVentilator,
 
 
   SetpointManager:Scheduled,
-      Heat Exhchanger Supply Air Temp Manager,  !- Name
+      Heat Exchanger Supply Air Temp Manager,  !- Name
       Temperature,  !- Control variable
       Heat Exchanger Supply Air Temp Sch,  !- Schedule Name
       Heat Exchanger Supply Air Nodes;     !- Name of the set point Node List
@@ -3924,6 +3964,11 @@ This is the availability status of the Stand Alone ERV~ fan. This status flag is
 
 Terminal units with variable refrigerant flow compound HVAC object are used exclusively with variable refrigerant flow (VRF) air conditioning systems (Ref. \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} objects). The VRF terminal unit may be used as zone, air loop or outside air system equipment. The VRF terminal unit compound object contains an optional outdoor air mixer, a DX cooling coil, a DX heating coil, a supply fan (optional for air loop and outdoor air system equipment), and an optional supplemental heating coil object.
 
+When the inputs of the last two fields (Design Specification Multispeed Object Type and Design Specification Multispeed Fan Object Name) are entered, a multiuspeed fan with different air flow rates is applied to Coil:Cooling:DX:VariableRefrigerantFlow and Coil:Heating:DX:VariableRefrigerantFlow.  The fan speed number is determined by zone load. The fan air flow cycles between adjacent speeds based on the cooling / heating capacity (or coordinate with the cooling / heating coil stage for variable speed water to air coils). However, the water flow rate in the coils remain the same while air flow rate varies with speed.
+
+When there are no inputs of the last two fields, a multispeed fan may be also applied if the Fan:SysmModel is selected as fan type, and Discrete is selected as Speed Control Method and the Number of Speeds is greater than 1 in the Fan:SystemMode object. 
+
+
 \begin{callout}
 Note: The terminal unit may be used in the air loop and/or outdoor air system, however, at this time only constant flow (or limited variation within the limits allowed for DX coils) through the unit is allowed. Using a wide range of outdoor air flow rates will cause the DX coil model to fail. For example, if the minimum outdoor air flow rate is allowed to fall near 0, the DX coil model will calculate very low, even very negative, coil outlet temperatures. This can cause psychrometric warnings to occur and cause the simulation to end prematurely.
 \end{callout}
@@ -3932,11 +3977,13 @@ For zone equipment the terminal units are connected to a zone using the inlet an
 
 For air loop equipment and outdoor air system equipment the VRF terminal unit inlet and outlet nodes define the location of the system in the air loop and outdoor air system. The node names must define the path of the air stream in order from the beginning of the air loop or outdoor air system to the outlet of that system.
 
-This VRF terminal unit can be controlled based on a load or set point. When the system is used as zone equipment, load control is always used. When the VRF terminal unit is used in an air loop and the control zone name or thermostat location is specified, the system is controlled based on zone load. If the control zone name or thermostat location is not specified the VRF terminal unit will be controlled based on termninal unit or coil outlet node set point temperature. When set point based control is used the node temperature set points may be placed at the outlet of the terminal unit or at individual coil outlet nodes. If the VRF terminal unit is used in an air loop's outdoor air system, control is always based on a termninal unit or coil outlet node temperature set point.
+This VRF terminal unit can be controlled based on a load or set point. When the system is used as zone equipment, load control is always used. When the VRF terminal unit is used in an air loop and the control zone name or thermostat location is specified, the system is controlled based on zone load. If the control zone name or thermostat location is not specified the VRF terminal unit will be controlled based on terminal unit or coil outlet node set point temperature. When set point based control is used the node temperature set points may be placed at the outlet of the terminal unit or at individual coil outlet nodes. If the VRF terminal unit is used in an air loop's outdoor air system, control is always based on a terminal unit or coil outlet node temperature set point.
 
 The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. An optional supplemental heating coil can also be added to the terminal unit to provide additional heating when the main DX heating coil could not meet the entire heating load of a zone during cold outdoor conditions. The Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating.
 
 A supply air fan can be modeled as either draw through or blow through. The supply air fan is required for zone equipment and optional for air loop and outdoor air system equipment. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanconstantvolume]{Fan:ConstantVolume} if \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanvariablevolume]{Fan:VariableVolume} if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
+
+Multispeed fan operation is available to both coils as\textit{\hyperref[coilcoolingdxvariablerefrigerantflow]{Coil:Cooling:DX:VariableRefrigerantFlow}} and \textit{\hyperref[coilheatingdxvariablerefrigerantflow]{Coil:Heating:DX:VariableRefrigerantFlow}}. There are two ways to accomplish multispeed fan operation. The first way is to input last two fields: Design Specification Multispeed Object Type and Design Specification Multispeed Object Name.The object allows users to input multiple speed fan flow fractions for both heating and cooling. It also allows users to input the supply air flow ratio with no load. 
 
 \subsubsection{Inputs}\label{inputs-14-018}
 
@@ -4050,7 +4097,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name-9}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Cooling Supply Air Flow Rate in this VRF terminal unit zone HVAC object. The scaled Supply Air Flow Rate in turn is used to size cooling and heating capacity of the unit.
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-2-000}
 
@@ -4071,6 +4118,21 @@ This numeric field defines the maximum outdoor dry-bulb temperature in degrees C
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{controlling-zone-or-thermostat-location-2-110}
 
 This alpha field is only used when this VRF terminal unit is used as air loop equipment with load based operational control. When the terminal unit is used in an air loop and this terminal unit is load controlled, this zone's thermostat will control operation. When this terminal unit is used in an air loop and is set point controlled, this field must be blank (i.e., when the controlling zone name is present the system will be load controlled).
+
+\paragraph{Field: Design Specification Multispeed Object Type}\label{field-design-specification-multispeed-object-type-3}
+
+This optional alpha field contains the identifying type for the design specification multispeed object. This field is only needed when multispeed fan is applied. The only available type is:
+
+\begin{itemize}
+\tightlist
+\item
+  \hyperref[unitarysystemperformancemultispeed]{UnitarySystemPerformance:Multispeed}
+\end{itemize}
+ 
+\paragraph{Field: Design Specification Multispeed Object Name}\label{field-design-specification-multispeed-object-name-3}
+
+This optional alpha field contains the identifying name for the design specification multispeed object. This field is only needed when multispeed fan is applied.
+
 
 Following is an example input for a ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object.
 
@@ -4147,6 +4209,12 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   HVAC,Sum,Zone VRF Air Terminal Heating Electricity Energy {[}J{]}
 \item
   HVAC,Average, Zone VRF Air Terminal Fan Availability Status {[]}
+\item
+  HVAC,Average, Zone VRF Air Terminal Multispeed Fan Cycling Ratio {[]}
+\item
+  HVAC,Average, Zone VRF Air Terminal Multispeed Fan Speed Ratio {[]}
+\item
+  HVAC,Average, Zone VRF Air Terminal Multispeed Fan Speed Level {[]}
 \end{itemize}
 
 \paragraph{Zone VRF Air Terminal Total Cooling Rate {[}W{]}}\label{zone-vrf-air-terminal-total-cooling-rate-w}
@@ -4217,6 +4285,18 @@ This output field is the electricity consumption of the zone terminal unit in Jo
 
 This is the availability status of the Zone Terminal Unit fan. This status flag is a result of the calculations made by the Availability Manager(s) listed in an AvailabilityManagerAssignmentList object and/or calculations made by Hybrid Ventilation Manager object. The AvailabilityManagerAssignmentList is an optional input in the Zone Terminal Unit object. When a single availability manager is used in an Availability Manager Assignment List, this is also the availability status reported by the specific availability manager (Ref. AvailabilityManager:* Outputs). For multiple availability managers in an Availability Manager Assignment List along with Hybrid Ventilation Manager, rules to determine fan availability status are described in the section `Group -- System Availability Managers'. The control status outputs are represented using integers 0 through 3. These integers represent NoAction (0), ForceOff (1), CycleOn (2), and CycleOnZoneFansOnly (3). Since the status output is averaged, the output result may not correspond to the values described here when output variable frequencies other than detailed are used. Use the ``detailed'' reporting frequency (Ref. Output:Variable object) to view the availability status at each simulation timestep.
 
+\paragraph{Zone VRF Air Terminal Multispeed Fan Cycling Ratio {[]}}\label{zone-vrf-air-terminal-multispeed-fan-cycling-ratio}
+
+This output variable is only available with a multispeed fan for COIL:Cooling:DX:VariableRefrigerantFlow and COIL:Heatling:DX:VariableRefrigerantFlow. It is the ratio of the sensible load (heating or cooling) to the steady-state capacity of the zone VRF terminal heating or cooling coil (Speed 1) for the entire system timestep. The value is between 0.0 and 1.0 when the zone water source heat pump is cycling on and off its lowest speed (Speed 1) and 1.0 when the zone VRF terminal operates at speeds above 1.
+
+\paragraph{Zone VRF Air Terminal Multispeed Fan Speed Ratio {[]}}\label{zone-vrf-air-terminal-multispeed-fan-speed-ratio}
+
+This output variable is only available with a multispeed fan  for COIL:Cooling:DX:VariableRefrigerantFlow and COIL:Heatling:DX:VariableRefrigerantFlow. It is the ratio of time in a system timestep that the fan is at rated speed between two consecutive speed numbers ( [Fanr Speed - Fan speed at Speed i-1] / Fan speed at Speed i - Fan speed at Speed i-1]). The fan speed ratio reports (1.0 is max, 0.0 is min) and any value in between as it is averaged over the timestep. The value is 0.0 during Speed 1 operation.
+
+\paragraph{Zone VRF Air Terminal Multispeed Fan Speed Level {[]}}\label{zone-vrf-air-terminal-multispeed-fan-speed-level}
+
+This output variable is only available with a multispeed fan  for COIL:Cooling:DX:VariableRefrigerantFlow and COIL:Heatling:DX:VariableRefrigerantFlow. It ts the maximum speed needed when the zone VRF terminal operates to meet the sensible load (heating or cooling) in a system timestep. When the value is 1, the zone VRF terminal operates at Speed 1 (lowest speed). For this case the cycling ratio is between 0.0 and 1.0, while the speed ratio is 0.0. When the speed number output variable is above one, such as i, the zone VRF terminal operation is determined by the speed ratio through linear interpolation. For example, when the speed ratio is 0.4 and the speed number is 3, the zone VRF terminal operates at Speed 3 for 40\% of a system timestep and at Speed 2 for 60\% of a system timestep for a multiple speed fan.
+
 \subsection{ZoneHVAC:HybridUnitaryHVAC}\label{zonehvac-hybridunitaryhvac}
 
 ZoneHVAC:Hybrid UnitaryHVAC is a black-box model for packaged forced air equipment with multiple discrete operating modes. Generally, a ''hybrid`` is any system that exhibits both continuous and discrete dynamic behavior – a system that can both flow (as could be described by a differential equation) and jump (as must be described by distinct modes). Equipment in this category may utilize a wide variety technologies including, but not limited to: indirect evaporative cooling, desiccant dehumidification, heat recovery, vapor compression, adsorption, or ventilation cooling. Each hybrid system packages multiple technologies into a single integrated system. There are a multitude of unique hybrid system architectures, and each unique system may have numerous unique operating modes.
@@ -4264,7 +4344,7 @@ This optional alpha input field specifies the name of the schedule (ref: Group �
 This optional alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies the minimum supply air humidity ratio allowed in each time step. Values in this schedule are used as a constraint in choosing the feasible settings for supply air flow rate and outdoor air fraction in each operating mode. If this field is blank, no minimum is imposed.
 
 \paragraph{Field: Maximum Supply Air Humidity Ratio Schedule Name}
-This optional alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies the maximum supply air humidity raio allowed in each time step. Values in this schedule are used as a constraint in choosing the feasible settings for supply air flow rate and outdoor air fraction in each operating mode. If this field is blank, no maximum is imposed.
+This optional alpha input field specifies the name of the schedule (ref: Group – Schedules) that specifies the maximum supply air humidity ratio allowed in each time step. Values in this schedule are used as a constraint in choosing the feasible settings for supply air flow rate and outdoor air fraction in each operating mode. If this field is blank, no maximum is imposed.
 
 \paragraph{Field: Method to Choose Controlled Inputs and Part Runtime Fraction}
 This alpha input field specifies the method that will be used to choose operating mode(s), supply air flow rate(s), outdoor air fraction(s) and part runtime fraction(s) in each time step. The only valid choices are ''Automatic`` and ''User Defined``, ''Automatic`` chooses the controlled independent variables to minimize resource use within each time step, subject to constraints, while best satisfying zone sensible loads, latent loads, and the scheduled ventilation rate. ''User Defined`` indicates that the user will provide a custom control sequence, using Energy Management System objects or other means, to choose the controlled independent variables and determine system outputs in each time step.

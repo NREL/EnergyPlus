@@ -205,7 +205,40 @@ namespace DataSizing {
         Num
     };
 
-    // Zone HVAC Equipment Supply Air Sizing Option
+    // Zone HVAC Equipment Sizing Option
+    enum class DesignSizingType
+    {
+        Invalid = -1,
+        Dummy1BasedOffset,
+        None, // until all models use this enum this numeric must match with constexpr int None(1) below
+        SupplyAirFlowRate,
+        FlowPerFloorArea,
+        FractionOfAutosizedCoolingAirflow,
+        FractionOfAutosizedHeatingAirflow,
+        FlowPerCoolingCapacity,
+        FlowPerHeatingCapacity,
+        CoolingDesignCapacity,
+        HeatingDesignCapacity,
+        CapacityPerFloorArea,
+        FractionOfAutosizedCoolingCapacity,
+        FractionOfAutosizedHeatingCapacity,
+        Num
+
+    };
+    constexpr std::array<std::string_view, static_cast<int>(DesignSizingType::Num)> DesignSizingTypeNamesUC{"DUMMY1BASEDOFFSET",
+                                                                                                            "NONE",
+                                                                                                            "SUPPLYAIRFLOWRATE",
+                                                                                                            "FLOWPERFLOORAREA",
+                                                                                                            "FRACTIONOFAUTOSIZEDCOOLINGAIRFLOW",
+                                                                                                            "FRACTIONOFAUTOSIZEDHEATINGAIRFLOW",
+                                                                                                            "FLOWPERCOOLINGCAPACITY",
+                                                                                                            "FLOWPERHEATINGCAPACITY",
+                                                                                                            "COOLINGDESIGNCAPACITY",
+                                                                                                            "HEATINGDESIGNCAPACITY",
+                                                                                                            "CAPACITYPERFLOORAREA",
+                                                                                                            "FRACTIONOFAUTOSIZEDCOOLINGCAPACITY",
+                                                                                                            "FRACTIONOFAUTOSIZEDHEATINGCAPACITY"};
+
     constexpr int None(1);
     constexpr int SupplyAirFlowRate(2);
     constexpr int FlowPerFloorArea(3);
@@ -561,12 +594,101 @@ namespace DataSizing {
         ZoneSizing zoneSizingMethod = ZoneSizing::Invalid; // load to sizing on: sensible, latent, sensibleandlatent, sensibleonlynolatent
         std::string CoolSizingType;                        // string reported to eio, Cooling or Latent Cooling
         std::string HeatSizingType;                        // string reported to eio, Heating or Latent Heating
+        std::string CoolPeakDateHrMin;                     // date:hr:min of cooling peak
+        std::string HeatPeakDateHrMin;                     // date:hr:min of heating peak
+        std::string LatCoolPeakDateHrMin;                  // date:hr:min of latent cooling peak
+        std::string LatHeatPeakDateHrMin;                  // date:hr:min of latent heating peak
+        Real64 ZoneSizThermSetPtHi = 0.0;                  // highest zone thermostat setpoint during zone sizing calcs
+        Real64 ZoneSizThermSetPtLo = 1000.0;               // lowest zone thermostat setpoint during zone sizing calcs
 
-        void scaleZoneCooling(Real64 ratio // Scaling ratio
-        );
-        void scaleZoneHeating(Real64 ratio // Scaling ratio
-        );
         void zeroMemberData();
+        void allocateMemberArrays(int numOfTimeStepInDay);
+    };
+
+    // based on ZoneSizingData but only member variables that are actually used by terminal unit sizing
+    struct TermUnitZoneSizingData
+    {
+        std::string ZoneName;           // name of a zone
+        std::string ADUName;            // Terminal Unit Name (air distribution unit or direct air unit) - only assigned for TermUnitFinalZoneSizing
+        Real64 CoolDesTemp = 0.0;       // zone design cooling supply air temperature [C]
+        Real64 HeatDesTemp = 0.0;       // zone design heating supply air temperature [C]
+        Real64 CoolDesHumRat = 0.0;     // zone design cooling supply air humidity ratio [kgWater/kgDryAir]
+        Real64 HeatDesHumRat = 0.0;     // zone design heating supply air humidity ratio [kgWater/kgDryAir]
+        Real64 DesOAFlowPPer = 0.0;     // design outside air flow per person in zone [m3/s] (average for zone across spaces)
+        Real64 DesOAFlowPerArea = 0.0;  // design outside air flow per zone area [m3/s / m2] (average for zone across spaces)
+        Real64 DesCoolMinAirFlow = 0.0; // design cooling minimum air flow rate [m3/s]
+        Real64 DesCoolMinAirFlowFrac = 0.0; // design cooling minimum air flow rate fraction (of the cooling design air flow rate)
+        Real64 DesHeatMaxAirFlow = 0.0;     // design heating maximum air flow rate [m3/s]
+        Real64 DesHeatMaxAirFlowFrac = 0.0; // design heating maximum air flow rate fraction (of the cooling design air flow rate)
+        int ZoneNum = 0;                    // index into the Zone data array (in DataHeatBalance)
+        Real64 DesHeatMassFlow = 0.0;       // zone design heating air mass flow rate [kg/s]
+        Real64 DesHeatMassFlowNoOA = 0.0;   // zone design heating air mass flow rate without applying MinOA as a limit [kg/s]
+        Real64 DesHeatOAFlowFrac = 0.0;     // zone design heating OA air volume fraction [-]
+        Real64 DesCoolMassFlow = 0.0;       // zone design cooling air mass flow rate [kg/s]
+        Real64 DesCoolMassFlowNoOA = 0.0;   // zone design cooling air mass flow rate without applying MinOA as a limit [kg/s]
+        Real64 DesCoolOAFlowFrac = 0.0;     // zone design cooling OA air volume fraction [-]
+        Real64 DesHeatLoad = 0.0;           // zone design heating load including sizing factor and scaled to match airflow sizing [W]
+        Real64 NonAirSysDesHeatLoad = 0.0;  // base zone design heating load including sizing factor [W]
+        Real64 DesCoolLoad = 0.0;           // zone design cooling load including sizing factor and scaled to match airflow sizing [W]
+        Real64 NonAirSysDesCoolLoad = 0.0;  // base zone design cooling load including sizing factor [W]
+        Real64 DesHeatVolFlow = 0.0;     // zone design heating air volume flow rate including sizing factor and scaled to match airflow sizing [m3/s]
+        Real64 DesHeatVolFlowNoOA = 0.0; // zone design heating air volume flow rate including sizing factor and scaled to match airflow sizing
+                                         // without MinOA limit [m3/s]
+        Real64 NonAirSysDesHeatVolFlow = 0.0;    // base zone design heating air volume flow rate including sizing factor [m3/s]
+        Real64 DesCoolVolFlow = 0.0;             // zone design cooling air volume flow rate [m3/s]
+        Real64 DesCoolVolFlowNoOA = 0.0;         // zone design cooling air volume flow rate without applying MinOA as a limit [m3/s]
+        Real64 NonAirSysDesCoolVolFlow = 0.0;    // base zone design cooling air volume flow rate including sizing factor [m3/s]
+        Real64 DesHeatVolFlowMax = 0.0;          // zone design heating maximum air volume flow rate [m3/s]
+        Real64 DesCoolVolFlowMin = 0.0;          // zone design cooling minimum air volume flow rate [m3/s]
+        Real64 DesHeatCoilInTempTU = 0.0;        // zone heating coil design air inlet temperature (supply air)([C]
+        Real64 DesCoolCoilInTempTU = 0.0;        // zone cooling coil design air inlet temperature (supply air)[C]
+        Real64 DesHeatCoilInHumRatTU = 0.0;      // zone heating coil design air inlet humidity ratio  [kg/kg]
+        Real64 DesCoolCoilInHumRatTU = 0.0;      // zone cooling coil design air inlet humidity ratio  [kg/kg]
+        Real64 ZoneTempAtHeatPeak = 0.0;         // zone temp at max heating [C]
+        Real64 ZoneRetTempAtHeatPeak = 0.0;      // zone return temp at max heating [C]
+        Real64 ZoneTempAtCoolPeak = 0.0;         // zone temp at max cooling [C]
+        Real64 ZoneRetTempAtCoolPeak = 0.0;      // zone return temp at max cooling [C]
+        Real64 ZoneHumRatAtHeatPeak = 0.0;       // zone humidity ratio at max heating [kg/kg]
+        Real64 ZoneHumRatAtCoolPeak = 0.0;       // zone humidity ratio at max cooling [kg/kg]
+        int TimeStepNumAtHeatMax = 0;            // time step number (in day) at Heating peak
+        int TimeStepNumAtCoolMax = 0;            // time step number (in day) at cooling peak
+        int HeatDDNum = 0;                       // design day index of design day causing heating peak
+        int CoolDDNum = 0;                       // design day index of design day causing cooling peak
+        Real64 MinOA = 0.0;                      // design minimum outside air in m3/s
+        Real64 DesCoolMinAirFlow2 = 0.0;         // design cooling minimum air flow rate [m3/s] derived from DesCoolMinAirFlowPerArea
+        Real64 DesHeatMaxAirFlow2 = 0.0;         // design heating maximum air flow rate [m3/s] derived from DesHeatMaxAirFlowPerArea
+        EPVector<Real64> HeatFlowSeq;            // daily sequence of zone heating air mass flow rate (zone time step) [kg/s]
+        EPVector<Real64> HeatFlowSeqNoOA;        // daily sequence of zone heating air mass flow rate (zone time step) without MinOA limit [kg/s]
+        EPVector<Real64> CoolFlowSeq;            // daily sequence of zone cooling air mass flow rate (zone time step) [kg/s]
+        EPVector<Real64> CoolFlowSeqNoOA;        // daily sequence of zone cooling air mass flow rate (zone time step) without MinOA limit [kg/s]
+        EPVector<Real64> HeatZoneTempSeq;        // daily sequence of zone temperatures (heating, zone time step)
+        EPVector<Real64> HeatZoneRetTempSeq;     // daily sequence of zone return temperatures (heating, zone time step)
+        EPVector<Real64> CoolZoneTempSeq;        // daily sequence of zone temperatures (cooling, zone time step)
+        EPVector<Real64> CoolZoneRetTempSeq;     // daily sequence of zone return temperatures (cooling, zone time step)
+        Real64 ZoneADEffCooling = 1.0;           // the zone air distribution effectiveness in cooling mode
+        Real64 ZoneADEffHeating = 1.0;           // the zone air distribution effectiveness in heating mode
+        Real64 ZoneSecondaryRecirculation = 0.0; // the zone secondary air recirculation fraction
+        Real64 ZoneVentilationEff = 0.0;         // zone ventilation efficiency
+        Real64 ZonePrimaryAirFraction = 0.0;     // the zone primary air fraction for cooling based calculations
+        Real64 ZonePrimaryAirFractionHtg = 0.0;  // the zone primary air fraction for heating based calculations
+        Real64 ZoneOAFracCooling = 0.0;          // OA fraction in cooling mode
+        Real64 ZoneOAFracHeating = 0.0;          // OA fraction in heating mode
+        Real64 TotalOAFromPeople = 0.0;          // Zone OA required due to people
+        Real64 TotalOAFromArea = 0.0;            // Zone OA required based on floor area
+        Real64 TotPeopleInZone = 0.0;            // total number of people in the zone
+        Real64 TotalZoneFloorArea = 0.0;         // total zone floor area
+        Real64 SupplyAirAdjustFactor = 1.0;      // supply air adjustment factor for next time step if OA is capped
+        Real64 ZpzClgByZone = 0.0;               // OA Std 62.1 required fraction in cooling mode ? should this be ZdzClgByZone
+        Real64 ZpzHtgByZone = 0.0;               // OA Std 62.1 required fraction in heating mode ? should this be ZdzHtgByZone
+        Real64 VozClgByZone = 0.0; // value of required cooling vent to zone, used in 62.1 tabular report, already includes people diversity term
+        Real64 VozHtgByZone = 0.0; // value of required heating vent to zone, used in 62.1 tabular report, already includes people diversity term
+        bool VpzMinByZoneSPSized = false;    // is Vpz_min sized using the 62.1 Standard Simplified Procedure
+        Real64 ZoneSizThermSetPtHi = 0.0;    // highest zone thermostat setpoint during zone sizing calcs
+        Real64 ZoneSizThermSetPtLo = 1000.0; // lowest zone thermostat setpoint during zone sizing calcs
+
+        void scaleZoneCooling(Real64 ratio);
+        void scaleZoneHeating(Real64 ratio);
+        void copyFromZoneSizing(ZoneSizingData const &sourceData);
         void allocateMemberArrays(int numOfTimeStepInDay);
     };
 
@@ -958,6 +1080,8 @@ namespace DataSizing {
         Real64 DesVolFlowRate = 0.0; // loop design flow rate in m3/s
         bool VolFlowSizingDone = 0;  // flag to indicate when this loop has finished sizing flow rate
         Real64 PlantSizFac = 0.0;    // hold the loop and pump sizing factor
+
+        Real64 DesCapacity; // final capacity in W
     };
 
     // based on ZoneSizingData but only have member variables that are related to the CheckSum/
@@ -1200,12 +1324,6 @@ struct SizingData : BaseGlobalStruct
     Real64 GlobalCoolSizingFactor = 0.0;             // the global cooling sizing ratio
     Real64 SuppHeatCap = 0.0;                        // the heating capacity of the supplemental heater in a unitary system
     Real64 UnitaryHeatCap = 0.0;                     // the heating capacity of a unitary system
-    Array1D<Real64> ZoneSizThermSetPtHi;             // highest zone thermostat setpoint during zone sizing calcs
-    Array1D<Real64> ZoneSizThermSetPtLo;             // lowest zone thermostat setpoint during zone sizing calcs
-    Array1D_string CoolPeakDateHrMin;                // date:hr:min of cooling peak
-    Array1D_string HeatPeakDateHrMin;                // date:hr:min of heating peak
-    Array1D_string LatCoolPeakDateHrMin;             // date:hr:min of latent cooling peak
-    Array1D_string LatHeatPeakDateHrMin;             // date:hr:min of latent heating peak
     char SizingFileColSep;                           // Character to separate columns in sizing outputs
     int DataDesicDehumNum = 0;                       // index to desiccant dehumidifier
     bool DataDesicRegCoil = false;                   // TRUE if heating coil desiccant regeneration coil
@@ -1221,25 +1339,29 @@ struct SizingData : BaseGlobalStruct
     int DataCoolCoilIndex = -1;
     EPVector<DataSizing::OARequirementsData> OARequirements;
     EPVector<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
-    EPVector<DataSizing::ZoneSizingInputData> ZoneSizingInput;    // Input data for zone sizing
-    Array2D<DataSizing::ZoneSizingData> ZoneSizing;               // Data for zone sizing (all data, all design)
-    EPVector<DataSizing::ZoneSizingData> FinalZoneSizing;         // Final data for zone sizing including effects
-    Array2D<DataSizing::ZoneSizingData> CalcZoneSizing;           // Data for zone sizing (all data)
-    EPVector<DataSizing::ZoneSizingData> CalcFinalZoneSizing;     // Final data for zone sizing (calculated only)
-    EPVector<DataSizing::ZoneSizingData> TermUnitFinalZoneSizing; // Final data for sizing terminal units (indexed per terminal unit)
-    EPVector<DataSizing::SystemSizingInputData> SysSizInput;      // Input data array for system sizing object
-    Array2D<DataSizing::SystemSizingData> SysSizing;              // Data array for system sizing (all data)
-    EPVector<DataSizing::SystemSizingData> FinalSysSizing;        // Data array for system sizing (max heat/cool)
-    EPVector<DataSizing::SystemSizingData> CalcSysSizing;         // Data array for system sizing (max heat/cool)
-    EPVector<DataSizing::SysSizPeakDDNumData> SysSizPeakDDNum;    // data array for peak des day indices
-    EPVector<DataSizing::TermUnitSizingData> TermUnitSizing;      // Data added in sizing routines (indexed per terminal unit)
-    EPVector<DataSizing::ZoneEqSizingData> ZoneEqSizing;          // Data added in zone eq component sizing routines
-    EPVector<DataSizing::ZoneEqSizingData> UnitarySysEqSizing;    // Data added in unitary system sizing routines
-    EPVector<DataSizing::ZoneEqSizingData> OASysEqSizing;         // Data added in unitary system sizing routines
-    EPVector<DataSizing::PlantSizingData> PlantSizData;           // Input data array for plant sizing
-    EPVector<DataSizing::DesDayWeathData> DesDayWeath;            // design day weather saved at major time step
-    EPVector<DataSizing::CompDesWaterFlowData> CompDesWaterFlow;  // array to store components' design water flow
-    EPVector<DataSizing::ZoneHVACSizingData> ZoneHVACSizing;      // Input data for zone HVAC sizing
+    EPVector<DataSizing::ZoneSizingInputData> ZoneSizingInput;            // Input data for zone sizing
+    Array2D<DataSizing::ZoneSizingData> ZoneSizing;                       // Data for zone sizing (all data, all design)
+    EPVector<DataSizing::ZoneSizingData> FinalZoneSizing;                 // Final data for zone sizing including effects
+    Array2D<DataSizing::ZoneSizingData> CalcZoneSizing;                   // Data for zone sizing (all data)
+    EPVector<DataSizing::ZoneSizingData> CalcFinalZoneSizing;             // Final data for zone sizing (calculated only)
+    Array2D<DataSizing::ZoneSizingData> SpaceSizing;                      // Data for space sizing (all data, all design)
+    EPVector<DataSizing::ZoneSizingData> FinalSpaceSizing;                // Final data for space sizing including effects
+    Array2D<DataSizing::ZoneSizingData> CalcSpaceSizing;                  // Data for space sizing (all data)
+    EPVector<DataSizing::ZoneSizingData> CalcFinalSpaceSizing;            // Final data for space sizing (calculated only)
+    EPVector<DataSizing::TermUnitZoneSizingData> TermUnitFinalZoneSizing; // Final data for sizing terminal units (indexed per terminal unit)
+    EPVector<DataSizing::SystemSizingInputData> SysSizInput;              // Input data array for system sizing object
+    Array2D<DataSizing::SystemSizingData> SysSizing;                      // Data array for system sizing (all data)
+    EPVector<DataSizing::SystemSizingData> FinalSysSizing;                // Data array for system sizing (max heat/cool)
+    EPVector<DataSizing::SystemSizingData> CalcSysSizing;                 // Data array for system sizing (max heat/cool)
+    EPVector<DataSizing::SysSizPeakDDNumData> SysSizPeakDDNum;            // data array for peak des day indices
+    EPVector<DataSizing::TermUnitSizingData> TermUnitSizing;              // Data added in sizing routines (indexed per terminal unit)
+    EPVector<DataSizing::ZoneEqSizingData> ZoneEqSizing;                  // Data added in zone eq component sizing routines
+    EPVector<DataSizing::ZoneEqSizingData> UnitarySysEqSizing;            // Data added in unitary system sizing routines
+    EPVector<DataSizing::ZoneEqSizingData> OASysEqSizing;                 // Data added in unitary system sizing routines
+    EPVector<DataSizing::PlantSizingData> PlantSizData;                   // Input data array for plant sizing
+    EPVector<DataSizing::DesDayWeathData> DesDayWeath;                    // design day weather saved at major time step
+    EPVector<DataSizing::CompDesWaterFlowData> CompDesWaterFlow;          // array to store components' design water flow
+    EPVector<DataSizing::ZoneHVACSizingData> ZoneHVACSizing;              // Input data for zone HVAC sizing
     EPVector<DataSizing::AirTerminalSizingSpecData>
         AirTerminalSizingSpec;                                   // Input data for zone HVAC sizing used only for Facility Load Component Summary
     EPVector<DataSizing::FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
