@@ -7677,10 +7677,12 @@ namespace SurfaceGeometry {
         int Found;
         int AlphaOffset; // local temp var
         std::string Roughness;
-        int ThisSurf;      // do loop counter
-        Real64 AvgAzimuth; // temp for error checking
-        Real64 AvgTilt;    // temp for error checking
-        int SurfID;        // local surface "pointer"
+        int ThisSurf;                   // do loop counter
+        Real64 AvgAzimuth;              // temp for error checking
+        Real64 AvgTilt;                 // temp for error checking
+        constexpr Real64 AZITOL = 15.0; // Degree Azimuth Angle Tolerance
+        constexpr Real64 TILTOL = 10.0; // Degree Tilt Angle Tolerance
+        int SurfID;                     // local surface "pointer"
         bool IsBlank;
         bool ErrorInName;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -7878,14 +7880,14 @@ namespace SurfaceGeometry {
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
                 SurfID = state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
-                if (General::rotAzmDiffDeg(state.dataSurface->Surface(SurfID).Azimuth, AvgAzimuth) > 15.0) {
+                if (General::rotAzmDiffDeg(state.dataSurface->Surface(SurfID).Azimuth, AvgAzimuth) > AZITOL) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Azimuth different from others in the associated group.",
                                             cCurrentModuleObject,
                                             state.dataHeatBal->ExtVentedCavity(Item).Name,
                                             state.dataSurface->Surface(SurfID).Name));
                 }
-                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > 10.0) {
+                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > TILTOL) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Tilt different from others in the associated group.",
                                             cCurrentModuleObject,
