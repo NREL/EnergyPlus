@@ -248,7 +248,7 @@ namespace General {
                              int nReportPeriods,
                              Array1D_bool &inReportPeriodFlags);
 
-    Real64 rotAzmDiffDeg(Real64 const &AzmA, Real64 const &AzmB);
+    Real64 rotAzmDiffDeg(Real64 AzmA, Real64 AzmB);
 
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {
