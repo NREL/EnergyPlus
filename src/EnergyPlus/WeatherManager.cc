@@ -854,6 +854,7 @@ namespace WeatherManager {
                         }
                         if (state.dataEnvrn->CurrentYearIsLeapYear) {
                             ActEndDayOfMonth(2) = state.dataWeatherManager->EndDayOfMonth(2) + state.dataWeatherManager->LeapYearAdd;
+                            state.dataWeatherManager->EndDayOfMonthWithLeapDay(2) = state.dataWeatherManager->EndDayOfMonth(2) + state.dataWeatherManager->LeapYearAdd;
                         }
                         state.dataWeatherManager->UseDaylightSaving = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseDST;
                         state.dataWeatherManager->UseSpecialDays = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseHolidays;
@@ -1894,7 +1895,7 @@ namespace WeatherManager {
             }
 
             state.dataEnvrn->EndYearFlag = false;
-            if (state.dataEnvrn->DayOfMonth == state.dataWeatherManager->EndDayOfMonth(state.dataEnvrn->Month)) {
+            if (state.dataEnvrn->DayOfMonth == state.dataWeatherManager->EndDayOfMonthWithLeapDay(state.dataEnvrn->Month)) {
                 state.dataEnvrn->EndMonthFlag = true;
                 state.dataEnvrn->EndYearFlag = (state.dataEnvrn->Month == 12);
             }
