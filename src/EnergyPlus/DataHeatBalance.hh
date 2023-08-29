@@ -60,6 +60,7 @@
 #include <EnergyPlus/ConvectionConstants.hh>
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataComplexFenestration.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
@@ -477,8 +478,8 @@ namespace DataHeatBalance {
         Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
         Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
-        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
-        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this space
+        std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
+        std::vector<std::string> otherEquipFuelTypeNames;    // List of fuel types used by other equipment in this space
 
         // Pointers to Surface Data Structure
         // |AllSurfF                                                                      |AllSurfL
@@ -653,17 +654,17 @@ namespace DataHeatBalance {
         bool HasLtsRetAirGain = false;       // TRUE means that zone lights return air heat > 0.0 calculated from plenum temperature
         bool HasAirFlowWindowReturn = false; // TRUE means that zone has return air flow from windows
         // from refrigeration cases for this zone
-        Real64 InternalHeatGains = 0.0;         // internal loads (W)
-        Real64 NominalInfilVent = 0.0;          // internal infiltration/ventilation
-        Real64 NominalMixing = 0.0;             // internal mixing/cross mixing
-        bool TempOutOfBoundsReported = false;   // if any temp out of bounds errors, first will show zone details.
-        bool EnforcedReciprocity = false;       // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
-        int ZoneMinCO2SchedIndex = 0;           // Index for the schedule the schedule which determines minimum CO2 concentration
-        int ZoneMaxCO2SchedIndex = 0;           // Index for the schedule the schedule which determines maximum CO2 concentration
-        int ZoneContamControllerSchedIndex = 0; // Index for this schedule
-        bool FlagCustomizedZoneCap = false;     // True if customized Zone Capacitance Multiplier is used
-        std::vector<ExteriorEnergyUse::ExteriorFuelUsage> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
-        std::vector<std::string> otherEquipFuelTypeNames;                         // List of fuel types used by other equipment in this zone
+        Real64 InternalHeatGains = 0.0;                      // internal loads (W)
+        Real64 NominalInfilVent = 0.0;                       // internal infiltration/ventilation
+        Real64 NominalMixing = 0.0;                          // internal mixing/cross mixing
+        bool TempOutOfBoundsReported = false;                // if any temp out of bounds errors, first will show zone details.
+        bool EnforcedReciprocity = false;                    // if zone/space required forced reciprocity -- less out of bounds temp errors allowed
+        int ZoneMinCO2SchedIndex = 0;                        // Index for the schedule the schedule which determines minimum CO2 concentration
+        int ZoneMaxCO2SchedIndex = 0;                        // Index for the schedule the schedule which determines maximum CO2 concentration
+        int ZoneContamControllerSchedIndex = 0;              // Index for this schedule
+        bool FlagCustomizedZoneCap = false;                  // True if customized Zone Capacitance Multiplier is used
+        std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
+        std::vector<std::string> otherEquipFuelTypeNames;    // List of fuel types used by other equipment in this zone
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature = 0.0;               // Measured zone air temperature input by user
@@ -881,23 +882,22 @@ namespace DataHeatBalance {
         bool ManageDemand = false;           // Flag to indicate whether to use demand limiting
         Real64 DemandLimit = 0.0;            // Demand limit set by demand manager [W]
         // Report variables
-        Real64 Power = 0.0;                   // Electric/Gas/Fuel power [W]
-        Real64 RadGainRate = 0.0;             // Radiant heat gain [W]
-        Real64 ConGainRate = 0.0;             // Convective heat gain [W]
-        Real64 LatGainRate = 0.0;             // Latent heat gain [W]
-        Real64 LostRate = 0.0;                // Lost energy (converted to work) [W]
-        Real64 TotGainRate = 0.0;             // Total heat gain [W]
-        Real64 CO2GainRate = 0.0;             // CO2 gain rate [m3/s]
-        Real64 Consumption = 0.0;             // Electric/Gas/Fuel consumption [J]
-        Real64 RadGainEnergy = 0.0;           // Radiant heat gain [J]
-        Real64 ConGainEnergy = 0.0;           // Convective heat gain [J]
-        Real64 LatGainEnergy = 0.0;           // Latent heat gain [J]
-        Real64 LostEnergy = 0.0;              // Lost energy (converted to work) [J]
-        Real64 TotGainEnergy = 0.0;           // Total heat gain [J]
-        std::string EndUseSubcategory;        // user defined name for the end use category
-        std::string otherEquipFuelTypeString; // Fuel Type string for Other Equipment
-        ExteriorEnergyUse::ExteriorFuelUsage OtherEquipFuelType =
-            ExteriorEnergyUse::ExteriorFuelUsage::Invalid; // Fuel Type Number of the Other Equipment (defined in ExteriorEnergyUse.cc)
+        Real64 Power = 0.0;                                            // Electric/Gas/Fuel power [W]
+        Real64 RadGainRate = 0.0;                                      // Radiant heat gain [W]
+        Real64 ConGainRate = 0.0;                                      // Convective heat gain [W]
+        Real64 LatGainRate = 0.0;                                      // Latent heat gain [W]
+        Real64 LostRate = 0.0;                                         // Lost energy (converted to work) [W]
+        Real64 TotGainRate = 0.0;                                      // Total heat gain [W]
+        Real64 CO2GainRate = 0.0;                                      // CO2 gain rate [m3/s]
+        Real64 Consumption = 0.0;                                      // Electric/Gas/Fuel consumption [J]
+        Real64 RadGainEnergy = 0.0;                                    // Radiant heat gain [J]
+        Real64 ConGainEnergy = 0.0;                                    // Convective heat gain [J]
+        Real64 LatGainEnergy = 0.0;                                    // Latent heat gain [J]
+        Real64 LostEnergy = 0.0;                                       // Lost energy (converted to work) [J]
+        Real64 TotGainEnergy = 0.0;                                    // Total heat gain [J]
+        std::string EndUseSubcategory;                                 // user defined name for the end use category
+        std::string otherEquipFuelTypeString;                          // Fuel Type string for Other Equipment
+        Constant::eFuel OtherEquipFuelType = Constant::eFuel::Invalid; // Fuel Type Number of the Other Equipment
     };
 
     struct ExtVentedCavityStruct

@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -2661,18 +2662,13 @@ namespace InternalHeatGains {
 
                     std::string FuelTypeString("");
                     if (IHGAlphas(2) == "NONE") {
-                        thisZoneOthEq.OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Invalid;
+                        thisZoneOthEq.OtherEquipFuelType = Constant::eFuel::Invalid;
                         FuelTypeString = IHGAlphas(2);
                     } else {
-                        ExteriorEnergyUse::ValidateFuelType(state,
-                                                            thisZoneOthEq.OtherEquipFuelType,
-                                                            IHGAlphas(2),
-                                                            FuelTypeString,
-                                                            othEqModuleObject,
-                                                            IHGAlphaFieldNames(2),
-                                                            IHGAlphas(2));
-                        if (thisZoneOthEq.OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::Invalid ||
-                            thisZoneOthEq.OtherEquipFuelType == ExteriorEnergyUse::ExteriorFuelUsage::WaterUse) {
+                        thisZoneOthEq.OtherEquipFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, IHGAlphas(2)));
+                        FuelTypeString = Constant::eFuelNames[static_cast<int>(thisZoneOthEq.OtherEquipFuelType)];
+                        if (thisZoneOthEq.OtherEquipFuelType == Constant::eFuel::Invalid ||
+                            thisZoneOthEq.OtherEquipFuelType == Constant::eFuel::Water) {
                             ShowSevereError(state,
                                             format("{}{}: invalid {} entered={} for {}={}",
                                                    RoutineName,
@@ -2686,7 +2682,7 @@ namespace InternalHeatGains {
                         thisZoneOthEq.otherEquipFuelTypeString = FuelTypeString; // Save for output variable setup later
                         // Build list of fuel types used in each zone and space (excluding None and Water)
                         bool found = false;
-                        for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
+                        for (Constant::eFuel fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
                             if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
                                 found = true;
                                 break;
@@ -2697,7 +2693,7 @@ namespace InternalHeatGains {
                             state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
                         }
                         found = false;
-                        for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
+                        for (Constant::eFuel fuelType : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
                             if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
                                 found = true;
                                 break;
@@ -2823,7 +2819,7 @@ namespace InternalHeatGains {
                     }
 
                     // Throw an error if the design level is negative and we have a fuel type
-                    if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
+                    if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != Constant::eFuel::Invalid) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} is not allowed to be negative",
                                                RoutineName,
@@ -6134,7 +6130,7 @@ namespace InternalHeatGains {
             // Set flags for zone and space total report variables
             addZoneOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex) = true;
-            if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
+            if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != Constant::eFuel::Invalid) {
                 std::string fuelTypeString = state.dataHeatBal->ZoneOtherEq(othEqNum).otherEquipFuelTypeString;
                 SetupOutputVariable(state,
                                     "Other Equipment " + fuelTypeString + " Rate",
