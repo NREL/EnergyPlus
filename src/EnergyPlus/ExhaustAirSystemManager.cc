@@ -713,11 +713,17 @@ namespace ExhaustAirSystemManager {
             Real64 FlowFrac = 0.0;
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 FlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
+                if (FlowFrac < 0.0) {
+                    FlowFrac = 0.0;
+                }
             }
 
             Real64 MinFlowFrac = 0.0;
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 MinFlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
+                if (MinFlowFrac < 0.0) {
+                    MinFlowFrac = 0.0;
+                }
             }
 
             if (FlowFrac < MinFlowFrac) {
