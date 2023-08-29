@@ -61,46 +61,25 @@ class HistoryTracker(EnergyPlusPlugin):
 
     def __init__(self):
         super().__init__()
-
-        self.need_to_get_handles = True
-        self.zone_air_temp_handle = None
-        self.datetime_history = []
-        self.zone_air_temp_history = []
-        self.print_header = True
-
-    def get_handles(self, state):
-
-        # get air temperature handles
-        self.zone_air_temp_handle = self.api.exchange.get_variable_handle(state,
-                                                                          "Zone Mean Air Temperature",
-                                                                          "Zone One")
-        self.need_to_get_handles = False
+        self.handle = None
+        self.history = []
 
     def on_begin_timestep_before_predictor(self, state) -> int:
-        # wait until API is ready
-        if not self.api.exchange.api_data_fully_ready(state):
+        # wait until API is ready and we are on the weather file run period
+        if not self.api.exchange.api_data_fully_ready(state) or self.api.exchange.kind_of_sim(state) != 3:
             return 0
 
-        # get handles
-        if self.need_to_get_handles:
-            self.get_handles(state)
-
-        # skipping all environments except weather file simulation
-        if self.api.exchange.kind_of_sim(state) != 3:
-            return 0
-
-        # print header row
-        if self.print_header:
+        # do one-time things when we first need to get the variable handle
+        if self.handle is None:
+            # get air temperature handles
+            zone_name = self.api.exchange.get_object_names(state, "Zone")[0]
+            self.handle = self.api.exchange.get_variable_handle(state, "Zone Mean Air Temperature", zone_name)
             print("Time [hr], Zone Temp [C], Num History Terms", flush=True)
-            self.print_header = False
 
+        # get current values, then update history array
         datetime = (self.api.exchange.day_of_year(state) - 1) * 24 + self.api.exchange.current_time(state)
-        temp = self.api.exchange.get_variable_value(state, self.zone_air_temp_handle)
-
-        # update history
-        self.datetime_history.append(datetime)
-        self.zone_air_temp_history.append(temp)
-
-        print(f'{datetime:0.2f}, {temp:0.2f}, {len(self.zone_air_temp_history)}', flush=True)
+        temp = self.api.exchange.get_variable_value(state, self.handle)
+        self.history.append((datetime, temp))
+        print(f'{datetime:0.2f}, {temp:0.2f}, {len(self.history)}', flush=True)
 
         return 0
