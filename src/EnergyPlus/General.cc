@@ -1407,7 +1407,7 @@ void findReportPeriodIdx(EnergyPlusData &state,
     }
 }
 
-Real64 rotAzmDiffDeg(Real64 const &AzmA, Real64 const &AzmB)
+Real64 rotAzmDiffDeg(Real64 AzmA, Real64 AzmB)
 {
     // This function takes two (azimuth) angles in Degree(s),
     // and returns the rotational angle difference in Degree(s).
