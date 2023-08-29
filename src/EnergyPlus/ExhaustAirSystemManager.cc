@@ -714,6 +714,9 @@ namespace ExhaustAirSystemManager {
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 FlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
                 if (FlowFrac < 0.0) {
+                    ShowWarningError(
+                        state, format("Exhaust Flow Fraction Schedule value is negative for Zone Exhaust Control Named: {};", thisExhCtrl.Name));
+                    ShowContinueError(state, "Reset value to zero and continue the simulation.");
                     FlowFrac = 0.0;
                 }
             }
@@ -722,6 +725,10 @@ namespace ExhaustAirSystemManager {
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 MinFlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
                 if (MinFlowFrac < 0.0) {
+                    ShowWarningError(
+                        state,
+                        format("Minimum Exhaust Flow Fraction Schedule value is negative for Zone Exhaust Control Named: {};", thisExhCtrl.Name));
+                    ShowContinueError(state, "Reset value to zero and continue the simulation.");
                     MinFlowFrac = 0.0;
                 }
             }
