@@ -4282,6 +4282,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     1.67,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     50.0,                    !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     OnDemand,                !- Defrost Control
@@ -4308,6 +4309,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     1.67,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     50.0,                    !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     OnDemand,                !- Defrost Control
@@ -4334,6 +4336,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     1.67,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     50.0,                    !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     OnDemand,                !- Defrost Control
@@ -4360,6 +4363,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     1.67,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     50.0,                    !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     OnDemand,                !- Defrost Control
@@ -4386,6 +4390,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     1.67,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     50.0,                    !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     4.4,                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     OnDemand,                !- Defrost Control

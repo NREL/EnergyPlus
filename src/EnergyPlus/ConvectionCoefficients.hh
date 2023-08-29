@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -233,7 +234,14 @@ namespace Convect {
                           Real64 &HExt,                         // Convection coefficient to exterior air
                           Real64 &HSky,                         // "Convection" coefficient to sky temperature
                           Real64 &HGround,                      // "Convection" coefficient to ground temperature
-                          Real64 &HAir                          // Radiation to Air Component
+                          Real64 &HAir,                         // Radiation to Air Component
+                          Real64 &HSrdSurf                      // Radiation to surrounding surfaces
+    );
+
+    Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state,
+                                              int const SurfNum,     // Surface number (in Surface derived type)
+                                              Real64 const TempExtK, // Exterior surface temperature (K)
+                                              Real64 const AbsExt    // Exterior thermal absorptance
     );
 
     Real64 CalcHfExteriorSparrow(Real64 SurfWindSpeed,                 // Local wind speed at height of the heat transfer surface (m/s)
@@ -318,14 +326,13 @@ namespace Convect {
                                     const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     );
 
-    void CalcNusselt(EnergyPlusData &state,
-                     int SurfNum, // Surface number
-                     Real64 asp,  // Aspect ratio: window height to gap width
-                     Real64 tso,  // Temperature of gap surface closest to outside (K)
-                     Real64 tsi,  // Temperature of gap surface closest to zone (K)
-                     Real64 gr,   // Gap gas Grashof number
-                     Real64 pr,   // Gap gas Prandtl number
-                     Real64 &gnu  // Gap gas Nusselt number
+    Real64 CalcNusselt(EnergyPlusData &state,
+                       int SurfNum, // Surface number
+                       Real64 asp,  // Aspect ratio: window height to gap width
+                       Real64 tso,  // Temperature of gap surface closest to outside (K)
+                       Real64 tsi,  // Temperature of gap surface closest to zone (K)
+                       Real64 gr,   // Gap gas Grashof number
+                       Real64 pr    // Gap gas Prandtl number
     );
 
     Real64 SetExtConvCoeff(EnergyPlusData &state, int SurfNum); // Surface Number
@@ -371,6 +378,16 @@ namespace Convect {
     Real64 CalcUserDefinedIntHcModel(EnergyPlusData &state, int SurfNum, int UserCurveNum);
 
     Real64 CalcUserDefinedExtHcModel(EnergyPlusData &state, int SurfNum, int UserCurveNum);
+
+    void ShowWarningHydraulicDiameterZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
+
+    void ShowWarningDeltaTempZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
+
+    void ShowWarningWindowLocation(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh, IntConvWinLoc winLoc);
+
+    void ShowWarningPerimeterLengthZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
+
+    void ShowWarningFaceAreaZero(EnergyPlusData &state, int &errorIdx, ErrorObjectHeader const &eoh);
 
     //** Begin catalog of Hc equation functions. **** !*************************************************
 
@@ -727,6 +744,22 @@ namespace Convect {
 
     SurfOrientation GetSurfConvOrientation(Real64 const Tilt);
 
+    void ShowSevereValueOutOfRange(EnergyPlusData &state,
+                                   ErrorObjectHeader const &eoh,
+                                   std::string_view fieldName,
+                                   Real64 fieldVal,
+                                   Real64 lo,
+                                   Real64 hi,
+                                   std::string const &msg);
+
+    void ShowSevereScheduleOutOfRange(EnergyPlusData &state,
+                                      ErrorObjectHeader const &eoh,
+                                      std::string_view fieldName,
+                                      std::string_view fieldVal,
+                                      Real64 lo,
+                                      Real64 hi,
+                                      std::string const &msg);
+
 } // namespace Convect
 
 struct ConvectionCoefficientsData : BaseGlobalStruct
@@ -768,12 +801,6 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
     bool ActiveSurfaceCheck = true;
     bool MyEnvirnFlag = true;
     bool FirstRoofSurf = true;
-    int ActiveWallCount = 0;
-    Real64 ActiveWallArea = 0.0;
-    int ActiveCeilingCount = 0;
-    Real64 ActiveCeilingArea = 0.0;
-    int ActiveFloorCount = 0;
-    Real64 ActiveFloorArea = 0.0;
 
     // Object Data
     Convect::IntAdaptiveConvAlgo intAdaptiveConvAlgo; // stores rules for Hc model equations

@@ -215,6 +215,8 @@ namespace HeatBalanceSurfaceManager {
 
     void ReSetGroundSurfacesViewFactor(EnergyPlusData &state, int const SurfNum);
 
+    void GetSurroundingSurfacesTemperatureAverage(EnergyPlusData &state);
+
 } // namespace HeatBalanceSurfaceManager
 
 struct HeatBalSurfMgr : BaseGlobalStruct

@@ -549,10 +549,10 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.ViewFactorSky = round(ViewFactorSky * 10.0) / 10.0;
 
     calcHashKey.HeatTransferAlgorithm = HeatTransferAlgorithm;
-    calcHashKey.intConvCoeff = state.dataSurface->SurfIntConvCoeff(SurfNum);
-    calcHashKey.extConvCoeff = state.dataSurface->SurfExtConvCoeff(SurfNum);
-    calcHashKey.intConvUserCoeffNum = state.dataSurface->SurfIntConvUserCoeffNum(SurfNum);
-    calcHashKey.extConvUserCoeffNum = state.dataSurface->SurfExtConvUserCoeffNum(SurfNum);
+    calcHashKey.intConvModel = state.dataSurface->surfIntConv(SurfNum).model;
+    calcHashKey.extConvModel = state.dataSurface->surfExtConv(SurfNum).model;
+    calcHashKey.intConvUserModelNum = state.dataSurface->surfIntConv(SurfNum).userModelNum;
+    calcHashKey.extConvUserModelNum = state.dataSurface->surfExtConv(SurfNum).userModelNum;
     calcHashKey.OSCPtr = OSCPtr;
     calcHashKey.OSCMPtr = OSCMPtr;
 
@@ -568,6 +568,7 @@ void SurfaceData::make_hash_key(EnergyPlusData &state, const int SurfNum)
     calcHashKey.LinkedOutAirNode = state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode;
     calcHashKey.OutsideHeatSourceTermSchedule = OutsideHeatSourceTermSchedule;
     calcHashKey.InsideHeatSourceTermSchedule = InsideHeatSourceTermSchedule;
+    calcHashKey.ViewFactorSrdSurfs = state.dataSurface->Surface(SurfNum).ViewFactorSrdSurfs;
 }
 
 void SurfaceData::set_representative_surface(EnergyPlusData &state, const int SurfNum)

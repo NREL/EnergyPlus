@@ -2892,6 +2892,20 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         }
     }
     EXPECT_EQ(RegCoilCapacity, state->dataHeatingCoils->HeatingCoil(CoilIndex).NominalCapacity);
+
+    // testing system peak cooling load timestamp
+    int coolPeakDD = 2;
+    auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
+    auto &sysSizPeakDDNum = state->dataSize->SysSizPeakDDNum(1);
+    EXPECT_TRUE(compare_enums(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling));
+    EXPECT_EQ(finalSysSizing.SizingOption, DataSizing::NonCoincident);
+    EXPECT_EQ(sysSizPeakDDNum.SensCoolPeakDD, coolPeakDD);
+    int timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(coolPeakDD);
+    EXPECT_EQ(sysSizPeakDDNum.TimeStepAtTotCoolPk(coolPeakDD), timeStepIndexAtPeakCoolLoad);
+    std::string coolPeakDDDate = sysSizPeakDDNum.cTotCoolPeakDDDate;
+    EXPECT_EQ(coolPeakDDDate, "7/21");
+    std::string dateHrMin = coolPeakDDDate + " " + SizingManager::TimeIndexToHrMinString(*state, timeStepIndexAtPeakCoolLoad);
+    EXPECT_EQ(dateHrMin, "7/21 10:30:00");
 }
 
 TEST_F(EnergyPlusFixture, DesiccantDehum_OnPrimaryAirSystemTest)
@@ -5301,7 +5315,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
         "  Branch,",
         "    Heating Purchased Hot Water Branch,  !- Name",
         "    ,                        !- Pressure Drop Curve Name",
-        "    DistrictHeating,         !- Component 1 Object Type",
+        "    DistrictHeating:Water,         !- Component 1 Object Type",
         "    Purchased Heating,       !- Component 1 Name",
         "    Purchased Heat Inlet Node,  !- Component 1 Inlet Node Name",
         "    Purchased Heat Outlet Node;  !- Component 1 Outlet Node Name",
@@ -5452,10 +5466,10 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_RegenAirHeaterHWCoilSizingTest)
 
         "  PlantEquipmentList,",
         "    heating plant,           !- Name",
-        "    DistrictHeating,         !- Equipment 1 Object Type",
+        "    DistrictHeating:Water,         !- Equipment 1 Object Type",
         "    Purchased Heating;       !- Equipment 1 Name",
 
-        "  DistrictHeating,",
+        "  DistrictHeating:Water,",
         "    Purchased Heating,       !- Name",
         "    Purchased Heat Inlet Node,  !- Hot Water Inlet Node Name",
         "    Purchased Heat Outlet Node,  !- Hot Water Outlet Node Name",
@@ -6536,11 +6550,15 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_VSCoolingCoilOnPrimaryAirSystemTest)
         "    1.05,                    !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}",
         "    1000,                    !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
         "    0.4,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
         "    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name",
         "    Condenser Inlet Node,    !- Condenser Air Inlet Node Name",
         "    AirCooled,               !- Condenser Type",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
         "    0.0,                     !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
         "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
         "    ,                        !- Supply Water Storage Tank Name",

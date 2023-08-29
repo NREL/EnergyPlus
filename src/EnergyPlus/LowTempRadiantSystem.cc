@@ -673,7 +673,7 @@ namespace LowTempRadiantSystem {
                     thisRadSys.SurfaceName(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfName(SurfNum);
                     thisRadSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     if (thisRadSys.SurfacePtr(SurfNum) > 0) {
-                        state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(SurfNum)) = true;
+                        state.dataSurface->surfIntConv(thisRadSys.SurfacePtr(SurfNum)).hasActiveInIt = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -698,8 +698,8 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
                 if (thisRadSys.SurfacePtr(1) != 0) {
-                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(1)) = true;
-                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisRadSys.SurfacePtr(1)) = true;
+                    state.dataSurface->surfIntConv(thisRadSys.SurfacePtr(1)).hasActiveInIt = true;
+                    state.dataSurface->surfIntConv(thisRadSys.SurfacePtr(1)).hasActiveInIt = true; // Ummmm ... what?
                 }
             }
 
@@ -974,7 +974,7 @@ namespace LowTempRadiantSystem {
                     thisCFloSys.SurfaceFrac(SurfNum) = state.dataSurfLists->SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     thisCFloSys.NumCircuits(SurfNum) = 0.0;
                     if (thisCFloSys.SurfacePtr(SurfNum) != 0) {
-                        state.dataSurface->SurfIntConvSurfHasActiveInIt(thisCFloSys.SurfacePtr(SurfNum)) = true;
+                        state.dataSurface->surfIntConv(thisCFloSys.SurfacePtr(SurfNum)).hasActiveInIt = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -1000,7 +1000,7 @@ namespace LowTempRadiantSystem {
                     ErrorsFound = true;
                 }
                 if (thisCFloSys.SurfacePtr(1) != 0) {
-                    state.dataSurface->SurfIntConvSurfHasActiveInIt(thisCFloSys.SurfacePtr(1)) = true;
+                    state.dataSurface->surfIntConv(thisCFloSys.SurfacePtr(1)).hasActiveInIt = true;
                     state.dataSurface->SurfIsRadSurfOrVentSlabOrPool(thisCFloSys.SurfacePtr(1)) = true;
                 }
             }

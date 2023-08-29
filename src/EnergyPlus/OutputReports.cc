@@ -423,9 +423,9 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
             auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
             DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
             std::string refPtType;
-            if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::DElight) {
+            if (thisDaylightControl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
                 refPtType = "DEDayRefPt";
-            } else if (thisDaylightControl.DaylightMethod == DataDaylighting::DaylightingMethod::SplitFlux) {
+            } else if (thisDaylightControl.DaylightMethod == Dayltg::DaylightingMethod::SplitFlux) {
                 refPtType = "DayRefPt";
             }
 
@@ -439,9 +439,9 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
                                                 Format_709,
                                                 normalizeName(thisDaylightControl.ZoneName),
                                                 state.dataSurfColor->DXFcolorno[static_cast<int>(curcolorno)],
-                                                thisDaylightControl.DaylRefPtAbsCoord(1, refpt),
-                                                thisDaylightControl.DaylRefPtAbsCoord(2, refpt),
-                                                thisDaylightControl.DaylRefPtAbsCoord(3, refpt),
+                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).x,
+                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).y,
+                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).z,
                                                 0.2);
                 curcolorno = DataSurfaceColors::ColorNo::DaylSensor2; // ref pts 2 and later are this color
             }
@@ -784,9 +784,9 @@ void DXFOut(EnergyPlusData &state,
                       Format_709,
                       normalizeName(state.dataHeatBal->Zone(zones).Name),
                       DXFcolorno[static_cast<int>(curcolorno)],
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(1, refpt),
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(2, refpt),
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(3, refpt),
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).x,
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).y,
+                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).z,
                       0.05);
             }
         }
@@ -1198,19 +1198,19 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 static constexpr std::array<std::string_view, (int)Convect::OverrideType::Num> overrideTypeStrs = {
                     "User Supplied Value", "User Supplied Schedule", "User Supplied Curve", "User Specified Model"};
 
-                if (state.dataSurface->SurfIntConvUserCoeffNum(surf) != 0) {
-                    IntConvCoeffCalc = overrideTypeStrs[static_cast<int>(
-                        state.dataSurface->UserIntConvCoeffs(state.dataSurface->SurfIntConvUserCoeffNum(surf)).overrideType)];
+                auto const &surfIntConv = state.dataSurface->surfIntConv(surf);
+                auto const &surfExtConv = state.dataSurface->surfExtConv(surf);
+                if (surfIntConv.userModelNum != 0) {
+                    IntConvCoeffCalc = overrideTypeStrs[(int)state.dataSurface->userIntConvModels(surfIntConv.userModelNum).overrideType];
                 } else {
-                    Convect::HcInt hcInt = state.dataSurface->SurfIntConvCoeff(surf);
+                    Convect::HcInt hcInt = surfIntConv.model;
                     if (hcInt == Convect::HcInt::SetByZone) hcInt = state.dataHeatBal->Zone(ZoneNum).IntConvAlgo;
-                    IntConvCoeffCalc = ConvCoeffCalcs[Convect::HcIntReportVals[static_cast<int>(hcInt)] - 1];
+                    IntConvCoeffCalc = ConvCoeffCalcs[Convect::HcIntReportVals[(int)hcInt] - 1];
                 }
-                if (state.dataSurface->SurfExtConvUserCoeffNum(surf) != 0) {
-                    ExtConvCoeffCalc = overrideTypeStrs[static_cast<int>(
-                        state.dataSurface->UserExtConvCoeffs(state.dataSurface->SurfExtConvUserCoeffNum(surf)).overrideType)];
+                if (surfExtConv.userModelNum != 0) {
+                    ExtConvCoeffCalc = overrideTypeStrs[(int)state.dataSurface->userExtConvModels(surfExtConv.userModelNum).overrideType];
                 } else {
-                    Convect::HcExt hcExt = state.dataSurface->SurfExtConvCoeff(surf);
+                    Convect::HcExt hcExt = surfExtConv.model;
                     if (hcExt == Convect::HcExt::SetByZone) hcExt = state.dataHeatBal->Zone(ZoneNum).ExtConvAlgo;
                     ExtConvCoeffCalc = ConvCoeffCalcs[Convect::HcExtReportVals[static_cast<int>(hcExt)] - 1];
                 }

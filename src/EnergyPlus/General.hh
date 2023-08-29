@@ -81,7 +81,7 @@ namespace General {
                    Real64 X_0,  // 1st bound of interval that contains the solution
                    Real64 X_1); // 2nd bound of interval that contains the solution
 
-    constexpr Real64 InterpGeneral(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
+    constexpr Real64 Interp(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
         return Lower + InterpFac * (Upper - Lower);
     }

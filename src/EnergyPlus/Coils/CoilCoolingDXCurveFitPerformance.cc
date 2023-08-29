@@ -107,7 +107,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     }
     // Validate fuel type input
     this->compressorFuelType =
-        static_cast<Constant::eFuel>(getEnumerationValue(Constant::eFuelNamesUC, UtilityRoutines::MakeUPPERCase(input_data.compressor_fuel_type)));
+        static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, UtilityRoutines::makeUPPER(input_data.compressor_fuel_type)));
     if (this->compressorFuelType == Constant::eFuel::Invalid) {
         ShowSevereError(state, std::string{routineName} + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Compressor Fuel Type=\"" + input_data.compressor_fuel_type + "\".");
@@ -123,6 +123,18 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
         setOperMode(state, this->alternateMode2, 3);
     }
 
+    if (!input_data.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name.empty()) {
+        this->crankcaseHeaterCapacityCurveIndex =
+            Curve::GetCurveIndex(state, input_data.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name);
+        // Verify Curve Object, only legal type is Quadratic and Cubic
+        errorsFound |= Curve::CheckCurveDims(state,
+                                             this->crankcaseHeaterCapacityCurveIndex,                                        // Curve index
+                                             {1},                                                                            // Valid dimensions
+                                             routineName,                                                                    // Routine name
+                                             this->object_name,                                                              // Object Type
+                                             this->name,                                                                     // Object Name
+                                             input_data.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name); // Field Name
+    }
     if (errorsFound) {
         ShowFatalError(
             state, std::string{routineName} + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
@@ -166,17 +178,20 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
         } else {
             input_specs.unit_internal_static_air_pressure = state.dataIPShortCut->rNumericArgs(4);
         }
-        input_specs.capacity_control = state.dataIPShortCut->cAlphaArgs(2);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
+            input_specs.outdoor_temperature_dependent_crankcase_heater_capacity_curve_name = state.dataIPShortCut->cAlphaArgs(2);
+        }
+        input_specs.capacity_control = state.dataIPShortCut->cAlphaArgs(3);
         input_specs.basin_heater_capacity = state.dataIPShortCut->rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = state.dataIPShortCut->rNumericArgs(6);
-        input_specs.basin_heater_operating_schedule_name = state.dataIPShortCut->cAlphaArgs(3);
-        input_specs.compressor_fuel_type = state.dataIPShortCut->cAlphaArgs(4);
-        input_specs.base_operating_mode_name = state.dataIPShortCut->cAlphaArgs(5);
+        input_specs.basin_heater_operating_schedule_name = state.dataIPShortCut->cAlphaArgs(4);
+        input_specs.compressor_fuel_type = state.dataIPShortCut->cAlphaArgs(5);
+        input_specs.base_operating_mode_name = state.dataIPShortCut->cAlphaArgs(6);
         if (!state.dataIPShortCut->lAlphaFieldBlanks(6)) {
-            input_specs.alternate_operating_mode_name = state.dataIPShortCut->cAlphaArgs(6);
+            input_specs.alternate_operating_mode_name = state.dataIPShortCut->cAlphaArgs(7);
         }
-        if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-            input_specs.alternate_operating_mode2_name = state.dataIPShortCut->cAlphaArgs(7);
+        if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
+            input_specs.alternate_operating_mode2_name = state.dataIPShortCut->cAlphaArgs(8);
         }
 
         this->instantiateFromInputSpec(state, input_specs);
@@ -351,6 +366,9 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
     // calculate crankcase heater operation
     if (state.dataEnvrn->OutDryBulbTemp < this->maxOutdoorDrybulbForBasin) {
         this->crankcaseHeaterPower = this->crankcaseHeaterCap;
+        if (this->crankcaseHeaterCapacityCurveIndex > 0) {
+            this->crankcaseHeaterPower *= Curve::CurveValue(state, this->crankcaseHeaterCapacityCurveIndex, state.dataEnvrn->OutDryBulbTemp);
+        }
     } else {
         this->crankcaseHeaterPower = 0.0;
     }

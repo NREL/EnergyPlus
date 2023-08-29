@@ -501,8 +501,8 @@ namespace WaterUse {
 
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(8)) && (state.dataIPShortCut->cAlphaArgs(8) != "NONE")) {
                     waterConnection.HeatRecovery = true;
-                    waterConnection.HeatRecoveryHX = static_cast<HeatRecovHX>(
-                        getEnumerationValue(HeatRecoverHXNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(8))));
+                    waterConnection.HeatRecoveryHX =
+                        static_cast<HeatRecovHX>(getEnumValue(HeatRecoverHXNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
                     if (waterConnection.HeatRecoveryHX == HeatRecovHX::Invalid) {
                         ShowSevereError(state,
                                         format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8)));
@@ -511,7 +511,7 @@ namespace WaterUse {
                     }
 
                     waterConnection.HeatRecoveryConfig = static_cast<HeatRecovConfig>(
-                        getEnumerationValue(HeatRecoveryConfigNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(9))));
+                        getEnumValue(HeatRecoveryConfigNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
                     if (waterConnection.HeatRecoveryConfig == HeatRecovConfig::Invalid) {
                         ShowSevereError(state,
                                         format("Invalid {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -740,7 +740,7 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "DISTRICTHEATING",
+                                "DISTRICTHEATINGWATER",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
                                 "Plant");
@@ -754,7 +754,7 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "DISTRICTHEATING",
+                                "DISTRICTHEATINGWATER",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
                                 "Plant");

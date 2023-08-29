@@ -175,6 +175,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -370,6 +371,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -670,6 +672,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -865,6 +868,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -1163,6 +1167,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes
@@ -1358,6 +1363,7 @@
     DXCoilAirInletNode,      !- Air Inlet Node Name
     DXCoilAirOutletNode,     !- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     0,                       !- Number of Enhanced Dehumidification Modes

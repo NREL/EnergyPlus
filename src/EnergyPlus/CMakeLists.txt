@@ -14,7 +14,6 @@ set(PYTHON_API_VERSION_MINOR 2)
 set(BUILD_PLATFORM_STRING "${SYSTEM_NICKNAME}_${TARGET_ARCH}")
 configure_file(DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc")
 configure_file(ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema")
 
 if(LINK_WITH_PYTHON)
   add_compile_definitions(LINK_WITH_PYTHON)
@@ -216,7 +215,6 @@ set(SRC
     DataSystemVariables.cc
     DataSystemVariables.hh
     DataTimings.hh
-    DataUCSDSharedData.hh
     DataVectorTypes.hh
     DataViewFactorInformation.hh
     DataWater.hh
@@ -388,8 +386,6 @@ set(SRC
     InputProcessing/CsvParser.cc
     InputProcessing/CsvParser.hh
     InputProcessing/DataStorage.hh
-    InputProcessing/EmbeddedEpJSONSchema.hh
-    "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
     IOFiles.cc
     IOFiles.hh
     InputProcessing/IdfParser.cc
@@ -466,6 +462,7 @@ set(SRC
     Plant/Connection.hh
     Plant/DataPlant.hh
     Plant/Enums.hh
+    Plant/EquipAndOperations.cc
     Plant/EquipAndOperations.hh
     Plant/Loop.cc
     Plant/Loop.hh
@@ -690,8 +687,6 @@ set(INPUTPARSING_SRC
     DataStringGlobals.hh
     FileSystem.cc
     FileSystem.hh
-    InputProcessing/EmbeddedEpJSONSchema.hh
-    "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
     InputProcessing/IdfParser.cc
     InputProcessing/IdfParser.hh
     InputProcessing/InputValidation.cc
@@ -699,19 +694,6 @@ set(INPUTPARSING_SRC
     UtilityRoutines.hh)
 
 create_src_groups("${INPUTPARSING_SRC}")
-
-add_custom_target(
-  GenerateEmbeddedEpJSONSchema
-  COMMAND
-    ${CMAKE_COMMAND}
-        -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
-        -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-        -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
-        -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
-        -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddable_epJSON_schema>"
-        -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS generate_embeddable_epJSON_schema)
 
 add_subdirectory(AirflowNetwork)
 
@@ -747,8 +729,7 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
-add_dependencies(energyplusparser GenerateEmbeddedEpJSONSchema)
-target_link_libraries(energyplusparser PUBLIC ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
+target_link_libraries(energyplusparser PUBLIC embedded_epjson_source ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
@@ -765,7 +746,8 @@ add_library(energypluslib STATIC ${SRC})
 
 target_link_libraries(
   energypluslib
-  PUBLIC fmt::fmt
+  PUBLIC embedded_epjson_source
+         fmt::fmt
          ModernJSON
          objexx
          sqlite
@@ -787,7 +769,6 @@ target_link_libraries(energypluslib PRIVATE project_options project_fp_options p
 if(OPENGL_FOUND)
   target_link_libraries(energypluslib PUBLIC penumbra)
 endif()
-add_dependencies(energypluslib GenerateEmbeddedEpJSONSchema)
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries(energypluslib PUBLIC groundplot)
@@ -1090,6 +1071,46 @@ if(BUILD_TESTING)
   set_tests_properties("API.test_SysExit" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
   add_test(NAME "API.test_OutputFiles" COMMAND "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py")
   set_tests_properties("API.test_OutputFiles" PROPERTIES ENVIRONMENT PYTHONPATH=${DIR_WITH_PY_ENERGYPLUS})
+
+  # 9825 - Test some non-ASCII directories
+  set(CLI_TEST_DIR "${PROJECT_BINARY_DIR}/tst/cli")
+  set(EXAMPLES_FILES_DIR "${PROJECT_SOURCE_DIR}/testfiles")
+
+  # This has some accented chars, and also the nice thing about it is that in `C:\path\dir\térmica`, you do have something that could be a `\t` escape sequence
+  set(NON_ASCII_DIRNAME "térmicà")
+  set(INPUT_TEST_DIR "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}")
+  file(MAKE_DIRECTORY ${INPUT_TEST_DIR})
+
+  set(TEST_CASE "1ZoneUncontrolled")
+  set(IDF_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.idf")
+  configure_file(${IDF_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.idf" COPYONLY)
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.NoPlugin.FromWithin
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/NoPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+  )
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.NoPlugin.FromOutside
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/NoPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+  )
+
+  set(TEST_CASE "PythonPlugin1ZoneUncontrolledCondFD")
+  set(IDF_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.idf")
+  configure_file(${IDF_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.idf" COPYONLY)
+  set(PY_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.py")
+  configure_file(${PY_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.py" COPYONLY)
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+  )
+
+  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
+    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+  )
+
 endif()
 
 if(UNIX AND NOT APPLE)
