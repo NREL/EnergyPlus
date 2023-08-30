@@ -1618,7 +1618,7 @@ void SQLite::createSQLiteTimeIndexRecord(int const reportingInterval,
 
         static std::vector<int> lastDayOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
         if (curYearIsLeapYear) {
-            lastDayOfMonth[2] = 29;
+            lastDayOfMonth[1] = 29;
         }
 
         switch (reportingInterval) {
