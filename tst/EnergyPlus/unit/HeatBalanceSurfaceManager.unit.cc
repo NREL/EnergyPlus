@@ -8557,7 +8557,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
 {
     Real64 const diffTol = 0.0000000001;
     Real64 expectedResult;
-    
+
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->space.allocate(1);
     state->dataSurface->Surface.allocate(1);
@@ -8570,14 +8570,14 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     state->dataHeatBalSurf->SurfQdotRadSolarInRepPerArea.dimension(1, 0.0);
     state->dataHeatBalSurf->SurfOpaqQRadSWInAbs.dimension(1, 0.0);
     state->dataHeatBalSurf->SurfQdotRadLightsInPerArea.dimension(1, 0.0);
-    
+
     auto &thisZone = state->dataHeatBal->Zone(1);
     auto &thisSpace = state->dataHeatBal->space(1);
     auto &thisSurface = state->dataSurface->Surface(1);
     auto &thisRep = state->dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(1);
     auto &thisQRadSW = state->dataHeatBalSurf->SurfOpaqQRadSWInAbs(1);
     auto &thisLights = state->dataHeatBalSurf->SurfQdotRadLightsInPerArea(1);
-    
+
     state->dataGlobal->NumOfZones = 1;
     thisZone.spaceIndexes.allocate(1);
     thisZone.spaceIndexes(1) = 1;
@@ -8589,13 +8589,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     thisSpace.OpaqOrWinSurfaceLast = 0;
     thisSpace.OpaqOrIntMassSurfaceFirst = 1;
     thisSpace.OpaqOrIntMassSurfaceLast = 1;
-    
+
     // Test 1: all zero values--returns a zero (all are already zero--so just call and check)
     thisRep = -9999.9;
     expectedResult = 0.0;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
-    
+
     // Test 2: positive values that shouldn't return zero
     thisRep = -9999.9;
     expectedResult = 3.0;
@@ -8603,7 +8603,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     thisLights = 3.0;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
-    
+
     // Test 3: positive value that would calculate negative--should return zero
     thisRep = -9999.9;
     expectedResult = 0.0;
@@ -8611,7 +8611,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     thisLights = 7.0;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
-    
+
     // Test 4: positive values that would calculate a very small number--should return zero
     thisRep = -9999.9;
     expectedResult = 0.0;
@@ -8620,7 +8620,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
 }
-    
+
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurroundingSurfacesTempTest)
 {
     std::string_view constexpr idf_objects = R"IDF(
