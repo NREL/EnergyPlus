@@ -173,6 +173,23 @@ namespace DataHVACGlobals {
     int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
 
+    enum class EconomizerStagingType
+    // OA Controller Economizer Staging
+    {
+        Invalid = -1,
+        EconomizerFirst,                  // system air flow rate and economizer is ramped-up before using mechanical cooling
+        InterlockedWithMechanicalCooling, // economizer operation (flow rate) depends on the cooling speed chosen by the system
+        Num
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeUC = {
+        "ECONOMIZERFIRST",
+        "INTERLOCKEDWITHMECHANICALCOOLING",
+    };
+    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeCC = {
+        "EconomizerFirst",
+        "InterlockedWithMechanicalCooling",
+    };
+
     // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);
     // Furnace/Unitary System Types
@@ -460,16 +477,18 @@ struct HVACGlobalsData : BaseGlobalStruct
     Real64 MSHPWasteHeat = 0.0;             // Waste heat
     Real64 PreviousTimeStep = 0.0;          // The time step length at the previous time step
     bool ShortenTimeStepSysRoomAir = false; // Logical flag that triggers shortening of system time step
+    // For multispeed unitary systems
+    Real64 MSUSEconoSpeedNum = 0; // Economizer speed
 
     Real64 deviationFromSetPtThresholdHtg = -0.2; // heating threshold for reporting setpoint deviation
     Real64 deviationFromSetPtThresholdClg = 0.2;  // cooling threshold for reporting setpoint deviation
 
-    bool SimAirLoopsFlag;                   // True when the air loops need to be (re)simulated
-    bool SimElecCircuitsFlag;               // True when electic circuits need to be (re)simulated
-    bool SimPlantLoopsFlag;                 // True when the main plant loops need to be (re)simulated
-    bool SimZoneEquipmentFlag;              // True when zone equipment components need to be (re)simulated
-    bool SimNonZoneEquipmentFlag;           // True when non-zone equipment components need to be (re)simulated
-    bool ZoneMassBalanceHVACReSim;          // True when zone air mass flow balance and air loop needs (re)simulated
+    bool SimAirLoopsFlag = false;           // True when the air loops need to be (re)simulated
+    bool SimElecCircuitsFlag = false;       // True when electic circuits need to be (re)simulated
+    bool SimPlantLoopsFlag = false;         // True when the main plant loops need to be (re)simulated
+    bool SimZoneEquipmentFlag = false;      // True when zone equipment components need to be (re)simulated
+    bool SimNonZoneEquipmentFlag = false;   // True when non-zone equipment components need to be (re)simulated
+    bool ZoneMassBalanceHVACReSim = false;  // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
     Array1D<Real64> MaxRatedVolFlowPerRatedTotCap =
