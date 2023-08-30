@@ -2139,7 +2139,8 @@ namespace OutputProcessor {
             op->EnergyMeters(Meter).MNValue += op->EnergyMeters(Meter).TSValue;
             op->EnergyMeters(Meter).YRValue += op->EnergyMeters(Meter).TSValue;
             op->EnergyMeters(Meter).SMValue += op->EnergyMeters(Meter).TSValue;
-            if (op->isFinalYear) op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
+            //if (op->isFinalYear) op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
+            op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
         }
         // Set Max
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
@@ -2164,12 +2165,12 @@ namespace OutputProcessor {
                 op->EnergyMeters(Meter).SMMaxVal = op->EnergyMeters(Meter).TSValue;
                 op->EnergyMeters(Meter).SMMaxValDate = TimeStamp;
             }
-            if (op->isFinalYear) {
-                if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).FinYrSMMaxVal) {
-                    op->EnergyMeters(Meter).FinYrSMMaxVal = op->EnergyMeters(Meter).TSValue;
-                    op->EnergyMeters(Meter).FinYrSMMaxValDate = TimeStamp;
-                }
+            //if (op->isFinalYear) {
+            if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).FinYrSMMaxVal) {
+                op->EnergyMeters(Meter).FinYrSMMaxVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).FinYrSMMaxValDate = TimeStamp;
             }
+            //}
         }
         // Set Min
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
@@ -2193,12 +2194,12 @@ namespace OutputProcessor {
                 op->EnergyMeters(Meter).SMMinVal = op->EnergyMeters(Meter).TSValue;
                 op->EnergyMeters(Meter).SMMinValDate = TimeStamp;
             }
-            if (op->isFinalYear) {
-                if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).FinYrSMMinVal) {
-                    op->EnergyMeters(Meter).FinYrSMMinVal = op->EnergyMeters(Meter).TSValue;
-                    op->EnergyMeters(Meter).FinYrSMMinValDate = TimeStamp;
-                }
+            //if (op->isFinalYear) {
+            if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).FinYrSMMinVal) {
+                op->EnergyMeters(Meter).FinYrSMMinVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).FinYrSMMinValDate = TimeStamp;
             }
+            //}
         }
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             op->MeterValue(Meter) = 0.0; // Ready for next update
