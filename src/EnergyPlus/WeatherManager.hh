@@ -971,15 +971,15 @@ struct WeatherManagerData : BaseGlobalStruct
     Array1D_string SPSiteScheduleUnits;                   // SP Site Schedule Units NOLINT(cert-err58-cpp)
     int NumSPSiteScheduleNamePtrs;                        // Number of SP Site Schedules (DesignDay only)
     // Number of hours of missing data
-    Array1D<Real64> Interpolation;      // Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
-    Array1D<Real64> SolarInterpolation; // Solar Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
-    Array1D_int EndDayOfMonth;          // NOLINT(cert-err58-cpp)
-    Array1D_int EndDayOfMonthWithLeapDay;  // end day of the month including Feb 29 for leap years instead of Feb 28
-    int LeapYearAdd;                    // Set during environment if leap year is active (adds 1 to number days in Feb)
-    bool DatesShouldBeReset;            // True when weekdays should be reset
-    bool StartDatesCycleShouldBeReset;  // True when start dates on repeat should be reset
-    bool Jan1DatesShouldBeReset;        // True if Jan 1 should signal reset of dates
-    bool RPReadAllWeatherData;          // True if need to read all weather data prior to simulation
+    Array1D<Real64> Interpolation;        // Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
+    Array1D<Real64> SolarInterpolation;   // Solar Interpolation values based on Number of Time Steps in Hour NOLINT(cert-err58-cpp)
+    Array1D_int EndDayOfMonth;            // NOLINT(cert-err58-cpp)
+    Array1D_int EndDayOfMonthWithLeapDay; // end day of the month including Feb 29 for leap years instead of Feb 28
+    int LeapYearAdd;                      // Set during environment if leap year is active (adds 1 to number days in Feb)
+    bool DatesShouldBeReset;              // True when weekdays should be reset
+    bool StartDatesCycleShouldBeReset;    // True when start dates on repeat should be reset
+    bool Jan1DatesShouldBeReset;          // True if Jan 1 should signal reset of dates
+    bool RPReadAllWeatherData;            // True if need to read all weather data prior to simulation
 
     // Object Data
     // NOLINTNEXTLINE(cert-err58-cpp)
@@ -1285,8 +1285,8 @@ struct WeatherManagerData : BaseGlobalStruct
           DaylightSavingIsActive(false), WFAllowsLeapYears(false), curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0),
           NumWPSkyTemperatures(0), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0),
           HorizIRSky(0.0), TimeStepFraction(0.0), NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}),
-          EndDayOfMonthWithLeapDay(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}),
-          LeapYearAdd(0), DatesShouldBeReset(false), StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
+          EndDayOfMonthWithLeapDay(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), LeapYearAdd(0), DatesShouldBeReset(false),
+          StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
     {
     }
 };

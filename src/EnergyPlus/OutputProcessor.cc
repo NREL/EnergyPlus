@@ -3305,8 +3305,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
-                                                                                state.dataEnvrn->CurrentYearIsLeapYear
-                );
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear);
             }
             break;
         default:

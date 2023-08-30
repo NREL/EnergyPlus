@@ -851,7 +851,8 @@ namespace WeatherManager {
                             state.dataWeatherManager->LeapYearAdd = 0;
                         }
                         if (state.dataEnvrn->CurrentYearIsLeapYear) {
-                            state.dataWeatherManager->EndDayOfMonthWithLeapDay(2) = state.dataWeatherManager->EndDayOfMonth(2) + state.dataWeatherManager->LeapYearAdd;
+                            state.dataWeatherManager->EndDayOfMonthWithLeapDay(2) =
+                                state.dataWeatherManager->EndDayOfMonth(2) + state.dataWeatherManager->LeapYearAdd;
                         }
                         state.dataWeatherManager->UseDaylightSaving = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseDST;
                         state.dataWeatherManager->UseSpecialDays = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).UseHolidays;
