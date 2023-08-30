@@ -350,6 +350,56 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord)
     state->dataSQLiteProcedures->sqlite->sqliteCommit();
 }
 
+TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord_NonLeapDay)
+{
+    // set the leap year flag to false (6th argument) and expect the last day of february to be the 28th
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2012, false);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, false, 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, false, 2); // February
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, false, 3);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, false, 4);
+    auto result = queryResult("SELECT * FROM Time;", "Time");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    ASSERT_EQ(5ul, result.size());
+    std::vector<std::string> testResult0{"1", "", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
+    std::vector<std::string> testResult1{"2", "2012", "1", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+    std::vector<std::string> testResult2{"3", "2012", "2", "28", "24", "0", "", "40320", "3", "1", "", "0", ""}; // February
+    std::vector<std::string> testResult3{"4", "2012", "3", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+    std::vector<std::string> testResult4{"5", "2012", "4", "30", "24", "0", "", "43200", "3", "1", "", "0", ""};
+    EXPECT_EQ(testResult0, result[0]);
+    EXPECT_EQ(testResult1, result[1]);
+    EXPECT_EQ(testResult2, result[2]);
+    EXPECT_EQ(testResult3, result[3]);
+    EXPECT_EQ(testResult4, result[4]);
+}
+
+TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteTimeIndexRecord_LeapDay)
+{
+    // set the leap year flag to true (6th argument) and expect the last day of february to be the 29th
+    state->dataSQLiteProcedures->sqlite->sqliteBegin();
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2012, true);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, true, 1);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, true, 2); // February
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, true, 3);
+    state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(3, 1, 1, 0, 2012, true, 4);
+    auto result = queryResult("SELECT * FROM Time;", "Time");
+    state->dataSQLiteProcedures->sqlite->sqliteCommit();
+
+    ASSERT_EQ(5ul, result.size());
+    std::vector<std::string> testResult0{"1", "", "", "", "", "", "", "1440", "4", "1", "", "0", ""};
+    std::vector<std::string> testResult1{"2", "2012", "1", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+    std::vector<std::string> testResult2{"3", "2012", "2", "29", "24", "0", "", "41760", "3", "1", "", "0", ""}; // February
+    std::vector<std::string> testResult3{"4", "2012", "3", "31", "24", "0", "", "44640", "3", "1", "", "0", ""};
+    std::vector<std::string> testResult4{"5", "2012", "4", "30", "24", "0", "", "43200", "3", "1", "", "0", ""};
+    EXPECT_EQ(testResult0, result[0]);
+    EXPECT_EQ(testResult1, result[1]);
+    EXPECT_EQ(testResult2, result[2]);
+    EXPECT_EQ(testResult3, result[3]);
+    EXPECT_EQ(testResult4, result[4]);
+}
+
 TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord)
 {
     state->dataSQLiteProcedures->sqlite->sqliteBegin();
