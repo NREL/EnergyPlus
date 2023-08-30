@@ -3429,6 +3429,7 @@
     DOAS Supply Fan Outlet,  !- Air Inlet Node Name
     DOAS Cooling Coil Outlet,!- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     2,                       !- Number of Capacity Stages
     1,                       !- Number of Enhanced Dehumidification Modes
@@ -3593,9 +3594,9 @@
     DOAS Cooling Coil Outlet,!- Air Inlet Node Name
     DOAS Heating Coil Outlet,!- Air Outlet Node Name
     DOAS Heating Coil Outlet,!- Temperature Setpoint Node Name
-    0.0,                     !- Parasitic Electric Load {W}
+    0.0,                     !- On Cycle Parasitic Electric Load {W}
     DOAS Heating Coil PLF-FPLR,  !- Part Load Fraction Correlation Curve Name
-    0;                       !- Parasitic Fuel Load {W}
+    0;                       !- Off Cycle Parasitic Fuel Load {W}
 
   Curve:Cubic,
     DOAS Heating Coil PLF-FPLR,  !- Name

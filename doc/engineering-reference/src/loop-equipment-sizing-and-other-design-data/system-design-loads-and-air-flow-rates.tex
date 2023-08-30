@@ -164,7 +164,7 @@ Here $\rho$\(_{air}\) is the density of dry air at 20\(^{\circ}\)C and standard 
 {\setlength\parindent{25pt} \(T_{outside}\) is the current outside air temperature {[}C{]}; }
 {\setlength\parindent{25pt} \(W_{outside}\) is the current outside air humidity ratio {[}kg water / kg dry air{]}. }
 
-Note: When latent sizing is requested the zone design supply air humidity ratio used during zone latent sizing is used as the system cooling coil outlet air humidity ratio (\emph{w\(_{sup}\)}) for sytem cooling coil sizing. The system cooling coil outlet air humidity ratio is calculated as a mass flow rate weighted average of each zone's latent cooling supply air humidity ratio. See \emph{Sizing:Zone} field \emph{Zone Latent Cooling Design Supply Air Humidity Ratio Input Method}. This calculated value is used only when one or more zone latent load is found to be greater than that zone's sensible load, or latent only sizing is requested. A control method that enables the system cooling coil to dehumidify to the design latent supply air humidity ratio is suggested so that the system sensible load can be exceeded when additional dehumidification is required.
+Note: When latent sizing is requested the zone design supply air humidity ratio used during zone latent sizing is used as the system cooling coil outlet air humidity ratio (\emph{w\(_{sup}\)}) for system cooling coil sizing. The system cooling coil outlet air humidity ratio is calculated as a mass flow rate weighted average of each zone's latent cooling supply air humidity ratio. See \emph{Sizing:Zone} field \emph{Zone Latent Cooling Design Supply Air Humidity Ratio Input Method}. This calculated value is used only when one or more zone latent load is found to be greater than that zone's sensible load, or latent only sizing is requested. A control method that enables the system cooling coil to dehumidify to the design latent supply air humidity ratio is suggested so that the system sensible load can be exceeded when additional dehumidification is required.
 
 
 \begin{enumerate}
@@ -239,7 +239,7 @@ If the user has specified \emph{noncoincident}system sizing then:
 
 \emph{DesMainVolFlow\(_{sys}\)} = \textbf{Max}(\emph{DesCoolVolFlow\(_{sys}\)}, \emph{DesHeatVolFlow\(_{sys}\)})
 
-Based on the outdoor air method selected, the \emph{DesCoolVolFlow\(_{sys}\)} and \emph{DesHeatVolFlow\(_{sys}\)} are modified based on the system ventilation effciency calculated based on the maximum outdoor air fraction.
+Based on the outdoor air method selected, the \emph{DesCoolVolFlow\(_{sys}\)} and \emph{DesHeatVolFlow\(_{sys}\)} are modified based on the system ventilation efficiency calculated based on the maximum outdoor air fraction.
 
 \subsubsection{EndSysSizingCalc}\label{endsyssizingcalc}
 
@@ -477,7 +477,7 @@ The design outdoor air flow rate input in the Sizing:System object can be set to
 
 \subsection{Scalable System HVAC Sizing}\label{scalable-system-HVAC-sizing}
 
-The scalable system sizing applies to system supply air flow rates and sysyem capacity in coolin and heating modes.
+The scalable system sizing applies to system supply air flow rates and system capacity in cooling and heating modes.
 
 \textbf{Scalable System Air Flow Sizing}
 
