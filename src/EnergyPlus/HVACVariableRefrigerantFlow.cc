@@ -11369,6 +11369,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     Real64 T_comp_in;                // temperature of refrigerant at compressor inlet, after piping loss (c) [C]
     Real64 TU_HeatingLoad;           // Heating load from terminal units, excluding heating loss [W]
     Real64 TU_CoolingLoad;           // Cooling load from terminal units, excluding heating loss [W]
+    Real64 TU_CoolingLoad_actual;    // TU_CoolingLoad trimed to maximum system capacity[W]
     Real64 Tdischarge;               // VRF Compressor discharge refrigerant temperature [C]
     Real64 Tsuction;                 // VRF compressor suction refrigerant temperature [C]
     Real64 Tolerance;                // Tolerance for condensing temperature calculation [C]
@@ -11436,6 +11437,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     }
     this->TUCoolingLoad = TU_CoolingLoad; // this is cooling coil load, not terminal unit load
     this->TUHeatingLoad = TU_HeatingLoad; // this is heating coil load, not terminal unit load
+    TU_CoolingLoad_actual = TU_CoolingLoad;
 
     // loop through TU's and calculate average inlet conditions for active coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
@@ -11571,9 +11573,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         if (Q_c_TU_PL > CompEvaporatingCAPSpdMax) {
             // Required load is beyond the max system capacity
 
-            Q_c_TU_PL = CompEvaporatingCAPSpdMax;
-            TU_CoolingLoad = CompEvaporatingCAPSpdMax;
-            this->TUCoolingLoad = TU_CoolingLoad;
+            TU_CoolingLoad_actual = min(TU_CoolingLoad, CompEvaporatingCAPSpdMax);
             RefTSat = GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
             h_IU_evap_out = GetSupHeatEnthalpyRefrig(state,
                                                      this->RefrigerantName,
@@ -11582,7 +11582,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                                      RefrigerantIndex,
                                                      RoutineName);
             SH_IU_merged = 3;
-            m_ref_IU_evap = TU_CoolingLoad / (h_IU_evap_out - h_IU_evap_in);
+            m_ref_IU_evap = TU_CoolingLoad_actual / (h_IU_evap_out - h_IU_evap_in);
 
         } else {
 
@@ -11734,12 +11734,12 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
             this->CoffEvapCap * this->RatedEvapCapacity *
             CurveValue(
                 state, this->OUCoolingCAPFT(NumOfCompSpdInput), Tdischarge, Tsuction); // Include the piping loss, at the highest compressor speed
-        this->PipingCorrectionCooling = TU_CoolingLoad / (TU_CoolingLoad + Pipe_Q_c);
+        this->PipingCorrectionCooling = TU_CoolingLoad_actual / (TU_CoolingLoad_actual + Pipe_Q_c);
         state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = this->CoolingCapacity; // for report, maximum evaporating capacity of the system
 
         this->HeatingCapacity = 0.0;         // Include the piping loss
         this->PipingCorrectionHeating = 1.0; // 1 means no piping loss
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = 0.0;
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = 0.0; // yujie: might be wrong here too, should be MaxCap = 1e+20
 
         this->OUCondHeatRate = Q_h_OU;
         this->OUEvapHeatRate = 0;
@@ -11957,7 +11957,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
         this->CoolingCapacity = 0.0; // Include the piping loss
         this->PipingCorrectionCooling = 0.0;
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = 0.0; // for report
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = 0.0; // for report . yujie: might be wrong here too, should be MaxCap = 1e+20
 
         this->OUCondHeatRate = 0;
         this->OUEvapHeatRate = Q_c_OU;

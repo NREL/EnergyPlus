@@ -881,7 +881,8 @@ namespace DXCoils {
                                   int const FanOpMode,                               // Allows parent object to control fan operation
                                   Real64 const CompCycRatio,                         // cycling ratio of VRF condenser
                                   ObjexxFCL::Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                                  ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
+                                  ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
+                                  ObjexxFCL::Optional<Real64 const> MaxCoolCap         // maximum allowed cooling capacity
     );
 
     void

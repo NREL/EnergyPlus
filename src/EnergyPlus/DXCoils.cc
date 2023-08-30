@@ -234,7 +234,8 @@ void SimDXCoil(EnergyPlusData &state,
         CalcDXHeatingCoil(state, DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio, MaxCap);
     } break;
     case CoilVRF_FluidTCtrl_Cooling: {
-        CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _);
+        CalcVRFCoolingCoil_FluidTCtrl(
+            state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _, MaxCap);
     } break;
     case CoilVRF_FluidTCtrl_Heating: {
         CalcVRFHeatingCoil_FluidTCtrl(state, CompressorOp, DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap);
@@ -6962,7 +6963,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
             } else if (thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilVRF_Cooling) {
                 CalcVRFCoolingCoil(state, DXCoilNum, CompressorOperation::On, false, 1.0, 1.0, 1.0, _, _, _);
             } else if (thisDXCoil.DXCoilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling) {
-                CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, CompressorOperation::On, false, 1.0, 1.0, 1.0, _, _);
+                CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, CompressorOperation::On, false, 1.0, 1.0, 1.0, _, _, _);
             }
 
             // coil outlets
@@ -16613,7 +16614,8 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
                                    int const FanOpMode,                    // Allows parent object to control fan operation
                                    Real64 const CompCycRatio,              // cycling ratio of VRF condenser
                                    ObjexxFCL::Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
+                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
+                                   ObjexxFCL::Optional<Real64 const> MaxCoolCap         // maximum allowed cooling capacity
 )
 {
     // SUBROUTINE INFORMATION:
@@ -16838,7 +16840,12 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
             ShowFatalError(state, format("{} \"{}\" - Rated total cooling capacity is zero or less.", thisDXCoil.DXCoilType, thisDXCoil.Name));
         }
 
-        TotCap = thisDXCoil.RatedTotCap(Mode);
+        if (present(MaxCoolCap)) {
+            TotCap = min(MaxCoolCap, thisDXCoil.RatedTotCap(Mode));
+        } else {
+            TotCap = thisDXCoil.RatedTotCap(Mode);
+        }
+
         QCoilReq = -PartLoadRatio * TotCap;
         if (PartLoadRatio == 0.0) {
             AirMassFlowMin = state.dataHVACVarRefFlow->OACompOffMassFlow;
