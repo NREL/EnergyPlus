@@ -13811,8 +13811,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
 
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
-                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-                        thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
+                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                         DefrostEIRTempModFac = CurveValue(state, thisDXCoil.DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         LoadDueToDefrostLS =
                             (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (thisDXCoil.MSRatedTotCap(SpeedNumLS) / 1.01667);
@@ -14026,8 +14025,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
 
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
-                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-                        thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
+                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                         LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (thisDXCoil.MSRatedTotCap(1) / 1.01667);
                         DefrostEIRTempModFac = CurveValue(state, thisDXCoil.DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         thisDXCoil.DefrostPower = DefrostEIRTempModFac * (thisDXCoil.MSRatedTotCap(1) / 1.01667) * FractionalDefrostTime;
