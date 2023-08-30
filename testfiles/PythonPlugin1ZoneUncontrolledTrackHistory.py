@@ -53,40 +53,33 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import idd_parser
-import modify_schema
-import json
-import sys
-from os import path
+
+from pyenergyplus.plugin import EnergyPlusPlugin
 
 
-source_dir_path = sys.argv[1]
-data = idd_parser.Data()
-idd_path = path.join(source_dir_path, 'Energy+.idd')
-if path.exists(idd_path):
-    with open(idd_path, 'r') as f:
-        data.file = f.read()
-else:
-    # this script is also used in the sphinx documentation, which doesn't do a CMake configuration run
-    # so the runtime/Products/Energy+.idd file is not generated.  The script is just executed on the raw
-    # Energy+.idd.in file in the idd folder.  So try to find the .in file if we couldn't find the
-    # generated idd file.
-    idd_in_path = path.join(source_dir_path, 'Energy+.idd.in')
-    if path.exists(idd_in_path):
-        with open(idd_in_path, 'r') as f:
-            data.file = f.read()
-    else:
-        print(f"Could not find E+ IDD, looked for both: {idd_path} and {idd_in_path}.  Aborting")
-        sys.exit(1)
+class HistoryTracker(EnergyPlusPlugin):
 
-idd_parser.parse_idd(data)
-modify_schema.change_schedule_compact(data.schema)
-modify_schema.change_utility_cost(data.schema)
-modify_schema.change_special_cased_enums(data.schema)
-modify_schema.change_special_cased_name_fields(data.schema)
-modify_schema.change_extensions_name(data.schema)
-modify_schema.change_89_release_issues(data.schema)
-modify_schema.add_explicit_extensible_bounds(data.schema)
+    def __init__(self):
+        super().__init__()
+        self.handle = None
+        self.history = []
 
-with open(path.join(source_dir_path, 'Energy+.schema.epJSON'), 'w') as f2:
-    f2.write(json.dumps(data.schema, indent=4))
+    def on_begin_timestep_before_predictor(self, state) -> int:
+        # wait until API is ready and we are on the weather file run period
+        if not self.api.exchange.api_data_fully_ready(state) or self.api.exchange.kind_of_sim(state) != 3:
+            return 0
+
+        # do one-time things when we first need to get the variable handle
+        if self.handle is None:
+            # get air temperature handles
+            zone_name = self.api.exchange.get_object_names(state, "Zone")[0]
+            self.handle = self.api.exchange.get_variable_handle(state, "Zone Mean Air Temperature", zone_name)
+            print("Time [hr], Zone Temp [C], Num History Terms", flush=True)
+
+        # get current values, then update history array
+        datetime = (self.api.exchange.day_of_year(state) - 1) * 24 + self.api.exchange.current_time(state)
+        temp = self.api.exchange.get_variable_value(state, self.handle)
+        self.history.append((datetime, temp))
+        print(f'{datetime:0.2f}, {temp:0.2f}, {len(self.history)}', flush=True)
+
+        return 0

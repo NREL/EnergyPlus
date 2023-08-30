@@ -167,6 +167,7 @@ protected:
             "Coil:Cooling:DX:CurveFit:Performance, ",
             " " + performanceName + ",             ", // name
             " 100,                                 ", // crankcase heater capacity
+            " ,                                    ", // Crankcase Heater Capacity Function of Temperature Curve Name
             " 0,                                   ", // min OAT for compressor
             " 1,                                   ", // max OAT for basin heater
             " 100,                                 ", // static pressure

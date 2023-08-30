@@ -137,6 +137,8 @@ extension_renaming = {
     'Parametric:FileNameSuffix': 'suffixes',
     'Parametric:RunControl': 'runs',
     'ZoneHVAC:EquipmentList': 'equipment',
+    'SpaceHVAC:ZoneEquipmentSplitter': 'spaces',
+    'SpaceHVAC:ZoneEquipmentMixer': 'spaces',
     'AvailabilityManagerAssignmentList': 'managers',
     'Table:IndependentVariable': 'values',
     'Table:IndependentVariableList': 'independent_variables',

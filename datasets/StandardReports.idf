@@ -223,9 +223,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     DistrictCooling:Facility,!- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    DistrictHeating:Facility,!- Variable or Meter 3 Name
+    DistrictHeatingWater:Facility,!- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    DistrictHeating:Facility,!- Variable or Meter 4 Name
+    DistrictHeatingWater:Facility,!- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -615,13 +615,13 @@
     ,                        !- Digits After Decimal
     Boiler Heating Energy,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Boiler Gas Energy,       !- Variable or Meter 2 Name
+    Boiler NaturalGas Energy, !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Boiler Heating Energy,   !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
     Boiler Heating Rate,     !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Boiler Gas Rate,         !- Variable or Meter 5 Name
+    Boiler NaturalGas Rate,  !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
     Boiler Inlet Temperature,!- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
@@ -871,7 +871,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Water Heater Burner Heating Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Water Heater Gas Energy, !- Variable or Meter 4 Name
+    Water Heater NaturalGas Energy, !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 5 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 5
@@ -893,7 +893,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Generator Diesel Energy, !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Generator Gas Energy,    !- Variable or Meter 3 Name
+    Generator NaturalGas Energy,     !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Generator Produced Electricity Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4
@@ -1021,7 +1021,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Air System Electricity Energy,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Air System Gas Energy,   !- Variable or Meter 5 Name
+    Air System NaturalGas Energy,   !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
     Air System Water Volume, !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
@@ -1061,7 +1061,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
     Air System Heating Coil Electricity Energy,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Air System Heating Coil Gas Energy,  !- Variable or Meter 7 Name
+    Air System Heating Coil NaturalGas Energy,  !- Variable or Meter 7 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 7
     Air System Heating Coil Steam Energy,  !- Variable or Meter 8 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 8

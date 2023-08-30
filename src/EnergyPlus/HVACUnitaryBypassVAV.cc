@@ -602,7 +602,7 @@ namespace HVACUnitaryBypassVAV {
 
             // required field must be Key=Fan:ConstantVolume, Fan:OnOff or Fan:SystemModel and read in as upper case
             std::string fanTypeString = Alphas(10);
-            thisCBVAV.FanType = static_cast<DataHVACGlobals::FanType>(getEnumerationValue(DataHVACGlobals::fanTypeNamesUC, fanTypeString));
+            thisCBVAV.FanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, fanTypeString));
             thisCBVAV.FanName = Alphas(11);
             int fanOutletNode(0);
 
@@ -630,7 +630,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             // required field must be Key=BlowThrough or DrawThrough and read in as BLOWTHROUGH or DRAWTHROUGH
-            thisCBVAV.FanPlace = static_cast<DataHVACGlobals::FanLoc>(getEnumerationValue(DataHVACGlobals::fanLocNamesUC, Alphas(12)));
+            thisCBVAV.FanPlace = static_cast<DataHVACGlobals::FanLoc>(getEnumValue(DataHVACGlobals::fanLocNamesUC, Alphas(12)));
 
             if (thisCBVAV.FanPlace == DataHVACGlobals::FanLoc::DrawThrough) {
                 if (thisCBVAV.SplitterOutletAirNode != fanOutletNode) {
@@ -693,7 +693,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             std::string thisCoolCoilType = Alphas(14);
-            thisCBVAV.CoolCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumerationValue(DataHVACGlobals::coilTypeNamesUC, thisCoolCoilType));
+            thisCBVAV.CoolCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumValue(DataHVACGlobals::coilTypeNamesUC, thisCoolCoilType));
             thisCBVAV.DXCoolCoilName = Alphas(15);
 
             if (thisCBVAV.CoolCoilType == DataHVACGlobals::CoilType::DXCoolingSingleSpeed) {
@@ -850,7 +850,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             std::string thisHeatCoilType = Alphas(16);
-            thisCBVAV.HeatCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumerationValue(DataHVACGlobals::coilTypeNamesUC, thisHeatCoilType));
+            thisCBVAV.HeatCoilType = static_cast<DataHVACGlobals::CoilType>(getEnumValue(DataHVACGlobals::coilTypeNamesUC, thisHeatCoilType));
             thisCBVAV.HeatCoilName = Alphas(17);
 
             DXCoilErrFlag = false;
@@ -2323,9 +2323,6 @@ namespace HVACUnitaryBypassVAV {
                 case DataHVACGlobals::CoilType::CoolingAirToAirVariableSpeed: {
                     Real64 QZnReq(0.0);                 // Zone load (W), input to variable-speed DX coil
                     Real64 QLatReq(0.0);                // Zone latent load, input to variable-speed DX coil
-                    Real64 MaxONOFFCyclesperHour(4.0);  // Maximum cycling rate of heat pump [cycles/hr]
-                    Real64 HPTimeConstant(0.0);         // Heat pump time constant [s]
-                    Real64 FanDelayTime(0.0);           // Fan delay time, time delay for the HP's fan to
                     Real64 LocalOnOffAirFlowRatio(1.0); // ratio of compressor on flow to average flow over time step
                     Real64 LocalPartLoadFrac(0.0);
                     Real64 SpeedRatio(0.0);
@@ -2338,9 +2335,6 @@ namespace HVACUnitaryBypassVAV {
                                                               cBVAV.DXCoolCoilName,
                                                               cBVAV.CoolCoilCompIndex,
                                                               DataHVACGlobals::ContFanCycCoil,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::Off,
                                                               LocalPartLoadFrac,
                                                               SpeedNum,
@@ -2363,9 +2357,6 @@ namespace HVACUnitaryBypassVAV {
                                                               cBVAV.DXCoolCoilName,
                                                               cBVAV.CoolCoilCompIndex,
                                                               DataHVACGlobals::ContFanCycCoil,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               LocalPartLoadFrac,
                                                               SpeedNum,
@@ -2396,9 +2387,6 @@ namespace HVACUnitaryBypassVAV {
                                                                   cBVAV.DXCoolCoilName,
                                                                   cBVAV.CoolCoilCompIndex,
                                                                   DataHVACGlobals::ContFanCycCoil,
-                                                                  MaxONOFFCyclesperHour,
-                                                                  HPTimeConstant,
-                                                                  FanDelayTime,
                                                                   DataHVACGlobals::CompressorOperation::Off,
                                                                   LocalPartLoadFrac,
                                                                   SpeedNum,
@@ -2432,9 +2420,6 @@ namespace HVACUnitaryBypassVAV {
                                                                       cBVAV.DXCoolCoilName,
                                                                       cBVAV.CoolCoilCompIndex,
                                                                       DataHVACGlobals::ContFanCycCoil,
-                                                                      MaxONOFFCyclesperHour,
-                                                                      HPTimeConstant,
-                                                                      FanDelayTime,
                                                                       DataHVACGlobals::CompressorOperation::On,
                                                                       LocalPartLoadFrac,
                                                                       SpeedNum,
@@ -2464,9 +2449,6 @@ namespace HVACUnitaryBypassVAV {
                                                                               cBVAV.DXCoolCoilName,
                                                                               cBVAV.CoolCoilCompIndex,
                                                                               DataHVACGlobals::ContFanCycCoil,
-                                                                              MaxONOFFCyclesperHour,
-                                                                              HPTimeConstant,
-                                                                              FanDelayTime,
                                                                               DataHVACGlobals::CompressorOperation::On,
                                                                               LocalPartLoadFrac,
                                                                               SpeedNum,
@@ -2506,9 +2488,6 @@ namespace HVACUnitaryBypassVAV {
                                                                               "",
                                                                               CoilIndex,
                                                                               FanOpMode,
-                                                                              thisCBVAV.MaxONOFFCyclesperHourCycling,
-                                                                              thisCBVAV.HPTimeConstantCycling,
-                                                                              thisCBVAV.FanDelayTimeCycling,
                                                                               DataHVACGlobals::CompressorOperation::On,
                                                                               partLoadRatio,
                                                                               SpeedNum,
@@ -2584,9 +2563,6 @@ namespace HVACUnitaryBypassVAV {
                                                                               "",
                                                                               thisCBVAV.CoolCoilCompIndex,
                                                                               DataHVACGlobals::ContFanCycCoil,
-                                                                              thisCBVAV.MaxONOFFCyclesperHourCycling,
-                                                                              thisCBVAV.HPTimeConstantCycling,
-                                                                              thisCBVAV.FanDelayTimeCycling,
                                                                               DataHVACGlobals::CompressorOperation::On,
                                                                               PartLoadRatio,
                                                                               speedNum,
@@ -2978,12 +2954,10 @@ namespace HVACUnitaryBypassVAV {
                                                 DataHVACGlobals::ContFanCycCoil);
                     state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(cBVAV.DXCoolCoilIndexNum);
                 } else if (cBVAV.CoolCoilType == DataHVACGlobals::CoilType::CoolingAirToAirVariableSpeed) {
-                    Real64 QZnReq = 0.0;                // Zone load (W), input to variable-speed DX coil
-                    Real64 QLatReq = 0.0;               // Zone latent load, input to variable-speed DX coil
-                    Real64 MaxONOFFCyclesperHour = 4.0; // Maximum cycling rate of heat pump [cycles/hr]
-                    Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
-                    Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
+                    // Real64 PartLoadFrac(0.0);
                     Real64 LocalPartLoadFrac = 0.0;
+                    Real64 QZnReq = 0.0;  // Zone load (W), input to variable-speed DX coil
+                    Real64 QLatReq = 0.0; // Zone latent load, input to variable-speed DX coil
                     Real64 SpeedRatio = 0.0;
                     int SpeedNum = 1;
                     // Get no load result
@@ -2991,9 +2965,6 @@ namespace HVACUnitaryBypassVAV {
                                                               cBVAV.DXCoolCoilName,
                                                               cBVAV.CoolCoilCompIndex,
                                                               DataHVACGlobals::ContFanCycCoil,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::Off,
                                                               LocalPartLoadFrac,
                                                               SpeedNum,
@@ -3025,11 +2996,8 @@ namespace HVACUnitaryBypassVAV {
                                    0.0,
                                    OnOffAirFlowRatio);
             } else if (cBVAV.CoolCoilType == DataHVACGlobals::CoilType::CoolingAirToAirVariableSpeed) {
-                Real64 QZnReq = 0.0;                // Zone load (W), input to variable-speed DX coil
-                Real64 QLatReq = 0.0;               // Zone latent load, input to variable-speed DX coil
-                Real64 MaxONOFFCyclesperHour = 4.0; // Maximum cycling rate of heat pump [cycles/hr]
-                Real64 HPTimeConstant = 0.0;        // Heat pump time constant [s]
-                Real64 FanDelayTime = 0.0;          // Fan delay time, time delay for the HP's fan to
+                Real64 QZnReq = 0.0;  // Zone load (W), input to variable-speed DX coil
+                Real64 QLatReq = 0.0; // Zone latent load, input to variable-speed DX coil
                 Real64 LocalPartLoadFrac = 0.0;
                 Real64 SpeedRatio = 0.0;
                 int SpeedNum = 1;
@@ -3038,9 +3006,6 @@ namespace HVACUnitaryBypassVAV {
                                                           cBVAV.DXCoolCoilName,
                                                           cBVAV.CoolCoilCompIndex,
                                                           DataHVACGlobals::ContFanCycCoil,
-                                                          MaxONOFFCyclesperHour,
-                                                          HPTimeConstant,
-                                                          FanDelayTime,
                                                           DataHVACGlobals::CompressorOperation::Off,
                                                           LocalPartLoadFrac,
                                                           SpeedNum,
@@ -3140,9 +3105,6 @@ namespace HVACUnitaryBypassVAV {
         case DataHVACGlobals::CoilType::HeatingAirToAirVariableSpeed: {
             Real64 QZnReq = 0.0;                 // Zone load (W), input to variable-speed DX coil
             Real64 QLatReq = 0.0;                // Zone latent load, input to variable-speed DX coil
-            Real64 MaxONOFFCyclesperHour = 4.0;  // Maximum cycling rate of heat pump [cycles/hr]
-            Real64 HPTimeConstant = 0.0;         // Heat pump time constant [s]
-            Real64 FanDelayTime = 0.0;           // Fan delay time, time delay for the HP's fan to
             Real64 LocalOnOffAirFlowRatio = 1.0; // ratio of compressor on flow to average flow over time step
             Real64 LocalPartLoadFrac = 0.0;
             Real64 SpeedRatio = 0.0;
@@ -3155,9 +3117,6 @@ namespace HVACUnitaryBypassVAV {
                                                       cBVAV.HeatCoilName,
                                                       cBVAV.DXHeatCoilIndexNum,
                                                       DataHVACGlobals::ContFanCycCoil,
-                                                      MaxONOFFCyclesperHour,
-                                                      HPTimeConstant,
-                                                      FanDelayTime,
                                                       DataHVACGlobals::CompressorOperation::Off,
                                                       LocalPartLoadFrac,
                                                       SpeedNum,
@@ -3182,9 +3141,6 @@ namespace HVACUnitaryBypassVAV {
                                                       cBVAV.HeatCoilName,
                                                       cBVAV.DXHeatCoilIndexNum,
                                                       DataHVACGlobals::ContFanCycCoil,
-                                                      MaxONOFFCyclesperHour,
-                                                      HPTimeConstant,
-                                                      FanDelayTime,
                                                       DataHVACGlobals::CompressorOperation::On,
                                                       LocalPartLoadFrac,
                                                       SpeedNum,
@@ -3216,9 +3172,6 @@ namespace HVACUnitaryBypassVAV {
                                                           cBVAV.HeatCoilName,
                                                           cBVAV.DXHeatCoilIndexNum,
                                                           DataHVACGlobals::ContFanCycCoil,
-                                                          MaxONOFFCyclesperHour,
-                                                          HPTimeConstant,
-                                                          FanDelayTime,
                                                           DataHVACGlobals::CompressorOperation::Off,
                                                           LocalPartLoadFrac,
                                                           SpeedNum,
@@ -3242,9 +3195,6 @@ namespace HVACUnitaryBypassVAV {
                                                               cBVAV.HeatCoilName,
                                                               cBVAV.DXHeatCoilIndexNum,
                                                               DataHVACGlobals::ContFanCycCoil,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               LocalPartLoadFrac,
                                                               SpeedNum,
@@ -3262,9 +3212,6 @@ namespace HVACUnitaryBypassVAV {
                                                               cBVAV.HeatCoilName,
                                                               cBVAV.DXHeatCoilIndexNum,
                                                               DataHVACGlobals::ContFanCycCoil,
-                                                              MaxONOFFCyclesperHour,
-                                                              HPTimeConstant,
-                                                              FanDelayTime,
                                                               DataHVACGlobals::CompressorOperation::On,
                                                               LocalPartLoadFrac,
                                                               SpeedNum,
@@ -3286,9 +3233,6 @@ namespace HVACUnitaryBypassVAV {
                                                                       cBVAV.HeatCoilName,
                                                                       cBVAV.DXHeatCoilIndexNum,
                                                                       DataHVACGlobals::ContFanCycCoil,
-                                                                      MaxONOFFCyclesperHour,
-                                                                      HPTimeConstant,
-                                                                      FanDelayTime,
                                                                       DataHVACGlobals::CompressorOperation::On,
                                                                       LocalPartLoadFrac,
                                                                       SpeedNum,
@@ -3364,9 +3308,6 @@ namespace HVACUnitaryBypassVAV {
                                                                   cBVAV.HeatCoilName,
                                                                   cBVAV.DXHeatCoilIndexNum,
                                                                   DataHVACGlobals::ContFanCycCoil,
-                                                                  MaxONOFFCyclesperHour,
-                                                                  HPTimeConstant,
-                                                                  FanDelayTime,
                                                                   DataHVACGlobals::CompressorOperation::On,
                                                                   LocalPartLoadFrac,
                                                                   SpeedNum,
@@ -3435,9 +3376,6 @@ namespace HVACUnitaryBypassVAV {
                                                                   cBVAV.HeatCoilName,
                                                                   cBVAV.DXHeatCoilIndexNum,
                                                                   DataHVACGlobals::ContFanCycCoil,
-                                                                  MaxONOFFCyclesperHour,
-                                                                  HPTimeConstant,
-                                                                  FanDelayTime,
                                                                   DataHVACGlobals::CompressorOperation::On,
                                                                   LocalPartLoadFrac,
                                                                   SpeedNum,

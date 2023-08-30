@@ -606,7 +606,7 @@ namespace DualDuct {
                         state, CurrentModuleObject + ":RecirculatedAir", thisDD.Name, AlphArray(5), AlphArray(3), "Air Nodes");
                 }
 
-                thisDD.OAPerPersonMode = static_cast<PerPersonMode>(getEnumerationValue(modeStrings, AlphArray(7)));
+                thisDD.OAPerPersonMode = static_cast<PerPersonMode>(getEnumValue(modeStrings, AlphArray(7)));
                 if (thisDD.OAPerPersonMode == PerPersonMode::Invalid) {
                     thisDD.OAPerPersonMode = PerPersonMode::ModeNotSet;
                 }
