@@ -8569,7 +8569,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     state->dataHeatBalSurf->SurfQdotRadSolarInRepPerArea.dimension(1, 0.0);
     state->dataHeatBalSurf->SurfOpaqQRadSWInAbs.dimension(1, 0.0);
     state->dataHeatBalSurf->SurfQdotRadLightsInPerArea.dimension(1, 0.0);
-    state->dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones.dimension(1, 0.0);
 
     auto &thisZone = state->dataHeatBal->Zone(1);
     auto &thisSpace = state->dataHeatBal->space(1);
@@ -8577,7 +8576,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     auto &thisRep = state->dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(1);
     auto &thisQRadSW = state->dataHeatBalSurf->SurfOpaqQRadSWInAbs(1);
     auto &thisLights = state->dataHeatBalSurf->SurfQdotRadLightsInPerArea(1);
-    auto &thisOther = state->dataHeatBalSurf->SurfQdotRadLightsInPerAreaOtherZones(1);
 
     state->dataGlobal->NumOfZones = 1;
     thisZone.spaceIndexes.allocate(1);
@@ -8599,10 +8597,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
 
     // Test 2: positive values that shouldn't return zero
     thisRep = -9999.9;
-    expectedResult = 2.0;
+    expectedResult = 3.0;
     thisQRadSW = 6.0;
     thisLights = 3.0;
-    thisOther = 1.0;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
 
@@ -8610,8 +8607,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     thisRep = -9999.9;
     expectedResult = 0.0;
     thisQRadSW = 6.0;
-    thisLights = 5.0;
-    thisOther = 2.0;
+    thisLights = 7.0;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
 
@@ -8619,8 +8615,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     thisRep = -9999.9;
     expectedResult = 0.0;
     thisQRadSW = 6.0;
-    thisLights = 5.0;
-    thisOther = 0.999999999;
+    thisLights = 5.999999999;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
 }

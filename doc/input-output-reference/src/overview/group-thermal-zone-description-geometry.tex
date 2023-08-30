@@ -2877,9 +2877,6 @@ Zone,Sum,Surface Inside Face Solar Radiation Heat Gain Energy [J]
 Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate [W]
 Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area [W/m2]
 Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy [J]
-Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate From Other Zones [W]
-Zone,Average,Surface Inside Face Lights Radiation Heat Gain Rate per Area From Other Zones [W/m2]
-Zone,Sum,Surface Inside Face Lights Radiation Heat Gain Energy From Other Zones [J]
 Zone,Average,Surface Inside Face Conduction Heat Transfer Rate [W]
 Zone,Average,Surface Inside Face Conduction Heat Gain Rate [W]
 Zone,Average,Surface Inside Face Conduction Heat Loss Rate [W]
@@ -3115,15 +3112,7 @@ These ``inside face solar radiation heat gain'' output variables describe the he
 
 \subsubsection{Surface Inside Face Lights Radiation Heat Gain Energy {[}J{]}}\label{surface-inside-face-lights-radiation-heat-gain-energy-j}
 
-These ``inside face lights radiation heat gain'' output variables describe the heat transferred by shortwave radiation onto the inside face. The values are always positive and indicate heat is being added to the surface's face by shortwave radiation that emanated from electric lighting equipment and was absorbed by the surface. Different versions of the report are available including the basic heat gain rate (W), and a per unit area flux (W/m2), and an energy version (J).
-
-\subsubsection{Surface Inside Face Lights Radiation Heat Gain Rate From Other Zones {[}W{]}}\label{surface-inside-face-lights-radiation-heat-gain-rate-from-other-zones-w}
-
-\subsubsection{Surface Inside Face Lights Radiation Heat Gain Rate per Area From Other Zones {[}W/m2{]}}\label{surface-inside-face-lights-radiation-heat-gain-rate-per-area-from-other-zones-wm2}
-
-\subsubsection{Surface Inside Face Lights Radiation Heat Gain Energy From Other Zones {[}J{]}}\label{surface-inside-face-lights-radiation-heat-gain-energy-from-other-zones-j}
-
-These ``inside face lights radiation heat gain (from other zones)'' output variables describe the heat transferred by shortwave radiation onto the inside face as a result of lights from other zones being transmitted through interzone windows. The values are always positive and indicate heat is being added to the surface's face by shortwave radiation that emanated from electric lighting equipment in other zones that goes through an interzone window and was absorbed by the surface. Different versions of the report are available including the basic heat gain rate (W), and a per unit area flux (W/m2), and an energy version (J).
+These ``inside face lights radiation heat gain'' output variables describe the heat transferred by shortwave radiation onto the inside face. The values are always positive and indicate heat is being added to the surface's face by shortwave radiation that emanated from electric lighting equipment and was absorbed by the surface. Note that this includes light from other zones that are transmitted through interzone windows. Different versions of the report are available including the basic heat gain rate (W), and a per unit area flux (W/m2), and an energy version (J).
 
 \subsubsection{Surface Inside Face Internal Gains Radiation Heat Gain Rate {[}W{]}}\label{surface-inside-face-internal-gains-radiation-heat-gain-rate-w}
 

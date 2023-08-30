@@ -2021,10 +2021,9 @@ struct HeatBalanceData : BaseGlobalStruct
 
     Array1D<Real64>
         EnclSolQSWRad; // Zone short-wave flux density; used to calculate short-wave  radiation absorbed on inside surfaces of zone or enclosure
-    Array1D<Real64> EnclSolQSWRadLights;           // Like QS, but Lights short-wave only.
-    Array1D<Real64> EnclSolQSWRadLightsOtherZones; // Like QS, but Lights short-wave only, from other zones.
-    Array1D<Real64> EnclSolDB;                     // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
-    Array1D<Real64> EnclSolDBSSG;                  // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces.
+    Array1D<Real64> EnclSolQSWRadLights; // Like QS, but Lights short-wave only.
+    Array1D<Real64> EnclSolDB;           // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces
+    Array1D<Real64> EnclSolDBSSG;        // Factor for diffuse radiation in a zone from beam reflecting from inside surfaces.
     // Used only for scheduled surface gains
     Array1D<Real64> EnclSolDBIntWin; // Value of factor for beam solar entering a zone through interior windows
     // (considered to contribute to diffuse in zone)
