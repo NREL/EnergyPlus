@@ -198,6 +198,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(2) = false;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 9;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 9;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;

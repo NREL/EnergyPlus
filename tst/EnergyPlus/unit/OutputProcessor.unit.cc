@@ -1179,9 +1179,9 @@ namespace OutputProcessor {
                                                                  {"WELLWATER", "WellWater"},
                                                                  {"CONDENSATE", "Condensate"},
                                                                  {"ENERGYTRANSFER", "EnergyTransfer"},
-                                                                 {"STEAM", "Steam"},
+                                                                 {"DISTRICTHEATINGSTEAM", "DistrictHeatingSteam"},
                                                                  {"DISTRICTCOOLING", "DistrictCooling"},
-                                                                 {"DISTRICTHEATING", "DistrictHeating"},
+                                                                 {"DISTRICTHEATINGWATER", "DistrictHeatingWater"},
                                                                  {"ELECTRICITYPRODUCED", "ElectricityProduced"},
                                                                  {"ELECTRICITYPURCHASED", "ElectricityPurchased"},
                                                                  {"ELECTRICITYSURPLUSSOLD", "ElectricitySurplusSold"},
@@ -1243,7 +1243,7 @@ namespace OutputProcessor {
     {
         std::map<std::string, int> const resource_map = {{"Electricity:Facility", 100},
                                                          {"NaturalGas:Facility", 101},
-                                                         {"DistricHeating:Facility", 102},
+                                                         {"DistricHeatingWater:Facility", 102},
                                                          {"DistricCooling:Facility", 103},
                                                          {"ElectricityNet:Facility", 104},
                                                          {"Electricity:Building", 201},
@@ -5803,7 +5803,7 @@ namespace OutputProcessor {
                                                           "CustomMeter1,               !- Name",
                                                           "Generic,                    !- Fuel Type",
                                                           ",                           !- Key Name 1",
-                                                          "DistrictHeating:Facility;   !- Variable or Meter 1 Name",
+                                                          "DistrictHeatingWater:Facility;   !- Variable or Meter 1 Name",
                                                           "Meter:Custom,",
                                                           "CustomMeter2,               !- Name",
                                                           "Generic,                    !- Fuel Type",
@@ -5821,7 +5821,7 @@ namespace OutputProcessor {
         EXPECT_FALSE(errors_found);
 
         std::string errMsg = delimited_string(
-            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATING:FACILITY\".",
+            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATINGWATER:FACILITY\".",
              "   **   ~~~   ** ...will not be shown with the Meter results.",
              "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
              "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another "

@@ -3819,14 +3819,14 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  ,                        !- Heater Minimum Capacity {W}",
         "  0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
         "  0,                       !- Heater Ignition Delay {s}",
-        "  Steam,              !- Heater Fuel Type",
+        "  DistrictHeatingSteam,              !- Heater Fuel Type",
         "  0.8,                     !- Heater Thermal Efficiency",
         "  ,                        !- Part Load Factor Curve Name",
         "  20,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
-        "  Steam,              !- Off Cycle Parasitic Fuel Type",
+        "  DistrictHeatingSteam,              !- Off Cycle Parasitic Fuel Type",
         "  0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
         "  0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
-        "  Steam,              !- On Cycle Parasitic Fuel Type",
+        "  DistrictHeatingSteam,              !- On Cycle Parasitic Fuel Type",
         "  0,                       !- On Cycle Parasitic Heat Fraction to Tank",
         "  Zone,                    !- Ambient Temperature Indicator",
         "  ,                        !- Ambient Temperature Schedule Name",
@@ -4223,9 +4223,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs(*state);
-        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, Constant::eFuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, Constant::eFuel::Steam));
-        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, Constant::eFuel::Steam));
+        EXPECT_TRUE(compare_enums(HPWHTank.FuelType, Constant::eFuel::DistrictHeatingSteam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OffCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
+        EXPECT_TRUE(compare_enums(HPWHTank.OnCycParaFuelType, Constant::eFuel::DistrictHeatingSteam));
     }
 
     ++HPWaterHeaterNum;
