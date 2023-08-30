@@ -11737,8 +11737,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         this->PipingCorrectionCooling = TU_CoolingLoad_actual / (TU_CoolingLoad_actual + Pipe_Q_c);
         state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = this->CoolingCapacity; // for report, maximum evaporating capacity of the system
 
-        this->HeatingCapacity = 0.0;         // Include the piping loss
-        this->PipingCorrectionHeating = 1.0; // 1 means no piping loss
+        this->HeatingCapacity = 0.0;                                 // Include the piping loss
+        this->PipingCorrectionHeating = 1.0;                         // 1 means no piping loss
         state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = 0.0; // yujie: might be wrong here too, should be MaxCap = 1e+20
 
         this->OUCondHeatRate = Q_h_OU;
