@@ -15,24 +15,42 @@ import sys
 from wheel.bdist_wheel import bdist_wheel
 
 
+
+version_major, version_minor, version_patch = None, None, None
+
+# Parser assuming set(XXX Y) format in Version.cmake file
+with open("cmake/Version.cmake", "r") as f:
+    for line in f.readlines():
+        if 'CMAKE_VERSION_MAJOR' in line:
+            version_major = line.split()[-1].rstrip(")")
+        elif 'CMAKE_VERSION_MINOR' in line:
+            version_minor = line.split()[-1].rstrip(")")
+        elif 'CMAKE_VERSION_PATCH' in line:
+            version_patch = line.split()[-1].rstrip(")")
+        if version_major and version_minor and version_patch:
+            break
+
+version = f"{version_major}.{version_minor}.{version_patch}"
+
+
 wheels = {
     "darwin": {
         "x86_64": {
             "wheel": "macosx_10_13_x86_64",
             "zip_tag": "OSX",
-            "build_tool": "Ninja",
+            "build_tool": "Unix Makefiles",
         },
         "arm64": {
             "wheel": "macosx_11_0_arm64",
             "zip_tag": "OSX_arm64",
-            "build_tool": "Ninja",
+            "build_tool": "Unix Makefiles",
         },
     },
     "linux": {
         "x86_64": {
             "wheel": "manylinux1_x86_64",
             "zip_tag": "Linux",
-            "build_tool": "Ninja",
+            "build_tool": "Unix Makefiles",
         }
     },
     "windows": {
@@ -136,7 +154,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="energyplus",
-    version="23.1.0",
+    version=version,
     packages=[],
     license="LICENSE.txt",
     author="Placeholder",
