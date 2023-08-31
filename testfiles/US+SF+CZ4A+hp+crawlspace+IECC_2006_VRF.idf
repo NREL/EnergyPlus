@@ -50,7 +50,7 @@
     VRFCondAvailSched,       !- Availability Schedule Name
     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
     R410A,                   !- Refrigerant Type
-    10023,                   !- Rated Evaporative Capacity {W}
+    5000,                   !- Rated Evaporative Capacity {W}
     0.2931,                  !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {dimensionless}
     -5,                      !- Minimum Outdoor Air Temperature in Cooling Mode {C}
     43,                      !- Maximum Outdoor Air Temperature in Cooling Mode {C}
