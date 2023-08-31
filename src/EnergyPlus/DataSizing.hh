@@ -391,14 +391,14 @@ namespace DataSizing {
         Real64 MinOA = 0.0;                      // design minimum outside air in m3/s
         Real64 DesCoolMinAirFlow2 = 0.0;         // design cooling minimum air flow rate [m3/s] derived from DesCoolMinAirFlowPerArea
         Real64 DesHeatMaxAirFlow2 = 0.0;         // design heating maximum air flow rate [m3/s] derived from DesHeatMaxAirFlowPerArea
-        EPVector<Real64> HeatFlowSeq;            // daily sequence of zone heating air mass flow rate (zone time step) [kg/s]
-        EPVector<Real64> HeatFlowSeqNoOA;        // daily sequence of zone heating air mass flow rate (zone time step) without MinOA limit [kg/s]
-        EPVector<Real64> CoolFlowSeq;            // daily sequence of zone cooling air mass flow rate (zone time step) [kg/s]
-        EPVector<Real64> CoolFlowSeqNoOA;        // daily sequence of zone cooling air mass flow rate (zone time step) without MinOA limit [kg/s]
+        Array1D<Real64> HeatFlowSeq;             // daily sequence of zone heating air mass flow rate (zone time step) [kg/s]
+        Array1D<Real64> HeatFlowSeqNoOA;         // daily sequence of zone heating air mass flow rate (zone time step) without MinOA limit [kg/s]
+        Array1D<Real64> CoolFlowSeq;             // daily sequence of zone cooling air mass flow rate (zone time step) [kg/s]
+        Array1D<Real64> CoolFlowSeqNoOA;         // daily sequence of zone cooling air mass flow rate (zone time step) without MinOA limit [kg/s]
         EPVector<Real64> HeatZoneTempSeq;        // daily sequence of zone temperatures (heating, zone time step)
-        EPVector<Real64> HeatZoneRetTempSeq;     // daily sequence of zone return temperatures (heating, zone time step)
+        Array1D<Real64> HeatZoneRetTempSeq;      // daily sequence of zone return temperatures (heating, zone time step)
         EPVector<Real64> CoolZoneTempSeq;        // daily sequence of zone temperatures (cooling, zone time step)
-        EPVector<Real64> CoolZoneRetTempSeq;     // daily sequence of zone return temperatures (cooling, zone time step)
+        Array1D<Real64> CoolZoneRetTempSeq;      // daily sequence of zone return temperatures (cooling, zone time step)
         Real64 ZoneADEffCooling = 1.0;           // the zone air distribution effectiveness in cooling mode
         Real64 ZoneADEffHeating = 1.0;           // the zone air distribution effectiveness in heating mode
         Real64 ZoneSecondaryRecirculation = 0.0; // the zone secondary air recirculation fraction
@@ -575,8 +575,8 @@ namespace DataSizing {
         Array1D<Real64> LatentCoolLoadSeq;                 // daily sequence of zone latent cooling load (zone time step) [W]
         Array1D<Real64> HeatLatentLoadNoDOASSeq;           // daily sequence of zone latent heating load No DOAS (zone time step) [W]
         Array1D<Real64> CoolLatentLoadNoDOASSeq;           // daily sequence of zone latent cooling load No DOAS (zone time step) [W]
-        EPVector<Real64> LatentCoolFlowSeq;                // daily sequence of zone latent cooling supply mass flow rate (zone time step) [Kg/s]
-        EPVector<Real64> LatentHeatFlowSeq;                // daily sequence of zone latent heating supply mass flow rate (zone time step) [Kg/s]
+        Array1D<Real64> LatentCoolFlowSeq;                 // daily sequence of zone latent cooling supply mass flow rate (zone time step) [Kg/s]
+        Array1D<Real64> LatentHeatFlowSeq;                 // daily sequence of zone latent heating supply mass flow rate (zone time step) [Kg/s]
         bool zoneLatentSizing = false;                     // trigger to do RH control during zone sizing
         Real64 zoneRHDehumidifySetPoint = 50.0;            // RH dehumidifying set point used during sizing, default to 50%
         int zoneRHDehumidifySchIndex = 0;                  // index to zone RH dehumidifying schedule used for zone sizing
