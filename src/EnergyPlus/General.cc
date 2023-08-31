@@ -291,9 +291,9 @@ void SolveRoot(const EnergyPlusData &state,
 void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
     if (NumItemsInAvg <= 1) return; // no need to average/smooth
-    //if (std::accumulate(DataIn.begin(), DataIn.end(), 0.0) == 0.0) {
-    //    return; // no noeed to average if all zeroes
-    //}
+    if (std::accumulate(DataIn.begin(), DataIn.end(), 0.0) == 0.0) {
+        return; // no noeed to average if all zeroes
+    }
 
     Array1D<Real64> movingWindow(NumItemsInAvg, 0.0); // holds the last NumItemsInAvg values
     Real64 movingSum = 0.0;                           // holds the sum of movingWindow
