@@ -1272,7 +1272,6 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string condenserType = UtilityRoutines::makeUPPER(fields.at("condenser_type").get<std::string>());
                 std::string sourceSideInletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_inlet_node_name").get<std::string>());
                 std::string sourceSideOutletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
-
                 thisPLHP.companionCoilName = UtilityRoutines::makeUPPER(
                     state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "companion_heat_pump_name"));
 
@@ -1471,6 +1470,12 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     condenserNodeType = DataLoopNode::NodeFluidType::Air;
                     condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
                     condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+                    if (sourceSideInletNodeName == sourceSideOutletNodeName) {
+                        ShowSevereError(state, format("PlantLoopHeatPump {} has the same inlet and outlet node.", thisObjectName));
+                        ShowContinueError(state, format("Node Name: {}", sourceSideInletNodeName));
+                        ShowFatalError(state, "Previous condition causes termination.");
+                        errorsFound = true;
+                    }
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(
