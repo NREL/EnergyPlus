@@ -7325,20 +7325,22 @@ namespace InternalHeatGains {
         //       at 30F were assumed in order to give reasonable values beyond
         //       The reported temperature range.
         for (int Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
+            auto &thisPeople = state.dataHeatBal->People(Loop);
             int NZ = state.dataHeatBal->People(Loop).ZonePtr;
+            int spaceNum = thisPeople.spaceIndex;
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-            NumberOccupants =
-                state.dataHeatBal->People(Loop).NumberOfPeople * GetCurrentScheduleValue(state, state.dataHeatBal->People(Loop).NumberOfPeoplePtr);
-            if (state.dataHeatBal->People(Loop).EMSPeopleOn) NumberOccupants = state.dataHeatBal->People(Loop).EMSNumberOfPeople;
+            NumberOccupants = thisPeople.NumberOfPeople * GetCurrentScheduleValue(state, thisPeople.NumberOfPeoplePtr);
+            if (thisPeople.EMSPeopleOn) NumberOccupants = thisPeople.EMSNumberOfPeople;
 
             TotalPeopleGain = 0.0;
             SensiblePeopleGain = 0.0;
 
+            auto &thisZoneRep = state.dataHeatBal->ZonePreDefRep(NZ);
             if (NumberOccupants > 0.0) {
-                ActivityLevel_WperPerson = GetCurrentScheduleValue(state, state.dataHeatBal->People(Loop).ActivityLevelPtr);
+                ActivityLevel_WperPerson = GetCurrentScheduleValue(state, thisPeople.ActivityLevelPtr);
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
-                if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
+                if (thisPeople.UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
                     if (state.dataRoomAir->anyNonMixingRoomAirModel) {
                         if (state.dataRoomAir->IsZoneDispVent3Node(NZ) || state.dataRoomAir->IsZoneUFAD(NZ)) {
@@ -7350,300 +7352,308 @@ namespace InternalHeatGains {
                                            airTemp * ((C[3] + ActivityLevel_WperPerson * (C[4] + ActivityLevel_WperPerson * C[5])) +
                                                       airTemp * (C[6] + ActivityLevel_WperPerson * (C[7] + ActivityLevel_WperPerson * C[8]))));
                 } else { // if the user did specify a sensible fraction, use it
-                    SensiblePeopleGain = TotalPeopleGain * state.dataHeatBal->People(Loop).UserSpecSensFrac;
+                    SensiblePeopleGain = TotalPeopleGain * thisPeople.UserSpecSensFrac;
                 }
 
                 if (SensiblePeopleGain > TotalPeopleGain) SensiblePeopleGain = TotalPeopleGain;
                 if (SensiblePeopleGain < 0.0) SensiblePeopleGain = 0.0;
 
                 // For predefined tabular reports related to outside air ventilation
-                state.dataHeatBal->ZonePreDefRep(NZ).isOccupied = true; // set flag to occupied to be used in tabular reporting for ventilation
-                state.dataHeatBal->ZonePreDefRep(NZ).NumOcc += NumberOccupants;
-                state.dataHeatBal->ZonePreDefRep(NZ).NumOccAccum += NumberOccupants * state.dataGlobal->TimeStepZone;
-                state.dataHeatBal->ZonePreDefRep(NZ).NumOccAccumTime += state.dataGlobal->TimeStepZone;
+                thisZoneRep.isOccupied = true; // set flag to occupied to be used in tabular reporting for ventilation
+                thisZoneRep.NumOcc += NumberOccupants;
+                thisZoneRep.NumOccAccum += NumberOccupants * state.dataGlobal->TimeStepZone;
+                thisZoneRep.NumOccAccumTime += state.dataGlobal->TimeStepZone;
             } else {
                 state.dataHeatBal->ZonePreDefRep(NZ).isOccupied = false; // set flag to occupied to be used in tabular reporting for ventilation
             }
 
-            state.dataHeatBal->People(Loop).NumOcc = NumberOccupants;
-            state.dataHeatBal->People(Loop).RadGainRate = SensiblePeopleGain * state.dataHeatBal->People(Loop).FractionRadiant;
-            state.dataHeatBal->People(Loop).ConGainRate = SensiblePeopleGain * state.dataHeatBal->People(Loop).FractionConvected;
-            state.dataHeatBal->People(Loop).SenGainRate = SensiblePeopleGain;
-            state.dataHeatBal->People(Loop).LatGainRate = TotalPeopleGain - SensiblePeopleGain;
-            state.dataHeatBal->People(Loop).TotGainRate = TotalPeopleGain;
-            state.dataHeatBal->People(Loop).CO2GainRate = TotalPeopleGain * state.dataHeatBal->People(Loop).CO2RateFactor;
+            thisPeople.NumOcc = NumberOccupants;
+            thisPeople.RadGainRate = SensiblePeopleGain * thisPeople.FractionRadiant;
+            thisPeople.ConGainRate = SensiblePeopleGain * thisPeople.FractionConvected;
+            thisPeople.SenGainRate = SensiblePeopleGain;
+            thisPeople.LatGainRate = TotalPeopleGain - SensiblePeopleGain;
+            thisPeople.TotGainRate = TotalPeopleGain;
+            thisPeople.CO2GainRate = TotalPeopleGain * thisPeople.CO2RateFactor;
 
-            int spaceNum = state.dataHeatBal->People(Loop).spaceIndex;
-            state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC += state.dataHeatBal->People(Loop).NumOcc;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD += state.dataHeatBal->People(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOCCON += state.dataHeatBal->People(Loop).ConGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOCSEN += state.dataHeatBal->People(Loop).SenGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOCLAT += state.dataHeatBal->People(Loop).LatGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOCTOT += state.dataHeatBal->People(Loop).TotGainRate;
-        }
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.NOFOCC += thisPeople.NumOcc;
+            thisZoneIntGain.QOCRAD += thisPeople.RadGainRate;
+            thisZoneIntGain.QOCCON += thisPeople.ConGainRate;
+            thisZoneIntGain.QOCSEN += thisPeople.SenGainRate;
+            thisZoneIntGain.QOCLAT += thisPeople.LatGainRate;
+            thisZoneIntGain.QOCTOT += thisPeople.TotGainRate;
 
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataHeatBal->ZoneIntGain(zoneNum).NOFOCC = 0.0;
-            state.dataHeatBal->ZoneIntGain(zoneNum).QOCRAD = 0.0;
-            state.dataHeatBal->ZoneIntGain(zoneNum).QOCCON = 0.0;
-            state.dataHeatBal->ZoneIntGain(zoneNum).QOCSEN = 0.0;
-            state.dataHeatBal->ZoneIntGain(zoneNum).QOCLAT = 0.0;
-            state.dataHeatBal->ZoneIntGain(zoneNum).QOCTOT = 0.0;
-            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                state.dataHeatBal->ZoneIntGain(zoneNum).NOFOCC += state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
-                state.dataHeatBal->ZoneIntGain(zoneNum).QOCRAD += state.dataHeatBal->spaceIntGain(spaceNum).QOCRAD;
-                state.dataHeatBal->ZoneIntGain(zoneNum).QOCCON += state.dataHeatBal->spaceIntGain(spaceNum).QOCCON;
-                state.dataHeatBal->ZoneIntGain(zoneNum).QOCSEN += state.dataHeatBal->spaceIntGain(spaceNum).QOCSEN;
-                state.dataHeatBal->ZoneIntGain(zoneNum).QOCLAT += state.dataHeatBal->spaceIntGain(spaceNum).QOCLAT;
-                state.dataHeatBal->ZoneIntGain(zoneNum).QOCTOT += state.dataHeatBal->spaceIntGain(spaceNum).QOCTOT;
-            }
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.NOFOCC += thisPeople.NumOcc;
+            thisSpaceIntGain.QOCRAD += thisPeople.RadGainRate;
+            thisSpaceIntGain.QOCCON += thisPeople.ConGainRate;
+            thisSpaceIntGain.QOCSEN += thisPeople.SenGainRate;
+            thisSpaceIntGain.QOCLAT += thisPeople.LatGainRate;
+            thisSpaceIntGain.QOCTOT += thisPeople.TotGainRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {
-            int NZ = state.dataHeatBal->Lights(Loop).ZonePtr;
-            int spaceNum = state.dataHeatBal->Lights(Loop).spaceIndex;
-            Q = state.dataHeatBal->Lights(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->Lights(Loop).SchedPtr);
+            auto &thisLights = state.dataHeatBal->Lights(Loop);
+            int NZ = thisLights.ZonePtr;
+            int spaceNum = thisLights.spaceIndex;
+            Q = thisLights.DesignLevel * GetCurrentScheduleValue(state, thisLights.SchedPtr);
 
             if (state.dataDaylightingData->ZoneDaylight(NZ).totRefPts > 0) {
-                if (state.dataHeatBal->Lights(Loop).FractionReplaceable > 0.0) { // FractionReplaceable can only be 0 or 1 for these models
+                if (thisLights.FractionReplaceable > 0.0) { // FractionReplaceable can only be 0 or 1 for these models
                     Q *= state.dataDaylightingData->spacePowerReductionFactor(spaceNum);
                 }
             }
 
             // Reduce lighting power due to demand limiting
-            if (state.dataHeatBal->Lights(Loop).ManageDemand && (Q > state.dataHeatBal->Lights(Loop).DemandLimit))
-                Q = state.dataHeatBal->Lights(Loop).DemandLimit;
+            if (thisLights.ManageDemand && (Q > thisLights.DemandLimit)) Q = thisLights.DemandLimit;
 
             // Set Q to EMS override if being called for by EMs
-            if (state.dataHeatBal->Lights(Loop).EMSLightsOn) Q = state.dataHeatBal->Lights(Loop).EMSLightingPower;
+            if (thisLights.EMSLightsOn) Q = thisLights.EMSLightingPower;
 
-            FractionConvected = state.dataHeatBal->Lights(Loop).FractionConvected;
-            FractionReturnAir = state.dataHeatBal->Lights(Loop).FractionReturnAir;
-            FractionRadiant = state.dataHeatBal->Lights(Loop).FractionRadiant;
-            if (state.dataHeatBal->Lights(Loop).FractionReturnAirIsCalculated && !state.dataGlobal->ZoneSizingCalc &&
-                state.dataGlobal->SimTimeSteps > 1) {
+            FractionConvected = thisLights.FractionConvected;
+            FractionReturnAir = thisLights.FractionReturnAir;
+            FractionRadiant = thisLights.FractionRadiant;
+            if (thisLights.FractionReturnAirIsCalculated && !state.dataGlobal->ZoneSizingCalc && state.dataGlobal->SimTimeSteps > 1) {
                 // Calculate FractionReturnAir based on conditions in the zone's return air plenum, if there is one.
                 if (state.dataHeatBal->Zone(NZ).IsControlled) {
-                    int retNum = state.dataHeatBal->Lights(Loop).ZoneReturnNum;
+                    int retNum = thisLights.ZoneReturnNum;
                     int ReturnZonePlenumCondNum = state.dataZoneEquip->ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
                     if (ReturnZonePlenumCondNum > 0) {
                         ReturnPlenumTemp = state.dataZonePlenum->ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
-                        FractionReturnAir = state.dataHeatBal->Lights(Loop).FractionReturnAirPlenTempCoeff1 -
-                                            state.dataHeatBal->Lights(Loop).FractionReturnAirPlenTempCoeff2 * ReturnPlenumTemp;
+                        FractionReturnAir =
+                            thisLights.FractionReturnAirPlenTempCoeff1 - thisLights.FractionReturnAirPlenTempCoeff2 * ReturnPlenumTemp;
                         FractionReturnAir = max(0.0, min(1.0, FractionReturnAir));
-                        if (FractionReturnAir >= (1.0 - state.dataHeatBal->Lights(Loop).FractionShortWave)) {
-                            FractionReturnAir = 1.0 - state.dataHeatBal->Lights(Loop).FractionShortWave;
+                        if (FractionReturnAir >= (1.0 - thisLights.FractionShortWave)) {
+                            FractionReturnAir = 1.0 - thisLights.FractionShortWave;
                             FractionRadiant = 0.0;
                             FractionConvected = 0.0;
                         } else {
-                            FractionRadiant =
-                                ((1.0 - FractionReturnAir - state.dataHeatBal->Lights(Loop).FractionShortWave) /
-                                 (state.dataHeatBal->Lights(Loop).FractionRadiant + state.dataHeatBal->Lights(Loop).FractionConvected)) *
-                                state.dataHeatBal->Lights(Loop).FractionRadiant;
-                            FractionConvected = 1.0 - (FractionReturnAir + FractionRadiant + state.dataHeatBal->Lights(Loop).FractionShortWave);
+                            FractionRadiant = ((1.0 - FractionReturnAir - thisLights.FractionShortWave) /
+                                               (thisLights.FractionRadiant + thisLights.FractionConvected)) *
+                                              thisLights.FractionRadiant;
+                            FractionConvected = 1.0 - (FractionReturnAir + FractionRadiant + thisLights.FractionShortWave);
                         }
                     }
                 }
             }
 
-            state.dataHeatBal->Lights(Loop).Power = Q;
-            state.dataHeatBal->Lights(Loop).RadGainRate = Q * FractionRadiant;
-            state.dataHeatBal->Lights(Loop).VisGainRate = Q * state.dataHeatBal->Lights(Loop).FractionShortWave;
-            state.dataHeatBal->Lights(Loop).ConGainRate = Q * FractionConvected;
-            state.dataHeatBal->Lights(Loop).RetAirGainRate = Q * FractionReturnAir;
-            state.dataHeatBal->Lights(Loop).TotGainRate = Q;
+            thisLights.Power = Q;
+            thisLights.RadGainRate = Q * FractionRadiant;
+            thisLights.VisGainRate = Q * thisLights.FractionShortWave;
+            thisLights.ConGainRate = Q * FractionConvected;
+            thisLights.RetAirGainRate = Q * FractionReturnAir;
+            thisLights.TotGainRate = Q;
 
-            state.dataHeatBal->ZoneRpt(NZ).LtsPower += state.dataHeatBal->Lights(Loop).Power;
-            state.dataHeatBal->ZoneIntGain(NZ).QLTRAD += state.dataHeatBal->Lights(Loop).RadGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QLTSW += state.dataHeatBal->Lights(Loop).VisGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QLTCON += state.dataHeatBal->Lights(Loop).ConGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QLTCRA += state.dataHeatBal->Lights(Loop).RetAirGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QLTTOT += state.dataHeatBal->Lights(Loop).TotGainRate;
+            state.dataHeatBal->ZoneRpt(NZ).LtsPower += thisLights.Power;
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.QLTRAD += thisLights.RadGainRate;
+            thisZoneIntGain.QLTSW += thisLights.VisGainRate;
+            thisZoneIntGain.QLTCON += thisLights.ConGainRate;
+            thisZoneIntGain.QLTCRA += thisLights.RetAirGainRate;
+            thisZoneIntGain.QLTTOT += thisLights.TotGainRate;
 
-            state.dataHeatBal->spaceRpt(spaceNum).LtsPower += state.dataHeatBal->Lights(Loop).Power;
-            state.dataHeatBal->spaceIntGain(spaceNum).QLTRAD += state.dataHeatBal->Lights(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QLTSW += state.dataHeatBal->Lights(Loop).VisGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QLTCON += state.dataHeatBal->Lights(Loop).ConGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QLTCRA += state.dataHeatBal->Lights(Loop).RetAirGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QLTTOT += state.dataHeatBal->Lights(Loop).TotGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).LtsPower += thisLights.Power;
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.QLTRAD += thisLights.RadGainRate;
+            thisSpaceIntGain.QLTSW += thisLights.VisGainRate;
+            thisSpaceIntGain.QLTCON += thisLights.ConGainRate;
+            thisSpaceIntGain.QLTCRA += thisLights.RetAirGainRate;
+            thisSpaceIntGain.QLTTOT += thisLights.TotGainRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotElecEquip; ++Loop) {
-            Q = state.dataHeatBal->ZoneElectric(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->ZoneElectric(Loop).SchedPtr);
+            auto &thisElecEq = state.dataHeatBal->ZoneElectric(Loop);
+            Q = thisElecEq.DesignLevel * GetCurrentScheduleValue(state, thisElecEq.SchedPtr);
 
             // Reduce equipment power due to demand limiting
-            if (state.dataHeatBal->ZoneElectric(Loop).ManageDemand && (Q > state.dataHeatBal->ZoneElectric(Loop).DemandLimit))
-                Q = state.dataHeatBal->ZoneElectric(Loop).DemandLimit;
+            if (thisElecEq.ManageDemand && (Q > thisElecEq.DemandLimit)) Q = thisElecEq.DemandLimit;
 
             // Set Q to EMS override if being called for by EMs
-            if (state.dataHeatBal->ZoneElectric(Loop).EMSZoneEquipOverrideOn) Q = state.dataHeatBal->ZoneElectric(Loop).EMSEquipPower;
+            if (thisElecEq.EMSZoneEquipOverrideOn) Q = thisElecEq.EMSEquipPower;
 
-            state.dataHeatBal->ZoneElectric(Loop).Power = Q;
-            state.dataHeatBal->ZoneElectric(Loop).RadGainRate = Q * state.dataHeatBal->ZoneElectric(Loop).FractionRadiant;
-            state.dataHeatBal->ZoneElectric(Loop).ConGainRate = Q * state.dataHeatBal->ZoneElectric(Loop).FractionConvected;
-            state.dataHeatBal->ZoneElectric(Loop).LatGainRate = Q * state.dataHeatBal->ZoneElectric(Loop).FractionLatent;
-            state.dataHeatBal->ZoneElectric(Loop).LostRate = Q * state.dataHeatBal->ZoneElectric(Loop).FractionLost;
-            state.dataHeatBal->ZoneElectric(Loop).TotGainRate = Q - state.dataHeatBal->ZoneElectric(Loop).LostRate;
+            thisElecEq.Power = Q;
+            thisElecEq.RadGainRate = Q * thisElecEq.FractionRadiant;
+            thisElecEq.ConGainRate = Q * thisElecEq.FractionConvected;
+            thisElecEq.LatGainRate = Q * thisElecEq.FractionLatent;
+            thisElecEq.LostRate = Q * thisElecEq.FractionLost;
+            thisElecEq.TotGainRate = Q - thisElecEq.LostRate;
 
-            int NZ = state.dataHeatBal->ZoneElectric(Loop).ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).ElecPower += state.dataHeatBal->ZoneElectric(Loop).Power;
-            state.dataHeatBal->ZoneIntGain(NZ).QEERAD += state.dataHeatBal->ZoneElectric(Loop).RadGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QEECON += state.dataHeatBal->ZoneElectric(Loop).ConGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate;
+            int NZ = thisElecEq.ZonePtr;
+            state.dataHeatBal->ZoneRpt(NZ).ElecPower += thisElecEq.Power;
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.QEERAD += thisElecEq.RadGainRate;
+            thisZoneIntGain.QEECON += thisElecEq.ConGainRate;
+            thisZoneIntGain.QEELAT += thisElecEq.LatGainRate;
+            thisZoneIntGain.QEELost += thisElecEq.LostRate;
 
-            int spaceNum = state.dataHeatBal->ZoneElectric(Loop).spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).ElecPower += state.dataHeatBal->ZoneElectric(Loop).Power;
-            state.dataHeatBal->spaceIntGain(spaceNum).QEERAD += state.dataHeatBal->ZoneElectric(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QEECON += state.dataHeatBal->ZoneElectric(Loop).ConGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QEELAT += state.dataHeatBal->ZoneElectric(Loop).LatGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QEELost += state.dataHeatBal->ZoneElectric(Loop).LostRate;
+            int spaceNum = thisElecEq.spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).ElecPower += thisElecEq.Power;
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.QEERAD += thisElecEq.RadGainRate;
+            thisSpaceIntGain.QEECON += thisElecEq.ConGainRate;
+            thisSpaceIntGain.QEELAT += thisElecEq.LatGainRate;
+            thisSpaceIntGain.QEELost += thisElecEq.LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotGasEquip; ++Loop) {
-            Q = state.dataHeatBal->ZoneGas(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->ZoneGas(Loop).SchedPtr);
+            auto &thisGasEq = state.dataHeatBal->ZoneGas(Loop);
+            Q = thisGasEq.DesignLevel * GetCurrentScheduleValue(state, thisGasEq.SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
-            if (state.dataHeatBal->ZoneGas(Loop).EMSZoneEquipOverrideOn) Q = state.dataHeatBal->ZoneGas(Loop).EMSEquipPower;
+            if (thisGasEq.EMSZoneEquipOverrideOn) Q = thisGasEq.EMSEquipPower;
 
-            state.dataHeatBal->ZoneGas(Loop).Power = Q;
-            state.dataHeatBal->ZoneGas(Loop).RadGainRate = Q * state.dataHeatBal->ZoneGas(Loop).FractionRadiant;
-            state.dataHeatBal->ZoneGas(Loop).ConGainRate = Q * state.dataHeatBal->ZoneGas(Loop).FractionConvected;
-            state.dataHeatBal->ZoneGas(Loop).LatGainRate = Q * state.dataHeatBal->ZoneGas(Loop).FractionLatent;
-            state.dataHeatBal->ZoneGas(Loop).LostRate = Q * state.dataHeatBal->ZoneGas(Loop).FractionLost;
-            state.dataHeatBal->ZoneGas(Loop).TotGainRate = Q - state.dataHeatBal->ZoneGas(Loop).LostRate;
-            state.dataHeatBal->ZoneGas(Loop).CO2GainRate = Q * state.dataHeatBal->ZoneGas(Loop).CO2RateFactor;
+            thisGasEq.Power = Q;
+            thisGasEq.RadGainRate = Q * thisGasEq.FractionRadiant;
+            thisGasEq.ConGainRate = Q * thisGasEq.FractionConvected;
+            thisGasEq.LatGainRate = Q * thisGasEq.FractionLatent;
+            thisGasEq.LostRate = Q * thisGasEq.FractionLost;
+            thisGasEq.TotGainRate = Q - thisGasEq.LostRate;
+            thisGasEq.CO2GainRate = Q * thisGasEq.CO2RateFactor;
 
-            int NZ = state.dataHeatBal->ZoneGas(Loop).ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).GasPower += state.dataHeatBal->ZoneGas(Loop).Power;
-            state.dataHeatBal->ZoneIntGain(NZ).QGERAD += state.dataHeatBal->ZoneGas(Loop).RadGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QGECON += state.dataHeatBal->ZoneGas(Loop).ConGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate;
+            int NZ = thisGasEq.ZonePtr;
+            state.dataHeatBal->ZoneRpt(NZ).GasPower += thisGasEq.Power;
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.QGERAD += thisGasEq.RadGainRate;
+            thisZoneIntGain.QGECON += thisGasEq.ConGainRate;
+            thisZoneIntGain.QGELAT += thisGasEq.LatGainRate;
+            thisZoneIntGain.QGELost += thisGasEq.LostRate;
 
-            int spaceNum = state.dataHeatBal->ZoneGas(Loop).spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).GasPower += state.dataHeatBal->ZoneGas(Loop).Power;
-            state.dataHeatBal->spaceIntGain(spaceNum).QGERAD += state.dataHeatBal->ZoneGas(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QGECON += state.dataHeatBal->ZoneGas(Loop).ConGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QGELAT += state.dataHeatBal->ZoneGas(Loop).LatGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QGELost += state.dataHeatBal->ZoneGas(Loop).LostRate;
+            int spaceNum = thisGasEq.spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).GasPower += thisGasEq.Power;
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.QGERAD += thisGasEq.RadGainRate;
+            thisSpaceIntGain.QGECON += thisGasEq.ConGainRate;
+            thisSpaceIntGain.QGELAT += thisGasEq.LatGainRate;
+            thisSpaceIntGain.QGELost += thisGasEq.LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotOthEquip; ++Loop) {
-            Q = state.dataHeatBal->ZoneOtherEq(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->ZoneOtherEq(Loop).SchedPtr);
+            auto &thisOtherEq = state.dataHeatBal->ZoneOtherEq(Loop);
+            Q = thisOtherEq.DesignLevel * GetCurrentScheduleValue(state, thisOtherEq.SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
-            if (state.dataHeatBal->ZoneOtherEq(Loop).EMSZoneEquipOverrideOn) Q = state.dataHeatBal->ZoneOtherEq(Loop).EMSEquipPower;
+            if (thisOtherEq.EMSZoneEquipOverrideOn) Q = thisOtherEq.EMSEquipPower;
 
-            state.dataHeatBal->ZoneOtherEq(Loop).Power = Q;
-            state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate = Q * state.dataHeatBal->ZoneOtherEq(Loop).FractionRadiant;
-            state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate = Q * state.dataHeatBal->ZoneOtherEq(Loop).FractionConvected;
-            state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate = Q * state.dataHeatBal->ZoneOtherEq(Loop).FractionLatent;
-            state.dataHeatBal->ZoneOtherEq(Loop).LostRate = Q * state.dataHeatBal->ZoneOtherEq(Loop).FractionLost;
-            state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate = Q - state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
+            thisOtherEq.Power = Q;
+            thisOtherEq.RadGainRate = Q * thisOtherEq.FractionRadiant;
+            thisOtherEq.ConGainRate = Q * thisOtherEq.FractionConvected;
+            thisOtherEq.LatGainRate = Q * thisOtherEq.FractionLatent;
+            thisOtherEq.LostRate = Q * thisOtherEq.FractionLost;
+            thisOtherEq.TotGainRate = Q - thisOtherEq.LostRate;
 
-            int NZ = state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).OtherPower += state.dataHeatBal->ZoneOtherEq(Loop).Power;
-            state.dataHeatBal->ZoneIntGain(NZ).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
+            int NZ = thisOtherEq.ZonePtr;
+            state.dataHeatBal->ZoneRpt(NZ).OtherPower += thisOtherEq.Power;
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.QOERAD += thisOtherEq.RadGainRate;
+            thisZoneIntGain.QOECON += thisOtherEq.ConGainRate;
+            thisZoneIntGain.QOELAT += thisOtherEq.LatGainRate;
+            thisZoneIntGain.QOELost += thisOtherEq.LostRate;
 
-            int spaceNum = state.dataHeatBal->ZoneOtherEq(Loop).spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).OtherPower += state.dataHeatBal->ZoneOtherEq(Loop).Power;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
+            int spaceNum = thisOtherEq.spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherPower += thisOtherEq.Power;
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.QOERAD += thisOtherEq.RadGainRate;
+            thisSpaceIntGain.QOECON += thisOtherEq.ConGainRate;
+            thisSpaceIntGain.QOELAT += thisOtherEq.LatGainRate;
+            thisSpaceIntGain.QOELost += thisOtherEq.LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotHWEquip; ++Loop) {
-            Q = state.dataHeatBal->ZoneHWEq(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->ZoneHWEq(Loop).SchedPtr);
+            auto &thisHWEq = state.dataHeatBal->ZoneHWEq(Loop);
+            Q = thisHWEq.DesignLevel * GetCurrentScheduleValue(state, thisHWEq.SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
-            if (state.dataHeatBal->ZoneHWEq(Loop).EMSZoneEquipOverrideOn) Q = state.dataHeatBal->ZoneHWEq(Loop).EMSEquipPower;
+            if (thisHWEq.EMSZoneEquipOverrideOn) Q = thisHWEq.EMSEquipPower;
 
-            state.dataHeatBal->ZoneHWEq(Loop).Power = Q;
-            state.dataHeatBal->ZoneHWEq(Loop).RadGainRate = Q * state.dataHeatBal->ZoneHWEq(Loop).FractionRadiant;
-            state.dataHeatBal->ZoneHWEq(Loop).ConGainRate = Q * state.dataHeatBal->ZoneHWEq(Loop).FractionConvected;
-            state.dataHeatBal->ZoneHWEq(Loop).LatGainRate = Q * state.dataHeatBal->ZoneHWEq(Loop).FractionLatent;
-            state.dataHeatBal->ZoneHWEq(Loop).LostRate = Q * state.dataHeatBal->ZoneHWEq(Loop).FractionLost;
-            state.dataHeatBal->ZoneHWEq(Loop).TotGainRate = Q - state.dataHeatBal->ZoneHWEq(Loop).LostRate;
+            thisHWEq.Power = Q;
+            thisHWEq.RadGainRate = Q * thisHWEq.FractionRadiant;
+            thisHWEq.ConGainRate = Q * thisHWEq.FractionConvected;
+            thisHWEq.LatGainRate = Q * thisHWEq.FractionLatent;
+            thisHWEq.LostRate = Q * thisHWEq.FractionLost;
+            thisHWEq.TotGainRate = Q - thisHWEq.LostRate;
 
-            int NZ = state.dataHeatBal->ZoneHWEq(Loop).ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).HWPower += state.dataHeatBal->ZoneHWEq(Loop).Power;
-            state.dataHeatBal->ZoneIntGain(NZ).QHWRAD += state.dataHeatBal->ZoneHWEq(Loop).RadGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QHWCON += state.dataHeatBal->ZoneHWEq(Loop).ConGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate;
+            int NZ = thisHWEq.ZonePtr;
+            state.dataHeatBal->ZoneRpt(NZ).HWPower += thisHWEq.Power;
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.QHWRAD += thisHWEq.RadGainRate;
+            thisZoneIntGain.QHWCON += thisHWEq.ConGainRate;
+            thisZoneIntGain.QHWLAT += thisHWEq.LatGainRate;
+            thisZoneIntGain.QHWLost += thisHWEq.LostRate;
 
-            int spaceNum = state.dataHeatBal->ZoneHWEq(Loop).spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).HWPower += state.dataHeatBal->ZoneHWEq(Loop).Power;
-            state.dataHeatBal->spaceIntGain(spaceNum).QHWRAD += state.dataHeatBal->ZoneHWEq(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QHWCON += state.dataHeatBal->ZoneHWEq(Loop).ConGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QHWLAT += state.dataHeatBal->ZoneHWEq(Loop).LatGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QHWLost += state.dataHeatBal->ZoneHWEq(Loop).LostRate;
+            int spaceNum = thisHWEq.spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).HWPower += thisHWEq.Power;
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.QHWRAD += thisHWEq.RadGainRate;
+            thisSpaceIntGain.QHWCON += thisHWEq.ConGainRate;
+            thisSpaceIntGain.QHWLAT += thisHWEq.LatGainRate;
+            thisSpaceIntGain.QHWLost += thisHWEq.LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotStmEquip; ++Loop) {
-            Q = state.dataHeatBal->ZoneSteamEq(Loop).DesignLevel * GetCurrentScheduleValue(state, state.dataHeatBal->ZoneSteamEq(Loop).SchedPtr);
+            auto &thisSteamEq = state.dataHeatBal->ZoneSteamEq(Loop);
+            Q = thisSteamEq.DesignLevel * GetCurrentScheduleValue(state, thisSteamEq.SchedPtr);
 
             // Set Q to EMS override if being called for by EMs
-            if (state.dataHeatBal->ZoneSteamEq(Loop).EMSZoneEquipOverrideOn) Q = state.dataHeatBal->ZoneSteamEq(Loop).EMSEquipPower;
+            if (thisSteamEq.EMSZoneEquipOverrideOn) Q = thisSteamEq.EMSEquipPower;
 
-            state.dataHeatBal->ZoneSteamEq(Loop).Power = Q;
-            state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate = Q * state.dataHeatBal->ZoneSteamEq(Loop).FractionRadiant;
-            state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate = Q * state.dataHeatBal->ZoneSteamEq(Loop).FractionConvected;
-            state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate = Q * state.dataHeatBal->ZoneSteamEq(Loop).FractionLatent;
-            state.dataHeatBal->ZoneSteamEq(Loop).LostRate = Q * state.dataHeatBal->ZoneSteamEq(Loop).FractionLost;
-            state.dataHeatBal->ZoneSteamEq(Loop).TotGainRate = Q - state.dataHeatBal->ZoneSteamEq(Loop).LostRate;
+            thisSteamEq.Power = Q;
+            thisSteamEq.RadGainRate = Q * thisSteamEq.FractionRadiant;
+            thisSteamEq.ConGainRate = Q * thisSteamEq.FractionConvected;
+            thisSteamEq.LatGainRate = Q * thisSteamEq.FractionLatent;
+            thisSteamEq.LostRate = Q * thisSteamEq.FractionLost;
+            thisSteamEq.TotGainRate = Q - thisSteamEq.LostRate;
 
-            int NZ = state.dataHeatBal->ZoneSteamEq(Loop).ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).SteamPower += state.dataHeatBal->ZoneSteamEq(Loop).Power;
-            state.dataHeatBal->ZoneIntGain(NZ).QSERAD += state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QSECON += state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate;
+            int NZ = thisSteamEq.ZonePtr;
+            state.dataHeatBal->ZoneRpt(NZ).SteamPower += thisSteamEq.Power;
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.QSERAD += thisSteamEq.RadGainRate;
+            thisZoneIntGain.QSECON += thisSteamEq.ConGainRate;
+            thisZoneIntGain.QSELAT += thisSteamEq.LatGainRate;
+            thisZoneIntGain.QSELost += thisSteamEq.LostRate;
 
-            int spaceNum = state.dataHeatBal->ZoneSteamEq(Loop).spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).SteamPower += state.dataHeatBal->ZoneSteamEq(Loop).Power;
-            state.dataHeatBal->spaceIntGain(spaceNum).QSERAD += state.dataHeatBal->ZoneSteamEq(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QSECON += state.dataHeatBal->ZoneSteamEq(Loop).ConGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QSELAT += state.dataHeatBal->ZoneSteamEq(Loop).LatGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QSELost += state.dataHeatBal->ZoneSteamEq(Loop).LostRate;
+            int spaceNum = thisSteamEq.spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).SteamPower += thisSteamEq.Power;
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.QSERAD += thisSteamEq.RadGainRate;
+            thisSpaceIntGain.QSECON += thisSteamEq.ConGainRate;
+            thisSpaceIntGain.QSELAT += thisSteamEq.LatGainRate;
+            thisSpaceIntGain.QSELost += thisSteamEq.LostRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotBBHeat; ++Loop) {
-            int NZ = state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr;
-            if (state.dataHeatBal->Zone(NZ).OutDryBulbTemp >= state.dataHeatBal->ZoneBBHeat(Loop).HighTemperature) {
+            auto &thisBBHeat = state.dataHeatBal->ZoneBBHeat(Loop);
+            int NZ = thisBBHeat.ZonePtr;
+            if (state.dataHeatBal->Zone(NZ).OutDryBulbTemp >= thisBBHeat.HighTemperature) {
                 Q = 0.0;
-            } else if (state.dataHeatBal->Zone(NZ).OutDryBulbTemp > state.dataHeatBal->ZoneBBHeat(Loop).LowTemperature) {
-                Q = (state.dataHeatBal->Zone(NZ).OutDryBulbTemp - state.dataHeatBal->ZoneBBHeat(Loop).LowTemperature) *
-                        (state.dataHeatBal->ZoneBBHeat(Loop).CapatHighTemperature - state.dataHeatBal->ZoneBBHeat(Loop).CapatLowTemperature) /
-                        (state.dataHeatBal->ZoneBBHeat(Loop).HighTemperature - state.dataHeatBal->ZoneBBHeat(Loop).LowTemperature) +
-                    state.dataHeatBal->ZoneBBHeat(Loop).CapatLowTemperature;
+            } else if (state.dataHeatBal->Zone(NZ).OutDryBulbTemp > thisBBHeat.LowTemperature) {
+                Q = (state.dataHeatBal->Zone(NZ).OutDryBulbTemp - thisBBHeat.LowTemperature) *
+                        (thisBBHeat.CapatHighTemperature - thisBBHeat.CapatLowTemperature) /
+                        (thisBBHeat.HighTemperature - thisBBHeat.LowTemperature) +
+                    thisBBHeat.CapatLowTemperature;
             } else {
-                Q = state.dataHeatBal->ZoneBBHeat(Loop).CapatLowTemperature;
+                Q = thisBBHeat.CapatLowTemperature;
             }
-            Q *= GetCurrentScheduleValue(state, state.dataHeatBal->ZoneBBHeat(Loop).SchedPtr);
+            Q *= GetCurrentScheduleValue(state, thisBBHeat.SchedPtr);
 
             // set with EMS value if being called for.
-            if (state.dataHeatBal->ZoneBBHeat(Loop).EMSZoneBaseboardOverrideOn) Q = state.dataHeatBal->ZoneBBHeat(Loop).EMSZoneBaseboardPower;
+            if (thisBBHeat.EMSZoneBaseboardOverrideOn) Q = thisBBHeat.EMSZoneBaseboardPower;
 
-            state.dataHeatBal->ZoneBBHeat(Loop).Power = Q;
-            state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate = Q * state.dataHeatBal->ZoneBBHeat(Loop).FractionRadiant;
-            state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate = Q * state.dataHeatBal->ZoneBBHeat(Loop).FractionConvected;
-            state.dataHeatBal->ZoneBBHeat(Loop).TotGainRate = Q;
+            thisBBHeat.Power = Q;
+            thisBBHeat.RadGainRate = Q * thisBBHeat.FractionRadiant;
+            thisBBHeat.ConGainRate = Q * thisBBHeat.FractionConvected;
+            thisBBHeat.TotGainRate = Q;
 
-            NZ = state.dataHeatBal->ZoneBBHeat(Loop).ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).BaseHeatPower += state.dataHeatBal->ZoneBBHeat(Loop).Power;
-            state.dataHeatBal->ZoneIntGain(NZ).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate;
-            state.dataHeatBal->ZoneIntGain(NZ).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate;
+            NZ = thisBBHeat.ZonePtr;
+            state.dataHeatBal->ZoneRpt(NZ).BaseHeatPower += thisBBHeat.Power;
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
+            thisZoneIntGain.QBBRAD += thisBBHeat.RadGainRate;
+            thisZoneIntGain.QBBCON += thisBBHeat.ConGainRate;
 
-            int spaceNum = state.dataHeatBal->ZoneBBHeat(Loop).spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatPower += state.dataHeatBal->ZoneBBHeat(Loop).Power;
-            state.dataHeatBal->spaceIntGain(spaceNum).QBBRAD += state.dataHeatBal->ZoneBBHeat(Loop).RadGainRate;
-            state.dataHeatBal->spaceIntGain(spaceNum).QBBCON += state.dataHeatBal->ZoneBBHeat(Loop).ConGainRate;
+            int spaceNum = thisBBHeat.spaceIndex;
+            state.dataHeatBal->spaceRpt(spaceNum).BaseHeatPower += thisBBHeat.Power;
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
+            thisSpaceIntGain.QBBRAD += thisBBHeat.RadGainRate;
+            thisSpaceIntGain.QBBCON += thisBBHeat.ConGainRate;
         }
 
         for (int Loop = 1; Loop <= state.dataHeatBal->TotCO2Gen; ++Loop) {
