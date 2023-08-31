@@ -288,42 +288,33 @@ void SolveRoot(const EnergyPlusData &state,
     XRes = XTemp;
 }
 
-void MovingAvg(EPVector<Real64> &DataIn, int const NumItemsInAvg)
-{
-    if (NumItemsInAvg <= 1) return; // no need to average/smooth
-
-    EPVector<Real64> TempData;
-    TempData.allocate(2 * DataIn.size()); // a scratch array twice the size, bottom end duplicate of top end
-
-    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
-        TempData(i) = TempData(DataIn.size() + i) = DataIn(i); // initialize both bottom and top end
-        DataIn(i) = 0.0;
-    }
-
-    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
-        for (int j = 1; j <= NumItemsInAvg; ++j) {
-            DataIn(i) += TempData(DataIn.size() - NumItemsInAvg + i + j); // sum top end including NumItemsInAvg history terms
-        }
-        DataIn(i) /= NumItemsInAvg; // average to smooth over NumItemsInAvg window
-    }
-}
-
 void MovingAvg(Array1D<Real64> &DataIn, int const NumItemsInAvg)
 {
     if (NumItemsInAvg <= 1) return; // no need to average/smooth
+    //if (std::accumulate(DataIn.begin(), DataIn.end(), 0.0) == 0.0) {
+    //    return; // no noeed to average if all zeroes
+    //}
 
-    Array1D<Real64> TempData(2 * DataIn.size()); // a scratch array twice the size, bottom end duplicate of top end
+    Array1D<Real64> movingWindow(NumItemsInAvg, 0.0); // holds the last NumItemsInAvg values
+    Real64 movingSum = 0.0;                           // holds the sum of movingWindow
 
-    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
-        TempData(i) = TempData(DataIn.size() + i) = DataIn(i); // initialize both bottom and top end
-        DataIn(i) = 0.0;
+    // Initialize movingWindow with last NumItemsInAvg - 1 elements of DataIn
+    int iWindow;
+    for (iWindow = 1; iWindow <= NumItemsInAvg - 1; ++iWindow) {
+        movingWindow(iWindow) = DataIn(DataIn.size() - (NumItemsInAvg - 1) + iWindow);
+        movingSum += movingWindow(iWindow);
     }
 
-    for (std::size_t i = 1; i <= DataIn.size(); ++i) {
-        for (int j = 1; j <= NumItemsInAvg; ++j) {
-            DataIn(i) += TempData(DataIn.size() - NumItemsInAvg + i + j); // sum top end including NumItemsInAvg history terms
-        }
-        DataIn(i) /= NumItemsInAvg; // average to smooth over NumItemsInAvg window
+    // For every new element, slide movingWindow and movingSum forward one.
+    for (int i = 1; i <= (int)DataIn.size(); ++i) {
+        movingWindow(iWindow) = DataIn(i);
+        movingSum += movingWindow(iWindow);
+        DataIn(i) = movingSum / NumItemsInAvg;
+        // movingWindow is indexed in circular fashion
+        ++iWindow;
+        if (iWindow > NumItemsInAvg) iWindow = 1;
+        // Subtract value of oldest element in movingWindow from movingSum
+        movingSum -= movingWindow(iWindow);
     }
 }
 

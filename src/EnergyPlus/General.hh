@@ -98,8 +98,6 @@ namespace General {
         }
     }
 
-    void MovingAvg(EPVector<Real64> &DataIn, int NumItemsInAvg);
-
     void MovingAvg(Array1D<Real64> &DataIn, int NumItemsInAvg);
 
     void ProcessDateString(EnergyPlusData &state,
