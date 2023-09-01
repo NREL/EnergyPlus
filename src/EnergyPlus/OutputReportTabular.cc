@@ -323,7 +323,7 @@ void GetInputTabularMonthly(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &ort = state.dataOutRptTab;
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite || state.files.outputControl.json)) {
+    if (!state.files.outputControl.writeTabular(state)) {
         ort->WriteTabularFiles = false;
         return;
     }
@@ -1064,7 +1064,7 @@ void GetInputTabularTimeBins(EnergyPlusData &state)
     Array1D_int objVarIDs;
     auto &ort = state.dataOutRptTab;
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite || state.files.outputControl.json)) {
+    if (!state.files.outputControl.writeTabular(state)) {
         ort->WriteTabularFiles = false;
         return;
     }
@@ -1470,7 +1470,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
     auto &ort = state.dataOutRptTab;
     bool ErrorsFound = false;
 
-    if (!(state.files.outputControl.tabular || state.files.outputControl.sqlite || state.files.outputControl.json)) {
+    if (!state.files.outputControl.writeTabular(state)) {
         ort->WriteTabularFiles = false;
         return;
     }
