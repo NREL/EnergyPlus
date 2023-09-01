@@ -74,7 +74,7 @@ void SetupZoneInternalGain(EnergyPlusData &state,
     Real64 gainFrac = 1.0;
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
         if (state.dataHeatBal->Zone(ZoneNum).numSpaces > 1) {
-            gainFrac = state.dataHeatBal->space(spaceNum).floorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
+            gainFrac = state.dataHeatBal->space(spaceNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).FloorArea;
         }
         SetupSpaceInternalGain(state,
                                spaceNum,
