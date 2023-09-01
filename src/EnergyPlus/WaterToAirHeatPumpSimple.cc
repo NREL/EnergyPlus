@@ -111,15 +111,11 @@ namespace WaterToAirHeatPumpSimple {
     constexpr std::array<std::string_view, static_cast<int>(WatertoAirHP::Num)> WatertoAirHPNamesUC{"HEATING", "COOLING"};
 
     void SimWatertoAirHPSimple(EnergyPlusData &state,
-                               std::string_view CompName,     // Coil Name
-                               int &CompIndex,                // Index for Component name
-                               Real64 const SensLoad,         // Sensible demand load [W]
-                               Real64 const LatentLoad,       // Latent demand load [W]
-                               int const CyclingScheme,       // Continuous fan OR cycling compressor
-                               Real64 const RuntimeFrac,      // Compressor run time fraction  or
-                               Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
-                               Real64 &HPTimeConstant,        // Heat pump time constant [s]
-                               Real64 &FanDelayTime,          // Fan delay time, time delay for the HP's fan to
+                               std::string_view CompName, // Coil Name
+                               int &CompIndex,            // Index for Component name
+                               Real64 const SensLoad,     // Sensible demand load [W]
+                               Real64 const LatentLoad,   // Latent demand load [W]
+                               int const CyclingScheme,   // Continuous fan OR cycling compressor
                                DataHVACGlobals::CompressorOperation const CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
@@ -185,31 +181,13 @@ namespace WaterToAirHeatPumpSimple {
 
         if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
-            InitSimpleWatertoAirHP(state,
-                                   HPNum,
-                                   MaxONOFFCyclesperHour,
-                                   HPTimeConstant,
-                                   FanDelayTime,
-                                   SensLoad,
-                                   LatentLoad,
-                                   CyclingScheme,
-                                   OnOffAirFlowRatio,
-                                   FirstHVACIteration);
-            CalcHPCoolingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPCoolingSimple(state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
             // Heating mode
-            InitSimpleWatertoAirHP(state,
-                                   HPNum,
-                                   MaxONOFFCyclesperHour,
-                                   HPTimeConstant,
-                                   FanDelayTime,
-                                   SensLoad,
-                                   DataPrecisionGlobals::constant_zero,
-                                   CyclingScheme,
-                                   OnOffAirFlowRatio,
-                                   FirstHVACIteration);
-            CalcHPHeatingSimple(state, HPNum, CyclingScheme, RuntimeFrac, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, DataPrecisionGlobals::constant_zero, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPHeatingSimple(state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else {
             ShowFatalError(state, "SimWatertoAirHPSimple: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -320,15 +298,13 @@ namespace WaterToAirHeatPumpSimple {
             simpleWAHP.WAHPType = WatertoAirHP::Cooling;
             simpleWAHP.WAHPPlantType = DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit;
             simpleWAHP.RatedAirVolFlowRate = NumArray(1);
-            simpleWAHP.RatedEvapFanPowerPerVolFlowRate2017 = NumArray(2);
-            simpleWAHP.RatedEvapFanPowerPerVolFlowRate2023 = NumArray(3);
-            simpleWAHP.RatedWaterVolFlowRate = NumArray(4);
-            simpleWAHP.RatedCapCoolTotal = NumArray(5);
-            simpleWAHP.RatedCapCoolSens = NumArray(6);
-            simpleWAHP.RatedCOPCoolAtRatedCdts = NumArray(7);
-            simpleWAHP.RatedEntWaterTemp = NumArray(8);
-            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(9);
-            simpleWAHP.RatedEntAirWetbulbTemp = NumArray(10);
+            simpleWAHP.RatedWaterVolFlowRate = NumArray(2);
+            simpleWAHP.RatedCapCoolTotal = NumArray(3);
+            simpleWAHP.RatedCapCoolSens = NumArray(4);
+            simpleWAHP.RatedCOPCoolAtRatedCdts = NumArray(5);
+            simpleWAHP.RatedEntWaterTemp = NumArray(6);
+            simpleWAHP.RatedEntAirDrybulbTemp = NumArray(7);
+            simpleWAHP.RatedEntAirWetbulbTemp = NumArray(8);
             simpleWAHP.TotalCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             simpleWAHP.SensCoolCapCurveIndex = Curve::GetCurveIndex(state, AlphArray(7));  // convert curve name to number
             simpleWAHP.CoolPowCurveIndex = Curve::GetCurveIndex(state, AlphArray(8));      // convert curve name to number
@@ -386,9 +362,74 @@ namespace WaterToAirHeatPumpSimple {
                                                      simpleWAHP.Name,
                                                      "Cooling Power Consumption Curve Name");
             }
+            simpleWAHP.PLFCurveIndex = Curve::GetCurveIndex(state, AlphArray(9)); // convert curve name to number
+
+            if (simpleWAHP.PLFCurveIndex == 0) {
+                if (lAlphaBlanks(9)) {
+                    ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(9)));
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(9), AlphArray(9)));
+                }
+                ErrorsFound = true;
+            } else {
+                // Verify Curve Object, only legal types are Quadratic or Cubic
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     simpleWAHP.PLFCurveIndex, // Curve index
+                                                     {1},                      // Valid dimensions
+                                                     RoutineName,              // Routine name
+                                                     CurrentModuleObject,      // Object Type
+                                                     simpleWAHP.Name,          // Object Name
+                                                     cAlphaFields(9));         // Field Name
+
+                if (!ErrorsFound) {
+                    //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+                    Real64 MinCurveVal = 999.0;
+                    Real64 MaxCurveVal = -999.0;
+                    Real64 CurveInput = 0.0;
+                    Real64 MinCurvePLR{0.0};
+                    Real64 MaxCurvePLR{0.0};
+
+                    while (CurveInput <= 1.0) {
+                        Real64 CurveVal = Curve::CurveValue(state, simpleWAHP.PLFCurveIndex, CurveInput);
+                        if (CurveVal < MinCurveVal) {
+                            MinCurveVal = CurveVal;
+                            MinCurvePLR = CurveInput;
+                        }
+                        if (CurveVal > MaxCurveVal) {
+                            MaxCurveVal = CurveVal;
+                            MaxCurvePLR = CurveInput;
+                        }
+                        CurveInput += 0.01;
+                    }
+                    if (MinCurveVal < 0.7) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                        ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFields(9), AlphArray(9)));
+                        ShowContinueError(state,
+                                          format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
+                        ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
+                        Curve::SetCurveOutputMinValue(state, simpleWAHP.PLFCurveIndex, ErrorsFound, 0.7);
+                    }
+
+                    if (MaxCurveVal > 1.0) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                        ShowContinueError(state, format("...{} = {} has out of range value.", cAlphaFields(9), AlphArray(9)));
+                        ShowContinueError(state,
+                                          format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
+                        ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
+                        Curve::SetCurveOutputMaxValue(state, simpleWAHP.PLFCurveIndex, ErrorsFound, 1.0);
+                    }
+                }
+            }
+
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
-            simpleWAHP.Twet_Rated = NumArray(11);
-            simpleWAHP.Gamma_Rated = NumArray(12);
+            simpleWAHP.Twet_Rated = NumArray(9);
+            simpleWAHP.Gamma_Rated = NumArray(10);
+            simpleWAHP.MaxONOFFCyclesperHour = NumArray(11);
+            simpleWAHP.LatentCapacityTimeConstant = NumArray(12);
+            simpleWAHP.FanDelayTime = NumArray(13);
+
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = simpleWAHP.Name;
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
@@ -565,6 +606,68 @@ namespace WaterToAirHeatPumpSimple {
                                                      simpleWAHP.Name,
                                                      "Heating Power Consumption Curve Name");
             }
+
+            simpleWAHP.PLFCurveIndex = Curve::GetCurveIndex(state, AlphArray(8)); // convert curve name to number
+
+            if (simpleWAHP.PLFCurveIndex == 0) {
+                if (lAlphaBlanks(8)) {
+                    ShowSevereError(state, format("{}{}=\"{}\", missing", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                    ShowContinueError(state, format("...required {} is blank.", cAlphaFields(8)));
+                } else {
+                    ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                    ShowContinueError(state, format("...not found {}=\"{}\".", cAlphaFields(8), AlphArray(8)));
+                }
+                ErrorsFound = true;
+            } else {
+                // Verify Curve Object, only legal types are Quadratic or Cubic
+                ErrorsFound |= Curve::CheckCurveDims(state,
+                                                     simpleWAHP.PLFCurveIndex, // Curve index
+                                                     {1},                      // Valid dimensions
+                                                     RoutineName,              // Routine name
+                                                     CurrentModuleObject,      // Object Type
+                                                     simpleWAHP.Name,          // Object Name
+                                                     cAlphaFields(8));         // Field Name
+
+                if (!ErrorsFound) {
+                    //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
+                    Real64 MinCurveVal = 999.0;
+                    Real64 MaxCurveVal = -999.0;
+                    Real64 CurveInput = 0.0;
+                    Real64 MinCurvePLR{0.0};
+                    Real64 MaxCurvePLR{0.0};
+
+                    while (CurveInput <= 1.0) {
+                        Real64 CurveVal = Curve::CurveValue(state, simpleWAHP.PLFCurveIndex, CurveInput);
+                        if (CurveVal < MinCurveVal) {
+                            MinCurveVal = CurveVal;
+                            MinCurvePLR = CurveInput;
+                        }
+                        if (CurveVal > MaxCurveVal) {
+                            MaxCurveVal = CurveVal;
+                            MaxCurvePLR = CurveInput;
+                        }
+                        CurveInput += 0.01;
+                    }
+                    if (MinCurveVal < 0.7) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                        ShowContinueError(state, format("...{}=\"{}\" has out of range values.", cAlphaFields(8), AlphArray(8)));
+                        ShowContinueError(state,
+                                          format("...Curve minimum must be >= 0.7, curve min at PLR = {:.2T} is {:.3T}", MinCurvePLR, MinCurveVal));
+                        ShowContinueError(state, "...Setting curve minimum to 0.7 and simulation continues.");
+                        Curve::SetCurveOutputMinValue(state, simpleWAHP.PLFCurveIndex, ErrorsFound, 0.7);
+                    }
+
+                    if (MaxCurveVal > 1.0) {
+                        ShowWarningError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, simpleWAHP.Name));
+                        ShowContinueError(state, format("...{} = {} has out of range value.", cAlphaFields(8), AlphArray(8)));
+                        ShowContinueError(state,
+                                          format("...Curve maximum must be <= 1.0, curve max at PLR = {:.2T} is {:.3T}", MaxCurvePLR, MaxCurveVal));
+                        ShowContinueError(state, "...Setting curve maximum to 1.0 and simulation continues.");
+                        Curve::SetCurveOutputMaxValue(state, simpleWAHP.PLFCurveIndex, ErrorsFound, 1.0);
+                    }
+                }
+            }
+
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
             simpleWAHP.WaterInletNodeNum = GetOnlySingleNode(state,
                                                              AlphArray(2),
@@ -886,9 +989,6 @@ namespace WaterToAirHeatPumpSimple {
 
     void InitSimpleWatertoAirHP(EnergyPlusData &state,
                                 int const HPNum,                                 // Current HPNum under simulation
-                                Real64 const MaxONOFFCyclesperHour,              // Maximum cycling rate of heat pump [cycles/hr]
-                                Real64 const HPTimeConstant,                     // Heat pump time constant [s]
-                                Real64 const FanDelayTime,                       // Fan delay time, time delay for the HP's fan to
                                 Real64 const SensLoad,                           // Control zone sensible load[W]
                                 Real64 const LatentLoad,                         // Control zone latent load[W]
                                 [[maybe_unused]] int const CyclingScheme,        // fan operating mode
@@ -1037,9 +1137,6 @@ namespace WaterToAirHeatPumpSimple {
                 simpleWatertoAirHP.COP = 0.0;
                 simpleWatertoAirHP.RunFrac = 0.0;
                 simpleWatertoAirHP.PartLoadRatio = 0.0;
-                simpleWatertoAirHP.MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-                simpleWatertoAirHP.HPTimeConstant = HPTimeConstant;
-                simpleWatertoAirHP.FanDelayTime = FanDelayTime;
 
                 if (simpleWatertoAirHP.RatedWaterVolFlowRate != DataSizing::AutoSize) {
                     rho = FluidProperties::GetDensityGlycol(state,
@@ -1160,10 +1257,6 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.OutletWaterTemp = simpleWatertoAirHP.InletWaterTemp;
         simpleWatertoAirHP.OutletWaterEnthalpy = simpleWatertoAirHP.InletWaterEnthalpy;
 
-        simpleWatertoAirHP.MaxONOFFCyclesperHour = MaxONOFFCyclesperHour;
-        simpleWatertoAirHP.HPTimeConstant = HPTimeConstant;
-        simpleWatertoAirHP.FanDelayTime = FanDelayTime;
-
         // Outlet variables
         simpleWatertoAirHP.Power = 0.0;
         simpleWatertoAirHP.QLoadTotal = 0.0;
@@ -1240,16 +1333,16 @@ namespace WaterToAirHeatPumpSimple {
         Real64 VolFlowRate;
         Real64 CoolCapAtPeak;                  // Load on the cooling coil at cooling design conditions
         Real64 HeatCapAtPeak;                  // Load on the heating coil at heating design conditions
-        Real64 PeakTotCapTempModFac = 0.0;     // Peak total cooling capacity curve modifier
-        Real64 RatedTotCapTempModFac = 0.0;    // Rated total cooling capacity curve modifier
-        Real64 PeakHeatCapTempModFac = 0.0;    // Peak heating capacity curve modifier
+        Real64 PeakTotCapTempModFac = 1.0;     // Peak total cooling capacity curve modifier
+        Real64 RatedTotCapTempModFac = 1.0;    // Rated total cooling capacity curve modifier
+        Real64 PeakHeatCapTempModFac = 1.0;    // Peak heating capacity curve modifier
         Real64 DesignEntWaterTemp;             // Design entering coil water temperature
         Real64 SensCapAtPeak;                  // Sensible load on the cooling coil at cooling design conditions
-        Real64 PeakSensCapTempModFac = 0.0;    // Peak sensible cooling capacity curve modifier
-        Real64 RatedSensCapTempModFac = 0.0;   // Rated sensible cooling capacity curve modifier
-        Real64 RatedHeatCapTempModFac = 0.0;   // Rated heating capacity curve modifier
-        Real64 RatedCoolPowerTempModFac = 0.0; // Rated cooling power curve modifier
-        Real64 RatedHeatPowerTempModFac = 0.0; // Rated heating power curve modifier
+        Real64 PeakSensCapTempModFac = 1.0;    // Peak sensible cooling capacity curve modifier
+        Real64 RatedSensCapTempModFac = 1.0;   // Rated sensible cooling capacity curve modifier
+        Real64 RatedHeatCapTempModFac = 1.0;   // Rated heating capacity curve modifier
+        Real64 RatedCoolPowerTempModFac = 1.0; // Rated cooling power curve modifier
+        Real64 RatedHeatPowerTempModFac = 1.0; // Rated heating power curve modifier
         Real64 RatedCapCoolTotalDesCDD;        // Rated total cooling coil capacity determined at cooling design conditions
         constexpr Real64 Tref(283.15);         // Refrence Temperature for performance curves,10C [K]
         int TimeStepNumAtMax;
@@ -2973,11 +3066,10 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
-                             int const HPNum,                            // Heat Pump Number
-                             int const CyclingScheme,                    // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                   // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-                             [[maybe_unused]] Real64 const SensDemand,   // Cooling Sensible Demand [W] !unused1208
-                             [[maybe_unused]] Real64 const LatentDemand, // Cooling Latent Demand [W]
+                             int const HPNum,                                         // Heat Pump Number
+                             int const CyclingScheme,                                 // Fan/Compressor cycling scheme indicator
+                             [[maybe_unused]] Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
+                             [[maybe_unused]] Real64 const LatentDemand,              // Cooling Latent Demand [W]
                              DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,                              // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
@@ -3111,10 +3203,20 @@ namespace WaterToAirHeatPumpSimple {
             return;
         }
 
+        // Calculate Part Load Factor and Runtime Fraction
+        Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
+        if (simpleWatertoAirHP.PLFCurveIndex > 0) {
+            PLF = Curve::CurveValue(state, simpleWatertoAirHP.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
+        }
+        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
+        }
+        simpleWatertoAirHP.RunFrac = PartLoadRatio / PLF;
+
         // Loop the calculation at least once depending whether the latent degradation model
         // is enabled. 1st iteration to calculate the QLatent(rated) at (TDB,TWB)indoorair=(26.7C,19.4C)
         // and 2nd iteration to calculate the  QLatent(actual)
-        if ((RuntimeFrac >= 1.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0)) {
+        if ((simpleWatertoAirHP.RunFrac >= 1.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0)) {
             LatDegradModelSimFlag = false;
             // Set NumIteration=1 so that latent model would quit after 1 simulation with the actual condition
             NumIteration = 1;
@@ -3189,7 +3291,7 @@ namespace WaterToAirHeatPumpSimple {
                                               HPNum,
                                               SHRss,
                                               CyclingScheme,
-                                              RuntimeFrac,
+                                              simpleWatertoAirHP.RunFrac,
                                               state.dataWaterToAirHeatPumpSimple->QLatRated,
                                               state.dataWaterToAirHeatPumpSimple->QLatActual,
                                               state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp,
@@ -3233,7 +3335,7 @@ namespace WaterToAirHeatPumpSimple {
                                                Psychrometrics::PsyHFnTdbW(simpleWatertoAirHP.OutletAirDBTemp,
                                                                           simpleWatertoAirHP.OutletAirHumRat)); // Why doesn't this match QLoadTotal?
         simpleWatertoAirHP.QSensible *= PartLoadRatio;
-        state.dataWaterToAirHeatPumpSimple->Winput *= RuntimeFrac;
+        state.dataWaterToAirHeatPumpSimple->Winput *= simpleWatertoAirHP.RunFrac;
         simpleWatertoAirHP.QSource = simpleWatertoAirHP.QLoadTotalReport + state.dataWaterToAirHeatPumpSimple->Winput;
         state.dataHeatBal->HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = simpleWatertoAirHP.QSource;
 
@@ -3257,12 +3359,11 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.EnergySensible = simpleWatertoAirHP.QSensible * TimeStepSysSec;
         simpleWatertoAirHP.EnergyLatent = (simpleWatertoAirHP.QLoadTotalReport - simpleWatertoAirHP.QSensible) * TimeStepSysSec;
         simpleWatertoAirHP.EnergySource = simpleWatertoAirHP.QSource * TimeStepSysSec;
-        if (RuntimeFrac == 0.0) {
+        if (simpleWatertoAirHP.RunFrac == 0.0) {
             simpleWatertoAirHP.COP = 0.0;
         } else {
             simpleWatertoAirHP.COP = simpleWatertoAirHP.QLoadTotalReport / state.dataWaterToAirHeatPumpSimple->Winput;
         }
-        simpleWatertoAirHP.RunFrac = RuntimeFrac;
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
         if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterCycling) {
@@ -3304,7 +3405,6 @@ namespace WaterToAirHeatPumpSimple {
     void CalcHPHeatingSimple(EnergyPlusData &state,
                              int const HPNum,                                         // Heat Pump Number
                              int const CyclingScheme,                                 // Fan/Compressor cycling scheme indicator
-                             Real64 const RuntimeFrac,                                // Runtime Fraction of compressor
                              [[maybe_unused]] Real64 const SensDemand,                // Sensible Demand [W] !unused1208
                              DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,                              // compressor part load ratio
@@ -3405,6 +3505,16 @@ namespace WaterToAirHeatPumpSimple {
             return;
         }
 
+        // Calculate Part Load Factor and Runtime Fraction
+        Real64 PLF = 1.0; // part load factor as a function of PLR, RTF = PLR / PLF
+        if (simpleWatertoAirHP.PLFCurveIndex > 0) {
+            PLF = Curve::CurveValue(state, simpleWatertoAirHP.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
+        }
+        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+            state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
+        }
+        simpleWatertoAirHP.RunFrac = PartLoadRatio / PLF;
+
         ratioTDB = ((state.dataWaterToAirHeatPumpSimple->LoadSideInletDBTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
         ratioTS = ((state.dataWaterToAirHeatPumpSimple->SourceSideInletTemp + state.dataWaterToAirHeatPumpSimple->CelsiustoKelvin) / Tref);
         ratioVL = (LoadSideFullMassFlowRate /
@@ -3451,7 +3561,7 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.QLoadTotal *= PartLoadRatio;
         simpleWatertoAirHP.QLoadTotalReport = simpleWatertoAirHP.QLoadTotal;
         simpleWatertoAirHP.QSensible *= PartLoadRatio;
-        state.dataWaterToAirHeatPumpSimple->Winput *= RuntimeFrac;
+        state.dataWaterToAirHeatPumpSimple->Winput *= simpleWatertoAirHP.RunFrac;
         simpleWatertoAirHP.QSource = simpleWatertoAirHP.QLoadTotalReport - state.dataWaterToAirHeatPumpSimple->Winput;
 
         //  Add power to global variable so power can be summed by parent object
@@ -3466,12 +3576,11 @@ namespace WaterToAirHeatPumpSimple {
         simpleWatertoAirHP.EnergySensible = simpleWatertoAirHP.QSensible * TimeStepSysSec;
         simpleWatertoAirHP.EnergyLatent = 0.0;
         simpleWatertoAirHP.EnergySource = simpleWatertoAirHP.QSource * TimeStepSysSec;
-        if (RuntimeFrac == 0.0) {
+        if (simpleWatertoAirHP.RunFrac == 0.0) {
             simpleWatertoAirHP.COP = 0.0;
         } else {
             simpleWatertoAirHP.COP = simpleWatertoAirHP.QLoadTotalReport / state.dataWaterToAirHeatPumpSimple->Winput;
         }
-        simpleWatertoAirHP.RunFrac = RuntimeFrac;
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
         if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterCycling) {
@@ -3676,12 +3785,12 @@ namespace WaterToAirHeatPumpSimple {
         // at the current operating conditions (sec)
         Real64 Gamma; // Initial moisture evaporation rate divided by steady-state AC latent capacity
         // at the current operating conditions
-        Real64 Twet_Rated;            // Twet at rated conditions (coil air flow rate and air temperatures), sec
-        Real64 Gamma_Rated;           // Gamma at rated conditions (coil air flow rate and air temperatures)
-        Real64 Twet_max;              // Maximum allowed value for Twet
-        Real64 MaxONOFFCyclesperHour; // Maximum cycling rate of heat pump [cycles/hr]
-        Real64 HPTimeConstant;        // Heat pump time constant [s]
-        Real64 FanDelayTime;          // Fan delay time, time delay for the HP's fan to
+        Real64 Twet_Rated;                 // Twet at rated conditions (coil air flow rate and air temperatures), sec
+        Real64 Gamma_Rated;                // Gamma at rated conditions (coil air flow rate and air temperatures)
+        Real64 Twet_max;                   // Maximum allowed value for Twet
+        Real64 MaxONOFFCyclesperHour;      // Maximum cycling rate of heat pump [cycles/hr]
+        Real64 LatentCapacityTimeConstant; // Latent capacity time constant [s]
+        Real64 FanDelayTime;               // Fan delay time, time delay for the HP's fan to
         // shut off after compressor cycle off  [s]
         Real64 Ton;     // Coil on time (sec)
         Real64 Toff;    // Coil off time (sec)
@@ -3697,14 +3806,14 @@ namespace WaterToAirHeatPumpSimple {
         Twet_Rated = simpleWatertoAirHP.Twet_Rated;
         Gamma_Rated = simpleWatertoAirHP.Gamma_Rated;
         MaxONOFFCyclesperHour = simpleWatertoAirHP.MaxONOFFCyclesperHour;
-        HPTimeConstant = simpleWatertoAirHP.HPTimeConstant;
+        LatentCapacityTimeConstant = simpleWatertoAirHP.LatentCapacityTimeConstant;
         FanDelayTime = simpleWatertoAirHP.FanDelayTime;
 
         //  No moisture evaporation (latent degradation) occurs for runtime fraction of 1.0
         //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
         //  Latent degradation model parameters initialize to 0.0 meaning no evaporation model used.
         if ((RTF >= 1.0) || (QLatRated == 0.0) || (QLatActual == 0.0) || (Twet_Rated <= 0.0) || (Gamma_Rated <= 0.0) ||
-            (MaxONOFFCyclesperHour <= 0.0) || (HPTimeConstant <= 0.0) || (RTF <= 0.0)) {
+            (MaxONOFFCyclesperHour <= 0.0) || (LatentCapacityTimeConstant <= 0.0) || (RTF <= 0.0)) {
             SHReff = SHRss;
             return SHReff;
         }
@@ -3738,20 +3847,20 @@ namespace WaterToAirHeatPumpSimple {
         //  Use sucessive substitution to solve for To
         aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
 
-        To1 = aa + HPTimeConstant;
+        To1 = aa + LatentCapacityTimeConstant;
         Error = 1.0;
         while (Error > 0.001) {
-            To2 = aa - HPTimeConstant * (std::exp(-To1 / HPTimeConstant) - 1.0);
+            To2 = aa - LatentCapacityTimeConstant * (std::exp(-To1 / LatentCapacityTimeConstant) - 1.0);
             Error = std::abs((To2 - To1) / To1);
             To1 = To2;
         }
 
         //  Adjust Sensible Heat Ratio (SHR) using Latent Heat Ratio (LHR) multiplier
-        //  Floating underflow errors occur when -Ton/HPTimeConstant is a large negative number.
+        //  Floating underflow errors occur when -Ton/LatentCapacityTimeConstant is a large negative number.
         //  Cap lower limit at -700 to avoid the underflow errors.
-        aa = std::exp(max(-700.0, -Ton / HPTimeConstant));
+        aa = std::exp(max(-700.0, -Ton / LatentCapacityTimeConstant));
         //  Calculate latent heat ratio multiplier
-        LHRmult = max(((Ton - To2) / (Ton + HPTimeConstant * (aa - 1.0))), 0.0);
+        LHRmult = max(((Ton - To2) / (Ton + LatentCapacityTimeConstant * (aa - 1.0))), 0.0);
 
         //  Calculate part-load or "effective" sensible heat ratio
         SHReff = 1.0 - (1.0 - SHRss) * LHRmult;
@@ -3888,7 +3997,8 @@ namespace WaterToAirHeatPumpSimple {
             state.dataWaterToAirHeatPumpSimple->GetCoilsInputFlag = false;
         }
 
-        if (CoilType == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" || CoilType == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
+        if (Util::SameString(CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") ||
+            Util::SameString(CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT")) {
             WhichCoil = Util::FindItemInList(CoilName, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP);
             if (WhichCoil != 0) {
                 CoilAirFlowRate = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(WhichCoil).RatedAirVolFlowRate;

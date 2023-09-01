@@ -1388,20 +1388,14 @@ namespace WindowAC {
                                      state.dataWindowAC->WindAC(WindACNum).OpMode,
                                      HXUnitOn);
         } else if (state.dataWindowAC->WindAC(WindACNum).DXCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-            Real64 QZnReq(-1.0);               // Zone load (W), input to variable-speed DX coil
-            Real64 QLatReq(0.0);               // Zone latent load, input to variable-speed DX coil
-            Real64 MaxONOFFCyclesperHour(4.0); // Maximum cycling rate of heat pump [cycles/hr]
-            Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
-            Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
-            Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
+            Real64 QZnReq(-1.0);           // Zone load (W), input to variable-speed DX coil
+            Real64 QLatReq(0.0);           // Zone latent load, input to variable-speed DX coil
+            Real64 OnOffAirFlowRatio(1.0); // ratio of compressor on flow to average flow over time step
 
             VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                       state.dataWindowAC->WindAC(WindACNum).DXCoilName,
                                                       state.dataWindowAC->WindAC(WindACNum).DXCoilIndex,
                                                       state.dataWindowAC->WindAC(WindACNum).OpMode,
-                                                      MaxONOFFCyclesperHour,
-                                                      HPTimeConstant,
-                                                      FanDelayTime,
                                                       DataHVACGlobals::CompressorOperation::On,
                                                       PartLoadFrac,
                                                       state.dataWindowAC->WindAC(WindACNum).DXCoilNumOfSpeeds,

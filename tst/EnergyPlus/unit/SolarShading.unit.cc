@@ -3169,6 +3169,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SrdSurfsProperty.TotSurroundingSurface = 1;
     SrdSurfsProperty.SurroundingSurfs.allocate(1);
     SrdSurfsProperty.SurroundingSurfs(1).ViewFactor = 0.2;
+    SrdSurfsProperty.SurfsViewFactorSum = SrdSurfsProperty.SurroundingSurfs(1).ViewFactor;
     SrdSurfsProperty.SkyViewFactor = 0.0;
     SrdSurfsProperty.IsSkyViewFactorSet = false;
     SrdSurfsProperty.GroundViewFactor = 0.0;
@@ -3180,6 +3181,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     win_Surface.UseSurfPropertyGndSurfRefl = true;
     win_Surface.SurfHasSurroundingSurfProperty = true;
     win_Surface.SurfSurroundingSurfacesNum = 1;
+    win_Surface.ViewFactorSrdSurfs = SrdSurfsProperty.SurfsViewFactorSum;
 
     state->dataSurface->GroundSurfsProperty.allocate(1);
     auto &GndSurfsProperty = state->dataSurface->GroundSurfsProperty(1);
@@ -5025,4 +5027,41 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     // Expected results - window
     Real64 expWinSunlitFrac = 0.5 * 0.8 * 0.2; // again, in simple terms
     EXPECT_NEAR(expWinSunlitFrac, winSunLitFracShade1Shade2Partial, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_checkScheduledSurfacePresent)
+// Test of check to see if all surfaces have a sunlit schedule when shadow calculations are set to "Scheduled"
+{
+    auto &surfData = state->dataSurface;
+    surfData->TotSurfaces = 5;
+    surfData->Surface.allocate(surfData->TotSurfaces);
+
+    // Set up data for test: three of five surfaces are non-shading and two are shading.  Shading surfaces
+    // are skipped so they should not report any errors.  Two of the surfaces will be correctly defined while
+    // one surface will not be correctly defined and will generate an error.
+    surfData->Surface(1).Class = SurfaceClass::Wall;
+    surfData->Surface(1).SurfSchedExternalShadingFrac = true;
+    surfData->Surface(1).Name = "WALL1OK";
+    surfData->Surface(2).Class = SurfaceClass::Roof;
+    surfData->Surface(2).SurfSchedExternalShadingFrac = true;
+    surfData->Surface(2).Name = "ROOF1OK";
+    surfData->Surface(3).Class = SurfaceClass::Window;
+    surfData->Surface(3).SurfSchedExternalShadingFrac = false;
+    surfData->Surface(3).Name = "WINDOW1NOTOK";
+    surfData->Surface(4).Class = SurfaceClass::Shading;
+    surfData->Surface(4).SurfSchedExternalShadingFrac = true;
+    surfData->Surface(4).Name = "SHADING1OK";
+    surfData->Surface(5).Class = SurfaceClass::Overhang;
+    surfData->Surface(5).SurfSchedExternalShadingFrac = false;
+    surfData->Surface(5).Name = "SHADING2NOTOK";
+
+    checkScheduledSurfacePresent(*state);
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** ShadowCalculation specified Schedule for the Shading Calculation Method but no schedule provided for WINDOW1NOTOK",
+        "   **   ~~~   ** When Schedule is selected for the Shading Calculation Method and no schedule is provided for a particular surface,",
+        "   **   ~~~   ** EnergyPlus will assume that the surface is not shaded.  Use SurfaceProperty:LocalEnvironment to specify a schedule",
+        "   **   ~~~   ** for sunlit fraction if this was not desired.  Otherwise, this surface will not be shaded at all.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }

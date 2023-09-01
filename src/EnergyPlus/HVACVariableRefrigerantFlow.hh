@@ -62,6 +62,7 @@
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -700,61 +701,75 @@ namespace HVACVariableRefrigerantFlow {
         bool SuppHeatingCoilPresent = false;       // FALSE if coil not present
         std::string AvailManagerListName;          // Name of an availability manager list object
         int AvailStatus = 0;
-        Real64 TerminalUnitSensibleRate = 0.0; // sensible cooling/heating rate of VRF terminal unit (W)
-        Real64 TerminalUnitLatentRate = 0.0;   // latent dehumidification/humidification rate of VRF terminal unit (W)
-        Real64 TotalCoolingRate = 0.0;         // report variable for total cooling rate (W)
-        Real64 TotalHeatingRate = 0.0;         // report variable for total heating rate (W)
-        Real64 SensibleCoolingRate = 0.0;      // report variable for sensible cooling rate (W)
-        Real64 SensibleHeatingRate = 0.0;      // report variable for sensible heating rate (W)
-        Real64 LatentCoolingRate = 0.0;        // report variable for latent cooling rate (W)
-        Real64 LatentHeatingRate = 0.0;        // report variable for latent heating rate (W)
-        Real64 TotalCoolingEnergy = 0.0;       // report variable for total cooling energy (J)
-        Real64 TotalHeatingEnergy = 0.0;       // report variable for total heating energy (J)
-        Real64 SensibleCoolingEnergy = 0.0;    // report variable for sensible cooling energy (J)
-        Real64 SensibleHeatingEnergy = 0.0;    // report variable for sensible heating energy (J)
-        Real64 LatentCoolingEnergy = 0.0;      // report variable for latent cooling energy (J)
-        Real64 LatentHeatingEnergy = 0.0;      // report variable for latent heating energy (J)
-        bool EMSOverridePartLoadFrac = false;  // User defined EMS function
-        Real64 EMSValueForPartLoadFrac = 0.0;  // user defined value for EMS function
-        int IterLimitExceeded = 0;             // index used for warning messages
-        int FirstIterfailed = 0;               // index used for warning messages
-        int HVACSizingIndex = 0;               // index of a HVACSizing object for a VRF terminal
-        bool ATMixerExists = false;            // True if there is an ATMixer
-        std::string ATMixerName;               // name of air terminal mixer
-        int ATMixerIndex = 0;                  // index to the air terminal mixer
-        int ATMixerType = 0;                   // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode = 0;                // primary inlet air node number for the air terminal mixer
-        int ATMixerSecNode = 0;                // secondary air inlet node number for the air terminal mixer
-        int ATMixerOutNode = 0;                // outlet air node number for the air terminal mixer
-        int SuppHeatCoilAirInletNode = 0;      // supplemental heating coil air inlet node
-        int SuppHeatCoilAirOutletNode = 0;     // supplemental heating coil air outlet node
-        int SuppHeatCoilFluidInletNode = 0;    // supplemental heating coil fluid inlet node
-        int SuppHeatCoilFluidOutletNode = 0;   // supplemental heating coil fluid outlet node
-        bool firstPass = true;                 // used to reset global sizing data
-        PlantLocation SuppHeatCoilPlantLoc{};  // supplemental heating coil plant component index
-        Real64 coilInNodeT = 0.0;              // coil inlet node temp at full flow (C)
-        Real64 coilInNodeW = 0.0;              // coil inlet node humidity ratio at full flow (kg/kg)
-        int fanInletNode = 0;                  // fan inlet node index
-        int fanOutletNode = 0;                 // fan outlet node index
-        bool MySuppCoilPlantScanFlag = true;   // flag used to initialize plant comp for water and steam heating coils
-        int airLoopNum = 0;                    // index to air loop
-        bool isInOASys = false;                // true if TU is configured in outside air system
-        bool isInAirLoop = false;              // true if TU is configured in an air loop
-        bool isInZone = false;                 // true if TU is configured as zone equipment
-        bool isSetPointControlled = false;     // TU is controlled via setpoint instead of the standard load control
-        bool coolSPActive = false;             // set point controlled cooling coil active (needs to operate)
-        bool heatSPActive = false;             // set point controlled heating coil active (needs to operate)
-        Real64 coolLoadToSP = 0.0;             // load to set point in cooling mode
-        Real64 heatLoadToSP = 0.0;             // load to set point in heating mode
-        Real64 coilTempSetPoint = 0.0;         // coil control temperature
-        Real64 suppTempSetPoint = 0.0;         // supplemental heating coil control temperature
-        Real64 controlZoneMassFlowFrac = 1.0;  // ratio of control zone air mass flow rate to total zone air mass flow rate
-        int zoneSequenceCoolingNum = 0;        // zone equipment cooling sequence
-        int zoneSequenceHeatingNum = 0;        // zone equipment heating sequence
-        int coolCoilAirInNode = 0;             // cooling coil air inlet node number
-        int coolCoilAirOutNode = 0;            // cooling coil air outlet node number
-        int heatCoilAirInNode = 0;             // heating coil air inlet node number
-        int heatCoilAirOutNode = 0;            // heating coil air outlet node number
+        Real64 TerminalUnitSensibleRate = 0.0;  // sensible cooling/heating rate of VRF terminal unit (W)
+        Real64 TerminalUnitLatentRate = 0.0;    // latent dehumidification/humidification rate of VRF terminal unit (W)
+        Real64 TotalCoolingRate = 0.0;          // report variable for total cooling rate (W)
+        Real64 TotalHeatingRate = 0.0;          // report variable for total heating rate (W)
+        Real64 SensibleCoolingRate = 0.0;       // report variable for sensible cooling rate (W)
+        Real64 SensibleHeatingRate = 0.0;       // report variable for sensible heating rate (W)
+        Real64 LatentCoolingRate = 0.0;         // report variable for latent cooling rate (W)
+        Real64 LatentHeatingRate = 0.0;         // report variable for latent heating rate (W)
+        Real64 TotalCoolingEnergy = 0.0;        // report variable for total cooling energy (J)
+        Real64 TotalHeatingEnergy = 0.0;        // report variable for total heating energy (J)
+        Real64 SensibleCoolingEnergy = 0.0;     // report variable for sensible cooling energy (J)
+        Real64 SensibleHeatingEnergy = 0.0;     // report variable for sensible heating energy (J)
+        Real64 LatentCoolingEnergy = 0.0;       // report variable for latent cooling energy (J)
+        Real64 LatentHeatingEnergy = 0.0;       // report variable for latent heating energy (J)
+        bool EMSOverridePartLoadFrac = false;   // User defined EMS function
+        Real64 EMSValueForPartLoadFrac = 0.0;   // user defined value for EMS function
+        int IterLimitExceeded = 0;              // index used for warning messages
+        int FirstIterfailed = 0;                // index used for warning messages
+        int HVACSizingIndex = 0;                // index of a HVACSizing object for a VRF terminal
+        bool ATMixerExists = false;             // True if there is an ATMixer
+        std::string ATMixerName;                // name of air terminal mixer
+        int ATMixerIndex = 0;                   // index to the air terminal mixer
+        int ATMixerType = 0;                    // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerPriNode = 0;                 // primary inlet air node number for the air terminal mixer
+        int ATMixerSecNode = 0;                 // secondary air inlet node number for the air terminal mixer
+        int ATMixerOutNode = 0;                 // outlet air node number for the air terminal mixer
+        int SuppHeatCoilAirInletNode = 0;       // supplemental heating coil air inlet node
+        int SuppHeatCoilAirOutletNode = 0;      // supplemental heating coil air outlet node
+        int SuppHeatCoilFluidInletNode = 0;     // supplemental heating coil fluid inlet node
+        int SuppHeatCoilFluidOutletNode = 0;    // supplemental heating coil fluid outlet node
+        bool firstPass = true;                  // used to reset global sizing data
+        PlantLocation SuppHeatCoilPlantLoc{};   // supplemental heating coil plant component index
+        Real64 coilInNodeT = 0.0;               // coil inlet node temp at full flow (C)
+        Real64 coilInNodeW = 0.0;               // coil inlet node humidity ratio at full flow (kg/kg)
+        int fanInletNode = 0;                   // fan inlet node index
+        int fanOutletNode = 0;                  // fan outlet node index
+        bool MySuppCoilPlantScanFlag = true;    // flag used to initialize plant comp for water and steam heating coils
+        int airLoopNum = 0;                     // index to air loop
+        bool isInOASys = false;                 // true if TU is configured in outside air system
+        bool isInAirLoop = false;               // true if TU is configured in an air loop
+        bool isInZone = false;                  // true if TU is configured as zone equipment
+        bool isSetPointControlled = false;      // TU is controlled via setpoint instead of the standard load control
+        bool coolSPActive = false;              // set point controlled cooling coil active (needs to operate)
+        bool heatSPActive = false;              // set point controlled heating coil active (needs to operate)
+        Real64 coolLoadToSP = 0.0;              // load to set point in cooling mode
+        Real64 heatLoadToSP = 0.0;              // load to set point in heating mode
+        Real64 coilTempSetPoint = 0.0;          // coil control temperature
+        Real64 suppTempSetPoint = 0.0;          // supplemental heating coil control temperature
+        Real64 controlZoneMassFlowFrac = 1.0;   // ratio of control zone air mass flow rate to total zone air mass flow rate
+        int zoneSequenceCoolingNum = 0;         // zone equipment cooling sequence
+        int zoneSequenceHeatingNum = 0;         // zone equipment heating sequence
+        int coolCoilAirInNode = 0;              // cooling coil air inlet node number
+        int coolCoilAirOutNode = 0;             // cooling coil air outlet node number
+        int heatCoilAirInNode = 0;              // heating coil air inlet node number
+        int heatCoilAirOutNode = 0;             // heating coil air outlet node number
+        std::string DesignSpecMultispeedHPType; // Multiuple performance object type
+        std::string DesignSpecMultispeedHPName; // Multiuple performance object name
+        int DesignSpecMSHPIndex = -1;           //  Multiuple performance index
+        int NumOfSpeedHeating = 0;              // Number of heating speed
+        int NumOfSpeedCooling = 0;              // Number of cooling speed
+        int HeatSpeedNum = 0;                   // Heating speed number
+        int CoolSpeedNum = 0;                   // Cooling speed number
+        std::vector<Real64> CoolVolumeFlowRate;
+        std::vector<Real64> CoolMassFlowRate;
+        std::vector<Real64> HeatVolumeFlowRate;
+        std::vector<Real64> HeatMassFlowRate;
+        int SpeedNum = 0;
+        Real64 SpeedRatio = 0.0;
+        Real64 CycRatio = 0.0;
 
         // Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************

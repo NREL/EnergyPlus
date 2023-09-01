@@ -3785,9 +3785,9 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
     case COIL_HEATING_DESUPERHEATER:
 
         if (CompLoadFlag) thisSysLoadRepVars.HCCompHTNG += std::abs(CompLoad);
-        if ((EnergyType == Constant::eResource::PlantLoopHeatingDemand) || (EnergyType == Constant::eResource::DistrictHeating)) {
+        if ((EnergyType == Constant::eResource::PlantLoopHeatingDemand) || (EnergyType == Constant::eResource::DistrictHeatingWater)) {
             thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
-        } else if (EnergyType == Constant::eResource::Steam) {
+        } else if (EnergyType == Constant::eResource::DistrictHeatingSteam) {
             thisSysLoadRepVars.HCCompSteam += CompEnergy;
         } else if (EnergyType == Constant::eResource::Electricity) {
             thisSysLoadRepVars.HCCompElec += CompEnergy;
@@ -3816,11 +3816,11 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
                 thisSysLoadRepVars.HCCompHTNG += std::abs(CompLoad);
             }
         }
-        if ((EnergyType == Constant::eResource::PlantLoopHeatingDemand) || (EnergyType == Constant::eResource::DistrictHeating)) {
+        if ((EnergyType == Constant::eResource::PlantLoopHeatingDemand) || (EnergyType == Constant::eResource::DistrictHeatingWater)) {
             thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
         } else if ((EnergyType == Constant::eResource::PlantLoopCoolingDemand) || (EnergyType == Constant::eResource::DistrictCooling)) {
             thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
-        } else if (EnergyType == Constant::eResource::Steam) {
+        } else if (EnergyType == Constant::eResource::DistrictHeatingSteam) {
             thisSysLoadRepVars.HCCompSteam += CompEnergy;
         } else if (EnergyType == Constant::eResource::Electricity) {
             if (CompLoad > 0.0) {
@@ -3981,11 +3981,11 @@ void CalcSystemEnergyUse(EnergyPlusData &state,
                 thisSysLoadRepVars.UserDefinedTerminalHeating += std::abs(CompLoad);
             }
         }
-        if ((EnergyType == Constant::eResource::PlantLoopHeatingDemand) || (EnergyType == Constant::eResource::DistrictHeating)) {
+        if ((EnergyType == Constant::eResource::PlantLoopHeatingDemand) || (EnergyType == Constant::eResource::DistrictHeatingWater)) {
             thisSysLoadRepVars.HCCompH2OHOT += CompEnergy;
         } else if ((EnergyType == Constant::eResource::PlantLoopCoolingDemand) || (EnergyType == Constant::eResource::DistrictCooling)) {
             thisSysLoadRepVars.CCCompH2OCOLD += CompEnergy;
-        } else if (EnergyType == Constant::eResource::Steam) {
+        } else if (EnergyType == Constant::eResource::DistrictHeatingSteam) {
             thisSysLoadRepVars.HCCompSteam += CompEnergy;
         } else if (EnergyType == Constant::eResource::Electricity) {
             if (CompLoad > 0.0) {

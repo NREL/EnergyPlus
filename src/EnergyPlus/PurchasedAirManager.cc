@@ -699,7 +699,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                             OutputProcessor::SOVStoreType::Summed,
                             PurchAir(PurchAirNum).Name,
                             {},
-                            "DISTRICTHEATING",
+                            "DISTRICTHEATINGWATER",
                             "Heating",
                             {},
                             "System");

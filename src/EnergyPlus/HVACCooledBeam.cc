@@ -735,7 +735,7 @@ namespace HVACCooledBeam {
                         } else {
                             DesCoilLoad = CpAir * RhoAir * DesAirVolFlow *
                                           (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU -
-                                           state.dataSize->ZoneSizThermSetPtHi(state.dataSize->CurZoneEqNum));
+                                           state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneSizThermSetPtHi);
                         }
 
                         rho = GetDensityGlycol(state,

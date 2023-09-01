@@ -2149,7 +2149,6 @@ namespace WindowManager {
         Real64 Tright;
 
         Real64 SrdSurfTempAbs; // Absolute temperature of a surrounding surface
-        Real64 SrdSurfViewFac; // View factor of a surrounding surface
         Real64 OutSrdIR;       // LWR from surrouding srfs
 
         // New variables for thermochromic windows calc
@@ -2516,14 +2515,8 @@ namespace WindowManager {
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
                     if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                        int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                        auto &SrdSurfsProperty = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum);
-                        for (int SrdSurfNum = 1; SrdSurfNum <= SrdSurfsProperty.TotSurroundingSurface; SrdSurfNum++) {
-                            SrdSurfViewFac = SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).ViewFactor;
-                            SrdSurfTempAbs =
-                                GetCurrentScheduleValue(state, SrdSurfsProperty.SurroundingSurfs(SrdSurfNum).TempSchNum) + Constant::Kelvin;
-                            OutSrdIR += state.dataWindowManager->sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
-                        }
+                        SrdSurfTempAbs = surface.SrdSurfTemp + Constant::Kelvin;
+                        OutSrdIR = state.dataWindowManager->sigma * surface.ViewFactorSrdSurfs * pow_4(SrdSurfTempAbs);
                     }
                 }
                 if (surface.ExtWind) {             // Window is exposed to wind (and possibly rain)
@@ -2682,14 +2675,10 @@ namespace WindowManager {
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             if (state.dataSurface->Surface(SurfNum).SurfHasSurroundingSurfProperty) {
-                int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurfSurroundingSurfacesNum;
-                for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                    SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                    SrdSurfTempAbs = GetCurrentScheduleValue(
-                                         state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) +
-                                     Constant::Kelvin;
-                    rad_out_lw_srd_per_area += -emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
-                }
+                // update SurfHSrdSurfExt if the windows has exterior shade or blind
+                state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) =
+                    Convect::SurroundingSurfacesRadCoeffAverage(state, SurfNum, Tsout, SurfOutsideEmiss);
+                rad_out_lw_srd_per_area = state.dataHeatBalSurf->SurfHSrdSurfExt(SurfNum) * (surface.SrdSurfTemp - SurfOutsideTemp);
             }
         }
 

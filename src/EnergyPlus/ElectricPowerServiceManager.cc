@@ -3524,6 +3524,10 @@ ElectricStorage::ElectricStorage( // main constructor
             cutoffV_ = state.dataIPShortCut->rNumericArgs(12);
             maxChargeRate_ = state.dataIPShortCut->rNumericArgs(13);
 
+            // Check charging and discharging curves to make sure charging curve always gives a higher voltage (#8817)
+            if (!errorsFound && chargeCurveNum_ > 0 && dischargeCurveNum_ > 0)
+                checkChargeDischargeVoltageCurves(state, name_, chargedOCV_, dischargedOCV_, chargeCurveNum_, dischargeCurveNum_);
+
             break;
         }
         case StorageModelType::LiIonNmcBattery: {
@@ -3836,6 +3840,45 @@ Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, st
         }
     } else { // This shouldn't happen but this will still allow a value to be returned.
         return userInputValue;
+    }
+}
+
+void checkChargeDischargeVoltageCurves(
+    EnergyPlusData &state, std::string_view nameBatt, Real64 const E0c, Real64 const E0d, int const chargeIndex, int const dischargeIndex)
+{
+    int constexpr numChecks = 50;  // number of divisions for checking the functions from 0 to 1 for fraction charged/discharged
+    int constexpr numReports = 10; // number of divisions for reporting
+    bool gotErrs = false;
+
+    // Fix for Defect #8817.  When the charging curve results in a lower voltage than the discharging curve, the battery
+    // will give the appearance that the energy in Joules being removed from the battery exceeds what was stored.  This
+    // checks to make sure that voltage for charging is always higher than discharging at the same fraction charged.
+    for (int loop = 1; loop <= numChecks + 1; ++loop) {
+        Real64 xfc = float(loop - 1) / float(numChecks);                               // = q0/qmax
+        Real64 xfd = 1.0 - xfc;                                                        // = (qmax-q0)/qmax = 1 - xfc
+        Real64 chargeVoltage = E0d + Curve::CurveValue(state, chargeIndex, xfc);       // E0d+Ac*xfc+Cc*xfc/(Dc-xfc)
+        Real64 dischargeVoltage = E0c + Curve::CurveValue(state, dischargeIndex, xfd); // E0c+Ad*xfd+Cd*xfd/(Dd-xfd)
+        if (dischargeVoltage > chargeVoltage) {
+            gotErrs = true;
+            break;
+        }
+    }
+    if (gotErrs) {
+        ShowWarningMessage(state, format("Kinetic Battery Model: {} has a charging/discharging voltage curve conflict.", nameBatt));
+        ShowContinueError(state,
+                          "Discharging voltage is higher than charging voltage which may potentially lead to an imbalance in the stored energy.");
+        ShowContinueError(state, "Check the charging and discharging curves to make sure that the charging voltage is greater than discharging.");
+        ShowContinueError(state, "Also check the charging and discharging energy outputs to find any discrepancies.");
+        for (int loop = 1; loop <= numReports + 1; ++loop) {
+            Real64 xfc = float(loop - 1) / float(numReports);                              // = q0/qmax
+            Real64 xfd = 1.0 - xfc;                                                        // = (qmax-q0)/qmax = 1 - xfc
+            Real64 chargeVoltage = E0d + Curve::CurveValue(state, chargeIndex, xfc);       // E0d+Ac*xfc+Cc*xfc/(Dc-xfc)
+            Real64 dischargeVoltage = E0c + Curve::CurveValue(state, dischargeIndex, xfd); // E0c+Ad*xfd+Cd*xfd/(Dd-xfd)
+            ShowContinueError(
+                state,
+                format(
+                    "Charged fraction = {:.1R}, Charging voltage = {:.3R} V, Discharging voltage = {:.3R} V", xfc, chargeVoltage, dischargeVoltage));
+        }
     }
 }
 

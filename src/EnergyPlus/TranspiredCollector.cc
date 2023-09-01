@@ -1029,6 +1029,7 @@ namespace TranspiredCollector {
         Array1D<Real64> HAirARR;
         Array1D<Real64> HPlenARR;
         Array1D<Real64> LocalWindArr;
+        Array1D<Real64> HSrdSurfARR;
 
         // working variables
         Real64 RhoAir;                        // density of air
@@ -1167,6 +1168,7 @@ namespace TranspiredCollector {
         HPlenARR.dimension(NumSurfs, 0.0);
         //  ALLOCATE(TsoARR(NumSurfs))
         //  TsoARR = 0.0
+        HSrdSurfARR.dimension(NumSurfs, 0.0);
 
         Roughness = state.dataTranspiredCollector->UTSC(UTSCNum).CollRoughness;
         SolAbs = state.dataTranspiredCollector->UTSC(UTSCNum).SolAbsorp;
@@ -1178,8 +1180,17 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = state.dataSurface->SurfOutWindSpeed(SurfPtr);
-            Convect::InitExtConvCoeff(
-                state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
+            Convect::InitExtConvCoeff(state,
+                                      SurfPtr,
+                                      HMovInsul,
+                                      Roughness,
+                                      AbsExt,
+                                      TempExt,
+                                      HExt,
+                                      HSkyARR(ThisSurf),
+                                      HGroundARR(ThisSurf),
+                                      HAirARR(ThisSurf),
+                                      HSrdSurfARR(ThisSurf));
             ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
             AbsThermSurf =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
@@ -1731,6 +1742,7 @@ namespace TranspiredCollector {
         Array1D<Real64> HPlenARR;
         Array1D<Real64> HExtARR;
         Array1D<Real64> LocalWindArr;
+        Array1D<Real64> HSrdSurfARR;
 
         // local working variables
         Real64 Tamb;                  // outdoor drybulb
@@ -1775,6 +1787,7 @@ namespace TranspiredCollector {
         LocalWindArr.dimension(NumSurfs, 0.0);
         HPlenARR.dimension(NumSurfs, 0.0);
         HExtARR.dimension(NumSurfs, 0.0);
+        HSrdSurfARR.dimension(NumSurfs, 0.0);
 
         for (int ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf) {
             int SurfPtr = SurfPtrARR(ThisSurf);
@@ -1790,7 +1803,8 @@ namespace TranspiredCollector {
                                       HExtARR(ThisSurf),
                                       HSkyARR(ThisSurf),
                                       HGroundARR(ThisSurf),
-                                      HAirARR(ThisSurf));
+                                      HAirARR(ThisSurf),
+                                      HSrdSurfARR(ThisSurf));
             int ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
             Real64 AbsThermSurf =
                 dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)))
@@ -1846,6 +1860,7 @@ namespace TranspiredCollector {
         HPlenARR.deallocate();
         Real64 HExt = sum(HExtARR * Area) / A; // dummy for call to InitExteriorConvectionCoeff
         HExtARR.deallocate();
+        HSrdSurfARR.deallocate();
 
         if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
