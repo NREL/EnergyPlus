@@ -96,6 +96,7 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -839,6 +840,7 @@ void SimHVAC(EnergyPlusData &state)
         // simulation has converged for this system time step.
 
         UpdateZoneInletConvergenceLog(state);
+        SwimmingPool::updateSwimmingPoolConditions(state);
 
         ++state.dataHVACMgr->HVACManageIteration; // Increment the iteration counter
 
@@ -884,6 +886,7 @@ void SimHVAC(EnergyPlusData &state)
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
+            SwimmingPool::updateSwimmingPoolConditions(state);
             // now call for a last plant simulation
             state.dataHVACGlobal->SimAirLoopsFlag = false;
             state.dataHVACGlobal->SimZoneEquipmentFlag = false;
@@ -913,6 +916,7 @@ void SimHVAC(EnergyPlusData &state)
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
+            SwimmingPool::updateSwimmingPoolConditions(state);
         }
     }
 

@@ -1181,4 +1181,22 @@ Real64 MakeUpWaterVolFunct(Real64 MakeUpWaterMass, Real64 Density)
     return MakeUpWaterMass / Density;
 }
 
+void updateSwimmingPoolConditions(EnergyPlusData &state)
+{
+    // Update the temperature and flow conditions as needed to make sure that the plant gets the right temperature
+    // and so that the flow rate through the swimming pool (with an implied bypass potetially) is also correct.
+    for (auto &thisPool : state.dataSwimmingPools->Pool) {
+        auto &inletNode = state.dataLoopNodes->Node(thisPool.WaterInletNode);
+        auto &outletNode = state.dataLoopNodes->Node(thisPool.WaterOutletNode);
+        Real64 maxMassFlowRate = std::max(inletNode.MassFlowRate, outletNode.MassFlowRate);
+        inletNode.MassFlowRate = maxMassFlowRate;
+        outletNode.MassFlowRate = maxMassFlowRate;
+        if (thisPool.WaterMassFlowRate < maxMassFlowRate) {
+            Real64 bypassMassFlowRate = maxMassFlowRate - thisPool.WaterMassFlowRate;
+            outletNode.Temp = (thisPool.PoolWaterTemp * thisPool.WaterMassFlowRate + inletNode.Temp * bypassMassFlowRate) / maxMassFlowRate;
+            thisPool.WaterMassFlowRate = maxMassFlowRate;
+        }
+    }
+}
+
 } // namespace EnergyPlus::SwimmingPool
