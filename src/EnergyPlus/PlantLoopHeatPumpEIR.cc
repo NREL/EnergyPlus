@@ -74,6 +74,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 
 namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
@@ -1491,6 +1492,15 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                      condenserNodeConnectionType_Inlet,
                                                                                      NodeInputManager::CompFluidStream::Secondary,
                                                                                      DataLoopNode::ObjectIsNotParent);
+                if (condenserNodeType == DataLoopNode::NodeFluidType::Air) {
+                    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisPLHP.sourceSideNodes.inlet)) {
+                        ShowSevereError(
+                            state,
+                            format(
+                                "Air Source PlantLoop:HeatPump: {} inlet node: {} is not an OutdoorAir:Node.", thisPLHP.name, sourceSideInletNodeName));
+                        ShowContinueError(state, "Confirm that this is the intended source for the outdoor air stream.");
+                    }
+                }
                 thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                       sourceSideOutletNodeName,
                                                                                       nodeErrorsFound,
