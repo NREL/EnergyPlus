@@ -265,7 +265,8 @@ namespace DataLoopNode {
         DehumidifierDesiccantNoFans,
         DehumidifierDesiccantSystem,
         DistrictCooling,
-        DistrictHeating,
+        DistrictHeatingWater,
+        DistrictHeatingSteam,
         Duct,
         ElectricEquipmentITEAirCooled,
         EvaporativeCoolerDirectCelDekPad,
@@ -327,6 +328,7 @@ namespace DataLoopNode {
         PipingSystemUndergroundPipeCircuit,
         PlantComponentTemperatureSource,
         PlantComponentUserDefined,
+        PlantEquipmentOperationChillerHeaterChangeover,
         PlantEquipmentOperationComponentSetpoint,
         PlantEquipmentOperationOutdoorDewpointDifference,
         PlantEquipmentOperationOutdoorDrybulbDifference,
@@ -419,6 +421,9 @@ namespace DataLoopNode {
         ZoneHVACWaterToAirHeatPump,
         ZoneHVACWindowAirConditioner,
         ZonePropertyLocalEnvironment,
+        SpaceHVACEquipmentConnections,
+        SpaceHVACZoneEquipmentSplitter,
+        SpaceHVACZoneEquipmentMixer,
         Num,
     };
 

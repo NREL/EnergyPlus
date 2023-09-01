@@ -102,6 +102,7 @@ set(test_src
     EconomicTariff.unit.cc
     ElectricBaseboardRadiator.unit.cc
     ElectricPowerServiceManager.unit.cc
+    EquipAndOperations.unit.cc
     EvaporativeCoolers.unit.cc
     EvaporativeFluidCoolers.unit.cc
     ExhaustSystem.unit.cc
@@ -274,13 +275,20 @@ if(LINK_WITH_PYTHON)
   endif()
 endif()
 
-if(CMAKE_HOST_UNIX)
-  if(NOT APPLE)
-    list(APPEND test_dependencies dl)
-  endif()
+if(CMAKE_HOST_UNIX AND NOT APPLE)
+  list(APPEND test_dependencies dl)
 endif()
 
 # Executable name will be EnergyPlus_tests
 # Execute energyplus_tests --help for options using gtest runner
 # Execute energyplus_tests with no arguments to run all tests
 create_test_targets(energyplus "${test_src}" "${test_dependencies}" True)
+
+
+set(test_src
+    Fixtures/EnergyPlusFixture.cc
+    Fixtures/EnergyPlusFixture.hh
+    CommandLineInterface.unit.cc
+    main.cc
+)
+create_test_targets(energyplusapi "${test_src}" "${test_dependencies}" True)
