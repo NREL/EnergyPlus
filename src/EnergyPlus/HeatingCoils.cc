@@ -1860,6 +1860,11 @@ namespace HeatingCoils {
         default:
             break;
         }
+
+        // std 229 heating coils existing table adding new variables:
+        // pdchHeatCoilUsedAsSupHeat is now reported at coil selection report
+        // pdchHeatCoilAirloopName is now reported at coil selection report
+        // std 229 Coil Connections New table: now all reported at coil selection report
     }
 
     void CalcElectricHeatingCoil(EnergyPlusData &state,
