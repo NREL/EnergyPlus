@@ -196,20 +196,20 @@ namespace OutputProcessor {
 
         // Initialize end use category names - the indices must match up with endUseNames in OutputReportTabular
         op->EndUseCategory.allocate(static_cast<int>(Constant::EndUse::Num));
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::Heating) + 1).Name = "Heating";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cooling) + 1).Name = "Cooling";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorLights) + 1).Name = "InteriorLights";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorLights) + 1).Name = "ExteriorLights";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1).Name = "InteriorEquipment";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1).Name = "ExteriorEquipment";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::Fans) + 1).Name = "Fans";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::Pumps) + 1).Name = "Pumps";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRejection) + 1).Name = "HeatRejection";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::Humidification) + 1).Name = "Humidifier";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRecovery) + 1).Name = "HeatRecovery";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::WaterSystem) + 1).Name = "WaterSystems";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::Refrigeration) + 1).Name = "Refrigeration";
-        op->EndUseCategory(static_cast<int>(Constant::EndUse::Cogeneration) + 1).Name = "Cogeneration";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::Heating) + 1).Name = "Heating";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::Cooling) + 1).Name = "Cooling";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorLights) + 1).Name = "InteriorLights";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorLights) + 1).Name = "ExteriorLights";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::InteriorEquipment) + 1).Name = "InteriorEquipment";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1).Name = "ExteriorEquipment";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::Fans) + 1).Name = "Fans";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::Pumps) + 1).Name = "Pumps";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRejection) + 1).Name = "HeatRejection";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::Humidification) + 1).Name = "Humidifier";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::HeatRecovery) + 1).Name = "HeatRecovery";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::WaterSystem) + 1).Name = "WaterSystems";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::Refrigeration) + 1).Name = "Refrigeration";
+        // op->EndUseCategory(static_cast<int>(Constant::EndUse::Cogeneration) + 1).Name = "Cogeneration";
 
         // Initialize display names for output table - this could go away if end use key names are changed to match
         op->EndUseCategory(static_cast<int>(Constant::EndUse::Heating) + 1).DisplayName = "Heating";
