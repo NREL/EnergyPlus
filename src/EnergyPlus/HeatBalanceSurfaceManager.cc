@@ -4875,11 +4875,8 @@ void UpdateIntermediateSurfaceHeatBalanceResults(EnergyPlusData &state, ObjexxFC
             int const firstSurf = thisSpace.OpaqOrIntMassSurfaceFirst;
             int const lastSurf = thisSpace.OpaqOrIntMassSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-                Real64 lowValue = 0.0000001;
                 state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) =
                     state.dataHeatBalSurf->SurfOpaqQRadSWInAbs(surfNum) - state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(surfNum);
-                if (state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) <= lowValue)
-                    state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(surfNum) = 0.0;
             }
         }
     }

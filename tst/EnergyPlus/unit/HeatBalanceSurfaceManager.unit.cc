@@ -8604,19 +8604,19 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPer
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
 
-    // Test 3: positive value that would calculate negative--should return zero
+    // Test 3: positive values that would calculate negative--will return a negative number
     thisRep = -9999.9;
-    expectedResult = 0.0;
+    expectedResult = -0.1;
     thisQRadSW = 6.0;
-    thisLights = 7.0;
+    thisLights = 6.1;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
 
-    // Test 4: positive values that would calculate a very small number--should return zero
+    // Test 4: positive values that would calculate a small number--return that number
     thisRep = -9999.9;
-    expectedResult = 0.0;
+    expectedResult = 0.00001;
     thisQRadSW = 6.0;
-    thisLights = 5.999999999;
+    thisLights = 5.99999;
     UpdateIntermediateSurfaceHeatBalanceResults(*state);
     EXPECT_NEAR(thisRep, expectedResult, diffTol);
 }
