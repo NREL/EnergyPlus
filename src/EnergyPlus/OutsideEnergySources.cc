@@ -325,21 +325,19 @@ void OutsideEnergySourceSpecs::initialize(EnergyPlusData &state, Real64 MyLoad)
     // The mass flow rate could be an inter-connected-loop side trigger. This is not really the type of
     //  interconnect that that routine was written for, but it is the clearest example of using it.
 
+    auto &loop = state.dataPlnt->PlantLoop(this->plantLoc.loopNum);
+
     // begin environment inits
     if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
         // component model has not design flow rates, using data for overall plant loop
-        PlantUtilities::InitComponentNodes(state,
-                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinMassFlowRate,
-                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate,
-                                           this->InletNodeNum,
-                                           this->OutletNodeNum);
+        PlantUtilities::InitComponentNodes(state, loop.MinMassFlowRate, loop.MaxMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
         this->BeginEnvrnInitFlag = false;
     }
     if (!state.dataGlobal->BeginEnvrnFlag) this->BeginEnvrnInitFlag = true;
 
     Real64 TempPlantMassFlow(0.0);
     if (std::abs(MyLoad) > 0.0) {
-        TempPlantMassFlow = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate;
+        TempPlantMassFlow = loop.MaxMassFlowRate;
     }
 
     // get actual mass flow to use, hold in MassFlowRate variable
@@ -449,6 +447,8 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SimDistrictEnergy");
 
+    auto &loop = state.dataPlnt->PlantLoop(this->plantLoc.loopNum);
+
     // set inlet and outlet nodes
     int const LoopNum = this->plantLoc.loopNum;
     Real64 const LoopMinTemp = state.dataPlnt->PlantLoop(LoopNum).MinTemp;
@@ -487,23 +487,13 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                 MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             }
         } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on MyLoad
-            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                          this->InletTemp,
-                                                                          1.0,
-                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                                          RoutineName);
-            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state,
-                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                           this->InletTemp,
-                                                                           0.0,
-                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
-                                                                           RoutineName);
+            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, this->InletTemp, 1.0, loop.FluidIndex, RoutineName);
+            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, this->InletTemp, 0.0, loop.FluidIndex, RoutineName);
             Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
             this->MassFlowRate = MyLoad / LatentHeatSteam;
             PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
             // Like the assumption in Boiler:Steam, assume that it can meet the steam loop setpoint
-            this->OutletTemp = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+            this->OutletTemp = state.dataLoopNodes->Node(loop.TempSetPointNodeNum).TempSetPoint;
             this->OutletSteamQuality = 0.0;
             // apply loop limits on mass flow rate result to keep in check
             if (this->MassFlowRate < LoopMinMdot) {
@@ -531,6 +521,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
 
 void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
+    auto &loop = state.dataPlnt->PlantLoop(this->plantLoc.loopNum);
 
     // Locate the unit on the plant loops for later usage
     bool errFlag = false;
@@ -539,14 +530,11 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
         ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
     }
     // set limits on outlet node temps to plant loop limits
-    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MinOutletTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MinTemp;
-    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MaxOutletTemp = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxTemp;
+    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MinOutletTemp = loop.MinTemp;
+    DataPlant::CompData::getPlantComponent(state, this->plantLoc).MaxOutletTemp = loop.MaxTemp;
     // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxVolFlowRate);
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, loop.MaxVolFlowRate);
 
-    // this may need some help, if the objects change location later, due to a push_back,
-    //  then the pointers to these output variables will be bad
-    // for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
     std::string reportVarPrefix = "District Heating Water ";
     std::string heatingOrCooling = "Heating";
     std::string_view meterTypeKey = "DistrictHeatingWater";
@@ -560,7 +548,7 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
         meterTypeKey = "DistrictHeatingSteam";
     }
     SetupOutputVariable(state,
-                        reportVarPrefix + "Energy",
+                        format("{}Energy", reportVarPrefix),
                         OutputProcessor::Unit::J,
                         this->EnergyTransfer,
                         OutputProcessor::SOVTimeStepType::System,
@@ -572,28 +560,28 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
                         {},
                         "Plant");
     SetupOutputVariable(state,
-                        reportVarPrefix + "Rate",
+                        format("{}Rate", reportVarPrefix),
                         OutputProcessor::Unit::W,
                         this->EnergyRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        reportVarPrefix + "Inlet Temperature",
+                        format("{}Inlet Temperature", reportVarPrefix),
                         OutputProcessor::Unit::C,
                         this->InletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        reportVarPrefix + "Outlet Temperature",
+                        format("{}Outlet Temperature", reportVarPrefix),
                         OutputProcessor::Unit::C,
                         this->OutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
-                        reportVarPrefix + "Mass Flow Rate",
+                        format("{}Mass Flow Rate", reportVarPrefix),
                         OutputProcessor::Unit::kg_s,
                         this->MassFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
