@@ -65,6 +65,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
@@ -335,15 +336,15 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
                                                       "  hp cooling side,",
                                                       "  node 1,",
                                                       "  node 2,",
-                                                      "  AirSource,",
+                                                      "  WaterSource,",
                                                       "  node 3,",
-                                                      "  node 3,",
+                                                      "  node 4,",
                                                       "  ,",
-                                                      "  0.001,",
-                                                      "  0.001,",
-                                                      "  1000,",
-                                                      "  3.14,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
                                                       "  ,",
+                                                      "  1,",
                                                       "  dummyCurve,",
                                                       "  dummyCurve,",
                                                       "  dummyCurve;",
@@ -464,7 +465,7 @@ TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceDuplicateNodes)
     EXPECT_TRUE(compare_err_stream(error_msg));
 }
 
-TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceNoOANode)
+TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceOANode)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -487,7 +488,9 @@ TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceNoOANode)
                                                       "  1,",
                                                       "  0,",
                                                       "  1,",
-                                                      "  1;"});
+                                                      "  1;",
+                                                      "OutdoorAir:NodeList,",
+                                                      "  node 3;"});
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up the plant loops
@@ -512,16 +515,12 @@ TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceNoOANode)
 
     // the init call expects a "from" calling point
     PlantLocation myLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
-
+    // setup the outdoor air nodes
+    OutAirNodeManager::SetOutAirNodes(*state);
     // call the factory with a valid name to trigger reading inputs
     // expects fatal error due to same node names
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
-    // expect error related to same node names
-    std::string error_msg = delimited_string({
-        "   ** Severe  ** Air Source PlantLoop:HeatPump: HP COOLING SIDE inlet node: NODE 3 is not an OutdoorAir:Node.",
-        "   **   ~~~   ** Confirm that this is the intended source for the outdoor air stream.",
-    });
-    EXPECT_TRUE(compare_err_stream(error_msg));
+    EXPECT_TRUE(compare_err_stream(""));
 }
 
 TEST_F(EnergyPlusFixture, Initialization)
