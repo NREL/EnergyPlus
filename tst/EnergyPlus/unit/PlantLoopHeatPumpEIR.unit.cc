@@ -523,6 +523,66 @@ TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceOANode)
     EXPECT_TRUE(compare_err_stream(""));
 }
 
+TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceNoOANode)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  1.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    // then the source side
+
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1);
+    PLHPPlantLoadSourceComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    // expects fatal error due to same node names
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
+    // expect error related to OA node not being an OutdoorAirNode
+    std::string error_msg = delimited_string({
+        "   ** Severe  ** Air Source PlantLoop:HeatPump: HP COOLING SIDE inlet node: NODE 3 is not an OutdoorAir:Node.",
+        "   **   ~~~   ** Confirm that this is the intended source for the outdoor air stream.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_msg));
+}
+
 TEST_F(EnergyPlusFixture, Initialization)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
