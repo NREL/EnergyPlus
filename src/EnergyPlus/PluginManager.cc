@@ -578,7 +578,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
             fs::path modulePath(fields.at("python_module_name").get<std::string>());
             std::string className = fields.at("plugin_class_name").get<std::string>();
-            std::string const sWarmup = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("run_during_warmup_days").get<std::string>());
+            std::string const sWarmup = EnergyPlus::Util::makeUPPER(fields.at("run_during_warmup_days").get<std::string>());
             bool const warmup = (sWarmup == "YES");
             state.dataPluginManager->plugins.emplace_back(modulePath, className, thisObjectName, warmup);
         }
