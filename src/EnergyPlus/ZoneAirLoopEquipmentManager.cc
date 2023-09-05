@@ -692,14 +692,13 @@ namespace ZoneAirLoopEquipmentManager {
                 if (InNodeNum > 0) {
                     MassFlowRateMaxAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail;
                     MassFlowRateMinAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMinAvail;
-
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).IsConstLeakageRate) {
-                        MassFlowRateUpStreamLeakMax =
-                            max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac * MassFlowRateMaxAvail, 0.0);
-                    } else {
                         MassFlowRateUpStreamLeakMax = max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac *
                                                               state.dataLoopNodes->Node(InNodeNum).MassFlowRateMax,
                                                           0.0);
+                    } else {
+                        MassFlowRateUpStreamLeakMax =
+                            max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac * MassFlowRateMaxAvail, 0.0);
                     }
                     if (MassFlowRateMaxAvail > MassFlowRateUpStreamLeakMax) {
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk = MassFlowRateUpStreamLeakMax;
