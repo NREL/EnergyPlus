@@ -40,7 +40,7 @@ int main(void) {
 
   unsigned wallId = pumbra.addSurface(wall);
   unsigned windowId = pumbra.addSurface(window);
-  unsigned awningId = pumbra.addSurface(awning);
+  // unsigned awningId = pumbra.addSurface(awning);
 
   pumbra.setModel();
   pumbra.setSunPosition(2.50f, 0.3f);
@@ -63,7 +63,7 @@ int main(void) {
   Pumbra::Surface fin(finVerts);
 
   windowId = pumbra.addSurface(window);
-  awningId = pumbra.addSurface(awning);
+  // awningId = pumbra.addSurface(awning);
   /*unsigned finID = */ pumbra.addSurface(fin);
 
   pumbra.setModel();
