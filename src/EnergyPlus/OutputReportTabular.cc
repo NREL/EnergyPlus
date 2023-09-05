@@ -1501,7 +1501,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         for (int iReport = 1; iReport <= NumAlphas; ++iReport) {
             bool nameFound = false;
             if (AlphArray(iReport).empty()) {
-                ShowSevereError(state, "Blank report name in Output:Table:SummaryReports");
+                ShowWarningError(state, "Blank report name in Output:Table:SummaryReports");
             } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
                 ort->displayTabularBEPS = true;
                 ort->WriteTabularFiles = true;
