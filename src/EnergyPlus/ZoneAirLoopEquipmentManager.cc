@@ -673,7 +673,7 @@ namespace ZoneAirLoopEquipmentManager {
         Real64 MassFlowRateMinAvail;        // min avail mass flow rate excluding leaks [kg/s]
         Real64 MassFlowRateUpStreamLeakMax; // max upstream leak flow rate [kg/s]
         Real64 SpecHumOut(0.0);             // Specific humidity ratio of outlet air (kg moisture / kg moist air)
-        Real64 SpecHumIn(0.0);              // Specific humidity ratio of inlet air (kg moisture / kg moist air)
+        Real64 SpecHumIn(0.0);              // Specific humidity ratio of inlet air (kg moisture / kg moist air)																												
 
         ProvideSysOutput = true;
         for (AirDistCompNum = 1; AirDistCompNum <= state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).NumComponents; ++AirDistCompNum) {
@@ -688,6 +688,7 @@ namespace ZoneAirLoopEquipmentManager {
                 if (InNodeNum > 0) {
                     MassFlowRateMaxAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail;
                     MassFlowRateMinAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMinAvail;
+
                     MassFlowRateUpStreamLeakMax =
                         max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac * MassFlowRateMaxAvail, 0.0);
                     if (MassFlowRateMaxAvail > MassFlowRateUpStreamLeakMax) {
