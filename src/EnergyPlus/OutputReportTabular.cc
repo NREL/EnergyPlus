@@ -366,7 +366,10 @@ void GetInputTabularMonthly(EnergyPlusData &state)
         int const curTable = AddMonthlyReport(state, AlphArray(1), int(NumArray(1)));
         for (int jField = 2; jField <= NumAlphas; jField += 2) {
             if (AlphArray(jField).empty()) {
-                ShowFatalError(state, "Blank report name in Output:Table:Monthly");
+                ShowWarningError(state,
+                                 format("{}: Blank column specified in '{}', need to provide a variable or meter name ",
+                                        CurrentModuleObject,
+                                        ort->MonthlyInput(TabNum).name));
             }
             std::string const curAggString = AlphArray(jField + 1);
             AggType curAggType; // kind of aggregation identified (see AggType parameters)
@@ -402,7 +405,9 @@ void GetInputTabularMonthly(EnergyPlusData &state)
                 ShowWarningError(state, format("{}={}, Variable name={}", CurrentModuleObject, ort->MonthlyInput(TabNum).name, AlphArray(jField)));
                 ShowContinueError(state, format("Invalid aggregation type=\"{}\"  Defaulting to SumOrAverage.", curAggString));
             }
-            AddMonthlyFieldSetInput(state, curTable, AlphArray(jField), "", curAggType);
+            if (!AlphArray(jField).empty()) {
+                AddMonthlyFieldSetInput(state, curTable, AlphArray(jField), "", curAggType);
+            }
         }
     }
 }
