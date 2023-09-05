@@ -544,7 +544,7 @@ std::vector<float> Context::retrieve_pssas(const std::vector<unsigned int> &surf
   std::vector<float> pssas;
   pssas.reserve(surface_indices.size());
   for (const unsigned int surface_index : surface_indices) {
-    pssas.emplace_back(retrieve_pssa(surface_index));
+    pssas.push_back(retrieve_pssa(surface_index));
   }
   return pssas;
 }
@@ -553,7 +553,7 @@ std::vector<float> Context::retrieve_pssa() {
   std::vector<float> pssas;
   pssas.reserve(model.surface_buffers.size());
   for (auto const &surface_buffer : model.surface_buffers) {
-    pssas.emplace_back(retrieve_pssa(surface_buffer.index));
+    pssas.push_back(retrieve_pssa(surface_buffer.index));
   }
   return pssas;
 }
