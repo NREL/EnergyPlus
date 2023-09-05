@@ -130,11 +130,10 @@ void GetInputTabularAnnual(EnergyPlusData &state)
             for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                 curVarMtr = alphArray(jAlpha);
                 if (curVarMtr.empty()) {
-                    ShowWarningError(
-                        state,
-                        format("{}: Blank column specified in '{}', need to provide a variable or meter or EMS variable name ",
-                               currentModuleObject,
-                               alphArray(1)));
+                    ShowWarningError(state,
+                                     format("{}: Blank column specified in '{}', need to provide a variable or meter or EMS variable name ",
+                                            currentModuleObject,
+                                            alphArray(1)));
                 }
                 if (jAlpha <= numAlphas) {
                     std::string aggregationString = alphArray(jAlpha + 1);
