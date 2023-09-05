@@ -86,7 +86,10 @@
     ,                        !- Resistive Defrost Heater Capacity {W}
     ,                        !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
     4500000,                 !- Compressor maximum delta Pressure {Pa}
-    8,                       !- Number of Compressor Loading Index Entries
+    9,                       !- Number of Compressor Loading Index Entries
+    900,                    !- Compressor Speed at Loading Index 1 {rev/min}
+    MinSpdCooling,             !- Loading Index 1 Evaporative Capacity Multiplier Function of Temperature Curve Name
+    MinSpdPower,               !- Loading Index 1 Compressor Power Multiplier Function of Temperature Curve Name
     1320,                    !- Compressor Speed at Loading Index 2 {rev/min}
     Spd1Cooling,             !- Loading Index 2 Evaporative Capacity Multiplier Function of Temperature Curve Name
     Spd1Power,               !- Loading Index 2 Compressor Power Multiplier Function of Temperature Curve Name
