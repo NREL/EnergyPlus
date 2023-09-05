@@ -130,7 +130,11 @@ void GetInputTabularAnnual(EnergyPlusData &state)
             for (jAlpha = 4; jAlpha <= numAlphas; jAlpha += 2) {
                 curVarMtr = alphArray(jAlpha);
                 if (curVarMtr.empty()) {
-                    ShowFatalError(state, "Blank report name in Output:Table:Annual");
+                    ShowWarningError(
+                        state,
+                        format("{}: Blank column specified in '{}', need to provide a variable or meter or EMS variable name ",
+                               currentModuleObject,
+                               alphArray(1)));
                 }
                 if (jAlpha <= numAlphas) {
                     std::string aggregationString = alphArray(jAlpha + 1);
@@ -144,7 +148,9 @@ void GetInputTabularAnnual(EnergyPlusData &state)
                 } else {
                     curNumDgts = 2;
                 }
-                annualTables.back().addFieldSet(curVarMtr, curAgg, curNumDgts);
+                if (!curVarMtr.empty()) {
+                    annualTables.back().addFieldSet(curVarMtr, curAgg, curNumDgts);
+                }
             }
             annualTables.back().setupGathering(state);
         } else {
