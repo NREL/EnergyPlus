@@ -7328,7 +7328,7 @@ namespace InternalHeatGains {
             auto &thisPeople = state.dataHeatBal->People(Loop);
             int NZ = state.dataHeatBal->People(Loop).ZonePtr;
             int spaceNum = thisPeople.spaceIndex;
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
+            auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
             NumberOccupants = thisPeople.NumberOfPeople * GetCurrentScheduleValue(state, thisPeople.NumberOfPeoplePtr);
             if (thisPeople.EMSPeopleOn) NumberOccupants = thisPeople.EMSNumberOfPeople;
 
@@ -7341,7 +7341,7 @@ namespace InternalHeatGains {
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
                 if (thisPeople.UserSpecSensFrac == Constant::AutoCalculate) {
-                    Real64 airTemp = thisZoneHB.MAT;
+                    Real64 airTemp = thisSpaceHB.MAT;
                     if (state.dataRoomAir->anyNonMixingRoomAirModel) {
                         if (state.dataRoomAir->IsZoneDispVent3Node(NZ) || state.dataRoomAir->IsZoneUFAD(NZ)) {
                             airTemp = state.dataRoomAir->TCMF(NZ);
@@ -7678,12 +7678,10 @@ namespace InternalHeatGains {
         UpdateInternalGainValues(state);
 
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-
-            auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-            thisZoneHB.latentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ); // Also sets space gains
+            InternalHeatGains::SumAllInternalLatentGains(state, NZ); // Sets zone and space latent gains
             // Added for hybrid model
             if (state.dataHybridModel->FlagHybridModel_PC) {
-                thisZoneHB.latentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ); // Also sets space gains
+                InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ); // Also sets space gains
             }
         }
 
@@ -8801,10 +8799,10 @@ namespace InternalHeatGains {
         if (SumLatentGains) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
                 auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
-                thisZoneHB.latentGain = InternalHeatGains::SumAllInternalLatentGains(state, NZ);
+                InternalHeatGains::SumAllInternalLatentGains(state, NZ);
                 // Added for the hybrid model
                 if (state.dataHybridModel->FlagHybridModel_PC) {
-                    thisZoneHB.latentGainExceptPeople = InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
+                    InternalHeatGains::SumAllInternalLatentGainsExceptPeople(state, NZ);
                 }
             }
         }
@@ -9069,8 +9067,8 @@ namespace InternalHeatGains {
         return SumRadiationGainRate;
     }
 
-    Real64 SumAllInternalLatentGains(EnergyPlusData &state,
-                                     int const ZoneNum // zone index pointer for which zone to sum gains for
+    void SumAllInternalLatentGains(EnergyPlusData &state,
+                                   int const ZoneNum // zone index pointer for which zone to sum gains for
     )
     {
 
@@ -9081,45 +9079,48 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // worker routine for summing all the internal gain types
 
-        // Return value
-        Real64 SumLatentGainRate(0.0);
+        Real64 zoneLatentGainRate = 0.0;
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain = 0.0;
                 continue;
             }
 
+            Real64 spaceLatentGainRate = 0.0;
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                SumLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
+                spaceLatentGainRate += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
             }
-            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain = SumLatentGainRate;
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain = spaceLatentGainRate;
+            zoneLatentGainRate += spaceLatentGainRate;
         }
 
-        return SumLatentGainRate;
+        state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).latentGain = zoneLatentGainRate;
     }
 
     // Added for hybrid model -- calculate the latent gain from all sources except for people
-    Real64 SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
-                                                 int const ZoneNum // zone index pointer for which zone to sum gains for
+    void SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
+                                               int const ZoneNum // zone index pointer for which zone to sum gains for
     )
     {
-        // Return value
-        Real64 SumLatentGainRateExceptPeople(0.0);
+        Real64 zoneLatentGainRateExceptPeople(0.0);
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
 
+            Real64 spaceLatentGainRateExceptPeople = 0.0;
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType != DataHeatBalance::IntGainType::People) {
-                    SumLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
+                    spaceLatentGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).LatentGainRate;
                 }
             }
-            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGainExceptPeople = SumLatentGainRateExceptPeople;
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGainExceptPeople = spaceLatentGainRateExceptPeople;
+            zoneLatentGainRateExceptPeople += spaceLatentGainRateExceptPeople;
         }
 
-        return SumLatentGainRateExceptPeople;
+        state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).latentGainExceptPeople = zoneLatentGainRateExceptPeople;
     }
 
     Real64
