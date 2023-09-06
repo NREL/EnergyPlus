@@ -10320,7 +10320,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompConnectionError)
     ASSERT_THROW(AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(*state), std::runtime_error);
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** Node Connection Error, Inlet node of DOAS_COOLC as current component is not same as the outlet node of DOAS OA HUMIDIFIER "
+        "   ** Severe  ** getAirLoopMixer: Node Connection Error in AirLoopHVAC:DedicatedOutdoorAirSystem = AIRLOOPHVAC DOAS. Inlet node of "
+        "DOAS_COOLC as current component is not same as the outlet node of DOAS OA HUMIDIFIER "
         "as previous component",
         "   **   ~~~   ** The inlet node name = OUTSIDE AIR INLET NODE 1, and the outlet node name = AIRLOOPDOASSPLITTERINLET.",
         "   ** Severe  ** Inlet node (OA SUPPLY FAN OUTLET NODE) is not one of OutdoorAir:Node in AirLoopHVAC:OutdoorAirSystem:EquipmentList = "

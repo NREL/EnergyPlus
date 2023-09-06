@@ -701,8 +701,10 @@ namespace AirLoopHVACDOAS {
                     if (CompNum > 1) {
                         if (thisOutsideAirSys.InletNodeNum(CompNum) != thisOutsideAirSys.OutletNodeNum(CompNum - 1)) {
                             ShowSevereError(state,
-                                            format("Node Connection Error, Inlet node of {} as current component is not same as the outlet node of "
+                                            format("getAirLoopMixer: Node Connection Error in AirLoopHVAC:DedicatedOutdoorAirSystem = {}. Inlet node "
+                                                   "of {} as current component is not same as the outlet node of "
                                                    "{} as previous component",
+                                                   thisDOAS.Name,
                                                    thisOutsideAirSys.ComponentName(CompNum),
                                                    thisOutsideAirSys.ComponentName(CompNum - 1)));
                             ShowContinueError(state,
@@ -800,15 +802,7 @@ namespace AirLoopHVACDOAS {
                 thisDOAS.m_AirLoopDOASNum = AirLoopDOASNum - 1;
                 state.dataAirLoopHVACDOAS->airloopDOAS.push_back(thisDOAS);
 
-                // ensure the inlet node should be an outdoor air node
-                bool OAnodeFound = false;
-                for (int OutsideAirNodeNum = 1; OutsideAirNodeNum <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++OutsideAirNodeNum) {
-                    if (thisDOAS.m_InletNodeNum == state.dataOutAirNodeMgr->OutsideAirNodeList(OutsideAirNodeNum)) {
-                        OAnodeFound = true;
-                        break;
-                    }
-                }
-                if (!OAnodeFound) {
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisDOAS.m_InletNodeNum)) {
                     ShowSevereError(state,
                                     format("Inlet node ({}) is not one of OutdoorAir:Node in {} = {}",
                                            state.dataLoopNodes->NodeID(thisDOAS.m_InletNodeNum),
@@ -816,12 +810,9 @@ namespace AirLoopHVACDOAS {
                                            thisDOAS.Name));
                     errorsFound = true;
                 }
-                // Ensure the outlet node is the splitter inlet node
-                bool OutletnodeFound = false;
-                if (thisDOAS.m_OutletNodeNum == thisDOAS.m_CompPointerAirLoopSplitter->InletNodeNum) {
-                    OutletnodeFound = true;
-                }
-                if (!OutletnodeFound) {
+
+                // Ensure the outlet node is the splitter inlet node, otherwise issue a severe error
+                if (thisDOAS.m_OutletNodeNum != thisDOAS.m_CompPointerAirLoopSplitter->InletNodeNum) {
                     ShowSevereError(
                         state,
                         format("The outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
