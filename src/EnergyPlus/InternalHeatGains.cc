@@ -7281,6 +7281,9 @@ namespace InternalHeatGains {
             e.BaseHeatPower = 0.0;
             e.CO2Rate = 0.0;
             e.OtherTotGainRate = 0.0;
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+                e.OtherPower[i] = 0.0;
+            }
         }
 
         for (auto &e : state.dataHeatBal->spaceRpt) {
@@ -7292,6 +7295,9 @@ namespace InternalHeatGains {
             e.BaseHeatPower = 0.0;
             e.CO2Rate = 0.0;
             e.OtherTotGainRate = 0.0;
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+                e.OtherPower[i] = 0.0;
+            }
         }
 
         for (auto &e : state.dataHeatBal->ZonePreDefRep) {
