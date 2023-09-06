@@ -4222,12 +4222,20 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
 {
     Real64 maxTempChange = DataPrecisionGlobals::constant_zero; // Max absolute air temperature change between previous and current timestep
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        Real64 zoneTempChange = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).correctAirTemp(state, useZoneTimeStepHistory, zoneNum);
-        if (state.dataHeatBal->doSpaceHeatBalance) {
-            for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
-                Real64 spaceTempChange =
-                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
+        Real64 zoneTempChange = thisZoneHB.correctAirTemp(state, useZoneTimeStepHistory, zoneNum);
+        for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+            auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+            if (state.dataHeatBal->doSpaceHeatBalance) {
+                Real64 spaceTempChange = thisSpaceHB.correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
                 maxTempChange = max(maxTempChange, spaceTempChange);
+            } else {
+                // If no SpaceHB, then set space temps to match zone temps
+                thisSpaceHB.MAT = thisZoneHB.MAT;
+                thisSpaceHB.ZT = thisZoneHB.ZT;
+                thisSpaceHB.ZTAV = thisZoneHB.ZTAV;
+                thisSpaceHB.ZTAVComf = thisZoneHB.ZTAVComf;
+                thisSpaceHB.ZTM = thisZoneHB.ZTM;
             }
         }
         maxTempChange = max(maxTempChange, zoneTempChange);
@@ -6386,11 +6394,10 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
             if (zoneComfortControlsFanger.LowPMV > zoneComfortControlsFanger.HighPMV) {
                 ++zoneComfortControlsFanger.DualPMVErrCount;
                 if (zoneComfortControlsFanger.DualPMVErrCount < 2) {
-                    ShowWarningError(
-                        state,
-                        format(
-                            "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the cooling PMV setpoint in {}",
-                            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).Name));
+                    ShowWarningError(state,
+                                     format("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the "
+                                            "cooling PMV setpoint in {}",
+                                            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).Name));
                     ShowContinueError(state, "The zone dual heating PMV setpoint is set to the dual cooling PMV setpoint.");
                     ShowContinueErrorTimeStamp(state, "Occurrence info:");
                 } else {
@@ -6601,11 +6608,10 @@ void CalcZoneAirComfortSetPoints(EnergyPlusData &state)
                 SetPointLo = comfortControlledZone.TdbMinSetPoint;
 
                 if (comfortControlledZone.TdbDualMinErrIndex == 0) {
-                    ShowWarningMessage(
-                        state,
-                        format(
-                            "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below the Minimum dry-bulb temperature setpoint {}",
-                            comfortControlledZone.Name));
+                    ShowWarningMessage(state,
+                                       format("ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below the Minimum dry-bulb "
+                                              "temperature setpoint {}",
+                                              comfortControlledZone.Name));
                     ShowContinueError(state, "The zone dual heating setpoint is set to the Minimum dry-bulb temperature setpoint");
                     ShowContinueErrorTimeStamp(state, "Occurrence info:");
                 }
