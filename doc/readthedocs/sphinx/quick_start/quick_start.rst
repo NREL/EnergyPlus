@@ -350,8 +350,8 @@ following items should show up:
 
     HVAC,Average,Boiler Heating Rate [W]
     HVAC,Sum,Boiler Heating Energy [J]
-    HVAC,Average,Boiler Gas Rate [W]
-    HVAC,Sum,Boiler Gas Energy [J]
+    HVAC,Average,Boiler NaturalGas Rate [W]
+    HVAC,Sum,Boiler NaturalGas Energy [J]
     HVAC,Average,Boiler Inlet Temperature [C]
     HVAC,Average,Boiler Outlet Temperature [C]
     HVAC,Average,Boiler Mass Flow Rate [kg/s]
@@ -360,7 +360,7 @@ following items should show up:
     HVAC,Average,Boiler Part Load Ratio []
 
 Adding an additional output for the fourth item on the
-list (“HVAC,Sum,Boiler Gas Energy [J]”) will report
+list (“HVAC,Sum,Boiler NaturalGas Energy [J]”) will report
 information on the gas use more granularly than for
 entire run of the simulation. Furthermore, the outputs
 that EnergyPlus has produced in the ESO file are not
@@ -379,7 +379,7 @@ Step-By-Step Instructions
 
    ::
 
-      Output:Variable,*,Boiler Gas Energy,daily;
+      Output:Variable,*,Boiler NaturalGas Energy,daily;
 
    This adds an output variable to the reports that
    EnergyPlus produces for the boiler gas energy. The
@@ -414,7 +414,7 @@ Load the file into your favorite spreadsheet program
 and you will find that it has quite a lot of data in
 it. The variables are arranged in columns, and the
 variable of interest is in the column named “CENTRAL
-BOILER:Boiler Gas Energy [J](Daily)”. Find that column
+BOILER:Boiler NaturalGas Energy [J](Daily)”. Find that column
 and note that it only has one entry per day. Even
 though the variable values are in the rows of the last
 hour of each day, each result applies to the whole day
@@ -425,7 +425,7 @@ results in the graph shown in Figure 3.
 .. figure:: media/quickstart_3.png
    :name: fig:quickstart_3
 
-   Daily Boiler Gas Energy
+   Daily Boiler NaturalGas Energy
 
 Energy use of the boiler is, as expected for a
 building located in northern Illinois, somewhat higher

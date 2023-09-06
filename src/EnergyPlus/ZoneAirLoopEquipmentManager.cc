@@ -333,18 +333,22 @@ namespace ZoneAirLoopEquipmentManager {
                                                        "AirTerminal:SingleDuct:VAV:Reheat")) {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipTypeEnum(AirDistCompUnitNum) =
                         DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat;
+                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).IsConstLeakageRate = true;
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:NoReheat")) {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipTypeEnum(AirDistCompUnitNum) =
                         DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVNoReheat;
+                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).IsConstLeakageRate = true;
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat")) {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipTypeEnum(AirDistCompUnitNum) =
                         DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVReheat;
+                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).IsConstLeakageRate = true;
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat")) {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipTypeEnum(AirDistCompUnitNum) =
                         DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVNoReheat;
+                    state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).IsConstLeakageRate = true;
                 } else if (UtilityRoutines::SameString(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType(AirDistCompUnitNum),
                                                        "AirTerminal:SingleDuct:SeriesPIU:Reheat")) {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipTypeEnum(AirDistCompUnitNum) =
@@ -669,11 +673,9 @@ namespace ZoneAirLoopEquipmentManager {
         int AirDistCompNum;
         int InNodeNum;                      // air distribution unit inlet node
         int OutNodeNum;                     // air distribution unit outlet node
-        //int AirLoopNum(0);                  // index of air loop
         Real64 MassFlowRateMaxAvail;        // max avail mass flow rate excluding leaks [kg/s]
         Real64 MassFlowRateMinAvail;        // min avail mass flow rate excluding leaks [kg/s]
         Real64 MassFlowRateUpStreamLeakMax; // max upstream leak flow rate [kg/s]
-        //Real64 DesFlowRatio(0.0);           // ratio of system to sum of zones design flow rate
         Real64 SpecHumOut(0.0);             // Specific humidity ratio of outlet air (kg moisture / kg moist air)
         Real64 SpecHumIn(0.0);              // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
@@ -690,9 +692,14 @@ namespace ZoneAirLoopEquipmentManager {
                 if (InNodeNum > 0) {
                     MassFlowRateMaxAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail;
                     MassFlowRateMinAvail = state.dataLoopNodes->Node(InNodeNum).MassFlowRateMinAvail;
-                    MassFlowRateUpStreamLeakMax = max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac *
-                                                          state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail,
-                                                      0.0);
+                    if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).IsConstLeakageRate) {
+                        MassFlowRateUpStreamLeakMax = max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac *
+                                                              state.dataLoopNodes->Node(InNodeNum).MassFlowRateMax,
+                                                          0.0);
+                    } else {
+                        MassFlowRateUpStreamLeakMax =
+                            max(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).UpStreamLeakFrac * MassFlowRateMaxAvail, 0.0);
+                    }
                     if (MassFlowRateMaxAvail > MassFlowRateUpStreamLeakMax) {
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk = MassFlowRateUpStreamLeakMax;
                         state.dataLoopNodes->Node(InNodeNum).MassFlowRateMaxAvail = MassFlowRateMaxAvail - MassFlowRateUpStreamLeakMax;

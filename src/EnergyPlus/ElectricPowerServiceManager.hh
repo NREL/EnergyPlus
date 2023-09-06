@@ -833,6 +833,9 @@ void createFacilityElectricPowerServiceObject(const EnergyPlusData &state);
 
 Real64 checkUserEfficiencyInput(EnergyPlusData &state, Real64 userInputValue, std::string whichType, std::string deviceName, bool &errorsFound);
 
+void checkChargeDischargeVoltageCurves(
+    EnergyPlusData &state, std::string_view nameBatt, Real64 const E0c, Real64 const E0d, int const chargeIndex, int const dischargeIndex);
+
 struct ElectPwrSvcMgrData : BaseGlobalStruct
 {
 
