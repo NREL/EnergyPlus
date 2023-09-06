@@ -628,9 +628,9 @@ where:
 
 \({\rho_{CW}}\) is the density of chilled water, in kg/m\(^{3}\)
 
-\({T_{SA}}\) is the dryblub temperature of the (central) primary air entering the air terminal unit, in degrees C.
+\({T_{SA}}\) is the drybulb temperature of the (central) primary air entering the air terminal unit, in degrees C.
 
-\({T_{Z}}\) is the dryblub temperature of the zone air, in  \(^{\circ}\)C.
+\({T_{Z}}\) is the drybulb temperature of the zone air, in  \(^{\circ}\)C.
 
 \({T_{CW,in}}\) is the temperature of chilled water entering the convector, in \(^{\circ}\)C.
 
@@ -662,7 +662,7 @@ When cooling, the result for beam capacity (negative for cooling) is used to cal
 {T_{CW,out}} = {T_{CW,in}} - \frac{{\dot Q_{Beam}}}{{\dot m_{CW}} \cdot {c_{p,CW}} }
 \end{equation}
 
-However, to protect from a non-physical result the leaving chilled water temperature is constrained to be no warmer than a 1.0\(^{\circ}\)C approach temperature compared to the zone air or the primary supply air. If the above result is too warm the leaving temperature and beam cooling capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the cooliong performance input data.
+However, to protect from a non-physical result the leaving chilled water temperature is constrained to be no warmer than a 1.0\(^{\circ}\)C approach temperature compared to the zone air or the primary supply air. If the above result is too warm the leaving temperature and beam cooling capacity are adjusted using the following equations, and a recurring warning is issued to alert the user that there may be a problem with the cooling performance input data.
 
 \begin{equation}
   {T_{CW,out}} = { max( {T_{SA}} , {T_{Z}}) - 1.0 }
@@ -1226,4 +1226,4 @@ The model also includes a form of damping where the last three values for \({\do
 
 \subsubsection{References}\label{references-6}
 
-Sekhar, S. C., K. W. Tham, et al. (2004). Development of energy-efficient single-coil twin-fan air-conditioning system with zonal ventilation control, Nashville, TX, United states, Amer. Soc. Heating, Ref. Air-Conditoning Eng. Inc.
+Sekhar, S. C., K. W. Tham, et al. (2004). Development of energy-efficient single-coil twin-fan air-conditioning system with zonal ventilation control, Nashville, TX, United states, Amer. Soc. Heating, Ref. Air-Conditioning Eng. Inc.

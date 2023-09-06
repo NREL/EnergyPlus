@@ -234,7 +234,14 @@ namespace Convect {
                           Real64 &HExt,                         // Convection coefficient to exterior air
                           Real64 &HSky,                         // "Convection" coefficient to sky temperature
                           Real64 &HGround,                      // "Convection" coefficient to ground temperature
-                          Real64 &HAir                          // Radiation to Air Component
+                          Real64 &HAir,                         // Radiation to Air Component
+                          Real64 &HSrdSurf                      // Radiation to surrounding surfaces
+    );
+
+    Real64 SurroundingSurfacesRadCoeffAverage(EnergyPlusData &state,
+                                              int const SurfNum,     // Surface number (in Surface derived type)
+                                              Real64 const TempExtK, // Exterior surface temperature (K)
+                                              Real64 const AbsExt    // Exterior thermal absorptance
     );
 
     Real64 CalcHfExteriorSparrow(Real64 SurfWindSpeed,                 // Local wind speed at height of the heat transfer surface (m/s)

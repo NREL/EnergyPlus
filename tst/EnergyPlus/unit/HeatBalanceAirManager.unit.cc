@@ -410,13 +410,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     spaceNum = space1b;
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     EXPECT_EQ("SOMESPACES", state->dataHeatBal->spaceList(1).Name);
     EXPECT_EQ(2, state->dataHeatBal->spaceList(1).spaces.size());
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetInfiltrationAndVentilation)
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     // Defaults
     EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     // Now get to the point and check the infiltration and ventilation setup
     // Expected number of infiltration and ventilation instances:
@@ -786,13 +786,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     EXPECT_EQ("SPACE 1A", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1aFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     spaceNum = space1b;
     EXPECT_EQ("SPACE 1B", state->dataHeatBal->space(spaceNum).Name);
     EXPECT_EQ("ZONE 1", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Space1bFloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     EXPECT_EQ("SOMESPACES", state->dataHeatBal->spaceList(1).Name);
     EXPECT_EQ(2, state->dataHeatBal->spaceList(1).spaces.size());
@@ -805,7 +805,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     EXPECT_EQ("ZONE 2", state->dataHeatBal->Zone(state->dataHeatBal->space(spaceNum).zoneNum).Name);
     // Defaults
     EXPECT_EQ(-99999, state->dataHeatBal->space(spaceNum).userEnteredFloorArea);
-    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).floorArea);
+    EXPECT_EQ(Zone2FloorArea, state->dataHeatBal->space(spaceNum).FloorArea);
 
     // Now get to the point and check the mixing setup
     // Expected number of mixing and crossmixing instances:

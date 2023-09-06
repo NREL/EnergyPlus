@@ -1714,7 +1714,11 @@ namespace HeatBalanceManager {
                     ctf_dimensions = 1;
                 }
                 Real64 tube_spacing = fields.at("tube_spacing").get<Real64>();
-                Real64 calculation_position = fields.at("two_dimensional_temperature_calculation_position").get<Real64>();
+                Real64 calculation_position = 0.0;
+                auto const twoDimTempCalcPos = fields.find("two_dimensional_temperature_calculation_position");
+                if (twoDimTempCalcPos != fields.end()) {
+                    calculation_position = twoDimTempCalcPos.value().get<Real64>();
+                }
 
                 // Find the construction
                 int construction_index = UtilityRoutines::FindItemInList(construction_name, state.dataConstruction->Construct);
@@ -4703,8 +4707,8 @@ namespace HeatBalanceManager {
         // This subroutine only gets called once in the GetConstructionData subroutine
 
         // ASHRAE Handbook Fundamental 2005
-        // Thermal resistance of the inside air film, m2.K/W. Average of 0.14 (heat flow up) and 0.11 (heat flow down)
-        Real64 constexpr Rfilm_in(0.125);
+        // Thermal resistance of the inside air film, m2.K/W. Average of 0.16 (heat flow down) and 0.11 (heat flow up)
+        Real64 constexpr Rfilm_in(0.135);
         // Thermal resistance of the outside air film used in calculating the Ffactor, m2.K/W. 0.17/5.678
         Real64 constexpr Rfilm_out(0.03);
 
