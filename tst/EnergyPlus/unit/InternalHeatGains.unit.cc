@@ -1274,6 +1274,20 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
         "    0.0000,                  !- Fraction Lost",
         "    2.0E-7;                  !- Carbon Dioxide Generation Rate {m3/s-W}",
 
+        "  OtherEquipment,",
+        "    Main Zone Other Equipment2,  !- Name",
+        "    FuelOilNo2,              !- Fuel Type",
+        "    Main Zone,               !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    375.0,                   !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Fraction Latent",
+        "    0.5000,                  !- Fraction Radiant",
+        "    0.0000,                  !- Fraction Lost",
+        "    2.0E-7;                  !- Carbon Dioxide Generation Rate {m3/s-W}",
+
         "  ZoneBaseboard:OutdoorTemperatureControlled,",
         "    Main Zone BBHeat,           !- Name",
         "    Main Zone,                  !- Zone Name",
@@ -1319,7 +1333,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EXPECT_EQ(state->dataHeatBal->TotGasEquip, 1);
     EXPECT_EQ(state->dataHeatBal->TotHWEquip, 1);
     EXPECT_EQ(state->dataHeatBal->TotStmEquip, 1);
-    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 2);
     EXPECT_EQ(state->dataHeatBal->TotBBHeat, 1);
 
     EnergyPlus::createFacilityElectricPowerServiceObject(*state); // Needs to happen before InitInternalHeatGains
@@ -1329,6 +1343,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);
@@ -1341,6 +1357,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);
