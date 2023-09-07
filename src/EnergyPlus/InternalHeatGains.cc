@@ -8798,7 +8798,6 @@ namespace InternalHeatGains {
         }
         if (SumLatentGains) {
             for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
-                auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
                 InternalHeatGains::SumAllInternalLatentGains(state, NZ);
                 // Added for the hybrid model
                 if (state.dataHybridModel->FlagHybridModel_PC) {
