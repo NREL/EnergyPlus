@@ -7535,22 +7535,20 @@ namespace InternalHeatGains {
             thisOtherEq.LostRate = Q * thisOtherEq.FractionLost;
             thisOtherEq.TotGainRate = Q - thisOtherEq.LostRate;
 
-            int NZ = thisOtherEq.ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).OtherPower += thisOtherEq.Power;
-            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(NZ);
-            int fuelType = (int)state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType;
-            state.dataHeatBal->ZoneRpt(NZ).OtherPower[fuelType] += state.dataHeatBal->ZoneOtherEq(Loop).Power;
-            state.dataHeatBal->ZoneRpt(NZ).OtherTotGainRate += state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate;
+            auto &thisZoneRpt = state.dataHeatBal->ZoneRpt(thisOtherEq.ZonePtr);
+            auto &thisZoneIntGain = state.dataHeatBal->ZoneIntGain(thisOtherEq.ZonePtr);
+            int fuelType = (int)thisOtherEq.OtherEquipFuelType;
+            thisZoneRpt.OtherPower[fuelType] += thisOtherEq.Power;
+            thisZoneRpt.OtherTotGainRate += thisOtherEq.TotGainRate;
             thisZoneIntGain.QOERAD += thisOtherEq.RadGainRate;
             thisZoneIntGain.QOECON += thisOtherEq.ConGainRate;
             thisZoneIntGain.QOELAT += thisOtherEq.LatGainRate;
             thisZoneIntGain.QOELost += thisOtherEq.LostRate;
 
-            int spaceNum = thisOtherEq.spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).OtherPower += thisOtherEq.Power;
-            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(spaceNum);
-            state.dataHeatBal->spaceRpt(spaceNum).OtherPower[fuelType] += state.dataHeatBal->ZoneOtherEq(Loop).Power;
-            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate += state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate;
+            auto &thisSpaceRpt = state.dataHeatBal->spaceRpt(thisOtherEq.spaceIndex);
+            auto &thisSpaceIntGain = state.dataHeatBal->spaceIntGain(thisOtherEq.spaceIndex);
+            thisSpaceRpt.OtherPower[fuelType] += thisOtherEq.Power;
+            thisSpaceRpt.OtherTotGainRate += thisOtherEq.TotGainRate;
             thisSpaceIntGain.QOERAD += thisOtherEq.RadGainRate;
             thisSpaceIntGain.QOECON += thisOtherEq.ConGainRate;
             thisSpaceIntGain.QOELAT += thisOtherEq.LatGainRate;
