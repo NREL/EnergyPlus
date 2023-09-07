@@ -82,6 +82,7 @@ namespace ExteriorEnergyUse {
         DistrictHeatSteamUse,
         OtherFuel1Use,
         OtherFuel2Use,
+        None,
         Num
     };
 
