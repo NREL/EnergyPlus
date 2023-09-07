@@ -4224,18 +4224,28 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum);
         Real64 zoneTempChange = thisZoneHB.correctAirTemp(state, useZoneTimeStepHistory, zoneNum);
-        for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {
+        auto &thisZone = state.dataHeatBal->Zone(zoneNum);
+        for (int spaceNum : thisZone.spaceIndexes) {
             auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
             if (state.dataHeatBal->doSpaceHeatBalance) {
                 Real64 spaceTempChange = thisSpaceHB.correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
                 maxTempChange = max(maxTempChange, spaceTempChange);
             } else {
                 // If no SpaceHB, then set space temps to match zone temps
-                thisSpaceHB.MAT = thisZoneHB.MAT;
+                if (state.dataHeatBal->space(spaceNum).IsControlled) {
+                    auto &thisZoneNode = state.dataLoopNodes->Node(thisZone.SystemZoneNodeNumber);
+                    auto &thisSpaceNode = state.dataLoopNodes->Node(state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber);
+                    thisSpaceNode.Temp = thisZoneNode.Temp;
+                    thisSpaceNode.HumRat = thisZoneNode.HumRat;
+                    thisSpaceNode.Enthalpy = thisZoneNode.Enthalpy;
+                }
                 thisSpaceHB.ZT = thisZoneHB.ZT;
-                thisSpaceHB.ZTAV = thisZoneHB.ZTAV;
-                thisSpaceHB.ZTAVComf = thisZoneHB.ZTAVComf;
                 thisSpaceHB.ZTM = thisZoneHB.ZTM;
+                thisSpaceHB.MAT = thisZoneHB.MAT;
+                thisSpaceHB.airHumRat = thisZoneHB.airHumRat;
+                thisSpaceHB.airRelHum = thisZoneHB.airRelHum;
+                // thisSpaceHB.ZTAV = thisZoneHB.ZTAV;
+                // thisSpaceHB.ZTAVComf = thisZoneHB.ZTAVComf;
             }
         }
         maxTempChange = max(maxTempChange, zoneTempChange);
