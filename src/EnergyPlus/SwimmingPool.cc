@@ -952,7 +952,15 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     } else if (MassFlowRate < 0.0) {
         MassFlowRate = 0.0;
     }
-    PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
+    if ((MassFlowRate > state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate) &&
+        (MassFlowRate > state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate)) {
+        // Flow not resolved yet, make a request.
+        PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
+    } else {
+        // No longer making a request, make sure outlet is the same as the inlet
+        state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate;
+        MassFlowRate = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate;
+    }
     this->WaterMassFlowRate = MassFlowRate;
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
@@ -1179,24 +1187,6 @@ Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density)
 Real64 MakeUpWaterVolFunct(Real64 MakeUpWaterMass, Real64 Density)
 {
     return MakeUpWaterMass / Density;
-}
-
-void updateSwimmingPoolConditions(EnergyPlusData &state)
-{
-    // Update the temperature and flow conditions as needed to make sure that the plant gets the right temperature
-    // and so that the flow rate through the swimming pool (with an implied bypass potetially) is also correct.
-    for (auto &thisPool : state.dataSwimmingPools->Pool) {
-        auto &inletNode = state.dataLoopNodes->Node(thisPool.WaterInletNode);
-        auto &outletNode = state.dataLoopNodes->Node(thisPool.WaterOutletNode);
-        Real64 maxMassFlowRate = std::max(inletNode.MassFlowRate, outletNode.MassFlowRate);
-        inletNode.MassFlowRate = maxMassFlowRate;
-        outletNode.MassFlowRate = maxMassFlowRate;
-        if (thisPool.WaterMassFlowRate < maxMassFlowRate) {
-            Real64 bypassMassFlowRate = maxMassFlowRate - thisPool.WaterMassFlowRate;
-            outletNode.Temp = (thisPool.PoolWaterTemp * thisPool.WaterMassFlowRate + inletNode.Temp * bypassMassFlowRate) / maxMassFlowRate;
-            thisPool.WaterMassFlowRate = maxMassFlowRate;
-        }
-    }
 }
 
 } // namespace EnergyPlus::SwimmingPool

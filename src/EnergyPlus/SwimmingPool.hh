@@ -200,8 +200,6 @@ namespace SwimmingPool {
 
     Real64 MakeUpWaterVolFunct(Real64 MakeUpWaterMass, Real64 Density);
 
-    void updateSwimmingPoolConditions(EnergyPlusData &state);
-
 } // namespace SwimmingPool
 
 struct SwimmingPoolsData : BaseGlobalStruct

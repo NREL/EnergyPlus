@@ -840,7 +840,6 @@ void SimHVAC(EnergyPlusData &state)
         // simulation has converged for this system time step.
 
         UpdateZoneInletConvergenceLog(state);
-        SwimmingPool::updateSwimmingPoolConditions(state);
 
         ++state.dataHVACMgr->HVACManageIteration; // Increment the iteration counter
 
@@ -855,7 +854,8 @@ void SimHVAC(EnergyPlusData &state)
         }
     }
     if (state.dataGlobal->AnyPlantInModel) {
-        if (PlantUtilities::AnyPlantSplitterMixerLacksContinuity(state)) {
+        if (PlantUtilities::AnyPlantSplitterMixerLacksContinuity(state) ||
+            state.dataSwimmingPools->NumSwimmingPools > 0) { // need to resimulate pools
             // rerun systems in a "Final flow lock/last iteration" mode
             // now call for one second to last plant simulation
             state.dataHVACGlobal->SimAirLoopsFlag = false;
@@ -886,7 +886,6 @@ void SimHVAC(EnergyPlusData &state)
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
-            SwimmingPool::updateSwimmingPoolConditions(state);
             // now call for a last plant simulation
             state.dataHVACGlobal->SimAirLoopsFlag = false;
             state.dataHVACGlobal->SimZoneEquipmentFlag = false;
@@ -916,7 +915,6 @@ void SimHVAC(EnergyPlusData &state)
                                  FirstHVACIteration,
                                  SimWithPlantFlowLocked);
             UpdateZoneInletConvergenceLog(state);
-            SwimmingPool::updateSwimmingPoolConditions(state);
         }
     }
 
