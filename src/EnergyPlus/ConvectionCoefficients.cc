@@ -281,6 +281,7 @@ void InitIntConvCoeff(EnergyPlusData &state,
         for (int spaceNum : zone.spaceIndexes) {
             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
             for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                Real64 spaceMAT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
 
                 if (present(ZoneToResimulate)) {
                     if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
@@ -309,8 +310,7 @@ void InitIntConvCoeff(EnergyPlusData &state,
                 } break;
 
                 case HcInt::ASHRAESimple: {
-                    CalcASHRAESimpleIntConvCoeff(
-                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                    CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
@@ -318,11 +318,9 @@ void InitIntConvCoeff(EnergyPlusData &state,
 
                 case HcInt::ASHRAETARP: {
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                        CalcASHRAEDetailedIntConvCoeff(
-                            state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
                     } else {
-                        CalcISO15099WindowIntConvCoeff(
-                            state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        CalcISO15099WindowIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
                     }
 
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -2256,10 +2254,10 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
             if (ACH <= 3.0) { // Use the other convection algorithm
                 if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
                     CalcASHRAEDetailedIntConvCoeff(
-                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT);
                 } else {
                     CalcISO15099WindowIntConvCoeff(
-                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT);
                 }
             } else { // Use forced convection correlations
                 Real64 Tilt = state.dataSurface->Surface(SurfNum).Tilt;
