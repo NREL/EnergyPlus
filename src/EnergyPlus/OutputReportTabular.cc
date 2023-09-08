@@ -1751,7 +1751,7 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
         ort->resourceTypeNames(2) = "NaturalGas";
         ort->resourceTypeNames(3) = "DistrictCooling";
         ort->resourceTypeNames(4) = "DistrictHeatingWater";
-        ort->resourceTypeNames(5) = "DistirctHeatingSteam";
+        ort->resourceTypeNames(5) = "DistrictHeatingSteam";
         ort->resourceTypeNames(6) = "Gasoline";
         ort->resourceTypeNames(7) = "Water";
         ort->resourceTypeNames(8) = "Diesel";
