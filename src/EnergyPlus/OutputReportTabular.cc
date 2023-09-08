@@ -614,15 +614,13 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // #ifdef ITM_KEYCACHE
             //  Noel comment:  First time in this TabNum/ColNum loop, let's save the results
             //   of GetVariableKeyCountandType & GetVariableKeys.
-            std::string const &curVariMeter = UtilityRoutines::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
+            std::string const curVariMeter = UtilityRoutines::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
             if (TypeVar == OutputProcessor::VariableType::NotFound) {
                 if (!ort->MonthlyInput(TabNum).isNamedMonthly) {
-                    ShowWarningError(
-                        state,
-                        format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
+                    ++state.dataOutRptTab->ErrCount1;
                 }
             }
             //    IF (KeyCount > maxKeyCount) THEN
@@ -725,6 +723,22 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         ort->MonthlyColumns(colNum).duration = 0.0;
     }
 
+    // std::count_if(ort->MonthlyInput.begin(), ort->MonthlyInputCount.end(), [](auto& monthlyInput)
+    // If no weather file run requested, don't bother issuing a warning
+    bool issueWarnings = false;
+    if (state.dataGlobal->DoWeathSim && (state.dataOutRptTab->ErrCount1 > 0)) {
+        ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
+
+        if (!state.dataGlobal->DisplayExtraWarnings) {
+            ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
+        } else {
+            ShowContinueError(state,
+                              "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
+                              "the Table Report.");
+            issueWarnings = true;
+        }
+    }
+
     int ColumnsRecount = 0;
     int TablesRecount = 0;
     for (int TabNum = 1; TabNum <= ort->MonthlyInputCount; ++TabNum) {
@@ -734,45 +748,16 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         int UniqueKeyCount = 0;
         bool environmentKeyFound = false;
         for (int colNum = 1; colNum <= NumColumns; ++colNum) {
-            // #ifdef ITM_KEYCACHE
-            //  Noel comment:  Here is where we could use the saved values
             std::string const &curVariMeter = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
             const int KeyCount = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
             TypeVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
             AvgSumVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum;
             StepTypeVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType;
             UnitsVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits;
-            //    DO iKey = 1, KeyCount  !noel
-            //       NamesOfKeys(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey)  !noel
-            //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
-            //    ENDDO
-            // #else
-            //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
-            //    ! call the key count function but only need count during this pass
-            //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
-            //    ALLOCATE(NamesOfKeys(KeyCount))
-            //    ALLOCATE(IndexesForKeyVar(KeyCount))
-            //    CALL GetVariableKeys(state, curVariMeter,TypeVar,NamesOfKeys,IndexesForKeyVar)
-            // #endif
 
-            if (KeyCount == 0) {
-                ++state.dataOutRptTab->ErrCount1;
-                if (state.dataOutRptTab->ErrCount1 == 1 && !state.dataGlobal->DisplayExtraWarnings &&
-                    state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
-                    ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
-                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
-                }
-                // fixing CR5878 removed the showing of the warning once about a specific variable.
-                if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
-                    ShowWarningError(state, format("Processing Monthly Tabular Reports: {}", ort->MonthlyInput(TabNum).name));
-                    ShowContinueError(state, format("..Variable name={} not valid for this simulation.", curVariMeter));
-                    if (state.dataOutRptTab->VarWarning) {
-                        ShowContinueError(state,
-                                          "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
-                                          "the Table Report.");
-                        state.dataOutRptTab->VarWarning = false;
-                    }
-                }
+            if (KeyCount == 0 && issueWarnings && !ort->MonthlyInput(TabNum).isNamedMonthly) {
+                ShowWarningError(
+                    state, format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
             }
             for (int iKey = 1; iKey <= KeyCount; ++iKey) {
                 found = 0;
@@ -930,17 +915,12 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     }
                 } else { // if no key corresponds to this instance of the report
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
-                    if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
-                        ShowWarningError(state, format("Processing Monthly Tabular Reports: {}", ort->MonthlyInput(TabNum).name));
-                        ShowContinueError(state, format("..Variable name={} not valid for this simulation.", curVariMeter));
+                    if (issueWarnings && !ort->MonthlyInput(TabNum).isNamedMonthly) {
+                        ShowWarningError(
+                            state,
+                            format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
                         ShowContinueError(
                             state, format("..i.e., Variable name={}:{} not valid for this simulation.", UniqueKeyNames(kUniqueKey), curVariMeter));
-                        if (state.dataOutRptTab->VarWarning) {
-                            ShowContinueError(state,
-                                              "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column "
-                                              "of the Table Report.");
-                            state.dataOutRptTab->VarWarning = false;
-                        }
                     }
                     ort->MonthlyColumns(mColumn).varName = curVariMeter;
                     ort->MonthlyColumns(mColumn).varNum = 0;

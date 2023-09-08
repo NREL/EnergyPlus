@@ -1240,7 +1240,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int numPeopleAdaptive = 0;
 
     Real64 BigNum = 0.0;
-    bool VarWarning = true;
     int ErrCount1 = 0;
     Array1D<OutputProcessor::VariableType> MonthlyColumnsTypeOfVar;
     Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
@@ -1541,7 +1540,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->numPeopleAdaptive = 0;
 
         this->BigNum = 0.0;
-        this->VarWarning = true;
         this->ErrCount1 = 0;
         this->MonthlyColumnsTypeOfVar.clear();
         this->MonthlyColumnsStepType.clear();
