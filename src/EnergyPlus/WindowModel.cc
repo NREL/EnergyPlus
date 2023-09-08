@@ -87,7 +87,7 @@ namespace WindowManager {
         if (numCurrModels > 0) {
             state.dataInputProcessing->inputProcessor->getObjectItem(
                 state, objectName, 1, state.dataIPShortCut->cAlphaArgs, NumAlphas, state.dataIPShortCut->rNumericArgs, NumNums, IOStat);
-            // Please consider using getEnumerationValue pattern here.
+            // Please consider using getEnumValue pattern here.
             // Consider that you are creating an entire map for the
             // sole purpose of looking up a single element
             EnumParser<WindowsModel> aParser;

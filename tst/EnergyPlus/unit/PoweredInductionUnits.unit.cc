@@ -587,7 +587,8 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds)
     state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 1.0;
     state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
     state->dataSize->TermUnitSingDuct = true;
-    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum)
+        .copyFromZoneSizing(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum));
 
     // Call the sizing routine now
     PoweredInductionUnits::SizePIU(*state, PIUNum);
@@ -1665,6 +1666,8 @@ TEST_F(EnergyPlusFixture, PIU_InducedAir_Plenums)
         "  Autosize,                               !- High Speed Rated Sensible Heat Ratio",
         "  3,                                      !- High Speed Gross Rated Cooling COP {W/W}",
         "  Autosize,                               !- High Speed Rated Air Flow Rate {m3/s}",
+        "    ,",
+        "    ,",
         "  773.3,                                  !- Unit Internal Static Air Pressure {Pa}",
         "  Node 8,                                 !- Air Inlet Node Name",
         "  Node 9,                                 !- Air Outlet Node Name",
@@ -1677,6 +1680,8 @@ TEST_F(EnergyPlusFixture, PIU_InducedAir_Plenums)
         "  0.69,                                   !- Low Speed Gross Rated Sensible Heat Ratio",
         "  3,                                      !- Low Speed Gross Rated Cooling COP {W/W}",
         "  Autosize,                               !- Low Speed Rated Air Flow Rate {m3/s}",
+        "    ,",
+        "    ,",
         "  Curve Biquadratic 3,                    !- Low Speed Total Cooling Capacity Function of Temperature Curve Name",
         "  Curve Biquadratic 4,                    !- Low Speed Energy Input Ratio Function of Temperature Curve Name",
         "  ,                                       !- Condenser Air Inlet Node Name",

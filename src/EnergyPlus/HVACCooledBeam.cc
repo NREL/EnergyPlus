@@ -267,7 +267,6 @@ namespace HVACCooledBeam {
                                                                      cAlphaFields,
                                                                      cNumericFields);
             int CBNum = CBIndex;
-            UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
 
             CoolBeam(CBNum).Name = Alphas(1);
             CoolBeam(CBNum).UnitType = CurrentModuleObject;
@@ -736,7 +735,7 @@ namespace HVACCooledBeam {
                         } else {
                             DesCoilLoad = CpAir * RhoAir * DesAirVolFlow *
                                           (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU -
-                                           state.dataSize->ZoneSizThermSetPtHi(state.dataSize->CurZoneEqNum));
+                                           state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneSizThermSetPtHi);
                         }
 
                         rho = GetDensityGlycol(state,

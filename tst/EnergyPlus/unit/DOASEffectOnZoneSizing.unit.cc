@@ -198,6 +198,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(2) = false;
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 4;
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneNode = 9;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 4;
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 9;
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(2).NumInletNodes = 2;
     state->dataZoneEquip->ZoneEquipConfig(1).NumExhaustNodes = 1;
@@ -215,6 +217,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASHighSetpoint = 14.4;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASLowSetpoint = 12.2;
     state->dataEnvrn->StdBaroPress = 101325.;
+    state->dataEnvrn->StdRhoAir = 1.0;
     state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
     state->dataSize->CalcFinalZoneSizing(2).MinOA = 0.11;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = DataSizing::DOASControl::CoolSup;
