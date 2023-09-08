@@ -4183,7 +4183,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 "Standard Rated Energy Factor\n");
             static constexpr std::string_view Format_721(
                 "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
-                "Efficiency,Standard Rated Energy Factor,DX Coil Total Cooling Rate (HPWH Only) {{W}}\n");
+                "Efficiency,Standard Rated Energy Factor,DX Coil Total Cooling Rate {{W}}\n");
             static constexpr std::string_view Format_722(
                 "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
                 "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
