@@ -69,3 +69,9 @@ See pull request [#9982](https://github.com/NREL/EnergyPlus/pull/9982) for more 
  (d) "Steam" to "DistrictHeatingSteam"
 
  See [9260](https://github.com/NREL/EnergyPlus/pull/9260)
+
+### WaterHeaterReportMonthly report
+
+Column "Water Heater Source Energy []" renamed to "Water Heater Source Side Heat Transfer Energy [J]".
+
+See [10209](https://github.com/NREL/EnergyPlus/pull/10209)
