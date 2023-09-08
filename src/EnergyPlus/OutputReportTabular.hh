@@ -331,17 +331,13 @@ namespace OutputReportTabular {
     struct MonthlyInputType
     {
         // Members
-        std::string name;  // identifier
-        int numFieldSet;   // number of monthly field sets
-        int firstFieldSet; // pointer to the first field set
-        int numTables;     // number of tables
-        int firstTable;    // pointer to the first table
-        int showDigits;    // the number of digits to be shown
-
-        // Default Constructor
-        MonthlyInputType() : numFieldSet(0), firstFieldSet(0), numTables(0), firstTable(0), showDigits(0)
-        {
-        }
+        std::string name;      // identifier
+        int numFieldSet = 0;   // number of monthly field sets
+        int firstFieldSet = 0; // pointer to the first field set
+        int numTables = 0;     // number of tables
+        int firstTable = 0;    // pointer to the first table
+        int showDigits = 0;    // the number of digits to be shown
+        bool isNamedMonthly = false;
     };
 
     struct MonthlyFieldSetInputType
@@ -523,7 +519,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularMonthly(EnergyPlusData &state);
 
-    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
+    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown, bool isNamedMonthly = false);
 
     void AddMonthlyFieldSetInput(
         EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, AggType const inAggregate);
