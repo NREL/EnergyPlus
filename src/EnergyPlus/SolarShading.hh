@@ -643,6 +643,7 @@ struct SolarShadingData : BaseGlobalStruct
     }
 };
 
+#ifndef EP_NO_OPENGL
 class EnergyPlusLogger : public Courierr::Courierr
 {
 public:
@@ -651,6 +652,7 @@ public:
     void info(const std::string_view message) override;
     void debug(const std::string_view message) override;
 };
+#endif
 
 } // namespace EnergyPlus
 

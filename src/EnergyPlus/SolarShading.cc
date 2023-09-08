@@ -12919,6 +12919,7 @@ void TimestepInitComplexFenestration(EnergyPlusData &state)
 
 } // namespace EnergyPlus::SolarShading
 
+#ifndef EP_NO_OPENGL
 namespace EnergyPlus {
 
 void EnergyPlusLogger::error(const std::string_view message)
@@ -12944,3 +12945,4 @@ void EnergyPlusLogger::debug(const std::string_view message)
     info(message);
 }
 } // namespace EnergyPlus
+#endif
