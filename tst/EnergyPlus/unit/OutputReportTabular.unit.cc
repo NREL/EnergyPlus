@@ -12822,11 +12822,15 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFile
     GetInputTabularMonthly(*state);
     EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
     GetInputOutputTableSummaryReports(*state);
-    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly);
 
     InitializeTabularMonthly(*state);
 
-    compare_err_stream("");
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Output:Table:Monthly requested with SimulationControl Run Simulation for Weather File Run Periods set to No so "
+        "Output:Table:Monthly will not be generated",
+    });
+    compare_err_stream(expected_error);
 }
 
 TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_DontWarnMonthlyIfOnlyNamedReports)
