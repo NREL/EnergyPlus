@@ -7183,10 +7183,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->SysSizInput(1).AirLoopNum = 1;
     state->dataSize->SysSizInput(1).SizingOption = DataSizing::NonCoincident;
-    auto degC_to_F = [](Real64 celsius) constexpr
-    {
-        return celsius * (9.0 / 5.0) + 32.0;
-    };
+    auto degC_to_F = [](Real64 celsius) constexpr { return celsius * (9.0 / 5.0) + 32.0; };
     constexpr Real64 coolMixTempSys = 26.2;
     constexpr Real64 coolMixTempSysIP = degC_to_F(coolMixTempSys);
     constexpr Real64 heatMixTempSys = -1.7;
@@ -12585,4 +12582,53 @@ TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
     // check the value from result records
     Real64 return_val = execAndReturnFirstDouble(query);
     EXPECT_EQ(return_val, 5080.22);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnOnMissingMonthlyVariable)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
+        "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 2 Name",
+        "  Maximum; !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** In Output:Table:Monthly 'SPACE GAINS ANNUAL REPORT' invalid Variable or Meter Name 'NON EXISTANT VARIABLE'",
+    });
+    compare_err_stream(expected_error);
 }
