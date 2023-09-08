@@ -723,7 +723,6 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         ort->MonthlyColumns(colNum).duration = 0.0;
     }
 
-    // std::count_if(ort->MonthlyInput.begin(), ort->MonthlyInputCount.end(), [](auto& monthlyInput)
     // If no weather file run requested, don't bother issuing a warning
     bool issueWarnings = false;
     if (state.dataGlobal->DoWeathSim && (state.dataOutRptTab->ErrCount1 > 0)) {
