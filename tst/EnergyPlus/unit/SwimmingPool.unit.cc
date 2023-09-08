@@ -58,7 +58,9 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SwimmingPool.hh>
 
 using namespace EnergyPlus;
@@ -462,4 +464,108 @@ TEST_F(EnergyPlusFixture, SwimmingPool_MultiplePoolUpdatePoolSourceValAvgTest)
     EXPECT_NEAR(HBFanData->QPoolSurfNumerator(2), Pool2Data.QPoolSrcAvg(2), closeEnough);
     EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(1), Pool1Data.HeatTransCoefsAvg(1), closeEnough);
     EXPECT_NEAR(HBFanData->PoolHeatTransCoefs(2), Pool2Data.HeatTransCoefsAvg(2), closeEnough);
+}
+
+TEST_F(EnergyPlusFixture, SwimmingPool_anySwimmingPoolsInputFlagTest)
+{
+    // Test 1: no swimming pools--anySwimmingPoolsInput stays false
+    std::string const idf_objects1 = delimited_string({
+        "  SurfaceConvectionAlgorithm:Inside,",
+        "    TARP;",
+    });
+    ASSERT_TRUE(process_idf(idf_objects1));
+    GetSwimmingPool(*state);
+    ASSERT_FALSE(state->dataSwimmingPools->anySwimmingPoolsInput);
+
+    // Test 2: there's a swimming pool--anySwimmingPoolsInput gets set to true
+    state->dataSwimmingPools->clear_state();
+    std::string const idf_objects2 = delimited_string({
+        "SwimmingPool:Indoor,",
+        "  Test Pool,               !- Name",
+        "  F1-1,                    !- Surface Name",
+        "  1.5,                     !- Average Depth {m}",
+        "  Sched,                   !- Activity Factor Schedule Name",
+        "  Sched,                   !- Make-up Water Supply Schedule Name",
+        "  Sched,                   !- Cover Schedule Name",
+        "  0.8,                     !- Cover Evaporation Factor",
+        "  0.2,                     !- Cover Convection Factor",
+        "  0.9,                     !- Cover Short-Wavelength Radiation Factor",
+        "  0.5,                     !- Cover Long-Wavelength Radiation Factor",
+        "  Pool Water Inlet Node,   !- Pool Water Inlet Node",
+        "  Pool Water Outlet Node,  !- Pool Water Outlet Node",
+        "  0.1,                     !- Pool Heating System Maximum Water Flow Rate {m3/s}",
+        "  0.6,                     !- Pool Miscellaneous Equipment Power {W/(m3/s)}",
+        "  Sched,                   !- Setpoint Temperature Schedule",
+        "  15,                      !- Maximum Number of People",
+        "  Sched,                   !- People Schedule",
+        "  Sched;                   !- People Heat Gain Schedule",
+
+        "Schedule:Compact,",
+        "  Sched,                   !- Name",
+        "  Any Number,              !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,16.67;      !- Field 3",
+
+        "BuildingSurface:Detailed,",
+        "  F1-1,                    !- Name",
+        "  FLOOR,                   !- Surface Type",
+        "  FLOOR-SLAB-1,            !- Construction Name",
+        "  SPACE1-1,                !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Ground,                  !- Outside Boundary Condition",
+        "  ,                        !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  0.0,                     !- View Factor to Ground",
+        "  4,                       !- Number of Vertices",
+        "  26.8,3.7,0.0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "  30.5,0.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "  0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "  3.7,3.7,0.0;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Zone,",
+        "  SPACE1-1,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.438400269,             !- Ceiling Height {m}",
+        "  239.247360229;           !- Volume {m3}",
+
+        "Construction,",
+        "  FLOOR-SLAB-1,            !- Name",
+        "  CC03;                    !- Outside Layer",
+
+        "Material,",
+        "  CC03,                    !- Name",
+        "  MediumRough,             !- Roughness",
+        "  0.1016000,               !- Thickness {m}",
+        "  1.310000,                !- Conductivity {W/m-K}",
+        "  2243.000,                !- Density {kg/m3}",
+        "  837.0000,                !- Specific Heat {J/kg-K}",
+        "  0.9000000,               !- Thermal Absorptance",
+        "  0.6500000,               !- Solar Absorptance",
+        "  0.6500000;               !- Visible Absorptance",
+    });
+    ASSERT_TRUE(process_idf(idf_objects2));
+    bool errsFound = false;
+    Material::GetMaterialData(*state, errsFound); // read material data
+    EXPECT_FALSE(errsFound);
+    HeatBalanceManager::GetConstructData(*state, errsFound); // read construction data
+    EXPECT_FALSE(errsFound);
+    HeatBalanceManager::GetZoneData(*state, errsFound);
+    EXPECT_FALSE(errsFound);
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    SurfaceGeometry::GetSurfaceData(*state, errsFound);
+    EXPECT_FALSE(errsFound);
+    SwimmingPool::GetSwimmingPool(*state);
+    ASSERT_TRUE(state->dataSwimmingPools->anySwimmingPoolsInput);
 }

@@ -207,6 +207,7 @@ struct SwimmingPoolsData : BaseGlobalStruct
 
     // MODULE VARIABLE DECLARATIONS:
     int NumSwimmingPools = 0; // Number of swimming pools
+    bool anySwimmingPoolsInput = false;
     Array1D_bool CheckEquipName;
     bool getSwimmingPoolInput = true;
     Array1D<SwimmingPool::SwimmingPoolData> Pool;
@@ -214,6 +215,7 @@ struct SwimmingPoolsData : BaseGlobalStruct
     void clear_state() override
     {
         NumSwimmingPools = 0;
+        anySwimmingPoolsInput = false;
         getSwimmingPoolInput = true;
         CheckEquipName.deallocate();
         Pool.deallocate();

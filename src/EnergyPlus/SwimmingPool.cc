@@ -202,6 +202,7 @@ void GetSwimmingPool(EnergyPlusData &state)
     state.dataSwimmingPools->CheckEquipName = true;
 
     state.dataSwimmingPools->Pool.allocate(state.dataSwimmingPools->NumSwimmingPools);
+    if (state.dataSwimmingPools->NumSwimmingPools > 0) state.dataSwimmingPools->anySwimmingPoolsInput = true;
 
     // Obtain all of the user data related to indoor swimming pools...
     CurrentModuleObject = "SwimmingPool:Indoor";
