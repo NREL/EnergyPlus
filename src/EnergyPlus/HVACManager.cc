@@ -855,7 +855,7 @@ void SimHVAC(EnergyPlusData &state)
     }
     if (state.dataGlobal->AnyPlantInModel) {
         if (PlantUtilities::AnyPlantSplitterMixerLacksContinuity(state) ||
-            state.dataSwimmingPools->NumSwimmingPools > 0) { // need to resimulate pools
+            state.dataSwimmingPools->NumSwimmingPools > 0) { // also need to resimulate when there are pools present
             // rerun systems in a "Final flow lock/last iteration" mode
             // now call for one second to last plant simulation
             state.dataHVACGlobal->SimAirLoopsFlag = false;

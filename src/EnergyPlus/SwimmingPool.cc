@@ -952,15 +952,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     } else if (MassFlowRate < 0.0) {
         MassFlowRate = 0.0;
     }
-    if ((MassFlowRate > state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate) &&
-        (MassFlowRate > state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate)) {
-        // Flow not resolved yet, make a request.
-        PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
-    } else {
-        // No longer making a request, make sure outlet is the same as the inlet
-        state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate;
-        MassFlowRate = state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate;
-    }
+    PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
     this->WaterMassFlowRate = MassFlowRate;
 
     // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
