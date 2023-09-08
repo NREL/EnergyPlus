@@ -2664,7 +2664,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Heat Loss Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Tank Temperature", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Heat Recovery Supply Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Water Heater Source Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Water Heater Source Side Heat Transfer Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(51).show) {
         curReport = AddMonthlyReport(state, "GeneratorReportMonthly", 2);
