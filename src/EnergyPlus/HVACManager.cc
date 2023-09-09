@@ -162,13 +162,11 @@ void ManageHVAC(EnergyPlusData &state)
         thisZoneHB.ZTAV = 0.0;
         thisZoneHB.airHumRatAvg = 0.0;
     }
-    if (state.dataHeatBal->doSpaceHeatBalance) {
-        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
-            thisSpaceHB.ZT = thisSpaceHB.MAT;
-            // save for use with thermal comfort control models (Fang, Pierce, and KSU)
-            thisSpaceHB.ZTAV = 0.0;
-            thisSpaceHB.airHumRatAvg = 0.0;
-        }
+    for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+        thisSpaceHB.ZT = thisSpaceHB.MAT;
+        // save for use with thermal comfort control models (Fang, Pierce, and KSU)
+        thisSpaceHB.ZTAV = 0.0;
+        thisSpaceHB.airHumRatAvg = 0.0;
     }
     state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver = 0.0;
     state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver = 0.0;
@@ -391,12 +389,11 @@ void ManageHVAC(EnergyPlusData &state)
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             thisZoneHB.ZTAV += thisZoneHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
             thisZoneHB.airHumRatAvg += thisZoneHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
-            if (state.dataHeatBal->doSpaceHeatBalance) {
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
-                    thisSpaceHB.ZTAV += thisSpaceHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
-                    thisSpaceHB.airHumRatAvg += thisSpaceHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
-                }
+            // Space temps are always used, regardless of doSpaceHeatBalance setting
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                thisSpaceHB.ZTAV += thisSpaceHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
+                thisSpaceHB.airHumRatAvg += thisSpaceHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
             }
             if (state.dataContaminantBalance->Contaminant.CO2Simulation)
                 state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) +=
@@ -547,11 +544,9 @@ void ManageHVAC(EnergyPlusData &state)
         thisZoneHB.ZTAVComf = thisZoneHB.ZTAV;
         thisZoneHB.airHumRatAvgComf = thisZoneHB.airHumRatAvg;
     }
-    if (state.dataHeatBal->doSpaceHeatBalance) {
-        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
-            thisSpaceHB.ZTAVComf = thisSpaceHB.ZTAV;
-            thisSpaceHB.airHumRatAvgComf = thisSpaceHB.airHumRatAvg;
-        }
+    for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+        thisSpaceHB.ZTAVComf = thisSpaceHB.ZTAV;
+        thisSpaceHB.airHumRatAvgComf = thisSpaceHB.airHumRatAvg;
     }
 
     ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
