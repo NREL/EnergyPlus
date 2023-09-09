@@ -7322,17 +7322,6 @@ namespace InternalHeatGains {
             e.OtherLatGainRate = 0.0;
             e.OtherLostRate = 0.0;
             e.OtherTotGainRate = 0.0;
-            e.ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
-            e.ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
-            e.ITEqSHI = 0.0;                  // Zone Supply Heat Index []
-            e.ITEqTimeOutOfOperRange = 0.0;   // Zone ITE Air Inlet Operating Range Exceeded Time [hr]
-            e.ITEqTimeAboveDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
-            e.ITEqTimeBelowDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
-            e.ITEqTimeAboveDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
-            e.ITEqTimeBelowDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
-            e.ITEqTimeAboveRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
-            e.ITEqTimeBelowRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
-            e.ITEAdjReturnTemp = 0.0;         // Zone ITE Adjusted Return Air Temperature
             // Overall Zone Variables
             e.TotRadiantGain = 0.0;
             e.TotVisHeatGain = 0.0;
@@ -8398,17 +8387,6 @@ namespace InternalHeatGains {
             e.OtherLatGainRate = 0.0;
             e.OtherLostRate = 0.0;
             e.OtherTotGainRate = 0.0;
-            e.ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
-            e.ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
-            e.ITEqSHI = 0.0;                  // Zone Supply Heat Index []
-            e.ITEqTimeOutOfOperRange = 0.0;   // Zone ITE Air Inlet Operating Range Exceeded Time [hr]
-            e.ITEqTimeAboveDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
-            e.ITEqTimeBelowDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
-            e.ITEqTimeAboveDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
-            e.ITEqTimeBelowDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
-            e.ITEqTimeAboveRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
-            e.ITEqTimeBelowRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
-            e.ITEAdjReturnTemp = 0.0;         // Zone ITE Adjusted Return Air Temperature
             // Overall Zone Variables
             e.TotRadiantGain = 0.0;
             e.TotVisHeatGain = 0.0;
