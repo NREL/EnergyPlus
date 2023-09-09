@@ -7225,10 +7225,11 @@ namespace InternalHeatGains {
         }
 
         for (auto &e : state.dataHeatBal->spaceRpt) {
-            e.PeopleNumOcc = 0.0;
+            // People
             e.PeopleRadGain = 0.0;
             e.PeopleConGain = 0.0;
             e.PeopleSenGain = 0.0;
+            e.PeopleNumOcc = 0.0;
             e.PeopleLatGain = 0.0;
             e.PeopleTotGain = 0.0;
             e.PeopleRadGainRate = 0.0;
@@ -7236,16 +7237,119 @@ namespace InternalHeatGains {
             e.PeopleSenGainRate = 0.0;
             e.PeopleLatGainRate = 0.0;
             e.PeopleTotGainRate = 0.0;
+            // Lights
             e.LtsPower = 0.0;
-            e.ElecPower = 0.0;
-            e.GasPower = 0.0;
-            e.HWPower = 0.0;
-            e.SteamPower = 0.0;
+            e.LtsElecConsump = 0.0;
+            e.LtsRadGain = 0.0;
+            e.LtsVisGain = 0.0;
+            e.LtsConGain = 0.0;
+            e.LtsRetAirGain = 0.0;
+            e.LtsTotGain = 0.0;
+            e.LtsRadGainRate = 0.0;
+            e.LtsVisGainRate = 0.0;
+            e.LtsConGainRate = 0.0;
+            e.LtsRetAirGainRate = 0.0;
+            e.LtsTotGainRate = 0.0;
+            // Baseboard Heat
             e.BaseHeatPower = 0.0;
-            e.CO2Rate = 0.0;
+            e.BaseHeatElecCons = 0.0;
+            e.BaseHeatRadGain = 0.0;
+            e.BaseHeatConGain = 0.0;
+            e.BaseHeatTotGain = 0.0;
+            e.BaseHeatRadGainRate = 0.0;
+            e.BaseHeatConGainRate = 0.0;
+            e.BaseHeatTotGainRate = 0.0;
+            // Electric Equipment
+            e.ElecPower = 0.0;
+            e.ElecConsump = 0.0;
+            e.ElecRadGain = 0.0;
+            e.ElecConGain = 0.0;
+            e.ElecLatGain = 0.0;
+            e.ElecLost = 0.0;
+            e.ElecTotGain = 0.0;
+            e.ElecRadGainRate = 0.0;
+            e.ElecConGainRate = 0.0;
+            e.ElecLatGainRate = 0.0;
+            e.ElecLostRate = 0.0;
+            e.ElecTotGainRate = 0.0;
+            // Gas Equipment
+            e.GasPower = 0.0;
+            e.GasConsump = 0.0;
+            e.GasRadGain = 0.0;
+            e.GasConGain = 0.0;
+            e.GasLatGain = 0.0;
+            e.GasLost = 0.0;
+            e.GasTotGain = 0.0;
+            e.GasRadGainRate = 0.0;
+            e.GasConGainRate = 0.0;
+            e.GasLatGainRate = 0.0;
+            e.GasLostRate = 0.0;
+            e.GasTotGainRate = 0.0;
+            // Hot Water Equipment
+            e.HWPower = 0.0;
+            e.HWConsump = 0.0;
+            e.HWRadGain = 0.0;
+            e.HWConGain = 0.0;
+            e.HWLatGain = 0.0;
+            e.HWLost = 0.0;
+            e.HWTotGain = 0.0;
+            e.HWRadGainRate = 0.0;
+            e.HWConGainRate = 0.0;
+            e.HWLatGainRate = 0.0;
+            e.HWLostRate = 0.0;
+            e.HWTotGainRate = 0.0;
+            // Steam Equipment
+            e.SteamPower = 0.0;
+            e.SteamConsump = 0.0;
+            e.SteamRadGain = 0.0;
+            e.SteamConGain = 0.0;
+            e.SteamLatGain = 0.0;
+            e.SteamLost = 0.0;
+            e.SteamTotGain = 0.0;
+            e.SteamRadGainRate = 0.0;
+            e.SteamConGainRate = 0.0;
+            e.SteamLatGainRate = 0.0;
+            e.SteamLostRate = 0.0;
+            e.SteamTotGainRate = 0.0;
+            // Other Equipment
+            e.OtherRadGain = 0.0;
+            e.OtherConGain = 0.0;
+            e.OtherLatGain = 0.0;
+            e.OtherLost = 0.0;
+            e.OtherTotGain = 0.0;
+            e.OtherRadGainRate = 0.0;
+            e.OtherConGainRate = 0.0;
+            e.OtherLatGainRate = 0.0;
+            e.OtherLostRate = 0.0;
             e.OtherTotGainRate = 0.0;
+            e.ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
+            e.ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
+            e.ITEqSHI = 0.0;                  // Zone Supply Heat Index []
+            e.ITEqTimeOutOfOperRange = 0.0;   // Zone ITE Air Inlet Operating Range Exceeded Time [hr]
+            e.ITEqTimeAboveDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+            e.ITEqTimeBelowDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+            e.ITEqTimeAboveDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+            e.ITEqTimeBelowDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+            e.ITEqTimeAboveRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+            e.ITEqTimeBelowRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+            e.ITEAdjReturnTemp = 0.0;         // Zone ITE Adjusted Return Air Temperature
+            // Overall Zone Variables
+            e.TotRadiantGain = 0.0;
+            e.TotVisHeatGain = 0.0;
+            e.TotConvectiveGain = 0.0;
+            e.TotLatentGain = 0.0;
+            e.TotTotalHeatGain = 0.0;
+            e.TotRadiantGainRate = 0.0;
+            e.TotVisHeatGainRate = 0.0;
+            e.TotConvectiveGainRate = 0.0;
+            e.TotLatentGainRate = 0.0;
+            e.TotTotalHeatGainRate = 0.0;
+            // Contaminant
+            e.CO2Rate = 0.0;
+            e.GCRate = 0.0;
             for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
                 e.OtherPower[i] = 0.0;
+                e.OtherConsump[i] = 0.0;
             }
         }
 
@@ -8197,10 +8301,11 @@ namespace InternalHeatGains {
         }
 
         for (auto &e : state.dataHeatBal->ZoneRpt) {
-            e.PeopleNumOcc = 0.0;
+            // People
             e.PeopleRadGain = 0.0;
             e.PeopleConGain = 0.0;
             e.PeopleSenGain = 0.0;
+            e.PeopleNumOcc = 0.0;
             e.PeopleLatGain = 0.0;
             e.PeopleTotGain = 0.0;
             e.PeopleRadGainRate = 0.0;
@@ -8208,16 +8313,119 @@ namespace InternalHeatGains {
             e.PeopleSenGainRate = 0.0;
             e.PeopleLatGainRate = 0.0;
             e.PeopleTotGainRate = 0.0;
+            // Lights
             e.LtsPower = 0.0;
-            e.ElecPower = 0.0;
-            e.GasPower = 0.0;
-            e.HWPower = 0.0;
-            e.SteamPower = 0.0;
+            e.LtsElecConsump = 0.0;
+            e.LtsRadGain = 0.0;
+            e.LtsVisGain = 0.0;
+            e.LtsConGain = 0.0;
+            e.LtsRetAirGain = 0.0;
+            e.LtsTotGain = 0.0;
+            e.LtsRadGainRate = 0.0;
+            e.LtsVisGainRate = 0.0;
+            e.LtsConGainRate = 0.0;
+            e.LtsRetAirGainRate = 0.0;
+            e.LtsTotGainRate = 0.0;
+            // Baseboard Heat
             e.BaseHeatPower = 0.0;
-            // e.CO2Rate = 0.0; - cleared and accumulated in InitInternalHeatGains
+            e.BaseHeatElecCons = 0.0;
+            e.BaseHeatRadGain = 0.0;
+            e.BaseHeatConGain = 0.0;
+            e.BaseHeatTotGain = 0.0;
+            e.BaseHeatRadGainRate = 0.0;
+            e.BaseHeatConGainRate = 0.0;
+            e.BaseHeatTotGainRate = 0.0;
+            // Electric Equipment
+            e.ElecPower = 0.0;
+            e.ElecConsump = 0.0;
+            e.ElecRadGain = 0.0;
+            e.ElecConGain = 0.0;
+            e.ElecLatGain = 0.0;
+            e.ElecLost = 0.0;
+            e.ElecTotGain = 0.0;
+            e.ElecRadGainRate = 0.0;
+            e.ElecConGainRate = 0.0;
+            e.ElecLatGainRate = 0.0;
+            e.ElecLostRate = 0.0;
+            e.ElecTotGainRate = 0.0;
+            // Gas Equipment
+            e.GasPower = 0.0;
+            e.GasConsump = 0.0;
+            e.GasRadGain = 0.0;
+            e.GasConGain = 0.0;
+            e.GasLatGain = 0.0;
+            e.GasLost = 0.0;
+            e.GasTotGain = 0.0;
+            e.GasRadGainRate = 0.0;
+            e.GasConGainRate = 0.0;
+            e.GasLatGainRate = 0.0;
+            e.GasLostRate = 0.0;
+            e.GasTotGainRate = 0.0;
+            // Hot Water Equipment
+            e.HWPower = 0.0;
+            e.HWConsump = 0.0;
+            e.HWRadGain = 0.0;
+            e.HWConGain = 0.0;
+            e.HWLatGain = 0.0;
+            e.HWLost = 0.0;
+            e.HWTotGain = 0.0;
+            e.HWRadGainRate = 0.0;
+            e.HWConGainRate = 0.0;
+            e.HWLatGainRate = 0.0;
+            e.HWLostRate = 0.0;
+            e.HWTotGainRate = 0.0;
+            // Steam Equipment
+            e.SteamPower = 0.0;
+            e.SteamConsump = 0.0;
+            e.SteamRadGain = 0.0;
+            e.SteamConGain = 0.0;
+            e.SteamLatGain = 0.0;
+            e.SteamLost = 0.0;
+            e.SteamTotGain = 0.0;
+            e.SteamRadGainRate = 0.0;
+            e.SteamConGainRate = 0.0;
+            e.SteamLatGainRate = 0.0;
+            e.SteamLostRate = 0.0;
+            e.SteamTotGainRate = 0.0;
+            // Other Equipment
+            e.OtherRadGain = 0.0;
+            e.OtherConGain = 0.0;
+            e.OtherLatGain = 0.0;
+            e.OtherLost = 0.0;
+            e.OtherTotGain = 0.0;
+            e.OtherRadGainRate = 0.0;
+            e.OtherConGainRate = 0.0;
+            e.OtherLatGainRate = 0.0;
+            e.OtherLostRate = 0.0;
             e.OtherTotGainRate = 0.0;
+            e.ITEqAirVolFlowStdDensity = 0.0; // Zone Air volume flow rate at standard density [m3/s]
+            e.ITEqAirMassFlow = 0.0;          // Zone Air mass flow rate [kg/s]
+            e.ITEqSHI = 0.0;                  // Zone Supply Heat Index []
+            e.ITEqTimeOutOfOperRange = 0.0;   // Zone ITE Air Inlet Operating Range Exceeded Time [hr]
+            e.ITEqTimeAboveDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+            e.ITEqTimeBelowDryBulbT = 0.0;    // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+            e.ITEqTimeAboveDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+            e.ITEqTimeBelowDewpointT = 0.0;   // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+            e.ITEqTimeAboveRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+            e.ITEqTimeBelowRH = 0.0;          // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+            e.ITEAdjReturnTemp = 0.0;         // Zone ITE Adjusted Return Air Temperature
+            // Overall Zone Variables
+            e.TotRadiantGain = 0.0;
+            e.TotVisHeatGain = 0.0;
+            e.TotConvectiveGain = 0.0;
+            e.TotLatentGain = 0.0;
+            e.TotTotalHeatGain = 0.0;
+            e.TotRadiantGainRate = 0.0;
+            e.TotVisHeatGainRate = 0.0;
+            e.TotConvectiveGainRate = 0.0;
+            e.TotLatentGainRate = 0.0;
+            e.TotTotalHeatGainRate = 0.0;
+            // Contaminant
+            // e.CO2Rate = 0.0; - cleared and accumulated in InitInternalHeatGains
+            e.GCRate = 0.0;
             for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
                 e.OtherPower[i] = 0.0;
+                e.OtherConsump[i] = 0.0;
             }
         }
 

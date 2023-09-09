@@ -4244,7 +4244,6 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
                 thisSpaceHB.MAT = thisZoneHB.MAT;
                 thisSpaceHB.airHumRat = thisZoneHB.airHumRat;
                 thisSpaceHB.airRelHum = thisZoneHB.airRelHum;
-                // thisSpaceHB.ZTAV = thisZoneHB.ZTAV;
                 // thisSpaceHB.ZTAVComf = thisZoneHB.ZTAVComf;
             }
         }
