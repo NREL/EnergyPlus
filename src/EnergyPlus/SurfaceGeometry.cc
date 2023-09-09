@@ -9321,7 +9321,7 @@ namespace SurfaceGeometry {
 
         size_t const nSides = vertices.size();
 
-        // Vector of distance from this vertex to the next one
+        // Pass one: Vector of distance from this vertex to the next one
         std::vector<Real64> distances(nSides);
         size_t index = 0;
         double min_distance = std::numeric_limits<Real64>::max();
@@ -9336,10 +9336,13 @@ namespace SurfaceGeometry {
             min_distance = std::min(min_distance, dist);
             perimeter += dist;
         }
+        // Return early if nothing to be popped
         if (min_distance >= tolerance) {
             return {perimeter};
         }
 
+        // Pass two: figure out the vertex that is coincident with its previous and/or next vertex and
+        // that minimizes the (distanceThisToNext + distanceThisToPrev).
         Real64 min_weight = std::numeric_limits<Real64>::max();
         int poppedVertexPos = -1;
         int keptVertexPos = -1;
@@ -9363,6 +9366,7 @@ namespace SurfaceGeometry {
             }
         }
 
+        // Return the keptVertexPos (which can be the previous or the next), so we can print the displayExtraWarning correctly
         return {perimeter, poppedVertexPos, keptVertexPos};
     }
 
@@ -9548,6 +9552,7 @@ namespace SurfaceGeometry {
                     break;
                 }
 
+                // Grab the popped one, and the kept one (regardless of whether it's previous or next)
                 auto it = vertices.begin();
                 std::advance(it, popResult.poppedVertexPos);
                 int const poppedVertexIndex = popResult.poppedVertexPos + 1;
@@ -9583,6 +9588,7 @@ namespace SurfaceGeometry {
                                                  poppedVertexIndex));
                     }
                     ++state.dataErrTracking->TotalDegenerateSurfaces;
+                    // If degenerate, we won't be able to pop now nor later, so exit
                     // mark degenerate surface?
                     break;
                 }
