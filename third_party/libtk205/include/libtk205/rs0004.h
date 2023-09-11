@@ -151,7 +151,7 @@ namespace tk205  {
 			const static std::string_view grid_variables_name;
 			const static std::string_view lookup_variables_name;
 			using PerformanceMapBase::calculate_performance;
-			LookupVariablesCoolingStruct calculate_performance (double outdoor_coil_entering_dry_bulb_temperature, double indoor_coil_entering_relative_humidity, double indoor_coil_entering_dry_bulb_temperature, double indoor_coil_air_mass_flow_rate, double compressor_sequence_number, double ambient_absolute_air_pressure, Btwxt::Method performance_interpolation_method = Btwxt::Method::linear);
+			LookupVariablesCoolingStruct calculate_performance (double outdoor_coil_entering_dry_bulb_temperature, double indoor_coil_entering_relative_humidity, double indoor_coil_entering_dry_bulb_temperature, double indoor_coil_air_mass_flow_rate, double compressor_sequence_number, double ambient_absolute_air_pressure, Btwxt::InterpolationMethod performance_interpolation_method = Btwxt::InterpolationMethod::linear);
 		};
 		class GridVariablesStandby  : public GridVariablesBase {
 		public:
@@ -196,7 +196,7 @@ namespace tk205  {
 			const static std::string_view grid_variables_name;
 			const static std::string_view lookup_variables_name;
 			using PerformanceMapBase::calculate_performance;
-			LookupVariablesStandbyStruct calculate_performance (double outdoor_coil_environment_dry_bulb_temperature, Btwxt::Method performance_interpolation_method = Btwxt::Method::linear);
+			LookupVariablesStandbyStruct calculate_performance (double outdoor_coil_environment_dry_bulb_temperature, Btwxt::InterpolationMethod performance_interpolation_method = Btwxt::InterpolationMethod::linear);
 		};
 		class Performance  {
 		public:

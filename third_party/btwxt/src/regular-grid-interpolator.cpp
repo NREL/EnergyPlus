@@ -21,8 +21,8 @@ std::vector<GridAxis> construct_grid_axes(const std::vector<std::vector<double>>
     for (const auto& axis : grid_axis_vectors) {
         grid_axes.emplace_back(axis,
                                fmt::format("Axis {}", grid_axes.size() + 1),
-                               Method::linear,
-                               Method::constant,
+                               InterpolationMethod::linear,
+                               ExtrapolationMethod::constant,
                                std::pair<double, double> {-DBL_MAX, DBL_MAX},
                                logger_in);
     }
@@ -96,13 +96,15 @@ RegularGridInterpolator::RegularGridInterpolator(
 {
 }
 
-RegularGridInterpolator::~RegularGridInterpolator() = default; 
+RegularGridInterpolator::~RegularGridInterpolator() = default;
 
 RegularGridInterpolator::RegularGridInterpolator(const RegularGridInterpolator& source)
 {
     *this = source;
-    this->implementation = source.implementation ?
-                           std::make_unique<RegularGridInterpolatorImplementation>(*source.implementation) : nullptr;
+    this->implementation =
+        source.implementation
+            ? std::make_unique<RegularGridInterpolatorImplementation>(*source.implementation)
+            : nullptr;
 }
 
 RegularGridInterpolator::RegularGridInterpolator(const RegularGridInterpolator& source,
@@ -112,9 +114,12 @@ RegularGridInterpolator::RegularGridInterpolator(const RegularGridInterpolator& 
     this->implementation->set_logger(logger);
 }
 
-RegularGridInterpolator& RegularGridInterpolator::operator=(const RegularGridInterpolator& source) {
-    implementation = source.implementation ?
-                     std::make_unique<RegularGridInterpolatorImplementation>(*(source.implementation)) : nullptr;
+RegularGridInterpolator& RegularGridInterpolator::operator=(const RegularGridInterpolator& source)
+{
+    implementation =
+        source.implementation
+            ? std::make_unique<RegularGridInterpolatorImplementation>(*(source.implementation))
+            : nullptr;
     return *this;
 }
 
@@ -139,13 +144,13 @@ RegularGridInterpolator::add_grid_point_data_set(const GridPointDataSet& grid_po
 }
 
 void RegularGridInterpolator::set_axis_extrapolation_method(const std::size_t axis_index,
-                                                            const Method method)
+                                                            const ExtrapolationMethod method)
 {
     implementation->set_axis_extrapolation_method(axis_index, method);
 }
 
 void RegularGridInterpolator::set_axis_interpolation_method(const std::size_t axis_index,
-                                                            const Method method)
+                                                            const InterpolationMethod method)
 {
     implementation->set_axis_interpolation_method(axis_index, method);
 }

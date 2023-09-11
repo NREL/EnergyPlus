@@ -105,7 +105,7 @@ namespace tk205  {
 			const static std::string_view grid_variables_name;
 			const static std::string_view lookup_variables_name;
 			using PerformanceMapBase::calculate_performance;
-			LookupVariablesStruct calculate_performance (double output_power, double output_frequency, Btwxt::Method performance_interpolation_method = Btwxt::Method::linear);
+			LookupVariablesStruct calculate_performance (double output_power, double output_frequency, Btwxt::InterpolationMethod performance_interpolation_method = Btwxt::InterpolationMethod::linear);
 		};
 		class Performance  {
 		public:

@@ -118,7 +118,6 @@ namespace Curve {
             *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
         std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
         ShowSevereError(*contextPair.first, fullMessage);
-        ShowFatalError(*contextPair.first, "Btwxt: Errors discovered, program terminates.");
     }
     void EPlusLogging::warning(const std::string_view message)
     {
@@ -2253,8 +2252,8 @@ namespace Curve {
                             std::vector<Btwxt::GridAxis> gridAxes;
                             gridAxes.emplace_back(axis,
                                                   "",
-                                                  Btwxt::Method::linear,
-                                                  Btwxt::Method::linear,
+                                                  Btwxt::InterpolationMethod::linear,
+                                                  Btwxt::ExtrapolationMethod::linear,
                                                   std::pair<double, double>{0.0, 360.0},
                                                   BtwxtManager::btwxt_logger);
 
@@ -2263,7 +2262,7 @@ namespace Curve {
                             thisCurve->TableIndex = gridIndex;
                             thisCurve->GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, lookupValues);
                         } catch (Btwxt::BtwxtException &e) {
-                            ShowSevereError(state, "GridAxis construction error.");
+                            ShowFatalError(state, "Btwxt::GridAxis construction error; program terminates.");
                         }
                     }
                 }
@@ -2368,21 +2367,21 @@ namespace Curve {
 
                         // This could be an enum lookup, but they are accessing enums inside Btwxt that we don't control, and it's only two options
                         // for each
-                        Btwxt::Method interpMethod = Btwxt::Method::cubic; // Assume cubic as the default
+                        Btwxt::InterpolationMethod interpMethod = Btwxt::InterpolationMethod::cubic; // Assume cubic as the default
                         auto interpIterator = indVarInstance.find("interpolation_method");
                         if (interpIterator != indVarInstance.end()) {
                             if (interpIterator->get<std::string>() == "Linear") {
-                                interpMethod = Btwxt::Method::linear;
+                                interpMethod = Btwxt::InterpolationMethod::linear;
                             }
                         }
-                        Btwxt::Method extrapMethod = Btwxt::Method::linear; // Assume linear as the default
+                        Btwxt::ExtrapolationMethod extrapMethod = Btwxt::ExtrapolationMethod::linear; // Assume linear as the default
                         auto extrapIterator = indVarInstance.find("extrapolation_method");
                         if (extrapIterator != indVarInstance.end()) {
                             if (extrapIterator->get<std::string>() == "Unavailable") {
                                 ShowSevereError(state, format("{}: Extrapolation method \"Unavailable\" is not yet available.", contextString));
                                 ErrorsFound = true;
                             } else if (extrapIterator->get<std::string>() == "Constant") {
-                                extrapMethod = Btwxt::Method::constant;
+                                extrapMethod = Btwxt::ExtrapolationMethod::constant;
                             }
                         }
 

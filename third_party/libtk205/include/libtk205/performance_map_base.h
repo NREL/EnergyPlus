@@ -64,7 +64,7 @@ public:
   // ----------------------------------------------------------------------------------------------
     inline double calculate_performance(const std::vector<double> &target,
                                         std::size_t table_index,
-                                        Btwxt::Method performance_interpolation_method = Btwxt::Method::linear)
+                                        Btwxt::InterpolationMethod performance_interpolation_method = Btwxt::InterpolationMethod::linear)
     {
         for (auto i = 0u; i < grid_axes.size(); i++)
         {
@@ -79,7 +79,7 @@ public:
   /// @param	target 
   // ----------------------------------------------------------------------------------------------
     inline std::vector<double> calculate_performance(const std::vector<double> &target,
-                                                     Btwxt::Method performance_interpolation_method = Btwxt::Method::linear)
+                                                     Btwxt::InterpolationMethod performance_interpolation_method = Btwxt::InterpolationMethod::linear)
     {
         for (auto i = 0u; i < grid_axes.size(); i++)
         {

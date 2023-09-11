@@ -95,8 +95,8 @@ constexpr std::array<std::string_view, static_cast<int>(AmbientTempIndicator::Nu
     "OUTDOORS",
 };
 
-std::map<std::string, Btwxt::Method> InterpMethods = // NOLINT(cert-err58-cpp)
-    {{"LINEAR", Btwxt::Method::linear}, {"CUBIC", Btwxt::Method::cubic}};
+std::map<std::string, Btwxt::InterpolationMethod> InterpMethods = // NOLINT(cert-err58-cpp)
+    {{"LINEAR", Btwxt::InterpolationMethod::linear}, {"CUBIC", Btwxt::InterpolationMethod::cubic}};
 
 void getChillerASHRAE205Input(EnergyPlusData &state)
 {

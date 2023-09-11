@@ -17,6 +17,8 @@
 
 namespace Btwxt {
 
+enum class Method { undefined, constant, linear, cubic };
+
 class RegularGridInterpolatorImplementation {
   public:
     RegularGridInterpolatorImplementation() = default;
@@ -31,13 +33,13 @@ class RegularGridInterpolatorImplementation {
     // Data manipulation and settings
     std::size_t add_grid_point_data_set(const GridPointDataSet& grid_point_data_set);
 
-    void set_axis_interpolation_method(std::size_t axis_index, Method method)
+    void set_axis_interpolation_method(std::size_t axis_index, InterpolationMethod method)
     {
         check_axis_index(axis_index, "set axis interpolation method");
         grid_axes[axis_index].set_interpolation_method(method);
     }
 
-    void set_axis_extrapolation_method(const std::size_t axis_index, Method method)
+    void set_axis_extrapolation_method(const std::size_t axis_index, ExtrapolationMethod method)
     {
         check_axis_index(axis_index, "set axis extrapolation method");
         grid_axes[axis_index].set_extrapolation_method(method);
