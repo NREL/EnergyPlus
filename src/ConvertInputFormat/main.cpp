@@ -238,12 +238,14 @@ bool checkForUnsupportedObjects(json const &epJSON, bool convertHVACTemplate)
     return errorsFound;
 }
 
-bool processErrors(std::unique_ptr<IdfParser> const &idf_parser, std::unique_ptr<Validation> const &validation)
+bool processErrors(std::unique_ptr<IdfParser> const &idf_parser, std::unique_ptr<Validation> const &validation, bool isDDY)
 {
     auto const idf_parser_errors = idf_parser->errors();
     auto const idf_parser_warnings = idf_parser->warnings();
 
     auto const validation_errors = validation->errors();
+    bool hasValidationErrors = false;
+
     auto const validation_warnings = validation->warnings();
 
     for (auto const &error : idf_parser_errors) {
@@ -253,15 +255,20 @@ bool processErrors(std::unique_ptr<IdfParser> const &idf_parser, std::unique_ptr
         displayMessage(warning);
     }
     for (auto const &error : validation_errors) {
+        if (isDDY) {
+            if ((error.find("Missing required property 'Building'") != std::string::npos) ||
+                (error.find("Missing required property 'GlobalGeometryRules'") != std::string::npos)) {
+                continue;
+            }
+        }
+        hasValidationErrors = true;
         displayMessage(error);
     }
     for (auto const &warning : validation_warnings) {
         displayMessage(warning);
     }
 
-    bool has_errors = validation->hasErrors() || idf_parser->hasErrors();
-
-    return has_errors;
+    return hasValidationErrors || idf_parser->hasErrors();
 }
 
 void cleanEPJSON(json &epjson)
@@ -295,14 +302,16 @@ bool processInput(fs::path const &inputFilePath,
 
     auto const inputFileType = EnergyPlus::FileSystem::getFileType(inputFilePath);
 
-    bool const isEpJSON = EnergyPlus::FileSystem::is_all_json_type(inputFileType);
-    bool const isCBOR = (inputFileType == EnergyPlus::FileSystem::FileTypes::CBOR);
-    bool const isMsgPack = (inputFileType == EnergyPlus::FileSystem::FileTypes::MsgPack);
-    bool const isUBJSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::UBJSON);
-    bool const isBSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::BSON);
+    const bool isEpJSON = EnergyPlus::FileSystem::is_all_json_type(inputFileType);
+    const bool isCBOR = (inputFileType == EnergyPlus::FileSystem::FileTypes::CBOR);
+    const bool isMsgPack = (inputFileType == EnergyPlus::FileSystem::FileTypes::MsgPack);
+    const bool isUBJSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::UBJSON);
+    const bool isBSON = (inputFileType == EnergyPlus::FileSystem::FileTypes::BSON);
+    const bool isIDForIMF = EnergyPlus::FileSystem::is_idf_type(inputFileType); // IDF or IMF
+    const bool isDDY = (inputFileType == EnergyPlus::FileSystem::FileTypes::DDY);
 
-    if (!(isEpJSON || EnergyPlus::FileSystem::is_idf_type(inputFileType))) {
-        displayMessage("ERROR: Input file must have IDF, IMF, or epJSON extension.");
+    if (!(isEpJSON || isIDForIMF || isDDY)) {
+        displayMessage("ERROR: Input file must have IDF, IMF, DDY, or epJSON extension.");
         return false;
     }
 
@@ -310,8 +319,7 @@ bool processInput(fs::path const &inputFilePath,
         (inputFileType == EnergyPlus::FileSystem::FileTypes::EpJSON || inputFileType == EnergyPlus::FileSystem::FileTypes::JSON)) {
         displayMessage("Same output format as input format requested (epJSON). Skipping conversion and moving to next file.");
         return false;
-    } else if (outputType == OutputTypes::IDF &&
-               (inputFileType == EnergyPlus::FileSystem::FileTypes::IDF || inputFileType == EnergyPlus::FileSystem::FileTypes::IMF)) {
+    } else if (outputType == OutputTypes::IDF && (isIDForIMF || isDDY)) {
         displayMessage("Same output format as input format requested (IDF). Skipping conversion and moving to next file.");
         return false;
     } else if (outputType == OutputTypes::CBOR && isCBOR) {
@@ -349,8 +357,11 @@ bool processInput(fs::path const &inputFilePath,
         return false;
     }
 
-    bool const is_valid = validation->validate(epJSON);
-    bool const hasErrors = processErrors(idf_parser, validation);
+    bool is_valid = validation->validate(epJSON);
+    bool const hasErrors = processErrors(idf_parser, validation, isDDY);
+    if (isDDY && !hasErrors) {
+        is_valid = true;
+    }
     bool const versionMatch = checkVersionMatch(epJSON);
     bool const unsupportedFound = checkForUnsupportedObjects(epJSON, convertHVACTemplate);
 
