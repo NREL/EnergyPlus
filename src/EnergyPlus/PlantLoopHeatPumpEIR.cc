@@ -368,7 +368,8 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         }
 
         if (availableCapacity > 0) {
-            partLoadRatio = std::clamp(std::abs(currentLoad) / availableCapacity, 0.0, 1.0);
+            // partLoadRatio = std::clamp(std::abs(currentLoad) / availableCapacity, 0.0, 1.0);
+            partLoadRatio = std::clamp(std::abs(currentLoadConsolidated) / availableCapacity, 0.0, 1.0);
         }
 
         if (this->minSupplyWaterTempCurveIndex > 0) {
@@ -501,12 +502,6 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
             }
             // defrost energy rate is applied to rated power and is proportional to defrost cycles per hour
             this->defrostEnergyRate = (this->referenceCapacity / this->referenceCOP) * defrostHeatEnergyFraction * thisHourDefrostCycles;
-    Real64 availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
-    Real64 partLoadRatio = 0.0;
-    if (availableCapacity > 0) {
-        // partLoadRatio = max(0.0, min(std::abs(currentLoadConsolidated) / availableCapacity, 1.0));
-        partLoadRatio = std::clamp(std::abs(currentLoadConsolidated) / availableCapacity, 0.0, 1.0);
-    }
 
             // question on how these multipliers are accounted for with capacity and power (e.g., 1+ or 1-)
             InputPowerMultiplier = 1.0 + thisHourDefrostHeatLoad;
