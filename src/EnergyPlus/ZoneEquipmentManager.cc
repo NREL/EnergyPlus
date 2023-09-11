@@ -4501,9 +4501,9 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
         BuildingZoneReturnFlow = 0.0;
 
         for (int ZoneNum1 = 1; ZoneNum1 <= state.dataGlobal->NumOfZones; ++ZoneNum1) {
-            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum1).IsControlled) continue;
             int ZoneNum = ZoneNum1;
             if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) ZoneNum = state.dataHeatBalFanSys->ZoneReOrder(ZoneNum1);
+            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
             auto &massConservation = state.dataHeatBal->MassConservation(ZoneNum);
             auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
             Real64 TotExhaustAirMassFlowRate = 0.0;
