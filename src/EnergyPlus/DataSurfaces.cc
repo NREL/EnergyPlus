@@ -226,10 +226,10 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     Real64 RefAirTemp = 0;
 
     // determine reference air temperature for this surface
-    auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(this->spaceNum);
+    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->Zone);
     switch (state.dataSurface->SurfTAirRef(t_SurfNum)) {
     case RefAirTemp::ZoneMeanAirTemp: {
-        RefAirTemp = thisSpaceHB.MAT;
+        RefAirTemp = thisZoneHB.MAT;
     } break;
     case RefAirTemp::AdjacentAirTemp: {
         RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
@@ -248,25 +248,24 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         // determine supply air conditions
         Real64 SumSysMCp = 0;
         Real64 SumSysMCpT = 0;
-        auto &inletNodes = (state.dataHeatBal->doSpaceHeatBalance) ? state.dataZoneEquip->spaceEquipConfig(this->spaceNum).InletNode
-                                                                   : state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode;
-        for (int nodeNum : inletNodes) {
-            auto &inNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(nodeNum));
-            Real64 CpAir = PsyCpAirFnW(thisSpaceHB.airHumRat);
-            SumSysMCp += inNode.MassFlowRate * CpAir;
-            SumSysMCpT += inNode.MassFlowRate * CpAir * inNode.Temp;
+        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
+            Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
+            Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
+            Real64 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
+            SumSysMCp += MassFlowRate * CpAir;
+            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
         }
         // a weighted average of the inlet temperatures.
         if (SumSysMCp > 0.0) {
             // a weighted average of the inlet temperatures.
             RefAirTemp = SumSysMCpT / SumSysMCp;
         } else {
-            RefAirTemp = thisSpaceHB.MAT;
+            RefAirTemp = thisZoneHB.MAT;
         }
     } break;
     default: {
         // currently set to mean air temp but should add error warning here
-        RefAirTemp = thisSpaceHB.MAT;
+        RefAirTemp = thisZoneHB.MAT;
     } break;
     }
 
