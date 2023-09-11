@@ -6941,7 +6941,11 @@ namespace AirflowNetwork {
 
         std::vector<Real64> dirs30 = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360};
         std::vector<Btwxt::GridAxis> dirs30Axes;
-        dirs30Axes.emplace_back(dirs30, "30 Degree Increment", Btwxt::InterpolationMethod::linear, Btwxt::ExtrapolationMethod::linear, std::pair<double, double>{0.0, 360.0});
+        dirs30Axes.emplace_back(dirs30,
+                                "30 Degree Increment",
+                                Btwxt::InterpolationMethod::linear,
+                                Btwxt::ExtrapolationMethod::linear,
+                                std::pair<double, double>{0.0, 360.0});
 
         auto dirs30GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("30 Degree Increments", dirs30Axes);
 
@@ -7085,7 +7089,11 @@ namespace AirflowNetwork {
                                           190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360};
 
             std::vector<Btwxt::GridAxis> dirs10Axes;
-            dirs10Axes.emplace_back(dirs10, "10 Degree Increments", Btwxt::InterpolationMethod::linear, Btwxt::ExtrapolationMethod::linear, std::pair<double, double>{0.0, 360.0});
+            dirs10Axes.emplace_back(dirs10,
+                                    "10 Degree Increments",
+                                    Btwxt::InterpolationMethod::linear,
+                                    Btwxt::ExtrapolationMethod::linear,
+                                    std::pair<double, double>{0.0, 360.0});
 
             auto dirs10GridIndex = m_state.dataCurveManager->btwxtManager.addGrid("10 Degree Increments", dirs10Axes);
 
