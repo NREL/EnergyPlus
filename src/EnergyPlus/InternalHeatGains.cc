@@ -392,7 +392,7 @@ namespace InternalHeatGains {
                             if (thisPeopleInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state, format("{}Zone floor area is zero when allocating People loads to Spaces.", RoutineName));
                                     ShowContinueError(state,
@@ -415,8 +415,8 @@ namespace InternalHeatGains {
                         } else if (peopleMethod == "PEOPLE/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisPeople.NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisPeople.NumberOfPeople = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 People will result.",
@@ -448,8 +448,8 @@ namespace InternalHeatGains {
                         } else if (peopleMethod == "AREA/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) > 0.0) {
-                                    thisPeople.NumberOfPeople = state.dataHeatBal->space(spaceNum).floorArea / IHGNumbers(3);
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisPeople.NumberOfPeople = state.dataHeatBal->space(spaceNum).FloorArea / IHGNumbers(3);
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 People will result.",
@@ -505,7 +505,7 @@ namespace InternalHeatGains {
                     }
 
                     if (spaceNum > 0) {
-                        state.dataHeatBal->space(spaceNum).totOccupants += thisPeople.NumberOfPeople;
+                        state.dataHeatBal->space(spaceNum).TotOccupants += thisPeople.NumberOfPeople;
                         // Note that min/max occupants are non-coincident
                         state.dataHeatBal->space(spaceNum).minOccupants += thisPeople.NomMinNumberPeople;
                         state.dataHeatBal->space(spaceNum).maxOccupants += thisPeople.NomMaxNumberPeople;
@@ -878,7 +878,7 @@ namespace InternalHeatGains {
                             }
 
                             if (!IHGAlphaFieldBlanks(10) || !IHGAlphas(10).empty()) {
-                                thisPeople.clothingType = static_cast<ClothingType>(getEnumerationValue(clothingTypeNamesUC, IHGAlphas(10)));
+                                thisPeople.clothingType = static_cast<ClothingType>(getEnumValue(clothingTypeNamesUC, IHGAlphas(10)));
                                 if (thisPeople.clothingType == ClothingType::Invalid) {
                                     ShowSevereError(state,
                                                     format("{}{}=\"{}\", invalid {}, value  ={}",
@@ -1292,7 +1292,7 @@ namespace InternalHeatGains {
                             if (thisLightsInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state, format("{}Zone floor area is zero when allocating Lights loads to Spaces.", RoutineName));
                                     ShowContinueError(
@@ -1314,8 +1314,8 @@ namespace InternalHeatGains {
                         } else if (lightingLevel == "WATTS/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisLights.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisLights.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 Lights will result.",
@@ -1346,8 +1346,8 @@ namespace InternalHeatGains {
                         } else if (lightingLevel == "WATTS/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisLights.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisLights.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Lights will result.",
                                                                 RoutineName,
@@ -1577,7 +1577,7 @@ namespace InternalHeatGains {
                 // send values to predefined lighting summary report
                 liteName = state.dataHeatBal->Lights(lightsNum).Name;
                 Real64 mult = state.dataHeatBal->Zone(zoneNum).Multiplier * state.dataHeatBal->Zone(zoneNum).ListMultiplier;
-                Real64 spaceArea = state.dataHeatBal->space(spaceNum).floorArea;
+                Real64 spaceArea = state.dataHeatBal->space(spaceNum).FloorArea;
                 state.dataInternalHeatGains->sumArea += spaceArea * mult;
                 state.dataInternalHeatGains->sumPower += state.dataHeatBal->Lights(lightsNum).DesignLevel * mult;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, state.dataHeatBal->Zone(zoneNum).Name);
@@ -1730,7 +1730,7 @@ namespace InternalHeatGains {
                             if (thisElecEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
                                         state, format("{}Zone floor area is zero when allocating ElectricEquipment loads to Spaces.", RoutineName));
@@ -1753,8 +1753,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneElectric.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneElectric.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(
                                             state,
@@ -1787,8 +1787,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneElectric.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneElectric.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(
                                             state,
                                             format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Electric Equipment will result.",
@@ -1974,7 +1974,7 @@ namespace InternalHeatGains {
                             if (thisGasEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}Zone floor area is zero when allocating GasEquipment loads to Spaces.", RoutineName));
@@ -1997,8 +1997,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneGas.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneGas.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 Gas Equipment will result.",
@@ -2030,8 +2030,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneGas.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneGas.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Gas Equipment will result.",
                                                                 RoutineName,
@@ -2238,7 +2238,7 @@ namespace InternalHeatGains {
                             if (thisHWEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
                                         state, format("{}Zone floor area is zero when allocating HotWaterEquipment loads to Spaces.", RoutineName));
@@ -2261,8 +2261,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneHWEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneHWEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(
                                             state,
@@ -2295,8 +2295,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneHWEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneHWEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(
                                             state,
                                             format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Hot Water Equipment will result.",
@@ -2474,7 +2474,7 @@ namespace InternalHeatGains {
                             if (thisStmEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}Zone floor area is zero when allocating SteamEquipment loads to Spaces.", RoutineName));
@@ -2497,8 +2497,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             if (spaceNum > 0) {
                                 if (IHGNumbers(2) >= 0.0) {
-                                    thisZoneStmEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).floorArea;
-                                    if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                    thisZoneStmEq.DesignLevel = IHGNumbers(2) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                    if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                         !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                         ShowWarningError(
                                             state,
@@ -2531,8 +2531,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON") {
                             if (spaceNum != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
-                                    thisZoneStmEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).totOccupants;
-                                    if (state.dataHeatBal->space(spaceNum).totOccupants <= 0.0) {
+                                    thisZoneStmEq.DesignLevel = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).TotOccupants;
+                                    if (state.dataHeatBal->space(spaceNum).TotOccupants <= 0.0) {
                                         ShowWarningError(state,
                                                          format("{}{}=\"{}\", specifies {}, but Total Occupants = 0.  0 Steam Equipment will result.",
                                                                 RoutineName,
@@ -2661,7 +2661,7 @@ namespace InternalHeatGains {
 
                     std::string FuelTypeString("");
                     if (IHGAlphas(2) == "NONE") {
-                        thisZoneOthEq.OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::Invalid;
+                        thisZoneOthEq.OtherEquipFuelType = ExteriorEnergyUse::ExteriorFuelUsage::None;
                         FuelTypeString = IHGAlphas(2);
                     } else {
                         ExteriorEnergyUse::ValidateFuelType(state,
@@ -2684,29 +2684,29 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                         thisZoneOthEq.otherEquipFuelTypeString = FuelTypeString; // Save for output variable setup later
-                        // Build list of fuel types used in each zone and space (excluding None and Water)
-                        bool found = false;
-                        for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
-                            if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
-                                found = true;
-                                break;
-                            }
+                    }
+                    // Build list of fuel types used in each zone and space (excluding Water)
+                    bool found = false;
+                    for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
+                        if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
+                            found = true;
+                            break;
                         }
-                        if (!found) {
-                            state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums.emplace_back(thisZoneOthEq.OtherEquipFuelType);
-                            state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
+                    }
+                    if (!found) {
+                        state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums.emplace_back(thisZoneOthEq.OtherEquipFuelType);
+                        state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
+                    }
+                    found = false;
+                    for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
+                        if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
+                            found = true;
+                            break;
                         }
-                        found = false;
-                        for (ExteriorEnergyUse::ExteriorFuelUsage fuelType : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
-                            if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums.emplace_back(thisZoneOthEq.OtherEquipFuelType);
-                            state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
-                        }
+                    }
+                    if (!found) {
+                        state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums.emplace_back(thisZoneOthEq.OtherEquipFuelType);
+                        state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames.emplace_back(FuelTypeString);
                     }
 
                     thisZoneOthEq.SchedPtr = GetScheduleIndex(state, IHGAlphas(4));
@@ -2742,7 +2742,7 @@ namespace InternalHeatGains {
                             if (thisOthEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(state,
                                                     format("{}Zone floor area is zero when allocating OtherEquipment loads to Spaces.", RoutineName));
@@ -2766,8 +2766,8 @@ namespace InternalHeatGains {
                         } else if (equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA") {
                             DesignLevelFieldNumber = 2;
                             if (spaceNum > 0) {
-                                thisZoneOthEq.DesignLevel = IHGNumbers(DesignLevelFieldNumber) * state.dataHeatBal->space(spaceNum).floorArea;
-                                if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) && !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
+                                thisZoneOthEq.DesignLevel = IHGNumbers(DesignLevelFieldNumber) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) && !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                     ShowWarningError(state,
                                                      format("{}{}=\"{}\", specifies {}, but Space Floor Area = 0.  0 Other Equipment will result.",
                                                             RoutineName,
@@ -2823,7 +2823,8 @@ namespace InternalHeatGains {
                     }
 
                     // Throw an error if the design level is negative and we have a fuel type
-                    if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
+                    if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid &&
+                        thisZoneOthEq.OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::None) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} is not allowed to be negative",
                                                RoutineName,
@@ -2968,7 +2969,7 @@ namespace InternalHeatGains {
                             if (thisITEqInput.numOfSpaces > 1) {
                                 Real64 const zoneArea = state.dataHeatBal->Zone(zoneNum).FloorArea;
                                 if (zoneArea > 0.0) {
-                                    spaceFrac = state.dataHeatBal->space(spaceNum).floorArea / zoneArea;
+                                    spaceFrac = state.dataHeatBal->space(spaceNum).FloorArea / zoneArea;
                                 } else {
                                     ShowSevereError(
                                         state,
@@ -3003,8 +3004,8 @@ namespace InternalHeatGains {
                             if (thisZoneITEq.ZonePtr != 0) {
                                 if (IHGNumbers(3) >= 0.0) {
                                     if (spaceNum > 0) {
-                                        thisZoneITEq.DesignTotalPower = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).floorArea;
-                                        if ((state.dataHeatBal->space(spaceNum).floorArea <= 0.0) &&
+                                        thisZoneITEq.DesignTotalPower = IHGNumbers(3) * state.dataHeatBal->space(spaceNum).FloorArea;
+                                        if ((state.dataHeatBal->space(spaceNum).FloorArea <= 0.0) &&
                                             !state.dataHeatBal->space(spaceNum).isRemainderSpace) {
                                             ShowWarningError(
                                                 state,
@@ -3196,13 +3197,12 @@ namespace InternalHeatGains {
                         }
 
                         // Environmental class
-                        thisZoneITEq.Class =
-                            static_cast<ITEClass>(getEnumerationValue(ITEClassNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(10))));
+                        thisZoneITEq.Class = static_cast<ITEClass>(getEnumValue(ITEClassNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(10))));
                         ErrorsFound = ErrorsFound || (thisZoneITEq.Class == ITEClass::Invalid);
 
                         // Air and supply inlet connections
-                        thisZoneITEq.AirConnectionType = static_cast<ITEInletConnection>(
-                            getEnumerationValue(ITEInletConnectionNamesUC, UtilityRoutines::MakeUPPERCase(IHGAlphas(11))));
+                        thisZoneITEq.AirConnectionType =
+                            static_cast<ITEInletConnection>(getEnumValue(ITEInletConnectionNamesUC, UtilityRoutines::makeUPPER(IHGAlphas(11))));
                         if (thisZoneITEq.AirConnectionType == ITEInletConnection::RoomAirModel) {
                             // ZoneITEq(Loop).AirConnectionType = ITEInletConnection::RoomAirModel;
                             ShowWarningError(state,
@@ -4161,7 +4161,7 @@ namespace InternalHeatGains {
             int counter = 0;
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &objectFields = instance.value();
-                std::string const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
+                std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
                 ip->markObjectAsUsed(objectType, instance.key());
 
                 // For incoming idf, maintain object order
@@ -5572,7 +5572,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).Name,
                                 {},
-                                "DistrictHeating",
+                                "DistrictHeatingWater",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneHWEq(hwEqNum).EndUseSubcategory,
                                 "Building",
@@ -5861,7 +5861,7 @@ namespace InternalHeatGains {
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).Name,
                                 {},
-                                "DistrictHeating",
+                                "DistrictHeatingSteam",
                                 "InteriorEquipment",
                                 state.dataHeatBal->ZoneSteamEq(stmEqNum).EndUseSubcategory,
                                 "Building",
@@ -6135,7 +6135,8 @@ namespace InternalHeatGains {
             // Set flags for zone and space total report variables
             addZoneOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex) = true;
-            if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid) {
+            if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::Invalid &&
+                state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != ExteriorEnergyUse::ExteriorFuelUsage::None) {
                 std::string fuelTypeString = state.dataHeatBal->ZoneOtherEq(othEqNum).otherEquipFuelTypeString;
                 SetupOutputVariable(state,
                                     "Other Equipment " + fuelTypeString + " Rate",
@@ -6239,32 +6240,24 @@ namespace InternalHeatGains {
         // Zone total report variables
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             if (addZoneOutputs(zoneNum)) {
-                bool firstFuelType = true;
-                std::string firstFuel;
-                for (std::string fuelTypeString : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames) {
-                    if (firstFuelType) {
-                        firstFuel = fuelTypeString;
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment " + fuelTypeString + " Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->ZoneRpt(zoneNum).OtherPower,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->Zone(zoneNum).Name);
-                        SetupOutputVariable(state,
-                                            "Zone Other Equipment " + fuelTypeString + " Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->ZoneRpt(zoneNum).OtherConsump,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->Zone(zoneNum).Name);
-                        firstFuelType = false;
-                    } else {
-                        ShowWarningError(
-                            state,
-                            format("setupIHGOutputs: Output variables=Zone Other Equipment {} Rate and Energy are not available.", fuelTypeString));
-                        ShowContinueError(state, format("Only the first Other Equipment fuel type used in a zone is reported. ({})", firstFuel));
-                    }
+                for (size_t i = 0; i < state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums.size(); ++i) {
+                    ExteriorEnergyUse::ExteriorFuelUsage fuelType = state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums[i];
+                    if (fuelType == ExteriorEnergyUse::ExteriorFuelUsage::Invalid || fuelType == ExteriorEnergyUse::ExteriorFuelUsage::None) continue;
+
+                    SetupOutputVariable(state,
+                                        "Zone Other Equipment " + state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames[i] + " Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataHeatBal->ZoneRpt(zoneNum).OtherPower[(int)fuelType],
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataHeatBal->Zone(zoneNum).Name);
+                    SetupOutputVariable(state,
+                                        "Zone Other Equipment " + state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames[i] + " Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->ZoneRpt(zoneNum).OtherConsump[(int)fuelType],
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataHeatBal->Zone(zoneNum).Name);
                 }
 
                 SetupOutputVariable(state,
@@ -6345,32 +6338,24 @@ namespace InternalHeatGains {
         // Space total report variables
         for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
             if (addSpaceOutputs(spaceNum)) {
-                bool firstFuelType = true;
-                std::string firstFuel;
-                for (std::string fuelTypeString : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames) {
-                    if (firstFuelType) {
-                        firstFuel = fuelTypeString;
-                        SetupOutputVariable(state,
-                                            "Space Other Equipment " + fuelTypeString + " Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataHeatBal->spaceRpt(spaceNum).OtherPower,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Average,
-                                            state.dataHeatBal->space(spaceNum).Name);
-                        SetupOutputVariable(state,
-                                            "Space Other Equipment " + fuelTypeString + " Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataHeatBal->spaceRpt(spaceNum).OtherConsump,
-                                            OutputProcessor::SOVTimeStepType::Zone,
-                                            OutputProcessor::SOVStoreType::Summed,
-                                            state.dataHeatBal->space(spaceNum).Name);
-                        firstFuelType = false;
-                    } else {
-                        ShowWarningError(
-                            state,
-                            format("setupIHGOutputs: Output variables=Space Other Equipment {} Rate and Energy are not available.", fuelTypeString));
-                        ShowContinueError(state, format("Only the first Other Equipment fuel type used in a zone is reported. ({})", firstFuel));
-                    }
+                for (size_t i = 0; i < state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums.size(); ++i) {
+                    ExteriorEnergyUse::ExteriorFuelUsage fuelType = state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums[i];
+                    if (fuelType == ExteriorEnergyUse::ExteriorFuelUsage::Invalid || fuelType == ExteriorEnergyUse::ExteriorFuelUsage::None) continue;
+
+                    SetupOutputVariable(state,
+                                        "Space Other Equipment " + state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames[i] + " Rate",
+                                        OutputProcessor::Unit::W,
+                                        state.dataHeatBal->spaceRpt(spaceNum).OtherPower[(int)fuelType],
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Average,
+                                        state.dataHeatBal->space(spaceNum).Name);
+                    SetupOutputVariable(state,
+                                        "Space Other Equipment " + state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames[i] + " Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataHeatBal->spaceRpt(spaceNum).OtherConsump[(int)fuelType],
+                                        OutputProcessor::SOVTimeStepType::Zone,
+                                        OutputProcessor::SOVStoreType::Summed,
+                                        state.dataHeatBal->space(spaceNum).Name);
                 }
 
                 SetupOutputVariable(state,
@@ -7295,6 +7280,10 @@ namespace InternalHeatGains {
             e.SteamPower = 0.0;
             e.BaseHeatPower = 0.0;
             e.CO2Rate = 0.0;
+            e.OtherTotGainRate = 0.0;
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+                e.OtherPower[i] = 0.0;
+            }
         }
 
         for (auto &e : state.dataHeatBal->spaceRpt) {
@@ -7305,6 +7294,10 @@ namespace InternalHeatGains {
             e.SteamPower = 0.0;
             e.BaseHeatPower = 0.0;
             e.CO2Rate = 0.0;
+            e.OtherTotGainRate = 0.0;
+            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+                e.OtherPower[i] = 0.0;
+            }
         }
 
         for (auto &e : state.dataHeatBal->ZonePreDefRep) {
@@ -7341,9 +7334,9 @@ namespace InternalHeatGains {
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
                 if (state.dataHeatBal->People(Loop).UserSpecSensFrac == Constant::AutoCalculate) {
                     Real64 airTemp = thisZoneHB.MAT;
-                    if (state.dataRoomAirMod->anyNonMixingRoomAirModel) {
-                        if (state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ)) {
-                            airTemp = state.dataRoomAirMod->TCMF(NZ);
+                    if (state.dataRoomAir->anyNonMixingRoomAirModel) {
+                        if (state.dataRoomAir->IsZoneDispVent3Node(NZ) || state.dataRoomAir->IsZoneUFAD(NZ)) {
+                            airTemp = state.dataRoomAir->TCMF(NZ);
                         }
                     }
                     SensiblePeopleGain =
@@ -7544,14 +7537,17 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate = Q - state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
 
             int NZ = state.dataHeatBal->ZoneOtherEq(Loop).ZonePtr;
-            state.dataHeatBal->ZoneRpt(NZ).OtherPower += state.dataHeatBal->ZoneOtherEq(Loop).Power;
+            int fuelType = (int)state.dataHeatBal->ZoneOtherEq(Loop).OtherEquipFuelType;
+            state.dataHeatBal->ZoneRpt(NZ).OtherPower[fuelType] += state.dataHeatBal->ZoneOtherEq(Loop).Power;
+            state.dataHeatBal->ZoneRpt(NZ).OtherTotGainRate += state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
             state.dataHeatBal->ZoneIntGain(NZ).QOELost += state.dataHeatBal->ZoneOtherEq(Loop).LostRate;
 
             int spaceNum = state.dataHeatBal->ZoneOtherEq(Loop).spaceIndex;
-            state.dataHeatBal->spaceRpt(spaceNum).OtherPower += state.dataHeatBal->ZoneOtherEq(Loop).Power;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherPower[fuelType] += state.dataHeatBal->ZoneOtherEq(Loop).Power;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate += state.dataHeatBal->ZoneOtherEq(Loop).TotGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QOERAD += state.dataHeatBal->ZoneOtherEq(Loop).RadGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QOECON += state.dataHeatBal->ZoneOtherEq(Loop).ConGainRate;
             state.dataHeatBal->spaceIntGain(spaceNum).QOELAT += state.dataHeatBal->ZoneOtherEq(Loop).LatGainRate;
@@ -7794,9 +7790,9 @@ namespace InternalHeatGains {
         ITEInletConnection AirConnection; // Air connection type
         Real64 TSupply(0.0);              // Supply air temperature [C]
         Real64 WSupply;                   // Supply air humidity ratio [kgWater/kgDryAir]
-        Real64 RecircFrac;                // Recirulation fraction - current
-        Real64 TRecirc;                   // Recirulation air temperature [C]
-        Real64 WRecirc;                   // Recirulation air humidity ratio [kgWater/kgDryAir]
+        Real64 RecircFrac;                // Recirculation fraction - current
+        Real64 TRecirc;                   // Recirculation air temperature [C]
+        Real64 WRecirc;                   // Recirculation air humidity ratio [kgWater/kgDryAir]
         Real64 TAirIn;                    // Entering air dry-bulb temperature [C]
         Real64 TAirInDesign;              // Design entering air dry-bulb temperature [C]
         Real64 WAirIn;                    // Entering air humidity ratio [kgWater/kgDryAir]
@@ -8418,15 +8414,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->spaceRpt(spaceNum).OtherRadGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOERAD;
             state.dataHeatBal->spaceRpt(spaceNum).OtherLatGainRate = state.dataHeatBal->spaceIntGain(spaceNum).QOELAT;
             state.dataHeatBal->spaceRpt(spaceNum).OtherLostRate = state.dataHeatBal->spaceIntGain(spaceNum).QOELost;
-            state.dataHeatBal->spaceRpt(spaceNum).OtherConsump =
-                state.dataHeatBal->spaceRpt(spaceNum).OtherConGain + state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain +
-                state.dataHeatBal->spaceRpt(spaceNum).OtherLatGain + state.dataHeatBal->spaceRpt(spaceNum).OtherLost;
-            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGain = state.dataHeatBal->spaceRpt(spaceNum).OtherConGain +
-                                                                 state.dataHeatBal->spaceRpt(spaceNum).OtherRadGain +
-                                                                 state.dataHeatBal->spaceRpt(spaceNum).OtherLatGain;
-            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate = state.dataHeatBal->spaceRpt(spaceNum).OtherConGainRate +
-                                                                     state.dataHeatBal->spaceRpt(spaceNum).OtherRadGainRate +
-                                                                     state.dataHeatBal->spaceRpt(spaceNum).OtherLatGainRate;
+            state.dataHeatBal->spaceRpt(spaceNum).OtherTotGain =
+                state.dataHeatBal->spaceRpt(spaceNum).OtherTotGainRate * state.dataGlobal->TimeStepZoneSec;
+            for (ExteriorEnergyUse::ExteriorFuelUsage fuelTypeNum : state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums) {
+                int fuelIdx = (int)fuelTypeNum;
+                state.dataHeatBal->spaceRpt(spaceNum).OtherConsump[fuelIdx] =
+                    state.dataHeatBal->spaceRpt(spaceNum).OtherPower[fuelIdx] * state.dataGlobal->TimeStepZoneSec;
+            }
 
             // Baseboard Heat
             state.dataHeatBal->spaceRpt(spaceNum).BaseHeatConGain =
@@ -8596,15 +8590,13 @@ namespace InternalHeatGains {
             state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGainRate = state.dataHeatBal->ZoneIntGain(ZoneLoop).QOERAD;
             state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLatGainRate = state.dataHeatBal->ZoneIntGain(ZoneLoop).QOELAT;
             state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLostRate = state.dataHeatBal->ZoneIntGain(ZoneLoop).QOELost;
-            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConsump =
-                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConGain + state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGain +
-                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLatGain + state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLost;
-            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGain = state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConGain +
-                                                                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGain +
-                                                                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLatGain;
-            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGainRate = state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConGainRate +
-                                                                    state.dataHeatBal->ZoneRpt(ZoneLoop).OtherRadGainRate +
-                                                                    state.dataHeatBal->ZoneRpt(ZoneLoop).OtherLatGainRate;
+            state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGain =
+                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherTotGainRate * state.dataGlobal->TimeStepZoneSec;
+            for (ExteriorEnergyUse::ExteriorFuelUsage fuelTypeNum : state.dataHeatBal->Zone(ZoneLoop).otherEquipFuelTypeNums) {
+                int fuelIdx = (int)fuelTypeNum;
+                state.dataHeatBal->ZoneRpt(ZoneLoop).OtherConsump[fuelIdx] =
+                    state.dataHeatBal->ZoneRpt(ZoneLoop).OtherPower[fuelIdx] * state.dataGlobal->TimeStepZoneSec;
+            }
 
             // Baseboard Heat
             state.dataHeatBal->ZoneRpt(ZoneLoop).BaseHeatConGain =

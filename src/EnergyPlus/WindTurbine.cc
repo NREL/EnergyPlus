@@ -281,8 +281,8 @@ namespace WindTurbine {
                 }
             }
             // Select rotor type
-            windTurbine.rotorType = static_cast<RotorType>(
-                getEnumerationValue(WindTurbine::RotorNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(3))));
+            windTurbine.rotorType =
+                static_cast<RotorType>(getEnumValue(WindTurbine::RotorNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
             if (windTurbine.rotorType == RotorType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
                     windTurbine.rotorType = RotorType::HorizontalAxis;
@@ -298,8 +298,8 @@ namespace WindTurbine {
             }
 
             // Select control type
-            windTurbine.controlType = static_cast<ControlType>(
-                getEnumerationValue(WindTurbine::ControlNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(4))));
+            windTurbine.controlType =
+                static_cast<ControlType>(getEnumValue(WindTurbine::ControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
             if (windTurbine.controlType == ControlType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(4).empty()) {
                     windTurbine.controlType = ControlType::VariableSpeedVariablePitch;

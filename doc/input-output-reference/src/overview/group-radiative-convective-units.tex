@@ -152,7 +152,7 @@ This field specifies what fraction of the power input to the baseboard heater is
 
 \paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people}
 
-This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be rereleased to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
+This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be re-released to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
 
 An example IDF for the water baseboard design object is shown below.
 
@@ -356,7 +356,7 @@ This field specifies what fraction of the power input to the baseboard heater is
 
 \paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people-1}
 
-This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be rereleased to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
+This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be re-released to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
 
 An example IDF for the steam baseboard design object is shown below.
 
@@ -479,7 +479,7 @@ This field specifies what fraction of the power input to the baseboard heater is
 
 \paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people-2}
 
-This field specifies the fraction of the radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as a convective energy (like an internal gain). The basic assumption here is that radiant energy falling on people will most likely be rereleased to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
+This field specifies the fraction of the radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as a convective energy (like an internal gain). The basic assumption here is that radiant energy falling on people will most likely be re-released to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
 
 \paragraph{Field Set: Surface Name, Fraction of Radiant Energy to Surface}\label{field-set-surface-name-fraction-of-radiant-energy-to-surface-2}
 
@@ -1289,7 +1289,7 @@ Enter the heating capacity as a fraction of the autosized heating capacity for l
 
 \paragraph{Field: Heating Control Throttling Range}\label{field-heating-control-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum hot water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Heating Control Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero flow or half flow when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Heating Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
+This field specifies the range of temperature in degrees Celsius over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum hot water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Heating Control Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero flow or half flow when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Heating Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
 
 For clarity, here is an example of how the flow rate to the system will be set.  In this example, it is assumed that heating control temperature setpoint is currently 15$^\circ$C, the heating throttling range is 2$^\circ$C, and that the setpoint type is HalfFlowPower.  The water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, etc.; see control type field above) is at or above 16$^\circ$C and the maximum flow rate when the controlling temperature is at or below 14$^\circ$C. This represents a throttling range of 2$^\circ$C around the setpoint of 15$^\circ$C. In between 14$^\circ$C and 16$^\circ$C, the flow rate to the radiant system is varied linearly from full flow at a control temperature of 14$^\circ$C to half flow at 15$^\circ$C to zero flow at 16$^\circ$C.  If the throttling range is changed to 0$^\circ$C or on-off control, then the system will be off above 15$^\circ$C and on below 15$^\circ$C.  However, if the throttling range is kept at 2$^\circ$C and the setpoint type is changed to ZeroFlowPower, then the system will vary the flow linearly between zero for when the control temperature is at 15$^\circ$C to full flow at 13$^\circ$C.
 
@@ -1311,7 +1311,7 @@ Enter the cooling capacity as a fraction of the autosized cooling capacity for l
 
 \paragraph{Field: Cooling Control Throttling Range}\label{field-cooling-control-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum cold water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Cooling Control Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero flow or half flow when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Cooling Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
+This field specifies the range of temperature in degrees Celsius over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum cold water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Cooling Control Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero flow or half flow when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Cooling Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
 
 For clarity, here is an example of how the flow rate to the system will be set.  In this example, it is assumed that cooling control temperature setpoint is currently 25$^\circ$C, the cooling throttling range is 2$^\circ$C, and that the setpoint type is HalfFlowPower.  The water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, etc.; see control type field above) is at or below 24$^\circ$C and the maximum flow rate when the controlling temperature is at or above 26$^\circ$C. This represents a throttling range of 2$^\circ$C around the setpoint of 25$^\circ$C. In between 24$^\circ$C and 26$^\circ$C, the flow rate to the radiant system is varied linearly from zero flow at a control temperature of 24$^\circ$C to half flow at 15$^\circ$C to full flow at w6$^\circ$C.  If the throttling range is changed to 0$^\circ$C or on-off control, then the system will be on above 25$^\circ$C and off below 25$^\circ$C.  However, if the throttling range is kept at 2$^\circ$C and the setpoint type is changed to ZeroFlowPower, then the system will vary the flow linearly between zero for when the control temperature is at 25$^\circ$C to full flow at 27$^\circ$C.
 
@@ -1846,7 +1846,7 @@ This field has two options (ZeroFlowPower and HalfFlowPower) and is used to dete
 
 \paragraph{Field: Heating Throttling Range}\label{field-heating-throttling-range}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Heating Setpoint Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero heat input or half heat input when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Heating Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
+This field specifies the range of temperature in degrees Celsius over which the radiant system throttles from zero flow heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature and the setpoint type to define the response of the system to various conditions. The Heating Setpoint Temperature Schedule specifies the ``setpoint'' temperature that is to be met.  This is used in conjunction with the Setpoint Type which defines whether the flow rate of the system is at zero heat input or half heat input when the parameter defined by the Temperature Control Type is equal to the setpoint temperature defined by the Heating Control Temperature Schedule.  See these other input parameters of this radiant system for more information on these different parameters.  Note that when the throttling range is set to zero that this approximates an on-off system that is either fully on or totally off.
 
 For clarity, here is an example of how the heat input fraction (of the unit capacity) to the system will be set.  In this example, it is assumed that heating control temperature setpoint is currently 15$^\circ$C, the heating throttling range is 2$^\circ$C, and that the setpoint type is HalfFlowPower.  The heat input rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, etc.; see control type field above) is at or above 16$^\circ$C and the maximum heat input when the controlling temperature is at or below 14$^\circ$C. This represents a throttling range of 2$^\circ$C around the setpoint of 15$^\circ$C. In between 14$^\circ$C and 16$^\circ$C, the heat input rate to the radiant system is varied linearly from full heat input at a control temperature of 14$^\circ$C to half heat input at 15$^\circ$C to zero heat input at 16$^\circ$C.  If the throttling range is changed to 0$^\circ$C or on-off control, then the system will be off above 15$^\circ$C and on below 15$^\circ$C.  However, if the throttling range is kept at 2$^\circ$C and the setpoint type is changed to ZeroFlowPower, then the system will vary the heat input linearly between zero for when the control temperature is at 15$^\circ$C to full heat input at 13$^\circ$C.
 
@@ -2013,7 +2013,7 @@ If the user does not select a control type, OperativeTemperature control is assu
 
 \paragraph{Field: Heating Throttling Range}\label{field-heating-throttling-range-1}
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature (see below) to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the power input to the system is at half of the maximum power input. For example, if the heating control temperature setpoint is currently 15$^\circ$C and the heating throttling range is 2$^\circ$C, the electrical power supplied to the radiant system will be zero when the controlling temperature (Mean Air Temperature, Mean Radiant Temperature, and Operative Temperature; see control type field above) is at or above 16$^\circ$C and the maximum power input when the controlling temperature is at or below 14$^\circ$C. This represents a throttling range of 2$^\circ$C around the setpoint of 15$^\circ$C. In between 14$^\circ$C and 16$^\circ$C, the power input to the radiant system is varied linearly.
+This field specifies the range of temperature in degrees Celsius over which the radiant system throttles from zero heat input via the electric resistance wires up to the maximum defined by the maximum electrical power field described above. The throttling range parameter is used in conjunction with the control temperature (see below) to define the response of the system to various zone conditions. The heating control temperature schedule specifies the ``setpoint'' temperature where the power input to the system is at half of the maximum power input. For example, if the heating control temperature setpoint is currently 15$^\circ$C and the heating throttling range is 2$^\circ$C, the electrical power supplied to the radiant system will be zero when the controlling temperature (Mean Air Temperature, Mean Radiant Temperature, and Operative Temperature; see control type field above) is at or above 16$^\circ$C and the maximum power input when the controlling temperature is at or below 14$^\circ$C. This represents a throttling range of 2$^\circ$C around the setpoint of 15$^\circ$C. In between 14$^\circ$C and 16$^\circ$C, the power input to the radiant system is varied linearly.
 
 \paragraph{Field: Heating Setpoint Temperature Schedule Name}\label{field-heating-setpoint-temperature-schedule-name-1}
 
@@ -2069,9 +2069,9 @@ ZoneHVAC:HighTemperatureRadiant, Zone 2 Radiant Heater,
 \item
   HVAC,Sum, Zone Radiant HVAC Heating Energy {[}J{]}
 \item
-  HVAC,Average, Zone Radiant HVAC Gas Rate {[}W{]}
+  HVAC,Average, Zone Radiant HVAC NaturalGas Rate {[}W{]}
 \item
-  HVAC,Sum, Zone Radiant HVAC Gas Energy {[}J{]}
+  HVAC,Sum, Zone Radiant HVAC NaturalGas Energy {[}J{]}
 \item
   HVAC,Average, Zone Radiant HVAC Electricity Rate {[}W{]}
 \item
@@ -2086,11 +2086,11 @@ This field reports the rate at which energy is transferred from the high tempera
 
 This field reports the amount of energy transferred from the high temperature gas radiant system to the zone in Joules. This amount is determined by the zone conditions, the control scheme defined in the user input, and the timestep. Note that this amount takes into account any combustion inefficiency and thus could be different that the gas consumption in a high temperature gas radiant system.
 
-\paragraph{Zone Radiant HVAC Gas Rate {[}W{]}}\label{zone-radiant-hvac-gas-rate-w}
+\paragraph{Zone Radiant HVAC NaturalGas Rate {[}W{]}}\label{zone-radiant-hvac-gas-rate-w}
 
 This field reports the rate at which gas is ``burned'' in a high temperature gas radiant system in Watts. This rate is determined by the zone conditions and the control scheme defined in the user input.
 
-\paragraph{Zone Radiant HVAC Gas Energy {[}J{]}}\label{zone-radiant-hvac-gas-energy-j}
+\paragraph{Zone Radiant HVAC NaturalGas Energy {[}J{]}}\label{zone-radiant-hvac-gas-energy-j}
 
 This field reports the amount of gas ``burned'' in a high temperature gas radiant system in Joules. This amount is determined by the zone conditions, the control scheme defined in the user input, and the timestep.
 
@@ -2154,7 +2154,7 @@ This field contains a schedule name (ref: Schedule) that should contain values f
 
 \paragraph{Field: Maximum Outdoor Air Flow Rate}\label{field-maximum-outdoor-air-flow-rate-001}
 
-This field allows the user to enter the maximum volumetric flow rate of outdoor air that can be brought into the ventilated slab in m\(^{3}\)/sec.~ This parameter should be some real number greater than zero.~ Note that the value for this parameter may be less than the maximum air flow rate of the ventilated slab and this may affect the maximum fraction of outdoor air within the control strategy defined above. This parameter is an absolute maximum and will supercede any scheduled fraction of the ventilated slab maximum airflow rate. If ``FixedAmount'' type is selected as the outdoor air control strategy, this field will be ignored and be automatically set to be equal to the minimum outdoor air flow rate specified in the field above.
+This field allows the user to enter the maximum volumetric flow rate of outdoor air that can be brought into the ventilated slab in m\(^{3}\)/sec.~ This parameter should be some real number greater than zero.~ Note that the value for this parameter may be less than the maximum air flow rate of the ventilated slab and this may affect the maximum fraction of outdoor air within the control strategy defined above. This parameter is an absolute maximum and will supersede any scheduled fraction of the ventilated slab maximum airflow rate. If ``FixedAmount'' type is selected as the outdoor air control strategy, this field will be ignored and be automatically set to be equal to the minimum outdoor air flow rate specified in the field above.
 
 \paragraph{Field: Maximum Outdoor Air Fraction or Temperature Schedule Name}\label{field-maximum-outdoor-air-fraction-or-temperature-schedule-name}
 
@@ -2321,7 +2321,7 @@ This optional input field is the name of an \hyperref[availabilitymanagerassignm
 
 \paragraph{Field: Design Specification ZoneHVAC Sizing Object Name}\label{field-design-specification-zonehvac-sizing-object-name}
 
-This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Sepcification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
+This optional input field is the name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. The name must correspond to unique name of a \hyperref[designspecificationzonehvacsizing]{DesignSpecification:ZoneHVAC:Sizing} object. A Design Specification Zone HVAC Sizing object defines scalable sizing methods for sizing input fields such as Maximum Air Flow Rate in this Ventilated Slab zone HVAC object. The scaled Maximum Air Flow Rate in turn is used to size cooling and heating capacity of the coils.
 
 An example IDF with a ventilated slab is shown below.
 
@@ -2453,7 +2453,7 @@ This field reports the sensible cooling output rate of the cooling coil of the v
 
 \paragraph{Zone Ventilated Slab Coil Sensible Cooling Energy {[}J{]}}\label{zone-ventilated-slab-coil-sensible-cooling-energy-j}
 
-This field is the sensible cooling output of the cooling coli of the ventilated slab system to the zone it is serving in Joules over the timestep being reported.~ This is determined by outlet and zone air conditions, the mass flow rate through the ventilation slab system, and the timestep.
+This field is the sensible cooling output of the cooling coil of the ventilated slab system to the zone it is serving in Joules over the timestep being reported.~ This is determined by outlet and zone air conditions, the mass flow rate through the ventilation slab system, and the timestep.
 
 \paragraph{Zone Ventilated Slab Coil Latent Cooling Rate {[}W{]}}\label{zone-ventilated-slab-coil-latent-cooling-rate-w}
 
@@ -2461,7 +2461,7 @@ This field reports the latent cooling output rate of the cooling coil of the ven
 
 \paragraph{Zone Ventilated Slab Coil Latent Cooling Energy {[}J{]}}\label{zone-ventilated-slab-coil-latent-cooling-energy-j}
 
-This field is the latent cooling output of the cooling coli of the ventilated slab system to the zone it is serving in Joules over the timestep being reported.~ This is determined by outlet and zone air conditions, the mass flow rate through the ventilation slab system, and the timestep.
+This field is the latent cooling output of the cooling coil of the ventilated slab system to the zone it is serving in Joules over the timestep being reported.~ This is determined by outlet and zone air conditions, the mass flow rate through the ventilation slab system, and the timestep.
 
 \paragraph{Zone Ventilated Slab Air Mass Flow Rate {[}kg/s{]}}\label{zone-ventilated-slab-air-mass-flow-rate-kgs}
 

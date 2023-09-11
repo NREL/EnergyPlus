@@ -7746,7 +7746,7 @@ namespace FluidProperties {
         }
 
         // Check to see if this glycol shows up in the glycol data
-        int Found = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(Refrigerant), state.dataFluidProps->RefrigData);
+        int Found = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER(Refrigerant), state.dataFluidProps->RefrigData);
 
         if (Found > 0) {
             FindRefrigerant = Found;
@@ -7788,7 +7788,7 @@ namespace FluidProperties {
         }
 
         // Check to see if this glycol shows up in the glycol data
-        int Found = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase(Glycol),
+        int Found = UtilityRoutines::FindItemInList(UtilityRoutines::makeUPPER(Glycol),
                                                     state.dataFluidProps->GlycolData,
                                                     state.dataFluidProps->NumOfGlycols); // GlycolData is allocated to NumOfGlyConcs
 
@@ -8232,7 +8232,7 @@ namespace FluidProperties {
 
     GlycolAPI::GlycolAPI(EnergyPlusData &state, std::string const &glycolName)
     {
-        this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
+        this->glycolName = EnergyPlus::UtilityRoutines::makeUPPER(glycolName);
         this->glycolIndex = 0;
         this->cf = "GlycolAPI:Instance";
         if (this->glycolName != "WATER") {
@@ -8258,7 +8258,7 @@ namespace FluidProperties {
 
     RefrigerantAPI::RefrigerantAPI(EnergyPlusData &state, std::string const &refrigName)
     {
-        this->rName = EnergyPlus::UtilityRoutines::MakeUPPERCase(refrigName);
+        this->rName = EnergyPlus::UtilityRoutines::makeUPPER(refrigName);
         this->rIndex = 0;
         this->cf = "RefrigerantAPI:Instance";
         if (this->rName != "STEAM") {

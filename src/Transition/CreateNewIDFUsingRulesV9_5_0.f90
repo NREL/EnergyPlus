@@ -507,6 +507,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1) = TRIM(InArgs(1)) // ' Heat Source'
                 OutArgs(2) = InArgs(1)
                 OutArgs(3:7) =  InArgs(2:6)
+                IF (OutArgs(7) == Blank) THEN
+                    OutArgs(7) = '0.0'
+                END IF
                 CALL WriteOutIDFLines(DifLfn,'ConstructionProperty:InternalHeatSource',NwNumArgs,OutArgs,NwFldNames,NwFldUnits)
                 
                 CALL GetNewObjectDefInIDD('Construction',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)

@@ -57,7 +57,7 @@ An example of this object in an IDF, along with appropriate setpoint managers, i
 \begin{lstlisting}
 
 Controller:WaterCoil,
-  Central Cooling Coil Contoller 1,     !- Name
+  Central Cooling Coil Controller 1,    !- Name
   TemperatureAndHumidityRatio,          !- Control Variable
   Reverse,                              !- Action
   Flow,                                 !- Actuator Variable
@@ -226,7 +226,7 @@ No input (blank) in this field means that there is no outdoor air temperature lo
 
 \paragraph{Field: Lockout Type}\label{field-lockout-type}
 
-Choices for this field are NoLockout, LockoutWithHeating, and LockoutWithCompressor. This field is used for packaged systems with DX coils. LockoutWithHeating means that if the packaged unit is in heating mode, the economizer is locked out i.e., the economizer dampers are closed and there is minimum outdoor air flow. LockoutWithCompressor means that in addition to locking out the economizer when the unit is in heating mode the economizer is locked out when the DX unit compressor is operating to provide cooling. In other words, the economizer must meet the entire cooling load; it is not allowed to operate in conjunction with the DX cooling coil. This option (LockoutWithCompressor) is sometimes called a nonintegrated economizer.
+Choices for this field are NoLockout, LockoutWithHeating, and LockoutWithCompressor. This field is used for packaged systems with DX coils. LockoutWithHeating means that if the packaged unit is in heating mode, the economizer is locked out i.e., the economizer dampers are closed and there is minimum outdoor air flow. LockoutWithCompressor means that in addition to locking out the economizer when the unit is in heating mode the economizer is locked out when the DX unit compressor is operating to provide cooling. In other words, the economizer must meet the entire cooling load; it is not allowed to operate in conjunction with the DX cooling coil. This option (LockoutWithCompressor) is sometimes called a non-integrated economizer.
 
 When LockoutWithHeating or LockoutWithCompressor is selected, the lockout may also be applied to non-packaged systems for heating. If any air loop heating coil is operating, the lockout control compares the mixed air temperature at minimum outdoor air flow without heat recovery (if any) to the mixed air temperature set point. If the mixed air temperature at minimum outdoor air flow is less than the mixed air temperature set point, then the economizer is locked out and the outdoor air flow rate is set to the minimum. When the economizer is locked out, the heat recovery bypass control will be set to activate heat recovery (no bypass), if present. This action is meant to minimize heating energy (this action may also disable the heating coil on subsequent iterations, see output variable Air System Outdoor Air Heat Recovery Bypass Heating Coil Activity Status).
 
@@ -275,7 +275,7 @@ This alpha field is the name of a schedule which controls the outdoor air flow r
 
 \paragraph{Field: High Humidity Control}\label{field-high-humidity-control}
 
-This choice field establishes whether or not the outdoor air flow rate is modified in response to high indoor relative humidity. Valid choices are Yes and No. If Yes is selected, the outdoor air flow rate may be modified when the indoor relative humidity is above the humidstat setpoint. If No is selected, this option is disabled and the following three fields are not used.
+This choice field establishes whether or not the outdoor air flow rate is modified in response to high indoor relative humidity. Valid choices are Yes and No. If Yes is selected, the outdoor air flow rate may be modified when the indoor relative humidity is above the humidistat setpoint. If No is selected, this option is disabled and the following three fields are not used.
 
 \paragraph{Field: Humidistat Control Zone Name}\label{field-humidistat-control-zone-name}
 
@@ -287,13 +287,17 @@ This input is the ratio of the modified outdoor air flow rate to the maximum out
 
 \paragraph{Field: Control High Indoor Humidity Based on Outdoor Humidity Ratio}\label{field-control-high-indoor-humidity-based-on-outdoor-humidity-ratio}
 
-This choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidstat setpoint \emph{and} the indoor humidity ratio is greater than the outdoor humidity ratio. Valid choices are \textbf{Yes} and \textbf{No}. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If Yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat's zone air humidity ratio. This field is used only when the input field High Humidity Control is specified as Yes. The default value is \textbf{Yes}.
+This choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidistat setpoint \emph{and} the indoor humidity ratio is greater than the outdoor humidity ratio. Valid choices are \textbf{Yes} and \textbf{No}. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If Yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat's zone air humidity ratio. This field is used only when the input field High Humidity Control is specified as Yes. The default value is \textbf{Yes}.
 
 \paragraph{Field: Heat Recovery Bypass Control Type}\label{field-heat-recovery-bypass-control-type}
 
 This choice field determines if specialized control is used to optimize the use of heat recovery. Valid choices are \textbf{BypassWhenWithinEconomizerLimits} and \textbf{BypassWhenOAFlowGreaterThanMinimum}. If BypassWhenWithinEconomizerLimits is selected, heat recovery is disabled any time the controller determines that the economizer is active (i.e., all controls are within limits). If BypassWhenOAFlowGreaterThanMinimum is selected, the model first verifies that the economizer is active and then checks to see if the outdoor air flow rate is greater than the minimum. If it is greater than minimum, then heat recovery (if any) is set to bypass. When this option is used with Time of Day Economizer Control or High Humidity Control, this option has priority. The default value is \textbf{BypassWhenWithinEconomizerLimits}.
 
 An Example IDF specification:
+
+\paragraph{Field: Economizer Staging Operation}\label{field-economizer-staging-operation}
+
+This input is only applicable when the controller is used on an air loop that includes an \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} with multiple cooling speeds. When modeling an \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} with multiple cooling speeds, (as specified in a [unitarysystemperformancemultispeed]{UnitarySystemPerformance:Multispeed}), \textbf{EconomizerFirst} runs the economizer at all speeds, all the way to the highest cooling speed before mechanical cooling is used to meet the load. \textbf{InterlockedWithMechanicalCooling} runs the economizer at the cooling speed chosen by the \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem}. Use \textbf{EconomizerFirst} to model typical economizer operation for multi-speed packaged single-zone equipment with sensible load control (\textbf{Control Type} input of the \hyperref[airloophvacunitarysystem]{AirLoopHVAC:UnitarySystem} should be set to \textbf{Load}) and \textbf{InterlockedWithMechanicalCooling} otherwise (default input). \textbf{EconomizerFirst} works with both continuously operating and cycling fans but the approach it uses to determine at which speed the system should run to meet the load is the same. At each timestep, the system flow rate is chosen based on the lowest speed available speed that can meet the load assuming economizer-only operation, the outdoor air fraction to meet the load the load is then calculated (limits imposed by other inputs of the controller are applied).
 
 \begin{lstlisting}
 
@@ -386,7 +390,7 @@ Reports the operating status of any heating coil in the air loop. If the heating
 
 \paragraph{Air System Outdoor Air Heat Recovery Bypass Minimum Outdoor Air Mixed Air Temperature {[}C{]}}\label{air-system-outdoor-air-heat-recovery-bypass-minimum-outdoor-air-mixed-air-temperature-c}
 
-Reports the outdoor air mixer's mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer's inlet node temperature multipled by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer's mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
+Reports the outdoor air mixer's mixed air node temperature at minimum outdoor air flow rate when the heat exchanger is disabled (off). This temperature is calculated as the return air temperature multiplied by the return air mass flow rate plus the mixer's inlet node temperature multiplied by the minimum outdoor air flow rate. This quantity is then divided by the mixed air mass flow rate. If this temperature is less than the outdoor air mixer's mixed air node set point temperature, and the Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum, the outdoor air flow rate is set to the minimum. This output variable is only available when using Heat Recovery Bypass Control Type = BypassWhenOAFlowGreaterThanMinimum.
 
 \paragraph{Air System Outdoor Air High Humidity Control Status {[]}}\label{air-system-outdoor-air-high-humidity-control-status}
 
@@ -435,7 +439,7 @@ Reports the HVAC system relieve heat (total, sensible and latent) from the outdo
 
 \paragraph{Air System Outdoor Air Maximum Flow Fraction {[]}}\label{air-system-outdoor-air-maximum-flow-fraction}
 
-Reports the average maximum limit of the outdoor air fraction for the outdoor air controller over the reporting interval. The maximum flow fraction is used to prevent DX cooling coils from freezing, specified by ASHRAE Stadard 90.1. This output variable is available when a corresponding SetpointManager:MixedAir object specifies optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node.
+Reports the average maximum limit of the outdoor air fraction for the outdoor air controller over the reporting interval. The maximum flow fraction is used to prevent DX cooling coils from freezing, specified by ASHRAE Standard 90.1. This output variable is available when a corresponding SetpointManager:MixedAir object specifies optional inputs of Cooling Coil Inlet Node Name, Cooling coil Outlet Node Name, and Minimum Temperature at Cooling Coil Outlet Node.
 
 \paragraph{Air System Outdoor Air Mechanical Ventilation Requested Mass Flow Rate {[}kg/s{]}}\label{air-system-mechvent-air-mass-flow-rate-kgs}
 
@@ -592,7 +596,7 @@ This alpha field is the name of a schedule which controls the change in air flow
 
 \paragraph{Field: High Humidity Control Flag}\label{field-high-humidity-control-flag}
 
-This optional choice field establishes whether or not the supply and exhaust air flow rates are modified in response to high indoor relative humidity. Valid choices are Yes and No. If Yes is selected, the supply and exhaust air flow rates may be modified when the indoor relative humidity is above the humidstat set point. If No is selected, this option is disabled and the following three fields are not used. Note that heat exchange between the air streams is suspended during times when high humidity control is active. The default value is No.
+This optional choice field establishes whether or not the supply and exhaust air flow rates are modified in response to high indoor relative humidity. Valid choices are Yes and No. If Yes is selected, the supply and exhaust air flow rates may be modified when the indoor relative humidity is above the humidistat set point. If No is selected, this option is disabled and the following three fields are not used. Note that heat exchange between the air streams is suspended during times when high humidity control is active. The default value is No.
 
 \paragraph{Field: Humidistat Control Zone Name}\label{field-humidistat-control-zone-name-1}
 
@@ -604,7 +608,7 @@ This optional input is the ratio of the modified supply (outdoor) air flow rate 
 
 \paragraph{Field: Control High Indoor Humidity based on Outdoor Humidity Ratio}\label{field-control-high-indoor-humidity-based-on-outdoor-humidity-ratio-1}
 
-This optional choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidstat set point \emph{and} the outdoor humidity ratio is less than the indoor humidity ratio. Valid choices are Yes and No. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat's zone air humidity ratio. This field is used only when the High Humidity Control Flag is specified as Yes. The default value is Yes.
+This optional choice field determines if high humidity control is activated based on high indoor relative humidity alone or is activated only when the indoor relative humidity is above the humidistat set point \emph{and} the outdoor humidity ratio is less than the indoor humidity ratio. Valid choices are Yes and No. If No is selected, high humidity control is active any time the zone humidistat senses a moisture load. If yes is selected, the model also verifies that the outdoor humidity ratio is less than the humidistat's zone air humidity ratio. This field is used only when the High Humidity Control Flag is specified as Yes. The default value is Yes.
 
 Following is an example input for this stand alone ERV controller object:
 

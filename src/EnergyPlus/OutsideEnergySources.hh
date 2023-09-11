@@ -85,6 +85,7 @@ namespace OutsideEnergySources {
         Real64 MassFlowRate = 0.0;
         Real64 InletTemp = 0.0;
         Real64 OutletTemp = 0.0;
+        Real64 OutletSteamQuality = 0.0;
 
         OutsideEnergySourceSpecs() = default;
 

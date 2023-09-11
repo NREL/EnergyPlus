@@ -208,8 +208,8 @@ namespace PhotovoltaicThermalCollectors {
                                                                      state.dataIPShortCut->cNumericFieldNames);
             auto &thisTmpSimplePVTperf = tmpSimplePVTperf(Item);
             thisTmpSimplePVTperf.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisTmpSimplePVTperf.ThermEfficMode = static_cast<ThermEfficEnum>(
-                getEnumerationValue(ThermEfficTypeNamesUC, UtilityRoutines::MakeUPPERCase(state.dataIPShortCut->cAlphaArgs(2))));
+            thisTmpSimplePVTperf.ThermEfficMode =
+                static_cast<ThermEfficEnum>(getEnumValue(ThermEfficTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(2))));
             thisTmpSimplePVTperf.ThermalActiveFract = state.dataIPShortCut->rNumericArgs(1);
             thisTmpSimplePVTperf.ThermEffic = state.dataIPShortCut->rNumericArgs(2);
             thisTmpSimplePVTperf.ThermEffSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
@@ -1114,6 +1114,7 @@ namespace PhotovoltaicThermalCollectors {
             Real64 HrAir(0.0);
             Real64 HcExt(0.0);
             Real64 HrSky(0.0);
+            Real64 HrSrdSurf(0.0);
 
             Convect::InitExtConvCoeff(state,
                                       this->SurfNum,
@@ -1124,7 +1125,8 @@ namespace PhotovoltaicThermalCollectors {
                                       HcExt,
                                       HrSky,
                                       HrGround,
-                                      HrAir);
+                                      HrAir,
+                                      HrSrdSurf);
 
             Real64 WetBulbInlet(0.0);
             Real64 DewPointInlet(0.0);

@@ -107,7 +107,7 @@ This numeric input field contains the ``nominal'' heat rejection capacity of the
 
 \paragraph{Field: Free Convection Capacity}\label{field-free-convection-capacity}
 
-This numeric input field contains the ``nominal'' heat rejection capacity of the cooling tower in watts when the tower is in the ``free convection'' regime (water flow exists but tower fan is turned off), with entering water at 35C (95F), leaving water at 29.4C (85F), entering air at 25.6C (78F) wetbulb and 35C (95F) drybulb temperatures. The design water flow rate is assumed to be 5.382E-8 m\(^{3}\)/s per watt of nominal tower capacity (input field above). The heat rejection capacity and nominal capacity sizing ratio is applied tof this free convection tower capacity to give the actual tower heat rejection at these operating conditions (typical value is 1.25 based on historical assumption that the tower must dissipate 0.25W of compressor heat for every watt of heat removed by the evaporator). The value specified for this field must be less than the value specified for the field ``Tower Nominal Capacity''. If the user does not wish to model ``free convection'', then this field should be set to 0.0. If the user specifies a value greater than zero, then the ``Air Flow Rate in Free Convection Regime'' field must contain a value greater than zero. This field can be automatically calculated using the sizing factor in the following field.
+This numeric input field contains the ``nominal'' heat rejection capacity of the cooling tower in watts when the tower is in the ``free convection'' regime (water flow exists but tower fan is turned off), with entering water at 35C (95F), leaving water at 29.4C (85F), entering air at 25.6C (78F) wetbulb and 35C (95F) drybulb temperatures. The design water flow rate is assumed to be 5.382E-8 m\(^{3}\)/s per watt of nominal tower capacity (input field above). The heat rejection capacity and nominal capacity sizing ratio is applied to this free convection tower capacity to give the actual tower heat rejection at these operating conditions (typical value is 1.25 based on historical assumption that the tower must dissipate 0.25W of compressor heat for every watt of heat removed by the evaporator). The value specified for this field must be less than the value specified for the field ``Tower Nominal Capacity''. If the user does not wish to model ``free convection'', then this field should be set to 0.0. If the user specifies a value greater than zero, then the ``Air Flow Rate in Free Convection Regime'' field must contain a value greater than zero. This field can be automatically calculated using the sizing factor in the following field.
 
 \paragraph{Field: Free Convection Nominal Capacity Sizing Factor}\label{field-free-convection-nominal-capacity-sizing-factor}
 
@@ -488,7 +488,7 @@ The cooling tower seeks to maintain the temperature of the water exiting the coo
 
 The model assumes that part-load operation is represented by a simple linear interpolation between two steady-state regimes (i.e., tower fan at high speed for the entire simulation timestep and tower fan at low speed for the entire simulation timestep, or tower fan at low speed for the entire simulation timestep and tower fan off for the entire simulation timestep). Cyclic losses are not taken into account.
 
-Cooling towers here are ``wet'' and consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the towers. The last six input fields are optional and provide methods of controlling details of the water consumption calculations. The user can specifiy connections to the rest of the buildings water system by providing the name of a \hyperref[waterusestorage]{WaterUse:Storage} object.
+Cooling towers here are ``wet'' and consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the towers. The last six input fields are optional and provide methods of controlling details of the water consumption calculations. The user can specify connections to the rest of the buildings water system by providing the name of a \hyperref[waterusestorage]{WaterUse:Storage} object.
 
 For the operation of multi-cell towers, the first step is to determine the number of cells to operate based on the cell control method -- between the minimum number of cells subject to the maximum water flow rate fraction per cell, and maximum number of cells subject to the minimum water flow rate fraction per cell. If the calculated cells do not meet the loads, additional cells will be operating to help meet the loads. Inside each cell, the existing capacity controls still apply.
 
@@ -1131,7 +1131,7 @@ This alpha field contains the name of a curve or table object that describes how
 
 \paragraph{Field: U-Factor Times Area Modifier Function of Wetbulb Temperature Difference Curve Name}\label{field-u-factor-times-area-modifier-function-of-wetbulb-temperature-difference-curve-name}
 
-This alpha field contains the name of a curve or table object that describes how the UA value varies as a function of the current wetbulb temperature.~ The result of this curve is multiplied by the design UA value to adjust for wetbulb temperatures that differ from design conditions at 25.56°C (78°F), along with the two other modifiers discussed in the previous and following fields.~ The independe variable is the design wetbulb minus the current outdoor air wetbulb, in units of degrees Celsius.~ The curve or table object must be for one independent variable and should be normalized to 1.0 at a wetbulb temperature difference of 0.0.~ This field is required.
+This alpha field contains the name of a curve or table object that describes how the UA value varies as a function of the current wetbulb temperature.~ The result of this curve is multiplied by the design UA value to adjust for wetbulb temperatures that differ from design conditions at 25.56°C (78°F), along with the two other modifiers discussed in the previous and following fields.~ The independent variable is the design wetbulb minus the current outdoor air wetbulb, in units of degrees Celsius.~ The curve or table object must be for one independent variable and should be normalized to 1.0 at a wetbulb temperature difference of 0.0.~ This field is required.
 
 \paragraph{Field: U-Factor Times Area Modifier Function of Water Flow Ratio Curve Name}\label{field-u-factor-times-area-modifier-function-of-water-flow-ratio-curve-name}
 
@@ -1482,7 +1482,7 @@ The variable speed tower model is based on empirical curve fits of manufacturer'
 
 The cooling tower seeks to maintain the temperature of the water exiting the cooling tower at (or below) a set point. The set point schedule is defined by the field ``Condenser Loop Temperature Setpoint Node Name or Reference'' for the \hyperref[condenserloop]{CondenserLoop} object. The model first checks to determine the impact of ``free convection'' on the tower exiting water temperature. If the exiting water temperature based on ``free convection'' is at or below the set point, then the variable-speed tower fan is not turned on. If the exiting water temperature is above the set point after ``free convection'' is modeled, then the variable-speed tower fan is turned on to reduce the exiting water temperature. Tower fan power is calculated based on the tower air flow rate required to achieve the exiting water set point temperature.
 
-Cooling towers here are ``wet'' and consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the towers. The last six input fields are optional and provide methods of controlling details of the water consumption calculations. The user can specifiy connections to the rest of the buildings water system by providing the name of a \hyperref[waterusestorage]{WaterUse:Storage} object.
+Cooling towers here are ``wet'' and consume water through evaporation, drift, and blowdown. The model can be used to predict water consumed by the towers. The last six input fields are optional and provide methods of controlling details of the water consumption calculations. The user can specify connections to the rest of the buildings water system by providing the name of a \hyperref[waterusestorage]{WaterUse:Storage} object.
 
 For the operation of multi-cell towers, the first step is to determine the number of cells to operate based on the cell control method -- between the minimum number of cells subject to the maximum water flow rate fraction per cell, and maximum number of cells subject to the minimum water flow rate fraction per cell. If the calculated cells do not meet the loads, additional cells will be operating to help meet the loads. Inside each cell, the existing capacity controls still apply.
 
@@ -2891,7 +2891,7 @@ This numeric field contains the fan power (in Watts) at the low-speed air flow r
 
 \paragraph{Field: Low Fan Speed Fan Power Sizing Factor}\label{field-low-fan-speed-fan-power-sizing-factor-2}
 
-This numeric field contains the sizing factor to use whe calculating the Low Fan Speed Fan Power.~ The default is 0.16.
+This numeric field contains the sizing factor to use when calculating the Low Fan Speed Fan Power.~ The default is 0.16.
 
 \paragraph{Field: Outdoor Air Inlet Node Name}\label{field-outdoor-air-inlet-node-name-7}
 
@@ -2912,9 +2912,9 @@ FluidCooler:TwoSpeed,
       58601.,                  !- High Speed Nominal Capacity {W}
       28601.,                  !- Low Speed Nominal Capacity {W}
   .   0.6,                     !- Low Speed Nominal Capacity Sizing Factor
-      51.67,                   !- Design Entering Water tempereture {C}
-      35,                      !- Design Entering Air tempereture {C}
-      25.6,                    !- Design Entering Air Wet-bulb tempereture {C}
+      51.67,                   !- Design Entering Water temperature {C}
+      35,                      !- Design Entering Air temperature {C}
+      25.6,                    !- Design Entering Air Wet-bulb temperature {C}
       0.001388,                !- Design Water Flow Rate {m3/s}
       9.911,                   !- High Fan Speed Air Flow Rate {m3/s}
       autosize,                !- High Fan Speed Fan Power {W}
@@ -3044,7 +3044,7 @@ The unique name of the \hyperref[groundheatexchangerverticalarray]{GroundHeatExc
 
 \paragraph{Field: GHE:Vertical:Single names}
 
-The unique names of all single, vertical GLHE objects which are used to define and arbitrarily shaped GHE array. This field is exensible.
+The unique names of all single, vertical GLHE objects which are used to define and arbitrarily shaped GHE array. This field is extensible.
 
 The following is are example inputs corresponding to the input variations allowed which were described previously. The first example uses the \hyperref[groundheatexchangerverticalarray]{GroundHeatExchanger:Vertical:Array} object. The g-functions will be generated automatically by EnergyPlus and cached for later use.
 
@@ -4113,8 +4113,8 @@ This alpha field identifies the nature of heat exchanger.~ Heat exchanger model 
 \begin{description}
 \item [CrossFlowBothUnMixed] Specifies a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for both streams unmixed.
 \item [CrossFlowBothMixed]  Specifies a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for both streams mixed.
-\item [CrossFlowSupplyMixedDemandUnMixed] Specifes a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow mixed on the Loop Supply side and flow unmixed on the Loop Demand Side.
-\item [CrossFlowSupplyUnMixedDemandMixed] Specifes a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow unmixed on the Loop Supply side and flow mixed on the Loop Demand Side.
+\item [CrossFlowSupplyMixedDemandUnMixed] Specifies a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow mixed on the Loop Supply side and flow unmixed on the Loop Demand Side.
+\item [CrossFlowSupplyUnMixedDemandMixed] Specifies a single-pass, cross-flow heat exchanger. The effectiveness will be calculated using a cross-flow heat exchanger correlation for flow unmixed on the Loop Supply side and flow mixed on the Loop Demand Side.
 \item [CounterFlow] Specifies a counter-flow shell and tube heat exchanger (one fluid has the opposite direction to the other fluid). The effectiveness will be calculated using a counter-flow shell and tube heat exchanger correlation.
 \item [ParallelFlow] Specifies a parallel-flow shell and tube heat exchanger (both fluids have the same direction). The effectiveness will be calculated using a parallel-flow shell and tube heat exchanger correlation.
 \item [Ideal] Specifies an ideal heat exchanger. The effectiveness will be set to `1.0' and the specified UA will be ignored. The heat transfer rate will be calculated as the maximum possible heat transfer rate.
@@ -4152,7 +4152,7 @@ This field is used to specify how the heat exchanger is to be controlled during 
 \item
   \textbf{CoolingDifferentialOnOff}.~ This control mode is applicable to situations where the Loop Demand Side can provide useful cooling to the Loop Supply Side.~ This mode is similar to CoolingSetpointOnOff except that it ignores any cooling setpoint and its control is based only on the temperature difference between Loop Demand Side and the Loop Supply Side.~ The inlet temperatures must differ by more than the value set in the field called Minimum Temperature Difference to Activate Heat Exchanger for the heat exchanger to operate.~ ~This control mode corresponds to that available in the HeatExchanger:WatersideEconomizer object prior to version 8.0.
 \item
-  \textbf{CoolingSetpointOnOffWithComponentOverride}.  This control mode is applicable to situations where the heat exchanger operation is integrated with the operation of a specific chiller.  Typically the heat exchanger and chiller are in parallel on separate branches.  When conditions are favorable for the heat exchanger to provide cooling to the Loop Supply Side, the heat exchanger is run and the integrated chiller is turned off.  When conditions are not favorable, the heat exchanger is competely off and the chiller is allowed to run as usual.  A cooling setpoint is obtained from a node named in the following field.  If it runs it will run at full capacity and may undershoot the setpoint.  The chiller that is integrated with the heat exchanger is identified by entering the names of the chiller's inlet nodes in the input fields below.~ The control decision can be based on one of three different temperature signals selected in the field below called Component Override Cooling Control Temperature Mode.~ The setpoint and control signal temperatures must differ by more than the value set in the field called Minimum Temperature Difference to Activate Heat Exchanger for the heat exchanger to operate. This control mode corresponds to that available in the HeatExchanger:Hydronic object prior to version 8.0.
+  \textbf{CoolingSetpointOnOffWithComponentOverride}.  This control mode is applicable to situations where the heat exchanger operation is integrated with the operation of a specific chiller.  Typically the heat exchanger and chiller are in parallel on separate branches.  When conditions are favorable for the heat exchanger to provide cooling to the Loop Supply Side, the heat exchanger is run and the integrated chiller is turned off.  When conditions are not favorable, the heat exchanger is completely off and the chiller is allowed to run as usual.  A cooling setpoint is obtained from a node named in the following field.  If it runs it will run at full capacity and may undershoot the setpoint.  The chiller that is integrated with the heat exchanger is identified by entering the names of the chiller's inlet nodes in the input fields below.~ The control decision can be based on one of three different temperature signals selected in the field below called Component Override Cooling Control Temperature Mode.~ The setpoint and control signal temperatures must differ by more than the value set in the field called Minimum Temperature Difference to Activate Heat Exchanger for the heat exchanger to operate. This control mode corresponds to that available in the HeatExchanger:Hydronic object prior to version 8.0.
 \end{itemize}
 
 \paragraph{Field: Heat Exchanger Setpoint Node Name}\label{field-heat-exchanger-setpoint-node-name}

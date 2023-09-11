@@ -105,26 +105,26 @@ Real64 TermUnitSizingData::applyTermUnitSizingHeatFlow(Real64 const heatFlowWith
     return adjustedFlow;
 }
 
-void ZoneSizingData::scaleZoneCooling(Real64 const ratio // Scaling ratio
-)
+void TermUnitZoneSizingData::scaleZoneCooling(Real64 const ratio)
 {
     // Apply scaling ratio to TermUnitFinalZoneSizing cooling flow and load
-    this->DesCoolVolFlow = this->DesCoolVolFlow * ratio;
-    this->DesCoolMassFlow = this->DesCoolMassFlow * ratio;
-    this->DesCoolLoad = this->DesCoolLoad * ratio;
-    this->CoolFlowSeq = this->CoolFlowSeq * ratio;
-    this->CoolLoadSeq = this->CoolLoadSeq * ratio;
+    this->DesCoolVolFlow *= ratio;
+    this->DesCoolMassFlow *= ratio;
+    this->DesCoolLoad *= ratio;
+    for (auto &cfs : this->CoolFlowSeq) {
+        cfs *= ratio;
+    }
 }
 
-void ZoneSizingData::scaleZoneHeating(Real64 const ratio // Scaling ratio
-)
+void TermUnitZoneSizingData::scaleZoneHeating(Real64 const ratio)
 {
     // Apply scaling ratio to TermUnitFinalZoneSizing heating flow and load
-    this->DesHeatVolFlow = this->DesHeatVolFlow * ratio;
-    this->DesHeatMassFlow = this->DesHeatMassFlow * ratio;
-    this->DesHeatLoad = this->DesHeatLoad * ratio;
-    this->HeatFlowSeq = this->HeatFlowSeq * ratio;
-    this->HeatLoadSeq = this->HeatLoadSeq * ratio;
+    this->DesHeatVolFlow *= ratio;
+    this->DesHeatMassFlow *= ratio;
+    this->DesHeatLoad *= ratio;
+    for (auto &cfs : this->HeatFlowSeq) {
+        cfs *= ratio;
+    }
 }
 
 void ZoneSizingData::zeroMemberData()
@@ -312,6 +312,100 @@ void ZoneSizingData::allocateMemberArrays(int const numOfTimeStepInDay)
     this->CoolLatentLoadNoDOASSeq.dimension(numOfTimeStepInDay, 0.0);
     this->LatentCoolFlowSeq.dimension(numOfTimeStepInDay, 0.0);
     this->LatentHeatFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+}
+
+void TermUnitZoneSizingData::allocateMemberArrays(int const numOfTimeStepInDay)
+{
+    this->HeatFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->CoolFlowSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->HeatFlowSeqNoOA.dimension(numOfTimeStepInDay, 0.0);
+    this->CoolFlowSeqNoOA.dimension(numOfTimeStepInDay, 0.0);
+    this->HeatZoneTempSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->HeatZoneRetTempSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->CoolZoneTempSeq.dimension(numOfTimeStepInDay, 0.0);
+    this->CoolZoneRetTempSeq.dimension(numOfTimeStepInDay, 0.0);
+}
+
+void TermUnitZoneSizingData::copyFromZoneSizing(ZoneSizingData const &sourceData)
+{
+    this->ZoneName = sourceData.ZoneName;
+    this->ADUName = sourceData.ADUName;
+    this->CoolDesTemp = sourceData.CoolDesTemp;
+    this->HeatDesTemp = sourceData.HeatDesTemp;
+    this->CoolDesHumRat = sourceData.CoolDesHumRat;
+    this->HeatDesHumRat = sourceData.HeatDesHumRat;
+    this->DesOAFlowPPer = sourceData.DesOAFlowPPer;
+    this->DesOAFlowPerArea = sourceData.DesOAFlowPerArea;
+    this->DesCoolMinAirFlow = sourceData.DesCoolMinAirFlow;
+    this->DesCoolMinAirFlowFrac = sourceData.DesCoolMinAirFlowFrac;
+    this->DesHeatMaxAirFlow = sourceData.DesHeatMaxAirFlow;
+    this->DesHeatMaxAirFlowFrac = sourceData.DesHeatMaxAirFlowFrac;
+    this->ZoneNum = sourceData.ZoneNum;
+    this->DesHeatMassFlow = sourceData.DesHeatMassFlow;
+    this->DesHeatMassFlowNoOA = sourceData.DesHeatMassFlowNoOA;
+    this->DesHeatOAFlowFrac = sourceData.DesHeatOAFlowFrac;
+    this->DesCoolMassFlow = sourceData.DesCoolMassFlow;
+    this->DesCoolMassFlowNoOA = sourceData.DesCoolMassFlowNoOA;
+    this->DesCoolOAFlowFrac = sourceData.DesCoolOAFlowFrac;
+    this->DesHeatLoad = sourceData.DesHeatLoad;
+    this->NonAirSysDesHeatLoad = sourceData.NonAirSysDesHeatLoad;
+    this->DesCoolLoad = sourceData.DesCoolLoad;
+    this->NonAirSysDesCoolLoad = sourceData.NonAirSysDesCoolLoad;
+    this->DesHeatVolFlow = sourceData.DesHeatVolFlow;
+    this->DesHeatVolFlowNoOA = sourceData.DesHeatVolFlowNoOA;
+    this->NonAirSysDesHeatVolFlow = sourceData.NonAirSysDesHeatVolFlow;
+    this->DesCoolVolFlow = sourceData.DesCoolVolFlow;
+    this->DesCoolVolFlowNoOA = sourceData.DesCoolVolFlowNoOA;
+    this->NonAirSysDesCoolVolFlow = sourceData.NonAirSysDesCoolVolFlow;
+    this->DesHeatVolFlowMax = sourceData.DesHeatVolFlowMax;
+    this->DesCoolVolFlowMin = sourceData.DesCoolVolFlowMin;
+    this->DesHeatCoilInTempTU = sourceData.DesHeatCoilInTempTU;
+    this->DesCoolCoilInTempTU = sourceData.DesCoolCoilInTempTU;
+    this->DesHeatCoilInHumRatTU = sourceData.DesHeatCoilInHumRatTU;
+    this->DesCoolCoilInHumRatTU = sourceData.DesCoolCoilInHumRatTU;
+    this->ZoneTempAtHeatPeak = sourceData.ZoneTempAtHeatPeak;
+    this->ZoneRetTempAtHeatPeak = sourceData.ZoneRetTempAtHeatPeak;
+    this->ZoneTempAtCoolPeak = sourceData.ZoneTempAtCoolPeak;
+    this->ZoneRetTempAtCoolPeak = sourceData.ZoneRetTempAtCoolPeak;
+    this->ZoneHumRatAtHeatPeak = sourceData.ZoneHumRatAtHeatPeak;
+    this->ZoneHumRatAtCoolPeak = sourceData.ZoneHumRatAtCoolPeak;
+    this->TimeStepNumAtHeatMax = sourceData.TimeStepNumAtHeatMax;
+    this->TimeStepNumAtCoolMax = sourceData.TimeStepNumAtCoolMax;
+    this->HeatDDNum = sourceData.HeatDDNum;
+    this->CoolDDNum = sourceData.CoolDDNum;
+    this->MinOA = sourceData.MinOA;
+    this->DesCoolMinAirFlow2 = sourceData.DesCoolMinAirFlow2;
+    this->DesHeatMaxAirFlow2 = sourceData.DesHeatMaxAirFlow2;
+    for (size_t t = 1; t <= this->HeatFlowSeq.size(); ++t) {
+        this->HeatFlowSeq(t) = sourceData.HeatFlowSeq(t);
+        this->HeatFlowSeqNoOA(t) = sourceData.HeatFlowSeqNoOA(t);
+        this->CoolFlowSeq(t) = sourceData.CoolFlowSeq(t);
+        this->CoolFlowSeqNoOA(t) = sourceData.CoolFlowSeqNoOA(t);
+        this->HeatZoneTempSeq(t) = sourceData.HeatZoneTempSeq(t);
+        this->HeatZoneRetTempSeq(t) = sourceData.HeatZoneRetTempSeq(t);
+        this->CoolZoneTempSeq(t) = sourceData.CoolZoneTempSeq(t);
+        this->CoolZoneRetTempSeq(t) = sourceData.CoolZoneRetTempSeq(t);
+    }
+    this->ZoneADEffCooling = sourceData.ZoneADEffCooling;
+    this->ZoneADEffHeating = sourceData.ZoneADEffHeating;
+    this->ZoneSecondaryRecirculation = sourceData.ZoneSecondaryRecirculation;
+    this->ZoneVentilationEff = sourceData.ZoneVentilationEff;
+    this->ZonePrimaryAirFraction = sourceData.ZonePrimaryAirFraction;
+    this->ZonePrimaryAirFractionHtg = sourceData.ZonePrimaryAirFractionHtg;
+    this->ZoneOAFracCooling = sourceData.ZoneOAFracCooling;
+    this->ZoneOAFracHeating = sourceData.ZoneOAFracHeating;
+    this->TotalOAFromPeople = sourceData.TotalOAFromPeople;
+    this->TotalOAFromArea = sourceData.TotalOAFromArea;
+    this->TotPeopleInZone = sourceData.TotPeopleInZone;
+    this->TotalZoneFloorArea = sourceData.TotalZoneFloorArea;
+    this->SupplyAirAdjustFactor = sourceData.SupplyAirAdjustFactor;
+    this->ZpzClgByZone = sourceData.ZpzClgByZone;
+    this->ZpzHtgByZone = sourceData.ZpzHtgByZone;
+    this->VozClgByZone = sourceData.VozClgByZone;
+    this->VozHtgByZone = sourceData.VozHtgByZone;
+    this->VpzMinByZoneSPSized = sourceData.VpzMinByZoneSPSized;
+    this->ZoneSizThermSetPtHi = sourceData.ZoneSizThermSetPtHi;
+    this->ZoneSizThermSetPtLo = sourceData.ZoneSizThermSetPtLo;
 }
 
 void resetHVACSizingGlobals(EnergyPlusData &state,
@@ -579,7 +673,7 @@ Real64 OARequirementsData::desFlowPerZoneArea(EnergyPlusData &state,
             auto const &thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerPerson && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
                 thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
-                Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).floorArea;
+                Real64 spaceArea = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).FloorArea;
                 sumAreaOA += thisDSOA.OAFlowPerArea * spaceArea;
             }
         }
@@ -608,7 +702,7 @@ Real64 OARequirementsData::desFlowPerZonePerson(EnergyPlusData &state,
             auto const &thisDSOA = state.dataSize->OARequirements(this->dsoaIndexes(dsoaCount));
             if (thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerArea && thisDSOA.OAFlowMethod != OAFlowCalcMethod::PerZone &&
                 thisDSOA.OAFlowMethod != OAFlowCalcMethod::ACH) {
-                Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).totOccupants;
+                Real64 spacePeople = state.dataHeatBal->space(this->dsoaSpaceIndexes(dsoaCount)).TotOccupants;
                 sumPeopleOA += thisDSOA.OAFlowPerPerson * spacePeople;
             }
         }
@@ -669,14 +763,14 @@ Real64 OARequirementsData::calcOAFlowRate(EnergyPlusData &state,
     Real64 curNumOccupants = 0.0;
     Real64 maxOccupants = 0.0;
     if (spaceNum > 0) {
-        floorArea = state.dataHeatBal->space(spaceNum).floorArea;
+        floorArea = state.dataHeatBal->space(spaceNum).FloorArea;
         // TODO MJW: For now just proportion space volume by floor area
         if (thisZone.FloorArea > 0.0) {
-            volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).floorArea / thisZone.FloorArea;
+            volume = thisZone.Volume * state.dataHeatBal->space(spaceNum).FloorArea / thisZone.FloorArea;
         } else {
             volume = 0.0;
         }
-        nomTotOccupants = state.dataHeatBal->space(spaceNum).totOccupants;
+        nomTotOccupants = state.dataHeatBal->space(spaceNum).TotOccupants;
         curNumOccupants = state.dataHeatBal->spaceIntGain(spaceNum).NOFOCC;
         maxOccupants = state.dataHeatBal->space(spaceNum).maxOccupants;
     } else {
