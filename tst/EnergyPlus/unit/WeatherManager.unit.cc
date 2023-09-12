@@ -1913,7 +1913,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
 
     // We don't have an EPW
     state->dataWeatherManager->WeatherFileExists = false;
-    state->files.inputWeatherFilePath.filePath = "in.epw";
+    state->files.inputWeatherFilePath.filePath = "doesntnotexist.epw";
 
     state->dataGlobal->BeginSimFlag = false;
     state->dataGlobal->NumOfTimeStepInHour = 4;
