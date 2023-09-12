@@ -138,6 +138,7 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
         // Create dynamic built-in variables
         state.dataRuntimeLangProcessor->YearVariableNum = NewEMSVariable(state, "YEAR", 0);
+        state.dataRuntimeLangProcessor->CalendarYearVariableNum = NewEMSVariable(state, "CALENDARYEAR", 0);
         state.dataRuntimeLangProcessor->MonthVariableNum = NewEMSVariable(state, "MONTH", 0);
         state.dataRuntimeLangProcessor->DayOfMonthVariableNum = NewEMSVariable(state, "DAYOFMONTH", 0); // 'DAYOFMONTH'?
         state.dataRuntimeLangProcessor->DayOfWeekVariableNum = NewEMSVariable(state, "DAYOFWEEK", 0);
@@ -180,6 +181,8 @@ void InitializeRuntimeLanguage(EnergyPlusData &state)
 
     // Update built-in variables
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->YearVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Year));
+    state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->CalendarYearVariableNum).Value =
+        SetErlValueNumber(double(state.dataGlobal->CalendarYear));
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->MonthVariableNum).Value = SetErlValueNumber(double(state.dataEnvrn->Month));
     state.dataRuntimeLang->ErlVariable(state.dataRuntimeLangProcessor->DayOfMonthVariableNum).Value =
         SetErlValueNumber(double(state.dataEnvrn->DayOfMonth));
