@@ -6,7 +6,7 @@ add_library( nlohmann_json INTERFACE )
 target_compile_definitions(
         nlohmann_json
         INTERFACE
-        JSON_USE_IMPLICIT_CONVERSIONS=OFF
+        JSON_USE_IMPLICIT_CONVERSIONS=1
 )
 target_include_directories(
         nlohmann_json
