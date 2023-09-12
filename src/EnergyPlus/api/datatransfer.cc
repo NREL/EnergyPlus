@@ -147,7 +147,7 @@ char *listAllAPIDataCSV(EnergyPlusState state)
         output.append("Actuator,");
         output.append(availActuator.ComponentTypeName).append(",");
         output.append(availActuator.ControlTypeName).append(",");
-        output.append(availActuator.UniqueIDName).append(";\n");
+        output.append(availActuator.UniqueIDName).append("\n");
     }
     output.append("**INTERNAL_VARIABLES**\n");
     for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
