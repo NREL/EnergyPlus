@@ -352,7 +352,7 @@ namespace ZoneAirLoopEquipmentManager {
                 case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVNoReheat:
                     airDistUnit.IsConstLeakageRate = true;
                     break;
-                case DataDefineEquip::ZnAirLoopEquipType::Invalid:
+                default:
                     ShowSevereError(state, format("Error found in {} = {}", CurrentModuleObject, airDistUnit.Name));
                     ShowContinueError(state, format("Invalid {} = {}", cAlphaFields(3), airDistUnit.EquipType(AirDistCompUnitNum)));
                     ErrorsFound = true;
