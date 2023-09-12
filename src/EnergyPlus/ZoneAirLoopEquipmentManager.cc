@@ -85,26 +85,26 @@ namespace ZoneAirLoopEquipmentManager {
 
     using namespace DataDefineEquip;
 
-    constexpr std::array<std::string_view, (int)ZnAirLoopEquipType::Num> ZnAirLoopEquipTypeNames = {
-        "AirTerminal:DualDuct:ConstantVolume",
-        "AirTerminal:DualDuct:VAV",
-        "AirTerminal:SingleDuct:VAV:Reheat",
-        "AirTerminal:SingleDuct:VAV:NoReheat",
-        "AirTerminal:SingleDuct:ConstantVolume:Reheat",
-        "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
-        "AirTerminal:SingleDuct:SeriesPIU:Reheat",
-        "AirTerminal:SingleDuct:ParallelPIU:Reheat",
-        "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction",
-        "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
-        "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
-        "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
-        "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
-        "AirTerminal:DualDuct:VAV:OutdoorAir",
-        "AirTerminal:SingleDuct:UserDefined",
-        "AirTerminal:SingleDuct:Mixer",
-        "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam"};
+    // constexpr std::array<std::string_view, static_cast<int>(ZnAirLoopEquipType::Num)> ZnAirLoopEquipTypeNames = {
+    //     "AirTerminal:DualDuct:ConstantVolume",
+    //     "AirTerminal:DualDuct:VAV",
+    //     "AirTerminal:SingleDuct:VAV:Reheat",
+    //     "AirTerminal:SingleDuct:VAV:NoReheat",
+    //     "AirTerminal:SingleDuct:ConstantVolume:Reheat",
+    //     "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+    //     "AirTerminal:SingleDuct:SeriesPIU:Reheat",
+    //     "AirTerminal:SingleDuct:ParallelPIU:Reheat",
+    //     "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction",
+    //     "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
+    //     "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
+    //     "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
+    //     "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
+    //     "AirTerminal:DualDuct:VAV:OutdoorAir",
+    //     "AirTerminal:SingleDuct:UserDefined",
+    //     "AirTerminal:SingleDuct:Mixer",
+    //     "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam"};
 
-    constexpr std::array<std::string_view, (int)ZnAirLoopEquipType::Num> ZnAirLoopEquipTypeNamesUC = {
+    constexpr std::array<std::string_view, static_cast<int>(ZnAirLoopEquipType::Num)> ZnAirLoopEquipTypeNamesUC = {
         "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",
         "AIRTERMINAL:DUALDUCT:VAV",
         "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
