@@ -7345,7 +7345,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     } else {
                         TBmAll = TBmBm + TBmDif;
                     }
-                    BTOTZone += state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBmAll * SunLitFract * CosInc * state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
+                    BTOTZone += state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBmAll * SunLitFract * CosInc *
+                                state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
                 }
             }
 
@@ -7430,7 +7431,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     // Inside daylighting shelves assume that no beam will pass the end of the shelf.
                     // Since all beam is absorbed on the shelf, this might cause them to get unrealistically hot at times.
                     // BTOTWinZone - Transmitted beam solar factor for a window [m2]
-                    Real64 BTOTWinZone = TBm * SunLitFract * state.dataSurface->Surface(SurfNum).Area * CosInc * InOutProjSLFracMult;
+                    Real64 BTOTWinZone = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * SunLitFract *
+                                         state.dataSurface->Surface(SurfNum).Area * CosInc * InOutProjSLFracMult;
                     // Shelf surface area is divided by 2 because only one side sees beam (Area was multiplied by 2 during init)
                     state.dataSurface->SurfOpaqAI(InShelfSurf) += BTOTWinZone / (0.5 * state.dataSurface->Surface(InShelfSurf).Area); //[-]
                     BABSZone += BTOTWinZone;                                                                                          //[m2]
@@ -7451,7 +7453,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                             Real64 AOverlap =
                                 state.dataHeatBal->SurfWinOverlapAreas(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, IBack, SurfNum);
                             // Back surface area irradiated by beam solar from an exterior window, projected onto window plane
-                            Real64 BOverlap = TBm * AOverlap * CosInc; //[m2]
+                            Real64 BOverlap = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * AOverlap * CosInc; //[m2]
                             // AOverlap multiplied by exterior window beam transmittance and cosine of incidence angle
                             if (state.dataConstruction->Construct(ConstrNumBack).TransDiff <= 0.0) {
 
@@ -8172,7 +8174,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                             Real64 AOverlap =
                                 state.dataHeatBal->SurfWinOverlapAreas(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, IBack, SurfNum);
-                            Real64 BOverlap = TBm * AOverlap * CosInc; //[m2]
+                            Real64 BOverlap = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * AOverlap * CosInc; //[m2]
 
                             if (state.dataConstruction->Construct(ConstrNumBack).TransDiff <= 0.0) {
 
@@ -8280,7 +8282,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         if (state.dataSolarShading->SurfIntAbsFac(FloorNum) <= 0.0 || FloorNum == SurfNum) continue; // Keep only floor surfaces
                         int const FlConstrNum = state.dataSurface->SurfActiveConstruction(FloorNum);
 
-                        Real64 BTOTWinZone = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * SunLitFract * state.dataSurface->Surface(SurfNum).Area * CosInc * InOutProjSLFracMult; //[m2]
+                        Real64 BTOTWinZone = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * SunLitFract *
+                                             state.dataSurface->Surface(SurfNum).Area * CosInc * InOutProjSLFracMult; //[m2]
                         Real64 AbsBeamTotWin = 0.0;
 
                         if (state.dataConstruction->Construct(FlConstrNum).TransDiff <= 0.0) {
@@ -8766,7 +8769,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                     // Irradiated (overlap) area for this back surface, projected onto window plane
                     // (includes effect of shadowing on exterior window)
                     Real64 AOverlap = state.dataHeatBal->SurfWinOverlapAreas(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, IBack, SurfNum);
-                    Real64 BOverlap = TBm * AOverlap * CosInc; //[m2]
+                    Real64 BOverlap = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * AOverlap * CosInc; //[m2]
 
                     if (state.dataConstruction->Construct(ConstrNumBack).TransDiff <= 0.0) {
                         // Back surface is opaque interior or exterior wall
@@ -8782,7 +8785,8 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
                     if (!state.dataSurface->Surface(FloorNum).HeatTransSurf) continue;
                     if (state.dataSolarShading->SurfIntAbsFac(FloorNum) <= 0.0 || FloorNum == SurfNum) continue; // Keep only floor surfaces
 
-                    Real64 BTOTWinZone = TBm * SunLitFract * state.dataSurface->Surface(SurfNum).Area * CosInc *
+                    Real64 BTOTWinZone = state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBm * SunLitFract *
+                                         state.dataSurface->Surface(SurfNum).Area * CosInc *
                                          window.InOutProjSLFracMult(state.dataGlobal->HourOfDay); //[m2]
 
                     if (state.dataConstruction->Construct(state.dataSurface->Surface(FloorNum).Construction).TransDiff <= 0.0) {
