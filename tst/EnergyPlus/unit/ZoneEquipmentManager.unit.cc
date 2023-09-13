@@ -5016,12 +5016,12 @@ TEST_F(EnergyPlusFixture, ZoneAirLoopEquipmentGetInputTest)
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     auto &airDistUnit_CV = state->dataDefineEquipment->AirDistUnit(AirDistCompUnitNum);
     EXPECT_EQ(airDistUnit_CV.EquipType(1), "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT");
-    EXPECT_EQ(airDistUnit_CV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat);
+    EXPECT_TRUE(compare_enums(airDistUnit_CV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat));
     EXPECT_FALSE(airDistUnit_CV.IsConstLeakageRate);
 
     AirDistCompUnitNum = 2;
     auto &airDistUnit_VAV = state->dataDefineEquipment->AirDistUnit(AirDistCompUnitNum);
     EXPECT_EQ(airDistUnit_VAV.EquipType(1), "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT");
-    EXPECT_EQ(airDistUnit_VAV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat);
+    EXPECT_TRUE(compare_enums(airDistUnit_VAV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat));
     EXPECT_TRUE(airDistUnit_VAV.IsConstLeakageRate);
 }
