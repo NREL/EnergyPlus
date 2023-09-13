@@ -47,6 +47,9 @@
 
 // EnergyPlus::ZoneEquipmentManager Unit Tests
 
+// C++ Headers
+#include <iostream>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
