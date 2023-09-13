@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -83,6 +84,8 @@ namespace HeatBalanceAirManager {
     void CalcHeatBalanceAir(EnergyPlusData &state);
 
     void ReportZoneMeanAirTemp(EnergyPlusData &state);
+
+    void calcMeanAirTemps(EnergyPlusData &state, Real64 ZTAV, Real64 airHumRatAvg, DataHeatBalance::AirReportVars &thisAirRpt, int zoneNum);
 
 } // namespace HeatBalanceAirManager
 

@@ -4548,20 +4548,22 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         break;
     }
 
+    auto &thisAirRpt = (spaceNum == 0) ? state.dataHeatBal->ZnAirRpt(zoneNum) : state.dataHeatBal->spaceAirRpt(spaceNum);
+
     CalcZoneComponentLoadSums(state,
                               zoneNum,
                               this->TempDepCoef,
                               this->TempIndCoef,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumIntGains,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumHADTsurfs,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumMCpDTzones,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumMCpDtInfil,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumMCpDTsystem,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumNonAirSystem,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).CzdTdt,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).imBalance,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumEnthalpyM,
-                              state.dataHeatBal->ZnAirRpt(zoneNum).SumEnthalpyH);
+                              thisAirRpt.SumIntGains,
+                              thisAirRpt.SumHADTsurfs,
+                              thisAirRpt.SumMCpDTzones,
+                              thisAirRpt.SumMCpDtInfil,
+                              thisAirRpt.SumMCpDTsystem,
+                              thisAirRpt.SumNonAirSystem,
+                              thisAirRpt.CzdTdt,
+                              thisAirRpt.imBalance,
+                              thisAirRpt.SumEnthalpyM,
+                              thisAirRpt.SumEnthalpyH);
     return tempChange;
 }
 
