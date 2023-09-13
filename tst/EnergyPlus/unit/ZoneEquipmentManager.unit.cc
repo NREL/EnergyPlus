@@ -5007,7 +5007,6 @@ TEST_F(EnergyPlusFixture, ZoneAirLoopEquipmentGetInputTest)
 
     )IDF";
 
-    bool ErrorsFound = false;
     ASSERT_TRUE(process_idf(idf_objects));
 
     int AirDistCompUnitNum = 1;
