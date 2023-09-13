@@ -12871,176 +12871,175 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_DontWarnMonthlyIfOnlyNamedR
     InitializeTabularMonthly(*state);
 
     compare_err_stream("");
+}
 
-    TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
+TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
+{
+    // Test for #10190 - District Heating Steam is empty
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displayTabularBEPS = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
+
+    // Needed to avoid crash (from ElectricPowerServiceManager.hh)
+    createFacilityElectricPowerServiceObject(*state);
+
+    SetPredefinedTables(*state);
+
+    Real64 DistrictHeatingWater = 4e8;
+    SetupOutputVariable(*state,
+                        "Exterior Equipment DistrictHeatingWater Energy",
+                        OutputProcessor::Unit::J,
+                        DistrictHeatingWater,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "DHWaterExtEq",
+                        {},
+                        "DistrictHeatingWater",
+                        "ExteriorEquipment",
+                        "General");
+
+    Real64 DistrictHeatingSteam = 5e8;
+    SetupOutputVariable(*state,
+                        "Exterior Equipment DistrictHeatingSteam Energy",
+                        OutputProcessor::Unit::J,
+                        DistrictHeatingSteam,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "DHSteamExtEq",
+                        {},
+                        "DistrictHeatingSteam",
+                        "ExteriorEquipment",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 1.0;
+    state->dataGlobal->MinutesPerTimeStep = state->dataGlobal->TimeStepZone * 60;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
+    state->dataOutRptTab->displayTabularBEPS = true;
+    // OutputProcessor::TimeValue.allocate(2);
+
+    auto timeStep = 1.0;
+
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+
+    GetInputOutputTableSummaryReports(*state);
+
+    state->dataEnvrn->Month = 12;
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+
+    auto &ort = state->dataOutRptTab;
+    constexpr int dhWaterIndex = 4;
+    constexpr int dhSteamIndex = 5;
+    EXPECT_EQ("DistrictHeatingWater", ort->resourceTypeNames(dhWaterIndex));
+    EXPECT_EQ("DistrictHeatingSteam", ort->resourceTypeNames(dhSteamIndex));
+
+    EXPECT_NEAR(DistrictHeatingWater, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
+    EXPECT_NEAR(
+        DistrictHeatingWater, state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1), 1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingWater,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
+                1.);
+
+    EXPECT_NEAR(DistrictHeatingSteam, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
+    EXPECT_NEAR(
+        DistrictHeatingSteam, state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1), 1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingSteam,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
+                1.);
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    EXPECT_NEAR(DistrictHeatingWater * 2, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
+    EXPECT_NEAR(DistrictHeatingWater * 2,
+                state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
+                1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingWater * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
+                1.);
+
+    EXPECT_NEAR(DistrictHeatingSteam * 2, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
+    EXPECT_NEAR(DistrictHeatingSteam * 2,
+                state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
+                1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingSteam * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
+                1.);
+
+    OutputReportTabular::WriteBEPSTable(*state);
+    OutputReportTabular::WriteDemandEndUseSummary(*state);
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
+    std::vector<std::string> endUseSubCategoryNames = {"General"};
+
+    // Query End Use
     {
-        // Test for #10190 - District Heating Steam is empty
-        state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
-
-        state->dataOutRptTab->displayTabularBEPS = true;
-        state->dataOutRptTab->displayDemandEndUse = true;
-        state->dataOutRptTab->displayLEEDSummary = true;
-
-        state->dataOutRptTab->WriteTabularFiles = true;
-
-        SetupUnitConversions(*state);
-        state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
-        state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
-
-        // Needed to avoid crash (from ElectricPowerServiceManager.hh)
-        createFacilityElectricPowerServiceObject(*state);
-
-        SetPredefinedTables(*state);
-
-        Real64 DistrictHeatingWater = 4e8;
-        SetupOutputVariable(*state,
-                            "Exterior Equipment DistrictHeatingWater Energy",
-                            OutputProcessor::Unit::J,
-                            DistrictHeatingWater,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
-                            "DHWaterExtEq",
-                            {},
-                            "DistrictHeatingWater",
-                            "ExteriorEquipment",
-                            "General");
-
-        Real64 DistrictHeatingSteam = 5e8;
-        SetupOutputVariable(*state,
-                            "Exterior Equipment DistrictHeatingSteam Energy",
-                            OutputProcessor::Unit::J,
-                            DistrictHeatingSteam,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
-                            "DHSteamExtEq",
-                            {},
-                            "DistrictHeatingSteam",
-                            "ExteriorEquipment",
-                            "General");
-
-        state->dataGlobal->DoWeathSim = true;
-        state->dataGlobal->TimeStepZone = 1.0;
-        state->dataGlobal->MinutesPerTimeStep = state->dataGlobal->TimeStepZone * 60;
-        state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
-        state->dataOutRptTab->displayTabularBEPS = true;
-        // OutputProcessor::TimeValue.allocate(2);
-
-        auto timeStep = 1.0;
-
-        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
-        SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
-
-        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
-        *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
-
-        GetInputOutputTableSummaryReports(*state);
-
-        state->dataEnvrn->Month = 12;
-
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-        GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-
-        auto &ort = state->dataOutRptTab;
-        constexpr int dhWaterIndex = 4;
-        constexpr int dhSteamIndex = 5;
-        EXPECT_EQ("DistrictHeatingWater", ort->resourceTypeNames(dhWaterIndex));
-        EXPECT_EQ("DistrictHeatingSteam", ort->resourceTypeNames(dhSteamIndex));
-
-        EXPECT_NEAR(DistrictHeatingWater, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
-        EXPECT_NEAR(DistrictHeatingWater,
-                    state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
-                    1.);
-        // General
-        EXPECT_NEAR(DistrictHeatingWater,
-                    state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
-                    1.);
-
-        EXPECT_NEAR(DistrictHeatingSteam, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
-        EXPECT_NEAR(DistrictHeatingSteam,
-                    state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
-                    1.);
-        // General
-        EXPECT_NEAR(DistrictHeatingSteam,
-                    state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
-                    1.);
-
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
-        GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-        GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
-        EXPECT_NEAR(DistrictHeatingWater * 2, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
-        EXPECT_NEAR(DistrictHeatingWater * 2,
-                    state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
-                    1.);
-        // General
-        EXPECT_NEAR(DistrictHeatingWater * 2,
-                    state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
-                    1.);
-
-        EXPECT_NEAR(DistrictHeatingSteam * 2, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
-        EXPECT_NEAR(DistrictHeatingSteam * 2,
-                    state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
-                    1.);
-        // General
-        EXPECT_NEAR(DistrictHeatingSteam * 2,
-                    state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
-                    1.);
-
-        OutputReportTabular::WriteBEPSTable(*state);
-        OutputReportTabular::WriteDemandEndUseSummary(*state);
-
-        // We test for Heating and Total, since they should be the same
-        std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
-        std::vector<std::string> endUseSubCategoryNames = {"General"};
-
-        // Query End Use
-        {
-            std::string query(R"sql(
+        std::string query(R"sql(
         SELECT Value From TabularDataWithStrings
            WHERE TableName = 'End Uses'
              AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
              AND ColumnName = 'District Heating Water'
              AND RowName = 'Exterior Equipment')sql");
-            auto const result = queryResult(query, "TabularDataWithStrings");
-            Real64 const return_val1 = execAndReturnFirstDouble(query);
+        auto const result = queryResult(query, "TabularDataWithStrings");
+        Real64 const return_val1 = execAndReturnFirstDouble(query);
 
-            ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
-            EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
-        }
-
-        {
-            std::string query("SELECT Value From TabularDataWithStrings"
-                              "  WHERE TableName = 'End Uses'"
-                              "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-                              "  AND ColumnName = 'District Heating Steam'"
-                              "  AND RowName = 'Exterior Equipment'");
-            auto const result = queryResult(query, "TabularDataWithStrings");
-            Real64 const return_val = execAndReturnFirstDouble(query);
-
-            ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
-            EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
-        }
-
-        // Query End Use with Subcategory
-        {
-            std::string const query("SELECT Value From TabularDataWithStrings"
-                                    "  WHERE TableName = 'End Uses By Subcategory'"
-                                    "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-                                    "  AND ColumnName = 'District Heating Water'"
-                                    "  AND RowName = 'Exterior Equipment:General'");
-            Real64 const return_val = execAndReturnFirstDouble(query);
-            EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
-        }
-
-        {
-            std::string query("SELECT Value From TabularDataWithStrings"
-                              "  WHERE TableName = 'End Uses By Subcategory'"
-                              "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
-                              "  AND ColumnName = 'District Heating Steam'"
-                              "  AND RowName = 'Exterior Equipment:General'");
-            Real64 return_val = execAndReturnFirstDouble(query);
-            EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
-        }
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
     }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'District Heating Steam'"
+                          "  AND RowName = 'Exterior Equipment'");
+        auto const result = queryResult(query, "TabularDataWithStrings");
+        Real64 const return_val = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+
+    // Query End Use with Subcategory
+    {
+        std::string const query("SELECT Value From TabularDataWithStrings"
+                                "  WHERE TableName = 'End Uses By Subcategory'"
+                                "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                                "  AND ColumnName = 'District Heating Water'"
+                                "  AND RowName = 'Exterior Equipment:General'");
+        Real64 const return_val = execAndReturnFirstDouble(query);
+        EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'District Heating Steam'"
+                          "  AND RowName = 'Exterior Equipment:General'");
+        Real64 return_val = execAndReturnFirstDouble(query);
+        EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+}
