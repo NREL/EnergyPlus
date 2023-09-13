@@ -567,6 +567,8 @@ namespace ZoneAirLoopEquipmentManager {
         Real64 SpecHumOut(0.0);             // Specific humidity ratio of outlet air (kg moisture / kg moist air)
         Real64 SpecHumIn(0.0);              // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
+        auto &controlledZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+
         ProvideSysOutput = true;
         for (AirDistCompNum = 1; AirDistCompNum <= state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).NumComponents; ++AirDistCompNum) {
             NonAirSysOutput = 0.0;
@@ -611,7 +613,7 @@ namespace ZoneAirLoopEquipmentManager {
                                  airDistUnit.EquipName(AirDistCompNum),
                                  FirstHVACIteration,
                                  ControlledZoneNum,
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                 controlledZoneAirNode,
                                  airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::DualDuctVAV: {
@@ -619,7 +621,7 @@ namespace ZoneAirLoopEquipmentManager {
                                  airDistUnit.EquipName(AirDistCompNum),
                                  FirstHVACIteration,
                                  ControlledZoneNum,
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                 controlledZoneAirNode,
                                  airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::DualDuctVAVOutdoorAir: {
@@ -627,7 +629,7 @@ namespace ZoneAirLoopEquipmentManager {
                                  airDistUnit.EquipName(AirDistCompNum),
                                  FirstHVACIteration,
                                  ControlledZoneNum,
-                                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                 controlledZoneAirNode,
                                  airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat: {
@@ -635,7 +637,7 @@ namespace ZoneAirLoopEquipmentManager {
                                    airDistUnit.EquipName(AirDistCompNum),
                                    FirstHVACIteration,
                                    ControlledZoneNum,
-                                   state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                   controlledZoneAirNode,
                                    airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVReheat: {
@@ -643,7 +645,7 @@ namespace ZoneAirLoopEquipmentManager {
                                    airDistUnit.EquipName(AirDistCompNum),
                                    FirstHVACIteration,
                                    ControlledZoneNum,
-                                   state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                   controlledZoneAirNode,
                                    airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVNoReheat: {
@@ -651,7 +653,7 @@ namespace ZoneAirLoopEquipmentManager {
                                    airDistUnit.EquipName(AirDistCompNum),
                                    FirstHVACIteration,
                                    ControlledZoneNum,
-                                   state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                   controlledZoneAirNode,
                                    airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVNoReheat: {
@@ -659,7 +661,7 @@ namespace ZoneAirLoopEquipmentManager {
                                    airDistUnit.EquipName(AirDistCompNum),
                                    FirstHVACIteration,
                                    ControlledZoneNum,
-                                   state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                   controlledZoneAirNode,
                                    airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat: {
@@ -667,7 +669,7 @@ namespace ZoneAirLoopEquipmentManager {
                                    airDistUnit.EquipName(AirDistCompNum),
                                    FirstHVACIteration,
                                    ControlledZoneNum,
-                                   state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                   controlledZoneAirNode,
                                    airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolNoReheat: {
@@ -675,7 +677,7 @@ namespace ZoneAirLoopEquipmentManager {
                                    airDistUnit.EquipName(AirDistCompNum),
                                    FirstHVACIteration,
                                    ControlledZoneNum,
-                                   state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                   controlledZoneAirNode,
                                    airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat: {
@@ -683,7 +685,7 @@ namespace ZoneAirLoopEquipmentManager {
                        airDistUnit.EquipName(AirDistCompNum),
                        FirstHVACIteration,
                        ControlledZoneNum,
-                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                       controlledZoneAirNode,
                        airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat: {
@@ -691,7 +693,7 @@ namespace ZoneAirLoopEquipmentManager {
                        airDistUnit.EquipName(AirDistCompNum),
                        FirstHVACIteration,
                        ControlledZoneNum,
-                       state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                       controlledZoneAirNode,
                        airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ConstVol_4PipeInduc: {
@@ -699,7 +701,7 @@ namespace ZoneAirLoopEquipmentManager {
                            airDistUnit.EquipName(AirDistCompNum),
                            FirstHVACIteration,
                            ControlledZoneNum,
-                           state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                           controlledZoneAirNode,
                            airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheatVSFan: {
@@ -707,7 +709,7 @@ namespace ZoneAirLoopEquipmentManager {
                                    airDistUnit.EquipName(AirDistCompNum),
                                    FirstHVACIteration,
                                    ControlledZoneNum,
-                                   state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                   controlledZoneAirNode,
                                    airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolCooledBeam: {
@@ -715,7 +717,7 @@ namespace ZoneAirLoopEquipmentManager {
                             airDistUnit.EquipName(AirDistCompNum),
                             FirstHVACIteration,
                             ControlledZoneNum,
-                            state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                            controlledZoneAirNode,
                             airDistUnit.EquipIndex(AirDistCompNum),
                             NonAirSysOutput);
             } break;
@@ -727,7 +729,7 @@ namespace ZoneAirLoopEquipmentManager {
                                           airDistUnit.EquipName(AirDistCompNum),
                                           FirstHVACIteration,
                                           ControlledZoneNum,
-                                          state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode,
+                                          controlledZoneAirNode,
                                           airDistUnit.EquipIndex(AirDistCompNum));
             } break;
             case DataDefineEquip::ZnAirLoopEquipType::SingleDuctATMixer: {
@@ -781,15 +783,14 @@ namespace ZoneAirLoopEquipmentManager {
         }
         if (ProvideSysOutput) {
             int OutletNodeNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).OutletNodeNum;
-            int ZoneAirNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
             SpecHumOut = state.dataLoopNodes->Node(OutletNodeNum).HumRat;
-            SpecHumIn = state.dataLoopNodes->Node(ZoneAirNode).HumRat;
+            SpecHumIn = state.dataLoopNodes->Node(controlledZoneAirNode).HumRat;
             // Sign convention: SysOutputProvided <0 Zone is cooled
             //                  SysOutputProvided >0 Zone is heated
             SysOutputProvided = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate *
                                 Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(state.dataLoopNodes->Node(OutletNodeNum).Temp,
                                                                            SpecHumOut,
-                                                                           state.dataLoopNodes->Node(ZoneAirNode).Temp,
+                                                                           state.dataLoopNodes->Node(controlledZoneAirNode).Temp,
                                                                            SpecHumIn); // sensible {W};
             // Sign convention: LatOutputProvided <0 Zone is dehumidified
             //                  LatOutputProvided >0 Zone is humidified
