@@ -521,14 +521,14 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
 
 void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
 {
-    auto &loop = state.dataPlnt->PlantLoop(this->plantLoc.loopNum);
-
     // Locate the unit on the plant loops for later usage
     bool errFlag = false;
     PlantUtilities::ScanPlantLoopsForObject(state, this->Name, this->EnergyType, this->plantLoc, errFlag, _, _, _, _, _);
     if (errFlag) {
         ShowFatalError(state, "InitSimVars: Program terminated due to previous condition(s).");
     }
+
+    auto &loop = state.dataPlnt->PlantLoop(this->plantLoc.loopNum);
     // set limits on outlet node temps to plant loop limits
     DataPlant::CompData::getPlantComponent(state, this->plantLoc).MinOutletTemp = loop.MinTemp;
     DataPlant::CompData::getPlantComponent(state, this->plantLoc).MaxOutletTemp = loop.MaxTemp;
