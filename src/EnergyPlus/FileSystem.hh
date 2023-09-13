@@ -115,6 +115,7 @@ namespace FileSystem {
         ESO,
         MTR,
         last_flat_file_type = MTR,
+        DDY,
         Num
     };
 
