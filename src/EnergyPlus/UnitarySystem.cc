@@ -1282,8 +1282,8 @@ namespace UnitarySystems {
     void UnitarySys::frostControlSetPointLimit(EnergyPlusData &state,
                                                Real64 &TempSetPoint,       // temperature setpoint of the sensor node
                                                Real64 &HumRatSetPoint,     // humidity ratio setpoint of the sensor node
-                                               Real64 const BaroPress,     // baromtric pressure, Pa [N/m^2]
-                                               Real64 const TfrostControl, // minimum temperature limit for forst control
+                                               Real64 const BaroPress,     // barometric pressure, Pa [N/m^2]
+                                               Real64 const TfrostControl, // minimum temperature limit for frost control
                                                int const ControlMode       // temperature or humidity control mode
     )
     {
@@ -1293,7 +1293,7 @@ namespace UnitarySystems {
         //       DATE WRITTEN   January 2013
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Controls the forst formation condition based on user specified minimum DX coil outlet
+        // Controls the frost formation condition based on user specified minimum DX coil outlet
         // air temperature. Resets the cooling setpoint based on the user specified limiting
         // temperature for frost control.
 
@@ -1353,7 +1353,7 @@ namespace UnitarySystems {
         //       DATE WRITTEN   February 2013
 
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for sizing unitary system components for which nominal cpacities
+        // This subroutine is for sizing unitary system components for which nominal capacities
         // and flow rates have not been specified in the input. Coil sizing is preformed in the coil module.
         // Future modifications will size coils here and "push" this info to the specific coil.
 
@@ -1398,7 +1398,7 @@ namespace UnitarySystems {
             select_EqSizing = &OASysEqSizing(state.dataSize->CurOASysNum);
         } else if (state.dataSize->CurSysNum > 0) {
             select_EqSizing = &state.dataSize->UnitarySysEqSizing(state.dataSize->CurSysNum);
-            // this was reseting data set by OutdoorAirUnit when UnitarySystem is child
+            // this was resetting data set by OutdoorAirUnit when UnitarySystem is child
             // question is then who resets these (#8751 temporary fix)?
             // move here for now and only reset UnitarySystem flags, then find better way to do this
             select_EqSizing->AirFlow = false;
@@ -1558,7 +1558,7 @@ namespace UnitarySystems {
             if (!this->m_HeatCoilExists) state.dataSize->ZoneCoolingOnlyFan = true;
             TempSize = this->m_MaxCoolAirVolFlow;
             SaveCurDuctType = state.dataSize->CurDuctType;
-            // might want to rethink this method. Tries to find the larger of cooling or heating capcity
+            // might want to rethink this method. Tries to find the larger of cooling or heating capacity
             // however, if there is no heating coil the cooling air flow rate is used, not the main flow rate
             // this is fine if there are no other systems on the branch. CoilSystem does not do this (#8761).
             if (this->m_sysType == SysType::Unitary) state.dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
@@ -2549,7 +2549,7 @@ namespace UnitarySystems {
                     }
                 }
 
-                // TODO: Determine operating mode based on dehumdification stuff, using normalMode for now
+                // TODO: Determine operating mode based on dehumidification stuff, using normalMode for now
                 if (this->m_NumOfSpeedCooling != (int)newCoil.performance.normalMode.speeds.size()) {
                     ShowWarningError(state, format("{}: {} = {}", RoutineName, CompType, CompName));
                     ShowContinueError(state, "Number of cooling speeds does not match coil object.");
@@ -2688,7 +2688,7 @@ namespace UnitarySystems {
             DXCoils::SimDXCoilMultiSpeed(state, blankString, 1.0, 1.0, this->m_CoolingCoilIndex, 0, 0, DataHVACGlobals::CompressorOperation::Off);
             if (!HardSizeNoDesRun && EqSizing.Capacity) {
                 // do nothing, the vars EqSizing.DesCoolingLoad and DataSizing::DXCoolCap are already set earlier and the values could be max of the
-                // cooling and heating autosized values. Thus reseting them here to user specified value may not be the design size used else where
+                // cooling and heating autosized values. Thus resetting them here to user specified value may not be the design size used else where
             } else {
                 state.dataSize->DXCoolCap =
                     DXCoils::GetCoilCapacityByIndexType(state, this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound);
@@ -4054,7 +4054,7 @@ namespace UnitarySystems {
         }
 
         if (!AirLoopFound && !ZoneEquipmentFound && !OASysFound) {
-            // Unsucessful attempt to get all input data.
+            // Unsuccessful attempt to get all input data.
             return;
         } else if (ZoneEquipmentFound || OASysFound ||
                    (AirLoopFound && (this->m_ZoneInletNode > 0 || this->m_ControlType == UnitarySysCtrlType::Setpoint))) {
@@ -5540,7 +5540,7 @@ namespace UnitarySystems {
         }
 
         // Users may not provide SA flow input fields (below) and leave them blank. Check if other coil is AutoSized first to
-        // alieviate input requirements. check if coil has no air flow input (VolFlow = 0) and other coil isDataSizing::AutoSized. If so,
+        // alleviate input requirements. check if coil has no air flow input (VolFlow = 0) and other coil isDataSizing::AutoSized. If so,
         // use AutoSize for coil with 0 air flow rate. This means that the coils MUST mine the air flow rate if it exists
         if (this->m_CoolCoilExists && this->m_HeatCoilExists) {
             if (this->m_MaxCoolAirVolFlow == DataSizing::AutoSize && this->m_MaxHeatAirVolFlow == 0 && loc_m_HeatingSAFMethod == "") {
@@ -6448,7 +6448,7 @@ namespace UnitarySystems {
             // UnitarySystem has a single field for max outlet temp
             this->DesignMaxOutletTemp = input_data.maximum_supply_air_temperature;
         } else {
-            // PTHP has a field for max outlet temp for supplmental heater and max outlet temp for SZVAV
+            // PTHP has a field for max outlet temp for supplemental heater and max outlet temp for SZVAV
             if (this->m_ControlType == UnitarySysCtrlType::CCMASHRAE) {
                 this->DesignMaxOutletTemp = input_data.maximum_supply_air_temperature;
             } else {
@@ -6839,7 +6839,7 @@ namespace UnitarySystems {
                                          cCurrentModuleObject + " = " + this->Name + " with Fan:SystemModel is used in  " +
                                              this->input_specs.supply_fan_name + "\"");
                         ShowContinueError(state, format("...The number of speed = {:.0R}.", double(NumSpeeds)));
-                        ShowContinueError(state, "...Multiple speed fan will be appiled to this unit. The speed number is determined by load.");
+                        ShowContinueError(state, "...Multiple speed fan will be applied to this unit. The speed number is determined by load.");
                     }
                 }
             }
@@ -15231,7 +15231,7 @@ namespace UnitarySystems {
     void UnitarySys::simMultiSpeedCoils(EnergyPlusData &state,
                                         int const AirLoopNum,                               // Index to air loop
                                         bool const FirstHVACIteration,                      // True when first HVAC iteration
-                                        DataHVACGlobals::CompressorOperation &CompressorOn, // compresor on/off control
+                                        DataHVACGlobals::CompressorOperation &CompressorOn, // compressor on/off control
                                         bool const SensibleLoad,
                                         bool const LatentLoad,
                                         Real64 const PartLoadFrac,
@@ -16213,7 +16213,7 @@ namespace UnitarySystems {
         // DX Coil output depends on the compressor speed which is being varied to zero the residual.
 
         // METHODOLOGY EMPLOYED:
-        // Calls calc routine sof multi speed or variable speed coils to get outlet humidity ratio at the given compressor speed
+        // Calls calc routines of multi speed or variable speed coils to get outlet humidity ratio at the given compressor speed
         // and calculates the residual as defined above
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
@@ -17879,7 +17879,7 @@ namespace UnitarySystems {
             state.dataUnitarySystems->setupOutputOnce = false;
         } else {
             ShowSevereError(state,
-                            "setupAllOutputVar: Developer error. Should never get here. Remove when confortable that UnitarySys::allocateUnitarySys "
+                            "setupAllOutputVar: Developer error. Should never get here. Remove when comfortable that UnitarySys::allocateUnitarySys "
                             "is working as expected.");
             ShowFatalError(state, "setupAllOutputVar: Developer error. Conflict in number of UnitarySystems.");
         }
@@ -17946,7 +17946,7 @@ namespace UnitarySystems {
                                                    highSpeedEconMassFlowRate,
                                                    highSpeedEconMassFlowRate / this->m_CoolMassFlowRate[this->m_NumOfSpeedCooling]);
             econClgOutput = cpAir * highSpeedEconMassFlowRate * (zoneTemp - (outdoorAirTemp + highSpeedFanDT));
-            // check if economizer alone can meet the load, or if we have reached the maximumm cooling speed
+            // check if economizer alone can meet the load, or if we have reached the maximum cooling speed
             if (econClgOutput > std::abs(zoneLoad) || clgSpd == this->m_NumOfSpeedCooling) {
                 // low speed economizer operation is handled through normal process (i.e., no staging operation)
                 if (clgSpd > 1) {
