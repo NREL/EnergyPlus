@@ -8472,14 +8472,14 @@ namespace UnitarySystems {
                                       SupHeaterLoad,
                                       CompressorONFlag);
         Real64 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).HumRat);
+        Real64 heatCoildT =
+            (this->m_HeatCoilExists)
+                ? (state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp - state.dataLoopNodes->Node(this->HeatCoilInletNodeNum).Temp)
+                : 0.0;
         Real64 CoolingOnlySensibleOutput =
             state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate * CpAir *
-            (state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp - state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).Temp);
-        if (this->m_HeatCoilExists) {
-            CoolingOnlySensibleOutput -=
-                state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate * CpAir *
-                (state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp - state.dataLoopNodes->Node(this->HeatCoilInletNodeNum).Temp);
-        }
+            ((state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp - state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).Temp) -
+             heatCoildT);
         if (state.dataUnitarySystems->QToHeatSetPt < 0.0) {
             //   Calculate the reheat coil load wrt the heating setpoint temperature. Reheat coil picks up
             //   the entire excess sensible cooling (DX cooling coil and impact of outdoor air).
@@ -8510,22 +8510,21 @@ namespace UnitarySystems {
         // This subroutine determines operating PLR and calculates the load based system output.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr MaxIter(100); // maximum number of iterations
+        int constexpr MaxIter = 100; // maximum number of iterations
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int SpeedNum;                     // multi-speed coil speed number
-        Real64 SensOutputOn;              // sensible output at PLR = 1 [W]
-        Real64 LatOutputOn;               // latent output at PLR = 1 [W]
-        Real64 TempLoad;                  // represents either a sensible or latent load [W]
-        Real64 TempSysOutput;             // represents either a sensible or latent capacity [W]
-        Real64 TempSensOutput;            // iterative sensible capacity [W]
-        Real64 TempLatOutput;             // iterative latent capacity [W]
-        Real64 TempMinPLR;                // iterative minimum PLR
-        Real64 TempMaxPLR;                // iterative maximum PLR
-        Real64 CoolingOnlySensibleOutput; // use to calculate dehumidification induced heating [W]
-        Real64 CpAir;                     // specific heat of air [J/kg_C]
-        Real64 FullLoadAirOutletTemp;     // saved full load outlet air temperature [C]
-        Real64 FullLoadAirOutletHumRat;   // saved full load outlet air humidity ratio [kg/kg]
+        int SpeedNum;                   // multi-speed coil speed number
+        Real64 SensOutputOn;            // sensible output at PLR = 1 [W]
+        Real64 LatOutputOn;             // latent output at PLR = 1 [W]
+        Real64 TempLoad;                // represents either a sensible or latent load [W]
+        Real64 TempSysOutput;           // represents either a sensible or latent capacity [W]
+        Real64 TempSensOutput;          // iterative sensible capacity [W]
+        Real64 TempLatOutput;           // iterative latent capacity [W]
+        Real64 TempMinPLR;              // iterative minimum PLR
+        Real64 TempMaxPLR;              // iterative maximum PLR
+        Real64 CpAir;                   // specific heat of air [J/kg_C]
+        Real64 FullLoadAirOutletTemp;   // saved full load outlet air temperature [C]
+        Real64 FullLoadAirOutletHumRat; // saved full load outlet air humidity ratio [kg/kg]
 
         std::string CompName = this->Name;
         int OutletNode = this->AirOutNode;
@@ -10075,10 +10074,14 @@ namespace UnitarySystems {
         FullSensibleOutput = TempSensOutput;
 
         CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).HumRat);
-        CoolingOnlySensibleOutput =
+        Real64 heatCoildT =
+            (this->m_HeatCoilExists)
+                ? (state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp - state.dataLoopNodes->Node(this->HeatCoilInletNodeNum).Temp)
+                : 0.0;
+        Real64 CoolingOnlySensibleOutput =
             state.dataLoopNodes->Node(this->CoolCoilInletNodeNum).MassFlowRate * CpAir *
             ((state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp - state.dataLoopNodes->Node(this->CoolCoilOutletNodeNum).Temp) -
-             (state.dataLoopNodes->Node(this->HeatCoilOutletNodeNum).Temp - state.dataLoopNodes->Node(this->HeatCoilInletNodeNum).Temp));
+             heatCoildT);
         if (state.dataUnitarySystems->QToHeatSetPt < 0.0) {
             //   Calculate the reheat coil load wrt the heating setpoint temperature. Reheat coil picks up
             //   the entire excess sensible cooling (DX cooling coil and impact of outdoor air).
