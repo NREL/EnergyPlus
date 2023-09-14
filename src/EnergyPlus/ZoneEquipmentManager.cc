@@ -3639,13 +3639,14 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 for (auto &space : thisZeqSplitter.spaces) {
                     Real64 spaceSysOutputProvided = SysOutputProvided * space.outputFraction;
                     Real64 spaceLatOutputProvided = LatOutputProvided * space.outputFraction;
-                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(space.spaceIndex).NonAirSystemResponse += NonAirSysOutput;
+                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(space.spaceIndex).NonAirSystemResponse +=
+                        NonAirSysOutput * space.outputFraction;
                     if (thisZeqSplitter.zoneEquipOutletNodeNum > 0 && space.spaceNodeNum > 0) {
                         auto &equipOutletNode = state.dataLoopNodes->Node(thisZeqSplitter.zoneEquipOutletNodeNum);
                         auto &spaceInletNode = state.dataLoopNodes->Node(space.spaceNodeNum);
                         spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * space.outputFraction;
-                        spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail;
-                        spaceInletNode.MassFlowRateMinAvail = equipOutletNode.MassFlowRateMinAvail;
+                        spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail * space.outputFraction;
+                        spaceInletNode.MassFlowRateMinAvail = equipOutletNode.MassFlowRateMinAvail * space.outputFraction;
                         spaceInletNode.Temp = equipOutletNode.Temp;
                         spaceInletNode.HumRat = equipOutletNode.HumRat;
                         spaceInletNode.CO2 = equipOutletNode.CO2;
