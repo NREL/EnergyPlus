@@ -21,6 +21,9 @@ std::shared_ptr<RSInstanceBase> RS0006Factory::create_instance(const char* RS_in
     }
     else if (j["metadata"]["schema"] == "RS0006")
     {
+        if (ashrae205_ns::Ashrae205::logger == nullptr) {
+            ashrae205_ns::Ashrae205::logger = logger;
+        }
         rs0006_ns::RS0006::logger = logger;
         p_rs->initialize(j);
     }
