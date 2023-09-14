@@ -1469,8 +1469,8 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else if (condenserType == "AIRSOURCE") {
                     thisPLHP.airSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
+                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
                     if (sourceSideInletNodeName == sourceSideOutletNodeName) {
                         ShowSevereError(state, format("PlantLoopHeatPump {} has the same inlet and outlet node.", thisObjectName));
                         ShowContinueError(state, format("Node Name: {}", sourceSideInletNodeName));
@@ -1492,15 +1492,6 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                      condenserNodeConnectionType_Inlet,
                                                                                      NodeInputManager::CompFluidStream::Secondary,
                                                                                      DataLoopNode::ObjectIsNotParent);
-                if (condenserNodeType == DataLoopNode::NodeFluidType::Air) {
-                    if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisPLHP.sourceSideNodes.inlet)) {
-                        ShowSevereError(
-                            state,
-                            format(
-                                "Air Source PlantLoop:HeatPump: {} inlet node: {} is not an OutdoorAir:Node.", thisPLHP.name, sourceSideInletNodeName));
-                        ShowContinueError(state, "Confirm that this is the intended source for the outdoor air stream.");
-                    }
-                }
                 thisPLHP.sourceSideNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                       sourceSideOutletNodeName,
                                                                                       nodeErrorsFound,

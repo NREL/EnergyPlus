@@ -66,6 +66,7 @@
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
@@ -575,10 +576,17 @@ TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceNoOANode)
     // call the factory with a valid name to trigger reading inputs
     // expects fatal error due to same node names
     EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
+    bool ErrFound = false;
+    BranchNodeConnections::CheckNodeConnections(*state, ErrFound);
     // expect error related to OA node not being an OutdoorAirNode
     std::string error_msg = delimited_string({
-        "   ** Severe  ** Air Source PlantLoop:HeatPump: HP COOLING SIDE inlet node: NODE 3 is not an OutdoorAir:Node.",
-        "   **   ~~~   ** Confirm that this is the intended source for the outdoor air stream.",
+        "   ** Severe  ** Node Connection Error, Node=\"NODE 1\", Inlet node did not find an appropriate matching \"outlet\" node.",
+        "   **   ~~~   ** If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.",
+        "   **   ~~~   ** Reference Object=HeatPump:PlantLoop:EIR:Cooling, Name=HP COOLING SIDE",
+        "   ** Severe  ** Node Connection Error, Node=\"NODE 3\", Inlet node did not find an appropriate matching \"outlet\" node.",
+        "   **   ~~~   ** If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.",
+        "   **   ~~~   ** Reference Object=HeatPump:PlantLoop:EIR:Cooling, Name=HP COOLING SIDE",
+
     });
     EXPECT_TRUE(compare_err_stream(error_msg));
 }
@@ -682,7 +690,6 @@ TEST_F(EnergyPlusFixture, Initialization)
     EXPECT_NEAR(expectedSourceSideMassFlow, state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMax, flowTol);
     EXPECT_NEAR(expectedSourceSideMassFlow, state->dataLoopNodes->Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
 }
-
 
 TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource)
 {
