@@ -871,7 +871,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
         ThisInNode.Press = 0.0;
         ThisInNode.HumRat = 0.0;
 
-        thisCP.ZeroSourceSumHATsurf = 0.0;
+        thisCP.ZeroCPSourceSumHATsurf = 0.0;
         thisCP.CoolingPanelSource = 0.0;
         thisCP.CoolingPanelSrcAvg = 0.0;
         thisCP.LastCoolingPanelSrc = 0.0;
@@ -887,7 +887,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
     if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
         int ZoneNum = thisCP.ZonePtr;
-        state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
+        thisCP.ZeroCPSourceSumHATsurf = state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state);
         thisCP.CoolingPanelSrcAvg = 0.0;
         thisCP.LastCoolingPanelSrc = 0.0;
         thisCP.LastSysTimeElapsed = 0.0;
@@ -1238,8 +1238,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     // iterate like in the low temperature radiant systems because the inlet water condition is known
     // not calculated.  So, we can deal with this upfront rather than after calculation and then more
     // iteration.
-    Real64 DewPointTemp = Psychrometrics::PsyTdpFnWPb(
-        state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+    Real64 DewPointTemp =
+        Psychrometrics::PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRat, state.dataEnvrn->OutBaroPress);
 
     if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 
@@ -1412,8 +1412,8 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             // that all energy radiated to people is converted to convective energy is
             // not very precise, but at least it conserves energy. The system impact to heat balance
             // should include this.
-            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - state.dataHeatBal->Zone(ZoneNum).ZeroSourceSumHATsurf) +
-                      (CoolingPanelCool * this->FracConvect) + (RadHeat * this->FracDistribPerson);
+            LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - this->ZeroCPSourceSumHATsurf) + (CoolingPanelCool * this->FracConvect) +
+                      (RadHeat * this->FracDistribPerson);
         }
         this->WaterOutletEnthalpy = this->WaterInletEnthalpy - CoolingPanelCool / waterMassFlowRate;
 
