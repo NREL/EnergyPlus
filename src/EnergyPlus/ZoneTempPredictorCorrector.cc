@@ -3247,16 +3247,16 @@ void ZoneSpaceHeatBalanceData::beginEnvironmentInit(EnergyPlusData &state)
         this->DSWPrevZoneTS[i] = state.dataEnvrn->OutHumRat;
         this->WPrevZoneTSTemp[i] = 0.0;
     }
-    this->WZoneTimeMinusP = state.dataEnvrn->OutHumRat;
-    this->ZoneW1 = state.dataEnvrn->OutHumRat;
-    this->ZoneWMX = state.dataEnvrn->OutHumRat;
-    this->ZoneWM2 = state.dataEnvrn->OutHumRat;
-    this->ZoneAirHumRatTemp = 0.0;
-    this->TempIndZnLd = 0.0;
-    this->TempDepZnLd = 0.0;
-    this->ZoneAirRelHum = 0.0;
+    this->WTimeMinusP = state.dataEnvrn->OutHumRat;
+    this->W1 = state.dataEnvrn->OutHumRat;
+    this->WMX = state.dataEnvrn->OutHumRat;
+    this->WM2 = state.dataEnvrn->OutHumRat;
+    this->airHumRatTemp = 0.0;
+    this->tempIndLoad = 0.0;
+    this->tempDepLoad = 0.0;
+    this->airRelHum = 0.0;
     this->AirPowerCap = 0.0;
-    this->ZoneT1 = 0.0;
+    this->T1 = 0.0;
 }
 
 void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name)
@@ -3271,14 +3271,14 @@ void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::strin
     SetupOutputVariable(state,
                         format("{} Air Humidity Ratio", prefix),
                         OutputProcessor::Unit::None,
-                        this->ZoneAirHumRat,
+                        this->airHumRat,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Relative Humidity", prefix),
                         OutputProcessor::Unit::Perc,
-                        this->ZoneAirRelHum,
+                        this->airRelHum,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         name);
@@ -3425,7 +3425,7 @@ void PredictSystemLoads(EnergyPlusData &state,
                     Tprev = thisZoneHB.MAT;
                     if (ShortenTimeStepSys) Tprev = thisZoneHB.XMPT;
                 } else {
-                    Tprev = thisZoneHB.ZoneT1;
+                    Tprev = thisZoneHB.T1;
                 }
 
                 switch (state.dataHeatBalFanSys->TempControlType(thisTempControlledZone.ActualZoneNum)) {
@@ -3565,8 +3565,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     }
 
     this->AirPowerCap = volume * state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens *
-                        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->ZoneAirHumRat) *
-                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / TimeStepSysSec;
+                        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->airHumRat) *
+                        Psychrometrics::PsyCpAirFnW(this->airHumRat) / TimeStepSysSec;
     Real64 RAFNFrac = 0.0;
 
     // Calculate the various heat balance sums
@@ -3583,8 +3583,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     this->TempDepCoef = this->SumHA + this->SumMCp;
     this->TempIndCoef = this->SumIntGain + this->SumHATsurf - this->SumHATref + this->SumMCpT + this->SysDepZoneLoadsLagged;
     this->TempHistoryTerm = this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2]);
-    this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
-    this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
+    this->tempDepLoad = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
+    this->tempIndLoad = this->TempHistoryTerm + this->TempIndCoef;
     if (state.dataRoomAir->anyNonMixingRoomAirModel) {
         if (state.dataRoomAir->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
             // RoomAirflowNetworkModel - make dynamic term independent of TimeStepSys
@@ -3599,8 +3599,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                 this->AirPowerCap = afnZoneInfo.Node(RoomAirNode).AirVolume * state.dataHeatBal->Zone(zoneNum).ZoneVolCapMultpSens *
                                     afnZoneInfo.Node(RoomAirNode).RhoAir * afnZoneInfo.Node(RoomAirNode).CpAir / TimeStepSysSec;
                 this->TempHistoryTerm = this->AirPowerCap * (3.0 * this->ZTM[0] - (3.0 / 2.0) * this->ZTM[1] + (1.0 / 3.0) * this->ZTM[2]);
-                this->TempDepZnLd = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
-                this->TempIndZnLd = this->TempHistoryTerm + this->TempIndCoef;
+                this->tempDepLoad = (11.0 / 6.0) * this->AirPowerCap + this->TempDepCoef;
+                this->tempIndLoad = this->TempHistoryTerm + this->TempIndCoef;
                 if (afnZoneInfo.Node(RoomAirNode).HasHVACAssigned) RAFNFrac = afnZoneInfo.Node(RoomAirNode).HVAC(1).SupplyFraction;
             }
         }
@@ -3611,8 +3611,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
         if (shortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
             if (state.dataHVACGlobal->PreviousTimeStep < state.dataGlobal->TimeStepZone) {
-                this->ZoneT1 = this->ZoneTM2;
-                this->ZoneW1 = this->ZoneWM2;
+                this->T1 = this->TM2;
+                this->W1 = this->WM2;
                 if (state.dataRoomAir->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                     auto &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(zoneNum);
                     for (auto &afnNode : afnZoneInfo.Node) {
@@ -3621,8 +3621,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                     }
                 }
             } else {
-                this->ZoneT1 = this->ZoneTMX;
-                this->ZoneW1 = this->ZoneWMX;
+                this->T1 = this->TMX;
+                this->W1 = this->WMX;
                 if (state.dataRoomAir->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                     auto &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(zoneNum);
                     for (auto &afnNode : afnZoneInfo.Node) {
@@ -3633,8 +3633,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
             }
             state.dataHVACGlobal->ShortenTimeStepSysRoomAir = true;
         } else {
-            this->ZoneT1 = this->ZT;
-            this->ZoneW1 = this->ZoneAirHumRat;
+            this->T1 = this->ZT;
+            this->W1 = this->airHumRat;
             if (state.dataRoomAir->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
                 auto &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(zoneNum);
                 for (auto &afnNode : afnZoneInfo.Node) {
@@ -3643,8 +3643,8 @@ void ZoneSpaceHeatBalanceData::predictSystemLoad(
                 }
             }
         }
-        this->TempDepZnLd = this->TempDepCoef;
-        this->TempIndZnLd = this->TempIndCoef;
+        this->tempDepLoad = this->TempDepCoef;
+        this->tempIndLoad = this->TempIndCoef;
     }
 
     // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
@@ -4077,8 +4077,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 
         // Calculate hourly humidity ratio from infiltration + humidity added from latent load
         // to determine system added/subtracted moisture.
-        Real64 LatentGain =
-            this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
+        Real64 LatentGain = this->latentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
@@ -4088,8 +4087,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
         // are currently set to zero when the CTF only version is used.
 
         // The density of air and latent heat of vaporization are calculated as functions.
-        Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->ZT, this->ZoneAirHumRat, RoutineName);
-        Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(this->ZoneAirHumRat, this->ZT);
+        Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->ZT, this->airHumRat, RoutineName);
+        Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(this->airHumRat, this->ZT);
 
         // Assume that the system will have flow
         Real64 A = 0.0;
@@ -4139,13 +4138,13 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             // Exact solution
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
-                LoadToHumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) - B;
+                LoadToHumidifySetPoint = C * (WZoneSetPoint - this->W1) - B;
             } else {
                 exp_700_A_C = std::exp(min(700.0, -A / C)); // Tuned Save expensive value
-                LoadToHumidifySetPoint = A * (WZoneSetPoint - this->ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
+                LoadToHumidifySetPoint = A * (WZoneSetPoint - this->W1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
             }
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            LoadToHumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) + A * WZoneSetPoint - B;
+            LoadToHumidifySetPoint = C * (WZoneSetPoint - this->W1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
         WZoneSetPoint =
@@ -4157,12 +4156,12 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
             // Exact solution
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::AnalyticalSolution) {
             if (A == 0.0) { // B=0
-                LoadToDehumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) - B;
+                LoadToDehumidifySetPoint = C * (WZoneSetPoint - this->W1) - B;
             } else {
-                LoadToDehumidifySetPoint = A * (WZoneSetPoint - this->ZoneW1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
+                LoadToDehumidifySetPoint = A * (WZoneSetPoint - this->W1 * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
             }
         } else if (state.dataHeatBal->ZoneAirSolutionAlgo == DataHeatBalance::SolutionAlgo::EulerMethod) {
-            LoadToDehumidifySetPoint = C * (WZoneSetPoint - this->ZoneW1) + A * WZoneSetPoint - B;
+            LoadToDehumidifySetPoint = C * (WZoneSetPoint - this->W1) + A * WZoneSetPoint - B;
         }
         if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
 
@@ -4282,8 +4281,8 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         volume = thisZone.Volume;
     }
     this->AirPowerCap = volume * thisZone.ZoneVolCapMultpSens *
-                        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->ZoneAirHumRat, RoutineName) *
-                        Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat) / TimeStepSysSec;
+                        Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->MAT, this->airHumRat, RoutineName) *
+                        Psychrometrics::PsyCpAirFnW(this->airHumRat) / TimeStepSysSec;
 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0) {
@@ -4327,14 +4326,14 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         } break;
         case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
             if (this->TempDepCoef == 0.0) { // B=0
-                this->ZT = this->ZoneT1 + this->TempIndCoef / this->AirPowerCap;
+                this->ZT = this->T1 + this->TempIndCoef / this->AirPowerCap;
             } else {
-                this->ZT = (this->ZoneT1 - this->TempIndCoef / this->TempDepCoef) * std::exp(min(700.0, -this->TempDepCoef / this->AirPowerCap)) +
+                this->ZT = (this->T1 - this->TempIndCoef / this->TempDepCoef) * std::exp(min(700.0, -this->TempDepCoef / this->AirPowerCap)) +
                            this->TempIndCoef / this->TempDepCoef;
             }
         } break;
         case DataHeatBalance::SolutionAlgo::EulerMethod: {
-            this->ZT = (this->AirPowerCap * this->ZoneT1 + this->TempIndCoef) / (this->AirPowerCap + this->TempDepCoef);
+            this->ZT = (this->AirPowerCap * this->T1 + this->TempIndCoef) / (this->AirPowerCap + this->TempDepCoef);
         } break;
         default:
             break;
@@ -4414,7 +4413,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         }
 
         // Sensible load is the enthalpy into the zone minus the enthalpy that leaves the zone.
-        Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat);
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->airHumRat);
         Real64 ZoneEnthalpyIn = this->SumSysMCpT;
 
         // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
@@ -4440,14 +4439,14 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
         } break;
         case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
             if (this->TempDepCoef == 0.0) { // B=0
-                this->ZT = this->ZoneT1 + this->TempIndCoef / this->AirPowerCap;
+                this->ZT = this->T1 + this->TempIndCoef / this->AirPowerCap;
             } else {
-                this->ZT = (this->ZoneT1 - this->TempIndCoef / this->TempDepCoef) * std::exp(min(700.0, -this->TempDepCoef / this->AirPowerCap)) +
+                this->ZT = (this->T1 - this->TempIndCoef / this->TempDepCoef) * std::exp(min(700.0, -this->TempDepCoef / this->AirPowerCap)) +
                            this->TempIndCoef / this->TempDepCoef;
             }
         } break;
         case DataHeatBalance::SolutionAlgo::EulerMethod: {
-            this->ZT = (this->AirPowerCap * this->ZoneT1 + this->TempIndCoef) / (this->AirPowerCap + this->TempDepCoef);
+            this->ZT = (this->AirPowerCap * this->T1 + this->TempIndCoef) / (this->AirPowerCap + this->TempDepCoef);
         } break;
         default:
             break;
@@ -4498,8 +4497,8 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     // Final humidity calcs
     this->correctHumRat(state, zoneNum, spaceNum);
 
-    this->ZoneAirHumRat = this->ZoneAirHumRatTemp;
-    this->ZoneAirRelHum = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state, this->ZT, this->ZoneAirHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
+    this->airHumRat = this->airHumRatTemp;
+    this->airRelHum = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state, this->ZT, this->airHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
     // tempChange is used by HVACManager to determine if the timestep needs to be shortened.
     bool isMixed = true;
@@ -4521,7 +4520,7 @@ Real64 ZoneSpaceHeatBalanceData::correctAirTemp(
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution:
     case DataHeatBalance::SolutionAlgo::EulerMethod: {
         if (isMixed) {
-            tempChange = max(tempChange, std::abs(this->ZT - this->ZoneT1));
+            tempChange = max(tempChange, std::abs(this->ZT - this->T1));
         } else {
             tempChange = max(tempChange,
                              max(std::abs(state.dataRoomAir->ZTOC(zoneNum) - state.dataRoomAir->Zone1OC(zoneNum)),
@@ -4585,10 +4584,10 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
     }
     this->XMAT[0] = this->ZTAV; // using average for whole zone time step.
     this->XMPT = this->ZT;
-    this->WPrevZoneTS[0] = this->ZoneAirHumRatAvg; // using average for whole zone time step.
-    this->ZoneAirHumRat = this->ZoneAirHumRatTemp;
-    this->WZoneTimeMinusP = this->ZoneAirHumRatTemp;
-    this->ZoneAirRelHum = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state, this->ZT, this->ZoneAirHumRat, state.dataEnvrn->OutBaroPress, routineName);
+    this->WPrevZoneTS[0] = this->airHumRatAvg; // using average for whole zone time step.
+    this->airHumRat = this->airHumRatTemp;
+    this->WTimeMinusP = this->airHumRatTemp;
+    this->airRelHum = 100.0 * Psychrometrics::PsyRhFnTdbWPb(state, this->ZT, this->airHumRat, state.dataEnvrn->OutBaroPress, routineName);
 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0) {
@@ -4630,10 +4629,10 @@ void ZoneSpaceHeatBalanceData::pushZoneTimestepHistory(EnergyPlusData &state, in
     }
 
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
-        this->ZoneTM2 = this->ZoneTMX;
-        this->ZoneTMX = this->ZTAV; // using average for whole zone time step.
-        this->ZoneWM2 = this->ZoneWMX;
-        this->ZoneWMX = this->ZoneAirHumRatAvg; // using average for whole zone time step.
+        this->TM2 = this->TMX;
+        this->TMX = this->ZTAV; // using average for whole zone time step.
+        this->WM2 = this->WMX;
+        this->WMX = this->airHumRatAvg; // using average for whole zone time step.
         // SpaceHB TODO: For now, room air model is only for zones
         if (spaceNum == 0) {
             if (thisAirModel.AirModel == RoomAir::RoomAirModel::DispVent3Node || thisAirModel.AirModel == RoomAir::RoomAirModel::UFADInt ||
@@ -4687,7 +4686,7 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
         this->DSWPrevZoneTS[iHistory] = this->DSWPrevZoneTS[iHistory - 1];
     }
     this->DSXMAT[0] = this->MAT;
-    this->DSWPrevZoneTS[0] = this->ZoneAirHumRat;
+    this->DSWPrevZoneTS[0] = this->airHumRat;
 
     // SpaceHB TODO: For now, room air model is only for zones
     if (spaceNum == 0 && state.dataRoomAir->anyNonMixingRoomAirModel) {
@@ -4723,10 +4722,10 @@ void ZoneSpaceHeatBalanceData::pushSystemTimestepHistory(EnergyPlusData &state, 
     }
 
     if (state.dataHeatBal->ZoneAirSolutionAlgo != DataHeatBalance::SolutionAlgo::ThirdOrder) {
-        this->ZoneTM2 = this->ZoneTMX;
-        this->ZoneTMX = this->MAT; // using average for whole zone time step.
-        this->ZoneWM2 = this->ZoneWMX;
-        this->ZoneWMX = this->ZoneAirHumRatTemp; // using average for whole zone time step.
+        this->TM2 = this->TMX;
+        this->TMX = this->MAT; // using average for whole zone time step.
+        this->WM2 = this->WMX;
+        this->WMX = this->airHumRatTemp; // using average for whole zone time step.
 
         // SpaceHB TODO: For now, room air model is only for zones
         if (spaceNum == 0) {
@@ -4876,7 +4875,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
     }
 
     // Calculate hourly humidity ratio from infiltration + humidity added from latent load + system added moisture
-    Real64 LatentGain = this->ZoneLatentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
+    Real64 LatentGain = this->latentGain + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) + state.dataHeatBalFanSys->SumLatentPool(zoneNum);
 
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
@@ -4885,8 +4884,8 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
     // heat balance.  There are 2 cases that should be considered, system
     // operating and system shutdown.
 
-    Real64 const RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->ZT, this->ZoneAirHumRat, RoutineName);
-    Real64 const H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(this->ZoneAirHumRat, this->ZT);
+    Real64 const RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, this->ZT, this->airHumRat, RoutineName);
+    Real64 const H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(this->airHumRat, this->ZT);
 
     Real64 B = (LatentGain / H2OHtOfVap) + ((this->OAMFL + this->VAMFL + this->CTMFL) * state.dataEnvrn->OutHumRat) + this->EAMFLxHumRat +
                (MoistureMassFlowRate) + this->SumHmARaW + this->MixingMassFlowXHumRat + this->MDotOA * state.dataEnvrn->OutHumRat;
@@ -4912,36 +4911,36 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
     // auto &zoneW1 = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneW1;
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-        this->ZoneAirHumRatTemp =
+        this->airHumRatTemp =
             (B + C * (3.0 * this->WPrevZoneTSTemp[0] - (3.0 / 2.0) * this->WPrevZoneTSTemp[1] + (1.0 / 3.0) * this->WPrevZoneTSTemp[2])) /
             ((11.0 / 6.0) * C + A);
         // Exact solution
     } break;
     case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
         if (A == 0.0) { // B=0
-            this->ZoneAirHumRatTemp = this->ZoneW1 + B / C;
+            this->airHumRatTemp = this->W1 + B / C;
         } else {
-            this->ZoneAirHumRatTemp = (this->ZoneW1 - B / A) * std::exp(min(700.0, -A / C)) + B / A;
+            this->airHumRatTemp = (this->W1 - B / A) * std::exp(min(700.0, -A / C)) + B / A;
         }
     } break;
     case DataHeatBalance::SolutionAlgo::EulerMethod: {
-        this->ZoneAirHumRatTemp = (C * this->ZoneW1 + B) / (C + A);
+        this->airHumRatTemp = (C * this->W1 + B) / (C + A);
     } break;
     default:
         break;
     }
 
     // Set the humidity ratio to zero if the zone has been dried out
-    if (this->ZoneAirHumRatTemp < 0.0) this->ZoneAirHumRatTemp = 0.0;
+    if (this->airHumRatTemp < 0.0) this->airHumRatTemp = 0.0;
 
     // Check to make sure that is saturated there is condensation in the zone
     // by resetting to saturation conditions.
     Real64 const WZSat = Psychrometrics::PsyWFnTdbRhPb(state, this->ZT, 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
 
-    if (this->ZoneAirHumRatTemp > WZSat) this->ZoneAirHumRatTemp = WZSat;
+    if (this->airHumRatTemp > WZSat) this->airHumRatTemp = WZSat;
 
     if (state.dataRoomAir->AirModel(zoneNum).AirModel == RoomAir::RoomAirModel::AirflowNetwork) {
-        this->ZoneAirHumRatTemp = state.dataRoomAir->AFNZoneInfo(zoneNum).Node(state.dataRoomAir->AFNZoneInfo(zoneNum).ControlAirNodeID).HumRat;
+        this->airHumRatTemp = state.dataRoomAir->AFNZoneInfo(zoneNum).Node(state.dataRoomAir->AFNZoneInfo(zoneNum).ControlAirNodeID).HumRat;
     }
 
     // HybridModel with measured humidity ratio begins
@@ -4952,7 +4951,7 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
             (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing)) {
             Real64 LatentGainExceptPeople = 0.0;
             if (state.dataHybridModel->HybridModelZone(zoneNum).PeopleCountCalc_H) {
-                LatentGainExceptPeople = this->ZoneLatentGainExceptPeople + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) +
+                LatentGainExceptPeople = this->latentGainExceptPeople + state.dataHeatBalFanSys->SumLatentHTRadSys(zoneNum) +
                                          state.dataHeatBalFanSys->SumLatentPool(zoneNum);
             }
 
@@ -4966,22 +4965,22 @@ void ZoneSpaceHeatBalanceData::correctHumRat(EnergyPlusData &state, int const zo
         ZoneNodeNum = state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber;
     }
     if (ZoneNodeNum > 0) {
-        state.dataLoopNodes->Node(ZoneNodeNum).HumRat = this->ZoneAirHumRatTemp;
-        state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(this->ZT, this->ZoneAirHumRatTemp);
+        state.dataLoopNodes->Node(ZoneNodeNum).HumRat = this->airHumRatTemp;
+        state.dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(this->ZT, this->airHumRatTemp);
     }
     if (state.dataHeatBal->DoLatentSizing) {
         Real64 sensibleLoad = 0.0;
         Real64 pSat = Psychrometrics::PsyPsatFnTemp(state, this->ZT, RoutineName);
-        Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, this->ZoneAirHumRatTemp, state.dataEnvrn->StdBaroPress);
+        Real64 Tdp = Psychrometrics::PsyTdpFnWPb(state, this->airHumRatTemp, state.dataEnvrn->StdBaroPress);
         Real64 vaporPressureDiff = pSat - Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName);
         if (spaceNum > 0) {
-            sensibleLoad = state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).ZoneSNLoadHeatRate +
-                           state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).ZoneSNLoadCoolRate;
+            sensibleLoad = state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).airSysHeatRate +
+                           state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum).airSysCoolRate;
             state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum).reportZoneAirSystemMoistureLoads(
                 state, LatentGain, sensibleLoad, vaporPressureDiff);
         } else {
-            sensibleLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadHeatRate +
-                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadCoolRate;
+            sensibleLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).airSysHeatRate +
+                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).airSysCoolRate;
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum).reportZoneAirSystemMoistureLoads(
                 state, LatentGain, sensibleLoad, vaporPressureDiff);
         }
@@ -5254,8 +5253,8 @@ void InverseModelTemperature(EnergyPlusData &state,
                            Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                              state.dataEnvrn->OutBaroPress,
                                                              thisZoneHB.ZT,
-                                                             thisZoneHB.ZoneAirHumRat) *
-                           Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat)) *
+                                                             thisZoneHB.airHumRat) *
+                           Psychrometrics::PsyCpAirFnW(thisZoneHB.airHumRat)) *
                           (state.dataGlobal->TimeStepZone * Constant::SecInHour); // Inverse equation
                 if ((MultpHM < 1.0) || (MultpHM > 30.0)) {                        // Temperature capacity multiplier greater than
                                                                                   // 1 and less than 30
@@ -5389,7 +5388,7 @@ void InverseModelHumidity(EnergyPlusData &state,
     zone.ZoneMeasuredHumidityRatio = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredHumidityRatioSchedulePtr);
 
     if (state.dataEnvrn->DayOfYear >= hybridModelZone.HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= hybridModelZone.HybridEndDayOfYear) {
-        thisZoneHB.ZoneAirHumRat = zone.ZoneMeasuredHumidityRatio;
+        thisZoneHB.airHumRat = zone.ZoneMeasuredHumidityRatio;
 
         // Hybrid Model calculate air infiltration rate
         if (hybridModelZone.InfiltrationCalc_H && state.dataHVACGlobal->UseZoneTimeStepHistory) {
@@ -5575,7 +5574,7 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
                 // Get node conditions, this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
                 //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
                 auto const &node(state.dataLoopNodes->Node(zsec.InletNode(NodeNum)));
-                Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat);
+                Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->airHumRat);
                 Real64 const MassFlowRate_CpAir(node.MassFlowRate * CpAir);
                 this->SumSysMCp += MassFlowRate_CpAir;
                 this->SumSysMCpT += MassFlowRate_CpAir * node.Temp;
@@ -5583,7 +5582,7 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
 
         } else if (thisZone.IsReturnPlenum) {
             auto const &zrpc(state.dataZonePlenum->ZoneRetPlenCond(thisZone.PlenumCondNum));
-            Real64 const air_hum_rat(this->ZoneAirHumRat);
+            Real64 const air_hum_rat(this->airHumRat);
             for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                 auto const &node(state.dataLoopNodes->Node(zrpc.InletNode(NodeNum)));
                 Real64 const MassFlowRate_CpAir(node.MassFlowRate * Psychrometrics::PsyCpAirFnW(air_hum_rat));
@@ -5607,7 +5606,7 @@ void ZoneSpaceHeatBalanceData::calcZoneOrSpaceSums(EnergyPlusData &state,
 
         } else if (thisZone.IsSupplyPlenum) {
             Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(thisZone.PlenumCondNum).InletNode).MassFlowRate;
-            Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->ZoneAirHumRat);
+            Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->airHumRat);
             this->SumSysMCp += MassFlowRate * CpAir;
             this->SumSysMCpT +=
                 MassFlowRate * CpAir * state.dataLoopNodes->Node(state.dataZonePlenum->ZoneSupPlenCond(thisZone.PlenumCondNum).InletNode).Temp;
@@ -5852,7 +5851,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
             // Get node conditions
             Real64 const NodeTemp = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum)).Temp;
             Real64 const MassFlowRate = state.dataLoopNodes->Node(zoneEquipConfig.InletNode(NodeNum)).MassFlowRate;
-            QSensRate = calcZoneSensibleOutput(MassFlowRate, NodeTemp, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
+            QSensRate = calcZoneSensibleOutput(MassFlowRate, NodeTemp, thisZoneHB.MAT, thisZoneHB.airHumRat);
             SumMCpDTsystem += QSensRate;
 
             if (zoneEquipConfig.InletNodeADUNum(NodeNum) > 0) {
@@ -5860,7 +5859,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
                 Real64 ADUHeatAddRate = calcZoneSensibleOutput(state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).MassFlowRate,
                                                                state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp,
                                                                thisZoneHB.MAT,
-                                                               thisZoneHB.ZoneAirHumRat);
+                                                               thisZoneHB.airHumRat);
                 airDistUnit.HeatRate = max(0.0, ADUHeatAddRate);
                 airDistUnit.CoolRate = std::abs(min(0.0, ADUHeatAddRate));
                 airDistUnit.HeatGain = airDistUnit.HeatRate * TimeStepSysSec;
@@ -5874,24 +5873,20 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
             QSensRate = calcZoneSensibleOutput(state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum)).MassFlowRate,
                                                state.dataLoopNodes->Node(zoneRetPlenCond.InletNode(NodeNum)).Temp,
                                                thisZoneHB.MAT,
-                                               thisZoneHB.ZoneAirHumRat);
+                                               thisZoneHB.airHumRat);
             SumMCpDTsystem += QSensRate;
         }
         // add in the leaks
         for (int ADUListIndex = 1; ADUListIndex <= zoneRetPlenCond.NumADUs; ++ADUListIndex) {
             auto &airDistUnit = state.dataDefineEquipment->AirDistUnit(zoneRetPlenCond.ADUIndex(ADUListIndex));
             if (airDistUnit.UpStreamLeak) {
-                QSensRate = calcZoneSensibleOutput(airDistUnit.MassFlowRateUpStrLk,
-                                                   state.dataLoopNodes->Node(airDistUnit.InletNodeNum).Temp,
-                                                   thisZoneHB.MAT,
-                                                   thisZoneHB.ZoneAirHumRat);
+                QSensRate = calcZoneSensibleOutput(
+                    airDistUnit.MassFlowRateUpStrLk, state.dataLoopNodes->Node(airDistUnit.InletNodeNum).Temp, thisZoneHB.MAT, thisZoneHB.airHumRat);
                 SumMCpDTsystem += QSensRate;
             }
             if (airDistUnit.DownStreamLeak) {
-                QSensRate = calcZoneSensibleOutput(airDistUnit.MassFlowRateDnStrLk,
-                                                   state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp,
-                                                   thisZoneHB.MAT,
-                                                   thisZoneHB.ZoneAirHumRat);
+                QSensRate = calcZoneSensibleOutput(
+                    airDistUnit.MassFlowRateDnStrLk, state.dataLoopNodes->Node(airDistUnit.OutletNodeNum).Temp, thisZoneHB.MAT, thisZoneHB.airHumRat);
                 SumMCpDTsystem += QSensRate;
             }
         }
@@ -5901,7 +5896,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         QSensRate = calcZoneSensibleOutput(state.dataLoopNodes->Node(zoneSupPlenCond.InletNode).MassFlowRate,
                                            state.dataLoopNodes->Node(zoneSupPlenCond.InletNode).Temp,
                                            thisZoneHB.MAT,
-                                           thisZoneHB.ZoneAirHumRat);
+                                           thisZoneHB.airHumRat);
         SumMCpDTsystem += QSensRate;
     }
 
@@ -5975,8 +5970,8 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
     }
     // now calculate air energy storage source term.
     // capacitance is volume * density * heat capacity
-    Real64 CpAir = Psychrometrics::PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
-    Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
+    Real64 CpAir = Psychrometrics::PsyCpAirFnW(thisZoneHB.airHumRat);
+    Real64 RhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRat);
 
     switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
     case DataHeatBalance::SolutionAlgo::ThirdOrder: {
@@ -5987,7 +5982,7 @@ void CalcZoneComponentLoadSums(EnergyPlusData &state,
         CzdTdt = TempIndCoef - TempDepCoef * thisZoneHB.MAT;
     } break;
     case DataHeatBalance::SolutionAlgo::EulerMethod: {
-        CzdTdt = thisZoneHB.AirPowerCap * (thisZoneHB.MAT - thisZoneHB.ZoneT1);
+        CzdTdt = thisZoneHB.AirPowerCap * (thisZoneHB.MAT - thisZoneHB.T1);
     } break;
     default:
         break;
@@ -6771,7 +6766,7 @@ void AdjustCoolingSetPointforTempAndHumidityControl(EnergyPlusData &state,
         ZoneOvercoolRange = min(ZoneOvercoolRange, MaxAllowedOvercoolRange);
     }
     // Calculate difference between zone air relative humidity and the dehumidifying setpoint
-    Real64 RelativeHumidityDiff = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ActualZoneNum).ZoneAirRelHum -
+    Real64 RelativeHumidityDiff = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ActualZoneNum).airRelHum -
                                   ScheduleManager::GetCurrentScheduleValue(state, tempControlledZone.DehumidifyingSchedIndex);
     if (RelativeHumidityDiff > 0.0 && ZoneOvercoolControlRatio > 0.0) {
         // proportionally reset the cooling setpoint temperature downward (zone Overcool)
@@ -7113,7 +7108,7 @@ void ZoneSpaceHeatBalanceData::updateTemperatures(EnergyPlusData &state,
             state.dataHVACGlobal->NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
             Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
             this->MAT = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->XMAT, this->DSXMAT);
-            this->ZoneAirHumRat = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
+            this->airHumRat = DownInterpolate4HistoryValues(PriorTimeStep, TimeStepSys, this->WPrevZoneTS, this->DSWPrevZoneTS);
 
             if (spaceNum == 0 && state.dataRoomAir->anyNonMixingRoomAirModel) {
                 if (state.dataRoomAir->IsZoneDispVent3Node(zoneNum) || state.dataRoomAir->IsZoneUFAD(zoneNum)) {
@@ -7178,22 +7173,22 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     case DataHVACGlobals::ThermostatType::SingleHeating:
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
         case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-            LoadToHeatingSetPoint = (this->TempDepZnLd * thisTempZoneThermostatSetPoint - this->TempIndZnLd);
+            LoadToHeatingSetPoint = (this->tempDepLoad * thisTempZoneThermostatSetPoint - this->tempIndLoad);
             break;
         }
         case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-            if (this->TempDepZnLd == 0.0) { // B=0
-                LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) - this->TempIndZnLd;
+            if (this->tempDepLoad == 0.0) { // B=0
+                LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) - this->tempIndLoad;
             } else {
-                Real64 const exp_700_TA(std::exp(min(700.0, -this->TempDepZnLd / this->AirPowerCap)));
+                Real64 const exp_700_TA(std::exp(min(700.0, -this->tempDepLoad / this->AirPowerCap)));
                 LoadToHeatingSetPoint =
-                    this->TempDepZnLd * (thisTempZoneThermostatSetPoint - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                    this->tempDepLoad * (thisTempZoneThermostatSetPoint - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
             }
             break;
         }
         case DataHeatBalance::SolutionAlgo::EulerMethod: {
-            LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) +
-                                    this->TempDepZnLd * (thisTempZoneThermostatSetPoint) - this->TempIndZnLd;
+            LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) +
+                                    this->tempDepLoad * (thisTempZoneThermostatSetPoint) - this->tempIndLoad;
             break;
         }
         default: {
@@ -7212,22 +7207,22 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     case DataHVACGlobals::ThermostatType::SingleCooling:
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
         case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-            LoadToCoolingSetPoint = this->TempDepZnLd * thisTempZoneThermostatSetPoint - this->TempIndZnLd;
+            LoadToCoolingSetPoint = this->tempDepLoad * thisTempZoneThermostatSetPoint - this->tempIndLoad;
             break;
         }
         case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-            if (this->TempDepZnLd == 0.0) { // B=0
-                LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) - this->TempIndZnLd;
+            if (this->tempDepLoad == 0.0) { // B=0
+                LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) - this->tempIndLoad;
             } else {
-                Real64 const exp_700_TA(std::exp(min(700.0, -this->TempDepZnLd / this->AirPowerCap)));
+                Real64 const exp_700_TA(std::exp(min(700.0, -this->tempDepLoad / this->AirPowerCap)));
                 LoadToCoolingSetPoint =
-                    this->TempDepZnLd * (thisTempZoneThermostatSetPoint - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                    this->tempDepLoad * (thisTempZoneThermostatSetPoint - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
             }
             break;
         }
         case DataHeatBalance::SolutionAlgo::EulerMethod: {
-            LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) +
-                                    this->TempDepZnLd * thisTempZoneThermostatSetPoint - this->TempIndZnLd;
+            LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) +
+                                    this->tempDepLoad * thisTempZoneThermostatSetPoint - this->tempIndLoad;
             break;
         }
         default: {
@@ -7236,7 +7231,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         }
         if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
         if (thisZone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
-            LoadToCoolingSetPoint = this->TempDepZnLd * thisZone.AdjustedReturnTempByITE - this->TempIndZnLd;
+            LoadToCoolingSetPoint = this->tempDepLoad * thisZone.AdjustedReturnTempByITE - this->tempIndLoad;
         }
         totalLoad = LoadToCoolingSetPoint;
         ZoneSetPoint = thisTempZoneThermostatSetPoint;
@@ -7248,28 +7243,28 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     case DataHVACGlobals::ThermostatType::SingleHeatCool:
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
         case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-            LoadToHeatingSetPoint = (this->TempDepZnLd * (thisTempZoneThermostatSetPoint) - this->TempIndZnLd);
-            LoadToCoolingSetPoint = (this->TempDepZnLd * (thisTempZoneThermostatSetPoint) - this->TempIndZnLd);
+            LoadToHeatingSetPoint = (this->tempDepLoad * (thisTempZoneThermostatSetPoint) - this->tempIndLoad);
+            LoadToCoolingSetPoint = (this->tempDepLoad * (thisTempZoneThermostatSetPoint) - this->tempIndLoad);
             break;
         }
         case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-            if (this->TempDepZnLd == 0.0) { // B=0
-                LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) - this->TempIndZnLd;
-                LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) - this->TempIndZnLd;
+            if (this->tempDepLoad == 0.0) { // B=0
+                LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) - this->tempIndLoad;
+                LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) - this->tempIndLoad;
             } else {
-                Real64 const exp_700_TA(std::exp(min(700.0, -this->TempDepZnLd / this->AirPowerCap)));
+                Real64 const exp_700_TA(std::exp(min(700.0, -this->tempDepLoad / this->AirPowerCap)));
                 LoadToHeatingSetPoint =
-                    this->TempDepZnLd * (thisTempZoneThermostatSetPoint - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                    this->tempDepLoad * (thisTempZoneThermostatSetPoint - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
                 LoadToCoolingSetPoint =
-                    this->TempDepZnLd * (thisTempZoneThermostatSetPoint - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                    this->tempDepLoad * (thisTempZoneThermostatSetPoint - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
             }
             break;
         }
         case DataHeatBalance::SolutionAlgo::EulerMethod: {
-            LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) +
-                                    this->TempDepZnLd * thisTempZoneThermostatSetPoint - this->TempIndZnLd;
-            LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->ZoneT1) +
-                                    this->TempDepZnLd * thisTempZoneThermostatSetPoint - this->TempIndZnLd;
+            LoadToHeatingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) +
+                                    this->tempDepLoad * thisTempZoneThermostatSetPoint - this->tempIndLoad;
+            LoadToCoolingSetPoint = this->AirPowerCap * (thisTempZoneThermostatSetPoint - this->T1) +
+                                    this->tempDepLoad * thisTempZoneThermostatSetPoint - this->tempIndLoad;
             break;
         }
         default: {
@@ -7281,7 +7276,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
         if (thisZone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
-            LoadToCoolingSetPoint = this->TempDepZnLd * thisZone.AdjustedReturnTempByITE - this->TempIndZnLd;
+            LoadToCoolingSetPoint = this->tempDepLoad * thisZone.AdjustedReturnTempByITE - this->tempIndLoad;
         }
 
         // Note that LoadToHeatingSetPoint is generally not equal to LoadToCoolingSetPoint
@@ -7303,8 +7298,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
             ShowContinueErrorTimeStamp(state, format("occurs in Zone={}", thisZone.Name));
             ShowContinueError(state,
                               format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
-            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->TempDepZnLd));
-            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->TempIndZnLd));
+            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->tempDepLoad));
+            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->tempIndLoad));
             ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", thisTempZoneThermostatSetPoint));
             ShowFatalError(state, "Program terminates due to above conditions.");
         }
@@ -7327,8 +7322,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
             ShowContinueErrorTimeStamp(state, format("occurs in Zone={}", thisZone.Name));
             ShowContinueError(state,
                               format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
-            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->TempDepZnLd));
-            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->TempIndZnLd));
+            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->tempDepLoad));
+            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->tempIndLoad));
             ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", thisTempZoneThermostatSetPoint));
             ShowFatalError(state, "Program terminates due to above conditions.");
         }
@@ -7336,28 +7331,28 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
     case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
         switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
         case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-            LoadToHeatingSetPoint = (this->TempDepZnLd * (thisZoneThermostatSetPointLo) - this->TempIndZnLd);
-            LoadToCoolingSetPoint = (this->TempDepZnLd * (thisZoneThermostatSetPointHi) - this->TempIndZnLd);
+            LoadToHeatingSetPoint = (this->tempDepLoad * (thisZoneThermostatSetPointLo) - this->tempIndLoad);
+            LoadToCoolingSetPoint = (this->tempDepLoad * (thisZoneThermostatSetPointHi) - this->tempIndLoad);
             break;
         }
         case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-            if (this->TempDepZnLd == 0.0) { // B=0
-                LoadToHeatingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointLo - this->ZoneT1) - this->TempIndZnLd;
-                LoadToCoolingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointHi - this->ZoneT1) - this->TempIndZnLd;
+            if (this->tempDepLoad == 0.0) { // B=0
+                LoadToHeatingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointLo - this->T1) - this->tempIndLoad;
+                LoadToCoolingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointHi - this->T1) - this->tempIndLoad;
             } else {
-                Real64 const exp_700_TA(std::exp(min(700.0, -this->TempDepZnLd / this->AirPowerCap)));
+                Real64 const exp_700_TA(std::exp(min(700.0, -this->tempDepLoad / this->AirPowerCap)));
                 LoadToHeatingSetPoint =
-                    this->TempDepZnLd * (thisZoneThermostatSetPointLo - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                    this->tempDepLoad * (thisZoneThermostatSetPointLo - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
                 LoadToCoolingSetPoint =
-                    this->TempDepZnLd * (thisZoneThermostatSetPointHi - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                    this->tempDepLoad * (thisZoneThermostatSetPointHi - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
             }
             break;
         }
         case DataHeatBalance::SolutionAlgo::EulerMethod: {
-            LoadToHeatingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointLo - this->ZoneT1) +
-                                    this->TempDepZnLd * thisZoneThermostatSetPointLo - this->TempIndZnLd;
-            LoadToCoolingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointHi - this->ZoneT1) +
-                                    this->TempDepZnLd * thisZoneThermostatSetPointHi - this->TempIndZnLd;
+            LoadToHeatingSetPoint =
+                this->AirPowerCap * (thisZoneThermostatSetPointLo - this->T1) + this->tempDepLoad * thisZoneThermostatSetPointLo - this->tempIndLoad;
+            LoadToCoolingSetPoint =
+                this->AirPowerCap * (thisZoneThermostatSetPointHi - this->T1) + this->tempDepLoad * thisZoneThermostatSetPointHi - this->tempIndLoad;
             break;
         }
         default: {
@@ -7368,7 +7363,7 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
         if (thisZone.HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
-            LoadToCoolingSetPoint = this->TempDepZnLd * thisZone.AdjustedReturnTempByITE - this->TempIndZnLd;
+            LoadToCoolingSetPoint = this->tempDepLoad * thisZone.AdjustedReturnTempByITE - this->tempIndLoad;
         }
 
         // Possible combinations:
@@ -7385,8 +7380,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
             ShowContinueErrorTimeStamp(state, format("occurs in Zone={}", thisZone.Name));
             ShowContinueError(state,
                               format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
-            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->TempDepZnLd));
-            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->TempIndZnLd));
+            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->tempDepLoad));
+            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->tempIndLoad));
             ShowContinueError(state, format("Zone Heating ThermostatSetPoint={:.2R}", thisZoneThermostatSetPointLo));
             ShowContinueError(state, format("Zone Cooling ThermostatSetPoint={:.2R}", thisZoneThermostatSetPointHi));
             ShowFatalError(state, "Program terminates due to above conditions.");
@@ -7415,8 +7410,8 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
                               format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
             ShowContinueError(state, format("Zone Heating Set-point={:.2R}", thisZoneThermostatSetPointLo));
             ShowContinueError(state, format("Zone Cooling Set-point={:.2R}", thisZoneThermostatSetPointHi));
-            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->TempDepZnLd));
-            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->TempIndZnLd));
+            ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", this->tempDepLoad));
+            ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", this->tempIndLoad));
             ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", thisTempZoneThermostatSetPoint));
 
             ShowFatalError(state, "Program terminates due to above conditions.");
@@ -7452,22 +7447,22 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
             } else if (stageNum < 0) { // Cooling load
                 switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
                 case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                    LoadToCoolingSetPoint = (this->TempDepZnLd * (thisZoneThermostatSetPointHi) - this->TempIndZnLd);
+                    LoadToCoolingSetPoint = (this->tempDepLoad * (thisZoneThermostatSetPointHi) - this->tempIndLoad);
                     break;
                 }
                 case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-                    if (this->TempDepZnLd == 0.0) { // B=0
-                        LoadToCoolingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointHi - this->ZoneT1) - this->TempIndZnLd;
+                    if (this->tempDepLoad == 0.0) { // B=0
+                        LoadToCoolingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointHi - this->T1) - this->tempIndLoad;
                     } else {
-                        Real64 const exp_700_TA(std::exp(min(700.0, -this->TempDepZnLd / this->AirPowerCap)));
+                        Real64 const exp_700_TA(std::exp(min(700.0, -this->tempDepLoad / this->AirPowerCap)));
                         LoadToCoolingSetPoint =
-                            this->TempDepZnLd * (thisZoneThermostatSetPointHi - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                            this->tempDepLoad * (thisZoneThermostatSetPointHi - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
                     }
                     break;
                 }
                 case DataHeatBalance::SolutionAlgo::EulerMethod: {
-                    LoadToCoolingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointHi - this->ZoneT1) +
-                                            this->TempDepZnLd * thisZoneThermostatSetPointHi - this->TempIndZnLd;
+                    LoadToCoolingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointHi - this->T1) +
+                                            this->tempDepLoad * thisZoneThermostatSetPointHi - this->tempIndLoad;
                     break;
                 }
                 default: {
@@ -7481,22 +7476,22 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
             } else { // Heating load
                 switch (state.dataHeatBal->ZoneAirSolutionAlgo) {
                 case DataHeatBalance::SolutionAlgo::ThirdOrder: {
-                    LoadToHeatingSetPoint = (this->TempDepZnLd * thisZoneThermostatSetPointLo - this->TempIndZnLd);
+                    LoadToHeatingSetPoint = (this->tempDepLoad * thisZoneThermostatSetPointLo - this->tempIndLoad);
                     break;
                 }
                 case DataHeatBalance::SolutionAlgo::AnalyticalSolution: {
-                    if (this->TempDepZnLd == 0.0) { // B=0
-                        LoadToHeatingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointLo - this->ZoneT1) - this->TempIndZnLd;
+                    if (this->tempDepLoad == 0.0) { // B=0
+                        LoadToHeatingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointLo - this->T1) - this->tempIndLoad;
                     } else {
-                        Real64 const exp_700_TA(std::exp(min(700.0, -this->TempDepZnLd / this->AirPowerCap)));
+                        Real64 const exp_700_TA(std::exp(min(700.0, -this->tempDepLoad / this->AirPowerCap)));
                         LoadToHeatingSetPoint =
-                            this->TempDepZnLd * (thisZoneThermostatSetPointLo - this->ZoneT1 * exp_700_TA) / (1.0 - exp_700_TA) - this->TempIndZnLd;
+                            this->tempDepLoad * (thisZoneThermostatSetPointLo - this->T1 * exp_700_TA) / (1.0 - exp_700_TA) - this->tempIndLoad;
                     }
                     break;
                 }
                 case DataHeatBalance::SolutionAlgo::EulerMethod: {
-                    LoadToHeatingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointLo - this->ZoneT1) +
-                                            this->TempDepZnLd * (thisZoneThermostatSetPointLo) - this->TempIndZnLd;
+                    LoadToHeatingSetPoint = this->AirPowerCap * (thisZoneThermostatSetPointLo - this->T1) +
+                                            this->tempDepLoad * (thisZoneThermostatSetPointLo) - this->tempIndLoad;
                     break;
                 }
                 default: {
@@ -7516,9 +7511,9 @@ void ZoneSpaceHeatBalanceData::calcPredictedSystemLoad(EnergyPlusData &state, Re
         state.dataLoopNodes->Node(zoneNodeNum).TempSetPoint = ZoneSetPoint;
     }
 
-    state.dataZoneEnergyDemand->Setback(zoneNum) = (ZoneSetPoint > this->ZoneSetPointLast);
+    state.dataZoneEnergyDemand->Setback(zoneNum) = (ZoneSetPoint > this->setPointLast);
 
-    this->ZoneSetPointLast = ZoneSetPoint;
+    this->setPointLast = ZoneSetPoint;
     state.dataHeatBalFanSys->TempZoneThermostatSetPoint(zoneNum) = ZoneSetPoint; // needed to fix Issue # 5048
     state.dataZoneEnergyDemand->DeadBandOrSetback(zoneNum) = thisDeadBandOrSetBack;
     state.dataZoneEnergyDemand->CurDeadBandOrSetback(zoneNum) = thisDeadBandOrSetBack;

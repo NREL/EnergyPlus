@@ -395,8 +395,8 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
                                                 : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).NonAirSystemResponse;
     auto &sysDepZoneLoads = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoads
                                            : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).SysDepZoneLoads;
-    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGain
-                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneLatentGain;
+    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain
+                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).latentGain;
     auto &zoneNodeNum =
         (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber;
     nonAirSystemResponse = 0.0;
@@ -2301,8 +2301,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zsFinalSizing.DesCoolVolFlow = zsCalcFinalSizing.DesCoolVolFlow * TotCoolSizMult;
             zsFinalSizing.DesCoolMassFlow = zsCalcFinalSizing.DesCoolMassFlow * TotCoolSizMult;
             zsFinalSizing.DesCoolLoad = zsCalcFinalSizing.DesCoolLoad * TotCoolSizMult;
-            zsFinalSizing.CoolFlowSeq = zsCalcFinalSizing.CoolFlowSeq * TotCoolSizMult;
-            zsFinalSizing.CoolLoadSeq = zsCalcFinalSizing.CoolLoadSeq * TotCoolSizMult;
+            for (int i = 0; i < (int)zsFinalSizing.CoolFlowSeq.size(); ++i) {
+                zsFinalSizing.CoolFlowSeq[i] = zsCalcFinalSizing.CoolFlowSeq[i] * TotCoolSizMult;
+                zsFinalSizing.CoolLoadSeq[i] = zsCalcFinalSizing.CoolLoadSeq[i] * TotCoolSizMult;
+            }
             Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesCoolVolFlow;
             OAFrac = min(1.0, max(0.0, OAFrac));
             zsFinalSizing.DesCoolCoilInTemp =
@@ -2322,8 +2324,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizing.DesCoolVolFlow = calcZoneSizing.DesCoolVolFlow * TotCoolSizMult;
                 zoneSizing.DesCoolMassFlow = calcZoneSizing.DesCoolMassFlow * TotCoolSizMult;
                 zoneSizing.DesCoolLoad = calcZoneSizing.DesCoolLoad * TotCoolSizMult;
-                zoneSizing.CoolFlowSeq = calcZoneSizing.CoolFlowSeq * TotCoolSizMult;
-                zoneSizing.CoolLoadSeq = calcZoneSizing.CoolLoadSeq * TotCoolSizMult;
+                for (int i = 0; i < (int)zoneSizing.CoolFlowSeq.size(); ++i) {
+                    zoneSizing.CoolFlowSeq[i] = calcZoneSizing.CoolFlowSeq[i] * TotCoolSizMult;
+                    zoneSizing.CoolLoadSeq[i] = calcZoneSizing.CoolLoadSeq[i] * TotCoolSizMult;
+                }
                 Real64 OAFrac = zoneSizing.MinOA / zoneSizing.DesCoolVolFlow;
                 OAFrac = min(1.0, max(0.0, OAFrac));
                 zoneSizing.DesCoolCoilInTemp = OAFrac * desDayWeath.Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizing.ZoneTempAtCoolPeak;
@@ -2477,8 +2481,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zsFinalSizing.DesHeatVolFlow = zsCalcFinalSizing.DesHeatVolFlow * TotHeatSizMult;
             zsFinalSizing.DesHeatMassFlow = zsCalcFinalSizing.DesHeatMassFlow * TotHeatSizMult;
             zsFinalSizing.DesHeatLoad = zsCalcFinalSizing.DesHeatLoad * TotHeatSizMult;
-            zsFinalSizing.HeatFlowSeq = zsCalcFinalSizing.HeatFlowSeq * TotHeatSizMult;
-            zsFinalSizing.HeatLoadSeq = zsCalcFinalSizing.HeatLoadSeq * TotHeatSizMult;
+            for (int i = 0; i < (int)zsFinalSizing.HeatFlowSeq.size(); ++i) {
+                zsFinalSizing.HeatFlowSeq[i] = zsCalcFinalSizing.HeatFlowSeq[i] * TotHeatSizMult;
+                zsFinalSizing.HeatLoadSeq[i] = zsCalcFinalSizing.HeatLoadSeq[i] * TotHeatSizMult;
+            }
             Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesHeatVolFlow;
             OAFrac = min(1.0, max(0.0, OAFrac));
             zsFinalSizing.DesHeatCoilInTemp =
@@ -2497,8 +2503,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizingDD.DesHeatVolFlow = calcZoneSizing.DesHeatVolFlow * TotHeatSizMult;
                 zoneSizingDD.DesHeatMassFlow = calcZoneSizing.DesHeatMassFlow * TotHeatSizMult;
                 zoneSizingDD.DesHeatLoad = calcZoneSizing.DesHeatLoad * TotHeatSizMult;
-                zoneSizingDD.HeatFlowSeq = calcZoneSizing.HeatFlowSeq * TotHeatSizMult;
-                zoneSizingDD.HeatLoadSeq = calcZoneSizing.HeatLoadSeq * TotHeatSizMult;
+                for (int i = 0; i < (int)zoneSizingDD.HeatFlowSeq.size(); ++i) {
+                    zoneSizingDD.HeatFlowSeq[i] = calcZoneSizing.HeatFlowSeq[i] * TotHeatSizMult;
+                    zoneSizingDD.HeatLoadSeq[i] = calcZoneSizing.HeatLoadSeq[i] * TotHeatSizMult;
+                }
                 Real64 OAFrac = zoneSizingDD.MinOA / zoneSizingDD.DesHeatVolFlow;
                 OAFrac = min(1.0, max(0.0, OAFrac));
                 zoneSizingDD.DesHeatCoilInTemp =
@@ -5143,14 +5151,14 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                         state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
                     SumRetAirLatentGainRate = InternalHeatGains::SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
-                    thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
+                    thisZoneHB.latentGain += SumRetAirLatentGainRate;
                 }
             } else {
                 state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 SumRetAirLatentGainRate = InternalHeatGains::SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
-                thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
+                thisZoneHB.latentGain += SumRetAirLatentGainRate;
             }
 
             state.dataLoopNodes->Node(ReturnNode).Enthalpy =
@@ -5281,21 +5289,21 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     // Assign zone air temperature
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MixingMAT = thisZoneHB.MAT;
-        thisZoneHB.MixingHumRat = thisZoneHB.ZoneAirHumRat;
+        thisZoneHB.MixingHumRat = thisZoneHB.airHumRat;
         // This is only temporary fix for CR8867.  (L. Gu 8/12)
         if (SysTimestepLoop == 1) {
             thisZoneHB.MixingMAT = thisZoneHB.XMPT;
-            thisZoneHB.MixingHumRat = thisZoneHB.WZoneTimeMinusP;
+            thisZoneHB.MixingHumRat = thisZoneHB.WTimeMinusP;
         }
     }
     if (state.dataHeatBal->doSpaceHeatBalance) {
         for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
             thisSpaceHB.MixingMAT = thisSpaceHB.MAT;
-            thisSpaceHB.MixingHumRat = thisSpaceHB.ZoneAirHumRat;
+            thisSpaceHB.MixingHumRat = thisSpaceHB.airHumRat;
             // This is only temporary fix for CR8867.  (L. Gu 8/12)
             if (SysTimestepLoop == 1) {
                 thisSpaceHB.MixingMAT = thisSpaceHB.XMPT;
-                thisSpaceHB.MixingHumRat = thisSpaceHB.WZoneTimeMinusP;
+                thisSpaceHB.MixingHumRat = thisSpaceHB.WTimeMinusP;
             }
         }
     }
