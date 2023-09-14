@@ -3879,9 +3879,9 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
     //          HeatRejection
     //          Humidifier
     //          HeatRecovery
-    //          DHW
     //          Refrigeration
     //          Cogeneration
+    //          WaterSystems
     //   The <ResourceType> are:
     //          Electricity
     //          Gas
@@ -4013,9 +4013,9 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
     //          HeatRejection
     //          Humidifier
     //          HeatRecovery
-    //          DHW
     //          Refrigeration
     //          Cogeneration
+    //          WaterSystems
     //   The <ResourceType> are:
     //          Electricity 1
     //          Gas 2
@@ -4142,9 +4142,9 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     //          HeatRejection
     //          Humidifier
     //          HeatRecovery
-    //          DHW
     //          Refrigeration
     //          Cogeneration
+    //          WaterSystems
     //   The <ResourceType> are:
     //          Electricity
     //          Gas
