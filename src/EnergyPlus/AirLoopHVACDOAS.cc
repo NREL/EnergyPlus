@@ -71,6 +71,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -382,6 +383,7 @@ namespace AirLoopHVACDOAS {
 
                 thisSplitter.name = UtilityRoutines::makeUPPER(thisObjectName);
                 thisSplitter.InletNodeName = UtilityRoutines::makeUPPER(fields.at("inlet_node_name").get<std::string>());
+                thisSplitter.InletNodeNum = UtilityRoutines::FindItemInList(thisSplitter.InletNodeName, state.dataLoopNodes->NodeID);
                 thisSplitter.m_AirLoopSplitter_Num = AirLoopSplitterNum - 1;
 
                 auto NodeNames = fields.find("nodes");
@@ -695,6 +697,23 @@ namespace AirLoopHVACDOAS {
                         ShowSevereError(state, format("Outlet node number is not found in {} = {}", CurrentModuleObject, CompName));
                         errorsFound = true;
                     }
+                    // Check node connection to ensure that the outlet node of the previous component is the inlet node of the current component
+                    if (CompNum > 1) {
+                        if (thisOutsideAirSys.InletNodeNum(CompNum) != thisOutsideAirSys.OutletNodeNum(CompNum - 1)) {
+                            ShowSevereError(state,
+                                            format("getAirLoopMixer: Node Connection Error in AirLoopHVAC:DedicatedOutdoorAirSystem = {}. Inlet node "
+                                                   "of {} as current component is not same as the outlet node of "
+                                                   "{} as previous component",
+                                                   thisDOAS.Name,
+                                                   thisOutsideAirSys.ComponentName(CompNum),
+                                                   thisOutsideAirSys.ComponentName(CompNum - 1)));
+                            ShowContinueError(state,
+                                              format("The inlet node name = {}, and the outlet node name = {}.",
+                                                     state.dataLoopNodes->NodeID(thisOutsideAirSys.InletNodeNum(CompNum)),
+                                                     state.dataLoopNodes->NodeID(thisOutsideAirSys.OutletNodeNum(CompNum - 1))));
+                            errorsFound = true;
+                        }
+                    }
                 }
 
                 thisDOAS.m_InletNodeNum = thisOutsideAirSys.InletNodeNum(1);
@@ -782,6 +801,27 @@ namespace AirLoopHVACDOAS {
 
                 thisDOAS.m_AirLoopDOASNum = AirLoopDOASNum - 1;
                 state.dataAirLoopHVACDOAS->airloopDOAS.push_back(thisDOAS);
+
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisDOAS.m_InletNodeNum)) {
+                    ShowSevereError(state,
+                                    format("Inlet node ({}) is not one of OutdoorAir:Node in {} = {}",
+                                           state.dataLoopNodes->NodeID(thisDOAS.m_InletNodeNum),
+                                           CurrentModuleObject,
+                                           thisDOAS.Name));
+                    errorsFound = true;
+                }
+
+                // Ensure the outlet node is the splitter inlet node, otherwise issue a severe error
+                if (thisDOAS.m_OutletNodeNum != thisDOAS.m_CompPointerAirLoopSplitter->InletNodeNum) {
+                    ShowSevereError(
+                        state,
+                        format("The outlet node is not the inlet node of AirLoopHVAC:Splitter in {} = {}", CurrentModuleObject, thisDOAS.Name));
+                    ShowContinueError(state,
+                                      format("The outlet node name is {}, and the inlet node name of AirLoopHVAC:Splitter is {}",
+                                             state.dataLoopNodes->NodeID(thisDOAS.m_OutletNodeNum),
+                                             state.dataLoopNodes->NodeID(thisDOAS.m_CompPointerAirLoopSplitter->InletNodeNum)));
+                    errorsFound = true;
+                }
             }
 
             // Check valid OA controller
@@ -896,9 +936,14 @@ namespace AirLoopHVACDOAS {
 
         this->m_CompPointerAirLoopMixer->CalcAirLoopMixer(state);
         if (this->m_FanIndex > -1) {
-            state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
-            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
-            state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = this->SumMassFlowRate;
+            if (this->m_FanInletNodeNum == this->m_InletNodeNum) {
+                state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
+                state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
+                state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = this->SumMassFlowRate;
+            } else {
+                state.dataLoopNodes->Node(this->m_InletNodeNum).MassFlowRateMax = this->SumMassFlowRate;
+                state.dataLoopNodes->Node(this->m_InletNodeNum).MassFlowRateMaxAvail = this->SumMassFlowRate;
+            }
         }
         ManageOutsideAirSystem(state, this->OASystemName, FirstHVACIteration, 0, this->m_OASystemNum);
         Real64 Temp = state.dataLoopNodes->Node(this->m_OutletNodeNum).Temp;

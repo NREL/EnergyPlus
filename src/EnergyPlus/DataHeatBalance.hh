@@ -1726,8 +1726,8 @@ namespace DataHeatBalance {
         Real64 SteamLostRate = 0.0;
         Real64 SteamTotGainRate = 0.0;
         // Other Equipment
-        Real64 OtherPower = 0.0;
-        Real64 OtherConsump = 0.0;
+        std::array<Real64, (int)ExteriorEnergyUse::ExteriorFuelUsage::Num> OtherPower;
+        std::array<Real64, (int)ExteriorEnergyUse::ExteriorFuelUsage::Num> OtherConsump;
         Real64 OtherRadGain = 0.0;
         Real64 OtherConGain = 0.0;
         Real64 OtherLatGain = 0.0;
