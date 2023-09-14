@@ -3022,20 +3022,6 @@ namespace SurfaceGeometry {
         }
     }
 
-    Real64 rotAzmDiffDeg(Real64 const &AzmA, Real64 const &AzmB)
-    {
-        // This function takes two (azimuth) angles in Degree(s),
-        // and returns the rotational angle difference in Degree(s).
-
-        Real64 diff = AzmB - AzmA;
-        if (diff > 180.0) {
-            diff = 360.0 - diff;
-        } else if (diff < -180.0) {
-            diff = 360.0 + diff;
-        }
-        return std::abs(diff);
-    }
-
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -3071,7 +3057,7 @@ namespace SurfaceGeometry {
             // Is base surface horizontal? If so, ignore azimuth differences
             if (std::abs(baseSurface.Tilt) <= 1.0e-5 || std::abs(baseSurface.Tilt - 180.0) <= 1.0e-5) baseSurfHoriz = true;
 
-            if (((rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > errorTolerance) && !baseSurfHoriz) ||
+            if (((General::rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > errorTolerance) && !baseSurfHoriz) ||
                 (std::abs(baseSurface.Tilt - subSurface.Tilt) > errorTolerance)) {
                 surfaceError = true;
                 ShowSevereError(
@@ -3082,7 +3068,7 @@ namespace SurfaceGeometry {
                                   format("Subsurface=\"{}\" Tilt = {:.1R}  Azimuth = {:.1R}", subSurface.Name, subSurface.Tilt, subSurface.Azimuth));
                 ShowContinueError(
                     state, format("Base surface=\"{}\" Tilt = {:.1R}  Azimuth = {:.1R}", baseSurface.Name, baseSurface.Tilt, baseSurface.Azimuth));
-            } else if (((rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > warningTolerance) && !baseSurfHoriz) ||
+            } else if (((General::rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > warningTolerance) && !baseSurfHoriz) ||
                        (std::abs(baseSurface.Tilt - subSurface.Tilt) > warningTolerance)) {
                 ++state.dataSurfaceGeometry->checkSubSurfAzTiltNormErrCount;
                 if (state.dataSurfaceGeometry->checkSubSurfAzTiltNormErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -7691,10 +7677,12 @@ namespace SurfaceGeometry {
         int Found;
         int AlphaOffset; // local temp var
         std::string Roughness;
-        int ThisSurf;      // do loop counter
-        Real64 AvgAzimuth; // temp for error checking
-        Real64 AvgTilt;    // temp for error checking
-        int SurfID;        // local surface "pointer"
+        int ThisSurf;                   // do loop counter
+        Real64 AvgAzimuth;              // temp for error checking
+        Real64 AvgTilt;                 // temp for error checking
+        constexpr Real64 AZITOL = 15.0; // Degree Azimuth Angle Tolerance
+        constexpr Real64 TILTOL = 10.0; // Degree Tilt Angle Tolerance
+        int SurfID;                     // local surface "pointer"
         bool IsBlank;
         bool ErrorInName;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -7892,14 +7880,14 @@ namespace SurfaceGeometry {
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
                 SurfID = state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
-                if (std::abs(state.dataSurface->Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
+                if (General::rotAzmDiffDeg(state.dataSurface->Surface(SurfID).Azimuth, AvgAzimuth) > AZITOL) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Azimuth different from others in the associated group.",
                                             cCurrentModuleObject,
                                             state.dataHeatBal->ExtVentedCavity(Item).Name,
                                             state.dataSurface->Surface(SurfID).Name));
                 }
-                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > 10.0) {
+                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > TILTOL) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Tilt different from others in the associated group.",
                                             cCurrentModuleObject,
@@ -13052,7 +13040,7 @@ namespace SurfaceGeometry {
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (std::abs(state.dataSurface->Surface(curSurfNum).Azimuth - azimuth) < 1.) {
+            if (General::rotAzmDiffDeg(state.dataSurface->Surface(curSurfNum).Azimuth, azimuth) < 1.) {
                 facingAzimuth.emplace_back(iFace);
             }
         }
