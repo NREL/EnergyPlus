@@ -556,11 +556,11 @@ namespace ThermalComfort {
                 state.dataThermalComforts->RelHum =
                     PsyRhFnTdbWPb(state,
                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataThermalComforts->ZoneNum).MAT,
-                                  thisZoneHB.ZoneAirHumRatAvgComf,
+                                  thisZoneHB.airHumRatAvgComf,
                                   state.dataEnvrn->OutBaroPress);
             } else {
                 state.dataThermalComforts->RelHum =
-                    PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, thisZoneHB.ZoneAirHumRatAvgComf, state.dataEnvrn->OutBaroPress);
+                    PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, thisZoneHB.airHumRatAvgComf, state.dataEnvrn->OutBaroPress);
             }
             state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).TemperatureInZone = state.dataThermalComforts->AirTemp;
             state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).RelativeHumidityInZone = state.dataThermalComforts->RelHum * 100.0;
@@ -836,7 +836,7 @@ namespace ThermalComfort {
         state.dataThermalComforts->RadTemp = CalcRadTemp(state, state.dataThermalComforts->PeopleNum);
         // (var RH)
         state.dataThermalComforts->RelHum =
-            PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, thisZoneHB.ZoneAirHumRatAvgComf, state.dataEnvrn->OutBaroPress);
+            PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, thisZoneHB.airHumRatAvgComf, state.dataEnvrn->OutBaroPress);
         // Metabolic rate of body (W/m2) (var RM, M)
         state.dataThermalComforts->ActLevel =
             GetCurrentScheduleValue(state, state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).ActivityLevelPtr) / BodySurfAreaPierce;
@@ -1482,7 +1482,7 @@ namespace ThermalComfort {
             }
             state.dataThermalComforts->RadTemp = CalcRadTemp(state, state.dataThermalComforts->PeopleNum);
             state.dataThermalComforts->RelHum =
-                PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, thisZoneHB.ZoneAirHumRatAvgComf, state.dataEnvrn->OutBaroPress);
+                PsyRhFnTdbWPb(state, state.dataThermalComforts->AirTemp, thisZoneHB.airHumRatAvgComf, state.dataEnvrn->OutBaroPress);
             state.dataThermalComforts->ActLevel =
                 GetCurrentScheduleValue(state, state.dataHeatBal->People(state.dataThermalComforts->PeopleNum).ActivityLevelPtr) / BodySurfArea;
             state.dataThermalComforts->WorkEff =
@@ -2353,10 +2353,10 @@ namespace ThermalComfort {
                 //   8       25.1        Summer    0.000
                 // check summer clothing conditions
                 isComfortableWithSummerClothes =
-                    isInQuadrilateral(OperTemp, thisZoneHB.ZoneAirHumRatAvgComf, 25.1, 0.0, 23.6, 0.012, 26.8, 0.012, 28.3, 0.0);
+                    isInQuadrilateral(OperTemp, thisZoneHB.airHumRatAvgComf, 25.1, 0.0, 23.6, 0.012, 26.8, 0.012, 28.3, 0.0);
                 // check winter clothing conditions
                 isComfortableWithWinterClothes =
-                    isInQuadrilateral(OperTemp, thisZoneHB.ZoneAirHumRatAvgComf, 21.7, 0.0, 19.6, 0.012, 23.9, 0.012, 26.3, 0.0);
+                    isInQuadrilateral(OperTemp, thisZoneHB.airHumRatAvgComf, 21.7, 0.0, 19.6, 0.012, 23.9, 0.012, 26.3, 0.0);
                 if (isComfortableWithSummerClothes) {
                     state.dataThermalComforts->ThermalComfortInASH55(iZone).timeNotSummer = 0.0;
                 } else {

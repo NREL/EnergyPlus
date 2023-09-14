@@ -1747,20 +1747,20 @@ void GetInputOutputTableSummaryReports(EnergyPlusData &state)
     // if the BEPS report has been called for than initialize its arrays
     if (ort->displayTabularBEPS || ort->displayDemandEndUse || ort->displaySourceEnergyEndUseSummary || ort->displayLEEDSummary) {
         // initialize the resource type names
-        ort->resourceTypeNames(1) = "Electricity";
-        ort->resourceTypeNames(2) = "NaturalGas";
-        ort->resourceTypeNames(3) = "DistrictCooling";
-        ort->resourceTypeNames(4) = "DistrictHeatingWater";
-        ort->resourceTypeNames(5) = "DistirctHeatingSteam";
-        ort->resourceTypeNames(6) = "Gasoline";
-        ort->resourceTypeNames(7) = "Water";
-        ort->resourceTypeNames(8) = "Diesel";
-        ort->resourceTypeNames(9) = "Coal";
-        ort->resourceTypeNames(10) = "FuelOilNo1";
-        ort->resourceTypeNames(11) = "FuelOilNo2";
-        ort->resourceTypeNames(12) = "Propane";
-        ort->resourceTypeNames(13) = "OtherFuel1";
-        ort->resourceTypeNames(14) = "OtherFuel2";
+        ort->resourceTypeNames(1) = Constant::eResourceNames[static_cast<int>(Constant::eResource::Electricity)];
+        ort->resourceTypeNames(2) = Constant::eResourceNames[static_cast<int>(Constant::eResource::NaturalGas)];
+        ort->resourceTypeNames(3) = Constant::eResourceNames[static_cast<int>(Constant::eResource::DistrictCooling)];
+        ort->resourceTypeNames(4) = Constant::eResourceNames[static_cast<int>(Constant::eResource::DistrictHeatingWater)];
+        ort->resourceTypeNames(5) = Constant::eResourceNames[static_cast<int>(Constant::eResource::DistrictHeatingSteam)];
+        ort->resourceTypeNames(6) = Constant::eResourceNames[static_cast<int>(Constant::eResource::Gasoline)];
+        ort->resourceTypeNames(7) = Constant::eResourceNames[static_cast<int>(Constant::eResource::Water)];
+        ort->resourceTypeNames(8) = Constant::eResourceNames[static_cast<int>(Constant::eResource::Diesel)];
+        ort->resourceTypeNames(9) = Constant::eResourceNames[static_cast<int>(Constant::eResource::Coal)];
+        ort->resourceTypeNames(10) = Constant::eResourceNames[static_cast<int>(Constant::eResource::FuelOilNo1)];
+        ort->resourceTypeNames(11) = Constant::eResourceNames[static_cast<int>(Constant::eResource::FuelOilNo2)];
+        ort->resourceTypeNames(12) = Constant::eResourceNames[static_cast<int>(Constant::eResource::Propane)];
+        ort->resourceTypeNames(13) = Constant::eResourceNames[static_cast<int>(Constant::eResource::OtherFuel1)];
+        ort->resourceTypeNames(14) = Constant::eResourceNames[static_cast<int>(Constant::eResource::OtherFuel2)];
 
         ort->sourceTypeNames(1) = "Electricity";
         ort->sourceTypeNames(2) = "NaturalGas";
