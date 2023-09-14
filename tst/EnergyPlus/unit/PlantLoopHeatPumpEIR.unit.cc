@@ -458,7 +458,7 @@ TEST_F(EnergyPlusFixture, processInputForEIRPLHP_TestAirSourceDuplicateNodes)
     std::string error_msg = delimited_string({
         "   ** Severe  ** PlantLoopHeatPump hp cooling side has the same inlet and outlet node.",
         "   **   ~~~   ** Node Name: NODE 3",
-        "   **  Fatal  ** Previous condition causes termination.",
+        "   **  Fatal  ** Previous EIR PLHP errors cause program termination",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
         "   ..... Last severe error=PlantLoopHeatPump hp cooling side has the same inlet and outlet node.",

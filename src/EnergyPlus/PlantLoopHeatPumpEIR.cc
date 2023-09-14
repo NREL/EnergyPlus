@@ -1474,7 +1474,6 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     if (sourceSideInletNodeName == sourceSideOutletNodeName) {
                         ShowSevereError(state, format("PlantLoopHeatPump {} has the same inlet and outlet node.", thisObjectName));
                         ShowContinueError(state, format("Node Name: {}", sourceSideInletNodeName));
-                        ShowFatalError(state, "Previous condition causes termination.");
                         errorsFound = true;
                     }
                 } else {
