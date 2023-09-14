@@ -226,12 +226,6 @@ namespace RoomAir {
 
         using DataSizing::AutoSize;
 
-        Real64 ZoneElecConv(0.0);    // zone elec equip design convective gain [W]
-        Real64 ZoneGasConv(0.0);     // zone gas equip design convective gain [W]
-        Real64 ZoneOthEqConv(0.0);   // zone other equip design convective gain [W]
-        Real64 ZoneHWEqConv(0.0);    // zone hot water equip design convective gain [W]
-        Real64 ZoneSteamEqConv(0.0); // zone steam equip design convective gain [W]
-
         // This is for both UFADInt and UFADExt
         auto &zoneU = state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(ZoneNum));
 
@@ -329,45 +323,8 @@ namespace RoomAir {
         }
 
         if (zoneU.PowerPerPlume == Constant::AutoCalculate) {
-            Real64 NumberOfPlumes = (NumberOfOccupants > 0.0) ? NumberOfOccupants : 1.0;
 
-            ZoneElecConv = 0.0;
-            for (auto const &zoneElectric : state.dataHeatBal->ZoneElectric) {
-                if (zoneElectric.ZonePtr == ZoneNum) {
-                    // Is the behavior for Exterior UFAD supposed to be different than for Interior UFAD?
-                    ZoneElecConv +=
-                        (model == RoomAirModel::UFADExt) ? zoneElectric.DesignLevel : (zoneElectric.DesignLevel * zoneElectric.FractionConvected);
-                }
-            }
-            ZoneGasConv = 0.0;
-            for (auto const &zoneGas : state.dataHeatBal->ZoneGas) {
-                if (zoneGas.ZonePtr == ZoneNum) {
-                    ZoneGasConv += (model == RoomAirModel::UFADExt) ? zoneGas.DesignLevel : (zoneGas.DesignLevel * zoneGas.FractionConvected);
-                }
-            }
-            ZoneOthEqConv = 0.0;
-            for (auto const &zoneOtherEq : state.dataHeatBal->ZoneOtherEq) {
-                if (zoneOtherEq.ZonePtr == ZoneNum) {
-                    ZoneOthEqConv +=
-                        (model == RoomAirModel::UFADExt) ? zoneOtherEq.DesignLevel : (zoneOtherEq.DesignLevel * zoneOtherEq.FractionConvected);
-                }
-            }
-            ZoneHWEqConv = 0.0;
-            for (auto const &zoneHWEq : state.dataHeatBal->ZoneHWEq) {
-                if (zoneHWEq.ZonePtr == ZoneNum) {
-                    ZoneHWEqConv += (model == RoomAirModel::UFADExt) ? zoneHWEq.DesignLevel : (zoneHWEq.DesignLevel * zoneHWEq.FractionConvected);
-                }
-            }
-
-            for (auto const &zoneSteamEq : state.dataHeatBal->ZoneSteamEq) {
-                ZoneSteamEqConv = 0.0; // I'm 99.72% sure this is a bug.
-                if (zoneSteamEq.ZonePtr == ZoneNum) {
-                    ZoneSteamEqConv +=
-                        (model == RoomAirModel::UFADExt) ? zoneSteamEq.DesignLevel : (zoneSteamEq.DesignLevel * zoneSteamEq.FractionConvected);
-                }
-            }
-            zoneU.PowerPerPlume =
-                (NumberOfOccupants * 73.0 + ZoneElecConv + ZoneGasConv + ZoneOthEqConv + ZoneHWEqConv + ZoneSteamEqConv) / NumberOfPlumes;
+            zoneU.PowerPerPlume = sumUFADConvGainPerPlume(state, ZoneNum, NumberOfOccupants);
 
             BaseSizer::reportSizerOutput(state, cCMO, zoneU.ZoneName, "Power per plume [W]", zoneU.PowerPerPlume);
 
@@ -382,6 +339,48 @@ namespace RoomAir {
 
             BaseSizer::reportSizerOutput(state, cCMO, zoneU.ZoneName, "Number of diffusers per zone", zoneU.DiffusersPerZone);
         }
+    }
+
+    Real64 sumUFADConvGainPerPlume(EnergyPlusData &state, int const zoneNum, Real64 const numOccupants)
+    {
+        Real64 zoneElecConv(0.0); // zone elec equip design convective gain [W]
+        for (auto const &zoneElectric : state.dataHeatBal->ZoneElectric) {
+            if (zoneElectric.ZonePtr == zoneNum) {
+                zoneElecConv += zoneElectric.DesignLevel * zoneElectric.FractionConvected;
+            }
+        }
+
+        Real64 zoneGasConv(0.0); // zone gas equip design convective gain [W]
+        for (auto const &zoneGas : state.dataHeatBal->ZoneGas) {
+            if (zoneGas.ZonePtr == zoneNum) {
+                zoneGasConv += zoneGas.DesignLevel * zoneGas.FractionConvected;
+            }
+        }
+
+        Real64 zoneOthEqConv(0.0); // zone other equip design convective gain [W]
+        for (auto const &zoneOtherEq : state.dataHeatBal->ZoneOtherEq) {
+            if (zoneOtherEq.ZonePtr == zoneNum) {
+                zoneOthEqConv += zoneOtherEq.DesignLevel * zoneOtherEq.FractionConvected;
+            }
+        }
+
+        Real64 zoneHWEqConv(0.0); // zone hot water equip design convective gain [W]
+        for (auto const &zoneHWEq : state.dataHeatBal->ZoneHWEq) {
+            if (zoneHWEq.ZonePtr == zoneNum) {
+                zoneHWEqConv += zoneHWEq.DesignLevel * zoneHWEq.FractionConvected;
+            }
+        }
+
+        Real64 zoneSteamEqConv(0.0); // zone steam equip design convective gain [W]
+        for (auto const &zoneSteamEq : state.dataHeatBal->ZoneSteamEq) {
+            if (zoneSteamEq.ZonePtr == zoneNum) {
+                zoneSteamEqConv += zoneSteamEq.DesignLevel * zoneSteamEq.FractionConvected;
+            }
+        }
+
+        Real64 numPlumes = (numOccupants > 0.0) ? numOccupants : 1.0;
+
+        return (numOccupants * 73.0 + zoneElecConv + zoneGasConv + zoneOthEqConv + zoneHWEqConv + zoneSteamEqConv) / numPlumes;
     }
 
     void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight, UFADConvCoef &ufadCC)
