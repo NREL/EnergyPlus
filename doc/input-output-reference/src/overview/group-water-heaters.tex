@@ -56,7 +56,7 @@ Advantages of \textbf{\hyperref[waterheaterstratified]{WaterHeater:Stratified}}:
 \item
   better modeling of electric water heaters with two heating elements
 \item
-  better modeling of thermal storage applications which rely on stratification to improve heat transfer peformance.
+  better modeling of thermal storage applications which rely on stratification to improve heat transfer performance.
 \end{itemize}
 
 \subsection{Standard Ratings}\label{standard-ratings}
@@ -194,7 +194,7 @@ The peak flow rate {[}m\(^{3}\)/s{]} of domestic hot water usage for stand-alone
 
 \paragraph{Field: Use Flow Rate Fraction Schedule Name}\label{field-use-flow-rate-fraction-schedule-name}
 
-The reference to the schedule object specifiying the current fraction of Peak Volumetric Use Flow Rate of domestic hot water usage for stand-alone operation.
+The reference to the schedule object specifying the current fraction of Peak Volumetric Use Flow Rate of domestic hot water usage for stand-alone operation.
 
 \paragraph{Field: Cold Water Supply Temperature Schedule Name}\label{field-cold-water-supply-temperature-schedule-name}
 
@@ -443,7 +443,7 @@ The following output variables are reported for the WaterHeater:Mixed object:
 \item
   HVAC,Average,Water Heater Total Demand Heat Transfer Rate {[}W{]}
 \item
-  HVAC,Sum,Water Heater Total Demand Energy {[}J{]}
+  HVAC,Sum,Water Heater Total Demand Heat Transfer Energy {[}J{]}
 \item
   HVAC,Average,Water Heater Heating Rate {[}W{]}
 \item
@@ -562,7 +562,7 @@ The heat gain energy to the tank water due to on-cycle parasitics.
 
 The average heating rate demanded to maintain the setpoint temperature.
 
-\paragraph{Water Heater Total Demand Energy {[}J{]}}\label{water-heater-total-demand-energy-j}
+\paragraph{Water Heater Total Demand Heat Transfer Energy {[}J{]}}\label{water-heater-total-demand-heat-transfer-energy-j}
 
 The heating energy demanded to maintain the setpoint temperature.
 
@@ -658,7 +658,7 @@ The WaterHeater:Stratified object divides the water tank into multiple nodes of 
 
 For losses to the ambient environment, the ambient air temperature can be taken from a schedule, a zone, or the exterior. When used with a zone, a fraction of the skin losses can be added to the zone heat balance as internal heat gains.
 
-The WaterHeater:Stratified object allows two heating elements to be simulated. The two elements can cycle on and off to maintain the node temperature within the deadband. The Heater Priority Control field determines how the heaters work together. There are two options:~ MasterSlave or Simultaneous. In the MasterSlave option, Heater 1 is the master and Heater 2 is the slave. That is, both heaters are not allowed to turn on at the same time. If the thermostats ask for heat at both Heater 1 and 2, only Heater 1 will turn on. Once Heater 1 has met the set point, it turns off and Heater 2 can turn on, if necessary. In the Simultaneousoption, Heater 1 and Heater 2 can turn on and off independently.~ Autosizing is available for only Heater 1.
+The WaterHeater:Stratified object allows two heating elements to be simulated. The two elements can cycle on and off to maintain the node temperature within the deadband. The Heater Priority Control field determines how the heaters work together. There are two options:~ MasterSlave or Simultaneous. In the MasterSlave option, Heater 1 is the master and Heater 2 is the slave. That is, both heaters are not allowed to turn on at the same time. If the thermostats ask for heat at both Heater 1 and 2, only Heater 1 will turn on. Once Heater 1 has met the set point, it turns off and Heater 2 can turn on, if necessary. In the Simultaneous option, Heater 1 and Heater 2 can turn on and off independently.~ Autosizing is available for only Heater 1.
 
 \subsubsection{Inputs}\label{inputs-1-049}
 
@@ -821,7 +821,7 @@ The peak flow rate {[}m\(^{3}\)/s{]} of domestic hot water usage for stand-alone
 
 \paragraph{Field: Use Flow Rate Fraction Schedule Name}\label{field-use-flow-rate-fraction-schedule-name-1}
 
-The reference to the schedule object specifiying the current fraction of Peak Volumetric Use Flow Rate of domestic hot water usage for stand-alone operation. If blank, the fraction defaults to 1.0 at all times.
+The reference to the schedule object specifying the current fraction of Peak Volumetric Use Flow Rate of domestic hot water usage for stand-alone operation. If blank, the fraction defaults to 1.0 at all times.
 
 \paragraph{Field: Cold Water Supply Temperature Schedule Name}\label{field-cold-water-supply-temperature-schedule-name-1}
 
@@ -869,7 +869,7 @@ The height of the source side outlet from the tank. If blank, the inlet defaults
 
 \paragraph{Field: Inlet Mode}\label{field-inlet-mode-000}
 
-The inlet mode of entering fluid from the use and source sides. There are two options:~ \textbf{Fixed} or \textbf{Seeking}. In Fixed mode, the fluid enters at the fixed heights specified above. In Seeking mode, the fluid ``seeks out'' the stratified node that is closest to the inlet temperature and adds all flow to that node. The Seekingbmode provides maximum stratification. The default is \textbf{Fixed}.
+The inlet mode of entering fluid from the use and source sides. There are two options:~ \textbf{Fixed} or \textbf{Seeking}. In Fixed mode, the fluid enters at the fixed heights specified above. In Seeking mode, the fluid ``seeks out'' the stratified node that is closest to the inlet temperature and adds all flow to that node. The Seeking mode provides maximum stratification. The default is \textbf{Fixed}.
 
 \paragraph{Field: Use Side Design Flow Rate}\label{field-use-side-design-flow-rate-1-000}
 
@@ -1102,7 +1102,7 @@ This field is used in case the water heater is indirectly heated by its source s
 
 \paragraph{Field: Number of Bedrooms}\label{field-number-of-bedrooms}
 
-This field is used to enter the numer of bedrooms in the model.~ This field is only used if the Design Mode is ``\textbf{ResidentialHUD-FHAMinimum}.''
+This field is used to enter the number of bedrooms in the model.~ This field is only used if the Design Mode is ``\textbf{ResidentialHUD-FHAMinimum}.''
 
 \paragraph{Field: Number of Bathrooms}\label{field-number-of-bathrooms}
 
@@ -2512,7 +2512,7 @@ The delta temperature difference {[}Δ°C{]} between the setpoint and the ``cut-
 
 \paragraph{Field: Temperature Sensor Height}\label{field-temperature-sensor-height}
 
-This field is used to describe the location in the tank where the temperature is sensed for control descisions.~ The program will associate one of the nodes with this height and use that node's temperature for control decisions.~ The location is described in meters from the bottom of the tank.
+This field is used to describe the location in the tank where the temperature is sensed for control decisions.~ The program will associate one of the nodes with this height and use that node's temperature for control decisions.~ The location is described in meters from the bottom of the tank.
 
 \paragraph{Field: Minimum Temperature Limit}\label{field-minimum-temperature-limit-1}
 

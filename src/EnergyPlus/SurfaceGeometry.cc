@@ -2420,18 +2420,18 @@ namespace SurfaceGeometry {
                                 }
                             }
                         }
-                        thisSpace.floorArea = thisSpace.userEnteredFloorArea;
+                        thisSpace.FloorArea = thisSpace.userEnteredFloorArea;
                         thisSpace.hasFloor = true;
                     }
                 } else {
-                    thisSpace.floorArea = thisSpace.calcFloorArea;
+                    thisSpace.FloorArea = thisSpace.calcFloorArea;
                 }
             }
             ErrCount = 0;
             for (auto &thisZone : state.dataHeatBal->Zone) {
                 // Calculate zone floor area as sum of space floor areas
                 for (int spaceNum : thisZone.spaceIndexes) {
-                    thisZone.CalcFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                    thisZone.CalcFloorArea += state.dataHeatBal->space(spaceNum).FloorArea;
                     thisZone.HasFloor |= state.dataHeatBal->space(spaceNum).hasFloor;
                 }
                 if (thisZone.UserEnteredFloorArea != Constant::AutoCalculate) {
@@ -2475,12 +2475,12 @@ namespace SurfaceGeometry {
                         if (thisZone.numSpaces == 1) {
                             // If the zone contains only one space, then set the Space area to the Zone area
                             int spaceNum = thisZone.spaceIndexes(1);
-                            state.dataHeatBal->space(spaceNum).floorArea = thisZone.FloorArea;
+                            state.dataHeatBal->space(spaceNum).FloorArea = thisZone.FloorArea;
                         } else if (thisZone.CalcFloorArea > 0.0) {
                             // Adjust space areas proportionately
                             Real64 areaRatio = thisZone.FloorArea / thisZone.CalcFloorArea;
                             for (int spaceNum : thisZone.spaceIndexes) {
-                                state.dataHeatBal->space(spaceNum).floorArea *= areaRatio;
+                                state.dataHeatBal->space(spaceNum).FloorArea *= areaRatio;
                             }
                         } else {
                             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -2503,11 +2503,11 @@ namespace SurfaceGeometry {
                 }
                 Real64 totSpacesFloorArea = 0.0;
                 for (int spaceNum : thisZone.spaceIndexes) {
-                    totSpacesFloorArea += state.dataHeatBal->space(spaceNum).floorArea;
+                    totSpacesFloorArea += state.dataHeatBal->space(spaceNum).FloorArea;
                 }
                 if (totSpacesFloorArea > 0.0) {
                     for (int spaceNum : thisZone.spaceIndexes) {
-                        state.dataHeatBal->space(spaceNum).fracZoneFloorArea = state.dataHeatBal->space(spaceNum).floorArea / totSpacesFloorArea;
+                        state.dataHeatBal->space(spaceNum).fracZoneFloorArea = state.dataHeatBal->space(spaceNum).FloorArea / totSpacesFloorArea;
                     }
                 } // else leave fractions at zero
             }
@@ -2982,7 +2982,8 @@ namespace SurfaceGeometry {
                     ++state.dataHeatBal->Zone(zoneNum).numSpaces;
                     assert(state.dataHeatBal->Zone(zoneNum).numSpaces == int(state.dataHeatBal->Zone(zoneNum).spaceIndexes.size()));
                     // If some surfaces in the zone are assigned to a space, the new space is the remainder of the zone
-                    state.dataHeatBal->space(state.dataGlobal->numSpaces).Name = thisZone.Name + "-Remainder";
+                    state.dataHeatBal->space(state.dataGlobal->numSpaces).Name =
+                        thisZone.Name + "-REMAINDER"; // Make UPPERcase so it can be referenced in input
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).isRemainderSpace = true;
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceType = "GENERAL";
                     state.dataHeatBal->space(state.dataGlobal->numSpaces).spaceTypeNum = HeatBalanceManager::GetGeneralSpaceTypeNum(state);
@@ -3021,20 +3022,6 @@ namespace SurfaceGeometry {
         }
     }
 
-    Real64 rotAzmDiffDeg(Real64 const &AzmA, Real64 const &AzmB)
-    {
-        // This function takes two (azimuth) angles in Degree(s),
-        // and returns the rotational angle difference in Degree(s).
-
-        Real64 diff = AzmB - AzmA;
-        if (diff > 180.0) {
-            diff = 360.0 - diff;
-        } else if (diff < -180.0) {
-            diff = 360.0 + diff;
-        }
-        return std::abs(diff);
-    }
-
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -3070,7 +3057,7 @@ namespace SurfaceGeometry {
             // Is base surface horizontal? If so, ignore azimuth differences
             if (std::abs(baseSurface.Tilt) <= 1.0e-5 || std::abs(baseSurface.Tilt - 180.0) <= 1.0e-5) baseSurfHoriz = true;
 
-            if (((rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > errorTolerance) && !baseSurfHoriz) ||
+            if (((General::rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > errorTolerance) && !baseSurfHoriz) ||
                 (std::abs(baseSurface.Tilt - subSurface.Tilt) > errorTolerance)) {
                 surfaceError = true;
                 ShowSevereError(
@@ -3081,7 +3068,7 @@ namespace SurfaceGeometry {
                                   format("Subsurface=\"{}\" Tilt = {:.1R}  Azimuth = {:.1R}", subSurface.Name, subSurface.Tilt, subSurface.Azimuth));
                 ShowContinueError(
                     state, format("Base surface=\"{}\" Tilt = {:.1R}  Azimuth = {:.1R}", baseSurface.Name, baseSurface.Tilt, baseSurface.Azimuth));
-            } else if (((rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > warningTolerance) && !baseSurfHoriz) ||
+            } else if (((General::rotAzmDiffDeg(baseSurface.Azimuth, subSurface.Azimuth) > warningTolerance) && !baseSurfHoriz) ||
                        (std::abs(baseSurface.Tilt - subSurface.Tilt) > warningTolerance)) {
                 ++state.dataSurfaceGeometry->checkSubSurfAzTiltNormErrCount;
                 if (state.dataSurfaceGeometry->checkSubSurfAzTiltNormErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -7690,10 +7677,12 @@ namespace SurfaceGeometry {
         int Found;
         int AlphaOffset; // local temp var
         std::string Roughness;
-        int ThisSurf;      // do loop counter
-        Real64 AvgAzimuth; // temp for error checking
-        Real64 AvgTilt;    // temp for error checking
-        int SurfID;        // local surface "pointer"
+        int ThisSurf;                   // do loop counter
+        Real64 AvgAzimuth;              // temp for error checking
+        Real64 AvgTilt;                 // temp for error checking
+        constexpr Real64 AZITOL = 15.0; // Degree Azimuth Angle Tolerance
+        constexpr Real64 TILTOL = 10.0; // Degree Tilt Angle Tolerance
+        int SurfID;                     // local surface "pointer"
         bool IsBlank;
         bool ErrorInName;
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -7891,14 +7880,14 @@ namespace SurfaceGeometry {
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             for (ThisSurf = 1; ThisSurf <= state.dataHeatBal->ExtVentedCavity(Item).NumSurfs; ++ThisSurf) {
                 SurfID = state.dataHeatBal->ExtVentedCavity(Item).SurfPtrs(ThisSurf);
-                if (std::abs(state.dataSurface->Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
+                if (General::rotAzmDiffDeg(state.dataSurface->Surface(SurfID).Azimuth, AvgAzimuth) > AZITOL) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Azimuth different from others in the associated group.",
                                             cCurrentModuleObject,
                                             state.dataHeatBal->ExtVentedCavity(Item).Name,
                                             state.dataSurface->Surface(SurfID).Name));
                 }
-                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > 10.0) {
+                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > TILTOL) {
                     ShowWarningError(state,
                                      format("{}=\"{}, Surface {} has Tilt different from others in the associated group.",
                                             cCurrentModuleObject,
@@ -8289,23 +8278,24 @@ namespace SurfaceGeometry {
                     SurfLocalEnv.SurfPtr = SurfNum;
                 }
 
-                // Assign External Shading Schedule number
+                // Assign Sunlit Fraction Schedule number
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(3)) {
-                    int ExtShadingSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
-                    if (ExtShadingSchedNum == 0) {
+                    int SunlitFracSchedNum = GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+                    if (SunlitFracSchedNum == 0) {
                         ShowSevereError(state,
                                         format("{} {} = \"{}\", object. Illegal value for \"{}\" has been found.",
                                                RoutineName,
                                                cCurrentModuleObject,
                                                SurfLocalEnv.Name,
                                                state.dataIPShortCut->cAlphaFieldNames(3)));
-                        ShowContinueError(state,
-                                          format("{} entered value = \"{}\", no corresponding shading schedule has been found in the input file.",
-                                                 state.dataIPShortCut->cAlphaFieldNames(3),
-                                                 state.dataIPShortCut->cAlphaArgs(3)));
+                        ShowContinueError(
+                            state,
+                            format("{} entered value = \"{}\", no corresponding sunlit fraction schedule has been found in the input file.",
+                                   state.dataIPShortCut->cAlphaFieldNames(3),
+                                   state.dataIPShortCut->cAlphaArgs(3)));
                         ErrorsFound = true;
                     } else {
-                        SurfLocalEnv.ExtShadingSchedPtr = ExtShadingSchedNum;
+                        SurfLocalEnv.SunlitFracSchedPtr = SunlitFracSchedNum;
                     }
                 }
 
@@ -8390,9 +8380,9 @@ namespace SurfaceGeometry {
                     if (SurfLocalEnv.OutdoorAirNodePtr != 0) {
                         surface.SurfLinkedOutAirNode = SurfLocalEnv.OutdoorAirNodePtr;
                     }
-                    if (SurfLocalEnv.ExtShadingSchedPtr != 0) {
+                    if (SurfLocalEnv.SunlitFracSchedPtr != 0) {
                         surface.SurfSchedExternalShadingFrac = true;
-                        surface.SurfExternalShadingSchInd = SurfLocalEnv.ExtShadingSchedPtr;
+                        surface.SurfExternalShadingSchInd = SurfLocalEnv.SunlitFracSchedPtr;
                     }
                     if (SurfLocalEnv.SurroundingSurfsPtr != 0) {
                         surface.SurfHasSurroundingSurfProperty = true;
@@ -9306,6 +9296,68 @@ namespace SurfaceGeometry {
         }
     }
 
+    struct PopCoincidentVertexReturn
+    {
+        double perimeter;
+        int poppedVertexPos = -1; // This is a STL vector position, 0-indexed
+        int keptVertexPos = -1;
+    };
+
+    PopCoincidentVertexReturn checkPopCoincidentVertex(const Array1D<Vector> &vertices)
+    {
+        constexpr double tolerance = 0.01;
+
+        size_t const nSides = vertices.size();
+
+        // Pass one: Vector of distance from this vertex to the next one
+        std::vector<Real64> distances(nSides);
+        size_t index = 0;
+        double min_distance = std::numeric_limits<Real64>::max();
+        double perimeter = 0.0;
+        for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+            auto itnext = std::next(it);
+            if (itnext == std::end(vertices)) {
+                itnext = std::begin(vertices);
+            }
+            const auto dist = distance(*it, *itnext);
+            distances[index++] = dist;
+            min_distance = std::min(min_distance, dist);
+            perimeter += dist;
+        }
+        // Return early if nothing to be popped
+        if (min_distance >= tolerance) {
+            return {perimeter};
+        }
+
+        // Pass two: figure out the vertex that is coincident with its previous and/or next vertex and
+        // that minimizes the (distanceThisToNext + distanceThisToPrev).
+        Real64 min_weight = std::numeric_limits<Real64>::max();
+        int poppedVertexPos = -1;
+        int keptVertexPos = -1;
+
+        for (size_t index = 0; index < nSides; ++index) {
+            size_t const prevIndex = (index == 0) ? nSides - 1 : index - 1;
+            Real64 &distanceThisToNext = distances[index];
+            Real64 &distanceThisToPrev = distances[prevIndex];
+            if ((distanceThisToNext >= tolerance) && (distanceThisToPrev >= tolerance)) {
+                continue;
+            }
+            Real64 const weight = distanceThisToNext + distanceThisToPrev;
+            if (weight < min_weight) {
+                min_weight = weight;
+                poppedVertexPos = static_cast<int>(index);
+                if (distanceThisToPrev < distanceThisToNext) {
+                    keptVertexPos = prevIndex;
+                } else {
+                    keptVertexPos = static_cast<int>((index == nSides - 1) ? 0 : index + 1);
+                }
+            }
+        }
+
+        // Return the keptVertexPos (which can be the previous or the next), so we can print the displayExtraWarning correctly
+        return {perimeter, poppedVertexPos, keptVertexPos};
+    }
+
     void GetVertices(EnergyPlusData &state,
                      int const SurfNum,             // Current surface number
                      int const NSides,              // Number of sides to figure
@@ -9363,7 +9415,6 @@ namespace SurfaceGeometry {
         std::string TiltString;
         Real64 ThisWidth;
         Real64 ThisHeight;
-        Real64 DistanceCheck;
         // unused    REAL(r64) :: ccwtest
         // unused    LOGICAL   :: SurfaceCCW
         Real64 dotp;
@@ -9481,54 +9532,61 @@ namespace SurfaceGeometry {
             auto &vertices = surface.Vertex;
             auto &nSides = surface.Sides;
 
-            bool poppedVertex = true;
-            while (poppedVertex) {
-                poppedVertex = false;
-                Perimeter = 0.0;
+            while (true) {
+                PopCoincidentVertexReturn const popResult = checkPopCoincidentVertex(vertices);
+                Perimeter = popResult.perimeter;
+                if (popResult.poppedVertexPos < 0) {
+                    // No pop needed, we're done
+                    break;
+                }
 
-                for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-                    auto itnext = std::next(it);
-                    if (itnext == std::end(vertices)) {
-                        itnext = std::begin(vertices);
-                    }
+                // Grab the popped one, and the kept one (regardless of whether it's previous or next)
+                auto it = vertices.begin();
+                std::advance(it, popResult.poppedVertexPos);
+                int const poppedVertexIndex = popResult.poppedVertexPos + 1;
 
-                    // TODO: use isAlmostEqual3Pt for consistency? (which uses 0.0127 m / 1/2inch instead of 0.01 m)
-                    DistanceCheck = distance(*it, *itnext);
-                    if (DistanceCheck < 0.01) {
-                        int curVertexIndex = std::distance(vertices.begin(), it) + 1;
-                        int nextVertexIndex = std::distance(vertices.begin(), itnext) + 1;
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state,
-                                             format("{}Distance between two vertices < .01, possibly coincident. for Surface={}, in Zone={}",
-                                                    RoutineName,
-                                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
-                            ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", curVertexIndex, it->x, it->y, it->z));
-                            ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", nextVertexIndex, itnext->x, itnext->y, it->z));
-                        }
-                        ++state.dataErrTracking->TotalCoincidentVertices;
-                        if (nSides > 3) {
-                            if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowContinueError(state, format("Dropping Vertex [{}].", nextVertexIndex));
-                            }
-                            --nSides;
-                            vertices.erase(itnext);
-                            poppedVertex = true;
-                            break;
-                        } else {
-                            if (state.dataGlobal->DisplayExtraWarnings) {
-                                ShowContinueError(state,
-                                                  format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a "
-                                                         "degenerate surface.",
-                                                         curVertexIndex));
-                            }
-                            ++state.dataErrTracking->TotalDegenerateSurfaces;
-                            // mark degenerate surface?
-                        }
+                auto itKept = vertices.begin();
+                std::advance(itKept, popResult.keptVertexPos);
+                int const keptVertexIndex = popResult.keptVertexPos + 1;
+
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state,
+                                     format("{}Distance between two vertices < .01, possibly coincident. for Surface={}, in Zone={}",
+                                            RoutineName,
+                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+
+                    bool const printPoppedFirst = (poppedVertexIndex < keptVertexIndex) ? !(poppedVertexIndex == 1 && keptVertexIndex == nSides)
+                                                                                        : (poppedVertexIndex == nSides && keptVertexIndex == 1);
+
+                    if (printPoppedFirst) {
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", poppedVertexIndex, it->x, it->y, it->z));
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", keptVertexIndex, itKept->x, itKept->y, itKept->z));
                     } else {
-                        Perimeter += DistanceCheck;
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", keptVertexIndex, itKept->x, itKept->y, itKept->z));
+                        ShowContinueError(state, format("Vertex [{}]=({:.2R},{:.2R},{:.2R})", poppedVertexIndex, it->x, it->y, it->z));
                     }
                 }
+                ++state.dataErrTracking->TotalCoincidentVertices;
+                if (nSides <= 3) {
+                    if (state.dataGlobal->DisplayExtraWarnings) {
+                        ShowContinueError(state,
+                                          format("Cannot Drop Vertex [{}]; Number of Surface Sides at minimum. This surface is now a "
+                                                 "degenerate surface.",
+                                                 poppedVertexIndex));
+                    }
+                    ++state.dataErrTracking->TotalDegenerateSurfaces;
+                    // If degenerate, we won't be able to pop now nor later, so exit
+                    // mark degenerate surface?
+                    break;
+                }
+
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowContinueError(state, format("Dropping Vertex [{}].", poppedVertexIndex));
+                }
+                --nSides;
+                vertices.erase(it);
+                // No need to recompute perimeter, because it'll be done in the next iteration, until no popping or degenerate happens
             }
 
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = Perimeter;
@@ -12599,7 +12657,7 @@ namespace SurfaceGeometry {
                 if (thisZone.numSpaces == 1) {
                     thisSpace.Volume = thisZone.Volume;
                 } else if (thisZone.geometricFloorArea > 0.0) {
-                    thisSpace.Volume = thisZone.Volume * thisSpace.floorArea / thisZone.geometricFloorArea;
+                    thisSpace.Volume = thisZone.Volume * thisSpace.FloorArea / thisZone.geometricFloorArea;
                 }
             }
             Real64 totSpacesVolume = 0.0;
@@ -13050,7 +13108,7 @@ namespace SurfaceGeometry {
 
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (std::abs(state.dataSurface->Surface(curSurfNum).Azimuth - azimuth) < 1.) {
+            if (General::rotAzmDiffDeg(state.dataSurface->Surface(curSurfNum).Azimuth, azimuth) < 1.) {
                 facingAzimuth.emplace_back(iFace);
             }
         }
@@ -15352,13 +15410,13 @@ namespace SurfaceGeometry {
                             thisEnclosure.Name = format("{} Enclosure {}", RadiantOrSolar, enclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(surf.spaceNum);
-                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).floorArea;
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).FloorArea;
                             otherSideEnclosureNum = enclosureNum;
                             int otherSideSpaceNum = state.dataSurface->Surface(surf.ExtBoundCond).spaceNum;
                             if (otherSideSpaceNum != surf.spaceNum) {
                                 thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(otherSideSpaceNum).Name);
                                 thisEnclosure.spaceNums.push_back(otherSideSpaceNum);
-                                thisEnclosure.FloorArea += state.dataHeatBal->space(otherSideSpaceNum).floorArea;
+                                thisEnclosure.FloorArea += state.dataHeatBal->space(otherSideSpaceNum).FloorArea;
                             }
                             if (radiantSetup) {
                                 state.dataHeatBal->space(surf.spaceNum).radiantEnclosureNum = thisSideEnclosureNum;
@@ -15381,7 +15439,7 @@ namespace SurfaceGeometry {
                             auto &thisEnclosure = Enclosures(thisSideEnclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(surf.spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(surf.spaceNum);
-                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).floorArea;
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(surf.spaceNum).FloorArea;
                             if (radiantSetup) {
                                 state.dataHeatBal->space(surf.spaceNum).radiantEnclosureNum = thisSideEnclosureNum;
                             } else {
@@ -15395,7 +15453,7 @@ namespace SurfaceGeometry {
                             auto &thisEnclosure = Enclosures(thisSideEnclosureNum);
                             thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).Name);
                             thisEnclosure.spaceNums.push_back(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum);
-                            thisEnclosure.FloorArea += state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).floorArea;
+                            thisEnclosure.FloorArea += state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).FloorArea;
                             if (radiantSetup) {
                                 state.dataHeatBal->space(state.dataSurface->Surface(surf.ExtBoundCond).spaceNum).radiantEnclosureNum =
                                     otherSideEnclosureNum;
@@ -15527,7 +15585,7 @@ namespace SurfaceGeometry {
                     thisEnclosure.Name = zone.Name;
                     thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
                     thisEnclosure.spaceNums.push_back(spaceNum);
-                    thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
+                    thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).FloorArea;
                     thisEnclosure.ExtWindowArea = state.dataHeatBal->space(spaceNum).extWindowArea;
                     thisEnclosure.TotalSurfArea = state.dataHeatBal->space(spaceNum).totalSurfArea;
                 }
@@ -15545,7 +15603,7 @@ namespace SurfaceGeometry {
                     spaceEnclosureNum = curSpace.solarEnclosureNum;
                 }
                 if (spaceEnclosureNum == 0) {
-                    if (UtilityRoutines::SameString(curSpace.Name, state.dataHeatBal->Zone(curSpace.zoneNum).Name + "-Remainder")) {
+                    if (UtilityRoutines::SameString(curSpace.Name, state.dataHeatBal->Zone(curSpace.zoneNum).Name + "-REMAINDER")) {
                         // Search for existing enclosure with same name as the zone
                         spaceEnclosureNum = UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(curSpace.zoneNum).Name, Enclosures);
                     }
@@ -15563,7 +15621,7 @@ namespace SurfaceGeometry {
                     auto &thisEnclosure = Enclosures(spaceEnclosureNum);
                     thisEnclosure.spaceNames.push_back(curSpace.Name);
                     thisEnclosure.spaceNums.push_back(spaceNum);
-                    thisEnclosure.FloorArea += curSpace.floorArea;
+                    thisEnclosure.FloorArea += curSpace.FloorArea;
                     thisEnclosure.ExtWindowArea += curSpace.extWindowArea;
                     thisEnclosure.TotalSurfArea += curSpace.totalSurfArea;
                 }
@@ -15580,7 +15638,7 @@ namespace SurfaceGeometry {
                 thisEnclosure.Name = state.dataHeatBal->space(spaceNum).Name;
                 thisEnclosure.spaceNames.push_back(state.dataHeatBal->space(spaceNum).Name);
                 thisEnclosure.spaceNums.push_back(spaceNum);
-                thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).floorArea;
+                thisEnclosure.FloorArea = state.dataHeatBal->space(spaceNum).FloorArea;
                 if (radiantSetup) {
                     state.dataHeatBal->space(spaceNum).radiantEnclosureNum = spaceNum;
                 } else {

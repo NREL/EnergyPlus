@@ -740,7 +740,7 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "DISTRICTHEATING",
+                                "DISTRICTHEATINGWATER",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
                                 "Plant");
@@ -754,7 +754,7 @@ namespace WaterUse {
                                 OutputProcessor::SOVStoreType::Summed,
                                 this->Name,
                                 {},
-                                "DISTRICTHEATING",
+                                "DISTRICTHEATINGWATER",
                                 "WATERSYSTEMS",
                                 this->EndUseSubcatName,
                                 "Plant");
@@ -1255,7 +1255,7 @@ namespace WaterUse {
                 this->LatentRate = 0.0;
                 this->LatentEnergy = 0.0;
             } else {
-                Real64 ZoneHumRat = thisZoneHB.ZoneAirHumRat;
+                Real64 ZoneHumRat = thisZoneHB.airHumRat;
                 Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state,
                                                                      thisZoneHB.MAT,
                                                                      1.0,

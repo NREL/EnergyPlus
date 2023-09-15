@@ -186,7 +186,7 @@ Solar Rating and Certification Corporation.~ 2004.~ Directory of SRCC Certified 
 
 \subsection{Integral-collector-storage (ICS) Solar Collector}\label{integral-collector-storage-ics-solar-collector}
 
-Solar collectors with integral storage unit models use SolarCollector:IntegralCollectorStorage object, and the characteristics parameter inputs of this collector are provided by the SolarCollectorPerformance:IntegralCollectorStorage object. This model is based on detailed Energy Balance equations of solar collectors that integrates storage in it. This model has two options to represent the collector bottom outside boundary conditions: AmbientAir, and OtherSideConditionsModel. AmbientAir simply applies outside air temperature using combined convection and radiation conductance, and the OtherSideConditionsModel applies combined radiation and convection models that exiats in a naturally ventilated cavity to represent the collector bottom outside boundary condition. The later boundary condition accounts for the shading of the collector on the underlying surface, hence, the ICS collector can be assumed as an integral part of the building envelope. Schematic diagram of a rectangular ICS solar collector is shown in Figure~\ref{fig:schematic-diagram-of-rectangular-integrated} below:
+Solar collectors with integral storage unit models use SolarCollector:IntegralCollectorStorage object, and the characteristics parameter inputs of this collector are provided by the SolarCollectorPerformance:IntegralCollectorStorage object. This model is based on detailed Energy Balance equations of solar collectors that integrates storage in it. This model has two options to represent the collector bottom outside boundary conditions: AmbientAir, and OtherSideConditionsModel. AmbientAir simply applies outside air temperature using combined convection and radiation conductance, and the OtherSideConditionsModel applies combined radiation and convection models that exist in a naturally ventilated cavity to represent the collector bottom outside boundary condition. The later boundary condition accounts for the shading of the collector on the underlying surface, hence, the ICS collector can be assumed as an integral part of the building envelope. Schematic diagram of a rectangular ICS solar collector is shown in Figure~\ref{fig:schematic-diagram-of-rectangular-integrated} below:
 
 \begin{figure}[hbtp] % fig 295
 \centering
@@ -700,17 +700,17 @@ Duffie, J.A., and W.A. Beckman. 1991. \emph{Solar Engineering of Thermal Process
 
 Kumar, R. and M.A.~Rosen. Thermal performance of integrated collector storage solar water heater with corrugated absorber surface. Applied Thermal Engineering:~ 30 (2010) 1764--1768.
 
-Fujii, T., and H. Imura. Natural convection heat transfer from aplate with arbitrary inclination. International Journal of Heat and Mass Transfer: 15(4), (1972), 755-764.
+Fujii, T., and H. Imura. Natural convection heat transfer from a plate with arbitrary inclination. International Journal of Heat and Mass Transfer: 15(4), (1972), 755-764.
 
 \subsection{Photovoltaic Thermal Flat-Plate Solar Collectors}\label{photovoltaic-thermal-flat-plate-solar-collectors}
 
-Photovoltaic-Thermal solar collectors (PVT) combine solar electric cells and thermal working fluid to collect both electricity and heat.~ Athough there are currently comparatively few commercial products, PVT research has been conducted for the past 30 years and many different types of collectors have been studied.~ Zondag (2008) and Charalambous et. al (2007) provide reviews of the PVT literature.~ Because PVT is much less commercially-mature, there are no standards or rating systems such as for thermal-only, hot-water collectors.~ EnergyPlus currently has one simple model based on user-defined efficiencies.
+Photovoltaic-Thermal solar collectors (PVT) combine solar electric cells and thermal working fluid to collect both electricity and heat.~ Although there are currently comparatively few commercial products, PVT research has been conducted for the past 30 years and many different types of collectors have been studied.~ Zondag (2008) and Charalambous et. al (2007) provide reviews of the PVT literature.~ Because PVT is much less commercially-mature, there are no standards or rating systems such as for thermal-only, hot-water collectors.~ EnergyPlus currently has one simple model based on user-defined efficiencies.
 
 The PVT models reuse the PV models for electrical production. These are described elsewhere in this document in the section on Photovoltaic Arrays-Simple Model
 
 \subsubsection{Simple PVT Thermal Model}\label{simple-pvt-thermal-model}
 
-The input object SolarCollector:FlatPlate:PhotovoltaicThermal provides a simple PVT model that is provided for quick use during design or policy studies.~ The user simply provides values for a thermal efficiency and the incident solar heats the working fuild.~ The model also includes a cooling mode for air-based systems where a user-provided surface emmittance is used to model cooling of the working fluid to the night sky (water-based cooling will be made available once a chilled water storage tank is available).~ No other details of the PVT collector's construction are required as input data.
+The input object SolarCollector:FlatPlate:PhotovoltaicThermal provides a simple PVT model that is provided for quick use during design or policy studies.~ The user simply provides values for a thermal efficiency and the incident solar heats the working fluid.~ The model also includes a cooling mode for air-based systems where a user-provided surface emittance is used to model cooling of the working fluid to the night sky (water-based cooling will be made available once a chilled water storage tank is available).~ No other details of the PVT collector's construction are required as input data.
 
 The simple model can heat either air or liquid.~ If it heats air, then the PVT is part of HVAC air system loop with air nodes connected to an air system.~ If it heats liquid, then the PVT is part of plant loop with nodes connected to a plant loop and the plant operating scheme determines flows.
 
@@ -718,7 +718,7 @@ Air-system-based PVT modeling include a modulating bypass damper arrangement.~ C
 
 Plant-based PVT do not include a bypass (although one could be used in the plant loop).~ The collector requests its design flow rate but it otherwise relies on the larger plant loop for control.
 
-When the PVT themal collector is controlled to be ``on,'' in heating mode, and working fluid is flowing, the model calculates the outlet temperature based on the inlet temperature and the collected heat using the following equations.
+When the PVT thermal collector is controlled to be ``on,'' in heating mode, and working fluid is flowing, the model calculates the outlet temperature based on the inlet temperature and the collected heat using the following equations.
 
 \begin{equation}
 {Q_{therm}} = {A_{surf}} \cdot {f_{activ}} \cdot {G_T} \cdot {\eta_{thermal}}
@@ -730,7 +730,7 @@ where:
 
 \({A_{surf}}\) is the net area of the surface (m\(^{2}\))
 
-\({f_{activ}}\) is the fraction of surface aire with active PV/T collector
+\({f_{activ}}\) is the fraction of surface area with active PV/T collector
 
 \({\eta_{thermal}}\) is the thermal conversion efficiency.
 
@@ -754,7 +754,7 @@ For air-based systems, the value of \({T_{out}}\) is then compared to the temper
 {f_{bypass}} = \frac{{\left( {{T_{set,out}} - {T_{out}}} \right)}}{{\left( {{T_{in}} - {T_{out}}} \right)}}
 \end{equation}
 
-When the PVT themal collector is controlled to be ``on,'' in cooling mode, and working fluid is flowing, the model calculates the outlet temperature based on the inlet temperature and the heat radiated and convected to the ambient using a heat balance on the outside face of the collector:
+When the PVT thermal collector is controlled to be ``on,'' in cooling mode, and working fluid is flowing, the model calculates the outlet temperature based on the inlet temperature and the heat radiated and convected to the ambient using a heat balance on the outside face of the collector:
 
 \begin{equation}
 \dot m{c_p}\left( {{T_{in}} - {T_{out}}} \right) = {\dot Q_{LWR}} + {\dot Q_{conv}}
@@ -935,7 +935,7 @@ where:
 
 \(q''_{LWR,plen}\) is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
 
-\({q''_{source}}\) is a source/sink term that accounts for energy exported out of the control volume when the collecter's absorber plate is a hybrid device such as a photovoltaic panel.
+\({q''_{source}}\) is a source/sink term that accounts for energy exported out of the control volume when the collector's absorber plate is a hybrid device such as a photovoltaic panel.
 
 While the heat balance on the passive collector surface control volume is:
 
@@ -1155,7 +1155,7 @@ where:
 
 \(z\) is the height of the centroid of the UTSC
 
-\(z_{met}\) is the height of the standard metereological wind speed measurement
+\(z_{met}\) is the height of the standard meteorological wind speed measurement
 
 \(a\) and \({\delta}\) are terrain-dependent coefficients.~ \({\delta}\) is the boundary layer thickness for the given terrain type.~ The values of a and \({\delta}\) are shown in the Table~\ref{table:terrain-dependent-coefficients-ashrae-2001.-001}.
 
@@ -1227,9 +1227,9 @@ where all temperatures are converted to Kelvin and:
 
 \({\sigma_{SB}}\) is the Stefan-Boltzmann constant
 
-\({e_{coll}}\) is the longwave thermal emmittance of the collector
+\({e_{coll}}\) is the longwave thermal emittance of the collector
 
-\({e_{so}}\) is the longwave thermal emmittance of the underlying heat transfer surface.
+\({e_{so}}\) is the longwave thermal emittance of the underlying heat transfer surface.
 
 The three other coefficients, \({h_{r,atm}}\), \({h_{r,sky}}\), and \({h_{r,gnd}}\) are used elsewhere in EnergyPlus for the outside face surface heat balance and are calculated in the same manner as equation for UTSC collectors.~ {[}This is accomplished by calling subroutine InitExteriorConvectionCoeffs in the file HeatBalanceConvectionCoeffs.f90.{]}
 
@@ -1694,7 +1694,7 @@ Ra = \frac{g \left(\frac{1}{T_{f}+273.15}\right) \left|T_{2}-T_{1}\right| d^{3}}
 
 \subsubsection{References}\label{BIPVT-references}
 
-Candanedo, L.M., Athienitis, A., Park, K.W., 2011. Convective heat transfer coefficients in a building-integraged photovoltaic/thermal system. \emph{Journal of Solar Energy Engineering}. March 2011, Vol. 133
+Candanedo, L.M., Athienitis, A., Park, K.W., 2011. Convective heat transfer coefficients in a building-integrated photovoltaic/thermal system. \emph{Journal of Solar Energy Engineering}. March 2011, Vol. 133
 
 Delisle, V., Kummert, M., 2014. A novel approach to compare building-integrated \mbox{photovoltaics/thermal} air collectors to side-by-side PV modules and solar thermal collectors. \emph{Solar Energy}. February 2014, Vol. 100, p.~50.
 

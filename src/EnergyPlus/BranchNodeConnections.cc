@@ -197,7 +197,8 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "Dehumidifier:Desiccant:NoFans",
     "Dehumidifier:Desiccant:System",
     "DistrictCooling",
-    "DistrictHeating",
+    "DistrictHeating:Water",
+    "DistrictHeating:Steam",
     "Duct",
     "ElectricEquipment:ITE:AirCooled",
     "EvaporativeCooler:Direct:CelDekPad",
@@ -259,6 +260,7 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "PipingSystem:Underground:PipeCircuit",
     "PlantComponent:TemperatureSource",
     "PlantComponent:UserDefined",
+    "PlantEquipmentOperation:ChillerHeaterChangeover",
     "PlantEquipmentOperation:ComponentSetpoint",
     "PlantEquipmentOperation:OutdoorDewpointDifference",
     "PlantEquipmentOperation:OutdoorDrybulbDifference",
@@ -351,7 +353,9 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "ZoneHVAC:WaterToAirHeatPump",
     "ZoneHVAC:WindowAirConditioner",
     "ZoneProperty:LocalEnvironment",
-};
+    "SpaceHVAC:EquipmentConnections",
+    "SpaceHVAC:ZoneEquipmentSplitter",
+    "SpaceHVAC:ZoneEquipmentMixer"};
 
 constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::ConnectionObjectType::Num)> ConnectionObjectTypeNamesUC = {
     undefined,
@@ -474,7 +478,8 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "DEHUMIDIFIER:DESICCANT:NOFANS",
     "DEHUMIDIFIER:DESICCANT:SYSTEM",
     "DISTRICTCOOLING",
-    "DISTRICTHEATING",
+    "DISTRICTHEATING:WATER",
+    "DISTRICTHEATING:STEAM",
     "DUCT",
     "ELECTRICEQUIPMENT:ITE:AIRCOOLED",
     "EVAPORATIVECOOLER:DIRECT:CELDEKPAD",
@@ -536,6 +541,7 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "PIPINGSYSTEM:UNDERGROUND:PIPECIRCUIT",
     "PLANTCOMPONENT:TEMPERATURESOURCE",
     "PLANTCOMPONENT:USERDEFINED",
+    "PLANTEQUIPMENTOPERATION:CHILLERHEATERCHANGEOVER",
     "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT",
     "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE",
     "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE",
@@ -628,7 +634,9 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "ZONEHVAC:WATERTOAIRHEATPUMP",
     "ZONEHVAC:WINDOWAIRCONDITIONER",
     "ZONEPROPERTY:LOCALENVIRONMENT",
-};
+    "SPACEHVAC:EQUIPMENTCONNECTIONS",
+    "SPACEHVAC:ZONEEQUIPMENTSPLITTER",
+    "SPACEHVAC:ZONEEQUIPMENTMIXER"};
 
 void RegisterNodeConnection(EnergyPlusData &state,
                             int const NodeNumber,                                // Number for this Node

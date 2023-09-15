@@ -307,6 +307,8 @@ set(INCLUDED_IMAGES
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/image901.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/image902.png
     ${PROJECT_SOURCE_DIR}/input-output-reference/media/image903.png
-    ${PROJECT_SOURCE_DIR}/input-output-reference/media/image904.png)
+    ${PROJECT_SOURCE_DIR}/input-output-reference/media/image904.png
+    ${PROJECT_SOURCE_DIR}/input-output-reference/media/ASHP_Plant.png
+    ${PROJECT_SOURCE_DIR}/input-output-reference/media/HW_reset.png)
 
 create_doc_target("input-output-reference" "InputOutputReference")
