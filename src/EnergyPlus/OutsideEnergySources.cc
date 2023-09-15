@@ -492,10 +492,8 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                 FluidProperties::GetSatTemperatureRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, loop.FluidIndex, RoutineName);
             Real64 CpCondensate = FluidProperties::GetSpecificHeatGlycol(state, loop.FluidName, this->InletTemp, loop.FluidIndex, RoutineName);
             Real64 deltaTsensible = SatTempAtmPress - this->InletTemp;
-            Real64 EnthSteamInDry =
-                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, 1.0, loop.FluidIndex, RoutineName);
-            Real64 EnthSteamOutWet =
-                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, 0.0, loop.FluidIndex, RoutineName);
+            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, this->InletTemp, 1.0, loop.FluidIndex, RoutineName);
+            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, this->InletTemp, 0.0, loop.FluidIndex, RoutineName);
             Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
             this->MassFlowRate = MyLoad / (LatentHeatSteam + (CpCondensate * deltaTsensible));
             PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);

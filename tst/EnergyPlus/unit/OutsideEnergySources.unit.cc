@@ -95,9 +95,9 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
     auto &thisDistrictHeatingSteam = state->dataOutsideEnergySrcs->EnergySource(3);
 
     // Tests for GetOutsideEnergySourcesInput()
-    EXPECT_EQ(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater);
-    EXPECT_EQ(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater);
-    EXPECT_EQ(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam);
+    EXPECT_TRUE(compare_enums(thisDistrictHeatingWater.EnergyType, DataPlant::PlantEquipmentType::PurchHotWater));
+    EXPECT_TRUE(compare_enums(thisDistrictCooling.EnergyType, DataPlant::PlantEquipmentType::PurchChilledWater));
+    EXPECT_TRUE(compare_enums(thisDistrictHeatingSteam.EnergyType, DataPlant::PlantEquipmentType::PurchSteam));
 
     EXPECT_EQ(thisDistrictHeatingWater.NomCap, 1000000.0);
     EXPECT_EQ(thisDistrictCooling.NomCap, 900000.0);
@@ -210,9 +210,9 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
         *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp, thisSteamLoop.FluidIndex, RoutineName);
     Real64 deltaTsensible = SatTempAtmPress - thisDistrictHeatingSteam.InletTemp;
     Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
-        *state, thisSteamLoop.FluidName, DataEnvironment::StdPressureSeaLevel, 1.0, thisSteamLoop.FluidIndex, RoutineName);
+        *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp, 1.0, thisSteamLoop.FluidIndex, RoutineName);
     Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(
-        *state, thisSteamLoop.FluidName, DataEnvironment::StdPressureSeaLevel, 0.0, thisSteamLoop.FluidIndex, RoutineName);
+        *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp, 0.0, thisSteamLoop.FluidIndex, RoutineName);
     Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
     Real64 calOutletMdot = MyLoad / (LatentHeatSteam + (CpCondensate * deltaTsensible));
 
