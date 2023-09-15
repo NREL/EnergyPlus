@@ -2001,10 +2001,10 @@ namespace RoomAir {
                                    AirflowNetwork::iComponentTypeNum::SCR) { // surface type = CRACK
                             surfParams.Width = mzSurf.Width / 2;
                             auto const &zoneHeatBal = state.dataZoneTempPredictorCorrector->zoneHeatBalance(iZone);
-                            Real64 AinCV = state.afn->MultizoneSurfaceCrackData(typeNum).coefficient /
-                                           (BaseDischargeCoef *
-                                            std::sqrt(2.0 / PsyRhoAirFnPbTdbW(
-                                                                state, state.dataEnvrn->OutBaroPress, zoneHeatBal.MAT, zoneHeatBal.ZoneAirHumRat)));
+                            Real64 AinCV =
+                                state.afn->MultizoneSurfaceCrackData(typeNum).coefficient /
+                                (BaseDischargeCoef *
+                                 std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, zoneHeatBal.MAT, zoneHeatBal.airHumRat)));
                             surfParams.Height = AinCV / surfParams.Width;
                         }
 

@@ -10152,27 +10152,25 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetSurfaceGroundSurfsTest)
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
 {
-    // Test for #9123
+    // Test for #9123 - We expect the point marked "x" to be popped.
+    // Once it is popped, point "y" is still below tolerance with the "#" point:
+    //  * Floor: originally 6 but now 5
+    //  * Ceiling: 1
+    //
+    //   ▲                       ▲
+    //   │                       │
+    // 4 o────────o 5          3 o────────o 2
+    //   │        │              │        │
+    //   ╵        ╵              ╵        ╵
+    //   ╵ Floor  ╵              ╵Ceiling ╵
+    //   ╵        ╵              ╵        ╵
+    // 3 │     2  │            4 │     5  │
+    //   o─────y  │              o─────y  │
+    //   │     │  │              │     │  │
+    //   └─────x──#───►          └─────x──#───►
+    //        1    6                  6    1
+
     std::string const idf_objects = delimited_string({
-        "BuildingSurface:Detailed,",
-        "  Zn001:Ceiling002,        !- Name",
-        "  Ceiling,                 !- Surface Type",
-        "  FLOOR,                   !- Construction Name",
-        "  ZONE 1,                  !- Zone Name",
-        "  ,                        !- Space Name",
-        "  Surface,                 !- Outside Boundary Condition",
-        "  Zn002:Flr002,            !- Outside Boundary Condition Object",
-        "  NoSun,                   !- Sun Exposure",
-        "  NoWind,                  !- Wind Exposure",
-        "  ,                        !- View Factor to Ground",
-        "  ,                        !- Number of Vertices",
-        "  54.379, -28.887, 3.7,    !- X,Y,Z Vertex 1 {m}",
-        "  54.379, -23.003, 3.7,    !- X,Y,Z Vertex 2 {m}",
-        "  54.36,  -23.003, 3.7,    !- X,Y,Z Vertex 3 {m}",
-        "  54.36,  -28.881, 3.7,    !- X,Y,Z Vertex 4 {m}",
-        "  54.373, -28.881, 3.7,    !- X,Y,Z Vertex 5 {m}",
-        "  54.373, -28.887, 3.7;    !- X,Y,Z Vertex 6 {m}",
-        "",
         "BuildingSurface:Detailed,",
         "  Zn002:Flr002,            !- Name",
         "  Floor,                   !- Surface Type",
@@ -10192,6 +10190,24 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
         "  54.379, -23.003, 3.7,    !- X,Y,Z Vertex 5 {m}",
         "  54.379, -28.887, 3.7;    !- X,Y,Z Vertex 6 {m}",
 
+        "BuildingSurface:Detailed,",
+        "  Zn001:Ceiling002,        !- Name",
+        "  Ceiling,                 !- Surface Type",
+        "  FLOOR,                   !- Construction Name",
+        "  ZONE 1,                  !- Zone Name",
+        "  ,                        !- Space Name",
+        "  Surface,                 !- Outside Boundary Condition",
+        "  Zn002:Flr002,            !- Outside Boundary Condition Object",
+        "  NoSun,                   !- Sun Exposure",
+        "  NoWind,                  !- Wind Exposure",
+        "  ,                        !- View Factor to Ground",
+        "  ,                        !- Number of Vertices",
+        "  54.379, -28.887, 3.7,    !- X,Y,Z Vertex 1 {m}",
+        "  54.379, -23.003, 3.7,    !- X,Y,Z Vertex 2 {m}",
+        "  54.36,  -23.003, 3.7,    !- X,Y,Z Vertex 3 {m}",
+        "  54.36,  -28.881, 3.7,    !- X,Y,Z Vertex 4 {m}",
+        "  54.373, -28.881, 3.7,    !- X,Y,Z Vertex 5 {m}",
+        "  54.373, -28.887, 3.7;    !- X,Y,Z Vertex 6 {m}",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -10231,29 +10247,29 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
 
     EXPECT_EQ(2, SurfNum);
     auto const error_string = delimited_string({
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
+        "   **   ~~~   ** Vertex [1]=(54.37,-28.89,3.70)",
+        "   **   ~~~   ** Vertex [2]=(54.37,-28.88,3.70)",
+        "   **   ~~~   ** Dropping Vertex [1].",
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
+        "   **   ~~~   ** Vertex [5]=(54.38,-28.89,3.70)",
+        "   **   ~~~   ** Vertex [1]=(54.37,-28.88,3.70)",
+        "   **   ~~~   ** Dropping Vertex [1].",
         "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN001:CEILING002, in Zone=ZONE 1",
-        "   **   ~~~   ** Vertex [5]=(54.37,-28.88,3.70)",
         "   **   ~~~   ** Vertex [6]=(54.37,-28.89,3.70)",
+        "   **   ~~~   ** Vertex [1]=(54.38,-28.89,3.70)",
         "   **   ~~~   ** Dropping Vertex [6].",
         "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN001:CEILING002, in Zone=ZONE 1",
         "   **   ~~~   ** Vertex [5]=(54.37,-28.88,3.70)",
         "   **   ~~~   ** Vertex [1]=(54.38,-28.89,3.70)",
-        "   **   ~~~   ** Dropping Vertex [1].",
-        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
-        "   **   ~~~   ** Vertex [1]=(54.37,-28.89,3.70)",
-        "   **   ~~~   ** Vertex [2]=(54.37,-28.88,3.70)",
-        "   **   ~~~   ** Dropping Vertex [2].",
-        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
-        "   **   ~~~   ** Vertex [5]=(54.38,-28.89,3.70)",
-        "   **   ~~~   ** Vertex [1]=(54.37,-28.89,3.70)",
-        "   **   ~~~   ** Dropping Vertex [1].",
+        "   **   ~~~   ** Dropping Vertex [5].",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     const auto &sf_temps = state->dataSurfaceGeometry->SurfaceTmp;
     EXPECT_EQ(2, sf_temps.size());
-    EXPECT_EQ("ZN001:CEILING002", sf_temps(1).Name);
-    EXPECT_EQ("ZN002:FLR002", sf_temps(2).Name);
+    EXPECT_EQ("ZN002:FLR002", sf_temps(1).Name);
+    EXPECT_EQ("ZN001:CEILING002", sf_temps(2).Name);
 
     EXPECT_EQ(4, sf_temps(1).Sides);
     EXPECT_EQ(4, sf_temps(1).Vertex.size());
@@ -10263,6 +10279,142 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
 
     EXPECT_NEAR(11.80, sf_temps(1).Perimeter, 0.02);
     EXPECT_NEAR(11.80, sf_temps(2).Perimeter, 0.02);
+}
+
+TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates_Once)
+{
+    // Test for #9873 - We expect the point marked "x" to be popped. Once it is popped, there are no distances that are below tolerance.
+    //   ▲                       ▲
+    //   │                       │
+    // 2 o────────o 3          5 o────────o 4
+    //   │        │              │        │
+    //   ┤        │              │        │
+    //   │ Floor  │              │Ceiling │
+    //   ┤        │              │        │
+    //   │ 5      │              │ 2      │
+    //   ┤  o─────o 4            │  o─────o 3
+    //   │  │                    │  │
+    //   o──x──┬──┬───►          o──x─────────►
+    //  1    6          x       6    1
+
+    constexpr double offset = 0.01;
+
+    constexpr double min_x = -41.28;
+    constexpr double max_x = min_x + 0.03;
+    constexpr double off_x = min_x + offset;
+
+    constexpr double min_y = -37.05;
+    constexpr double max_y = min_y + 0.04;
+    constexpr double off_y = min_y + offset;
+
+    constexpr double perimeter = 2 * ((max_x - min_x) + (max_y - min_y));
+
+    std::string const idf_objects = fmt::format(R"idf(
+  BuildingSurface:Detailed,
+    Zn002:Flr002,            !- Name
+    Floor,                   !- Surface Type
+    FLOOR,                   !- Construction Name
+    ZONE 2,                  !- Zone Name
+    ,                        !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    Zn001:Ceiling002,        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    {min_x:.2f}, {min_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 1
+    {min_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 2
+    {max_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 3
+    {max_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 4
+    {off_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 5
+    {off_x:.2f}, {min_y:.2f}, 0.00;    !- X,Y,Z ==> Vertex 6
+
+  BuildingSurface:Detailed,
+    Zn001:Ceiling002,        !- Name
+    Ceiling,                 !- Surface Type
+    FLOOR,                   !- Construction Name
+    ZONE 1,                  !- Zone Name
+    ,                        !- Space Name
+    Surface,                 !- Outside Boundary Condition
+    Zn002:Flr002,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    ,                        !- View Factor to Ground
+    ,                        !- Number of Vertices
+    {off_x:.2f}, {min_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 1
+    {off_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 2
+    {max_x:.2f}, {off_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 3
+    {max_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 4
+    {min_x:.2f}, {max_y:.2f}, 0.00,    !- X,Y,Z ==> Vertex 5
+    {min_x:.2f}, {min_y:.2f}, 0.00;    !- X,Y,Z ==> Vertex 6
+    )idf",
+                                                fmt::arg("min_x", min_x),
+                                                fmt::arg("max_x", max_x),
+                                                fmt::arg("off_x", off_x),
+                                                fmt::arg("min_y", min_y),
+                                                fmt::arg("max_y", max_y),
+                                                fmt::arg("off_y", off_y));
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(2).Name = "ZONE 2";
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(2);
+    int SurfNum = 0;
+    int TotHTSurfs = 2;
+    Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(
+        3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof});
+    int NeedToAddSurfaces;
+
+    bool ErrorsFound(false);
+    GetGeometryParameters(*state, ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(1);
+    state->dataConstruction->Construct(1).Name = "FLOOR";
+
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    EXPECT_FALSE(ErrorsFound);
+
+    EXPECT_EQ(2, SurfNum);
+    auto const error_string = delimited_string({
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN002:FLR002, in Zone=ZONE 2",
+        fmt::format("   **   ~~~   ** Vertex [6]=({:.2f},{:.2f},0.00)", off_x, min_y),
+        fmt::format("   **   ~~~   ** Vertex [1]=({:.2f},{:.2f},0.00)", min_x, min_y),
+        "   **   ~~~   ** Dropping Vertex [6].",
+        "   ** Warning ** GetVertices: Distance between two vertices < .01, possibly coincident. for Surface=ZN001:CEILING002, in Zone=ZONE 1",
+        fmt::format("   **   ~~~   ** Vertex [1]=({:.2f},{:.2f},0.00)", off_x, min_y),
+        fmt::format("   **   ~~~   ** Vertex [2]=({:.2f},{:.2f},0.00)", off_x, off_y),
+        "   **   ~~~   ** Dropping Vertex [1].",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    const auto &sf_temps = state->dataSurfaceGeometry->SurfaceTmp;
+    EXPECT_EQ(2, sf_temps.size());
+    EXPECT_EQ("ZN002:FLR002", sf_temps(1).Name);
+    EXPECT_EQ("ZN001:CEILING002", sf_temps(2).Name);
+
+    EXPECT_EQ(5, sf_temps(1).Sides);
+    EXPECT_EQ(5, sf_temps(1).Vertex.size());
+
+    EXPECT_EQ(5, sf_temps(2).Sides);
+    EXPECT_EQ(5, sf_temps(2).Vertex.size());
+
+    EXPECT_NEAR(perimeter, sf_temps(1).Perimeter, 0.02);
+    EXPECT_NEAR(perimeter, sf_temps(2).Perimeter, 0.02);
 }
 
 TEST_F(EnergyPlusFixture, Wrong_Window_Construction)

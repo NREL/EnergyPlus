@@ -103,10 +103,10 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRatAvg = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRatAvg = 0.0011;
     state->dataEnvrn->StdRhoAir = 1.20;
 
     state->dataHeatBal->CrossMixing(1).ZonePtr = 1;
@@ -211,10 +211,10 @@ TEST_F(EnergyPlusFixture, InfiltrationObjectLevelReport)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).airHumRat = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -389,10 +389,10 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataEnvrn->OutHumRat = 0.0005;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRatAvg = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRatAvg = 0.0011;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = 20.0;
@@ -423,12 +423,12 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
                     3600.0 *
                     (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
                      Psychrometrics::PsyHFnTdbW(state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT,
-                                                state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat));
+                                                state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).InfilTotalLoss, 0.0001);
     deltah = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPV / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
              (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
               Psychrometrics::PsyHFnTdbW(state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT,
-                                         state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat));
+                                         state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
 
@@ -453,10 +453,10 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataEnvrn->OutHumRat = 0.0005;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 22.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRatAvg = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRatAvg = 0.0011;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = 20.0;

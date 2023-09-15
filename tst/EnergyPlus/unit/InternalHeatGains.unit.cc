@@ -478,7 +478,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
@@ -894,7 +894,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
@@ -1046,7 +1046,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
@@ -1275,6 +1275,20 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
         "    0.0000,                  !- Fraction Lost",
         "    2.0E-7;                  !- Carbon Dioxide Generation Rate {m3/s-W}",
 
+        "  OtherEquipment,",
+        "    Main Zone Other Equipment2,  !- Name",
+        "    FuelOilNo2,              !- Fuel Type",
+        "    Main Zone,               !- Zone or ZoneList Name",
+        "    Schedule1,               !- Schedule Name",
+        "    EquipmentLevel,          !- Design Level Calculation Method",
+        "    375.0,                   !- Design Level {W}",
+        "    ,                        !- Watts per Zone Floor Area {W/m2}",
+        "    ,                        !- Watts per Person {W/person}",
+        "    0.0000,                  !- Fraction Latent",
+        "    0.5000,                  !- Fraction Radiant",
+        "    0.0000,                  !- Fraction Lost",
+        "    2.0E-7;                  !- Carbon Dioxide Generation Rate {m3/s-W}",
+
         "  ZoneBaseboard:OutdoorTemperatureControlled,",
         "    Main Zone BBHeat,           !- Name",
         "    Main Zone,                  !- Zone Name",
@@ -1320,7 +1334,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     EXPECT_EQ(state->dataHeatBal->TotGasEquip, 1);
     EXPECT_EQ(state->dataHeatBal->TotHWEquip, 1);
     EXPECT_EQ(state->dataHeatBal->TotStmEquip, 1);
-    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 2);
     EXPECT_EQ(state->dataHeatBal->TotBBHeat, 1);
 
     EnergyPlus::createFacilityElectricPowerServiceObject(*state); // Needs to happen before InitInternalHeatGains
@@ -1330,6 +1344,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);
@@ -1342,6 +1358,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);
@@ -1566,7 +1584,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -1788,7 +1806,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
 }
@@ -2013,7 +2031,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -2239,7 +2257,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
 }
@@ -2464,7 +2482,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -2642,7 +2660,7 @@ TEST_F(EnergyPlusFixture, ITEwithUncontrolledZoneTest)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.008;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -2783,7 +2801,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Fix_41C)
 
     // Test 1: 41C;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 41.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.015;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.015;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -2984,7 +3002,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Fix_39C)
 
     // Test 2: 39C;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 39.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.015;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.015;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -3194,7 +3212,7 @@ TEST_F(EnergyPlusFixture, ITE_Env_Class_Update_Class_H1)
 
     // Test: 41C
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 41.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.015;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.015;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
