@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, InfiltrationObjectLevelReport)
     EXPECT_EQ(state->dataHeatBal->TotInfiltration, 4); // one per zone
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
@@ -215,6 +215,15 @@ TEST_F(EnergyPlusFixture, InfiltrationObjectLevelReport)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.001;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).airHumRat = 0.001;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).airHumRat = 0.001;
+
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 21.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(2).MAT = 22.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(3).MAT = 23.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(4).MAT = 24.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(2).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(3).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(4).airHumRat = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
     state->dataEnvrn->OutBaroPress = 101325.0;

@@ -2227,7 +2227,7 @@ void ReportInfiltrations(EnergyPlusData &state)
     // This subroutine currently creates the values for standard Infiltration object level reporting
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("ReportInfiltrations");
+    static constexpr std::string_view RoutineName = "ReportInfiltrations";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AirDensity;          // Density of air (kg/m^3)
@@ -2240,8 +2240,9 @@ void ReportInfiltrations(EnergyPlusData &state)
 
     for (auto &thisInfiltration : state.dataHeatBal->Infiltration) {
 
+        int spaceNum = thisInfiltration.spaceIndex;
+        auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
         int NZ = thisInfiltration.ZonePtr;
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
         auto const &thisZone = state.dataHeatBal->Zone(NZ);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
@@ -2256,31 +2257,31 @@ void ReportInfiltrations(EnergyPlusData &state)
         thisInfiltration.InfilMdot = thisInfiltration.MCpI_temp / CpAir * ADSCorrectionFactor;
         thisInfiltration.InfilMass = thisInfiltration.InfilMdot * TimeStepSysSec;
 
-        if (thisZoneHB.MAT > thisZone.OutDryBulbTemp) {
+        if (thisSpaceHB.MAT > thisZone.OutDryBulbTemp) {
 
             thisInfiltration.InfilHeatLoss =
-                thisInfiltration.MCpI_temp * (thisZoneHB.MAT - thisZone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
+                thisInfiltration.MCpI_temp * (thisSpaceHB.MAT - thisZone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
             thisInfiltration.InfilHeatGain = 0.0;
 
         } else {
 
             thisInfiltration.InfilHeatGain =
-                thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
+                thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisSpaceHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
             thisInfiltration.InfilHeatLoss = 0.0;
         }
 
         // Report infiltration latent gains and losses
-        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
-        if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisSpaceHB.airHumRat, thisSpaceHB.MAT);
+        if (thisSpaceHB.airHumRat > state.dataEnvrn->OutHumRat) {
 
             thisInfiltration.InfilLatentLoss =
-                thisInfiltration.InfilMdot * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
+                thisInfiltration.InfilMdot * (thisSpaceHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentGain = 0.0;
 
         } else {
 
             thisInfiltration.InfilLatentGain =
-                thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
+                thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisSpaceHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
@@ -2294,7 +2295,7 @@ void ReportInfiltrations(EnergyPlusData &state)
             thisInfiltration.InfilTotalLoss = -TotalLoad;
         }
         // CR7751  second, calculate using indoor conditions for density property
-        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRatAvg, RoutineName);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisSpaceHB.MAT, thisSpaceHB.airHumRatAvg, RoutineName);
         thisInfiltration.InfilVdotCurDensity = thisInfiltration.InfilMdot / AirDensity;
         thisInfiltration.InfilVolumeCurDensity = thisInfiltration.InfilVdotCurDensity * TimeStepSysSec;
         thisInfiltration.InfilAirChangeRate = thisInfiltration.InfilVolumeCurDensity / (TimeStepSys * thisZone.Volume);
