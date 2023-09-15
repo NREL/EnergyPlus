@@ -1723,9 +1723,8 @@ namespace OutputProcessor {
         op->VarMeterArrays(MeterArrayPtr).OnCustomMeters(op->VarMeterArrays(MeterArrayPtr).NumOnCustomMeters) = MeterIndex;
     }
 
-    bool StandardizeEndUseMeter(EnergyPlusData &state, std::string &EndUse)
+    void StandardizeEndUseMeter(EnergyPlusData &state, std::string &EndUse, bool &LocalErrorsFound)
     {
-        bool LocalErrorsFound = false;
         //!!! EndUse Meters
         std::string const endUseMeter = uppercased(EndUse);
 
@@ -1894,8 +1893,6 @@ namespace OutputProcessor {
             ShowSevereError(state, format("Illegal EndUse (for Meters) Entered={}", EndUse));
             LocalErrorsFound = true;
         }
-
-        return LocalErrorsFound;
     }
 
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
@@ -1979,7 +1976,7 @@ namespace OutputProcessor {
             }
         }
 
-        LocalErrorsFound = StandardizeEndUseMeter(state, EndUse);
+        StandardizeEndUseMeter(state, EndUse, LocalErrorsFound);
 
         //!! Following if we do EndUse by ResourceType
         if (!LocalErrorsFound && !EndUse.empty()) {
@@ -4430,7 +4427,8 @@ void SetupOutputVariable(EnergyPlusData &state,
             }
 
             std::string EndUseKey_Std = std::string(EndUseKey);
-            bool EndUseKey_StdErrFound = StandardizeEndUseMeter(state, EndUseKey_Std);
+            bool EndUseKey_StdErrFound = false;
+            StandardizeEndUseMeter(state, EndUseKey_Std, EndUseKey_StdErrFound);
             if (!EndUseKey_Std.empty() && !EndUseKey_StdErrFound) {
                 EndUse = EndUseKey_Std;
                 OnMeter = true;
