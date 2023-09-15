@@ -407,7 +407,7 @@ void GetInputTabularMonthly(EnergyPlusData &state)
     }
 }
 
-int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown)
+int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown, bool isNamedMonthly)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Jason Glazer
@@ -458,6 +458,7 @@ int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int
     // initialize new record
     ort->MonthlyInput(ort->MonthlyInputCount).name = inReportName;
     ort->MonthlyInput(ort->MonthlyInputCount).showDigits = inNumDigitsShown;
+    ort->MonthlyInput(ort->MonthlyInputCount).isNamedMonthly = isNamedMonthly;
     return ort->MonthlyInputCount;
 }
 
@@ -613,13 +614,14 @@ void InitializeTabularMonthly(EnergyPlusData &state)
             // #ifdef ITM_KEYCACHE
             //  Noel comment:  First time in this TabNum/ColNum loop, let's save the results
             //   of GetVariableKeyCountandType & GetVariableKeys.
-            std::string const &curVariMeter = UtilityRoutines::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
+            std::string const curVariMeter = UtilityRoutines::makeUPPER(ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeter);
             // call the key count function but only need count during this pass
             int KeyCount = 0;
             GetVariableKeyCountandType(state, curVariMeter, KeyCount, TypeVar, AvgSumVar, StepTypeVar, UnitsVar);
             if (TypeVar == OutputProcessor::VariableType::NotFound) {
-                ShowWarningError(
-                    state, format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
+                if (!ort->MonthlyInput(TabNum).isNamedMonthly) {
+                    ++state.dataOutRptTab->ErrCount1;
+                }
             }
             //    IF (KeyCount > maxKeyCount) THEN
             //      DEALLOCATE(NamesOfKeys)
@@ -721,6 +723,21 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         ort->MonthlyColumns(colNum).duration = 0.0;
     }
 
+    // If no weather file run requested, don't bother issuing a warning
+    bool issueWarnings = false;
+    if (state.dataGlobal->DoWeathSim && (state.dataOutRptTab->ErrCount1 > 0)) {
+        ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
+
+        if (!state.dataGlobal->DisplayExtraWarnings) {
+            ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
+        } else {
+            ShowContinueError(state,
+                              "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
+                              "the Table Report.");
+            issueWarnings = true;
+        }
+    }
+
     int ColumnsRecount = 0;
     int TablesRecount = 0;
     for (int TabNum = 1; TabNum <= ort->MonthlyInputCount; ++TabNum) {
@@ -730,45 +747,16 @@ void InitializeTabularMonthly(EnergyPlusData &state)
         int UniqueKeyCount = 0;
         bool environmentKeyFound = false;
         for (int colNum = 1; colNum <= NumColumns; ++colNum) {
-            // #ifdef ITM_KEYCACHE
-            //  Noel comment:  Here is where we could use the saved values
             std::string const &curVariMeter = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).variMeterUpper;
             const int KeyCount = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).keyCount;
             TypeVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).typeOfVar;
             AvgSumVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varAvgSum;
             StepTypeVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varStepType;
             UnitsVar = ort->MonthlyFieldSetInput(FirstColumn + colNum - 1).varUnits;
-            //    DO iKey = 1, KeyCount  !noel
-            //       NamesOfKeys(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%NamesOfKeys(iKey)  !noel
-            //       IndexesForKeyVar(iKey) = MonthlyFieldSetInput(FirstColumn + ColNum - 1)%IndexesForKeyVar(iKey) !noel
-            //    ENDDO
-            // #else
-            //    curVariMeter = UtilityRoutines::makeUPPER(MonthlyFieldSetInput(FirstColumn + ColNum - 1)%variMeter)
-            //    ! call the key count function but only need count during this pass
-            //    CALL GetVariableKeyCountandType(state, curVariMeter,KeyCount,TypeVar,AvgSumVar,StepTypeVar,UnitsVar)
-            //    ALLOCATE(NamesOfKeys(KeyCount))
-            //    ALLOCATE(IndexesForKeyVar(KeyCount))
-            //    CALL GetVariableKeys(state, curVariMeter,TypeVar,NamesOfKeys,IndexesForKeyVar)
-            // #endif
 
-            if (KeyCount == 0) {
-                ++state.dataOutRptTab->ErrCount1;
-                if (state.dataOutRptTab->ErrCount1 == 1 && !state.dataGlobal->DisplayExtraWarnings &&
-                    state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
-                    ShowWarningError(state, "Processing Monthly Tabular Reports: Variable names not valid for this simulation");
-                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.");
-                }
-                // fixing CR5878 removed the showing of the warning once about a specific variable.
-                if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
-                    ShowWarningError(state, format("Processing Monthly Tabular Reports: {}", ort->MonthlyInput(TabNum).name));
-                    ShowContinueError(state, format("..Variable name={} not valid for this simulation.", curVariMeter));
-                    if (state.dataOutRptTab->VarWarning) {
-                        ShowContinueError(state,
-                                          "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of "
-                                          "the Table Report.");
-                        state.dataOutRptTab->VarWarning = false;
-                    }
-                }
+            if (KeyCount == 0 && issueWarnings && !ort->MonthlyInput(TabNum).isNamedMonthly) {
+                ShowWarningError(
+                    state, format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
             }
             for (int iKey = 1; iKey <= KeyCount; ++iKey) {
                 found = 0;
@@ -926,17 +914,12 @@ void InitializeTabularMonthly(EnergyPlusData &state)
                     }
                 } else { // if no key corresponds to this instance of the report
                     // fixing CR5878 removed the showing of the warning once about a specific variable.
-                    if (state.dataGlobal->DisplayExtraWarnings && state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather) {
-                        ShowWarningError(state, format("Processing Monthly Tabular Reports: {}", ort->MonthlyInput(TabNum).name));
-                        ShowContinueError(state, format("..Variable name={} not valid for this simulation.", curVariMeter));
+                    if (issueWarnings && !ort->MonthlyInput(TabNum).isNamedMonthly) {
+                        ShowWarningError(
+                            state,
+                            format("In Output:Table:Monthly '{}' invalid Variable or Meter Name '{}'", ort->MonthlyInput(TabNum).name, curVariMeter));
                         ShowContinueError(
                             state, format("..i.e., Variable name={}:{} not valid for this simulation.", UniqueKeyNames(kUniqueKey), curVariMeter));
-                        if (state.dataOutRptTab->VarWarning) {
-                            ShowContinueError(state,
-                                              "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column "
-                                              "of the Table Report.");
-                            state.dataOutRptTab->VarWarning = false;
-                        }
                     }
                     ort->MonthlyColumns(mColumn).varName = curVariMeter;
                     ort->MonthlyColumns(mColumn).varNum = 0;
@@ -2165,7 +2148,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
     // ----------------------------------------------------------------------------------------
 
     if (ort->namedMonthly(1).show) {
-        curReport = AddMonthlyReport(state, "ZoneCoolingSummaryMonthly", 2);
+        curReport = AddMonthlyReport(state, "ZoneCoolingSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", AggType::ValueWhenMaxMin);
@@ -2176,20 +2159,20 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(2).show) {
-        curReport = AddMonthlyReport(state, "ZoneHeatingSummaryMonthly", 2);
+        curReport = AddMonthlyReport(state, "ZoneHeatingSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Heating Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Heating Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(3).show) {
-        curReport = AddMonthlyReport(state, "ZoneElectricSummaryMonthly", 2);
+        curReport = AddMonthlyReport(state, "ZoneElectricSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Lights Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Lights Electricity Energy", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Electricity Energy", "", AggType::Maximum);
     }
     if (ort->namedMonthly(4).show) {
-        curReport = AddMonthlyReport(state, "SpaceGainsMonthly", 2);
+        curReport = AddMonthlyReport(state, "SpaceGainsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Total Heating Energy", "", AggType::SumOrAvg);
@@ -2201,7 +2184,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(5).show) {
-        curReport = AddMonthlyReport(state, "PeakSpaceGainsMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakSpaceGainsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Zone Electric Equipment Total Heating Energy", "", AggType::Maximum);
@@ -2213,7 +2196,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", AggType::Maximum);
     }
     if (ort->namedMonthly(6).show) {
-        curReport = AddMonthlyReport(state, "SpaceGainComponentsAtCoolingPeakMonthly", 2);
+        curReport = AddMonthlyReport(state, "SpaceGainComponentsAtCoolingPeakMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Air System Sensible Cooling Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Zone People Total Heating Energy", "", AggType::ValueWhenMaxMin);
         AddMonthlyFieldSetInput(state, curReport, "Zone Lights Total Heating Energy", "", AggType::ValueWhenMaxMin);
@@ -2226,21 +2209,21 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Infiltration Sensible Heat Loss Energy", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(7).show) {
-        curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityNaturalGasMonthly", 2);
+        curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityNaturalGasMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "NaturalGas:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "NaturalGas:Facility", "", AggType::Maximum);
     }
     if (ort->namedMonthly(8).show) {
-        curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityGeneratedPropaneMonthly", 2);
+        curReport = AddMonthlyReport(state, "EnergyConsumptionElectricityGeneratedPropaneMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ElectricityProduced:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "ElectricityProduced:Facility", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Propane:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Propane:Facility", "", AggType::Maximum);
     }
     if (ort->namedMonthly(9).show) {
-        curReport = AddMonthlyReport(state, "EnergyConsumptionDieselFuelOilMonthly", 2);
+        curReport = AddMonthlyReport(state, "EnergyConsumptionDieselFuelOilMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Diesel:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Diesel:Facility", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "FuelOilNo1:Facility", "", AggType::SumOrAvg);
@@ -2249,7 +2232,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "FuelOilNo2:Facility", "", AggType::Maximum);
     }
     if (ort->namedMonthly(10).show) {
-        curReport = AddMonthlyReport(state, "EnergyConsumptionDistrictHeatingCoolingMonthly", 2);
+        curReport = AddMonthlyReport(state, "EnergyConsumptionDistrictHeatingCoolingMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "DistrictCooling:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "DistrictCooling:Facility", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "DistrictHeatingWater:Facility", "", AggType::SumOrAvg);
@@ -2258,21 +2241,21 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "DistrictHeatingSteam:Facility", "", AggType::Maximum);
     }
     if (ort->namedMonthly(11).show) {
-        curReport = AddMonthlyReport(state, "EnergyConsumptionCoalGasolineMonthly", 2);
+        curReport = AddMonthlyReport(state, "EnergyConsumptionCoalGasolineMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Coal:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Coal:Facility", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Gasoline:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Gasoline:Facility", "", AggType::Maximum);
     }
     if (ort->namedMonthly(12).show) {
-        curReport = AddMonthlyReport(state, "EnergyConsumptionOtherFuelsMonthly", 2);
+        curReport = AddMonthlyReport(state, "EnergyConsumptionOtherFuelsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "OtherFuel1:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "OtherFuel1:Facility", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "OtherFuel2:Facility", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "OtherFuel2:Facility", "", AggType::Maximum);
     }
     if (ort->namedMonthly(13).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionElectricityMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionElectricityMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorLights:Electricity", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:Electricity", "", AggType::SumOrAvg);
@@ -2288,7 +2271,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Electricity", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(14).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionNaturalGasMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionNaturalGasMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:NaturalGas", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:NaturalGas", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating:NaturalGas", "", AggType::SumOrAvg);
@@ -2298,7 +2281,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Humidifier:NaturalGas", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(15).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionDieselMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionDieselMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Diesel", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:Diesel", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Diesel", "", AggType::SumOrAvg);
@@ -2306,7 +2289,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Diesel", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(16).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionFuelOilMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionFuelOilMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo1", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo1", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating:FuelOilNo1", "", AggType::SumOrAvg);
@@ -2319,13 +2302,13 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo2", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(17).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionCoalMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionCoalMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Coal", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Coal", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Coal", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(18).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionPropaneMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionPropaneMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Propane", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:Propane", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Propane", "", AggType::SumOrAvg);
@@ -2334,7 +2317,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Humidifier:Propane", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(19).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionGasolineMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionGasolineMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Gasoline", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:Gasoline", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Gasoline", "", AggType::SumOrAvg);
@@ -2342,7 +2325,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Gasoline", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(20).show) {
-        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionOtherFuelsMonthly", 2);
+        curReport = AddMonthlyReport(state, "EndUseEnergyConsumptionOtherFuelsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel1", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel1", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating:OtherFuel1", "", AggType::SumOrAvg);
@@ -2355,7 +2338,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel2", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(21).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart1Monthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart1Monthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorLights:Electricity", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:Electricity", "", AggType::Maximum);
@@ -2365,7 +2348,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Heating:Electricity", "", AggType::Maximum);
     }
     if (ort->namedMonthly(22).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart2Monthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseElectricityPart2Monthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:Electricity", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "HeatRejection:Electricity", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Humidifier:Electricity", "", AggType::Maximum);
@@ -2374,7 +2357,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Electricity", "", AggType::Maximum);
     }
     if (ort->namedMonthly(23).show) {
-        curReport = AddMonthlyReport(state, "ElectricComponentsOfPeakDemandMonthly", 2);
+        curReport = AddMonthlyReport(state, "ElectricComponentsOfPeakDemandMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Electricity:Facility", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "InteriorLights:Electricity", "", AggType::ValueWhenMaxMin);
         AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:Electricity", "", AggType::ValueWhenMaxMin);
@@ -2387,7 +2370,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "HeatRejection:Electricity", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(24).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseNaturalGasMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseNaturalGasMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "InteriorEquipment:NaturalGas", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:NaturalGas", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Heating:NaturalGas", "", AggType::Maximum);
@@ -2396,7 +2379,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:NaturalGas", "", AggType::Maximum);
     }
     if (ort->namedMonthly(25).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseDieselMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseDieselMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Diesel", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:Diesel", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Diesel", "", AggType::Maximum);
@@ -2404,7 +2387,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Diesel", "", AggType::Maximum);
     }
     if (ort->namedMonthly(26).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseFuelOilMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseFuelOilMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:FuelOilNo1", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:FuelOilNo1", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Heating:FuelOilNo1", "", AggType::Maximum);
@@ -2417,13 +2400,13 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:FuelOilNo2", "", AggType::Maximum);
     }
     if (ort->namedMonthly(27).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseCoalMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseCoalMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Coal", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Coal", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "WaterSystems:Coal", "", AggType::Maximum);
     }
     if (ort->namedMonthly(28).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUsePropaneMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUsePropaneMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Propane", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:Propane", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Propane", "", AggType::Maximum);
@@ -2431,7 +2414,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Propane", "", AggType::Maximum);
     }
     if (ort->namedMonthly(29).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseGasolineMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseGasolineMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:Gasoline", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:Gasoline", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Heating:Gasoline", "", AggType::Maximum);
@@ -2439,7 +2422,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:Gasoline", "", AggType::Maximum);
     }
     if (ort->namedMonthly(30).show) {
-        curReport = AddMonthlyReport(state, "PeakEnergyEndUseOtherFuelsMonthly", 2);
+        curReport = AddMonthlyReport(state, "PeakEnergyEndUseOtherFuelsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "ExteriorEquipment:OtherFuel1", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Cooling:OtherFuel1", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Heating:OtherFuel1", "", AggType::Maximum);
@@ -2452,7 +2435,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cogeneration:OtherFuel2", "", AggType::Maximum);
     }
     if (ort->namedMonthly(31).show) {
-        curReport = AddMonthlyReport(state, "SetpointsNotMetWithTemperaturesMonthly", 2);
+        curReport = AddMonthlyReport(state, "SetpointsNotMetWithTemperaturesMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Heating Setpoint Not Met Time", "", AggType::HoursNonZero);
         AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", AggType::SumOrAverageHoursShown);
         AddMonthlyFieldSetInput(state, curReport, "Zone Heating Setpoint Not Met While Occupied Time", "", AggType::HoursNonZero);
@@ -2463,7 +2446,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", AggType::SumOrAverageHoursShown);
     }
     if (ort->namedMonthly(32).show) {
-        curReport = AddMonthlyReport(state, "ComfortReportSimple55Monthly", 2);
+        curReport = AddMonthlyReport(state, "ComfortReportSimple55Monthly", 2, true);
         AddMonthlyFieldSetInput(
             state, curReport, "Zone Thermal Comfort ASHRAE 55 Simple Model Summer Clothes Not Comfortable Time", "", AggType::HoursNonZero);
         AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", AggType::SumOrAverageHoursShown);
@@ -2475,14 +2458,14 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Mean Air Temperature", "", AggType::SumOrAverageHoursShown);
     }
     if (ort->namedMonthly(33).show) {
-        curReport = AddMonthlyReport(state, "UnglazedTranspiredSolarCollectorSummaryMonthly", 5);
+        curReport = AddMonthlyReport(state, "UnglazedTranspiredSolarCollectorSummaryMonthly", 5, true);
         AddMonthlyFieldSetInput(state, curReport, "Solar Collector System Efficiency", "", AggType::HoursNonZero);
         AddMonthlyFieldSetInput(state, curReport, "Solar Collector System Efficiency", "", AggType::SumOrAverageHoursShown);
         AddMonthlyFieldSetInput(state, curReport, "Solar Collector Outside Face Suction Velocity", "", AggType::SumOrAverageHoursShown);
         AddMonthlyFieldSetInput(state, curReport, "Solar Collector Sensible Heating Rate", "", AggType::SumOrAverageHoursShown);
     }
     if (ort->namedMonthly(34).show) {
-        curReport = AddMonthlyReport(state, "OccupantComfortDataSummaryMonthly", 5);
+        curReport = AddMonthlyReport(state, "OccupantComfortDataSummaryMonthly", 5, true);
         AddMonthlyFieldSetInput(state, curReport, "People Occupant Count", "", AggType::HoursNonZero);
         AddMonthlyFieldSetInput(state, curReport, "People Air Temperature", "", AggType::SumOrAverageHoursShown);
         AddMonthlyFieldSetInput(state, curReport, "People Air Relative Humidity", "", AggType::SumOrAverageHoursShown);
@@ -2490,7 +2473,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Thermal Comfort Fanger Model PPD", "", AggType::SumOrAverageHoursShown);
     }
     if (ort->namedMonthly(35).show) {
-        curReport = AddMonthlyReport(state, "ChillerReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "ChillerReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Chiller Electricity Energy", "", AggType::HoursNonZero);
@@ -2503,7 +2486,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Chiller Part Load Ratio", "", AggType::Maximum);
     }
     if (ort->namedMonthly(36).show) {
-        curReport = AddMonthlyReport(state, "TowerReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "TowerReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Energy", "", AggType::HoursNonZero);
         AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Fan Electricity Rate", "", AggType::Maximum);
@@ -2513,7 +2496,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cooling Tower Mass Flow Rate", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(37).show) {
-        curReport = AddMonthlyReport(state, "BoilerReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "BoilerReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Boiler Heating Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Boiler Gas Consumption", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Boiler Heating Energy", "", AggType::HoursNonZero);
@@ -2527,7 +2510,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Boiler Part Load Ratio", "", AggType::Maximum);
     }
     if (ort->namedMonthly(38).show) {
-        curReport = AddMonthlyReport(state, "DXReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "DXReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Energy", "", AggType::HoursNonZero);
@@ -2543,7 +2526,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Crankcase Heater Electricity Rate", "", AggType::Maximum);
     }
     if (ort->namedMonthly(39).show) {
-        curReport = AddMonthlyReport(state, "WindowReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "WindowReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Diffuse Solar Radiation Rate", "", AggType::SumOrAvg);
@@ -2554,7 +2537,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Surface Storm Window On Off Status", "", AggType::HoursNonZero);
     }
     if (ort->namedMonthly(40).show) {
-        curReport = AddMonthlyReport(state, "WindowEnergyReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "WindowEnergyReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Surface Window Transmitted Diffuse Solar Radiation Energy", "", AggType::SumOrAvg);
@@ -2562,7 +2545,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Surface Window Heat Loss Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(41).show) {
-        curReport = AddMonthlyReport(state, "WindowZoneSummaryMonthly", 2);
+        curReport = AddMonthlyReport(state, "WindowZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Rate", "", AggType::SumOrAvg);
@@ -2572,7 +2555,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Rate", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(42).show) {
-        curReport = AddMonthlyReport(state, "WindowEnergyZoneSummaryMonthly", 2);
+        curReport = AddMonthlyReport(state, "WindowEnergyZoneSummaryMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Gain Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Heat Loss Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Windows Total Transmitted Solar Radiation Energy", "", AggType::SumOrAvg);
@@ -2582,7 +2565,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Interior Windows Total Transmitted Beam Solar Radiation Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(43).show) {
-        curReport = AddMonthlyReport(state, "AverageOutdoorConditionsMonthly", 2);
+        curReport = AddMonthlyReport(state, "AverageOutdoorConditionsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", AggType::SumOrAvg);
@@ -2593,7 +2576,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Site Rain Status", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(44).show) {
-        curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDryBulbMonthly", 2);
+        curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDryBulbMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", AggType::ValueWhenMaxMin);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", AggType::ValueWhenMaxMin);
@@ -2603,7 +2586,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(45).show) {
-        curReport = AddMonthlyReport(state, "OutdoorConditionsMinimumDryBulbMonthly", 2);
+        curReport = AddMonthlyReport(state, "OutdoorConditionsMinimumDryBulbMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", AggType::Minimum);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", AggType::ValueWhenMaxMin);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", AggType::ValueWhenMaxMin);
@@ -2613,7 +2596,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(46).show) {
-        curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumWetBulbMonthly", 2);
+        curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumWetBulbMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", AggType::ValueWhenMaxMin);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", AggType::ValueWhenMaxMin);
@@ -2623,7 +2606,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(47).show) {
-        curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDewPointMonthly", 2);
+        curReport = AddMonthlyReport(state, "OutdoorConditionsMaximumDewPointMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Dewpoint Temperature", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Drybulb Temperature", "", AggType::ValueWhenMaxMin);
         AddMonthlyFieldSetInput(state, curReport, "Site Outdoor Air Wetbulb Temperature", "", AggType::ValueWhenMaxMin);
@@ -2633,7 +2616,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Site Direct Solar Radiation Rate per Area", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(48).show) {
-        curReport = AddMonthlyReport(state, "OutdoorGroundConditionsMonthly", 2);
+        curReport = AddMonthlyReport(state, "OutdoorGroundConditionsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Site Ground Temperature", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Site Surface Ground Temperature", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Site Deep Ground Temperature", "", AggType::SumOrAvg);
@@ -2642,7 +2625,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Site Snow on Ground Status", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(49).show) {
-        curReport = AddMonthlyReport(state, "WindowACReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "WindowACReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Total Cooling Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Total Cooling Energy", "", AggType::HoursNonZero);
@@ -2654,7 +2637,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Window Air Conditioner Electricity Rate", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(50).show) {
-        curReport = AddMonthlyReport(state, "WaterHeaterReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "WaterHeaterReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Total Demand Heat Transfer Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Use Side Heat Transfer Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Burner Heating Energy", "", AggType::SumOrAvg);
@@ -2664,10 +2647,10 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Heat Loss Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Tank Temperature", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Water Heater Heat Recovery Supply Energy", "", AggType::SumOrAvg);
-        AddMonthlyFieldSetInput(state, curReport, "Water Heater Source Energy", "", AggType::SumOrAvg);
+        AddMonthlyFieldSetInput(state, curReport, "Water Heater Source Side Heat Transfer Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(51).show) {
-        curReport = AddMonthlyReport(state, "GeneratorReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "GeneratorReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Generator Produced AC Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Generator Diesel Consumption", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Generator Gas Consumption", "", AggType::SumOrAvg);
@@ -2679,7 +2662,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Generator Exhaust Air Temperature", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(52).show) {
-        curReport = AddMonthlyReport(state, "DaylightingReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "DaylightingReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Site Exterior Beam Normal Illuminance", "", AggType::HoursNonZero);
         AddMonthlyFieldSetInput(state, curReport, "Daylighting Lighting Power Multiplier", "", AggType::SumOrAverageHoursShown);
         AddMonthlyFieldSetInput(state, curReport, "Daylighting Lighting Power Multiplier", "", AggType::MinimumDuringHoursShown);
@@ -2693,7 +2676,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Daylighting Reference Point 2 Daylight Illuminance Setpoint Exceeded Time", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(53).show) {
-        curReport = AddMonthlyReport(state, "CoilReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "CoilReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Heating Coil Heating Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Heating Coil Heating Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Total Cooling Energy", "", AggType::SumOrAvg);
@@ -2703,21 +2686,21 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Cooling Coil Wetted Area Fraction", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(54).show) {
-        curReport = AddMonthlyReport(state, "PlantLoopDemandReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "PlantLoopDemandReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", AggType::Maximum);
     }
     if (ort->namedMonthly(55).show) {
-        curReport = AddMonthlyReport(state, "FanReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "FanReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Fan Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Fan Rise in Air Temperature", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Fan Electricity Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Fan Rise in Air Temperature", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(56).show) {
-        curReport = AddMonthlyReport(state, "PumpReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "PumpReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Pump Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Pump Fluid Heat Gain Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Pump Electricity Rate", "", AggType::Maximum);
@@ -2727,7 +2710,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Pump Mass Flow Rate", "", AggType::ValueWhenMaxMin);
     }
     if (ort->namedMonthly(57).show) {
-        curReport = AddMonthlyReport(state, "CondLoopDemandReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "CondLoopDemandReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Cooling Demand Rate", "", AggType::Maximum);
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Inlet Temperature", "", AggType::ValueWhenMaxMin);
@@ -2736,12 +2719,12 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Plant Supply Side Heating Demand Rate", "", AggType::Maximum);
     }
     if (ort->namedMonthly(58).show) {
-        curReport = AddMonthlyReport(state, "ZoneTemperatureOscillationReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "ZoneTemperatureOscillationReportMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Oscillating Temperatures Time", "", AggType::HoursNonZero);
         AddMonthlyFieldSetInput(state, curReport, "Zone People Occupant Count", "", AggType::SumOrAverageHoursShown);
     }
     if (ort->namedMonthly(59).show) {
-        curReport = AddMonthlyReport(state, "AirLoopSystemEnergyAndWaterUseMonthly", 2);
+        curReport = AddMonthlyReport(state, "AirLoopSystemEnergyAndWaterUseMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Air System Hot Water Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Air System Steam Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Air System Chilled Water Energy", "", AggType::SumOrAvg);
@@ -2751,7 +2734,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
     }
 
     if (ort->namedMonthly(60).show) {
-        curReport = AddMonthlyReport(state, "AirLoopSystemComponentLoadsMonthly", 2);
+        curReport = AddMonthlyReport(state, "AirLoopSystemComponentLoadsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Air System Fan Air Heating Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Air System Cooling Coil Total Cooling Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Total Heating Energy", "", AggType::SumOrAvg);
@@ -2762,7 +2745,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Air System Desiccant Dehumidifier Total Cooling Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(61).show) {
-        curReport = AddMonthlyReport(state, "AirLoopSystemComponentEnergyUseMonthly", 2);
+        curReport = AddMonthlyReport(state, "AirLoopSystemComponentEnergyUseMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Air System Fan Electricity Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Air System Heating Coil Hot Water Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Air System Cooling Coil Chilled Water Energy", "", AggType::SumOrAvg);
@@ -2777,7 +2760,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Air System Desiccant Dehumidifier Electricity Energy", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(62).show) {
-        curReport = AddMonthlyReport(state, "MechanicalVentilationLoadsMonthly", 2);
+        curReport = AddMonthlyReport(state, "MechanicalVentilationLoadsMonthly", 2, true);
         AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation No Load Heat Removal Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Cooling Load Increase Energy", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(
@@ -2791,7 +2774,7 @@ void CreatePredefinedMonthlyReports(EnergyPlusData &state)
         AddMonthlyFieldSetInput(state, curReport, "Zone Mechanical Ventilation Air Changes per Hour", "", AggType::SumOrAvg);
     }
     if (ort->namedMonthly(63).show) {
-        curReport = AddMonthlyReport(state, "HeatEmissionsReportMonthly", 2);
+        curReport = AddMonthlyReport(state, "HeatEmissionsReportMonthly", 2, true);
         // Place holder
         AddMonthlyFieldSetInput(state, curReport, "Site Total Surface Heat Emission to Air", "", AggType::SumOrAvg);
         AddMonthlyFieldSetInput(state, curReport, "Site Total Zone Exfiltration Heat Loss", "", AggType::SumOrAvg);

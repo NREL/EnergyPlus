@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     state->dataMstBal->HMassConvInFD.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0061285406810457849;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     state->dataMstBal->HMassConvInFD.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0061285406810457849;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
@@ -319,7 +319,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     state->dataMstBal->HMassConvInFD.allocate(surfNum);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(zoneNum);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT = 20.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneAirHumRat = 0.0061285406810457849;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).airHumRat = 0.0061285406810457849;
 
     // Construction
     int constNum = 1;

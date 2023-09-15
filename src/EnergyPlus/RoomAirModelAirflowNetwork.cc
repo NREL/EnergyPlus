@@ -735,7 +735,7 @@ namespace RoomAir {
                 for (auto const &afnHVAC : afnNode.HVAC) {
                     if (afnHVAC.SupNodeNum == zoneEquipConfig.InletNode(iNode)) {
                         Real64 MassFlowRate = inletNode.MassFlowRate * afnHVAC.SupplyFraction;
-                        Real64 CpAir = PsyCpAirFnW(zoneHB.ZoneAirHumRat);
+                        Real64 CpAir = PsyCpAirFnW(zoneHB.airHumRat);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * inletNode.Temp;
                         SumSysM += MassFlowRate;
@@ -748,7 +748,7 @@ namespace RoomAir {
             for (int iNode = 1; iNode <= zoneRetPlenum.NumInletNodes; ++iNode) {
                 // Get node conditions
                 auto const &zoneRetPlenumNode = state.dataLoopNodes->Node(zoneRetPlenum.InletNode(iNode));
-                Real64 CpAir = PsyCpAirFnW(zoneHB.ZoneAirHumRat);
+                Real64 CpAir = PsyCpAirFnW(zoneHB.airHumRat);
                 SumSysMCp += zoneRetPlenumNode.MassFlowRate * CpAir;
                 SumSysMCpT += zoneRetPlenumNode.MassFlowRate * CpAir * zoneRetPlenumNode.Temp;
             } // NodeNum
@@ -757,12 +757,12 @@ namespace RoomAir {
                 int ADUNum = zoneRetPlenum.ADUIndex(iADU);
                 auto const &adu = state.dataDefineEquipment->AirDistUnit(ADUNum);
                 if (adu.UpStreamLeak) {
-                    Real64 CpAir = PsyCpAirFnW(zoneHB.ZoneAirHumRat);
+                    Real64 CpAir = PsyCpAirFnW(zoneHB.airHumRat);
                     SumSysMCp += adu.MassFlowRateUpStrLk * CpAir;
                     SumSysMCpT += adu.MassFlowRateUpStrLk * CpAir * state.dataLoopNodes->Node(adu.InletNodeNum).Temp;
                 }
                 if (adu.DownStreamLeak) {
-                    Real64 CpAir = PsyCpAirFnW(zoneHB.ZoneAirHumRat);
+                    Real64 CpAir = PsyCpAirFnW(zoneHB.airHumRat);
                     SumSysMCp += adu.MassFlowRateDnStrLk * CpAir;
                     SumSysMCpT += adu.MassFlowRateDnStrLk * CpAir * state.dataLoopNodes->Node(adu.OutletNodeNum).Temp;
                 }
@@ -771,7 +771,7 @@ namespace RoomAir {
             // Get node conditions
             auto const &zoneSupPlenum = state.dataZonePlenum->ZoneSupPlenCond(zoneSupPlenumNum);
             auto const &inletNode = state.dataLoopNodes->Node(zoneSupPlenum.InletNode);
-            Real64 CpAir = PsyCpAirFnW(zoneHB.ZoneAirHumRat);
+            Real64 CpAir = PsyCpAirFnW(zoneHB.airHumRat);
             SumSysMCp += inletNode.MassFlowRate * CpAir;
             SumSysMCpT += inletNode.MassFlowRate * CpAir * inletNode.Temp;
         }

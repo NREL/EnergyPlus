@@ -233,6 +233,7 @@ set(test_src
     TranspiredCollector.unit.cc
     UnitHeater.unit.cc
     UnitVentilator.unit.cc
+    UFADManager.unit.cc
     UnitaryHybridAirConditioner.unit.cc
     UnitarySystem.unit.cc
     UtilityRoutines.unit.cc
