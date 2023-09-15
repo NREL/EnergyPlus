@@ -486,11 +486,18 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                 this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
                 MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             }
-        } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on MyLoad
-            Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, this->InletTemp, 1.0, loop.FluidIndex, RoutineName);
-            Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, this->InletTemp, 0.0, loop.FluidIndex, RoutineName);
+        } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on inlet temp, saturate temp at atmospheric pressure, Cp of inlet condensate, and MyLoad
+            Real64 SatTempAtmPress =
+                FluidProperties::GetSatTemperatureRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, loop.FluidIndex, RoutineName);
+            Real64 CpCondensate =
+                FluidProperties::GetSatSpecificHeatRefrig(state, loop.FluidName, this->InletTemp, 0.0, loop.FluidIndex, RoutineName);
+            Real64 deltaTsensible = SatTempAtmPress - this->InletTemp;
+            Real64 EnthSteamInDry =
+                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, 1.0, loop.FluidIndex, RoutineName);
+            Real64 EnthSteamOutWet =
+                FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, 0.0, loop.FluidIndex, RoutineName);
             Real64 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-            this->MassFlowRate = MyLoad / LatentHeatSteam;
+            this->MassFlowRate = MyLoad / (LatentHeatSteam + (CpCondensate * deltaTsensible));
             PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
             // Like the assumption in Boiler:Steam, assume that it can meet the steam loop setpoint
             this->OutletTemp = state.dataLoopNodes->Node(loop.TempSetPointNodeNum).TempSetPoint;

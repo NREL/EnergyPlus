@@ -127,22 +127,17 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
     state->dataPlantLoadProfile->PlantProfile.allocate(1);
 
     // Test setup for a load profile in a water loop
-    state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
-        DataPlant::PlantEquipmentType::PlantLoadProfile;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "LOAD PROFILE WATER";
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 2;
+    auto &thisWaterLoop(state->dataPlnt->PlantLoop(1));
+    thisWaterLoop.FluidName = "WATER";
+    thisWaterLoop.FluidIndex = 1;
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PlantLoadProfile;
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "LOAD PROFILE WATER";
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
+    thisWaterLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 2;
 
     state->dataLoopNodes->Node(1).Temp = 60.0;
     state->dataLoopNodes->Node(1).MassFlowRateMax = 10;
@@ -169,27 +164,28 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Waterloop)
     state->dataScheduleMgr->Schedule(thisLoadProfileWaterLoop.FlowRateFracSchedule).EMSActuatedOn = false;
     state->dataScheduleMgr->Schedule(thisLoadProfileWaterLoop.FlowRateFracSchedule).CurrentValue = 0.8;
 
-    // check InitPlantProfile()
+    // InitPlantProfile()
     thisLoadProfileWaterLoop.InitPlantProfile(*state);
 
-    EXPECT_EQ(thisLoadProfileWaterLoop.InletTemp, 60.0);     // Check the component's inlet temp is set to node data
-    EXPECT_EQ(thisLoadProfileWaterLoop.Power, 10000);        // Check the load schedule's current value is properly applied
-    EXPECT_EQ(thisLoadProfileWaterLoop.VolFlowRate, 0.0016); // Check the flow rate fraction schedule is properly applied
+    EXPECT_EQ(thisLoadProfileWaterLoop.InletTemp, 60.0);     // check if the component's inlet temp is set to node data
+    EXPECT_EQ(thisLoadProfileWaterLoop.Power, 10000);        // check if the load schedule's current value is properly applied
+    EXPECT_EQ(thisLoadProfileWaterLoop.VolFlowRate, 0.0016); // check if the flow rate fraction schedule is properly applied
 
-    // check simulate()
+    // simulate()
     bool firstHVAC = true;
     Real64 curLoad = 10000.0;
     bool runFlag = true;
+    std::string_view RoutineName("PlantLoadProfileTests");
     thisLoadProfileWaterLoop.simulate(*state, locWater, firstHVAC, curLoad, runFlag);
 
-    Real64 rhoWater = FluidProperties::GetDensityGlycol(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, 60, state->dataPlnt->PlantLoop(1).FluidIndex, "WaterDensity");
+    Real64 rhoWater = FluidProperties::GetDensityGlycol(*state, thisWaterLoop.FluidName, 60, thisWaterLoop.FluidIndex, RoutineName);
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, thisLoadProfileWaterLoop.InletTemp, state->dataPlnt->PlantLoop(1).FluidIndex, "GetWaterCp");
+        *state, thisWaterLoop.FluidName, thisLoadProfileWaterLoop.InletTemp, thisWaterLoop.FluidIndex, RoutineName);
     Real64 deltaTemp = curLoad / (rhoWater * thisLoadProfileWaterLoop.VolFlowRate * Cp);
     Real64 calOutletTemp = thisLoadProfileWaterLoop.InletTemp - deltaTemp;
 
-    EXPECT_EQ(thisLoadProfileWaterLoop.OutletTemp, calOutletTemp); // Check the water outlet temperature from simulate() is equal to the calculation
+    EXPECT_EQ(thisLoadProfileWaterLoop.OutletTemp,
+              calOutletTemp); // check if the water outlet temperature from simulate() is equal to the calculation
 }
 
 TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
@@ -199,25 +195,22 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
     state->dataPlantLoadProfile->PlantProfile.allocate(1);
 
     // Test setup for a load profile in a steam loop
-    state->dataPlnt->PlantLoop(1).FluidName = "STEAM";
-    state->dataPlnt->PlantLoop(1).FluidIndex = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type =
-        DataPlant::PlantEquipmentType::PlantLoadProfile;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "LOAD PROFILE STEAM";
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
-    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 2;
+    auto &thisSteamLoop(state->dataPlnt->PlantLoop(1));
+    thisSteamLoop.FluidName = "STEAM";
+    thisSteamLoop.FluidIndex = 1;
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Type = DataPlant::PlantEquipmentType::PlantLoadProfile;
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).Name = "LOAD PROFILE STEAM";
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 1;
+    thisSteamLoop.LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 2;
+
+    std::string_view RoutineName("PlantLoadProfileTests");
 
     Real64 SatTempAtmPress = FluidProperties::GetSatTemperatureRefrig(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, DataEnvironment::StdPressureSeaLevel, state->dataPlnt->PlantLoop(1).FluidIndex, "SatTemp");
+        *state, state->dataPlnt->PlantLoop(1).FluidName, DataEnvironment::StdPressureSeaLevel, state->dataPlnt->PlantLoop(1).FluidIndex, RoutineName);
 
     state->dataLoopNodes->Node(1).Temp = SatTempAtmPress;
     state->dataLoopNodes->Node(1).MassFlowRateMax = 1;
@@ -245,29 +238,28 @@ TEST_F(EnergyPlusFixture, LoadProfile_initandsimulate_Steamloop)
     state->dataScheduleMgr->Schedule(thisLoadProfileSteamLoop.FlowRateFracSchedule).EMSActuatedOn = false;
     state->dataScheduleMgr->Schedule(thisLoadProfileSteamLoop.FlowRateFracSchedule).CurrentValue = 0.8;
 
-    // check InitPlantProfile()
+    // InitPlantProfile()
     thisLoadProfileSteamLoop.InitPlantProfile(*state);
 
-    EXPECT_EQ(thisLoadProfileSteamLoop.InletTemp, SatTempAtmPress); // Check the component's inlet temp is set to node data
-    EXPECT_EQ(thisLoadProfileSteamLoop.Power, 10000);               // Check the load schedule's current value is properly applied
-    EXPECT_EQ(thisLoadProfileSteamLoop.VolFlowRate, 0.0064);        // Check the flow rate fraction schedule is properly applied
+    EXPECT_EQ(thisLoadProfileSteamLoop.InletTemp, SatTempAtmPress); // check if the component's inlet temp is set to node data
+    EXPECT_EQ(thisLoadProfileSteamLoop.Power, 10000);               // check if the load schedule's current value is properly applied
+    EXPECT_EQ(thisLoadProfileSteamLoop.VolFlowRate, 0.0064);        // check if the flow rate fraction schedule is properly applied
 
-    // check simulate()
+    // simulate()
     bool firstHVAC = true;
     Real64 curLoad = 10000.0;
     bool runFlag = true;
     thisLoadProfileSteamLoop.simulate(*state, locSteam, firstHVAC, curLoad, runFlag);
 
-    Real64 EnthSteamIn = FluidProperties::GetSatEnthalpyRefrig(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, SatTempAtmPress, 1.0, state->dataPlnt->PlantLoop(1).FluidIndex, "EnthDrySteam");
-    Real64 EnthSteamOut = FluidProperties::GetSatEnthalpyRefrig(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, SatTempAtmPress, 0.0, state->dataPlnt->PlantLoop(1).FluidIndex, "EnthWetSteam");
+    Real64 EnthSteamIn =
+        FluidProperties::GetSatEnthalpyRefrig(*state, thisSteamLoop.FluidName, SatTempAtmPress, 1.0, thisSteamLoop.FluidIndex, RoutineName);
+    Real64 EnthSteamOut =
+        FluidProperties::GetSatEnthalpyRefrig(*state, thisSteamLoop.FluidName, SatTempAtmPress, 0.0, thisSteamLoop.FluidIndex, RoutineName);
     Real64 LatentHeatSteam = EnthSteamIn - EnthSteamOut;
-
-    Real64 CpCondensate = FluidProperties::GetSpecificHeatGlycol(
-        *state, state->dataPlnt->PlantLoop(1).FluidName, SatTempAtmPress, state->dataPlnt->PlantLoop(1).FluidIndex, "CpCondensate");
+    Real64 CpCondensate =
+        FluidProperties::GetSpecificHeatGlycol(*state, thisSteamLoop.FluidName, SatTempAtmPress, thisSteamLoop.FluidIndex, RoutineName);
     Real64 calOutletMdot = curLoad / (LatentHeatSteam + thisLoadProfileSteamLoop.DegOfSubcooling * CpCondensate);
 
     EXPECT_EQ(thisLoadProfileSteamLoop.MassFlowRate, calOutletMdot);
-    // Check the Steam outlet mass flow rate from simulate() is equal to the calculation
+    // check if the Steam outlet mass flow rate from simulate() is equal to the calculation
 }
