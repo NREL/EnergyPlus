@@ -245,7 +245,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 } else {
                     if (static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, resourceType)) != Constant::eResource::Invalid) {
                         sResourceType = Constant::eResourceNames[getEnumValue(Constant::eResourceNamesUC, resourceType)];
-                    } else { 
+                    } else {
                         ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Resource Type = {}", resourceType));
                         ShowFatalError(state, "Python plugin output variable input problem causes program termination");
                     }

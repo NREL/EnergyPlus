@@ -486,7 +486,8 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
                 this->OutletTemp = min(this->OutletTemp, LoopMaxTemp);
                 MyLoad = this->MassFlowRate * Cp * (this->OutletTemp - this->InletTemp);
             }
-        } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on inlet temp, saturate temp at atmospheric pressure, Cp of inlet condensate, and MyLoad
+        } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on inlet temp, saturate temp at
+                                                                                    // atmospheric pressure, Cp of inlet condensate, and MyLoad
             Real64 SatTempAtmPress =
                 FluidProperties::GetSatTemperatureRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, loop.FluidIndex, RoutineName);
             Real64 CpCondensate = FluidProperties::GetSpecificHeatGlycol(state, loop.FluidName, this->InletTemp, loop.FluidIndex, RoutineName);
