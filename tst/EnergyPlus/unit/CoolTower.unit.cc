@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, ExerciseCoolTower)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MCPTC = 1;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).CTMFL = 1;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 1;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 1;
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataEnvrn->OutWetBulbTemp = 26.0;

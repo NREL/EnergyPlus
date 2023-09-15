@@ -95,6 +95,7 @@ namespace AirLoopHVACDOAS {
         std::vector<std::string> OutletNodeName;
         std::vector<int> OutletNodeNum;
         Real64 InletTemp = 0.0;
+        int InletNodeNum = 0;
 
         static void getAirLoopSplitter(EnergyPlusData &state);
         void CalcAirLoopSplitter(EnergyPlusData &state, Real64 Temp, Real64 Humrat);

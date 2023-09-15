@@ -122,26 +122,26 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfTempInMovInsRep;  // Temperature of interior movable insulation on the side facing the zone
     Array1D<Real64> SurfHSrdSurfExt;      // Outside Radiation Coefficient to Surrounding Surfaces
 
-    Array1D<Real64> SurfQConvInReport;     // Surface convection heat gain at inside face [J]
+    Array1D<Real64> SurfQConvInRep;        // Surface convection heat gain at inside face [J]
     Array1D<Real64> SurfQdotConvInRep;     // Surface convection heat transfer rate at inside face surface [W] (report)
     Array1D<Real64> SurfQdotConvInPerArea; // Surface conv heat transfer rate per m2 at inside face surf (report){w/m2]
 
     // these next three all are for net IR thermal radiation exchange with other surfaces in the model.
-    Array1D<Real64> SurfQRadNetSurfInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadNetSurfInRep;    // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadNetSurfInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next three all are for solar radiation gains on inside face
-    Array1D<Real64> SurfQRadSolarInReport;        // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadSolarInRep;           // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadSolarInRep;        // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadSolarInRepPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
     // these next two all are for Lights visible radiation gains on inside face
-    Array1D<Real64> SurfQRadLightsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadLightsInRep;    // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadLightsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next two all are for Internal Gains sources of radiation gains on inside face
-    Array1D<Real64> SurfQRadIntGainsInReport; // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadIntGainsInRep;    // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadIntGainsInRep; // Surface thermal radiation heat transfer inside face surface [W]
     // these next four all are for Radiative HVAC sources of radiation gains on inside face
     Array1D<bool> AnyRadiantSystems;          // True if there are any radiant systems
-    Array1D<Real64> SurfQRadHVACInReport;     // Surface thermal radiation heat gain at Inside face [J]
+    Array1D<Real64> SurfQRadHVACInRep;        // Surface thermal radiation heat gain at Inside face [J]
     Array1D<Real64> SurfQdotRadHVACInRep;     // Surface thermal radiation heat transfer inside face surface [W]
     Array1D<Real64> SurfQdotRadHVACInPerArea; // [W/m2]Surface thermal radiation heat transfer rate per m2 at Inside face surf
 

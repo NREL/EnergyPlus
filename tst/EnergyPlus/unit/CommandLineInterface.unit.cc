@@ -102,12 +102,24 @@ protected:
     {
         EnergyPlusFixture::SetUpTestCase();
 
-        // For the "legacy" mode, we need in.idf / in.epw in the current directory
-        auto inputFilePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf";
-        fs::copy_file(inputFilePath, FileSystem::getAbsolutePath("in.idf"), fs::copy_options::skip_existing);
+        // For the "legacy" mode, we need *any* in.idf / in.epw in the current directory
+        // This is done via cmake for the CTest case at least, but if you run the energyplusapi_tests exe directly, the current directory isn't
+        // necessarily the <build>/tst/unit/EnergyPlus one, so we do it here anyways
+        {
+            auto destPath = FileSystem::getAbsolutePath("in.idf");
+            if (!fs::is_regular_file(destPath)) {
+                auto inputFilePath = configured_source_directory() / "tst/EnergyPlus/unit/Resources/UnitaryHybridUnitTest_DOSA.idf";
+                fs::copy_file(inputFilePath, destPath, fs::copy_options::skip_existing);
+            }
+        }
 
-        auto inputWeatherFilePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
-        fs::copy_file(inputWeatherFilePath, FileSystem::getAbsolutePath("in.epw"), fs::copy_options::skip_existing);
+        {
+            auto destPath = FileSystem::getAbsolutePath("in.epw");
+            if (!fs::is_regular_file(destPath)) {
+                auto inputWeatherFilePath = configured_source_directory() / "weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+                fs::copy_file(inputWeatherFilePath, destPath, fs::copy_options::skip_existing);
+            }
+        }
     }
 
     void SetUp() override
