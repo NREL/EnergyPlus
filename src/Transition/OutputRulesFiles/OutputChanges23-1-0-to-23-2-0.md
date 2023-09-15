@@ -8,7 +8,7 @@ This file documents the structural changes on the output of EnergyPlus that coul
 This will eventually become a more structured file, but currently it isn't clear what format is best. As an intermediate solution, and to allow the form to be formed organically, this plain text file is being used. Entries should be clearly delimited. It isn't expected that there will be but maybe a couple each release at most. Entries should also include some reference back to the repo. At least a PR number or whatever.
 
 ### EIO System Sizing Information User Design Capacity header
-Missing unit is added to the EIO ystem Sizing Information table "User Design Capacity" header as shown below: 
+Missing unit is added to the EIO System Sizing Information table "User Design Capacity" header as shown below: 
 - <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity [W], Calc Des Air Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak
 - This change also impacts the html tabular output report file: report name "Initialization Summary" and table name "System Sizing Information".
 
@@ -22,7 +22,7 @@ Since each EnergyPlus IDF file could generate an RMD file, the Ruleset Checking 
 
 #### Adding reporting entries to existing tabular reports
 
-New variables related to Std 229 are appendeded to the right of the following existing tables:
+New variables related to Std 229 are appended to the right of the following existing tables:
 
 - Equipment Summary - Heating Coils
 - Equipment Summary - DX Heating Coils
@@ -69,3 +69,14 @@ See pull request [#9982](https://github.com/NREL/EnergyPlus/pull/9982) for more 
  (d) "Steam" to "DistrictHeatingSteam"
 
  See [9260](https://github.com/NREL/EnergyPlus/pull/9260)
+
+### WaterHeaterReportMonthly report
+
+Column "Water Heater Source Energy []" renamed to "Water Heater Source Side Heat Transfer Energy [J]".
+
+See [10209](https://github.com/NREL/EnergyPlus/pull/10209)
+### Heat Pump Water Heater Information table
+
+Columns `"DX Coil Total Cooling Rate {W` and `HPWH Only}"` have been merged into a single `DX Coil Total Cooling Rate {W}`.
+
+ See [10214](https://github.com/NREL/EnergyPlus/pull/10214)

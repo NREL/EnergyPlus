@@ -3099,6 +3099,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             if (ReceivingCount > 0) {
                 state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingPtr.allocate(ReceivingCount);
                 state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingFr.allocate(ReceivingCount);
+                state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingFr = 0.0;
                 for (int Loop = 1; Loop <= ReceivingCount; ++Loop) {
                     state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop) = ZoneMixingNum(Loop);
                 }
@@ -4816,40 +4817,34 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
     // Select type of airflow calculation
     if (state.dataHeatBal->AirFlowFlag) { // Simplified airflow calculation
         // Process the scheduled Mixing for air heat balance
-        for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-            state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate =
-                state.dataHeatBal->Mixing(Loop).DesignLevel *
-                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->Mixing(Loop).SchedPtr);
-            if (state.dataHeatBal->Mixing(Loop).EMSSimpleMixingOn)
-                state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate = state.dataHeatBal->Mixing(Loop).EMSimpleMixingFlowRate;
-            state.dataHeatBal->Mixing(Loop).DesiredAirFlowRateSaved = state.dataHeatBal->Mixing(Loop).DesiredAirFlowRate;
+        for (auto &thisMixing : state.dataHeatBal->Mixing) {
+            thisMixing.DesiredAirFlowRate = thisMixing.DesignLevel * ScheduleManager::GetCurrentScheduleValue(state, thisMixing.SchedPtr);
+            if (thisMixing.EMSSimpleMixingOn) thisMixing.DesiredAirFlowRate = thisMixing.EMSimpleMixingFlowRate;
+            thisMixing.DesiredAirFlowRateSaved = thisMixing.DesiredAirFlowRate;
         }
 
         // if zone air mass flow balance enforced calculate the fraction of
         // contribution of each mixing object to a zone mixed flow rate, BAN Feb 2014
         if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
-            for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            for (auto &massConservZone : state.dataHeatBal->MassConservation) {
                 ZoneMixingFlowSum = 0.0;
-                int NumOfMixingObjects = state.dataHeatBal->MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+                int NumOfMixingObjects = massConservZone.NumReceivingZonesMixingObject;
                 for (int Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
-                    ZoneMixingFlowSum = ZoneMixingFlowSum + state.dataHeatBal->Mixing(Loop).DesignLevel;
+                    ZoneMixingFlowSum += state.dataHeatBal->Mixing(Loop).DesignLevel;
+                    massConservZone.ZoneMixingReceivingFr(Loop) = 0.0;
                 }
                 if (ZoneMixingFlowSum > 0.0) {
                     for (int Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
-                        state.dataHeatBal->MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) =
-                            state.dataHeatBal->Mixing(Loop).DesignLevel / ZoneMixingFlowSum;
+                        massConservZone.ZoneMixingReceivingFr(Loop) = state.dataHeatBal->Mixing(Loop).DesignLevel / ZoneMixingFlowSum;
                     }
                 }
             }
         }
 
         // Process the scheduled CrossMixing for air heat balance
-        for (int Loop = 1; Loop <= state.dataHeatBal->TotCrossMixing; ++Loop) {
-            state.dataHeatBal->CrossMixing(Loop).DesiredAirFlowRate =
-                state.dataHeatBal->CrossMixing(Loop).DesignLevel *
-                ScheduleManager::GetCurrentScheduleValue(state, state.dataHeatBal->CrossMixing(Loop).SchedPtr);
-            if (state.dataHeatBal->CrossMixing(Loop).EMSSimpleMixingOn)
-                state.dataHeatBal->CrossMixing(Loop).DesiredAirFlowRate = state.dataHeatBal->CrossMixing(Loop).EMSimpleMixingFlowRate;
+        for (auto &thisCrossMix : state.dataHeatBal->CrossMixing) {
+            thisCrossMix.DesiredAirFlowRate = thisCrossMix.DesignLevel * ScheduleManager::GetCurrentScheduleValue(state, thisCrossMix.SchedPtr);
+            if (thisCrossMix.EMSSimpleMixingOn) thisCrossMix.DesiredAirFlowRate = thisCrossMix.EMSimpleMixingFlowRate;
         }
 
         // Note - do each Pair a Single time, so must do increment reports for both zones
@@ -4860,12 +4855,12 @@ void InitSimpleMixingConvectiveHeatGains(EnergyPlusData &state)
         if (state.dataHeatBal->TotRefDoorMixing > 0) {
             for (int NZ = 1; NZ <= (state.dataGlobal->NumOfZones - 1);
                  ++NZ) { // Can't have %ZonePtr==NumOfZones because lesser zone # of pair placed in ZonePtr in input
-                if (!state.dataHeatBal->RefDoorMixing(NZ).RefDoorMixFlag) continue;
-                if (state.dataHeatBal->RefDoorMixing(NZ).ZonePtr == NZ) {
-                    for (int J = 1; J <= state.dataHeatBal->RefDoorMixing(NZ).NumRefDoorConnections; ++J) {
-                        state.dataHeatBal->RefDoorMixing(NZ).VolRefDoorFlowRate(J) = 0.0;
-                        if (state.dataHeatBal->RefDoorMixing(NZ).EMSRefDoorMixingOn(J))
-                            state.dataHeatBal->RefDoorMixing(NZ).VolRefDoorFlowRate(J) = state.dataHeatBal->RefDoorMixing(NZ).EMSRefDoorFlowRate(J);
+                auto &thisRefDoor = state.dataHeatBal->RefDoorMixing(NZ);
+                if (!thisRefDoor.RefDoorMixFlag) continue;
+                if (thisRefDoor.ZonePtr == NZ) {
+                    for (int J = 1; J <= thisRefDoor.NumRefDoorConnections; ++J) {
+                        thisRefDoor.VolRefDoorFlowRate(J) = 0.0;
+                        if (thisRefDoor.EMSRefDoorMixingOn(J)) thisRefDoor.VolRefDoorFlowRate(J) = thisRefDoor.EMSRefDoorFlowRate(J);
                     }
                 }
             }
@@ -4920,7 +4915,7 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
         // temperature of the air temperatures at the system time step for the
         // entire zone time step.
         znAirRpt.MeanAirTemp = thisZoneHB.ZTAV;
-        znAirRpt.MeanAirHumRat = thisZoneHB.ZoneAirHumRatAvg;
+        znAirRpt.MeanAirHumRat = thisZoneHB.airHumRatAvg;
         znAirRpt.OperativeTemp = 0.5 * (thisZoneHB.ZTAV + state.dataHeatBal->ZoneMRT(ZoneLoop));
         znAirRpt.MeanAirDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, znAirRpt.MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
