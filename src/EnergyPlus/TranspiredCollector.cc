@@ -655,7 +655,7 @@ namespace TranspiredCollector {
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             for (ThisSurf = 1; ThisSurf <= state.dataTranspiredCollector->UTSC(Item).NumSurfs; ++ThisSurf) {
                 SurfID = state.dataTranspiredCollector->UTSC(Item).SurfPtrs(ThisSurf);
-                if (std::abs(state.dataSurface->Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
+                if (General::rotAzmDiffDeg(state.dataSurface->Surface(SurfID).Azimuth, AvgAzimuth) > 15.0) {
                     ShowWarningError(state,
                                      format("Surface {} has Azimuth different from others in the group associated with {} ={}",
                                             state.dataSurface->Surface(SurfID).Name,

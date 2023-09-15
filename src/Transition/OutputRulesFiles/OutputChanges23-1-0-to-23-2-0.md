@@ -70,6 +70,11 @@ See pull request [#9982](https://github.com/NREL/EnergyPlus/pull/9982) for more 
 
  See [9260](https://github.com/NREL/EnergyPlus/pull/9260)
 
+### WaterHeaterReportMonthly report
+
+Column "Water Heater Source Energy []" renamed to "Water Heater Source Side Heat Transfer Energy [J]".
+
+See [10209](https://github.com/NREL/EnergyPlus/pull/10209)
 ### Heat Pump Water Heater Information table
 
 Columns `"DX Coil Total Cooling Rate {W` and `HPWH Only}"` have been merged into a single `DX Coil Total Cooling Rate {W}`.
