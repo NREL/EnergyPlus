@@ -7175,7 +7175,7 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     Real64 TempExt;
 
                     if (state.dataSurface->SurfExtEcoRoof(SurfNum)) {
-                        EcoRoofManager::CalcEcoRoof(state, SurfNum, zoneNum, ConstrNum, TempExt);
+                        EcoRoofManager::CalcEcoRoof(state, SurfNum, ConstrNum, TempExt);
                         continue;
                     }
                     // Roughness index of the exterior surface
