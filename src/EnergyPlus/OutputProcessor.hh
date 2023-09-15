@@ -635,6 +635,8 @@ namespace OutputProcessor {
                             int MeterIndex      // Which meter this is
     );
 
+    bool StandardizeEndUseMeter(EnergyPlusData &state, std::string &EndUse);
+
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
                                          OutputProcessor::Unit MtrUnits, // Units for the meter
                                          std::string &ResourceType,      // Electricity, Gas, etc.

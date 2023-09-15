@@ -1723,6 +1723,181 @@ namespace OutputProcessor {
         op->VarMeterArrays(MeterArrayPtr).OnCustomMeters(op->VarMeterArrays(MeterArrayPtr).NumOnCustomMeters) = MeterIndex;
     }
 
+    bool StandardizeEndUseMeter(EnergyPlusData &state, std::string &EndUse)
+    {
+        bool LocalErrorsFound = false;
+        //!!! EndUse Meters
+        std::string const endUseMeter = uppercased(EndUse);
+
+        if (endUseMeter.empty()) {
+
+        } else if (endUseMeter == "INTERIOR LIGHTS" || endUseMeter == "INTERIORLIGHTS") {
+            EndUse = "InteriorLights";
+
+        } else if (endUseMeter == "EXTERIOR LIGHTS" || endUseMeter == "EXTERIORLIGHTS") {
+            EndUse = "ExteriorLights";
+
+        } else if (endUseMeter == "HEATING" || endUseMeter == "HTG") {
+            EndUse = "Heating";
+
+        } else if (endUseMeter == "HEATPRODUCED") {
+            EndUse = "HeatProduced";
+
+        } else if (endUseMeter == "COOLING" || endUseMeter == "CLG") {
+            EndUse = "Cooling";
+
+        } else if (endUseMeter == "DOMESTICHOTWATER" || endUseMeter == "DHW" || endUseMeter == "DOMESTIC HOT WATER") {
+            EndUse = "WaterSystems";
+
+        } else if (endUseMeter == "COGEN" || endUseMeter == "COGENERATION") {
+            EndUse = "Cogeneration";
+
+        } else if (endUseMeter == "INTERIOREQUIPMENT" || endUseMeter == "INTERIOR EQUIPMENT") {
+            EndUse = "InteriorEquipment";
+
+        } else if (endUseMeter == "EXTERIOREQUIPMENT" || endUseMeter == "EXTERIOR EQUIPMENT" || endUseMeter == "EXT EQ" ||
+                   endUseMeter == "EXTERIOREQ") {
+            EndUse = "ExteriorEquipment";
+
+        } else if (endUseMeter == "EXTERIOR:WATEREQUIPMENT") {
+            EndUse = "ExteriorEquipment";
+
+        } else if (endUseMeter == "PURCHASEDHOTWATER" || endUseMeter == "DISTRICTHOTWATER" || endUseMeter == "PURCHASED HEATING") {
+            EndUse = "DistrictHotWater";
+
+        } else if (endUseMeter == "PURCHASEDCOLDWATER" || endUseMeter == "DISTRICTCHILLEDWATER" || endUseMeter == "PURCHASEDCHILLEDWATER" ||
+                   endUseMeter == "PURCHASED COLD WATER" || endUseMeter == "PURCHASED COOLING") {
+            EndUse = "DistrictChilledWater";
+
+        } else if (endUseMeter == "FANS" || endUseMeter == "FAN") {
+            EndUse = "Fans";
+
+        } else if (endUseMeter == "HEATINGCOILS" || endUseMeter == "HEATINGCOIL" || endUseMeter == "HEATING COILS" || endUseMeter == "HEATING COIL") {
+            EndUse = "HeatingCoils";
+
+        } else if (endUseMeter == "COOLINGCOILS" || endUseMeter == "COOLINGCOIL" || endUseMeter == "COOLING COILS" || endUseMeter == "COOLING COIL") {
+            EndUse = "CoolingCoils";
+
+        } else if (endUseMeter == "PUMPS" || endUseMeter == "PUMP") {
+            EndUse = "Pumps";
+
+        } else if (endUseMeter == "FREECOOLING" || endUseMeter == "FREE COOLING") {
+            EndUse = "Freecooling";
+
+        } else if (endUseMeter == "LOOPTOLOOP") {
+            EndUse = "LoopToLoop";
+
+        } else if (endUseMeter == "CHILLERS" || endUseMeter == "CHILLER") {
+            EndUse = "Chillers";
+
+        } else if (endUseMeter == "BOILERS" || endUseMeter == "BOILER") {
+            EndUse = "Boilers";
+
+        } else if (endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS") {
+            EndUse = "Baseboard";
+
+        } else if (endUseMeter == "COOLINGPANEL" || endUseMeter == "COOLINGPANELS") {
+            EndUse = "CoolingPanel";
+
+        } else if (endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION") {
+            EndUse = "HeatRejection";
+
+        } else if (endUseMeter == "HUMIDIFIER" || endUseMeter == "HUMIDIFIERS") {
+            EndUse = "Humidifier";
+
+        } else if (endUseMeter == "HEATRECOVERY" || endUseMeter == "HEAT RECOVERY") {
+            EndUse = "HeatRecovery";
+
+        } else if (endUseMeter == "PHOTOVOLTAICS" || endUseMeter == "PV" || endUseMeter == "PHOTOVOLTAIC") {
+            EndUse = "Photovoltaic";
+
+        } else if (endUseMeter == "WINDTURBINES" || endUseMeter == "WT" || endUseMeter == "WINDTURBINE") {
+            EndUse = "WindTurbine";
+
+        } else if (endUseMeter == "ELECTRICSTORAGE") {
+            EndUse = "ElectricStorage";
+
+        } else if (endUseMeter == "POWERCONVERSION") {
+
+            EndUse = "PowerConversion";
+
+        } else if (endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" || endUseMeter == "HEATRECOVERYCOOLING") {
+            EndUse = "HeatRecoveryForCooling";
+
+        } else if (endUseMeter == "HEAT RECOVERY FOR HEATING" || endUseMeter == "HEATRECOVERYFORHEATING" || endUseMeter == "HEATRECOVERYHEATING") {
+            EndUse = "HeatRecoveryForHeating";
+
+        } else if (endUseMeter == "ELECTRICITYEMISSIONS") {
+            EndUse = "ElectricityEmissions";
+
+        } else if (endUseMeter == "PURCHASEDELECTRICITYEMISSIONS") {
+            EndUse = "PurchasedElectricityEmissions";
+
+        } else if (endUseMeter == "SOLDELECTRICITYEMISSIONS") {
+            EndUse = "SoldElectricityEmissions";
+
+        } else if (endUseMeter == "NATURALGASEMISSIONS") {
+            EndUse = "NaturalGasEmissions";
+
+        } else if (endUseMeter == "FUELOILNO1EMISSIONS") {
+            EndUse = "FuelOilNo1Emissions";
+
+        } else if (endUseMeter == "FUELOILNO2EMISSIONS") {
+            EndUse = "FuelOilNo2Emissions";
+
+        } else if (endUseMeter == "COALEMISSIONS") {
+            EndUse = "CoalEmissions";
+
+        } else if (endUseMeter == "GASOLINEEMISSIONS") {
+            EndUse = "GasolineEmissions";
+
+        } else if (endUseMeter == "PROPANEEMISSIONS") {
+            EndUse = "PropaneEmissions";
+
+        } else if (endUseMeter == "DIESELEMISSIONS") {
+            EndUse = "DieselEmissions";
+
+        } else if (endUseMeter == "OTHERFUEL1EMISSIONS") {
+            EndUse = "OtherFuel1Emissions";
+
+        } else if (endUseMeter == "OTHERFUEL2EMISSIONS") {
+            EndUse = "OtherFuel2Emissions";
+
+        } else if (endUseMeter == "CARBONEQUIVALENTEMISSIONS") {
+            EndUse = "CarbonEquivalentEmissions";
+
+        } else if (endUseMeter == "REFRIGERATION") {
+            EndUse = "Refrigeration";
+
+        } else if (endUseMeter == "COLDSTORAGECHARGE") {
+            EndUse = "ColdStorageCharge";
+
+        } else if (endUseMeter == "COLDSTORAGEDISCHARGE") {
+            EndUse = "ColdStorageDischarge";
+
+        } else if (endUseMeter == "WATERSYSTEMS" || endUseMeter == "WATERSYSTEM" || endUseMeter == "Water System") {
+            EndUse = "WaterSystems";
+
+        } else if (endUseMeter == "RAINWATER") {
+            EndUse = "Rainwater";
+
+        } else if (endUseMeter == "CONDENSATE") {
+            EndUse = "Condensate";
+
+        } else if (endUseMeter == "WELLWATER") {
+            EndUse = "Wellwater";
+
+        } else if (endUseMeter == "MAINSWATER" || endUseMeter == "PURCHASEDWATER") {
+            EndUse = "MainsWater";
+
+        } else {
+            ShowSevereError(state, format("Illegal EndUse (for Meters) Entered={}", EndUse));
+            LocalErrorsFound = true;
+        }
+
+        return LocalErrorsFound;
+    }
+
     void ValidateNStandardizeMeterTitles(EnergyPlusData &state,
                                          OutputProcessor::Unit const MtrUnits, // Units for the meter
                                          std::string &ResourceType,            // Electricity, Gas, etc.
@@ -1804,180 +1979,7 @@ namespace OutputProcessor {
             }
         }
 
-        //!!! EndUse Meters
-        {
-            std::string const endUseMeter = uppercased(EndUse);
-
-            if (endUseMeter.empty()) {
-
-            } else if (endUseMeter == "INTERIOR LIGHTS" || endUseMeter == "INTERIORLIGHTS") {
-                EndUse = "InteriorLights";
-
-            } else if (endUseMeter == "EXTERIOR LIGHTS" || endUseMeter == "EXTERIORLIGHTS") {
-                EndUse = "ExteriorLights";
-
-            } else if (endUseMeter == "HEATING" || endUseMeter == "HTG") {
-                EndUse = "Heating";
-
-            } else if (endUseMeter == "HEATPRODUCED") {
-                EndUse = "HeatProduced";
-
-            } else if (endUseMeter == "COOLING" || endUseMeter == "CLG") {
-                EndUse = "Cooling";
-
-            } else if (endUseMeter == "DOMESTICHOTWATER" || endUseMeter == "DHW" || endUseMeter == "DOMESTIC HOT WATER") {
-                EndUse = "WaterSystems";
-
-            } else if (endUseMeter == "COGEN" || endUseMeter == "COGENERATION") {
-                EndUse = "Cogeneration";
-
-            } else if (endUseMeter == "INTERIOREQUIPMENT" || endUseMeter == "INTERIOR EQUIPMENT") {
-                EndUse = "InteriorEquipment";
-
-            } else if (endUseMeter == "EXTERIOREQUIPMENT" || endUseMeter == "EXTERIOR EQUIPMENT" || endUseMeter == "EXT EQ" ||
-                       endUseMeter == "EXTERIOREQ") {
-                EndUse = "ExteriorEquipment";
-
-            } else if (endUseMeter == "EXTERIOR:WATEREQUIPMENT") {
-                EndUse = "ExteriorEquipment";
-
-            } else if (endUseMeter == "PURCHASEDHOTWATER" || endUseMeter == "DISTRICTHOTWATER" || endUseMeter == "PURCHASED HEATING") {
-                EndUse = "DistrictHotWater";
-
-            } else if (endUseMeter == "PURCHASEDCOLDWATER" || endUseMeter == "DISTRICTCHILLEDWATER" || endUseMeter == "PURCHASEDCHILLEDWATER" ||
-                       endUseMeter == "PURCHASED COLD WATER" || endUseMeter == "PURCHASED COOLING") {
-                EndUse = "DistrictChilledWater";
-
-            } else if (endUseMeter == "FANS" || endUseMeter == "FAN") {
-                EndUse = "Fans";
-
-            } else if (endUseMeter == "HEATINGCOILS" || endUseMeter == "HEATINGCOIL" || endUseMeter == "HEATING COILS" ||
-                       endUseMeter == "HEATING COIL") {
-                EndUse = "HeatingCoils";
-
-            } else if (endUseMeter == "COOLINGCOILS" || endUseMeter == "COOLINGCOIL" || endUseMeter == "COOLING COILS" ||
-                       endUseMeter == "COOLING COIL") {
-                EndUse = "CoolingCoils";
-
-            } else if (endUseMeter == "PUMPS" || endUseMeter == "PUMP") {
-                EndUse = "Pumps";
-
-            } else if (endUseMeter == "FREECOOLING" || endUseMeter == "FREE COOLING") {
-                EndUse = "Freecooling";
-
-            } else if (endUseMeter == "LOOPTOLOOP") {
-                EndUse = "LoopToLoop";
-
-            } else if (endUseMeter == "CHILLERS" || endUseMeter == "CHILLER") {
-                EndUse = "Chillers";
-
-            } else if (endUseMeter == "BOILERS" || endUseMeter == "BOILER") {
-                EndUse = "Boilers";
-
-            } else if (endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS") {
-                EndUse = "Baseboard";
-
-            } else if (endUseMeter == "COOLINGPANEL" || endUseMeter == "COOLINGPANELS") {
-                EndUse = "CoolingPanel";
-
-            } else if (endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION") {
-                EndUse = "HeatRejection";
-
-            } else if (endUseMeter == "HUMIDIFIER" || endUseMeter == "HUMIDIFIERS") {
-                EndUse = "Humidifier";
-
-            } else if (endUseMeter == "HEATRECOVERY" || endUseMeter == "HEAT RECOVERY") {
-                EndUse = "HeatRecovery";
-
-            } else if (endUseMeter == "PHOTOVOLTAICS" || endUseMeter == "PV" || endUseMeter == "PHOTOVOLTAIC") {
-                EndUse = "Photovoltaic";
-
-            } else if (endUseMeter == "WINDTURBINES" || endUseMeter == "WT" || endUseMeter == "WINDTURBINE") {
-                EndUse = "WindTurbine";
-
-            } else if (endUseMeter == "ELECTRICSTORAGE") {
-                EndUse = "ElectricStorage";
-
-            } else if (endUseMeter == "POWERCONVERSION") {
-
-                EndUse = "PowerConversion";
-
-            } else if (endUseMeter == "HEAT RECOVERY FOR COOLING" || endUseMeter == "HEATRECOVERYFORCOOLING" ||
-                       endUseMeter == "HEATRECOVERYCOOLING") {
-                EndUse = "HeatRecoveryForCooling";
-
-            } else if (endUseMeter == "HEAT RECOVERY FOR HEATING" || endUseMeter == "HEATRECOVERYFORHEATING" ||
-                       endUseMeter == "HEATRECOVERYHEATING") {
-                EndUse = "HeatRecoveryForHeating";
-
-            } else if (endUseMeter == "ELECTRICITYEMISSIONS") {
-                EndUse = "ElectricityEmissions";
-
-            } else if (endUseMeter == "PURCHASEDELECTRICITYEMISSIONS") {
-                EndUse = "PurchasedElectricityEmissions";
-
-            } else if (endUseMeter == "SOLDELECTRICITYEMISSIONS") {
-                EndUse = "SoldElectricityEmissions";
-
-            } else if (endUseMeter == "NATURALGASEMISSIONS") {
-                EndUse = "NaturalGasEmissions";
-
-            } else if (endUseMeter == "FUELOILNO1EMISSIONS") {
-                EndUse = "FuelOilNo1Emissions";
-
-            } else if (endUseMeter == "FUELOILNO2EMISSIONS") {
-                EndUse = "FuelOilNo2Emissions";
-
-            } else if (endUseMeter == "COALEMISSIONS") {
-                EndUse = "CoalEmissions";
-
-            } else if (endUseMeter == "GASOLINEEMISSIONS") {
-                EndUse = "GasolineEmissions";
-
-            } else if (endUseMeter == "PROPANEEMISSIONS") {
-                EndUse = "PropaneEmissions";
-
-            } else if (endUseMeter == "DIESELEMISSIONS") {
-                EndUse = "DieselEmissions";
-
-            } else if (endUseMeter == "OTHERFUEL1EMISSIONS") {
-                EndUse = "OtherFuel1Emissions";
-
-            } else if (endUseMeter == "OTHERFUEL2EMISSIONS") {
-                EndUse = "OtherFuel2Emissions";
-
-            } else if (endUseMeter == "CARBONEQUIVALENTEMISSIONS") {
-                EndUse = "CarbonEquivalentEmissions";
-
-            } else if (endUseMeter == "REFRIGERATION") {
-                EndUse = "Refrigeration";
-
-            } else if (endUseMeter == "COLDSTORAGECHARGE") {
-                EndUse = "ColdStorageCharge";
-
-            } else if (endUseMeter == "COLDSTORAGEDISCHARGE") {
-                EndUse = "ColdStorageDischarge";
-
-            } else if (endUseMeter == "WATERSYSTEMS" || endUseMeter == "WATERSYSTEM" || endUseMeter == "Water System") {
-                EndUse = "WaterSystems";
-
-            } else if (endUseMeter == "RAINWATER") {
-                EndUse = "Rainwater";
-
-            } else if (endUseMeter == "CONDENSATE") {
-                EndUse = "Condensate";
-
-            } else if (endUseMeter == "WELLWATER") {
-                EndUse = "Wellwater";
-
-            } else if (endUseMeter == "MAINSWATER" || endUseMeter == "PURCHASEDWATER") {
-                EndUse = "MainsWater";
-
-            } else {
-                ShowSevereError(state, format("Illegal EndUse (for Meters) Entered={}", EndUse));
-                LocalErrorsFound = true;
-            }
-        }
+        LocalErrorsFound = StandardizeEndUseMeter(state, EndUse);
 
         //!! Following if we do EndUse by ResourceType
         if (!LocalErrorsFound && !EndUse.empty()) {
@@ -4426,30 +4428,36 @@ void SetupOutputVariable(EnergyPlusData &state,
             } else {
                 ResourceType = "";
             }
-            if (!EndUseKey.empty()) {
-                EndUse = EndUseKey;
+
+            std::string EndUseKey_Std = std::string(EndUseKey);
+            bool EndUseKey_StdErrFound = StandardizeEndUseMeter(state, EndUseKey_Std);
+            if (!EndUseKey_Std.empty() && !EndUseKey_StdErrFound) {
+                EndUse = EndUseKey_Std;
                 OnMeter = true;
             } else {
                 EndUse = "";
             }
+
             if (!EndUseSubKey.empty()) {
                 EndUseSub = EndUseSubKey;
                 OnMeter = true;
             } else {
                 EndUseSub = "";
-                if (!EndUseKey.empty()) {
-                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::makeUPPER(std::string{EndUseKey})) !=
+                if (!EndUseKey_Std.empty()) {
+                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::makeUPPER(std::string{EndUseKey_Std})) !=
                         endUseCategoryNames.end()) {
                         EndUseSub = "General";
                     }
                 }
             }
+
             if (!GroupKey.empty()) {
                 Group = GroupKey;
                 OnMeter = true;
             } else {
                 Group = "";
             }
+
             if (!ZoneKey.empty()) {
                 zoneName = ZoneKey;
                 OnMeter = true;
