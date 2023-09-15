@@ -64,6 +64,8 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <embedded/EmbeddedEpJSONSchema.hh>
+
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -357,6 +359,11 @@ bool EnergyPlusFixture::process_idf(std::string_view const idf_snippet, bool use
     }
 
     return successful_processing;
+}
+
+const nlohmann::json &EnergyPlusFixture::schema()
+{
+    return InputProcessor::schema();
 }
 
 } // namespace EnergyPlus

@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -584,4 +585,71 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow[CostCategory::TotGrand].yrAmount(4), 1278. + 123456., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow[CostCategory::TotGrand].yrAmount(5), 1278., 0.001);
+}
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecognized)
+{
+
+    const auto &schema = EnergyPlusFixture::schema();
+    const auto &lcc_useprice = schema["properties"]["LifeCycleCost:UsePriceEscalation"];
+    const auto &resource_field = lcc_useprice["patternProperties"][".*"]["properties"]["resource"];
+    const auto &enum_values = resource_field["enum"];
+
+    // Should support all fuels + Water + ElectricityXXX (Purchased, Produced, SurplusSold, Net)
+    constexpr size_t numResources = static_cast<size_t>(Constant::eFuel::Num) + 5;
+    EXPECT_EQ(numResources, enum_values.size());
+    std::string idf_objects = delimited_string({
+        "LifeCycleCost:Parameters,",
+        "  TypicalLCC,              !- Name",
+        "  EndOfYear,               !- Discounting Convention",
+        "  ConstantDollar,          !- Inflation Approach",
+        "  0.03,                    !- Real Discount Rate",
+        "  ,                        !- Nominal Discount Rate",
+        "  ,                        !- Inflation",
+        "  January,                 !- Base Date Month",
+        "  2012,                    !- Base Date Year",
+        "  January,                 !- Service Date Month",
+        "  2014,                    !- Service Date Year",
+        "  100,                     !- Length of Study Period in Years",
+        "  0,                       !- Tax rate",
+        "  ;                        !- Depreciation Method",
+    });
+    // All should be valid resources
+    for (const auto &enum_value : enum_values) {
+        const std::string enum_string = enum_value.get<std::string>();
+
+        const auto resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, enum_string));
+        EXPECT_TRUE(compare_enums(Constant::eResource::Invalid, resource)) << "Failed for " << enum_string;
+
+        idf_objects += fmt::format(R"idf(
+LifeCycleCost:UsePriceEscalation,
+  LCCUsePriceEscalation {0},             !- Name
+  {0},                                   !- Resource
+  2009,                                   !- Escalation Start Year
+  January,                                !- Escalation Start Month
+  1,                                      !- Year Escalation 1
+  1.01,                                   !- Year Escalation 2
+  1.02;                                   !- Year Escalation 3
+
+LifeCycleCost:UseAdjustment,
+  LCCUseAdjustment {0},              !- Name
+  {0},                               !- Resource
+  1,                                      !- Year Multiplier 1
+  1.005,                                  !- Year Multiplier 2
+  1.01;                                   !- Year Multiplier 3
+  )idf",
+                                   enum_string);
+    }
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetInputForLifeCycleCost(*state);
+
+    EXPECT_EQ(numResources, state->dataEconLifeCycleCost->numUsePriceEscalation);
+    EXPECT_TRUE(std::all_of(state->dataEconLifeCycleCost->UsePriceEscalation.begin(),
+                            state->dataEconLifeCycleCost->UsePriceEscalation.end(),
+                            [](auto &lcc) { return lcc.resource != Constant::eResource::Invalid; }));
+    EXPECT_EQ(numResources, state->dataEconLifeCycleCost->numUseAdjustment);
+    EXPECT_TRUE(std::all_of(state->dataEconLifeCycleCost->UseAdjustment.begin(), state->dataEconLifeCycleCost->UseAdjustment.end(), [](auto &lcc) {
+        return lcc.resource != Constant::eResource::Invalid;
+    }));
 }
