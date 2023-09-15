@@ -489,8 +489,7 @@ void OutsideEnergySourceSpecs::calculate(EnergyPlusData &state, bool runFlag, Re
         } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) { // determine mass flow rate based on inlet temp, saturate temp at atmospheric pressure, Cp of inlet condensate, and MyLoad
             Real64 SatTempAtmPress =
                 FluidProperties::GetSatTemperatureRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, loop.FluidIndex, RoutineName);
-            Real64 CpCondensate =
-                FluidProperties::GetSatSpecificHeatRefrig(state, loop.FluidName, this->InletTemp, 0.0, loop.FluidIndex, RoutineName);
+            Real64 CpCondensate = FluidProperties::GetSpecificHeatGlycol(state, loop.FluidName, this->InletTemp, loop.FluidIndex, RoutineName);
             Real64 deltaTsensible = SatTempAtmPress - this->InletTemp;
             Real64 EnthSteamInDry =
                 FluidProperties::GetSatEnthalpyRefrig(state, loop.FluidName, DataEnvironment::StdPressureSeaLevel, 1.0, loop.FluidIndex, RoutineName);

@@ -206,8 +206,8 @@ TEST_F(EnergyPlusFixture, DistrictCoolingandHeating)
 
     Real64 SatTempAtmPress = FluidProperties::GetSatTemperatureRefrig(
         *state, thisSteamLoop.FluidName, DataEnvironment::StdPressureSeaLevel, thisSteamLoop.FluidIndex, RoutineName);
-    Real64 CpCondensate = FluidProperties::GetSatSpecificHeatRefrig(
-        *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp, 0.0, thisSteamLoop.FluidIndex, RoutineName);
+    Real64 CpCondensate = FluidProperties::GetSpecificHeatGlycol(
+        *state, thisSteamLoop.FluidName, thisDistrictHeatingSteam.InletTemp,thisSteamLoop.FluidIndex, RoutineName);
     Real64 deltaTsensible = SatTempAtmPress - thisDistrictHeatingSteam.InletTemp;
     Real64 EnthSteamInDry = FluidProperties::GetSatEnthalpyRefrig(
         *state, thisSteamLoop.FluidName, DataEnvironment::StdPressureSeaLevel, 1.0, thisSteamLoop.FluidIndex, RoutineName);
