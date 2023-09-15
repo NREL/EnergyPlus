@@ -6129,44 +6129,40 @@ DistrictCooling, Purchased Cooling,
 
 \begin{itemize}
     \item
-    HVAC,Average, District Cooling Chilled Water Rate {[}W{]}
+    HVAC,Average, District Cooling Water Rate {[}W{]}
     \item
-    HVAC,Sum, District Cooling Chilled Water Energy {[}J{]}
+    HVAC,Sum, District Cooling Water Energy {[}J{]}
     \item
     Zone,Meter, DistrictCooling:Plant {[}J{]}
     \item
     Zone,Meter,Cooling: DistrictCooling {[}J{]}
     \item
-    HVAC,Average,District Cooling Rate {[}W{]}
+    HVAC,Average,District Cooling Water Inlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Cooling Inlet Temperature {[}C{]}
+    HVAC,Average,District Cooling Water Outlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Cooling Outlet Temperature {[}C{]}
-    \item
-    HVAC,Average,District Cooling Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,District Cooling Water Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{District Cooling Chilled Water Rate {[}W{]}}\label{district-cooling-chilled-water-rate-w}
+\paragraph{District Cooling Water Rate {[}W{]}}\label{district-cooling-chilled-water-rate-w}
 
-\paragraph{District Cooling Chilled Water Energy {[}J{]}}\label{district-cooling-chilled-water-energy-j}
+This is the useful rate of cooling energy from purchased chilled water. 
+
+\paragraph{District Cooling Water Energy {[}J{]}}\label{district-cooling-chilled-water-energy-j}
 
 These outputs are the energy taken from purchased chilled water. Consumption is metered on Cooling:DistrictCooling, DistrictCooling:Plant, and DistrictCooling:Facility.
 
-\paragraph{District Cooling Rate {[}W{]}}\label{district-cooling-rate-w}
+\paragraph{District Cooling Water Inlet Temperature {[}C{]}}\label{district-cooling-inlet-temperature-c}
 
-This is the useful rate of cooling energy from purchased chilled water. For the current algorithm, this is the same as District Cooling Chilled Water Rate.
+\paragraph{District Cooling WaterOutlet Temperature {[}C{]}}\label{district-cooling-outlet-temperature-c}
 
-\paragraph{District Cooling Inlet Temperature {[}C{]}}\label{district-cooling-inlet-temperature-c}
-
-\paragraph{District Cooling Outlet Temperature {[}C{]}}\label{district-cooling-outlet-temperature-c}
-
-\paragraph{District Cooling Mass Flow Rate {[}kg/s{]}}\label{district-cooling-mass-flow-rate-kgs}
+\paragraph{District Cooling Water Mass Flow Rate {[}kg/s{]}}\label{district-cooling-mass-flow-rate-kgs}
 
 These outputs are the supply-side plant loop chilled water inlet and outlet temperatures and mass flow rate.
 
-\subsection{DistrictHeating}\label{districtheating}
+\subsection{DistrictHeating:Water}\label{districtheating}
 
-When the user is not interested in a plant simulation or there is some centralized source of hot water (district heating), the following object can be used in the input.
+When the user is not interested in a plant simulation or there is some centralized source of hot water (district heating water), the following object can be used in the input.
 
 \subsubsection{Inputs}\label{inputs-17-006}
 
@@ -6203,40 +6199,95 @@ DistrictHeating,Purchased Heating,
 
 \begin{itemize}
     \item
-    HVAC,Average,District Heating Hot Water Rate {[}W{]}
+    HVAC,Average,District Heating Water Rate {[}W{]}
     \item
-    HVAC,Sum,District Heating Hot Water Energy {[}J{]}
+    HVAC,Sum,District Heating Water Energy {[}J{]}
     \item
-    Zone,Meter,DistrictHeating:Plant {[}J{]}
+    Zone,Meter,DistrictHeatingWater:Plant {[}J{]}
     \item
-    Zone,Meter,Heating:DistrictHeating {[}J{]}
+    Zone,Meter,Heating:DistrictHeatingWater {[}J{]}
     \item
-    HVAC,Average,District Heating Rate {[}W{]}
+    HVAC,Average,District Heating Water Inlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Heating Inlet Temperature {[}C{]}
+    HVAC,Average,District Heating Water Outlet Temperature {[}C{]}
     \item
-    HVAC,Average,District Heating Outlet Temperature {[}C{]}
-    \item
-    HVAC,Average,District Heating Mass Flow Rate {[}kg/s{]}
+    HVAC,Average,District Heating Water Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{District Heating Hot Water Rate {[}W{]}}\label{district-heating-hot-water-rate-w}
+\paragraph{District Heating Water Rate {[}W{]}}\label{district-heating-hot-water-rate-w}
 
-\paragraph{District Heating Hot Water Energy {[}J{]}}\label{district-heating-hot-water-energy-j}
+This is the useful rate of heating energy from purchased hot water.
 
-These outputs are the energy taken from purchased hot water. Consumption is metered on Heating:DistrictHeating, DistrictHeating:Plant, and DistrictHeating:Facility.
+\paragraph{District Heating Water Energy {[}J{]}}\label{district-heating-hot-water-energy-j}
 
-\paragraph{District Heating Rate {[}W{]}}\label{district-heating-rate-w}
+These outputs are the energy taken from purchased hot water. Consumption is metered on Heating:DistrictHeatingWater, DistrictHeatingWater:Plant, and DistrictHeatingWater:Facility.
 
-This is the useful rate of heating energy from purchased hot water. For the current algorithm, this is the same as District Heating Hot Water Rate.
+\paragraph{District Heating Water Inlet Temperature {[}C{]}}\label{district-heating-inlet-temperature-c}
 
-\paragraph{District Heating Inlet Temperature {[}C{]}}\label{district-heating-inlet-temperature-c}
+\paragraph{District Heating Water Outlet Temperature {[}C{]}}\label{district-heating-outlet-temperature-c}
 
-\paragraph{District Heating Outlet Temperature {[}C{]}}\label{district-heating-outlet-temperature-c}
-
-\paragraph{District Heating Mass Flow Rate {[}kg/s{]}}\label{district-heating-mass-flow-rate-kgs}
+\paragraph{District Heating Water Mass Flow Rate {[}kg/s{]}}\label{district-heating-mass-flow-rate-kgs}
 
 These outputs are the supply-side plant loop hot water inlet and outlet temperatures and mass flow rate.
+
+\subsection{DistrictHeating:Steam}\label{districtheatingsteam}
+
+When the user is not interested in a plant simulation or there is some centralized source of steam (district heating steam), the following object can be used in the input.
+
+\subsubsection{Inputs}\label{inputs-17-006}
+
+\paragraph{Field: Name}\label{field-name-16-006}
+
+This alpha field contains the identifying name for the district heating steam (i.e., purchased steam).
+
+\paragraph{Field:Steam Inlet Node Name}\label{field-steam-inlet-node-name-2}
+
+This alpha field contains the identifying name for the district heating inlet node.
+
+\paragraph{Field: Steam Outlet Node Name}\label{field-steam-outlet-node-name-2}
+
+This alpha field contains the identifying name for the district heating outlet node.
+
+\paragraph{Field: Nominal Capacity}\label{field-nominal-capacity-12}
+
+This numeric field contains the nominal demand (W) that the district heating will meet. This field is autosizable.
+
+\paragraph{Field: Capacity Fraction Schedule Name}\label{field-capacity-fraction-schedule-name-2}
+
+This alpha field contains the name of a schedule that describes how the nominal capacity varies over time.~ Values must non-negative. The capacity at a given point in time is determined by the product of the previous field and the value in this schedule. If the field is omitted or left blank, then the program assumes a schedule value of 1.0 all the time.
+
+\subsubsection{Outputs}\label{outputs-15-003}
+
+\begin{itemize}
+    \item
+    HVAC,Average,District Heating Steam Rate {[}W{]}
+    \item
+    HVAC,Sum,District Heating Steam Energy {[}J{]}
+    \item
+    Zone,Meter,DistrictHeatingSteam:Plant {[}J{]}
+    \item
+    Zone,Meter,Heating:DistrictHeatingSteam {[}J{]}
+    \item
+    HVAC,Average,District Heating Steam Inlet Temperature {[}C{]}
+    \item
+    HVAC,Average,District Heating Steam Outlet Temperature {[}C{]}
+    \item
+    HVAC,Average,District Heating Steam Mass Flow Rate {[}kg/s{]}
+\end{itemize}
+
+\paragraph{District Heating Steam Energy {[}J{]}}\label{district-heating-Steam-energy-j}
+
+These outputs are the energy taken from purchased steam. Consumption is metered on Heating:DistrictHeatingSteam, DistrictHeatingSteam:Plant, and DistrictHeatingSteam:Facility.
+
+\paragraph{District Heating Steam Rate {[}W{]}}\label{district-heating-steam-rate-w}
+
+This is the useful rate of heating energy from purchased steam.
+
+\paragraph{District Heating Steam Inlet Temperature {[}C{]}}\label{district-heating-steam-inlet-temperature-c}
+
+\paragraph{District Heating Steam Outlet Temperature {[}C{]}}\label{district-heating-steam-outlet-temperature-c}
+
+\paragraph{District Heating Steam Mass Flow Rate {[}kg/s{]}}\label{district-heating-steam-mass-flow-rate-kgs}
 
 \subsection{PlantComponent:TemperatureSource}\label{plantcomponenttemperaturesource}
 
