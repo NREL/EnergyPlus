@@ -1682,4 +1682,17 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
     EXPECT_NEAR(DSHistoryValue2, 2.0, 0.000001);
     EXPECT_NEAR(DSHistoryValue3, 2.5, 0.000001);
     EXPECT_NEAR(DSHistoryValue4, 3.0, 0.000001);
+
+    std::array<Real64, 4> newValue = {0.0, 0.0, 0.0, 0.0};
+    std::array<Real64, 4> oldValue = {DSHistoryValue1, DSHistoryValue2, DSHistoryValue3, DSHistoryValue4};
+    Real64 returnValue = DownInterpolate4HistoryValues(PriorTimeStep, state->dataHVACGlobal->TimeStepSys, oldValue, newValue);
+    EXPECT_NEAR(returnValue, oldValue[0], 0.000001); // setting up history terms for shortened time step simulation
+    EXPECT_NEAR(newValue[0], 1.5, 0.000001);         // values are interpolated to provide history terms at the new time step
+    EXPECT_NEAR(newValue[1], 1.75, 0.000001);
+    EXPECT_NEAR(newValue[2], 2.0, 0.000001);
+    EXPECT_NEAR(newValue[3], 2.25, 0.000001);
+    EXPECT_NEAR(oldValue[0], DSHistoryValue1, 0.000001); // values are same as before
+    EXPECT_NEAR(oldValue[1], DSHistoryValue2, 0.000001);
+    EXPECT_NEAR(oldValue[2], DSHistoryValue3, 0.000001);
+    EXPECT_NEAR(oldValue[3], DSHistoryValue4, 0.000001);
 }
