@@ -646,11 +646,11 @@ LifeCycleCost:UseAdjustment,
     GetInputForLifeCycleCost(*state);
 
     EXPECT_EQ(numResources, state->dataEconLifeCycleCost->numUsePriceEscalation);
-    EXPECT_TRUE(std::all_of(state->dataEconLifeCycleCost->UsePriceEscalation.begin(),
-                            state->dataEconLifeCycleCost->UsePriceEscalation.end(),
-                            [](auto &lcc) { return lcc.resource != Constant::eResource::Invalid; }));
+    for (const auto &lcc : state->dataEconLifeCycleCost->UsePriceEscalation) {
+        EXPECT_FALSE(compare_enums(lcc.resource, Constant::eResource::Invalid, false)) << "Failed for " << lcc.name;
+    }
     EXPECT_EQ(numResources, state->dataEconLifeCycleCost->numUseAdjustment);
-    EXPECT_TRUE(std::all_of(state->dataEconLifeCycleCost->UseAdjustment.begin(), state->dataEconLifeCycleCost->UseAdjustment.end(), [](auto &lcc) {
-        return lcc.resource != Constant::eResource::Invalid;
-    }));
+    for (const auto &lcc : state->dataEconLifeCycleCost->UseAdjustment) {
+        EXPECT_FALSE(compare_enums(lcc.resource, Constant::eResource::Invalid, false)) << "Failed for " << lcc.name;
+    }
 }
