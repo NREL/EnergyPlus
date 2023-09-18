@@ -1909,6 +1909,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
     int LoopNum = this->HWPlantLoc.loopNum;
     DataPlant::LoopSideLocation LoopSideNum = this->HWPlantLoc.loopSideNum;
 
+    lHotWaterReturnTemp = state.dataLoopNodes->Node(lHeatReturnNodeNum).Temp;
     Real64 Cp_HW = FluidProperties::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, lHotWaterReturnTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
@@ -1917,7 +1918,6 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
     Real64 lCoolPartLoadRatio = this->CoolPartLoadRatio;
 
     // initialize entering conditions
-    lHotWaterReturnTemp = state.dataLoopNodes->Node(lHeatReturnNodeNum).Temp;
     lHotWaterMassFlowRate = state.dataLoopNodes->Node(lHeatReturnNodeNum).MassFlowRate;
     switch (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme) {
     case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
@@ -2007,6 +2007,7 @@ void ExhaustAbsorberSpecs::calcHeater(EnergyPlusData &state, Real64 &MyLoad, boo
 
         lExhaustInTemp = state.dataLoopNodes->Node(lExhaustAirInletNodeNum).Temp;
         lExhaustInFlow = state.dataLoopNodes->Node(lExhaustAirInletNodeNum).MassFlowRate;
+        lExhaustAirHumRat = state.dataLoopNodes->Node(this->ExhaustAirInletNodeNum).HumRat;
         Real64 CpAir = Psychrometrics::PsyCpAirFnW(lExhaustAirHumRat);
         lExhHeatRecPotentialHeat = lExhaustInFlow * CpAir * (lExhaustInTemp - AbsLeavingTemp);
         if (lExhHeatRecPotentialHeat < lHeatThermalEnergyUseRate) {
