@@ -280,8 +280,8 @@ void InitIntConvCoeff(EnergyPlusData &state,
         auto const &zone = state.dataHeatBal->Zone(ZoneNum);
         for (int spaceNum : zone.spaceIndexes) {
             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+            Real64 spaceMAT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
             for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                Real64 spaceMAT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
 
                 if (present(ZoneToResimulate)) {
                     if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->SurfAdjacentZone(SurfNum) != ZoneToResimulate)) {
