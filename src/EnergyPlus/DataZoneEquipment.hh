@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -464,9 +465,21 @@ namespace DataZoneEquipment {
         std::string equipName;
         int zoneEquipOutletNodeNum = 0;
         DataZoneEquipment::ZoneEquipTstatControl tstatControl = DataZoneEquipment::ZoneEquipTstatControl::Invalid;
-        int controlSpaceIndex = 0;
+        int controlSpaceIndex = 0; // Index to a space for the thermostat control space
+        Real64 controlSpaceFraction = 1.0;
         DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
         std::vector<ZoneEquipSplitterMixerSpace> spaces;
+        DataZoneEnergyDemands::ZoneSystemSensibleDemand saveZoneSysSensibleDemand; // Save unadjusted zone sensible loads
+        DataZoneEnergyDemands::ZoneSystemMoistureDemand saveZoneSysMoistureDemand; // Save unadjusted zone moisture loads
+
+        void distributeOutput(EnergyPlusData &state,
+                              int const zoneNum,
+                              Real64 const sysOutputProvided,
+                              Real64 const latOutputProvided,
+                              Real64 const nonAirSysOutput,
+                              int const equipTypeNum);
+
+        void adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum);
     };
 
     struct ZoneEquipmentMixer

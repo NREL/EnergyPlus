@@ -3281,6 +3281,13 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 }
             }
 
+            // If SpaceHVAC is active and this equipment has a space splitter, scale the zone load if needed
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
+                zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
+                state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)].adjustLoads(
+                    state, ControlledZoneNum, EquipTypeNum);
+            }
+
             switch (zoneEquipType) {
             case ZoneEquipType::AirDistributionUnit: { // 'ZoneHVAC:AirDistributionUnit'
                 // Air loop system availability manager status only applies to PIU and exhaust fans
@@ -3635,34 +3642,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             // If SpaceHVAC is active and this equipment has a space splitter, distribute the equipment output and update the spaces
             if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
                 zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
-                auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)];
-                for (auto &space : thisZeqSplitter.spaces) {
-                    Real64 spaceSysOutputProvided = SysOutputProvided * space.outputFraction;
-                    Real64 spaceLatOutputProvided = LatOutputProvided * space.outputFraction;
-                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(space.spaceIndex).NonAirSystemResponse +=
-                        NonAirSysOutput * space.outputFraction;
-                    if (thisZeqSplitter.zoneEquipOutletNodeNum > 0 && space.spaceNodeNum > 0) {
-                        auto &equipOutletNode = state.dataLoopNodes->Node(thisZeqSplitter.zoneEquipOutletNodeNum);
-                        auto &spaceInletNode = state.dataLoopNodes->Node(space.spaceNodeNum);
-                        spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * space.outputFraction;
-                        spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail * space.outputFraction;
-                        spaceInletNode.MassFlowRateMinAvail = equipOutletNode.MassFlowRateMinAvail * space.outputFraction;
-                        spaceInletNode.Temp = equipOutletNode.Temp;
-                        spaceInletNode.HumRat = equipOutletNode.HumRat;
-                        spaceInletNode.CO2 = equipOutletNode.CO2;
-                    }
-                    updateSystemOutputRequired(state,
-                                               ControlledZoneNum,
-                                               spaceSysOutputProvided,
-                                               spaceLatOutputProvided,
-                                               state.dataZoneEnergyDemand->spaceSysEnergyDemand(space.spaceIndex),
-                                               state.dataZoneEnergyDemand->spaceSysMoistureDemand(space.spaceIndex),
-                                               EquipTypeNum);
-                }
+                state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)].distributeOutput(
+                    state, ControlledZoneNum, SysOutputProvided, LatOutputProvided, NonAirSysOutput, EquipTypeNum);
             } else {
                 thisZoneHB.NonAirSystemResponse += NonAirSysOutput;
             }
-            // Space HVAC TODO: For now, update both spaces and zone, but ultimately update one or the other
+            // Space HVAC TODO: For now, update both spaces and zone, but maybe ultimately update one or the other
             updateSystemOutputRequired(state,
                                        ControlledZoneNum,
                                        SysOutputProvided,
@@ -4432,6 +4417,31 @@ void updateSystemOutputRequired(EnergyPlusData &state,
         ShowFatalError(state, "UpdateSystemOutputRequired: Illegal load distribution scheme type.");
         break;
     }
+}
+
+void adjustSystemOutputRequired(EnergyPlusData &state,
+                                int const ZoneNum,
+                                Real64 const sensibleRatio, // sensible load adjustment
+                                Real64 const latentRatio,   // latent load adjustment
+                                DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                                int const equipPriorityNum // index in PrioritySimOrder
+)
+{
+    // Adjust the zone energy demands for space thermostat control
+    energy.RemainingOutputRequired *= sensibleRatio;
+    energy.RemainingOutputReqToHeatSP *= sensibleRatio;
+    energy.RemainingOutputReqToCoolSP *= sensibleRatio;
+    moisture.RemainingOutputRequired *= latentRatio;
+    moisture.RemainingOutputReqToHumidSP *= latentRatio;
+    moisture.RemainingOutputReqToDehumidSP *= latentRatio;
+
+    energy.SequencedOutputRequired(equipPriorityNum) *= sensibleRatio;
+    energy.SequencedOutputRequiredToHeatingSP(equipPriorityNum) *= sensibleRatio;
+    energy.SequencedOutputRequiredToCoolingSP(equipPriorityNum) *= sensibleRatio;
+    moisture.SequencedOutputRequired(equipPriorityNum) *= latentRatio;
+    moisture.SequencedOutputRequiredToHumidSP(equipPriorityNum) *= latentRatio;
+    moisture.SequencedOutputRequiredToDehumidSP(equipPriorityNum) *= latentRatio;
 }
 
 void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)

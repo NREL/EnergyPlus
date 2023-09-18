@@ -68,6 +68,8 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::DataZoneEquipment {
 
@@ -1724,4 +1726,101 @@ void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spa
     spaceNode.MassFlowRateMin = zoneNode.MassFlowRateMin * frac;
     spaceNode.MassFlowRateMinAvail = zoneNode.MassFlowRateMinAvail * frac;
 }
+
+void ZoneEquipmentSplitter::adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum)
+{
+    auto &thisZoneEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
+    auto &thisZoneMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum);
+    Real64 sensibleRatio = 1.0;
+    Real64 latentRatio = 1.0;
+    switch (this->tstatControl) {
+    case DataZoneEquipment::ZoneEquipTstatControl::Ideal:
+        return; // Do nothing
+    case DataZoneEquipment::ZoneEquipTstatControl::SingleSpace:
+        sensibleRatio = state.dataZoneEnergyDemand->spaceSysEnergyDemand(this->controlSpaceIndex).RemainingOutputRequired /
+                        thisZoneEnergyDemand.RemainingOutputRequired;
+        latentRatio = state.dataZoneEnergyDemand->spaceSysMoistureDemand(this->controlSpaceIndex).RemainingOutputRequired /
+                      thisZoneMoistureDemand.RemainingOutputRequired;
+        break;
+    case DataZoneEquipment::ZoneEquipTstatControl::Maximum:
+        int maxSpaceIndex = 0;
+        Real64 maxDeltaTemp = 0.0; // Only positive deltaTemps are relevant
+        for (auto &splitterSpace : this->spaces) {
+            Real64 spaceTemp =
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(splitterSpace.spaceIndex).T1; // Based on calcPredictedSystemLoad usage
+            Real64 spaceDeltaTemp = max((state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum) - spaceTemp),
+                                        (spaceTemp - state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum)));
+            if (spaceDeltaTemp > maxDeltaTemp) {
+                maxSpaceIndex = splitterSpace.spaceIndex;
+                maxDeltaTemp = spaceDeltaTemp;
+            }
+        }
+        if (maxSpaceIndex > 0) {
+            sensibleRatio = state.dataZoneEnergyDemand->spaceSysEnergyDemand(maxSpaceIndex).RemainingOutputRequired /
+                            thisZoneEnergyDemand.RemainingOutputRequired;
+            latentRatio = state.dataZoneEnergyDemand->spaceSysMoistureDemand(maxSpaceIndex).RemainingOutputRequired /
+                          thisZoneMoistureDemand.RemainingOutputRequired;
+        }
+        break;
+    }
+    // Save unadjusted zone loads to restore later
+    this->saveZoneSysSensibleDemand = thisZoneEnergyDemand;
+    this->saveZoneSysMoistureDemand = thisZoneMoistureDemand;
+    // Apply zone load adjustment
+    ZoneEquipmentManager::adjustSystemOutputRequired(state,
+                                                     zoneNum,
+                                                     sensibleRatio,
+                                                     latentRatio,
+                                                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum),
+                                                     state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum),
+                                                     equipTypeNum);
+}
+
+void ZoneEquipmentSplitter::distributeOutput(EnergyPlusData &state,
+                                             int const zoneNum,
+                                             Real64 const sysOutputProvided,
+                                             Real64 const latOutputProvided,
+                                             Real64 const nonAirSysOutput,
+                                             int const equipTypeNum)
+{
+    for (auto &splitterSpace : this->spaces) {
+        if (this->tstatControl != DataZoneEquipment::ZoneEquipTstatControl::Ideal) {
+            // Restore zone loads to unadjusted values (for all ZoneEquipTstatControl types except Ideal)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum) = this->saveZoneSysSensibleDemand;
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum) = this->saveZoneSysMoistureDemand;
+        }
+
+        Real64 spaceFraction = splitterSpace.outputFraction;
+        if (this->tstatControl == DataZoneEquipment::ZoneEquipTstatControl::Ideal) {
+            // Proportion output by sensible space load / zone load (varies every timestep, overrides outputFraction)
+            spaceFraction = state.dataZoneEnergyDemand->spaceSysEnergyDemand(splitterSpace.spaceIndex).RemainingOutputRequired /
+                            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).RemainingOutputRequired;
+            // Restore zone loads to unadjusted values (for all ZoneEquipTstatControl types except Ideal)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum) = this->saveZoneSysSensibleDemand;
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum) = this->saveZoneSysMoistureDemand;
+        }
+
+        Real64 spaceSysOutputProvided = sysOutputProvided * spaceFraction;
+        Real64 spaceLatOutputProvided = latOutputProvided * spaceFraction;
+        state.dataZoneTempPredictorCorrector->spaceHeatBalance(splitterSpace.spaceIndex).NonAirSystemResponse += nonAirSysOutput * spaceFraction;
+        if (this->zoneEquipOutletNodeNum > 0 && splitterSpace.spaceNodeNum > 0) {
+            auto &equipOutletNode = state.dataLoopNodes->Node(this->zoneEquipOutletNodeNum);
+            auto &spaceInletNode = state.dataLoopNodes->Node(splitterSpace.spaceNodeNum);
+            spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * spaceFraction;
+            spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail * spaceFraction;
+            spaceInletNode.MassFlowRateMinAvail = equipOutletNode.MassFlowRateMinAvail * spaceFraction;
+            spaceInletNode.Temp = equipOutletNode.Temp;
+            spaceInletNode.HumRat = equipOutletNode.HumRat;
+            spaceInletNode.CO2 = equipOutletNode.CO2;
+        }
+        ZoneEquipmentManager::updateSystemOutputRequired(state,
+                                                         zoneNum,
+                                                         spaceSysOutputProvided,
+                                                         spaceLatOutputProvided,
+                                                         state.dataZoneEnergyDemand->spaceSysEnergyDemand(splitterSpace.spaceIndex),
+                                                         state.dataZoneEnergyDemand->spaceSysMoistureDemand(splitterSpace.spaceIndex),
+                                                         equipTypeNum);
+    }
+}
+
 } // namespace EnergyPlus::DataZoneEquipment
