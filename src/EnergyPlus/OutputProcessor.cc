@@ -4338,6 +4338,57 @@ namespace OutputProcessor {
 
 } // namespace OutputProcessor
 
+void SetupOutputVariable(EnergyPlusData &state,
+                         std::string_view const VariableName,              // String Name of variable (with units)
+                         OutputProcessor::Unit VariableUnit,               // Actual units corresponding to the actual variable
+                         Real64 &ActualVariable,                           // Actual Variable, used to set up pointer
+                         OutputProcessor::SOVTimeStepType TimeStepTypeKey, // Zone, HeatBalance=1, HVAC, System, Plant=2
+                         OutputProcessor::SOVStoreType VariableTypeKey,    // State, Average=1, NonState, Sum=2
+                         std::string_view const KeyedValue,                // Associated Key for this variable
+                         OutputProcessor::ReportingFrequency ReportFreq,   // Internal use -- causes reporting at this freqency
+                         Constant::eResource ResourceTypeKey,              // Meter Resource Type (Electricity, Gas, etc)
+                         Constant::EndUse EndUseKey,                       // Meter End Use Key (Lights, Heating, Cooling, etc)
+                         std::string_view const EndUseSubKey,              // Meter End Use Sub Key (General Lights, Task Lights, etc)
+                         std::string_view const GroupKey,                  // Meter Super Group Key (Building, System, Plant)
+                         std::string_view const ZoneKey,                   // Meter Zone Key (zone name)
+                         int const ZoneMult,                               // Zone Multiplier, defaults to 1
+                         int const ZoneListMult,                           // Zone List Multiplier, defaults to 1
+                         int const indexGroupKey,                          // Group identifier for SQL output
+                         std::string_view const customUnitName,            // the custom name for the units from EMS definition of units
+                         std::string_view const SpaceType                  // Space type (applicable for Building group only)
+)
+{
+    if (EndUseKey == Constant::EndUse::Invalid) {
+        // Severe warning message
+        ShowSevereError(state, "Invalid End Use Category Type.");
+    } else if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // maybe EachCall is valid
+    {
+        // Need to further consider if "EachCall" option is valid
+        ShowSevereError(state, "Invalid Reporting Frequency Type.");
+    } else if (ResourceTypeKey == Constant::eResource::Invalid) {
+        ShowSevereError(state, "Invalid Resource Type.");
+    } else {
+        SetupOutputVariable(state,
+                            VariableName,
+                            VariableUnit,
+                            ActualVariable,
+                            TimeStepTypeKey,
+                            VariableTypeKey,
+                            KeyedValue,
+                            OutputProcessor::ReportingFrequencyNames[static_cast<int>(ReportFreq)],
+                            Constant::eResourceNames[static_cast<int>(ResourceTypeKey)], // or eResourceNamesUC
+                            OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)],
+                            EndUseSubKey,
+                            GroupKey,
+                            ZoneKey,
+                            ZoneMult,
+                            ZoneListMult,
+                            indexGroupKey,
+                            customUnitName,
+                            SpaceType);
+    }
+}
+
 // TODO: Probably move these to a different location
 
 void SetupOutputVariable(EnergyPlusData &state,
