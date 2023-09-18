@@ -741,7 +741,7 @@ namespace ElectricBaseboardRadiator {
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-                    // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
+                    // Recalculate LoadMet with new ZeroBBSource... term and see if it is positive now.  If not, shut it down.
                     LoadMet = (state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state) - TempZeroBBSourceSumHATsurf) +
                               (QBBCap * elecBaseboard.FracConvect) + (RadHeat * elecBaseboard.FracDistribPerson);
                     if (LoadMet < 0.0) {
