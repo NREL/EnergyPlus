@@ -17178,6 +17178,16 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
         (PartLoadRatio > 0.0) && (OutdoorDryBulb > thisDXCoil.MinOATCompressor)) {
 
         TotCap = thisDXCoil.RatedTotCap(Mode);
+        HeatingCapacityMultiplier = 1.0;
+        // Modify total heating capacity based on defrost heating capacity multiplier
+        // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
+        if (present(MaxHeatCap)) {
+            TotCapAdj = min(MaxHeatCap, TotCap * HeatingCapacityMultiplier);
+            TotCap = min(MaxHeatCap, TotCap);
+        } else {
+            TotCapAdj = TotCap * HeatingCapacityMultiplier;
+        }
+
         QCoilReq = PartLoadRatio * TotCap;
         if (PartLoadRatio == 0.0) {
             AirMassFlowMin = state.dataHVACVarRefFlow->OACompOffMassFlow;
@@ -17217,18 +17227,8 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
 
         // Initializing defrost adjustment factors
         LoadDueToDefrost = 0.0;
-        HeatingCapacityMultiplier = 1.0;
         FractionalDefrostTime = 0.0;
         InputPowerMultiplier = 1.0;
-
-        // Modify total heating capacity based on defrost heating capacity multiplier
-        // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
-        if (present(MaxHeatCap)) {
-            TotCapAdj = min(MaxHeatCap, TotCap * HeatingCapacityMultiplier);
-            TotCap = min(MaxHeatCap, TotCap);
-        } else {
-            TotCapAdj = TotCap * HeatingCapacityMultiplier;
-        }
 
         // Calculate full load outlet conditions
         FullLoadOutAirEnth = InletAirEnthalpy + TotCapAdj / AirMassFlow;

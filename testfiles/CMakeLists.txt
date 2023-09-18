@@ -672,6 +672,7 @@ add_simulation_test(IDF_FILE VSHeatPumpWaterHeater.idf EPW_FILE USA_FL_Miami.Int
 add_simulation_test(IDF_FILE VSHeatPumpWaterToAirEquationFit.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE VSWaterHeaterHeatPumpStratifiedTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE VaryingLocationAndOrientation.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+add_simulation_test(IDF_FILE US+SF+CZ4A+hp+crawlspace+IECC_2006_VRF.idf EPW_FILE USA_NY_New.York-John.F.Kennedy.Intl.AP.744860_TMY3.epw)
 add_simulation_test(IDF_FILE VariableRefrigerantFlow_5Zone.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE VariableRefrigerantFlow_5Zone_wAirloop.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE VariableRefrigerantFlow_FluidTCtrl_5Zone.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
