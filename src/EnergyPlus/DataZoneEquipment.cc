@@ -65,6 +65,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -1725,6 +1726,46 @@ void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spa
     spaceNode.MassFlowRateMaxAvail = zoneNode.MassFlowRateMaxAvail * frac;
     spaceNode.MassFlowRateMin = zoneNode.MassFlowRateMin * frac;
     spaceNode.MassFlowRateMinAvail = zoneNode.MassFlowRateMinAvail * frac;
+}
+
+void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
+{
+    if (this->zoneEquipInletNodeNum == 0) return;
+
+    Real64 sumEnthalpy = 0.0;
+    Real64 sumHumRat = 0.0;
+    Real64 sumCO2 = 0.0;
+    Real64 sumPressure = 0.0;
+    Real64 sumFractions = 0.0;
+    auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
+    for (auto &mixerSpace : this->spaces) {
+        auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
+        sumEnthalpy += equipInletNode.Enthalpy * mixerSpace.outputFraction;
+        sumHumRat += equipInletNode.HumRat * mixerSpace.outputFraction;
+        sumCO2 += equipInletNode.CO2 * mixerSpace.outputFraction;
+        sumPressure += equipInletNode.Press * mixerSpace.outputFraction;
+        sumFractions += mixerSpace.outputFraction;
+    }
+    equipInletNode.Enthalpy = sumEnthalpy / sumFractions;
+    equipInletNode.HumRat = sumHumRat / sumFractions;
+    equipInletNode.CO2 = sumCO2 / sumFractions;
+    equipInletNode.Press = sumPressure / sumFractions;
+
+    // Use Enthalpy and humidity ratio to get outlet temperature from psych chart
+    equipInletNode.Temp = Psychrometrics::PsyTdbFnHW(equipInletNode.Enthalpy, equipInletNode.HumRat);
+}
+
+void ZoneEquipmentMixer::setInletFlows(EnergyPlusData &state)
+{
+    if (this->zoneEquipInletNodeNum == 0) return;
+
+    auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
+    for (auto &mixerSpace : this->spaces) {
+        auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
+        spaceOutletNode.MassFlowRate = equipInletNode.MassFlowRate * mixerSpace.outputFraction;
+        spaceOutletNode.MassFlowRateMaxAvail = equipInletNode.MassFlowRateMaxAvail * mixerSpace.outputFraction;
+        spaceOutletNode.MassFlowRateMinAvail = equipInletNode.MassFlowRateMinAvail * mixerSpace.outputFraction;
+    }
 }
 
 void ZoneEquipmentSplitter::adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum)

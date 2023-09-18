@@ -488,6 +488,10 @@ namespace DataZoneEquipment {
         int zoneEquipInletNodeNum = 0;
         DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
         std::vector<ZoneEquipSplitterMixerSpace> spaces;
+
+        void setOutletConditions(EnergyPlusData &state);
+
+        void ZoneEquipmentMixer::setInletFlows(EnergyPlusData &state);
     };
 
     struct ControlList

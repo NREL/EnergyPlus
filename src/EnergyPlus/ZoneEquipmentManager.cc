@@ -3189,6 +3189,13 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         }
     }
 
+    // If SpaceHVAC is active calculate SpaceHVAC:EquipmentMixer outlet conditions before simulating zone equipment
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing) {
+        for (auto &thisSpaceHVACMixer : state.dataZoneEquip->zoneEquipMixer) {
+            thisSpaceHVACMixer.setOutletConditions(state);
+        }
+    }
+
     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
 
         if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
@@ -3659,6 +3666,14 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             state.dataSize->CurTermUnitSizingNum = 0;
         } // zone equipment loop
     }     // End of controlled zone loop
+
+    // If SpaceHVAC is active calculate SpaceHVAC:EquipmentMixer inlet flow rates after simulating zone equipment
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing) {
+        for (auto &thisSpaceHVACMixer : state.dataZoneEquip->zoneEquipMixer) {
+            thisSpaceHVACMixer.setInletFlows(state);
+        }
+    }
+
     state.dataSize->CurZoneEqNum = 0;
     state.dataZoneEquipmentManager->FirstPassZoneEquipFlag = false;
 
