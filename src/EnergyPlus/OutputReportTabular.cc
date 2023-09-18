@@ -16462,8 +16462,8 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         if (kind == OutputType::AirLoop) {
             tableBody(1, 9) = RealToStr(curCompLoad.mixAirTemp, 2); // mixed air temperature - not for zone or facility
         }
-        tableBody(1, 10) = RealToStr(curCompLoad.mainFanAirFlow, 2);     // main fan air flow
-        tableBody(1, 11) = RealToStr(curCompLoad.outsideAirFlow, 2);     // outside air flow
+        tableBody(1, 10) = RealToStr(curCompLoad.mainFanAirFlow, 4);     // main fan air flow
+        tableBody(1, 11) = RealToStr(curCompLoad.outsideAirFlow, 4);     // outside air flow
         tableBody(1, 12) = RealToStr(curCompLoad.designPeakLoad, 2);     // design peak load
         tableBody(1, 13) = RealToStr(curCompLoad.diffDesignPeak, 2);     // difference between Design and Peak Load
         tableBody(1, 14) = RealToStr(curCompLoad.peakDesSensLoad, 2);    // Peak Design Sensible Load
