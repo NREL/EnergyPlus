@@ -136,20 +136,39 @@ namespace OutputProcessor {
 
     constexpr int N_WriteTimeStampFormatData(100);
 
-    static constexpr std::array<std::string_view, 14> endUseCategoryNames = {"HEATING",
-                                                                             "COOLING",
-                                                                             "INTERIORLIGHTS",
-                                                                             "EXTERIORLIGHTS",
-                                                                             "INTERIOREQUIPMENT",
-                                                                             "EXTERIOREQUIPMENT",
-                                                                             "FANS",
-                                                                             "PUMPS",
-                                                                             "HEATREJECTION",
-                                                                             "HUMIDIFIER",
-                                                                             "HEATRECOVERY",
-                                                                             "WATERSYSTEMS",
-                                                                             "REFRIGERATION",
-                                                                             "COGENERATION"};
+    enum class SOVendUseCategoryType
+    {
+        Invalid = -1,
+        Heating,
+        Cooling,
+        Interiorlights,
+        Exteriorlights,
+        Interiorequipment,
+        Exteriorequipment,
+        Fans,
+        Pumps,
+        Heatrejection,
+        Humidifier,
+        Heatrecovery,
+        Watersystems,
+        Refrigeration,
+        Cogeneration,
+        Num
+    };
+    static constexpr std::array<std::string_view, (int)SOVendUseCategoryType::Num> endUseCategoryNames = {"HEATING",
+                                                                                                          "COOLING",
+                                                                                                          "INTERIORLIGHTS",
+                                                                                                          "EXTERIORLIGHTS",
+                                                                                                          "INTERIOREQUIPMENT",
+                                                                                                          "EXTERIOREQUIPMENT",
+                                                                                                          "FANS",
+                                                                                                          "PUMPS",
+                                                                                                          "HEATREJECTION",
+                                                                                                          "HUMIDIFIER",
+                                                                                                          "HEATRECOVERY",
+                                                                                                          "WATERSYSTEMS",
+                                                                                                          "REFRIGERATION",
+                                                                                                          "COGENERATION"};
 
     constexpr int RVarAllocInc(1000);
     constexpr int LVarAllocInc(1000);
