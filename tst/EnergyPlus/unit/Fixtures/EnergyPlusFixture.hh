@@ -59,7 +59,6 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <ostream>
 
 namespace EnergyPlus {
@@ -281,9 +280,6 @@ protected:
         // function, and it will programmatically replace them with strings.  You can then do asserts as needed.
         std::replace(stringLiteral.begin(), stringLiteral.end(), '|', ' '); // replace the trailing || with spaces
     }
-
-    // InputProcessor::schema is private, so re-expose it to the tests deriving EnergyPlusFixture
-    static const nlohmann::json &schema();
 
 public:
     EnergyPlusData *state;

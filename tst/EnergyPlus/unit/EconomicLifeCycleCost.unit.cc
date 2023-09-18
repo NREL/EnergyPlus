@@ -62,6 +62,8 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+#include <nlohmann/json.hpp>
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicLifeCycleCost;
 using namespace EnergyPlus::EconomicTariff;
@@ -589,11 +591,10 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecognized)
 {
-
-    const auto &schema = EnergyPlusFixture::schema();
-    const auto &lcc_useprice = schema["properties"]["LifeCycleCost:UsePriceEscalation"];
-    const auto &resource_field = lcc_useprice["patternProperties"][".*"]["properties"]["resource"];
-    const auto &enum_values = resource_field["enum"];
+    using json = nlohmann::json;
+    const json &lcc_useprice_props = state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, "LifeCycleCost:UsePriceEscalation");
+    const json &resource_field = lcc_useprice_props.at("resource");
+    const json &enum_values = resource_field.at("enum");
 
     // Should support all fuels + Water + ElectricityXXX (Purchased, Produced, SurplusSold, Net)
     constexpr size_t numResources = static_cast<size_t>(Constant::eFuel::Num) + 5;
