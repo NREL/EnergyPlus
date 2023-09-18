@@ -1892,7 +1892,6 @@ void ZoneEquipmentSplitter::adjustLoads(EnergyPlusData &state, int zoneNum, int 
     this->saveZoneSysMoistureDemand = thisZoneMoistureDemand;
     // Apply zone load adjustment
     ZoneEquipmentManager::adjustSystemOutputRequired(state,
-                                                     zoneNum,
                                                      sensibleRatio,
                                                      latentRatio,
                                                      state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum),

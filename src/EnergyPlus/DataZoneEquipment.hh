@@ -495,7 +495,7 @@ namespace DataZoneEquipment {
 
         void setOutletConditions(EnergyPlusData &state);
 
-        void ZoneEquipmentMixer::setInletFlows(EnergyPlusData &state);
+        void setInletFlows(EnergyPlusData &state);
     };
 
     struct ControlList

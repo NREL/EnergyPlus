@@ -196,12 +196,11 @@ namespace ZoneEquipmentManager {
     );
 
     void adjustSystemOutputRequired(EnergyPlusData &state,
-                                    int const ZoneNum,
                                     Real64 const sensibleRatio, // sensible load adjustment
-                                    Real64 const latentRatio, // latent load adjustment
+                                    Real64 const latentRatio,   // latent load adjustment
                                     DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
                                     DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
-                                    int const EquipPriorityNum // index in PrioritySimOrder
+                                    int const equipPriorityNum // index in PrioritySimOrder
     );
 
     void CalcZoneMassBalance(EnergyPlusData &state, bool FirstHVACIteration);
