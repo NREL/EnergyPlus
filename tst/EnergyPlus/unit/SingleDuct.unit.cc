@@ -884,6 +884,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "    ,                      !- Evaporative Condenser Air Flow Rate",
         "    ,                      !- Evaporative Condenser Pump Rated Power Consumption",
         "    0.0,                   !- Crankcase Heater Capacity",
+        "    ,                      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "  Coil:Heating:Fuel,",
@@ -2021,7 +2022,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "    HeatSys1 Supply Equipment Outlet Node, !- Boiler Water Outlet Node Name",
         "    95.0,                    !- Water Outlet Upper Temperature Limit{ C }",
         "    LeavingSetpointModulated, !- Boiler Flow Mode",
-        "    0.0000,                  !- Parasitic Electric Load{ W }",
+        "    0.0000,                  !- On Cycle Parasitic Electric Load{ W }",
         "    0.3000;                  !- Sizing Factor",
 
         "  Curve:Cubic,",
@@ -2097,6 +2098,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "    ,                        !- Evaporative Condenser Air Flow Rate",
         "    ,                        !- Evaporative Condenser Pump Rated Power Consumption",
         "    0.0,                     !- Crankcase Heater Capacity",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "    10.0;                    !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "  Coil:Heating:Fuel,",

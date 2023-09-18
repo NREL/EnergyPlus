@@ -830,7 +830,7 @@ TEST_F(ConvectionCoefficientsFixture, initIntConvCoeffAdjRatio)
     state->dataHeatBalSurf->SurfTempInTmp.dimension(7, 20.0);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.006;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.006;
     state->dataHeatBalSurf->SurfHConvInt.allocate(7);
     state->dataHeatBalSurf->SurfHConvInt(7) = 0.0;
 

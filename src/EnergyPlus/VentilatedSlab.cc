@@ -1515,7 +1515,6 @@ namespace VentilatedSlab {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadNum;         // Number of the radiant system (DO loop counter)
-        int RadSurfNum;     // Number of the radiant system surface (DO loop counter)
         int SurfNum;        // Intermediate variable for keeping track of the surface number
         int ZoneNum;        // Intermediate variable for keeping track of the zone number
         int AirRelNode;     // relief air node number in Ventilated Slab loop
@@ -1539,19 +1538,18 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->MySizeFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             state.dataVentilatedSlab->MyPlantScanFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             state.dataVentilatedSlab->MyZoneEqFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataVentilatedSlab->QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastTimeStepSys.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-            // Initialize total areas for all radiant systems
-            for (RadNum = 1; RadNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++RadNum) {
-                state.dataVentilatedSlab->VentSlab(RadNum).TotalSurfaceArea = 0.0;
-                for (SurfNum = 1; SurfNum <= state.dataVentilatedSlab->VentSlab(RadNum).NumOfSurfaces; ++SurfNum) {
-                    state.dataVentilatedSlab->VentSlab(RadNum).TotalSurfaceArea +=
-                        state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(RadNum).SurfacePtr(SurfNum)).Area;
+            // Initialize total areas for all radiant systems and dimension record keeping arrays
+            for (auto &thisVentSlab : state.dataVentilatedSlab->VentSlab) {
+                thisVentSlab.TotalSurfaceArea = 0.0;
+                int numRadSurfs = thisVentSlab.NumOfSurfaces;
+                for (SurfNum = 1; SurfNum <= numRadSurfs; ++SurfNum) {
+                    thisVentSlab.TotalSurfaceArea += state.dataSurface->Surface(thisVentSlab.SurfacePtr(SurfNum)).Area;
                 }
+                thisVentSlab.QRadSysSrcAvg.dimension(numRadSurfs, 0.0);
+                thisVentSlab.LastQRadSysSrc.dimension(numRadSurfs, 0.0);
+                thisVentSlab.LastSysTimeElapsed = 0.0;
+                thisVentSlab.LastTimeStepSys = 0.0;
             }
             state.dataVentilatedSlab->MyEnvrnFlag = true;
             state.dataVentilatedSlab->MySizeFlag = true;
@@ -1631,18 +1629,17 @@ namespace VentilatedSlab {
             OutsideAirNode = ventSlab.OutsideAirNode;
             RhoAir = state.dataEnvrn->StdRhoAir;
 
-            // Radiation Panel Part
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf = 0.0;
-            state.dataVentilatedSlab->QRadSysSrcAvg = 0.0;
-            state.dataVentilatedSlab->LastQRadSysSrc = 0.0;
-            state.dataVentilatedSlab->LastSysTimeElapsed = 0.0;
-            state.dataVentilatedSlab->LastTimeStepSys = 0.0;
             if (state.dataVentilatedSlab->NumOfVentSlabs > 0) {
                 for (auto &e : state.dataVentilatedSlab->VentSlab) {
+                    e.ZeroVentSlabSourceSumHATsurf = 0.0;
                     e.RadHeatingPower = 0.0;
                     e.RadHeatingEnergy = 0.0;
                     e.RadCoolingPower = 0.0;
                     e.RadCoolingEnergy = 0.0;
+                    e.QRadSysSrcAvg = 0.0;
+                    e.LastQRadSysSrc = 0.0;
+                    e.LastSysTimeElapsed = 0.0;
+                    e.LastTimeStepSys = 0.0;
                 }
             }
 
@@ -1768,18 +1765,12 @@ namespace VentilatedSlab {
 
             // The first pass through in a particular time step
             ZoneNum = ventSlab.ZonePtr;
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf(ZoneNum) =
+            ventSlab.ZeroVentSlabSourceSumHATsurf =
                 state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
-            for (RadSurfNum = 1; RadSurfNum <= ventSlab.NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = ventSlab.SurfacePtr(RadSurfNum);
-                state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
-                state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) =
-                    0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) =
-                    0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                state.dataVentilatedSlab->LastTimeStepSys(SurfNum) =
-                    0.0; // At the start of a time step, reset to zero so average calculation can begin again
-            }
+            ventSlab.QRadSysSrcAvg = 0.0;                           // Initialize this variable to zero (radiant system defaults to off)
+            ventSlab.LastQRadSysSrc = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+            ventSlab.LastSysTimeElapsed = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+            ventSlab.LastTimeStepSys = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
         }
     }
 
@@ -2815,8 +2806,8 @@ namespace VentilatedSlab {
             break;
         }
         case ControlType::DewPointTemp: {
-            SetPointTemp = PsyTdpFnWPb(
-                state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZonePtr).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+            SetPointTemp =
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZonePtr).airHumRat, state.dataEnvrn->OutBaroPress);
             break;
         }
         default: {              // Should never get here
@@ -3915,7 +3906,7 @@ namespace VentilatedSlab {
                     // conditions.
 
                     if (state.dataVentilatedSlab->OperatingMode == CoolingMode) {
-                        DewPointTemp = PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+                        DewPointTemp = PsyTdpFnWPb(state, thisZoneHB.airHumRat, state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= ventSlab.NumOfSurfaces; ++RadSurfNum2) {
                             if (state.dataHeatBalSurf->SurfInsideTempHist(1)(ventSlab.SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system
@@ -4168,7 +4159,7 @@ namespace VentilatedSlab {
 
                     if (state.dataVentilatedSlab->OperatingMode == CoolingMode) {
                         DewPointTemp = PsyTdpFnWPb(state,
-                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZPtr(RadSurfNum)).ZoneAirHumRat,
+                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZPtr(RadSurfNum)).airHumRat,
                                                    state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= ventSlab.NumOfSurfaces; ++RadSurfNum2) {
                             if (state.dataHeatBalSurf->SurfInsideTempHist(1)(ventSlab.SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
@@ -4482,22 +4473,17 @@ namespace VentilatedSlab {
 
             SurfNum = ventSlab.SurfacePtr(RadSurfNum);
 
-            if (state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) == SysTimeElapsed) {
-                // Still iterating or reducing system time step, so subtract old values which were
-                // not valid
-                state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) -= state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) *
-                                                                    state.dataVentilatedSlab->LastTimeStepSys(SurfNum) /
-                                                                    state.dataGlobal->TimeStepZone;
+            if (ventSlab.LastSysTimeElapsed == SysTimeElapsed) {
+                // Still iterating or reducing system time step, so subtract old values which were not valid
+                ventSlab.QRadSysSrcAvg(RadSurfNum) -= ventSlab.LastQRadSysSrc(RadSurfNum) * ventSlab.LastTimeStepSys / state.dataGlobal->TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
-            state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) +=
-                state.dataHeatBalFanSys->QRadSysSource(SurfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
-
-            state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) = state.dataHeatBalFanSys->QRadSysSource(SurfNum);
-            state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) = SysTimeElapsed;
-            state.dataVentilatedSlab->LastTimeStepSys(SurfNum) = TimeStepSys;
+            ventSlab.QRadSysSrcAvg(RadSurfNum) += state.dataHeatBalFanSys->QRadSysSource(SurfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+            ventSlab.LastQRadSysSrc(RadSurfNum) = state.dataHeatBalFanSys->QRadSysSource(SurfNum);
         }
+        ventSlab.LastSysTimeElapsed = SysTimeElapsed;
+        ventSlab.LastTimeStepSys = TimeStepSys;
 
         // First sum up all of the heat sources/sinks associated with this system
         TotalHeatSource = 0.0;

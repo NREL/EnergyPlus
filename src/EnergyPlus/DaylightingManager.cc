@@ -5966,7 +5966,7 @@ void manageDaylighting(EnergyPlusData &state)
                     DayltgInterReflIllFrIntWins(state, enclNum);
                     for (int daylightCtrlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
                         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, enclNum);
+                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, daylightCtrlNum);
                     }
                 }
             }
@@ -9889,7 +9889,7 @@ void DayltgSetupAdjZoneListsAndPointers(EnergyPlusData &state)
                                 surfWinAdj.BackLumFromWinAtRefPt.allocate(thisEnclNumRefPoints);
                                 surfWinAdj.SourceLumFromWinAtRefPt.allocate(thisEnclNumRefPoints);
 
-                                for (int iRefPt = 1; iRefPt < (int)surfWinAdj.IllumFromWinAtRefPt.size1(); ++iRefPt) {
+                                for (int iRefPt = 1; iRefPt < (int)surfWinAdj.IllumFromWinAtRefPt.size(); ++iRefPt) {
                                     surfWinAdj.IllumFromWinAtRefPt(iRefPt) = {0.0, 0.0};
                                     surfWinAdj.BackLumFromWinAtRefPt(iRefPt) = {0.0, 0.0};
                                     surfWinAdj.SourceLumFromWinAtRefPt(iRefPt) = {0.0, 0.0};

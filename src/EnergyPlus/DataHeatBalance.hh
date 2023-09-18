@@ -453,6 +453,9 @@ namespace DataHeatBalance {
         Real64 ExtGrossWallArea = 0.0;                  // Exterior Wall Area for Zone (Gross)
         Real64 ExteriorTotalSurfArea = 0.0;             // Total surface area of all exterior surfaces for Zone
         int SystemZoneNodeNumber = 0;                   // This is the zone or space node number for the system for a controlled zone
+        Real64 FloorArea = 0.0;                         // Floor area used for this space
+        Real64 TotOccupants = 0.0;                      // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
+        bool IsControlled = false;                      // True when this is a controlled zone or space.
     };
 
     struct SpaceData : ZoneSpaceData
@@ -464,7 +467,6 @@ namespace DataHeatBalance {
         EPVector<std::string> tags;                            // Optional tags for reporting
         EPVector<int> surfaces;                                // Pointers to surfaces in this space
         Real64 calcFloorArea = 0.0;                            // Calculated floor area used for this space
-        Real64 floorArea = 0.0;                                // Floor area used for this space
         bool hasFloor = false;                                 // Has "Floor" surface
         Real64 fracZoneFloorArea = 0.0;                        // fraction of total floor area for all spaces in zone
         Real64 fracZoneVolume = 0.0;                           // fraction of total volume for all spaces in zone
@@ -472,7 +474,6 @@ namespace DataHeatBalance {
         Real64 totalSurfArea = 0.0;                            // Total surface area for space
         int radiantEnclosureNum = 0;                           // Radiant exchange enclosure this space belongs to
         int solarEnclosureNum = 0;                             // Solar distribution enclosure this space belongs to
-        Real64 totOccupants = 0.0;     // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
         Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
         Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
@@ -579,7 +580,6 @@ namespace DataHeatBalance {
         // 2=Plenum Zone, 11=Solar Wall, 12=Roof Pond
         Real64 UserEnteredFloorArea = Constant::AutoCalculate; // User input floor area for this zone
         // Calculated after input
-        Real64 FloorArea = 0.0;            // Floor area used for area based internal gains and outputs
         Real64 CalcFloorArea = 0.0;        // Calculated floor area excluding air boundary surfaces
         Real64 geometricFloorArea = 0.0;   // Calculated floor area including air boundary surfaces
         Real64 CeilingArea = 0.0;          // Ceiling area excluding air boundary surfaces
@@ -598,7 +598,6 @@ namespace DataHeatBalance {
         Real64 ExteriorTotalGroundSurfArea = 0.0;                  // Total surface area of all surfaces for Zone with ground contact
         Real64 ExtGrossGroundWallArea = 0.0;                       // Ground contact Wall Area for Zone (Gross)
         Real64 ExtGrossGroundWallArea_Multiplied = 0.0;            // Ground contact Wall Area for Zone (Gross) with multipliers
-        bool IsControlled = false;                                 // True when this is a controlled zone.
         bool IsSupplyPlenum = false;                               // True when this zone is a supply plenum
         bool IsReturnPlenum = false;                               // True when this zone is a return plenum
         int PlenumCondNum = 0;                                     // Supply or return plenum conditions number, 0 if this is not a plenum zone
@@ -643,7 +642,6 @@ namespace DataHeatBalance {
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified
         bool isNominalControlled = false;        // has Controlled Zone Equip Configuration reference
-        Real64 TotOccupants = 0.0;               // total design occupancy (sum of NumberOfPeople for the zone People objects, not multiplied)
         Real64 minOccupants = 0.0;               // minimum occupancy (sum of NomMinNumberPeople for the zone People objects, not multiplied)
         Real64 maxOccupants = 0.0;               // maximum occupancy (sum of NomMaxNumberPeople for the zone People objects, not multiplied)
         int AirHBimBalanceErrIndex = 0;          // error management counter
@@ -692,9 +690,8 @@ namespace DataHeatBalance {
         Real64 delta_T = 0.0;                               // Indoor and outdoor temperature
         Real64 delta_HumRat = 0.0;                          // Indoor and outdoor humidity ratio delta
 
-        Real64 ZeroSourceSumHATsurf = 0.0; // From Chilled Ceiling Panel, equal to the SumHATsurf for all the walls in a zone with no source
-        bool zoneOAQuadratureSum = false;  // True when zone OA balance method is Quadrature
-        int zoneOABalanceIndex = 0;        // Index to ZoneAirBalance for this zone, if any
+        bool zoneOAQuadratureSum = false; // True when zone OA balance method is Quadrature
+        int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
 
         // Spaces
         bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
@@ -1728,8 +1725,8 @@ namespace DataHeatBalance {
         Real64 SteamLostRate = 0.0;
         Real64 SteamTotGainRate = 0.0;
         // Other Equipment
-        Real64 OtherPower = 0.0;
-        Real64 OtherConsump = 0.0;
+        std::array<Real64, (int)ExteriorEnergyUse::ExteriorFuelUsage::Num> OtherPower;
+        std::array<Real64, (int)ExteriorEnergyUse::ExteriorFuelUsage::Num> OtherConsump;
         Real64 OtherRadGain = 0.0;
         Real64 OtherConGain = 0.0;
         Real64 OtherLatGain = 0.0;
