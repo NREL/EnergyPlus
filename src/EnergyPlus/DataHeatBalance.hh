@@ -897,7 +897,6 @@ namespace DataHeatBalance {
         std::string EndUseSubcategory;                                 // user defined name for the end use category
         std::string otherEquipFuelTypeString;                          // Fuel Type string for Other Equipment
         Constant::eFuel OtherEquipFuelType = Constant::eFuel::Invalid; // Fuel Type Number of the Other Equipment
-        bool OtherEquipFuelTypeNone = false;                           // Flag for Fuel Type = "None"
     };
 
     struct ExtVentedCavityStruct

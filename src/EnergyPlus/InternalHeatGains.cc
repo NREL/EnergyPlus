@@ -2662,8 +2662,7 @@ namespace InternalHeatGains {
 
                     std::string FuelTypeString("");
                     if (IHGAlphas(2) == "NONE") {
-                        thisZoneOthEq.OtherEquipFuelType = Constant::eFuel::Invalid;
-                        thisZoneOthEq.OtherEquipFuelTypeNone = true;
+                        thisZoneOthEq.OtherEquipFuelType = Constant::eFuel::None;
                         FuelTypeString = IHGAlphas(2);
                     } else {
                         thisZoneOthEq.OtherEquipFuelType = static_cast<Constant::eFuel>(getEnumValue(Constant::eFuelNamesUC, IHGAlphas(2)));
@@ -2681,7 +2680,7 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                         thisZoneOthEq.otherEquipFuelTypeString = FuelTypeString; // Save for output variable setup later
-                        // Build list of fuel types used in each zone and space (excluding None and Water)
+                        // Build list of fuel types used in each zone and space (excluding Water)
                         bool found = false;
                         for (Constant::eFuel fuelType : state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums) {
                             if (thisZoneOthEq.OtherEquipFuelType == fuelType) {
@@ -2821,7 +2820,7 @@ namespace InternalHeatGains {
 
                     // Throw an error if the design level is negative and we have a fuel type
                     if (thisZoneOthEq.DesignLevel < 0.0 && thisZoneOthEq.OtherEquipFuelType != Constant::eFuel::Invalid &&
-                        !(thisZoneOthEq.OtherEquipFuelTypeNone)) {
+                        thisZoneOthEq.OtherEquipFuelType != Constant::eFuel::None) {
                         ShowSevereError(state,
                                         format("{}{}=\"{}\", {} is not allowed to be negative",
                                                RoutineName,
@@ -6133,7 +6132,7 @@ namespace InternalHeatGains {
             addZoneOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).ZonePtr) = true;
             addSpaceOutputs(state.dataHeatBal->ZoneOtherEq(othEqNum).spaceIndex) = true;
             if (state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != Constant::eFuel::Invalid &&
-                !(state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelTypeNone)) {
+                state.dataHeatBal->ZoneOtherEq(othEqNum).OtherEquipFuelType != Constant::eFuel::None) {
                 std::string fuelTypeString = state.dataHeatBal->ZoneOtherEq(othEqNum).otherEquipFuelTypeString;
                 SetupOutputVariable(state,
                                     "Other Equipment " + fuelTypeString + " Rate",
@@ -6239,7 +6238,7 @@ namespace InternalHeatGains {
             if (addZoneOutputs(zoneNum)) {
                 for (size_t i = 0; i < state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums.size(); ++i) {
                     Constant::eFuel fuelType = state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNums[i];
-                    if (fuelType == Constant::eFuel::Invalid) continue;
+                    if (fuelType == Constant::eFuel::Invalid || fuelType == Constant::eFuel::None) continue;
 
                     SetupOutputVariable(state,
                                         "Zone Other Equipment " + state.dataHeatBal->Zone(zoneNum).otherEquipFuelTypeNames[i] + " Rate",
@@ -6337,7 +6336,7 @@ namespace InternalHeatGains {
             if (addSpaceOutputs(spaceNum)) {
                 for (size_t i = 0; i < state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums.size(); ++i) {
                     Constant::eFuel fuelType = state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNums[i];
-                    if (fuelType == Constant::eFuel::Invalid) continue;
+                    if (fuelType == Constant::eFuel::Invalid || fuelType == Constant::eFuel::None) continue;
 
                     SetupOutputVariable(state,
                                         "Space Other Equipment " + state.dataHeatBal->space(spaceNum).otherEquipFuelTypeNames[i] + " Rate",
