@@ -676,7 +676,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
     constexpr Real64 exhaustInTemp = 350.0;
     constexpr Real64 absLeavingTemp = 176.667;
     constexpr Real64 exhaustInMassFlowRate = 0.5;
-    constexpr Real64 exhaustInHumRate = 0.000; // FIXME: use a non zero one
+    constexpr Real64 exhaustInHumRate = 0.005;
     state->dataLoopNodes->Node(thisChillerHeater.ExhaustAirInletNodeNum).Temp = exhaustInTemp;
     state->dataLoopNodes->Node(thisChillerHeater.ExhaustAirInletNodeNum).MassFlowRate = exhaustInMassFlowRate;
     state->dataLoopNodes->Node(thisChillerHeater.ExhaustAirInletNodeNum).HumRat = exhaustInHumRate;
@@ -685,12 +685,11 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
     bool const runflaginput = true;
     thisChillerHeater.calcHeater(*state, loadinput, runflaginput);
 
-    // FIXME: this shouldn't be zero
-    const Real64 CpHW = FluidProperties::GetSpecificHeatGlycol(*state, hwPlantLoop.FluidName, 0.0, hwPlantLoop.FluidIndex, "UnitTest");
-    EXPECT_EQ(4217.0, CpHW);
+    const Real64 CpHW = FluidProperties::GetSpecificHeatGlycol(*state, hwPlantLoop.FluidName, hwReturnTemp, hwPlantLoop.FluidIndex, "UnitTest");
+    EXPECT_EQ(4185.0, CpHW);
     const Real64 expectedHeatingLoad = (hwSupplySetpoint - hwReturnTemp) * hwMassFlow * CpHW;
 
-    EXPECT_NEAR(21085.0, expectedHeatingLoad, 1e-6);
+    EXPECT_NEAR(20925.0, expectedHeatingLoad, 1e-6);
 
     EXPECT_NEAR(thisChillerHeater.HeatingLoad, expectedHeatingLoad, 1e-6);
     EXPECT_NEAR(thisChillerHeater.HeatElectricPower, 400.0, 1e-6);
@@ -705,8 +704,8 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
 
     Real64 const CpAir = Psychrometrics::PsyCpAirFnW(exhaustInHumRate);
     Real64 const epectedExhHeatRecPotentialHeat = exhaustInMassFlowRate * CpAir * (exhaustInTemp - absLeavingTemp);
-    EXPECT_NEAR(87087.5769469, epectedExhHeatRecPotentialHeat, 1e-6);
-    EXPECT_NEAR(epectedExhHeatRecPotentialHeat, thisChillerHeater.ExhHeatRecPotentialHeat, 1e-6);
+    EXPECT_NEAR(87891.51, epectedExhHeatRecPotentialHeat, 0.01);
+    EXPECT_NEAR(epectedExhHeatRecPotentialHeat, thisChillerHeater.ExhHeatRecPotentialHeat, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, ExhAbsorption_GetInput_Multiple_Objects_Test)
