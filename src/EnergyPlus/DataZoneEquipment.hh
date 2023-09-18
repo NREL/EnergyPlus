@@ -206,7 +206,8 @@ namespace DataZoneEquipment {
     enum class SpaceEquipSizingBasis
     {
         Invalid = -1,
-        DesignLoad,
+        DesignCoolingLoad,
+        DesignHeatingLoad,
         FloorArea,
         Volume,
         PerimeterLength,
@@ -453,22 +454,28 @@ namespace DataZoneEquipment {
 
     struct ZoneEquipSplitterMixerSpace
     {
-        int spaceIndex = 0;          // Index to a space
-        Real64 outputFraction = 0.0; // Fraction of equipment output (either flow or heating/cooling) to this space
-        int spaceNodeNum = 0;        // Space Inlet Node number (zero if not airflow equipment)
+        int spaceIndex = 0;    // Index to a space
+        Real64 fraction = 0.0; // Fraction of equipment output or flow for this space
+        int spaceNodeNum = 0;  // Space Inlet Node number (zero if not airflow equipment)
     };
 
-    struct ZoneEquipmentSplitter
+    struct ZoneEquipmentSplitterMixer
     {
         std::string Name;
+        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
+        std::vector<ZoneEquipSplitterMixerSpace> spaces;
+
+        void size(EnergyPlusData &state);
+    };
+
+    struct ZoneEquipmentSplitter : ZoneEquipmentSplitterMixer
+    {
         DataZoneEquipment::ZoneEquipType equipType = DataZoneEquipment::ZoneEquipType::Invalid;
         std::string equipName;
         int zoneEquipOutletNodeNum = 0;
         DataZoneEquipment::ZoneEquipTstatControl tstatControl = DataZoneEquipment::ZoneEquipTstatControl::Invalid;
         int controlSpaceIndex = 0; // Index to a space for the thermostat control space
         Real64 controlSpaceFraction = 1.0;
-        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
-        std::vector<ZoneEquipSplitterMixerSpace> spaces;
         DataZoneEnergyDemands::ZoneSystemSensibleDemand saveZoneSysSensibleDemand; // Save unadjusted zone sensible loads
         DataZoneEnergyDemands::ZoneSystemMoistureDemand saveZoneSysMoistureDemand; // Save unadjusted zone moisture loads
 
@@ -482,12 +489,9 @@ namespace DataZoneEquipment {
         void adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum);
     };
 
-    struct ZoneEquipmentMixer
+    struct ZoneEquipmentMixer : ZoneEquipmentSplitterMixer
     {
-        std::string Name;
         int zoneEquipInletNodeNum = 0;
-        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
-        std::vector<ZoneEquipSplitterMixerSpace> spaces;
 
         void setOutletConditions(EnergyPlusData &state);
 
