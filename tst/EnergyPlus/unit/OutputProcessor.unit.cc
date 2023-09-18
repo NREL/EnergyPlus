@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -67,7 +68,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/General.hh>
 
 using namespace EnergyPlus::PurchasedAirManager;
 using namespace EnergyPlus::WeatherManager;
@@ -5360,7 +5360,6 @@ namespace OutputProcessor {
                 "2,999.0",
             },
             "\n"));
-
     }
 
     TEST_F(EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
