@@ -703,9 +703,9 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
     EXPECT_NEAR(thisChillerHeater.ExhaustInFlow, 0.5, 1e-6);
 
     Real64 const CpAir = Psychrometrics::PsyCpAirFnW(exhaustInHumRate);
-    Real64 const epectedExhHeatRecPotentialHeat = exhaustInMassFlowRate * CpAir * (exhaustInTemp - absLeavingTemp);
-    EXPECT_NEAR(87891.51, epectedExhHeatRecPotentialHeat, 0.01);
-    EXPECT_NEAR(epectedExhHeatRecPotentialHeat, thisChillerHeater.ExhHeatRecPotentialHeat, 0.01);
+    Real64 const expectedExhHeatRecPotentialHeat = exhaustInMassFlowRate * CpAir * (exhaustInTemp - absLeavingTemp);
+    EXPECT_NEAR(87891.51, expectedExhHeatRecPotentialHeat, 0.01);
+    EXPECT_NEAR(expectedExhHeatRecPotentialHeat, thisChillerHeater.ExhHeatRecPotentialHeat, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, ExhAbsorption_GetInput_Multiple_Objects_Test)
