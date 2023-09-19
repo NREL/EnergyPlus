@@ -79,6 +79,8 @@ cmake-build-*
 .vs
 .vscode
 CMakeSettings.json
+CMakeCache.txt
+CMakeFiles/
 
 # vim temp file:
 *.swp

@@ -784,6 +784,12 @@ int year(EnergyPlusState state)
     return thisState->dataEnvrn->Year;
 }
 
+int calendarYear(EnergyPlusState state)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataGlobal->CalendarYear;
+}
+
 int month(EnergyPlusState state)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);

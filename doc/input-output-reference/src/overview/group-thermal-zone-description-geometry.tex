@@ -3114,7 +3114,7 @@ These ``inside face solar radiation heat gain'' output variables describe the he
 
 \subsubsection{Surface Inside Face Lights Radiation Heat Gain Energy {[}J{]}}\label{surface-inside-face-lights-radiation-heat-gain-energy-j}
 
-These ``inside face lights radiation heat gain'' output variables describe the heat transferred by shortwave radiation onto the inside face. The values are always positive and indicate heat is being added to the surface's face by shortwave radiation that emanated from electric lighting equipment and was absorbed by the surface. Different versions of the report are available including the basic heat gain rate (W), and a per unit area flux (W/m2), and an energy version (J).
+These ``inside face lights radiation heat gain'' output variables describe the heat transferred by shortwave radiation onto the inside face. The values are always positive and indicate heat is being added to the surface's face by shortwave radiation that emanated from electric lighting equipment and was absorbed by the surface. Note that this includes light from other zones that are transmitted through interzone windows. Different versions of the report are available including the basic heat gain rate (W), and a per unit area flux (W/m2), and an energy version (J).
 
 \subsubsection{Surface Inside Face Internal Gains Radiation Heat Gain Rate {[}W{]}}\label{surface-inside-face-internal-gains-radiation-heat-gain-rate-w}
 
@@ -3341,7 +3341,7 @@ The following variables apply only to opaque surfaces, where an opaque surface i
 
 These ``inside face conduction'' output variables describe heat flow by conduction right at the inside face of an opaque heat transfer surface. A positive value means that the conduction is from just inside the inside face toward the inside face. A negative value means that the conduction is from the inside face into the core of the heat transfer surface.
 
-Note that Inside Face Conduction, when positive, does \textbf{not} indicate the heat flow from the surface to the zone air, which is governed by the inside face convection coefficient and the difference in temperature between the inside face and the zone air.
+Note that Inside Face Conduction, when positive, does \textbf{not} necessarily indicate the heat flow from the surface to the zone air, which is governed by the inside face convection coefficient, the difference in temperature between the inside face and the zone air, and various radiation terms due to solar, internal gains, and radiant exchange with other surfaces in the zone.
 
 Different versions of the reports are available. The basic heat gain rate (W) and a per unit area flux (W/m\(^{2}\)) can have positive or negative values with the sign convention that positive indicates heat flowing toward the face itself. There are also directed ``gain'' and ``loss'' versions that have only positive values or zero when the heat flow direction opposes.
 
@@ -3359,7 +3359,9 @@ Former Name: For Conduction Finite Difference simulations (CondFD), CondFD Insid
 
 These ``outside face conduction'' output variables describe heat flow by conduction right at the outside face of an opaque heat transfer surface. A positive value means that the conduction is from just inside the outside face toward the outside face. A negative value means that the conduction is from the outside face into the core of the heat transfer surface.
 
-Note that outside face conduction, when positive, does \textbf{not} indicate the heat flow from the surface to the surrounding air, which is governed by the outside face convection coefficient and the difference in temperature between the inside face and the surrounding air.
+Note that outside face conduction, when positive, does \textbf{not} necessarily indicate the heat flow from the surface to the surrounding air, due to the fact that there could be various terms such as convection and/or radiation terms based on whatever is the ''outside'' environment for this surface.
+
+When the surface in question is a partition, the output for this variable is set to zero because there is no outside face because the surface is fully exposed to the zone.  When the surface is an interzone partition, the value will be non-zero because there will potentially be conduction into or out of the zone on the other side at this surface.
 
 Different versions of the reports are available. The basic heat transfer rate (W) and a per unit area flux (W/m\(^{2}\)) can have positive or negative values with the sign convention that positive indicates heat flowing toward the face itself. There are also directed ``gain'' and ``loss'' versions that have only positive values or zero when the heat flow direction opposes.
 

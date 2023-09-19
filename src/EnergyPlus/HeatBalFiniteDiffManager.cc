@@ -2609,6 +2609,8 @@ namespace HeatBalFiniteDiffManager {
                 interNodeFlux - sourceFlux +
                 surfaceFD.CpDelXRhoS2(node) * (surfaceFD.TDT(node) - surfaceFD.TDpriortimestep(node)) / state.dataGlobal->TimeStepZoneSec;
         }
+        if (state.dataEnvrn->IsRain)
+            state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(Surf) = -surfaceFD.QDreport(1); // Update the outside flux if it is raining
     }
 
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,

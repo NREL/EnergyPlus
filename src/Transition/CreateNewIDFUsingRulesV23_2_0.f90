@@ -921,6 +921,22 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with L, insert the rules here
 
+              CASE('LIFECYCLECOST:USEPRICEESCALATION')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (SameString(OutArgs(2), "STEAM")) THEN
+                     OutArgs(2) = "DistrictHeatingSteam"
+                 END IF
+
+              CASE('LIFECYCLECOST:USEADJUSTMENT')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (SameString(OutArgs(2), "STEAM")) THEN
+                     OutArgs(2) = "DistrictHeatingSteam"
+                 END IF
+
               ! If your original object starts with M, insert the rules here
 
               ! If your original object starts with N, insert the rules here
