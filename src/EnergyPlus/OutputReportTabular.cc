@@ -3124,7 +3124,8 @@ void OpenOutputTabularFile(EnergyPlusData &state)
                     open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<?xml version=\"1.0\"?>\n";
                 tbl_stream << "<EnergyPlusTabularReports>\n";
-                tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
+                tbl_stream << "  <state.dataHeatBal->BuildingName>" << ConvertToEscaped(state.dataHeatBal->BuildingName)
+                           << "</state.dataHeatBal->BuildingName>\n";
                 tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
                 tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
                 tbl_stream << "  <ProgramVersion>" << state.dataStrGlobals->VerStringVar << "</ProgramVersion>\n";
@@ -16631,7 +16632,7 @@ void WriteReportHeaders(EnergyPlusData &state,
                 tbl_stream << "</" << ort->prevReportName << ">\n"; // close the last element if it was used.
             }
             tbl_stream << "<" << ConvertToElementTag(modifiedReportName) << ">\n";
-            tbl_stream << "  <for>" << objectName << "</for>\n";
+            tbl_stream << "  <for>" << ConvertToEscaped(objectName) << "</for>\n";
             ort->prevReportName = ConvertToElementTag(modifiedReportName); // save the name for next time
         }
     }
