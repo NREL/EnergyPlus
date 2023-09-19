@@ -47,6 +47,9 @@
 
 // EnergyPlus::ZoneEquipmentManager Unit Tests
 
+// C++ Headers
+#include <iostream>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -56,6 +59,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -401,11 +405,11 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).MAT = 23.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).MAT = 24.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).ZoneAirHumRat = 0.001;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).ZoneAirHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(3).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(4).airHumRat = 0.001;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(5).airHumRat = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
     state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
@@ -4396,8 +4400,8 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_CO2andGCforRefrigerationDoorsTest)
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 21.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MAT = 22.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.0021;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).ZoneAirHumRat = 0.0022;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.0021;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).airHumRat = 0.0022;
 
     state->dataHeatBal->TotRefDoorMixing = 1;
     state->dataHeatBal->TotMixing = 0;
@@ -4711,7 +4715,7 @@ TEST_F(EnergyPlusFixture, CalcAirFlowSimple_WindAndStackArea)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
     thisZoneHB.MAT = 21.0;
-    thisZoneHB.ZoneAirHumRat = 0.0021;
+    thisZoneHB.airHumRat = 0.0021;
     thisZoneHB.MixingMAT = 20.0;
 
     state->dataHeatBal->TotRefDoorMixing = 0;
@@ -4948,4 +4952,76 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest)
     // check sensible and total doas zone loads
     EXPECT_NEAR(SensibleOutput, -4091.6, 0.1); // W
     EXPECT_NEAR(TotalOutput, -4091.6, 0.1);    // W
+}
+
+TEST_F(EnergyPlusFixture, ZoneAirLoopEquipmentGetInputTest)
+{
+    std::string_view constexpr idf_objects = R"IDF(
+	
+	  ZoneHVAC:AirDistributionUnit,
+		ADU CV HW Rht,           !- Name
+		Node 5,                  !- Air Distribution Unit Outlet Node Name
+		AirTerminal:SingleDuct:ConstantVolume:Reheat,  !- Air Terminal Object Type
+		CV HW Rht,               !- Air Terminal Name
+		0.05,                    !- Nominal Upstream Leakage Fraction
+		0.07;                    !- Constant Downstream Leakage Fraction
+
+	  AirTerminal:SingleDuct:ConstantVolume:Reheat,
+		CV HW Rht,               !- Name
+		Always On Discrete,      !- Availability Schedule Name
+		Node 5,                  !- Air Outlet Node Name
+		Node 9,                  !- Air Inlet Node Name
+		Autosize,                !- Maximum Air Flow Rate {m3/s}
+		Coil:Heating:Water,      !- Reheat Coil Object Type
+		CV HW Rht Coil,          !- Reheat Coil Name
+		Autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
+		0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
+		0.001,                   !- Convergence Tolerance
+		50;                      !- Maximum Reheat Air Temperature {C}
+	
+      ZoneHVAC:AirDistributionUnit,
+        ADU VAV Rht,             !- Name
+        Node 5,                  !- Air Distribution Unit Outlet Node Name
+        AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
+        VAV with Rht AT,         !- Air Terminal Name
+        0.05,                    !- Nominal Upstream Leakage Fraction
+        0.07;                    !- Constant Downstream Leakage Fraction
+
+      AirTerminal:SingleDuct:VAV:Reheat,
+        VAV with Rht AT,         !- Name
+        Always On Discrete,      !- Availability Schedule Name
+        VAV with Rht AT Damper Outlet,  !- Damper Air Outlet Node Name
+        Node 9,                  !- Air Inlet Node Name
+        Autosize,                !- Maximum Air Flow Rate {m3/s}
+        Constant,                !- Zone Minimum Air Flow Input Method
+        0.3,                     !- Constant Minimum Air Flow Fraction
+        ,                        !- Fixed Minimum Air Flow Rate {m3/s}
+        ,                        !- Minimum Air Flow Fraction Schedule Name
+        Coil:Heating:Water,      !- Reheat Coil Object Type
+        VAV HW Rht Coil,         !- Reheat Coil Name
+        Autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
+        0,                       !- Minimum Hot Water or Steam Flow Rate {m3/s}
+        Node 5,                  !- Air Outlet Node Name
+        0.001,                   !- Convergence Tolerance
+        Normal,                  !- Damper Heating Action
+        Autocalculate,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+        Autocalculate,           !- Maximum Flow Fraction During Reheat
+        50;                      !- Maximum Reheat Air Temperature {C}
+
+    )IDF";
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    int AirDistCompUnitNum = 1;
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    auto &airDistUnit_CV = state->dataDefineEquipment->AirDistUnit(AirDistCompUnitNum);
+    EXPECT_EQ(airDistUnit_CV.EquipType(1), "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT");
+    EXPECT_TRUE(compare_enums(airDistUnit_CV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat));
+    EXPECT_FALSE(airDistUnit_CV.IsConstLeakageRate);
+
+    AirDistCompUnitNum = 2;
+    auto &airDistUnit_VAV = state->dataDefineEquipment->AirDistUnit(AirDistCompUnitNum);
+    EXPECT_EQ(airDistUnit_VAV.EquipType(1), "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT");
+    EXPECT_TRUE(compare_enums(airDistUnit_VAV.EquipTypeEnum(1), DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat));
+    EXPECT_TRUE(airDistUnit_VAV.IsConstLeakageRate);
 }

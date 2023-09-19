@@ -279,52 +279,33 @@ namespace SingleDuct {
     {
         // Members
         // Input data
-        std::string Name;             // name of unit
-        int MixerType;                // type of inlet mixer, 1 = inlet side, 2 = supply side
-        int ZoneHVACUnitType;         // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
-        std::string ZoneHVACUnitName; // name of Zone HVAC unit
-        int SecInNode;                // secondary air inlet node number
-        int PriInNode;                // primary air inlet node number
-        int MixedAirOutNode;          // mixed air outlet node number
-        int ZoneInletNode;            // zone inlet node that ultimately receives air from this mixer
-        Real64 ZoneAirTemp;           // zone air in temp
-        Real64 ZoneAirHumRat;         // zone air in hum rat
-        Real64 ZoneAirEnthalpy;       // zone air in enthalpy
-        Real64 ZoneAirPressure;       // zone air in pressure
-        Real64 ZoneAirMassFlowRate;   // zone air in mass flow rate
-        Real64 DOASTemp;              // DOAS air in temp
-        Real64 DOASHumRat;            // DOAS air in hum rat
-        Real64 DOASEnthalpy;          // DOAS air in enthalpy
-        Real64 DOASPressure;          // DOAS air in pressure
-        Real64 DOASMassFlowRate;      // DOAS air in mass flow rate
-        Real64 MixedAirTemp;          // mixed air in temp
-        Real64 MixedAirHumRat;        // mixed air in hum rat
-        Real64 MixedAirEnthalpy;      // mixed air in enthalpy
-        Real64 MixedAirPressure;      // mixed air in pressure
-        Real64 MixedAirMassFlowRate;  // mixed air in mass flow rate
-        Real64 MassFlowRateMaxAvail;  // maximum air mass flow rate allowed through component
-        int ADUNum;                   // index of Air Distribution Unit
-        int TermUnitSizingIndex;      // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
-        bool OneTimeInitFlag;         // true if one-time inits should be done
-        bool OneTimeInitFlag2;        // true if more one-time inits should be done
-        int CtrlZoneInNodeIndex;      // which controlled zone inlet node number corresponds with this unit
-        int ZoneNum;
-        bool NoOAFlowInputFromUser;                               // avoids OA calculation if no input specified by user
-        int OARequirementsPtr;                                    // - Index to DesignSpecification:OutdoorAir object
-        int AirLoopNum;                                           // System sizing adjustments
-        Real64 DesignPrimaryAirVolRate;                           // System sizing adjustments, filled from design OA spec using sizing mode flags.
-        DataZoneEquipment::PerPersonVentRateMode OAPerPersonMode; // mode for how per person rates are determined, DCV or design.
-        bool printWarning;                                        // flag to print warnings only once
-        // Default Constructor
-        AirTerminalMixerData()
-            : MixerType(0), ZoneHVACUnitType(0), SecInNode(0), PriInNode(0), MixedAirOutNode(0), ZoneInletNode(0), ZoneAirTemp(0.0),
-              ZoneAirHumRat(0.0), ZoneAirEnthalpy(0.0), ZoneAirPressure(0.0), ZoneAirMassFlowRate(0.0), DOASTemp(0.0), DOASHumRat(0.0),
-              DOASEnthalpy(0.0), DOASPressure(0.0), DOASMassFlowRate(0.0), MixedAirTemp(0.0), MixedAirHumRat(0.0), MixedAirEnthalpy(0.0),
-              MixedAirPressure(0.0), MixedAirMassFlowRate(0.0), MassFlowRateMaxAvail(0.0), ADUNum(0), TermUnitSizingIndex(0), OneTimeInitFlag(true),
-              OneTimeInitFlag2(true), CtrlZoneInNodeIndex(0), ZoneNum(0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), AirLoopNum(0),
-              DesignPrimaryAirVolRate(0.0), OAPerPersonMode(DataZoneEquipment::PerPersonVentRateMode::Invalid), printWarning(true)
-        {
-        }
+        std::string Name;                  // name of unit
+        int MixerType = 0;                 // type of inlet mixer, 1 = inlet side, 2 = supply side
+        int ZoneHVACUnitType = 0;          // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
+        std::string ZoneHVACUnitName;      // name of Zone HVAC unit
+        int SecInNode = 0;                 // secondary air inlet node number
+        int PriInNode = 0;                 // primary air inlet node number
+        int MixedAirOutNode = 0;           // mixed air outlet node number
+        int ZoneInletNode = 0;             // zone inlet node that ultimately receives air from this mixer
+        Real64 MixedAirTemp = 0.0;         // mixed air in temp
+        Real64 MixedAirHumRat = 0.0;       // mixed air in hum rat
+        Real64 MixedAirEnthalpy = 0.0;     // mixed air in enthalpy
+        Real64 MixedAirPressure = 0.0;     // mixed air in pressure
+        Real64 MixedAirMassFlowRate = 0.0; // mixed air in mass flow rate
+        Real64 MassFlowRateMaxAvail = 0.0; // maximum air mass flow rate allowed through component
+        int ADUNum = 0;                    // index of Air Distribution Unit
+        int TermUnitSizingIndex = 0;       // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+        bool OneTimeInitFlag = true;       // true if one-time inits should be done
+        bool OneTimeInitFlag2 = true;      // true if more one-time inits should be done
+        int CtrlZoneInNodeIndex = 0;       // which controlled zone inlet node number corresponds with this unit
+        int ZoneNum = 0;
+        bool NoOAFlowInputFromUser = true;    // avoids OA calculation if no input specified by user
+        int OARequirementsPtr = 0;            // - Index to DesignSpecification:OutdoorAir object
+        int AirLoopNum = 0;                   // System sizing adjustments
+        Real64 DesignPrimaryAirVolRate = 0.0; // System sizing adjustments, filled from design OA spec using sizing mode flags.
+        DataZoneEquipment::PerPersonVentRateMode OAPerPersonMode =
+            DataZoneEquipment::PerPersonVentRateMode::Invalid; // mode for how per person rates are determined, DCV or design.
+        bool printWarning = true;                              // flag to print warnings only once
 
         void InitATMixer(EnergyPlusData &state, bool FirstHVACIteration);
     };
@@ -377,7 +358,7 @@ namespace SingleDuct {
 struct SingleDuctData : BaseGlobalStruct
 {
 
-    Array1D<SingleDuct::AirTerminalMixerData> SysATMixer;
+    EPVector<SingleDuct::AirTerminalMixerData> SysATMixer;
     Array1D<SingleDuct::SingleDuctAirTerminal> sd_airterminal;
     std::unordered_map<std::string, std::string> SysUniqueNames;
     Array1D_bool CheckEquipName;
@@ -456,78 +437,7 @@ struct SingleDuctData : BaseGlobalStruct
 
     void clear_state() override
     {
-        this->SysATMixer.deallocate();
-        this->sd_airterminal.deallocate();
-        this->SysUniqueNames.clear();
-        this->CheckEquipName.deallocate();
-        this->NumATMixers = 0;
-        this->NumConstVolSys = 0;
-        this->NumSDAirTerminal = 0;
-        this->GetInputFlag = true;
-        this->GetATMixerFlag = true;
-        this->InitSysFlag = true;
-        this->InitATMixerFlag = true;
-        this->ZoneEquipmentListChecked = false;
-
-        this->SysNumGSI = 0;   // The Sys that you are currently loading input into
-        this->SysIndexGSI = 0; // The Sys that you are currently loading input into
-        this->NumVAVSysGSI = 0;
-        this->NumNoRHVAVSysGSI = 0;
-        this->NumVAVVSGSI = 0;
-        this->NumCBVAVSysGSI = 0;
-        this->NumNoRHCBVAVSysGSI = 0;
-        this->NumAlphasGSI = 0;
-        this->NumNumsGSI = 0;
-        this->NumCVNoReheatSysGSI = 0;
-        this->MaxNumsGSI = 0;   // Maximum number of numeric input fields
-        this->MaxAlphasGSI = 0; // Maximum number of alpha input fields
-        this->TotalArgsGSI = 0; // Total number of alpha and numeric arguments  = max for a
-        this->CoilInTempSS = 0.0;
-        this->DesCoilLoadSS = 0.0;
-        this->DesZoneHeatLoadSS = 0.0;
-        this->ZoneDesTempSS = 0.0;
-        this->ZoneDesHumRatSS = 0.0;
-        this->CoilWaterInletNodeSS = 0;
-        this->CoilWaterOutletNodeSS = 0;
-        this->CoilSteamInletNodeSS = 0;
-        this->CoilSteamOutletNodeSS = 0;
-        this->DummyWaterIndexSS = 1;
-        this->UserInputMaxHeatAirVolFlowRateSS = 0.0; // user input for MaxHeatAirVolFlowRate
-        this->MinAirMassFlowRevActSVAV = 0.0;         // minimum air mass flow rate used in "reverse action" air mass flow rate calculation
-        this->MaxAirMassFlowRevActSVAV = 0.0;         // maximum air mass flow rate used in "reverse action" air mass flow rate calculation
-        this->ZoneTempSCBVAV = 0.0;                   // zone air temperature [C]
-        this->MaxHeatTempSCBVAV = 0.0;                // maximum supply air temperature [C]
-        this->MassFlowReqSCBVAV = 0.0;                // air mass flow rate required to meet the coil heating load [W]
-        this->MassFlowActualSCBVAV = 0.0;             // air mass flow rate actually used [W]
-        this->QZoneMaxSCBVAV = 0.0;                   // maximum zone heat addition rate given constraints of MaxHeatTemp and max        /
-        this->MinMassAirFlowSCBVAV = 0.0;             // the air flow rate during heating for normal acting damper
-        this->QZoneMax2SCBVAV = 0.0;                  // temporary variable
-        this->QZoneMax3SCBVAV = 0.0;                  // temporary variable
-        this->TAirMaxSCV = 0.0;                       // Maximum zone supply air temperature [C]
-        this->QMaxSCV = 0.0;                          // Maximum heat addition rate imposed by the max zone supply air temperature [W]
-        this->ZoneTempSCV = 0.0;                      // Zone temperature [C]
-        this->QMax2SCV = 0.0;
-        this->SysNumSATM = 0;
-        this->PriMassFlowRateCATM = 0.0;
-        this->PriEnthalpyCATM = 0.0;
-        this->PriHumRatCATM = 0.0;
-        this->PriTempCATM = 0.0;
-        this->SecAirMassFlowRateCATM = 0.0;
-        this->SecAirEnthalpyCATM = 0.0;
-        this->SecAirHumRatCATM = 0.0;
-        this->SecAirTempCATM = 0.0;
-        this->MixedAirMassFlowRateCATM = 0.0;
-        this->MixedAirEnthalpyCATM = 0.0;
-        this->MixedAirHumRatCATM = 0.0;
-        this->MixedAirTempCATM = 0.0;
-
-        this->ZoneTempSDAT = 0.0;                      // zone air temperature [C]
-        this->MaxHeatTempSDAT = 0.0;                   // maximum supply air temperature [C]
-        this->MaxDeviceAirMassFlowReheatSDAT = 0.0;    // air mass flow rate required to meet the coil heating load [W]
-        this->MassFlowReqToLimitLeavingTempSDAT = 0.0; // air mass flow rate actually used [W]
-        this->QZoneMaxRHTempLimitSDAT = 0.0;           // maximum zone heat addition rate given constraints of MaxHeatTemp and max
-        this->MinMassAirFlowSDAT = 0.0;                // the air flow rate during heating for normal acting damper
-        this->QZoneMax2SDAT = 0.0;                     // temporary variable
+        new (this) SingleDuctData();
     }
 };
 

@@ -1021,6 +1021,8 @@ namespace OutputReportPredefined {
         // s->pdchEMmaxvaluetime = newPreDefColumn(state, s->pdstEMvalues,'Timestamp of Maximum')
         // Electricity Sub Table
         s->pdstEMelecvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Electricity");
+        addFootNoteSubTable(
+            state, s->pdstEMelecvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMelecannual = newPreDefColumn(state, s->pdstEMelecvalues, "Electricity Annual Value [GJ]");
         s->pdchEMelecminvalue = newPreDefColumn(state, s->pdstEMelecvalues, "Electricity Minimum Value [W]");
         s->pdchEMelecminvaluetime = newPreDefColumn(state, s->pdstEMelecvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -1029,6 +1031,8 @@ namespace OutputReportPredefined {
 
         // Gas Sub Table
         s->pdstEMgasvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Natural Gas");
+        addFootNoteSubTable(
+            state, s->pdstEMgasvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMgasannual = newPreDefColumn(state, s->pdstEMgasvalues, "Natural Gas Annual Value [GJ]");
         s->pdchEMgasminvalue = newPreDefColumn(state, s->pdstEMgasvalues, "Natural Gas Minimum Value [W]");
         s->pdchEMgasminvaluetime = newPreDefColumn(state, s->pdstEMgasvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -1037,6 +1041,8 @@ namespace OutputReportPredefined {
 
         // Cool SubTable
         s->pdstEMcoolvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Cooling");
+        addFootNoteSubTable(
+            state, s->pdstEMcoolvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMcoolannual = newPreDefColumn(state, s->pdstEMcoolvalues, "Cooling Annual Value [GJ]");
         s->pdchEMcoolminvalue = newPreDefColumn(state, s->pdstEMcoolvalues, "Cooling Minimum Value [W]");
         s->pdchEMcoolminvaluetime = newPreDefColumn(state, s->pdstEMcoolvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -1045,6 +1051,8 @@ namespace OutputReportPredefined {
 
         // Water SubTable
         s->pdstEMwatervalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Water");
+        addFootNoteSubTable(
+            state, s->pdstEMwatervalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMwaterannual = newPreDefColumn(state, s->pdstEMwatervalues, "Annual Value [m3]");
         s->pdchEMwaterminvalue = newPreDefColumn(state, s->pdstEMwatervalues, "Minimum Value [m3/s]");
         s->pdchEMwaterminvaluetime = newPreDefColumn(state, s->pdstEMwatervalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -1053,6 +1061,8 @@ namespace OutputReportPredefined {
 
         // Other KG SubTable
         s->pdstEMotherKGvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other by Weight/Mass");
+        addFootNoteSubTable(
+            state, s->pdstEMotherKGvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherKGannual = newPreDefColumn(state, s->pdstEMotherKGvalues, "Annual Value [kg]");
         s->pdchEMotherKGminvalue = newPreDefColumn(state, s->pdstEMotherKGvalues, "Minimum Value [kg/s]");
         s->pdchEMotherKGminvaluetime = newPreDefColumn(state, s->pdstEMotherKGvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -1061,6 +1071,8 @@ namespace OutputReportPredefined {
 
         // Other M3 SubTable
         s->pdstEMotherM3values = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other Volumetric");
+        addFootNoteSubTable(
+            state, s->pdstEMotherM3values, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherM3annual = newPreDefColumn(state, s->pdstEMotherM3values, "Annual Value [m3]");
         s->pdchEMotherM3minvalue = newPreDefColumn(state, s->pdstEMotherM3values, "Minimum Value [m3/s]");
         s->pdchEMotherM3minvaluetime = newPreDefColumn(state, s->pdstEMotherM3values, "Timestamp of Minimum {TIMESTAMP}");
@@ -1069,6 +1081,8 @@ namespace OutputReportPredefined {
 
         // Other M3 SubTable
         s->pdstEMotherLvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other Liquid/Gas");
+        addFootNoteSubTable(
+            state, s->pdstEMotherLvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherLannual = newPreDefColumn(state, s->pdstEMotherLvalues, "Annual Value [L]");
         s->pdchEMotherLminvalue = newPreDefColumn(state, s->pdstEMotherLvalues, "Minimum Value [L]");
         s->pdchEMotherLminvaluetime = newPreDefColumn(state, s->pdstEMotherLvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -1077,6 +1091,8 @@ namespace OutputReportPredefined {
 
         // Other J SubTable
         s->pdstEMotherJvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other");
+        addFootNoteSubTable(
+            state, s->pdstEMotherJvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherJannual = newPreDefColumn(state, s->pdstEMotherJvalues, "Annual Value [GJ]");
         s->pdchEMotherJminvalue = newPreDefColumn(state, s->pdstEMotherJvalues, "Minimum Value [W]");
         s->pdchEMotherJminvaluetime = newPreDefColumn(state, s->pdstEMotherJvalues, "Timestamp of Minimum {TIMESTAMP}");
