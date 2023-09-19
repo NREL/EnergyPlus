@@ -4434,8 +4434,7 @@ void updateSystemOutputRequired(EnergyPlusData &state,
     }
 }
 
-void adjustSystemOutputRequired(EnergyPlusData &state,
-                                Real64 const sensibleRatio, // sensible load adjustment
+void adjustSystemOutputRequired(Real64 const sensibleRatio, // sensible load adjustment
                                 Real64 const latentRatio,   // latent load adjustment
                                 DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
                                 DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,

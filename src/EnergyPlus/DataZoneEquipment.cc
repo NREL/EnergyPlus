@@ -1266,6 +1266,9 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
                                       DataLoopNode::ConnectionType::Outlet,
                                       NodeInputManager::CompFluidStream::Primary,
                                       objectIsParent);
+                if (thisZeqSplitter.controlSpaceIndex == thisZeqSpace.spaceIndex) {
+                    thisZeqSplitter.controlSpaceNumber = spaceCount;
+                }
             }
         }
     }
@@ -1769,6 +1772,8 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
                               DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
                               this->Name));
         break;
+    default:
+        break;
     }
 
     if (spacesTotal == 0.0) {
@@ -1808,6 +1813,8 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
                               DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
                               this->Name));
         break;
+    default:
+        break;
     }
 }
 
@@ -1823,10 +1830,10 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
     auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
     for (auto &mixerSpace : this->spaces) {
         auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
-        sumEnthalpy += equipInletNode.Enthalpy * mixerSpace.fraction;
-        sumHumRat += equipInletNode.HumRat * mixerSpace.fraction;
-        sumCO2 += equipInletNode.CO2 * mixerSpace.fraction;
-        sumPressure += equipInletNode.Press * mixerSpace.fraction;
+        sumEnthalpy += spaceOutletNode.Enthalpy * mixerSpace.fraction;
+        sumHumRat += spaceOutletNode.HumRat * mixerSpace.fraction;
+        sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
+        sumPressure += spaceOutletNode.Press * mixerSpace.fraction;
         sumFractions += mixerSpace.fraction;
     }
     equipInletNode.Enthalpy = sumEnthalpy / sumFractions;
@@ -1859,16 +1866,27 @@ void ZoneEquipmentSplitter::adjustLoads(EnergyPlusData &state, int zoneNum, int 
     Real64 latentRatio = 1.0;
     switch (this->tstatControl) {
     case DataZoneEquipment::ZoneEquipTstatControl::Ideal:
-        return; // Do nothing
-    case DataZoneEquipment::ZoneEquipTstatControl::SingleSpace:
-        sensibleRatio = state.dataZoneEnergyDemand->spaceSysEnergyDemand(this->controlSpaceIndex).RemainingOutputRequired /
-                        thisZoneEnergyDemand.RemainingOutputRequired;
-        latentRatio = state.dataZoneEnergyDemand->spaceSysMoistureDemand(this->controlSpaceIndex).RemainingOutputRequired /
-                      thisZoneMoistureDemand.RemainingOutputRequired;
-        break;
-    case DataZoneEquipment::ZoneEquipTstatControl::Maximum:
+        return;
+        break; // Do nothing
+    case DataZoneEquipment::ZoneEquipTstatControl::SingleSpace: {
+        Real64 controlSpaceFrac = this->spaces[this->controlSpaceNumber].fraction;
+        if (controlSpaceFrac > 0.0) {
+            if (thisZoneEnergyDemand.RemainingOutputRequired != 0.0) {
+                sensibleRatio = (state.dataZoneEnergyDemand->spaceSysEnergyDemand(this->controlSpaceIndex).RemainingOutputRequired /
+                                 thisZoneEnergyDemand.RemainingOutputRequired) /
+                                controlSpaceFrac;
+            }
+            if (thisZoneMoistureDemand.RemainingOutputRequired != 0.0) {
+                latentRatio = (state.dataZoneEnergyDemand->spaceSysMoistureDemand(this->controlSpaceIndex).RemainingOutputRequired /
+                               thisZoneMoistureDemand.RemainingOutputRequired) /
+                              controlSpaceFrac;
+            }
+        }
+    } break;
+    case DataZoneEquipment::ZoneEquipTstatControl::Maximum: {
         int maxSpaceIndex = 0;
         Real64 maxDeltaTemp = 0.0; // Only positive deltaTemps are relevant
+        Real64 maxSpaceFrac = 1.0;
         for (auto &splitterSpace : this->spaces) {
             Real64 spaceTemp =
                 state.dataZoneTempPredictorCorrector->spaceHeatBalance(splitterSpace.spaceIndex).T1; // Based on calcPredictedSystemLoad usage
@@ -1876,23 +1894,31 @@ void ZoneEquipmentSplitter::adjustLoads(EnergyPlusData &state, int zoneNum, int 
                                         (spaceTemp - state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum)));
             if (spaceDeltaTemp > maxDeltaTemp) {
                 maxSpaceIndex = splitterSpace.spaceIndex;
+                maxSpaceFrac = splitterSpace.fraction;
                 maxDeltaTemp = spaceDeltaTemp;
             }
         }
-        if (maxSpaceIndex > 0) {
-            sensibleRatio = state.dataZoneEnergyDemand->spaceSysEnergyDemand(maxSpaceIndex).RemainingOutputRequired /
-                            thisZoneEnergyDemand.RemainingOutputRequired;
-            latentRatio = state.dataZoneEnergyDemand->spaceSysMoistureDemand(maxSpaceIndex).RemainingOutputRequired /
-                          thisZoneMoistureDemand.RemainingOutputRequired;
+        if ((maxSpaceIndex > 0) && (maxSpaceFrac > 0.0)) {
+            if (thisZoneEnergyDemand.RemainingOutputRequired != 0.0) {
+                sensibleRatio = (state.dataZoneEnergyDemand->spaceSysEnergyDemand(maxSpaceIndex).RemainingOutputRequired /
+                                 thisZoneEnergyDemand.RemainingOutputRequired) /
+                                maxSpaceFrac;
+            }
+            if (thisZoneMoistureDemand.RemainingOutputRequired != 0.0) {
+                latentRatio = (state.dataZoneEnergyDemand->spaceSysMoistureDemand(maxSpaceIndex).RemainingOutputRequired /
+                               thisZoneMoistureDemand.RemainingOutputRequired) /
+                              maxSpaceFrac;
+            }
         }
+    } break;
+    default:
         break;
     }
     // Save unadjusted zone loads to restore later
     this->saveZoneSysSensibleDemand = thisZoneEnergyDemand;
     this->saveZoneSysMoistureDemand = thisZoneMoistureDemand;
     // Apply zone load adjustment
-    ZoneEquipmentManager::adjustSystemOutputRequired(state,
-                                                     sensibleRatio,
+    ZoneEquipmentManager::adjustSystemOutputRequired(sensibleRatio,
                                                      latentRatio,
                                                      state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum),
                                                      state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum),
@@ -1916,11 +1942,11 @@ void ZoneEquipmentSplitter::distributeOutput(EnergyPlusData &state,
         Real64 spaceFraction = splitterSpace.fraction;
         if (this->tstatControl == DataZoneEquipment::ZoneEquipTstatControl::Ideal) {
             // Proportion output by sensible space load / zone load (varies every timestep, overrides outputFraction)
-            spaceFraction = state.dataZoneEnergyDemand->spaceSysEnergyDemand(splitterSpace.spaceIndex).RemainingOutputRequired /
-                            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).RemainingOutputRequired;
-            // Restore zone loads to unadjusted values (for all ZoneEquipTstatControl types except Ideal)
-            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum) = this->saveZoneSysSensibleDemand;
-            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum) = this->saveZoneSysMoistureDemand;
+            auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
+            if (thisZoneSysEnergyDemand.RemainingOutputRequired != 0.0) {
+                spaceFraction = state.dataZoneEnergyDemand->spaceSysEnergyDemand(splitterSpace.spaceIndex).RemainingOutputRequired /
+                                thisZoneSysEnergyDemand.RemainingOutputRequired;
+            }
         }
 
         Real64 spaceSysOutputProvided = sysOutputProvided * spaceFraction;

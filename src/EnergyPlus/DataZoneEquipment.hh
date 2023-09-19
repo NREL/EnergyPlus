@@ -474,8 +474,8 @@ namespace DataZoneEquipment {
         std::string equipName;
         int zoneEquipOutletNodeNum = 0;
         DataZoneEquipment::ZoneEquipTstatControl tstatControl = DataZoneEquipment::ZoneEquipTstatControl::Invalid;
-        int controlSpaceIndex = 0; // Index to a space for the thermostat control space
-        Real64 controlSpaceFraction = 1.0;
+        int controlSpaceIndex = 0;                                                 // Index to a space for the thermostat control space
+        int controlSpaceNumber = 0;                                                // Control space number within the zone equipment splitter list
         DataZoneEnergyDemands::ZoneSystemSensibleDemand saveZoneSysSensibleDemand; // Save unadjusted zone sensible loads
         DataZoneEnergyDemands::ZoneSystemMoistureDemand saveZoneSysMoistureDemand; // Save unadjusted zone moisture loads
 
