@@ -3154,6 +3154,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 Hour,
@@ -3182,6 +3183,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 Hour,
@@ -3207,6 +3209,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 _,
@@ -3225,6 +3228,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month);
             }
             break;
@@ -3235,7 +3239,8 @@ namespace OutputProcessor {
                                                                                 reportID,
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
-                                                                                state.dataGlobal->CalendarYear);
+                                                                                state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear);
             }
             break;
         default:
