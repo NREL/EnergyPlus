@@ -50,6 +50,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -495,6 +496,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             auto const &objectFields = instance.value();
             auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zeqSplitterNum];
             thisZeqSplitter.Name = UtilityRoutines::makeUPPER(instance.key());
+            thisZeqSplitter.spaceEquipType = DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter;
             ip->markObjectAsUsed(CurrentModuleObject, instance.key());
 
             std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
@@ -531,6 +533,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             auto const &objectFields = instance.value();
             auto &thisZeqMixer = state.dataZoneEquip->zoneEquipMixer[zeqMixerNum];
             thisZeqMixer.Name = UtilityRoutines::makeUPPER(instance.key());
+            thisZeqMixer.spaceEquipType = DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer;
             ip->markObjectAsUsed(CurrentModuleObject, instance.key());
 
             std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
@@ -1172,13 +1175,13 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("processZoneEquipSplitterInput: "); // include trailing blank space
     auto &ip = state.dataInputProcessing->inputProcessor;
     std::string const zeqTypeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_object_type");
-    thisZeqSplitter.equipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
+    thisZeqSplitter.zoneEquipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
     // SpaceHVAC TODO: Copied this block from processZoneEquipmentInput section for ZoneHVAC:EquipmentList - seems this could be simplified
-    if (thisZeqSplitter.equipType == ZoneEquipType::Invalid) {
+    if (thisZeqSplitter.zoneEquipType == ZoneEquipType::Invalid) {
         if (zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" || zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
-            thisZeqSplitter.equipType = ZoneEquipType::LowTemperatureRadiant;
+            thisZeqSplitter.zoneEquipType = ZoneEquipType::LowTemperatureRadiant;
         } else if (zeqTypeName == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-            thisZeqSplitter.equipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
+            thisZeqSplitter.zoneEquipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
         } else {
             ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
             ShowContinueError(state, format("..Invalid Equipment Type = {}", zeqTypeName));
@@ -1186,14 +1189,14 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         }
     }
 
-    thisZeqSplitter.equipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
+    thisZeqSplitter.zoneEquipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
 
     // Search zone equipment list for matching equip type and name
     bool found = false;
     auto &thisZoneEqList = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex);
     for (int eqCount = 1; eqCount <= thisZoneEqList.NumOfEquipTypes; ++eqCount) {
-        if (thisZeqSplitter.equipType == thisZoneEqList.EquipType(eqCount)) {
-            if (thisZeqSplitter.equipName == thisZoneEqList.EquipName(eqCount)) {
+        if (thisZeqSplitter.zoneEquipType == thisZoneEqList.EquipType(eqCount)) {
+            if (thisZeqSplitter.zoneEquipName == thisZoneEqList.EquipName(eqCount)) {
                 found = true;
                 // Set index in zone equipment list pointing to this SpaceHVAC:ZoneEquipmentSplitter
                 thisZoneEqList.zoneEquipSplitterIndex = zeqSplitterNum;
@@ -1205,8 +1208,8 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
     }
     if (!found) {
         ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
-        ShowContinueError(state,
-                          format(".. Zone Equipment Object Type={} and Zone Equipment Name={} not found", zeqTypeName, thisZeqSplitter.equipName));
+        ShowContinueError(
+            state, format(".. Zone Equipment Object Type={} and Zone Equipment Name={} not found", zeqTypeName, thisZeqSplitter.zoneEquipName));
         ShowContinueError(state, format(".. in ZoneHVAC:EquipmentList={}", thisZoneEqList.Name));
         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         return;
@@ -1217,7 +1220,7 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         GetOnlySingleNode(state,
                           ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_outlet_node_name"),
                           state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                          DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter,
+                          thisZeqSplitter.spaceEquipType,
                           thisZeqSplitter.Name,
                           DataLoopNode::NodeFluidType::Air,
                           DataLoopNode::ConnectionType::Inlet,
@@ -1260,7 +1263,7 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_supply_node_name"),
                                       state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter,
+                                      thisZeqSplitter.spaceEquipType,
                                       thisZeqSplitter.Name,
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::ConnectionType::Outlet,
@@ -1288,7 +1291,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
     thisZeqMixer.zoneEquipInletNodeNum = GetOnlySingleNode(state,
                                                            ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_inlet_node_name"),
                                                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer,
+                                                           thisZeqMixer.spaceEquipType,
                                                            thisZeqMixer.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Outlet,
@@ -1336,7 +1339,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
                 thisZeqSpace.spaceNodeNum = GetOnlySingleNode(state,
                                                               ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_node_name"),
                                                               state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer,
+                                                              thisZeqMixer.spaceEquipType,
                                                               thisZeqMixer.Name,
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::ConnectionType::Inlet,
@@ -1768,8 +1771,9 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
         break;
     case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
         ShowFatalError(state,
-                       format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}",
+                       format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}={}",
                               DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
+                              BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
                               this->Name));
         break;
     default:
@@ -1777,44 +1781,53 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
     }
 
     if (spacesTotal == 0.0) {
-        ShowFatalError(state,
-                       format("ZoneEquipmentSplitterMixer::size: Total={} is zero for {}. Unable to autosize Space Fractions.",
-                              DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
-                              this->Name));
+        ShowSevereError(state,
+                        format("ZoneEquipmentSplitterMixer::size: Total {} is zero for {}={}. Unable to autosize Space Fractions.",
+                               DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
+                               BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                               this->Name));
+        Real64 spaceFrac = 1.0 / (int)this->spaces.size();
+        ShowContinueError(state, format("Setting space fractions to 1/number of spaces = {}.", spaceFrac));
+        for (auto &thisSpace : this->spaces) {
+            thisSpace.fraction = spaceFrac;
+        }
+        return;
     }
 
     // Calculate space fractions
-    switch (this->spaceSizingBasis) {
-    case DataZoneEquipment::SpaceEquipSizingBasis::DesignCoolingLoad:
-        for (auto &thisSpace : this->spaces) {
-            if (thisSpace.fraction == DataSizing::AutoSize) {
+    int spaceCounter = 0;
+    for (auto &thisSpace : this->spaces) {
+        ++spaceCounter;
+        if (thisSpace.fraction == DataSizing::AutoSize) {
+            switch (this->spaceSizingBasis) {
+            case DataZoneEquipment::SpaceEquipSizingBasis::DesignCoolingLoad:
                 thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesCoolLoad / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::DesignHeatingLoad:
+                thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesHeatLoad / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::FloorArea:
+                thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).FloorArea / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::Volume:
+                thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).Volume / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
+                ShowFatalError(state,
+                               format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}={}",
+                                      DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
+                                      BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                                      this->Name));
+                break;
+            default:
+                break;
             }
+            BaseSizer::reportSizerOutput(state,
+                                         BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                                         this->Name,
+                                         format("Space {} Fraction", spaceCounter),
+                                         thisSpace.fraction);
         }
-        break;
-    case DataZoneEquipment::SpaceEquipSizingBasis::DesignHeatingLoad:
-        for (auto &thisSpace : this->spaces) {
-            thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesHeatLoad / spacesTotal;
-        }
-        break;
-    case DataZoneEquipment::SpaceEquipSizingBasis::FloorArea:
-        for (auto &thisSpace : this->spaces) {
-            thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).FloorArea / spacesTotal;
-        }
-        break;
-    case DataZoneEquipment::SpaceEquipSizingBasis::Volume:
-        for (auto &thisSpace : this->spaces) {
-            thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).Volume / spacesTotal;
-        }
-        break;
-    case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
-        ShowFatalError(state,
-                       format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}",
-                              DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
-                              this->Name));
-        break;
-    default:
-        break;
     }
 }
 

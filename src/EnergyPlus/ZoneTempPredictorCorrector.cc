@@ -4254,7 +4254,7 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
 
         CalcZoneComponentLoadSums(
             state, zoneNum, &state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum), state.dataHeatBal->ZnAirRpt(zoneNum));
-        if (state.dataHeatBal->doSpaceHeatBalance) {
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
             for (int spaceNum : thisZone.spaceIndexes) {
                 CalcZoneComponentLoadSums(
                     state, zoneNum, &state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum), state.dataHeatBal->spaceAirRpt(spaceNum));

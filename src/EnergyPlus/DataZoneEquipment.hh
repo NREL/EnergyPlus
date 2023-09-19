@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
@@ -462,6 +463,7 @@ namespace DataZoneEquipment {
     struct ZoneEquipmentSplitterMixer
     {
         std::string Name;
+        DataLoopNode::ConnectionObjectType spaceEquipType = DataLoopNode::ConnectionObjectType::Invalid;
         DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
         std::vector<ZoneEquipSplitterMixerSpace> spaces;
 
@@ -470,8 +472,8 @@ namespace DataZoneEquipment {
 
     struct ZoneEquipmentSplitter : ZoneEquipmentSplitterMixer
     {
-        DataZoneEquipment::ZoneEquipType equipType = DataZoneEquipment::ZoneEquipType::Invalid;
-        std::string equipName;
+        DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::Invalid;
+        std::string zoneEquipName;
         int zoneEquipOutletNodeNum = 0;
         DataZoneEquipment::ZoneEquipTstatControl tstatControl = DataZoneEquipment::ZoneEquipTstatControl::Invalid;
         int controlSpaceIndex = 0;                                                 // Index to a space for the thermostat control space
