@@ -109,6 +109,9 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
     Real64 simTime = currentSimTime(state);
     printf("Current Sim Time: %0.2f \n", simTime);
+    const int epwYear = year(state);
+    const int runPeriodYear = calendarYear(state);
+    printf("year: %i, calendarYear: %i\n", epwYear, runPeriodYear);
 
     if (oa_temp > 10) {
         printf("Setting Zn001:Wall001 construction (%d) to R13WALL (%d)", zone1_wall1Actuator, wallConstruction);
