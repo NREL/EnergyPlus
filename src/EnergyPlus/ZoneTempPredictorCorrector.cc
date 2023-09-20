@@ -4230,7 +4230,8 @@ Real64 correctZoneAirTemps(EnergyPlusData &state,
         auto &thisZone = state.dataHeatBal->Zone(zoneNum);
         for (int spaceNum : thisZone.spaceIndexes) {
             auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
-            if (state.dataHeatBal->doSpaceHeatBalance) {
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation &&
+                !state.dataGlobal->DoingSizing) { // Need space air temps to match zone temps for sizing
                 Real64 spaceTempChange = thisSpaceHB.correctAirTemp(state, useZoneTimeStepHistory, zoneNum, spaceNum);
                 maxTempChange = max(maxTempChange, spaceTempChange);
             } else {

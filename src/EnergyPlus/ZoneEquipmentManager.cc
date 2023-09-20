@@ -715,7 +715,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
                 sizeZoneSpaceEquipmentPart1(state,
-                                            zoneEquipConfig,
+                                            state.dataZoneEquip->spaceEquipConfig(spaceNum),
                                             state.dataSize->CalcSpaceSizing(state.dataSize->CurOverallSimDay, spaceNum),
                                             state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum),
                                             state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum),
