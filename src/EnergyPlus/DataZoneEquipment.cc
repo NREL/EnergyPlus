@@ -1736,13 +1736,7 @@ void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spa
 
 void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
 {
-    bool anyAutoSize = false;
-    for (auto &thisSpace : this->spaces) {
-        if (thisSpace.fraction == DataSizing::AutoSize) {
-            anyAutoSize = true;
-            break;
-        }
-    }
+    bool anyAutoSize = std::any_of(spaces.begin(), spaces.end(), [](ZoneEquipSplitterMixerSpace &s) { return s.fraction == DataSizing::AutoSize; });
     if (!anyAutoSize) return;
 
     // Calculate total of space fraction basis value across all spaces for this splitter or mixer
@@ -1780,7 +1774,7 @@ void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
         break;
     }
 
-    if (spacesTotal == 0.0) {
+    if (spacesTotal < 0.00001) {
         ShowSevereError(state,
                         format("ZoneEquipmentSplitterMixer::size: Total {} is zero for {}={}. Unable to autosize Space Fractions.",
                                DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
