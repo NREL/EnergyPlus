@@ -8571,6 +8571,81 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestUpdateVariableAbsorptanc
     EXPECT_NEAR(state->dataHeatBalSurf->SurfAbsSolarExt(2), 0.5, 1e-6);
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateThermalHistoriesIZSurfaceCheck)
+{
+    state->dataSurface->TotSurfaces = 2;
+    state->dataGlobal->NumOfZones = 2;
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+    state->dataHeatBal->AnyInternalHeatSourceInInput = false;
+    state->dataHeatBal->SimpleCTFOnly = false;
+
+    AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
+
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel::CTF;
+    state->dataSurface->Surface(2).Construction = 1;
+    state->dataHeatBal->space.allocate(2);
+    state->dataHeatBal->Zone(1).spaceIndexes.emplace_back(1);
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->space(1).OpaqOrIntMassSurfaceLast = 1;
+    state->dataHeatBal->space(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->space(1).HTSurfaceLast = 1;
+    state->dataHeatBal->Zone(2).spaceIndexes.emplace_back(2);
+    state->dataHeatBal->space(2).OpaqOrIntMassSurfaceFirst = 2;
+    state->dataHeatBal->space(2).OpaqOrIntMassSurfaceLast = 2;
+    state->dataHeatBal->space(2).HTSurfaceFirst = 2;
+    state->dataHeatBal->space(2).HTSurfaceLast = 2;
+
+    state->dataConstruction->Construct(1).NumCTFTerms = 2;
+    state->dataConstruction->Construct(1).SourceSinkPresent = false;
+    state->dataConstruction->Construct(1).NumHistories = 1;
+    state->dataConstruction->Construct(1).CTFOutside[0] = 1.5;
+    state->dataConstruction->Construct(1).CTFCross[0] = 1.5;
+    state->dataConstruction->Construct(1).CTFInside[0] = 1.5;
+
+    state->dataHeatBalSurf->SurfCurrNumHist(1) = 0;
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(1) = 20.0;
+    state->dataHeatBalSurf->SurfTempIn(1) = 10.0;
+    state->dataHeatBalSurf->SurfCTFConstInPart(1) = 0.0;
+    state->dataHeatBalSurf->SurfCurrNumHist(2) = 0;
+    state->dataHeatBalSurf->SurfOutsideTempHist(1)(2) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(2) = 20.0;
+    state->dataHeatBalSurf->SurfCTFConstInPart(2) = 0.0;
+
+    // Test 1: Partition--outside should have a non-zero value (interzone and regular partitions treated the same)
+    state->dataSurface->Surface(1).ExtBoundCond = 1;
+    state->dataSurface->Surface(2).ExtBoundCond = 2;
+
+    UpdateThermalHistories(*state); // Test to make sure that the outside surface flux is being set properly for interzone surfaces
+
+    EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(1));
+    EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(1));
+    EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(2));
+    EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(2));
+
+    // Test 2: Interzone Partition--outside should have a non-zero value
+    state->dataSurface->Surface(1).ExtBoundCond = 2;
+    state->dataSurface->Surface(2).ExtBoundCond = 1;
+    state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux = 0.0;
+    state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux = 0.0;
+
+    UpdateThermalHistories(*state); // Test to make sure that the outside surface flux is being set properly for interzone surfaces
+
+    EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(1));
+    EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(1));
+    EXPECT_EQ(-15.0, state->dataHeatBalSurf->SurfOpaqInsFaceCondFlux(2));
+    EXPECT_EQ(15.0, state->dataHeatBalSurf->SurfOpaqOutFaceCondFlux(2));
+}
+
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfQdotRadSolarInRepPerAreaCalc)
 {
     Real64 const diffTol = 0.0000000001;

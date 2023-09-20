@@ -194,6 +194,7 @@ public:
                                      int const CumlativeSimulationDays,
                                      int const curEnvirNum,
                                      int const simulationYear,
+                                     bool const curYearIsLeapYear,
                                      ObjexxFCL::Optional_int_const Month = _,
                                      ObjexxFCL::Optional_int_const DayOfMonth = _,
                                      ObjexxFCL::Optional_int_const Hour = _,
