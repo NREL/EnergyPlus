@@ -7338,7 +7338,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                     } else {
                         TBmAll = TBmBm + TBmDif;
                     }
-                    BTOTZone += TBmAll * SunLitFract * CosInc * state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
+                    BTOTZone += state.dataSurface->Surface(SurfNum).IncSolMultiplier * TBmAll * SunLitFract * CosInc *
+                                state.dataSurface->Surface(SurfNum).Area * InOutProjSLFracMult; // [m2]
                 }
             }
 
@@ -7416,6 +7417,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                         TBm -= state.dataSurface->SurfWinBmSolAbsdInsReveal(SurfNum) / TBmDenom;
                     }
                     TBm = max(0.0, TBm);
+                    // this multiplier doesn't work with other shading, so no need to apply in other branches
+                    TBm *= state.dataSurface->Surface(SurfNum).IncSolMultiplier;
                 }
 
                 if (TBm == 0.0) continue;
@@ -8744,6 +8747,7 @@ void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state)
             }
 
             TBm = max(0.0, TBm);
+            TBm *= state.dataSurface->Surface(SurfNum).IncSolMultiplier;
 
             int NumOfBackSurf = state.dataShadowComb->ShadowComb(BaseSurfNum).NumBackSurf;
 
