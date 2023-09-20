@@ -584,6 +584,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     } else {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    this->sourceSideCp = CpSrc;
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 
@@ -1747,6 +1748,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
+        SetupOutputVariable(state,
+                            "Heat Pump Source Side Specific Heat",
+                            OutputProcessor::Unit::J_kgK,
+                            this->sourceSideCp,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            this->name);
 
         // find this component on the plant
         bool thisErrFlag = false;
@@ -2246,11 +2254,20 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // calculate source side outlet conditions
     Real64 CpSrc = 0.0;
     if (this->waterSource) {
+        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
         CpSrc = FluidProperties::GetSpecificHeatGlycol(
-            state, thisLoadPlantLoop.FluidName, thisInletNode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
+            state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    this->sourceSideCp = CpSrc;
+    SetupOutputVariable(state,
+                        "Heat Pump Source Side Specific Heat",
+                        OutputProcessor::Unit::J_kgK,
+                        this->sourceSideCp,
+                        OutputProcessor::SOVTimeStepType::System,
+                        OutputProcessor::SOVStoreType::Average,
+                        this->name);
     // Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate) * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
