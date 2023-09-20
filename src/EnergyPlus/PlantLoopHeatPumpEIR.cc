@@ -66,6 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -1272,7 +1273,6 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string condenserType = UtilityRoutines::makeUPPER(fields.at("condenser_type").get<std::string>());
                 std::string sourceSideInletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_inlet_node_name").get<std::string>());
                 std::string sourceSideOutletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
-
                 thisPLHP.companionCoilName = UtilityRoutines::makeUPPER(
                     state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "companion_heat_pump_name"));
 
@@ -1469,8 +1469,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else if (condenserType == "AIRSOURCE") {
                     thisPLHP.airSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
+                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
+                    if (sourceSideInletNodeName == sourceSideOutletNodeName) {
+                        ShowSevereError(state, format("PlantLoopHeatPump {} has the same inlet and outlet node.", thisObjectName));
+                        ShowContinueError(state, format("Node Name: {}", sourceSideInletNodeName));
+                        errorsFound = true;
+                    }
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(
