@@ -791,7 +791,7 @@ namespace WaterManager {
                                     state.dataWaterData->WaterStorage(Item).Name,
                                     {},
                                     "MainsWater",
-                                    "WaterSystem",
+                                    "WaterSystems",
                                     state.dataWaterData->WaterStorage(Item).QualitySubCategoryName,
                                     "System");
                 SetupOutputVariable(state,
