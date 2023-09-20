@@ -8397,7 +8397,7 @@ namespace InternalHeatGains {
             // Contaminant
             // e.CO2Rate = 0.0; - cleared and accumulated in InitInternalHeatGains
             e.GCRate = 0.0;
-            for (int i = 0; i < (int)ExteriorEnergyUse::ExteriorFuelUsage::Num; ++i) {
+            for (int i = 0; i < (int)Constant::eFuel::Num; ++i) {
                 e.OtherPower[i] = 0.0;
                 e.OtherConsump[i] = 0.0;
             }

@@ -1364,8 +1364,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     auto &zoneRpt1 = state->dataHeatBal->ZoneRpt(1);
     EXPECT_NEAR(zoneRpt1.LtsPower, 100.0, 0.01);
     EXPECT_NEAR(zoneRpt1.ElecPower, 150.0, 0.01);
-    EXPECT_NEAR(zoneRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1Use], 350.0, 0.01);
-    EXPECT_NEAR(zoneRpt1.OtherPower[(int)Constant::eFuel::ExteriorFuelUsage::FuelOil2Use], 375.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0, 0.01);
     EXPECT_NEAR(zoneRpt1.GasPower, 200.0, 0.01);
     EXPECT_NEAR(zoneRpt1.HWPower, 250.0, 0.01);
     EXPECT_NEAR(zoneRpt1.SteamPower, 300.0, 0.01);
@@ -1376,8 +1376,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     auto &spaceRpt1 = state->dataHeatBal->spaceRpt(1);
     EXPECT_NEAR(spaceRpt1.LtsPower, 100.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.ElecPower, 150.0 * 0.25, 0.01);
-    EXPECT_NEAR(spaceRpt1.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0 * 0.25, 0.01);
-    EXPECT_NEAR(spaceRpt1.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.GasPower, 200.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.HWPower, 250.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.SteamPower, 300.0 * 0.25, 0.01);
@@ -1388,8 +1388,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     auto &spaceRpt2 = state->dataHeatBal->spaceRpt(2);
     EXPECT_NEAR(spaceRpt2.LtsPower, 100.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.ElecPower, 150.0 * 0.75, 0.01);
-    EXPECT_NEAR(spaceRpt2.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0 * 0.75, 0.01);
-    EXPECT_NEAR(spaceRpt2.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.GasPower, 200.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.HWPower, 250.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.SteamPower, 300.0 * 0.75, 0.01);
@@ -1406,8 +1406,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_EQ(zoneRpt1.LtsPower, 100.0);
     EXPECT_EQ(zoneRpt1.ElecPower, 150.0);
-    EXPECT_EQ(zoneRpt1.OtherPower[(int)Constant::eFuel::ExteriorFuelUsage::OtherFuel1Use], 350.0);
-    EXPECT_EQ(zoneRpt1.OtherPower[(int)Constant::eFuel::ExteriorFuelUsage::FuelOil2Use], 375.0);
+    EXPECT_EQ(zoneRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
+    EXPECT_EQ(zoneRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
     EXPECT_EQ(zoneRpt1.GasPower, 200.0);
     EXPECT_EQ(zoneRpt1.HWPower, 250.0);
     EXPECT_EQ(zoneRpt1.SteamPower, 300.0);
@@ -1417,8 +1417,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_NEAR(spaceRpt1.LtsPower, 100.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.ElecPower, 150.0 * 0.25, 0.01);
-    EXPECT_NEAR(spaceRpt1.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0 * 0.25, 0.01);
-    EXPECT_NEAR(spaceRpt1.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.GasPower, 200.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.HWPower, 250.0 * 0.25, 0.01);
     EXPECT_NEAR(spaceRpt1.SteamPower, 300.0 * 0.25, 0.01);
@@ -1428,8 +1428,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_NEAR(spaceRpt2.LtsPower, 100.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.ElecPower, 150.0 * 0.75, 0.01);
-    EXPECT_NEAR(spaceRpt2.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0 * 0.75, 0.01);
-    EXPECT_NEAR(spaceRpt2.OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.GasPower, 200.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.HWPower, 250.0 * 0.75, 0.01);
     EXPECT_NEAR(spaceRpt2.SteamPower, 300.0 * 0.75, 0.01);
