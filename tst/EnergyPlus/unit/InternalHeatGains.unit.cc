@@ -56,6 +56,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -128,9 +129,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::None));
+            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::None));
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::PropaneUse));
+            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::Propane));
         }
     }
 }
@@ -1343,8 +1344,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);
@@ -1357,8 +1358,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::OtherFuel1Use], 350.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)ExteriorEnergyUse::ExteriorFuelUsage::FuelOil2Use], 375.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
+    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
     EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);

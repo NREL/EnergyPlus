@@ -596,8 +596,10 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecog
     const json &resource_field = lcc_useprice_props.at("resource");
     const json &enum_values = resource_field.at("enum");
 
-    // Should support all fuels + Water + ElectricityXXX (Purchased, Produced, SurplusSold, Net)
-    constexpr size_t numResources = static_cast<size_t>(Constant::eFuel::Num) + 5;
+    // Should support all fuels + ElectricityXXX (Purchased, Produced, SurplusSold, Net)
+    constexpr size_t numResources = static_cast<size_t>(Constant::eFuel::Num) + 3;
+    // Constant::eFuel::Num has 15 fuel types including "None" (which is a fuel type for "OtherEquipment")
+    // "LifeCycleCost:UsePriceEscalation" has 18 fuel types including  ElectricityXXX (Purchased, Produced, SurplusSold, Net)
     EXPECT_EQ(numResources, enum_values.size());
     std::string idf_objects = delimited_string({
         "LifeCycleCost:Parameters,",
