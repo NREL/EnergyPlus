@@ -1132,6 +1132,21 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     std::string const idf_objects = delimited_string({
         "Zone,Main Zone;",
 
+        "Space,",
+        "Space 1,            !- Name",
+        "Main Zone,             !- Zone Name",
+        ",                   !- Ceiling Height {m}",
+        ",                   !- Volume {m3}",
+        "5.0;                !- Floor Area {m2}",
+
+        "Space,",
+        "Space 2,            !- Name",
+        "Main Zone,             !- Zone Name",
+        ",                   !- Ceiling Height {m}",
+        ",                   !- Volume {m3}",
+        "15.0;                !- Floor Area {m2}",
+        "SpaceList, All Spaces, Space 1, Space 2;"
+
         "ZoneHVAC:EquipmentConnections,",
         "  Main Zone,                   !- Zone Name",
         "  Main Zone Equipment,         !- Zone Conditioning Equipment List Name",
@@ -1325,47 +1340,102 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
+    state->dataHeatBal->Zone(1).FloorArea = 20.0;
+    state->dataHeatBal->space(1).FloorArea = 5.0;
+    state->dataHeatBal->space(2).FloorArea = 15.0;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_EQ(state->dataHeatBal->TotPeople, 1);
-    EXPECT_EQ(state->dataHeatBal->TotLights, 1);
-    EXPECT_EQ(state->dataHeatBal->TotElecEquip, 1);
-    EXPECT_EQ(state->dataHeatBal->TotGasEquip, 1);
-    EXPECT_EQ(state->dataHeatBal->TotHWEquip, 1);
-    EXPECT_EQ(state->dataHeatBal->TotStmEquip, 1);
-    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 2);
-    EXPECT_EQ(state->dataHeatBal->TotBBHeat, 1);
+    EXPECT_EQ(state->dataHeatBal->TotPeople, 2);
+    EXPECT_EQ(state->dataHeatBal->TotLights, 2);
+    EXPECT_EQ(state->dataHeatBal->TotElecEquip, 2);
+    EXPECT_EQ(state->dataHeatBal->TotGasEquip, 2);
+    EXPECT_EQ(state->dataHeatBal->TotHWEquip, 2);
+    EXPECT_EQ(state->dataHeatBal->TotStmEquip, 2);
+    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 4);
+    EXPECT_EQ(state->dataHeatBal->TotBBHeat, 2);
 
     EnergyPlus::createFacilityElectricPowerServiceObject(*state); // Needs to happen before InitInternalHeatGains
 
-    // First time should be all good, because ZoneRpt values initialize to zero
+    // First time should be all good, because ZoneRpt/spaceRpt values initialize to zero
     InternalHeatGains::InitInternalHeatGains(*state);
+    InternalHeatGains::ReportInternalHeatGains(*state);
 
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ITEqSHI, 0);
+    auto &zoneRpt1 = state->dataHeatBal->ZoneRpt(1);
+    EXPECT_NEAR(zoneRpt1.LtsPower, 100.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.ElecPower, 150.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.GasPower, 200.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.HWPower, 250.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.SteamPower, 300.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.BaseHeatPower, 1500.0, 0.01);
+    EXPECT_NEAR(zoneRpt1.CO2Rate, 0.0001125, 0.01);
+    EXPECT_NEAR(zoneRpt1.ITEqSHI, 0, 0.01);
+
+    auto &spaceRpt1 = state->dataHeatBal->spaceRpt(1);
+    EXPECT_NEAR(spaceRpt1.LtsPower, 100.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.ElecPower, 150.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.GasPower, 200.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.HWPower, 250.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.SteamPower, 300.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.BaseHeatPower, 1500.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.CO2Rate, 0.0001125 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.ITEqSHI, 0, 0.01);
+
+    auto &spaceRpt2 = state->dataHeatBal->spaceRpt(2);
+    EXPECT_NEAR(spaceRpt2.LtsPower, 100.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.ElecPower, 150.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.GasPower, 200.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.HWPower, 250.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.SteamPower, 300.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.BaseHeatPower, 1500.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.CO2Rate, 0.0001125 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.ITEqSHI, 0, 0.01);
+
+    // Not implemented yet EXPECT_EQ(spaceRpt1.CO2Rate, 0.0001125);
+    EXPECT_EQ(spaceRpt1.ITEqSHI, 0);
 
     // Second time should should give the same answers, because everything should reset before accumulating
     InternalHeatGains::InitInternalHeatGains(*state);
+    InternalHeatGains::ReportInternalHeatGains(*state);
 
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).GasPower, 200.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).HWPower, 250.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(state->dataHeatBal->ZoneRpt(1).ITEqSHI, 0);
+    EXPECT_EQ(zoneRpt1.LtsPower, 100.0);
+    EXPECT_EQ(zoneRpt1.ElecPower, 150.0);
+    EXPECT_EQ(zoneRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0);
+    EXPECT_EQ(zoneRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0);
+    EXPECT_EQ(zoneRpt1.GasPower, 200.0);
+    EXPECT_EQ(zoneRpt1.HWPower, 250.0);
+    EXPECT_EQ(zoneRpt1.SteamPower, 300.0);
+    EXPECT_EQ(zoneRpt1.BaseHeatPower, 1500.0);
+    EXPECT_EQ(zoneRpt1.CO2Rate, 0.0001125);
+    EXPECT_EQ(zoneRpt1.ITEqSHI, 0);
+
+    EXPECT_NEAR(spaceRpt1.LtsPower, 100.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.ElecPower, 150.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.GasPower, 200.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.HWPower, 250.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.SteamPower, 300.0 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.BaseHeatPower, 1500.0 * 0.25, 0.01);
+    // space CO2 not implemented yet - EXPECT_NEAR(spaceRpt1.CO2Rate, 0.0001125 * 0.25, 0.01);
+    EXPECT_NEAR(spaceRpt1.ITEqSHI, 0, 0.01);
+
+    EXPECT_NEAR(spaceRpt2.LtsPower, 100.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.ElecPower, 150.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::OtherFuel1], 350.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.OtherPower[(int)Constant::eFuel::FuelOilNo2], 375.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.GasPower, 200.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.HWPower, 250.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.SteamPower, 300.0 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.BaseHeatPower, 1500.0 * 0.75, 0.01);
+    // space CO2 not implemented yet - EXPECT_NEAR(spaceRpt2.CO2Rate, 0.0001125 * 0.75, 0.01);
+    EXPECT_NEAR(spaceRpt2.ITEqSHI, 0, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
