@@ -1594,7 +1594,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
             } else {
                 tempHeatRecVolFlowRate = this->EvapVolFlowRate;
             }
-            tempHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->HeatRecCapacityFraction;
+            tempHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->CompPowerToCondenserFrac * this->HeatRecCapacityFraction;
         }
         if (this->DesignHeatRecVolFlowRateWasAutoSized) {
 

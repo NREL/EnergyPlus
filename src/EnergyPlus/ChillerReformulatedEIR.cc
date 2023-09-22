@@ -1375,7 +1375,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
             } else {
                 tmpHeatRecVolFlowRate = this->EvapVolFlowRate;
             }
-            tmpHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->HeatRecCapacityFraction;
+            tmpHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->CompPowerToCondenserFrac * this->HeatRecCapacityFraction;
         }
         if (!this->DesignHeatRecVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
