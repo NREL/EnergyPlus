@@ -5191,3 +5191,83 @@ TEST_F(EnergyPlusFixture, SpaceHVACSplitterTest)
     EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToCoolingSP(1), 100.0 * expectedRatio, 0.001);
     EXPECT_NEAR(zone1Energy.SequencedOutputRequiredToHeatingSP(1), 10.0 * expectedRatio, 0.001);
 }
+
+TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
+{
+    state->dataZoneEquip->zoneEquipMixer.resize(1);
+    auto &thisMixer = state->dataZoneEquip->zoneEquipMixer[0];
+    // Assume 3 spaces are served by this mixter
+    state->dataZoneEquip->zoneEquipMixer[0].spaces.resize(3);
+    auto &mixSpace1 = state->dataZoneEquip->zoneEquipMixer[0].spaces[0];
+    auto &mixSpace2 = state->dataZoneEquip->zoneEquipMixer[0].spaces[1];
+    auto &mixSpace3 = state->dataZoneEquip->zoneEquipMixer[0].spaces[2];
+    mixSpace1.fraction = 0.2;
+    mixSpace2.fraction = 0.5;
+    mixSpace3.fraction = 0.3;
+    mixSpace1.spaceIndex = 1;
+    mixSpace2.spaceIndex = 3;
+    mixSpace3.spaceIndex = 2;
+    mixSpace1.spaceNodeNum = 11;
+    mixSpace2.spaceNodeNum = 12;
+    mixSpace3.spaceNodeNum = 13;
+    state->dataLoopNodes->Node.allocate(13);
+    thisMixer.zoneEquipInletNodeNum = 1;
+    auto &equipInletNode = state->dataLoopNodes->Node(thisMixer.zoneEquipInletNodeNum);
+    auto &mixSpace1Node = state->dataLoopNodes->Node(mixSpace1.spaceNodeNum);
+    auto &mixSpace2Node = state->dataLoopNodes->Node(mixSpace2.spaceNodeNum);
+    auto &mixSpace3Node = state->dataLoopNodes->Node(mixSpace3.spaceNodeNum);
+
+    // Case 1
+
+    mixSpace1Node.Temp = 15.0;
+    mixSpace2Node.Temp = 15.0;
+    mixSpace3Node.Temp = 15.0;
+
+    mixSpace1Node.HumRat = 0.004;
+    mixSpace2Node.HumRat = 0.001;
+    mixSpace3Node.HumRat = 0.080;
+
+    mixSpace1Node.Enthalpy = Psychrometrics::PsyHFnTdbW(mixSpace1Node.Temp, mixSpace1Node.HumRat);
+    mixSpace2Node.Enthalpy = Psychrometrics::PsyHFnTdbW(mixSpace2Node.Temp, mixSpace2Node.HumRat);
+
+    mixSpace1Node.Press = 100000.0;
+    mixSpace2Node.Press = 100020.0;
+    mixSpace3Node.Press = 99400.0;
+
+    equipInletNode.Temp = 19.2;
+    equipInletNode.HumRat = 0.005;
+    equipInletNode.CO2 = 100.0;
+
+    thisMixer.setOutletConditions(*state);
+    Real64 expectedInletEnthalpy =
+        mixSpace1Node.Enthalpy * mixSpace1.fraction + mixSpace2Node.Enthalpy * mixSpace2.fraction + mixSpace3Node.Enthalpy * mixSpace3.fraction;
+    Real64 expectedInletHumRat =
+        mixSpace1Node.HumRat * mixSpace1.fraction + mixSpace2Node.HumRat * mixSpace2.fraction + mixSpace3Node.HumRat * mixSpace3.fraction;
+    Real64 expectedInletCO2 =
+        mixSpace1Node.CO2 * mixSpace1.fraction + mixSpace2Node.CO2 * mixSpace2.fraction + mixSpace3Node.CO2 * mixSpace3.fraction;
+    Real64 expectedInletPress =
+        mixSpace1Node.Press * mixSpace1.fraction + mixSpace2Node.Press * mixSpace2.fraction + mixSpace3Node.Press * mixSpace3.fraction;
+    Real64 expectedInletTemp = Psychrometrics::PsyTdbFnHW(expectedInletEnthalpy, expectedInletHumRat);
+
+    EXPECT_NEAR(expectedInletEnthalpy, equipInletNode.Enthalpy, 0.0001);
+    EXPECT_NEAR(expectedInletTemp, equipInletNode.Temp, 0.0001);
+    EXPECT_NEAR(expectedInletHumRat, equipInletNode.HumRat, 0.0001);
+    EXPECT_NEAR(expectedInletCO2, equipInletNode.CO2, 0.0001);
+    EXPECT_NEAR(expectedInletPress, equipInletNode.Press, 0.0001);
+
+    equipInletNode.MassFlowRate = 0.1;
+    equipInletNode.MassFlowRateMinAvail = 0.0;
+    equipInletNode.MassFlowRateMaxAvail = 0.15;
+
+    thisMixer.setInletFlows(*state);
+
+    EXPECT_NEAR(mixSpace1Node.MassFlowRate, equipInletNode.MassFlowRate * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRate, equipInletNode.MassFlowRate * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRate, equipInletNode.MassFlowRate * mixSpace3.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace1Node.MassFlowRateMinAvail, equipInletNode.MassFlowRateMinAvail * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRateMinAvail, equipInletNode.MassFlowRateMinAvail * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRateMinAvail, equipInletNode.MassFlowRateMinAvail * mixSpace3.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace1Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace1.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace2Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace2.fraction, 0.0001);
+    EXPECT_NEAR(mixSpace3Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace3.fraction, 0.0001);
+}
