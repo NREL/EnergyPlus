@@ -5061,9 +5061,6 @@ TEST_F(EnergyPlusFixture, SpaceHVACSplitterTest)
     auto &space1Energy = state->dataZoneEnergyDemand->spaceSysEnergyDemand(1);
     auto &space2Energy = state->dataZoneEnergyDemand->spaceSysEnergyDemand(2);
     auto &space3Energy = state->dataZoneEnergyDemand->spaceSysEnergyDemand(3);
-    auto &space1Moist = state->dataZoneEnergyDemand->spaceSysMoistureDemand(1);
-    auto &space2Moist = state->dataZoneEnergyDemand->spaceSysMoistureDemand(2);
-    auto &space3Moist = state->dataZoneEnergyDemand->spaceSysMoistureDemand(3);
     zone1Energy.SequencedOutputRequired.allocate(1);
     zone1Energy.SequencedOutputRequiredToCoolingSP.allocate(1);
     zone1Energy.SequencedOutputRequiredToHeatingSP.allocate(1);
