@@ -346,20 +346,9 @@ namespace ZoneTempPredictorCorrector {
     );
 
     void CalcZoneComponentLoadSums(EnergyPlusData &state,
-                                   int ZoneNum,             // Zone number
-                                   Real64 TempDepCoef,      // Dependent coefficient
-                                   Real64 TempIndCoef,      // Independent coefficient
-                                   Real64 &SumIntGains,     // Zone sum of convective internal gains
-                                   Real64 &SumHADTsurfs,    // Zone sum of Hc*Area*(Tsurf - Tz)
-                                   Real64 &SumMCpDTzones,   // zone sum of MassFlowRate*cp*(TremotZone - Tz) transfer air from other zone, Mixing
-                                   Real64 &SumMCpDtInfil,   // Zone sum of MassFlowRate*Cp*(Tout - Tz) transfer from outside, ventil, earth tube
-                                   Real64 &SumMCpDTsystem,  // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
-                                   Real64 &SumNonAirSystem, // Zone sum of non air system convective heat gains
-                                   Real64 &CzdTdt,          // Zone air energy storage term.
-                                   Real64 &imBalance,       // put all terms in eq. 5 on RHS , should be zero
-                                   Real64 &SumEnthalpyM,    // Zone sum of phase change material melting enthlpy
-                                   Real64 &SumEnthalpyH     // Zone sum of phase change material freezing enthalpy
-    );
+                                   int ZoneNum, // Zone number
+                                   ZoneTempPredictorCorrector::ZoneSpaceHeatBalanceData *thisHB,
+                                   DataHeatBalance::AirReportVars &thisAirRpt);
 
     bool VerifyThermostatInZone(EnergyPlusData &state, std::string const &ZoneName); // Zone to verify
 

@@ -147,7 +147,7 @@ char *listAllAPIDataCSV(EnergyPlusState state)
         output.append("Actuator,");
         output.append(availActuator.ComponentTypeName).append(",");
         output.append(availActuator.ControlTypeName).append(",");
-        output.append(availActuator.UniqueIDName).append(";\n");
+        output.append(availActuator.UniqueIDName).append("\n");
     }
     output.append("**INTERNAL_VARIABLES**\n");
     for (auto const &availVariable : thisState->dataRuntimeLang->EMSInternalVarsAvailable) {
@@ -782,6 +782,12 @@ int year(EnergyPlusState state)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     return thisState->dataEnvrn->Year;
+}
+
+int calendarYear(EnergyPlusState state)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    return thisState->dataGlobal->CalendarYear;
 }
 
 int month(EnergyPlusState state)
