@@ -95,8 +95,8 @@ void EIRPlantLoopHeatPump::simulate(
 
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state, FirstHVACIteration);
-        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) {                           // condenser side
-            Real64 sourceQdotArg = 0.0;                                                                 // pass negative if heat pump heating
+        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
+            Real64 sourceQdotArg = 0.0;                                       // pass negative if heat pump heating
             if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
                 sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone;
             } else {
