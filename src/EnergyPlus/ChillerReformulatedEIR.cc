@@ -1270,7 +1270,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
         }
     }
 
-    if (PltSizCondNum > 0 && PltSizNum > 0) {
+    if (PltSizCondNum > 0 && PltSizNum > 0 && this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
@@ -1337,19 +1337,19 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
             }
         }
     } else {
-        if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+        if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize &&
+            this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             ShowSevereError(state, "Autosizing of Reformulated Electric EIR Chiller condenser flow rate requires a condenser");
             ShowContinueError(state, "loop Sizing:Plant object");
             ShowContinueError(state, format("Occurs in Reformulated Electric EIR Chiller object={}", this->Name));
             ErrorsFound = true;
         }
-        this->CondVolFlowRate = this->RefCap * 0.000114;
-        if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (this->CondVolFlowRate > 0.0)) {
-            BaseSizer::reportSizerOutput(state,
-                                         "Chiller:Electric:ReformulatedEIR",
-                                         this->Name,
-                                         "User-Specified Reference Condenser Water Flow Rate [m3/s]",
-                                         this->CondVolFlowRate);
+        tmpCondVolFlowRate = this->CondVolFlowRateWasAutoSized ? this->RefCap * 0.000114 : this->CondVolFlowRate;
+        if (this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (tmpCondVolFlowRate > 0.0) &&
+            this->CondenserType != DataPlant::CondenserType::WaterCooled) {
+            this->CondVolFlowRate = tmpCondVolFlowRate;
+            BaseSizer::reportSizerOutput(
+                state, "Chiller:Electric:ReformulatedEIR", this->Name, "Design Size Reference Condenser Air Flow Rate [m3/s]", this->CondVolFlowRate);
         }
     }
 
