@@ -264,74 +264,14 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
                 }
             }
         }
-        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-
-            auto &zoneNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode);
-            zoneNode.Temp = 20.0;
-            zoneNode.MassFlowRate = 0.0;
-            zoneNode.Quality = 1.0;
-            zoneNode.Press = state.dataEnvrn->OutBaroPress;
-            zoneNode.HumRat = state.dataEnvrn->OutHumRat;
-            zoneNode.Enthalpy = PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
-            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                zoneNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-            }
-            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                zoneNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-            }
-
-            for (int ZoneInNode = 1; ZoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInNode) {
-                auto &inNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInNode));
-                inNode.Temp = 20.0;
-                inNode.MassFlowRate = 0.0;
-                inNode.Quality = 1.0;
-                inNode.Press = state.dataEnvrn->OutBaroPress;
-                inNode.HumRat = state.dataEnvrn->OutHumRat;
-                inNode.Enthalpy = PsyHFnTdbW(inNode.Temp, inNode.HumRat);
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    inNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    inNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                }
-            }
-
-            for (int ZoneExhNode = 1; ZoneExhNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNode) {
-
-                auto &exhNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNode));
-                exhNode.Temp = 20.0;
-                exhNode.MassFlowRate = 0.0;
-                exhNode.Quality = 1.0;
-                exhNode.Press = state.dataEnvrn->OutBaroPress;
-                exhNode.HumRat = state.dataEnvrn->OutHumRat;
-                exhNode.Enthalpy = PsyHFnTdbW(exhNode.Temp, exhNode.HumRat);
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    exhNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    exhNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                }
-            }
-
-            // BG CR 7122 following resets return air node.
-            int NumRetNodes = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes;
-            if (NumRetNodes > 0) {
-                for (int nodeCount = 1; nodeCount <= NumRetNodes; ++nodeCount) {
-                    auto &returnNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(nodeCount));
-                    returnNode.Temp = 20.0;
-                    returnNode.MassFlowRate = 0.0;
-                    returnNode.Quality = 1.0;
-                    returnNode.Press = state.dataEnvrn->OutBaroPress;
-                    returnNode.HumRat = state.dataEnvrn->OutHumRat;
-                    returnNode.Enthalpy = PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);
-                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        returnNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                    }
-                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        returnNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                    }
-                }
+        for (auto &thisZoneEquipConfig : state.dataZoneEquip->ZoneEquipConfig) {
+            if (!thisZoneEquipConfig.IsControlled) continue;
+            thisZoneEquipConfig.beginEnvirnInit(state);
+        }
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            for (auto &thisSpaceEquipConfig : state.dataZoneEquip->spaceEquipConfig) {
+                if (!thisSpaceEquipConfig.IsControlled) continue;
+                thisSpaceEquipConfig.beginEnvirnInit(state);
             }
         }
 
@@ -344,29 +284,14 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
 
     // do the  HVAC time step initializations
 
-    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-        if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-        auto &zoneNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode);
-        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExcessZoneExh = 0.0;
-
-        if (FirstHVACIteration) {
-            for (int ZoneExhNode = 1; ZoneExhNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNode) {
-                auto &exhNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNode));
-                exhNode.Temp = zoneNode.Temp;
-                exhNode.HumRat = zoneNode.HumRat;
-                exhNode.Enthalpy = zoneNode.Enthalpy;
-                exhNode.Press = zoneNode.Press;
-                exhNode.Quality = zoneNode.Quality;
-                exhNode.MassFlowRate = 0.0;
-                exhNode.MassFlowRateMaxAvail = 0.0;
-                exhNode.MassFlowRateMinAvail = 0.0;
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    exhNode.CO2 = zoneNode.CO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    exhNode.GenContam = zoneNode.GenContam;
-                }
-            }
+    for (auto &thisZoneEquipConfig : state.dataZoneEquip->ZoneEquipConfig) {
+        if (!thisZoneEquipConfig.IsControlled) continue;
+        thisZoneEquipConfig.hvacTimeStepInit(state, FirstHVACIteration);
+    }
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        for (auto &thisSpaceEquipConfig : state.dataZoneEquip->spaceEquipConfig) {
+            if (!thisSpaceEquipConfig.IsControlled) continue;
+            thisSpaceEquipConfig.hvacTimeStepInit(state, FirstHVACIteration);
         }
     }
 

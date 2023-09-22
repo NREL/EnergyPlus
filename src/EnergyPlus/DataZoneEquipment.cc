@@ -1979,4 +1979,99 @@ void ZoneEquipmentSplitter::distributeOutput(EnergyPlusData &state,
     }
 }
 
+void EquipConfiguration::beginEnvirnInit(EnergyPlusData &state)
+{
+    auto &zoneNode = state.dataLoopNodes->Node(this->ZoneNode);
+    zoneNode.Temp = 20.0;
+    zoneNode.MassFlowRate = 0.0;
+    zoneNode.Quality = 1.0;
+    zoneNode.Press = state.dataEnvrn->OutBaroPress;
+    zoneNode.HumRat = state.dataEnvrn->OutHumRat;
+    zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        zoneNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+    }
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        zoneNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+    }
+
+    for (int const nodeNum : this->InletNode) {
+        auto &inNode = state.dataLoopNodes->Node(nodeNum);
+        inNode.Temp = 20.0;
+        inNode.MassFlowRate = 0.0;
+        inNode.Quality = 1.0;
+        inNode.Press = state.dataEnvrn->OutBaroPress;
+        inNode.HumRat = state.dataEnvrn->OutHumRat;
+        inNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inNode.Temp, inNode.HumRat);
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            inNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            inNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+        }
+    }
+
+    for (int const nodeNum : this->ExhaustNode) {
+        auto &exhNode = state.dataLoopNodes->Node(nodeNum);
+        exhNode.Temp = 20.0;
+        exhNode.MassFlowRate = 0.0;
+        exhNode.Quality = 1.0;
+        exhNode.Press = state.dataEnvrn->OutBaroPress;
+        exhNode.HumRat = state.dataEnvrn->OutHumRat;
+        exhNode.Enthalpy = Psychrometrics::PsyHFnTdbW(exhNode.Temp, exhNode.HumRat);
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            exhNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            exhNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+        }
+    }
+
+    // BG CR 7122 following resets return air node.
+    int NumRetNodes = this->NumReturnNodes;
+    if (NumRetNodes > 0) {
+        for (int const nodeNum : this->ReturnNode) {
+            auto &returnNode = state.dataLoopNodes->Node(nodeNum);
+            returnNode.Temp = 20.0;
+            returnNode.MassFlowRate = 0.0;
+            returnNode.Quality = 1.0;
+            returnNode.Press = state.dataEnvrn->OutBaroPress;
+            returnNode.HumRat = state.dataEnvrn->OutHumRat;
+            returnNode.Enthalpy = Psychrometrics::PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);
+            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                returnNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+            }
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                returnNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+            }
+        }
+    }
+}
+
+void EquipConfiguration::hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACIteration)
+{
+    auto &zoneNode = state.dataLoopNodes->Node(this->ZoneNode);
+    this->ExcessZoneExh = 0.0;
+
+    if (FirstHVACIteration) {
+        for (int const nodeNum : this->ExhaustNode) {
+            auto &exhNode = state.dataLoopNodes->Node(nodeNum);
+            exhNode.Temp = zoneNode.Temp;
+            exhNode.HumRat = zoneNode.HumRat;
+            exhNode.Enthalpy = zoneNode.Enthalpy;
+            exhNode.Press = zoneNode.Press;
+            exhNode.Quality = zoneNode.Quality;
+            exhNode.MassFlowRate = 0.0;
+            exhNode.MassFlowRateMaxAvail = 0.0;
+            exhNode.MassFlowRateMinAvail = 0.0;
+            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                exhNode.CO2 = zoneNode.CO2;
+            }
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                exhNode.GenContam = zoneNode.GenContam;
+            }
+        }
+    }
+}
+
 } // namespace EnergyPlus::DataZoneEquipment

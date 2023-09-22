@@ -386,6 +386,10 @@ namespace DataZoneEquipment {
         }
 
         void setTotalInletFlows(EnergyPlusData &state);
+
+        void beginEnvirnInit(EnergyPlusData &state);
+
+        void hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACIteration);
     };
 
     struct EquipmentData // data for an individual component
