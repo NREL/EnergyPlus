@@ -1350,6 +1350,10 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
             this->CondVolFlowRate = tmpCondVolFlowRate;
             BaseSizer::reportSizerOutput(
                 state, "Chiller:Electric:ReformulatedEIR", this->Name, "Design Size Reference Condenser Air Flow Rate [m3/s]", this->CondVolFlowRate);
+        } else if (!this->CondVolFlowRateWasAutoSized && state.dataPlnt->PlantFinalSizesOkayToReport && (tmpCondVolFlowRate > 0.0) &&
+                   this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+            BaseSizer::reportSizerOutput(
+                state, "Chiller:Electric:ReformulatedEIR", this->Name, "User-Specified Reference Condenser Water Flow Rate [m3/s]", this->CondVolFlowRate);
         }
     }
 
