@@ -95,13 +95,13 @@ void EIRPlantLoopHeatPump::simulate(
 
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state, FirstHVACIteration);
-        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) {                           // condenser side
-            Real64 sourceQdotArg = 0.0;                                                                 // TRANE, pass negative if heat pump heating
-            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {                 // TRANE
-                sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone; // TRANE
-            } else {                                                                                    // TRANE
-                sourceQdotArg = this->sourceSideHeatTransfer;                                           // TRANE
-            }                                                                                           // TRANE
+        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
+            Real64 sourceQdotArg = 0.0;                                       // pass negative if heat pump heating
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+                sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone;
+            } else {
+                sourceQdotArg = this->sourceSideHeatTransfer;
+            }
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->sourceSidePlantLoc.loopNum,
                                                                 this->sourceSidePlantLoc.loopSideNum,

@@ -162,13 +162,11 @@ void ManageHVAC(EnergyPlusData &state)
         thisZoneHB.ZTAV = 0.0;
         thisZoneHB.airHumRatAvg = 0.0;
     }
-    if (state.dataHeatBal->doSpaceHeatBalance) {
-        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
-            thisSpaceHB.ZT = thisSpaceHB.MAT;
-            // save for use with thermal comfort control models (Fang, Pierce, and KSU)
-            thisSpaceHB.ZTAV = 0.0;
-            thisSpaceHB.airHumRatAvg = 0.0;
-        }
+    for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+        thisSpaceHB.ZT = thisSpaceHB.MAT;
+        // save for use with thermal comfort control models (Fang, Pierce, and KSU)
+        thisSpaceHB.ZTAV = 0.0;
+        thisSpaceHB.airHumRatAvg = 0.0;
     }
     state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver = 0.0;
     state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver = 0.0;
@@ -391,12 +389,11 @@ void ManageHVAC(EnergyPlusData &state)
             auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
             thisZoneHB.ZTAV += thisZoneHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
             thisZoneHB.airHumRatAvg += thisZoneHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
-            if (state.dataHeatBal->doSpaceHeatBalance) {
-                for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-                    auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
-                    thisSpaceHB.ZTAV += thisSpaceHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
-                    thisSpaceHB.airHumRatAvg += thisSpaceHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
-                }
+            // Space temps are always used, regardless of doSpaceHeatBalance setting
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
+                thisSpaceHB.ZTAV += thisSpaceHB.ZT * state.dataHVACGlobal->FracTimeStepZone;
+                thisSpaceHB.airHumRatAvg += thisSpaceHB.airHumRat * state.dataHVACGlobal->FracTimeStepZone;
             }
             if (state.dataContaminantBalance->Contaminant.CO2Simulation)
                 state.dataContaminantBalance->ZoneAirCO2Avg(ZoneNum) +=
@@ -547,11 +544,9 @@ void ManageHVAC(EnergyPlusData &state)
         thisZoneHB.ZTAVComf = thisZoneHB.ZTAV;
         thisZoneHB.airHumRatAvgComf = thisZoneHB.airHumRatAvg;
     }
-    if (state.dataHeatBal->doSpaceHeatBalance) {
-        for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
-            thisSpaceHB.ZTAVComf = thisSpaceHB.ZTAV;
-            thisSpaceHB.airHumRatAvgComf = thisSpaceHB.airHumRatAvg;
-        }
+    for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
+        thisSpaceHB.ZTAVComf = thisSpaceHB.ZTAV;
+        thisSpaceHB.airHumRatAvgComf = thisSpaceHB.airHumRatAvg;
     }
 
     ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
@@ -2232,7 +2227,7 @@ void ReportInfiltrations(EnergyPlusData &state)
     // This subroutine currently creates the values for standard Infiltration object level reporting
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static std::string const RoutineName("ReportInfiltrations");
+    static constexpr std::string_view RoutineName = "ReportInfiltrations";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 AirDensity;          // Density of air (kg/m^3)
@@ -2245,8 +2240,9 @@ void ReportInfiltrations(EnergyPlusData &state)
 
     for (auto &thisInfiltration : state.dataHeatBal->Infiltration) {
 
+        int spaceNum = thisInfiltration.spaceIndex;
+        auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum);
         int NZ = thisInfiltration.ZonePtr;
-        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(NZ);
         auto const &thisZone = state.dataHeatBal->Zone(NZ);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
@@ -2261,31 +2257,31 @@ void ReportInfiltrations(EnergyPlusData &state)
         thisInfiltration.InfilMdot = thisInfiltration.MCpI_temp / CpAir * ADSCorrectionFactor;
         thisInfiltration.InfilMass = thisInfiltration.InfilMdot * TimeStepSysSec;
 
-        if (thisZoneHB.MAT > thisZone.OutDryBulbTemp) {
+        if (thisSpaceHB.MAT > thisZone.OutDryBulbTemp) {
 
             thisInfiltration.InfilHeatLoss =
-                thisInfiltration.MCpI_temp * (thisZoneHB.MAT - thisZone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
+                thisInfiltration.MCpI_temp * (thisSpaceHB.MAT - thisZone.OutDryBulbTemp) * TimeStepSysSec * ADSCorrectionFactor;
             thisInfiltration.InfilHeatGain = 0.0;
 
         } else {
 
             thisInfiltration.InfilHeatGain =
-                thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisZoneHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
+                thisInfiltration.MCpI_temp * (thisZone.OutDryBulbTemp - thisSpaceHB.MAT) * TimeStepSysSec * ADSCorrectionFactor;
             thisInfiltration.InfilHeatLoss = 0.0;
         }
 
         // Report infiltration latent gains and losses
-        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
-        if (thisZoneHB.airHumRat > state.dataEnvrn->OutHumRat) {
+        H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(thisSpaceHB.airHumRat, thisSpaceHB.MAT);
+        if (thisSpaceHB.airHumRat > state.dataEnvrn->OutHumRat) {
 
             thisInfiltration.InfilLatentLoss =
-                thisInfiltration.InfilMdot * (thisZoneHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
+                thisInfiltration.InfilMdot * (thisSpaceHB.airHumRat - state.dataEnvrn->OutHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentGain = 0.0;
 
         } else {
 
             thisInfiltration.InfilLatentGain =
-                thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisZoneHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
+                thisInfiltration.InfilMdot * (state.dataEnvrn->OutHumRat - thisSpaceHB.airHumRat) * H2OHtOfVap * TimeStepSysSec;
             thisInfiltration.InfilLatentLoss = 0.0;
         }
         // Total infiltration losses and gains
@@ -2299,7 +2295,7 @@ void ReportInfiltrations(EnergyPlusData &state)
             thisInfiltration.InfilTotalLoss = -TotalLoad;
         }
         // CR7751  second, calculate using indoor conditions for density property
-        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRatAvg, RoutineName);
+        AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisSpaceHB.MAT, thisSpaceHB.airHumRatAvg, RoutineName);
         thisInfiltration.InfilVdotCurDensity = thisInfiltration.InfilMdot / AirDensity;
         thisInfiltration.InfilVolumeCurDensity = thisInfiltration.InfilVdotCurDensity * TimeStepSysSec;
         thisInfiltration.InfilAirChangeRate = thisInfiltration.InfilVolumeCurDensity / (TimeStepSys * thisZone.Volume);

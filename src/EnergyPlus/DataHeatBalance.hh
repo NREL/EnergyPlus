@@ -1325,40 +1325,8 @@ namespace DataHeatBalance {
 
     struct SpaceZoneSimData // Calculated data by Space or Zone during each time step/hour
     {
-        // Members
-        Real64 NOFOCC = 0.0;  // Number of Occupants
-        Real64 QOCTOT = 0.0;  // Total Energy from Occupants
-        Real64 QOCSEN = 0.0;  // Sensible Energy from Occupants
-        Real64 QOCCON = 0.0;  // ENERGY CONVECTED FROM OCCUPANTS (WH)
-        Real64 QOCRAD = 0.0;  // ENERGY RADIATED FROM OCCUPANTS
-        Real64 QOCLAT = 0.0;  // LATENT ENERGY FROM OCCUPANTS
-        Real64 QLTTOT = 0.0;  // TOTAL ENERGY INTO LIGHTS (WH)
-        Real64 QLTCON = 0.0;  // ENERGY CONVECTED TO SPACE AIR FROM LIGHTS
-        Real64 QLTRAD = 0.0;  // ENERGY RADIATED TO SPACE FROM LIGHTS
-        Real64 QLTCRA = 0.0;  // ENERGY CONVECTED TO RETURN AIR FROM LIGHTS
-        Real64 QLTSW = 0.0;   // VISIBLE ENERGY FROM LIGHTS
-        Real64 QEECON = 0.0;  // ENERGY CONVECTED FROM ELECTRIC EQUIPMENT
-        Real64 QEERAD = 0.0;  // ENERGY RADIATED FROM ELECTRIC EQUIPMENT
-        Real64 QEELost = 0.0; // Energy from Electric Equipment (lost)
-        Real64 QEELAT = 0.0;  // LATENT ENERGY FROM Electric Equipment
-        Real64 QGECON = 0.0;  // ENERGY CONVECTED FROM GAS EQUIPMENT
-        Real64 QGERAD = 0.0;  // ENERGY RADIATED FROM GAS EQUIPMENT
-        Real64 QGELost = 0.0; // Energy from Gas Equipment (lost)
-        Real64 QGELAT = 0.0;  // LATENT ENERGY FROM Gas Equipment
-        Real64 QOECON = 0.0;  // ENERGY CONVECTED FROM OTHER EQUIPMENT
-        Real64 QOERAD = 0.0;  // ENERGY RADIATED FROM OTHER EQUIPMENT
-        Real64 QOELost = 0.0; // Energy from Other Equipment (lost)
-        Real64 QOELAT = 0.0;  // LATENT ENERGY FROM Other Equipment
-        Real64 QHWCON = 0.0;  // ENERGY CONVECTED FROM Hot Water EQUIPMENT
-        Real64 QHWRAD = 0.0;  // ENERGY RADIATED FROM Hot Water EQUIPMENT
-        Real64 QHWLost = 0.0; // Energy from Hot Water Equipment (lost)
-        Real64 QHWLAT = 0.0;  // LATENT ENERGY FROM Hot Water Equipment
-        Real64 QSECON = 0.0;  // ENERGY CONVECTED FROM Steam EQUIPMENT
-        Real64 QSERAD = 0.0;  // ENERGY RADIATED FROM Steam EQUIPMENT
-        Real64 QSELost = 0.0; // Energy from Steam Equipment (lost)
-        Real64 QSELAT = 0.0;  // LATENT ENERGY FROM Steam Equipment
-        Real64 QBBCON = 0.0;  // ENERGY CONVECTED FROM BASEBOARD HEATING
-        Real64 QBBRAD = 0.0;  // ENERGY RADIATED FROM BASEBOARD HEATING
+        Real64 NOFOCC = 0.0; // Number of Occupants
+        Real64 QLTSW = 0.0;  // VISIBLE ENERGY FROM LIGHTS
     };
 
     struct SpaceIntGainDeviceData
