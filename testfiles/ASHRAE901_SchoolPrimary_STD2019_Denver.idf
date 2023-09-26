@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,23.1;
+  Version,23.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -13506,6 +13506,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     VAV_POD_1_OA-VAV_POD_1_CoolCNode,  !- Air Inlet Node Name
     VAV_POD_1_CoolC-VAV_POD_1_HeatCNode,  !- Air Outlet Node Name
@@ -13518,6 +13520,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
@@ -13528,6 +13532,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     VAV_POD_2_OA-VAV_POD_2_CoolCNode,  !- Air Inlet Node Name
     VAV_POD_2_CoolC-VAV_POD_2_HeatCNode,  !- Air Outlet Node Name
@@ -13540,6 +13546,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
@@ -13550,6 +13558,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     VAV_POD_3_OA-VAV_POD_3_CoolCNode,  !- Air Inlet Node Name
     VAV_POD_3_CoolC-VAV_POD_3_HeatCNode,  !- Air Outlet Node Name
@@ -13562,6 +13572,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
@@ -13572,6 +13584,8 @@
     AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
     3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- High Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- High Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     ,                        !- Unit Internal Static Air Pressure {Pa}
     VAV_OTHER_OA-VAV_OTHER_CoolCNode,  !- Air Inlet Node Name
     VAV_OTHER_CoolC-VAV_OTHER_HeatCNode,  !- Air Outlet Node Name
@@ -13584,6 +13598,8 @@
     AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
     3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
     AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Low Speed 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Low Speed 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
     VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
@@ -13602,6 +13618,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}
@@ -13662,6 +13679,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}
@@ -13722,6 +13740,7 @@
     No,                      !- Apply Part Load Fraction to Speeds Greater than 1
     No,                      !- Apply Latent Degradation to Speeds Greater than 1
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Basin Heater Capacity {W/K}
     2,                       !- Basin Heater Setpoint Temperature {C}
@@ -14324,10 +14343,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -14379,10 +14394,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -14434,10 +14445,6 @@
     AUTOSIZE,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Heat Pump Time Constant {s}
-    ,                        !- Fraction of On-Cycle Power Use
-    ,                        !- Heat Pump Fan Delay Time {s}
     ,                        !- Ancillary On-Cycle Electric Power {W}
     ,                        !- Ancillary Off-Cycle Electric Power {W}
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
@@ -16202,7 +16209,7 @@
     HeatSys1 Supply Equipment Outlet Node,  !- Boiler Water Outlet Node Name
     95.0,                    !- Water Outlet Upper Temperature Limit {C}
     LeavingSetpointModulated,!- Boiler Flow Mode
-    0.0000,                  !- Parasitic Electric Load {W}
+    0.0000,                  !- On Cycle Parasitic Electric Load {W}
     1.0000;                  !- Sizing Factor
 
 !-   ===========  ALL OBJECTS IN CLASS: WATERHEATER:MIXED ===========

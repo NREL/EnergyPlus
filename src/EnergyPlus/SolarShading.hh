@@ -95,7 +95,11 @@ namespace SolarShading {
 
     void InitSolarCalculations(EnergyPlusData &state);
 
+    void checkShadingSurfaceSchedules(EnergyPlusData &state);
+
     void GetShadowingInput(EnergyPlusData &state);
+
+    void checkScheduledSurfacePresent(EnergyPlusData &state);
 
     void AllocateModuleArrays(EnergyPlusData &state);
 
@@ -369,18 +373,18 @@ struct SolarShadingData : BaseGlobalStruct
     Array1D<Real64> SurfMultCircumSolar;        // Contribution to eff sky view factor from circumsolar brightening
     Array1D<Real64> SurfMultHorizonZenith;      // Contribution to eff sky view factor from horizon or zenith brightening
 
-    int FBKSHC;                     // HC location of first back surface
-    int FGSSHC;                     // HC location of first general shadowing surface
-    int FINSHC;                     // HC location of first back surface overlap
-    int FRVLHC;                     // HC location of first reveal surface
-    int FSBSHC;                     // HC location of first subsurface
+    int FBKSHC = 0;                 // HC location of first back surface
+    int FGSSHC = 0;                 // HC location of first general shadowing surface
+    int FINSHC = 0;                 // HC location of first back surface overlap
+    int FRVLHC = 0;                 // HC location of first reveal surface
+    int FSBSHC = 0;                 // HC location of first subsurface
     int LOCHCA = 0;                 // Location of highest data in the HC arrays
-    int NBKSHC;                     // Number of back surfaces in the HC arrays
-    int NGSSHC;                     // Number of general shadowing surfaces in the HC arrays
-    int NINSHC;                     // Number of back surface overlaps in the HC arrays
-    int NRVLHC;                     // Number of reveal surfaces in HC array
-    int NSBSHC;                     // Number of subsurfaces in the HC arrays
-    bool CalcSkyDifShading;         // True when sky diffuse solar shading is
+    int NBKSHC = 0;                 // Number of back surfaces in the HC arrays
+    int NGSSHC = 0;                 // Number of general shadowing surfaces in the HC arrays
+    int NINSHC = 0;                 // Number of back surface overlaps in the HC arrays
+    int NRVLHC = 0;                 // Number of reveal surfaces in HC array
+    int NSBSHC = 0;                 // Number of subsurfaces in the HC arrays
+    bool CalcSkyDifShading = false; // True when sky diffuse solar shading is
     int ShadowingCalcFrequency = 0; // Frequency for Shadowing Calculations
     int ShadowingDaysLeft = 0;      // Days left in current shadowing period
 
@@ -426,7 +430,7 @@ struct SolarShadingData : BaseGlobalStruct
 #ifdef EP_NO_OPENGL
     bool penumbra = false;
 #else
-    std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+    std::unique_ptr<Penumbra::Penumbra> penumbra = nullptr;
 #endif
 
     bool GetInputFlag = true;
@@ -638,6 +642,18 @@ struct SolarShadingData : BaseGlobalStruct
     {
     }
 };
+
+#ifndef EP_NO_OPENGL
+class EnergyPlusLogger : public Courierr::Courierr
+{
+public:
+    void error(const std::string_view message) override;
+    void warning(const std::string_view message) override;
+    void info(const std::string_view message) override;
+    void debug(const std::string_view message) override;
+};
+#endif
+
 } // namespace EnergyPlus
 
 #endif

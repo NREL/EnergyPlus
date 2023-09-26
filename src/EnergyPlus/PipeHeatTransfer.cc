@@ -327,7 +327,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
         if (state.dataIPShortCut->lAlphaFieldBlanks(5)) state.dataIPShortCut->cAlphaArgs(5) = "ZONE";
 
         PipeIndoorBoundaryType indoorType =
-            static_cast<PipeIndoorBoundaryType>(getEnumerationValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
+            static_cast<PipeIndoorBoundaryType>(getEnumValue(pipeIndoorBoundaryTypeNamesUC, state.dataIPShortCut->cAlphaArgs(5)));
         switch (indoorType) {
         case PipeIndoorBoundaryType::Zone:
             state.dataPipeHT->PipeHT(Item).EnvironmentPtr = EnvrnPtr::ZoneEnv;
@@ -1351,7 +1351,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     // This then interfaces with the Hanby model for near-pipe region
 
     // Using/Aliasing
-    using ConvectionCoefficients::CalcASHRAESimpExtConvectCoeff;
+    using Convect::CalcASHRAESimpExtConvCoeff;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr NumSections(20);
@@ -1427,7 +1427,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
                         Cp = this->SoilCp;
 
                         // ASHRAE simple convection coefficient model for external surfaces.
-                        this->OutdoorConvCoef = CalcASHRAESimpExtConvectCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
+                        this->OutdoorConvCoef = CalcASHRAESimpExtConvCoeff(TopRoughness, state.dataEnvrn->WindSpeed);
                         ConvCoef = this->OutdoorConvCoef;
 
                         // thermal radiation coefficient using surf temp from past time step

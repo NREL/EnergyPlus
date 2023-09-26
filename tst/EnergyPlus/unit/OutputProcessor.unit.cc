@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -83,7 +84,7 @@ namespace OutputProcessor {
         Array1D<OutputProcessor::VariableType> VarTypes(NumVariables);   // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-        std::map<int, Constant::ResourceType> ResourceTypes;             // ResourceTypes for each variable
+        Array1D<Constant::eResource> ResourceTypes(NumVariables);        // ResourceTypes for each variable
         Array1D_string EndUses(NumVariables);                            // EndUses for each variable
         Array1D_string Groups(NumVariables);                             // Groups for each variable
         Array1D_string Names(NumVariables);                              // Variable Names for each variable
@@ -93,10 +94,6 @@ namespace OutputProcessor {
         std::string NameOfComp = "FC-5-1B";
 
         int NumFound;
-
-        for (int varN = 1; varN <= NumVariables; ++varN) {
-            ResourceTypes.insert(std::pair<int, Constant::ResourceType>(varN, Constant::ResourceType::None));
-        }
 
         GetMeteredVariables(
             *state, TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
@@ -779,7 +776,7 @@ namespace OutputProcessor {
     {
         state->dataGlobal->MinutesPerTimeStep = 10;
 
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -872,7 +869,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeReportRealData)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -1036,7 +1033,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeReportIntegerData)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -1121,7 +1118,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeNumericData_1)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -1176,23 +1173,15 @@ namespace OutputProcessor {
                                                                  {"FUELOILNO2", "FuelOilNo2"},
                                                                  {"PROPANE", "Propane"},
                                                                  {"WATER", "Water"},
-                                                                 {"H2O", "Water"},
                                                                  {"ONSITEWATER", "OnSiteWater"},
-                                                                 {"WATERPRODUCED", "OnSiteWater"},
-                                                                 {"ONSITE WATER", "OnSiteWater"},
                                                                  {"MAINSWATER", "MainsWater"},
-                                                                 {"WATERSUPPLY", "MainsWater"},
                                                                  {"RAINWATER", "RainWater"},
-                                                                 {"PRECIPITATION", "RainWater"},
                                                                  {"WELLWATER", "WellWater"},
-                                                                 {"GROUNDWATER", "WellWater"},
                                                                  {"CONDENSATE", "Condensate"},
                                                                  {"ENERGYTRANSFER", "EnergyTransfer"},
-                                                                 {"ENERGYXFER", "EnergyTransfer"},
-                                                                 {"XFER", "EnergyTransfer"},
-                                                                 {"STEAM", "Steam"},
+                                                                 {"DISTRICTHEATINGSTEAM", "DistrictHeatingSteam"},
                                                                  {"DISTRICTCOOLING", "DistrictCooling"},
-                                                                 {"DISTRICTHEATING", "DistrictHeating"},
+                                                                 {"DISTRICTHEATINGWATER", "DistrictHeatingWater"},
                                                                  {"ELECTRICITYPRODUCED", "ElectricityProduced"},
                                                                  {"ELECTRICITYPURCHASED", "ElectricityPurchased"},
                                                                  {"ELECTRICITYSURPLUSSOLD", "ElectricitySurplusSold"},
@@ -1254,7 +1243,7 @@ namespace OutputProcessor {
     {
         std::map<std::string, int> const resource_map = {{"Electricity:Facility", 100},
                                                          {"NaturalGas:Facility", 101},
-                                                         {"DistricHeating:Facility", 102},
+                                                         {"DistricHeatingWater:Facility", 102},
                                                          {"DistricCooling:Facility", 103},
                                                          {"ElectricityNet:Facility", 104},
                                                          {"Electricity:Building", 201},
@@ -1404,7 +1393,7 @@ namespace OutputProcessor {
     {
         InitializeOutput(*state);
 
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
 
         WriteMeterDictionaryItem(*state,
                                  ReportingFrequency::TimeStep,
@@ -1838,7 +1827,7 @@ namespace OutputProcessor {
     {
         InitializeOutput(*state);
 
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
 
         // Store expected results
         std::vector<std::vector<std::string>> expectedReportDataDictionary;
@@ -2395,7 +2384,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeCumulativeReportMeterData)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -2431,7 +2420,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeNumericData_2)
     {
-        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
+        state->dataSQLiteProcedures->sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017, false);
         state->dataSQLiteProcedures->sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false);
 
@@ -5289,18 +5278,14 @@ namespace OutputProcessor {
             "\n"));
     }
 
-    TEST_F(EnergyPlusFixture, OutputProcessor_ResetAccumulationWhenWarmupComplete)
+    TEST_F(EnergyPlusFixture, OutputProcessor_UpdateMeters)
     {
         std::string const idf_objects = delimited_string({
-            "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,detailed;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,detailed;",
-            "Output:Variable,*,Zone Ideal Loads Supply Air Total Heating Energy,runperiod;",
-            "Output:Meter:MeterFileOnly,DistrictHeating:HVAC,hourly;",
+            "Output:Meter,Electricity:Facility,timestep;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        // Setup so that UpdateDataandReport can be called.
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -5325,117 +5310,58 @@ namespace OutputProcessor {
         if (state->dataEnvrn->DayOfMonth == state->dataWeatherManager->EndDayOfMonth(state->dataEnvrn->Month)) {
             state->dataEnvrn->EndMonthFlag = true;
         }
+
         // OutputProcessor::TimeValue.allocate(2);
+
         auto timeStep = 1.0 / 6;
+
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
         SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
 
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 10;
-        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 10;
-
-        state->dataGlobal->WarmupFlag = true;
-
-        ReportOutputFileHeaders(*state);
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).CurMinute = 50;
+        state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).CurMinute = 50;
 
         GetReportVariableInput(*state);
-        Array1D<ZonePurchasedAir> PurchAir; // Used to specify purchased air parameters
-        PurchAir.allocate(1);
+        Real64 light_consumption = 999;
         SetupOutputVariable(*state,
-                            "Zone Ideal Loads Supply Air Total Heating Energy",
+                            "Lights Electricity Energy",
                             OutputProcessor::Unit::J,
-                            PurchAir(1).TotHeatEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
+                            light_consumption,
+                            OutputProcessor::SOVTimeStepType::Zone,
                             OutputProcessor::SOVStoreType::Summed,
-                            PurchAir(1).Name,
+                            "SPACE1-1 LIGHTS 1",
                             {},
-                            "DISTRICTHEATING",
-                            "Heating",
-                            {},
-                            "System");
-
-        PurchAir(1).TotHeatEnergy = 1.1;
+                            "Electricity",
+                            "InteriorLights",
+                            "GeneralLights",
+                            "Building",
+                            "SPACE1-1",
+                            1,
+                            1);
+        state->dataGlobal->WarmupFlag = true;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.3;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.5;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.7;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 1.9;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 2.2;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        state->dataGlobal->WarmupFlag = false;
-
-        PurchAir(1).TotHeatEnergy = 2.4;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         compare_eso_stream(delimited_string(
             {
-                "1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]",
-                "2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType",
-                "3,5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables "
-                "Requested",
-                "4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested",
-                "5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested",
-                "6,1,Calendar Year of Simulation[] ! When Annual Report Variables Requested",
-                "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-                "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                "2,365,12,31, 0,24,10.00,20.00,Tuesday",
-                "7,1.1",
-                "2,365,12,31, 0,24,20.00,30.00,Tuesday",
-                "7,1.3",
-                "2,365,12,31, 0,24,30.00,40.00,Tuesday",
-                "7,1.5",
-                "2,365,12,31, 0,24,40.00,50.00,Tuesday",
-                "7,1.7",
-                "2,365,12,31, 0,24,50.00,60.00,Tuesday",
-                "7,1.9",
-                "2,365,12,31, 0,24,60.00,70.00,Tuesday",
-                "7,2.2",
-                "5,365",
-                "56,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+                "2,1,Electricity:Facility [J] !TimeStep",
+                ",365,12,31, 0,24,50.00,60.00,Tuesday",
+                "2,0.0",
             },
             "\n"));
 
-        ResetAccumulationWhenWarmupComplete(*state);
-
-        PurchAir(1).TotHeatEnergy = 100.0;
+        state->dataGlobal->WarmupFlag = false;
         UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 200.0;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::System);
-
-        PurchAir(1).TotHeatEnergy = 300.0;
-        UpdateMeterReporting(*state);
-        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone); // zone timestep
+        UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
 
         compare_eso_stream(delimited_string(
             {
-                "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
-                "7,100.0",
-                "2,365,12,31, 0,24,10.00,20.00,Tuesday",
-                "7,200.0",
-                "5,365",
-                "56,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
+                ",365,12,31, 0,24, 0.00,10.00,Tuesday",
+                "2,999.0",
             },
             "\n"));
     }
+
     TEST_F(EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
     {
         std::string const idf_objects = delimited_string({
@@ -5876,7 +5802,7 @@ namespace OutputProcessor {
                                                           "CustomMeter1,               !- Name",
                                                           "Generic,                    !- Fuel Type",
                                                           ",                           !- Key Name 1",
-                                                          "DistrictHeating:Facility;   !- Variable or Meter 1 Name",
+                                                          "DistrictHeatingWater:Facility;   !- Variable or Meter 1 Name",
                                                           "Meter:Custom,",
                                                           "CustomMeter2,               !- Name",
                                                           "Generic,                    !- Fuel Type",
@@ -5894,7 +5820,7 @@ namespace OutputProcessor {
         EXPECT_FALSE(errors_found);
 
         std::string errMsg = delimited_string(
-            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATING:FACILITY\".",
+            {"   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", invalid Output Variable or Meter Name=\"DISTRICTHEATINGWATER:FACILITY\".",
              "   **   ~~~   ** ...will not be shown with the Meter results.",
              "   ** Warning ** Meter:Custom=\"CUSTOMMETER1\", no items assigned ",
              "   **   ~~~   ** ...will not be shown with the Meter results. This may be caused by a Meter:Custom be assigned to another "

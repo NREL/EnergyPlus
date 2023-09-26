@@ -655,8 +655,6 @@ namespace OutputProcessor {
 
     void UpdateMeters(EnergyPlusData &state, int TimeStamp); // Current TimeStamp (for max/min)
 
-    void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state);
-
     void ReportTSMeters(EnergyPlusData &state,
                         Real64 StartMinute,      // Start Minute for TimeStep
                         Real64 EndMinute,        // End Minute for TimeStep
@@ -924,7 +922,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         std::map<int, Constant::ResourceType> &ResourceTypes,  // ResourceTypes for each variable
+                         Array1D<Constant::eResource> &ResourceTypes,           // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
@@ -938,7 +936,7 @@ void GetMeteredVariables(EnergyPlusData &state,
                          Array1D<OutputProcessor::VariableType> &VarTypes,      // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         std::map<int, Constant::ResourceType> &ResourceTypes,  // ResourceTypes for each variable
+                         Array1D<Constant::eResource> &ResourceTypes,           // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable

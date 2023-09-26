@@ -59,8 +59,11 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SystemReports.hh>
 
@@ -105,42 +108,60 @@ namespace DataZoneEquipment {
 
     // Start zone equip objects
     // list units that are valid for zone system availability managers first
-    enum ZoneEquip
+    enum ZoneEquipType
     {
         Invalid = -1,
-        FanCoil4Pipe = 1,
-        PkgTermHPAirToAir,
-        PkgTermACAirToAir,
-        PkgTermHPWaterToAir,
-        WindowAC,
+        DUMMY,
+        FourPipeFanCoil,
+        PackagedTerminalHeatPump,
+        PackagedTerminalAirConditioner,
+        PackagedTerminalHeatPumpWaterToAir,
+        WindowAirConditioner,
         UnitHeater,
         UnitVentilator,
-        ERVStandAlone,
+        EnergyRecoveryVentilator,
         VentilatedSlab,
         OutdoorAirUnit,
-        VRFTerminalUnit,
+        VariableRefrigerantFlowTerminal,
         PurchasedAir,
-        ZoneEvaporativeCoolerUnit,
-        ZoneHybridEvaporativeCooler, // last zone equipment type to use zone availability manager. The above list must not change or
-                                     // NumValidSysAvailZoneComponents must also change.
-        AirDistUnit,
-        BBWaterConvective,
-        BBElectricConvective,
-        HiTempRadiant,
-        LoTempRadiant,
-        ZoneExhaustFan,
-        HeatXchngr,
-        HPWaterHeater,
-        BBWater,
-        ZoneDXDehumidifier,
-        BBSteam,
-        BBElectric,
-        RefrigerationAirChillerSet,
-        UserDefinedZoneHVACForcedAir,
+        EvaporativeCooler,
+        HybridEvaporativeCooler, // last zone equipment type to use zone availability manager. The above list must not change or
+                                 // NumValidSysAvailZoneComponents must also change.
+        AirDistributionUnit,
+        BaseboardConvectiveWater,
+        BaseboardConvectiveElectric,
+        BaseboardSteam,
+        BaseboardWater,
+        BaseboardElectric,
+        HighTemperatureRadiant,
+        LowTemperatureRadiant,
+        ExhaustFan,
+        HeatExchanger,
+        HeatPumpWaterHeater,
+        DehumidifierDX,
+        RefrigerationChillerSet,
+        UserDefinedHVACForcedAir,
         CoolingPanel,
-        ZoneUnitarySys,
+        UnitarySystem,
+        AirTerminalDualDuctConstantVolume,
+        AirTerminalDualDuctVAV,
+        AirTerminalSingleDuctConstantVolumeReheat,
+        AirTerminalSingleDuctConstantVolumeNoReheat,
+        AirTerminalSingleDuctVAVReheat,
+        AirTerminalSingleDuctVAVNoReheat,
+        AirTerminalSingleDuctSeriesPIUReheat,
+        AirTerminalSingleDuctParallelPIUReheat,
+        AirTerminalSingleDuctCAVFourPipeInduction,
+        AirTerminalSingleDuctVAVReheatVariableSpeedFan,
+        AirTerminalSingleDuctVAVHeatAndCoolReheat,
+        AirTerminalSingleDuctVAVHeatAndCoolNoReheat,
+        AirTerminalSingleDuctConstantVolumeCooledBeam,
+        AirTerminalDualDuctVAVOutdoorAir,
+        AirLoopHVACReturnAir,
         Num
     };
+
+    extern const std::array<std::string_view, static_cast<int>(ZoneEquipType::Num)> zoneEquipTypeNamesUC;
 
     constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
@@ -174,12 +195,32 @@ namespace DataZoneEquipment {
         Num
     };
 
+    enum class ZoneEquipTstatControl
+    {
+        Invalid = -1,
+        SingleSpace,
+        Maximum,
+        Ideal,
+        Num
+    };
+
+    enum class SpaceEquipSizingBasis
+    {
+        Invalid = -1,
+        DesignCoolingLoad,
+        DesignHeatingLoad,
+        FloorArea,
+        Volume,
+        PerimeterLength,
+        Num
+    };
+
     struct EquipMeterData
     {
         // Members
         std::string ReportVarName;
         OutputProcessor::Unit ReportVarUnits;
-        Constant::ResourceType ResourceType;
+        Constant::eResource ResourceType = Constant::eResource::Invalid;
         std::string EndUse;
         SystemReports::EndUseType EndUse_CompMode;
         std::string Group;
@@ -190,9 +231,8 @@ namespace DataZoneEquipment {
 
         // Default Constructor
         EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(Constant::ResourceType::None),
-              EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0), ReportVarIndexType(OutputProcessor::TimeStepType::Zone),
-              ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
+            : ReportVarUnits(OutputProcessor::Unit::None), EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0),
+              ReportVarIndexType(OutputProcessor::TimeStepType::Zone), ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
         {
         }
     };
@@ -344,6 +384,12 @@ namespace DataZoneEquipment {
               ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0), AirLoopDesSupply(0.0)
         {
         }
+
+        void setTotalInletFlows(EnergyPlusData &state);
+
+        void beginEnvirnInit(EnergyPlusData &state);
+
+        void hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACIteration);
     };
 
     struct EquipmentData // data for an individual component
@@ -379,15 +425,16 @@ namespace DataZoneEquipment {
     struct EquipList
     {
         // Members
-        std::string Name;                           // Name of the equipment list
-        DataZoneEquipment::LoadDist LoadDistScheme; // load distribution scheme
-        int NumOfEquipTypes;                        // Number of items on this list
-        int NumAvailHeatEquip;                      // Number of pieces of equipment available for heating
-        int NumAvailCoolEquip;                      // Number of pieces of equipment available for cooling
-        Array1D_string EquipType;                   // TODO: Convert this from string to enum and remove EquipTypeEnum below
-        Array1D<DataZoneEquipment::ZoneEquip> EquipTypeEnum;
+        std::string Name;                                                                     // Name of the equipment list
+        DataZoneEquipment::LoadDist LoadDistScheme = DataZoneEquipment::LoadDist::Sequential; // load distribution scheme
+        int NumOfEquipTypes = 0;                                                              // Number of items on this list
+        int NumAvailHeatEquip = 0;                                                            // Number of pieces of equipment available for heating
+        int NumAvailCoolEquip = 0;                                                            // Number of pieces of equipment available for cooling
+        Array1D_string EquipTypeName; // TODO: Convert this from string to enum and remove EquipTypeEnum below
+        Array1D<DataZoneEquipment::ZoneEquipType> EquipType;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
+        EPVector<int> zoneEquipSplitterIndex; // index to SpaceHVAC:ZoneEquipmentSplitter, if any, for this equipment (0 base)
         // SystemAvailManagers need to know the index of specific equipment (e.g., PTAC as 1,2,3)
         // if UnitarySystem models PTAC, PTHP, UnitarySystems, then the index to a specific UnitarySystem is not the index to the PTAC
         std::vector<HVACSystemData *> compPointer;
@@ -399,11 +446,6 @@ namespace DataZoneEquipment {
         Array1D_int HeatingCapacity;      // Current heating capacity (positive) [W]
         Array1D<EquipmentData> EquipData; // Index of energy output report data
 
-        // Default Constructor
-        EquipList() : LoadDistScheme(DataZoneEquipment::LoadDist::Sequential), NumOfEquipTypes(0), NumAvailHeatEquip(0), NumAvailCoolEquip(0)
-        {
-        }
-
         void getPrioritiesForInletNode(EnergyPlusData &state,
                                        int inletNodeNum,     // Zone inlet node number to match
                                        int &coolingPriority, // Cooling priority num for matching equipment
@@ -413,6 +455,53 @@ namespace DataZoneEquipment {
         Real64 SequentialHeatingFraction(EnergyPlusData &state, int equipNum);
 
         Real64 SequentialCoolingFraction(EnergyPlusData &state, int equipNum);
+    };
+
+    struct ZoneEquipSplitterMixerSpace
+    {
+        int spaceIndex = 0;    // Index to a space
+        Real64 fraction = 0.0; // Fraction of equipment output or flow for this space
+        int spaceNodeNum = 0;  // Space Inlet Node number (zero if not airflow equipment)
+    };
+
+    struct ZoneEquipmentSplitterMixer
+    {
+        std::string Name;
+        DataLoopNode::ConnectionObjectType spaceEquipType = DataLoopNode::ConnectionObjectType::Invalid;
+        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
+        std::vector<ZoneEquipSplitterMixerSpace> spaces;
+
+        void size(EnergyPlusData &state);
+    };
+
+    struct ZoneEquipmentSplitter : ZoneEquipmentSplitterMixer
+    {
+        DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::Invalid;
+        std::string zoneEquipName;
+        int zoneEquipOutletNodeNum = 0;
+        DataZoneEquipment::ZoneEquipTstatControl tstatControl = DataZoneEquipment::ZoneEquipTstatControl::Invalid;
+        int controlSpaceIndex = 0;                                                 // Index to a space for the thermostat control space
+        int controlSpaceNumber = 0;                                                // Control space number within the zone equipment splitter list
+        DataZoneEnergyDemands::ZoneSystemSensibleDemand saveZoneSysSensibleDemand; // Save unadjusted zone sensible loads
+        DataZoneEnergyDemands::ZoneSystemMoistureDemand saveZoneSysMoistureDemand; // Save unadjusted zone moisture loads
+
+        void distributeOutput(EnergyPlusData &state,
+                              int const zoneNum,
+                              Real64 const sysOutputProvided,
+                              Real64 const latOutputProvided,
+                              Real64 const nonAirSysOutput,
+                              int const equipTypeNum);
+
+        void adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum);
+    };
+
+    struct ZoneEquipmentMixer : ZoneEquipmentSplitterMixer
+    {
+        int zoneEquipInletNodeNum = 0;
+
+        void setOutletConditions(EnergyPlusData &state);
+
+        void setInletFlows(EnergyPlusData &state);
     };
 
     struct ControlList
@@ -472,7 +561,32 @@ namespace DataZoneEquipment {
 
     void GetZoneEquipmentData(EnergyPlusData &state);
 
-    void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
+    void processZoneEquipmentInput(EnergyPlusData &state,
+                                   std::string_view zoneEqModuleObject,
+                                   int const zoneOrSpaceNum,
+                                   bool const isSpace,
+                                   int &locTermUnitSizingCounter,
+                                   int &overallEquipCount,
+                                   DataZoneEquipment::EquipConfiguration &thisEquipConfig,
+                                   Array1D_string &AlphArray,
+                                   Array1D_string &cAlphaFields, // Alpha field names
+                                   Array1D_bool &lAlphaBlanks,   // Logical array, alpha field input BLANK = .TRUE.
+                                   Array1D_int &NodeNums);
+
+    void processZoneEquipSplitterInput(EnergyPlusData &state,
+                                       std::string_view zeqSplitterModuleObject,
+                                       int const zeqSplitterNum,
+                                       int const zoneNum,
+                                       InputProcessor::json const objectSchemaProps,
+                                       InputProcessor::json const objectFields,
+                                       DataZoneEquipment::ZoneEquipmentSplitter &thisZeqSplitter);
+
+    void processZoneEquipMixerInput(EnergyPlusData &state,
+                                    std::string_view zeqMixerModuleObject,
+                                    int const zoneNum,
+                                    InputProcessor::json const objectSchemaProps,
+                                    InputProcessor::json const objectFields,
+                                    DataZoneEquipment::ZoneEquipmentMixer &thisZeqMixer);
 
     bool CheckZoneEquipmentList(EnergyPlusData &state,
                                 std::string_view ComponentType, // Type of component
@@ -497,11 +611,13 @@ namespace DataZoneEquipment {
                             std::string const &NodeName // Return air node name to match (may be blank)
     );
 
-    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquip const ZoneEquipTypeNum, std::string const &EquipmentName);
+    int GetZoneEquipControlledZoneNum(EnergyPlusData &state, DataZoneEquipment::ZoneEquipType const ZoneEquipType, std::string const &EquipmentName);
 
     bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum);
 
     void CheckSharedExhaust(EnergyPlusData &state);
+
+    void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spaceNodeNum, Real64 const frac);
 
 } // namespace DataZoneEquipment
 
@@ -519,32 +635,19 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     int NumOfZoneEquipLists = 0;
     Array1D_int ZoneEquipAvail;
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
+    EPVector<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
     Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
     Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
     Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
     Array1D<ExhaustAirSystemManager::ExhaustAir> ExhaustAirSystem;
     Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
+    std::vector<DataZoneEquipment::ZoneEquipmentSplitter> zoneEquipSplitter;
+    std::vector<DataZoneEquipment::ZoneEquipmentMixer> zoneEquipMixer;
 
     void clear_state() override
     {
-        this->GetZoneEquipmentDataErrorsFound = false;
-        this->GetZoneEquipmentDataFound = 0;
-        this->NumSupplyAirPaths = 0;
-        this->NumReturnAirPaths = 0;
-        this->NumExhaustAirSystems = 0;
-        this->NumZoneExhaustControls = 0;
-        this->ZoneEquipInputsFilled = false;
-        this->ZoneEquipSimulatedOnce = false;
-        this->NumOfZoneEquipLists = 0;
-        this->ZoneEquipAvail.deallocate();
-        this->ZoneEquipConfig.deallocate();
-        this->UniqueZoneEquipListNames.clear();
-        this->ZoneEquipList.deallocate();
-        this->SupplyAirPath.deallocate();
-        this->ReturnAirPath.deallocate();
-        this->ExhaustAirSystem.deallocate();
-        this->ZoneExhaustControlSystem.deallocate();
+        new (this) DataZoneEquipmentData();
     }
 };
 

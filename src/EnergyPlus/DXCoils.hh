@@ -55,11 +55,13 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -149,16 +151,17 @@ namespace DXCoils {
         int EIRFTempErrorIndex; // Used for warning messages when output of EIRFTemp is negative
         Array1D_int EIRFFlow;   // index of energy input ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
-        int EIRFFlowErrorIndex;               // Used for warning messages when output of EIRFFlow is negative
-        Array1D_int PLFFPLR;                  // index of part-load factor vs part-load ratio curve
-        bool ReportCoolingCoilCrankcasePower; // logical determines if the cooling coil crankcase heater power is reported
-        Real64 CrankcaseHeaterCapacity;       // total crankcase heater capacity [W]
-        Real64 CrankcaseHeaterPower;          // report variable for average crankcase heater power [W]
-        Real64 MaxOATCrankcaseHeater;         // maximum OAT for crankcase heater operation [C]
-        Real64 CrankcaseHeaterConsumption;    // report variable for total crankcase heater energy consumption [J]
-        Real64 BasinHeaterPowerFTempDiff;     // Basin heater capacity per degree C below setpoint (W/C)
-        Real64 BasinHeaterSetPointTemp;       // setpoint temperature for basin heater operation (C)
-        int CompanionUpstreamDXCoil;          // index number of the DX coil that is "upstream" of this DX coil. Currently used for
+        int EIRFFlowErrorIndex;                // Used for warning messages when output of EIRFFlow is negative
+        Array1D_int PLFFPLR;                   // index of part-load factor vs part-load ratio curve
+        bool ReportCoolingCoilCrankcasePower;  // logical determines if the cooling coil crankcase heater power is reported
+        Real64 CrankcaseHeaterCapacity;        // total crankcase heater capacity [W]
+        Real64 CrankcaseHeaterPower;           // report variable for average crankcase heater power [W]
+        Real64 MaxOATCrankcaseHeater;          // maximum OAT for crankcase heater operation [C]
+        int CrankcaseHeaterCapacityCurveIndex; // Crankcase heater power-temperature curve or table index
+        Real64 CrankcaseHeaterConsumption;     // report variable for total crankcase heater energy consumption [J]
+        Real64 BasinHeaterPowerFTempDiff;      // Basin heater capacity per degree C below setpoint (W/C)
+        Real64 BasinHeaterSetPointTemp;        // setpoint temperature for basin heater operation (C)
+        int CompanionUpstreamDXCoil;           // index number of the DX coil that is "upstream" of this DX coil. Currently used for
         // UnitarySystem:HeatPump:AirToAir for proper calculation of crankcase heater energy
         // consumption
         bool FindCompanionUpStreamCoil;    // Flag to get the companion coil in Init.
@@ -175,9 +178,14 @@ namespace DXCoils {
         Real64 RatedTotCap2; // Gross total cooling capacity at rated conditions, low speed [watts]
         // Note: For HPWHs, RatedTotCap2   = Water Heating Capacity for Coil:DX:HPWH and
         //                  RatedTotCap(1) = Air Cooling Coil Capacity for Coil:DX:HPWH
-        Real64 RatedSHR2;             // Sensible heat ratio (sens cap/total cap) at rated conditions, low speed
-        Real64 RatedCOP2;             // Coefficient of performance at rated conditions, low speed
-        Real64 RatedAirVolFlowRate2;  // Air volume flow rate through unit at rated conditions, low speed [m3/s]
+        Real64 RatedSHR2;            // Sensible heat ratio (sens cap/total cap) at rated conditions, low speed
+        Real64 RatedCOP2;            // Coefficient of performance at rated conditions, low speed
+        Real64 RatedAirVolFlowRate2; // Air volume flow rate through unit at rated conditions, low speed [m3/s]
+
+        Array1D<Real64> FanPowerPerEvapAirFlowRate_LowSpeed; // Fan Power Per Air volume flow rate through the
+        // Evaporator coil at rated conditions [W/(m3/s)], low speed
+        Array1D<Real64> FanPowerPerEvapAirFlowRate_2023_LowSpeed;
+
         Real64 RatedAirMassFlowRate2; // Air mass flow rate through unit at rated conditions, low speed [kg/s]
         Real64 RatedCBF2;             // rated coil bypass factor (low speed), determined using RatedTotCap2 and RatedSHR2
         int CCapFTemp2;               // index of total cooling capacity modifier curve (low speed)
@@ -345,8 +353,7 @@ namespace DXCoils {
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
         Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
         // for multispeed DX coil type
-        std::string FuelType;                       // Fuel type string
-        Constant::ResourceType FuelTypeNum;         // Fuel type number
+        Constant::eFuel FuelType;                   // Fuel type number
         int NumOfSpeeds;                            // Number of speeds
         bool PLRImpact;                             // Part load fraction applied to Speed Number > 1
         bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
@@ -458,10 +465,11 @@ namespace DXCoils {
               BypassedFlowFrac(MaxModes, 0.0), RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0),
               CCapFFlow(MaxModes, 0), CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0), EIRFFlow(MaxModes, 0),
               EIRFFlowErrorIndex(0), PLFFPLR(MaxModes, 0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0),
-              CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0),
-              BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true), CondenserInletNodeNum(MaxModes, 0),
-              LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0), PrintLowOutTempMessage(false),
-              HeatingCoilPLFCurvePTR(0), BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0), RatedAirVolFlowRate2(0.0),
+              CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterCapacityCurveIndex(0), CrankcaseHeaterConsumption(0.0),
+              BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true),
+              CondenserInletNodeNum(MaxModes, 0), LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0),
+              PrintLowOutTempMessage(false), HeatingCoilPLFCurvePTR(0), BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0),
+              RatedAirVolFlowRate2(0.0), FanPowerPerEvapAirFlowRate_LowSpeed(MaxModes, 0.0), FanPowerPerEvapAirFlowRate_2023_LowSpeed(MaxModes, 0.0),
               RatedAirMassFlowRate2(0.0), RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0), RatedEIR2(0.0), InternalStaticPressureDrop(0.0),
               RateWithInternalStaticAndFanObject(false), SupplyFanIndex(-1), SupplyFan_TypeNum(0), RatedEIR(MaxModes, 0.0), InletAirMassFlowRate(0.0),
               InletAirMassFlowRateMax(0.0), InletAirTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirTemp(0.0), OutletAirHumRat(0.0),
@@ -488,8 +496,8 @@ namespace DXCoils {
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
               PrintHighAmbMessage(false), EvapWaterSupplyMode(EvapWaterSupply::FromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               CondensateCollectMode(CondensateCollectAction::Discard), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0),
-              CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(Constant::ResourceType::None), NumOfSpeeds(0),
-              PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0), MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true),
+              CondensateVol(0.0), CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelType(Constant::eFuel::Invalid), NumOfSpeeds(0), PLRImpact(false),
+              LatentImpact(false), MSFuelWasteHeat(0.0), MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true),
               HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false), SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0),
               SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0), UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0),
               SecCoilSHRFF(0), SecCoilAirFlow(0.0), SecCoilAirFlowScalingFactor(1.0), SecCoilRatedSHR(1.0), SecCoilSHR(1.0), EvapInletWetBulb(0.0),

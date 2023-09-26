@@ -79,7 +79,6 @@ set(test_src
     DOASEffectOnZoneSizing.unit.cc
     DXCoils.unit.cc
     DataEnvironment.unit.cc
-    DataGlobalConstants.unit.cc
     DataHeatBalance.unit.cc
     DataPlant.unit.cc
     DataRuntimeLanguage.unit.cc
@@ -103,6 +102,7 @@ set(test_src
     EconomicTariff.unit.cc
     ElectricBaseboardRadiator.unit.cc
     ElectricPowerServiceManager.unit.cc
+    EquipAndOperations.unit.cc
     EvaporativeCoolers.unit.cc
     EvaporativeFluidCoolers.unit.cc
     ExhaustSystem.unit.cc
@@ -172,6 +172,7 @@ set(test_src
     OutputReportTabular.unit.cc
     OutputReportTabularAnnual.unit.cc
     OutputReports.unit.cc
+    OutsideEnergySources.unit.cc
     PVWatts.unit.cc
     PackagedTerminalHeatPump.unit.cc
     Photovoltaics.unit.cc
@@ -185,6 +186,7 @@ set(test_src
     PlantComponentTemperatureSources.unit.cc
     PlantCondLoopOperation.unit.cc
     PlantHeatExchangerFluidToFluid.unit.cc
+    PlantLoadProfile.unit.cc
     PlantLoopHeatPumpEIR.unit.cc
     PlantManager.unit.cc
     PlantPipingSystemsManager.unit.cc
@@ -233,6 +235,7 @@ set(test_src
     TranspiredCollector.unit.cc
     UnitHeater.unit.cc
     UnitVentilator.unit.cc
+    UFADManager.unit.cc
     UnitaryHybridAirConditioner.unit.cc
     UnitarySystem.unit.cc
     UtilityRoutines.unit.cc
@@ -275,13 +278,23 @@ if(LINK_WITH_PYTHON)
   endif()
 endif()
 
-if(CMAKE_HOST_UNIX)
-  if(NOT APPLE)
-    list(APPEND test_dependencies dl)
-  endif()
+if(CMAKE_HOST_UNIX AND NOT APPLE)
+  list(APPEND test_dependencies dl)
 endif()
 
 # Executable name will be EnergyPlus_tests
 # Execute energyplus_tests --help for options using gtest runner
 # Execute energyplus_tests with no arguments to run all tests
 create_test_targets(energyplus "${test_src}" "${test_dependencies}" True)
+
+
+set(test_src
+    Fixtures/EnergyPlusFixture.cc
+    Fixtures/EnergyPlusFixture.hh
+    CommandLineInterface.unit.cc
+    main.cc
+)
+# For CommandLineInterface.unit.cc, make an in.idf / in.epw in the test directory so we can test the legacy CLI (applies to CTest which sets the current directory to this one)
+configure_file("${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" "${CMAKE_CURRENT_BINARY_DIR}/in.epw" COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Resources/UnitaryHybridUnitTest_DOSA.idf" "${CMAKE_CURRENT_BINARY_DIR}/in.idf" COPYONLY)
+create_test_targets(energyplusapi "${test_src}" "${test_dependencies}" True)

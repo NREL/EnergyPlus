@@ -127,8 +127,8 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     thisFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state->dataFans->LocalTurnFansOn = true;
-    state->dataFans->LocalTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     Fans::SimSimpleFan(*state, FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
@@ -174,8 +174,8 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     thisFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state->dataFans->LocalTurnFansOn = true;
-    state->dataFans->LocalTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     Fans::SimOnOffFan(*state, FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
@@ -227,8 +227,8 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     thisFan.FanCoeff(5) = 0.000;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    state->dataFans->LocalTurnFansOn = true;
-    state->dataFans->LocalTurnFansOff = false;
+    state->dataHVACGlobal->TurnFansOn = true;
+    state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     Fans::SimVariableVolumeFan(*state, FanNum);
     // fan power = PartLoadFrac * MassFlow * DeltaPress / (FanEff * RhoAir)

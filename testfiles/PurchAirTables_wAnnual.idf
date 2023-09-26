@@ -99,7 +99,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Timestep,6;
 
@@ -1222,9 +1222,9 @@
 
   Output:Meter,DistrictCooling:Facility,runperiod;
 
-  Output:Meter,DistrictHeating:Facility,monthly;
+  Output:Meter,DistrictHeatingWater:Facility,monthly;
 
-  Output:Meter,DistrictHeating:Facility,runperiod;
+  Output:Meter,DistrictHeatingWater:Facility,runperiod;
 
   Output:Meter,Electricity:Facility,monthly;
 
@@ -1349,7 +1349,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    DistrictHeating:Facility,!- Variable Name
+    DistrictHeatingWater:Facility,!- Variable Name
     15000000,                !- Interval Start
     1000000,                 !- Interval Size
     10;                      !- Interval Count
@@ -1518,9 +1518,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     DistrictCooling:Facility,!- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    DistrictHeating:Facility,!- Variable or Meter 3 Name
+    DistrictHeatingWater:Facility,!- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    DistrictHeating:Facility,!- Variable or Meter 4 Name
+    DistrictHeatingWater:Facility,!- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,

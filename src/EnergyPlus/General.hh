@@ -57,6 +57,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -81,7 +82,7 @@ namespace General {
                    Real64 X_0,  // 1st bound of interval that contains the solution
                    Real64 X_1); // 2nd bound of interval that contains the solution
 
-    constexpr Real64 InterpGeneral(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
+    constexpr Real64 Interp(Real64 const Lower, Real64 const Upper, Real64 const InterpFac)
     {
         return Lower + InterpFac * (Upper - Lower);
     }
@@ -248,6 +249,8 @@ namespace General {
                              int nReportPeriods,
                              Array1D_bool &inReportPeriodFlags);
 
+    Real64 rotAzmDiffDeg(Real64 AzmA, Real64 AzmB);
+
     inline Real64 epexp(const Real64 numerator, const Real64 denominator)
     {
         if (denominator == 0.0) {
@@ -256,7 +259,6 @@ namespace General {
             return std::exp(numerator / denominator);
         }
     }
-
 } // namespace General
 
 struct GeneralData : BaseGlobalStruct

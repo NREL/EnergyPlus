@@ -98,7 +98,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     NONE,                    !- Name
@@ -1448,9 +1448,9 @@
     Heating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    100,                     !- Parasitic Electric Load {W}
+    100,                     !- On Cycle Parasitic Electric Load {W}
     PLFCurveforGasFurnace,   !- Part Load Fraction Correlation Curve Name
-    10;                      !- Parasitic Fuel Load {W}
+    10;                      !- Off Cycle Parasitic Fuel Load {W}
 
   Coil:Heating:Fuel,
     Furnace Coil 2,          !- Name
@@ -1461,9 +1461,9 @@
     Heating Coil Air Inlet Node 2,  !- Air Inlet Node Name
     Air Loop Outlet Node 2,  !- Air Outlet Node Name
     ,                        !- Temperature Setpoint Node Name
-    100,                     !- Parasitic Electric Load {W}
+    100,                     !- On Cycle Parasitic Electric Load {W}
     PLFCurveforGasFurnace 2, !- Part Load Fraction Correlation Curve Name
-    10;                      !- Parasitic Fuel Load {W}
+    10;                      !- Off Cycle Parasitic Fuel Load {W}
 
   Fan:OnOff,
     Supply Fan 1,            !- Name

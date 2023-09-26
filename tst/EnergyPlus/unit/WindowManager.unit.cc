@@ -213,7 +213,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
     state->dataHeatBal->ZoneMRT(1) = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -249,8 +249,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataSurface->SurfWinIRfromParentZone(winNum) = Constant::StefanBoltzmann * std::pow(T_in + Constant::KelvinConv, 4);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.01;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.01;
 
     // initial guess temperatures
     int numTemps = 2 + 2 * state->dataConstruction->Construct(cNum).TotGlassLayers;
@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         state->dataSurface->Surface(1).Tilt = 180 - tiltSave;
         state->dataSurface->Surface(1).CosTilt = cos(state->dataSurface->Surface(winNum).Tilt * Constant::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(state->dataSurface->Surface(winNum).Tilt * Constant::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+        Convect::CalcISO15099WindowIntConvCoeff(
             *state,
             winNum,
             outSurfTemp,
@@ -299,7 +299,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         state->dataSurface->Surface(1).Tilt = tiltSave;
         state->dataSurface->Surface(1).CosTilt = cos(tiltSave * Constant::Pi / 180);
         state->dataSurface->Surface(1).SinTilt = sin(tiltSave * Constant::Pi / 180);
-        ConvectionCoefficients::CalcISO15099WindowIntConvCoeff(
+        Convect::CalcISO15099WindowIntConvCoeff(
             *state,
             winNum,
             inSurfTemp,
@@ -473,7 +473,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
@@ -544,8 +544,12 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.011;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(1);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).MAT = 25.0;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRatAvg = 0.011;
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.011;
 
     state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
@@ -2534,8 +2538,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     Material::GetMaterialData(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetFrameAndDividerData(*state, FoundError);
-    EXPECT_FALSE(FoundError);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
 
     HeatBalanceManager::GetConstructData(*state, FoundError);
     EXPECT_FALSE(FoundError);
@@ -2730,7 +2733,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     createFacilityElectricPowerServiceObject(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     HeatBalanceManager::GetProjectControlData(*state, ErrorsFound);
-    HeatBalanceManager::GetFrameAndDividerData(*state, ErrorsFound);
+    HeatBalanceManager::GetFrameAndDividerData(*state);
     Material::GetMaterialData(*state, ErrorsFound);
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     HeatBalanceManager::GetBuildingData(*state, ErrorsFound);
@@ -2809,8 +2812,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBal->Zone(1).IsControlled = true;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 25.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.011;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.011;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.011;
 
     // initialize simple glazing adjustment ratio
     state->dataHeatBalSurf->SurfWinCoeffAdjRatio.allocate(3);
@@ -2834,6 +2837,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     // Calculate temperature based on supply flow rate
 
     HeatBalanceSurfaceManager::InitSurfacePropertyViewFactors(*state);
+
+    HeatBalanceSurfaceManager::GetSurroundingSurfacesTemperatureAverage(*state);
 
     WindowManager::CalcWindowHeatBalance(*state, surfNum2, state->dataHeatBalSurf->SurfHConvInt(surfNum2), inSurfTemp, outSurfTemp);
 
@@ -7681,7 +7686,7 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 0.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAV = 0.0;
     state->dataHeatBal->ZoneMRT(1) = 0.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.0;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -7703,8 +7708,8 @@ TEST_F(EnergyPlusFixture, CFS_InteriorSolarDistribution_Test)
         }
     }
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRatAvg = 0.01;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvg = 0.01;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.01;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = T_in;
 
     state->dataEnvrn->SOLCOS(1) = 0.84471127222777276;

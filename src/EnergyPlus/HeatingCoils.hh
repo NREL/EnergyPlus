@@ -87,11 +87,11 @@ namespace HeatingCoils {
         std::string HeatingCoilType;  // Type of HeatingCoil ie. Heating or Cooling
         std::string HeatingCoilModel; // Type of HeatingCoil ie. Simple, Detailed, etc.
         int HCoilType_Num = 0;
-        Constant::ResourceType FuelType_Num = Constant::ResourceType::None; // Type of fuel used, reference resource type integers
-        std::string Schedule;                                               // HeatingCoil Operation Schedule
-        int SchedPtr = 0;                                                   // Pointer to the correct schedule
-        int InsuffTemperatureWarn = 0;                                      // Used for recurring error message
-        Real64 InletAirMassFlowRate = 0.0;                                  // MassFlow through the HeatingCoil being Simulated [kg/Sec]
+        Constant::eFuel FuelType = Constant::eFuel::Invalid; // Type of fuel used, reference resource type integers
+        std::string Schedule;                                // HeatingCoil Operation Schedule
+        int SchedPtr = 0;                                    // Pointer to the correct schedule
+        int InsuffTemperatureWarn = 0;                       // Used for recurring error message
+        Real64 InletAirMassFlowRate = 0.0;                   // MassFlow through the HeatingCoil being Simulated [kg/Sec]
         Real64 OutletAirMassFlowRate = 0.0;
         Real64 InletAirTemp = 0.0;
         Real64 OutletAirTemp = 0.0;
@@ -114,20 +114,18 @@ namespace HeatingCoils {
         int AirOutletNodeNum = 0;
         int TempSetPointNodeNum = 0; // If applicable this is the node number that the temp setpoint exists.
         int Control = 0;
-        int PLFCurveIndex = 0;          // Index for part-load factor curve index for gas heating coil
-        Real64 ParasiticElecLoad = 0.0; // parasitic electric load associated with the gas heating coil
-        Real64 ParasiticFuelLoad = 0.0; // parasitic fuel load associated with the gas heating coil
-        // (standing pilot light) [J]
-        Real64 ParasiticFuelRate = 0.0; // avg. parasitic fuel consumption rate with the gas heating coil
-        // (standing pilot light) [J]
-        Real64 ParasiticFuelCapacity = 0.0;                        // capacity of parasitic fuel consumption rate, input by user [W]
-        Real64 RTF = 0.0;                                          // Heater runtime fraction, including PLF curve impacts
-        int RTFErrorIndex = 0;                                     // used in recurring error warnings
-        int RTFErrorCount = 0;                                     // used in recurring error warnings
-        int PLFErrorIndex = 0;                                     // used in recurring error warnings
-        int PLFErrorCount = 0;                                     // used in recurring error warnings
-        std::string ReclaimHeatingCoilName;                        // Name of reclaim heating coil
-        int ReclaimHeatingSourceIndexNum = 0;                      // Index to reclaim heating source (condenser) of a specific type
+        int PLFCurveIndex = 0;                 // Index for part-load factor curve index for gas heating coil
+        Real64 ParasiticElecLoad = 0.0;        // parasitic electric load associated with the gas heating coil
+        Real64 ParasiticFuelConsumption = 0.0; // parasitic fuel consumption associated with the gas heating coil (standing pilot light) [J]
+        Real64 ParasiticFuelRate = 0.0;        // avg. parasitic fuel consumption rate with the gas heating coil (standing pilot light) [W]
+        Real64 ParasiticFuelCapacity = 0.0;    // capacity of parasitic fuel consumption rate, input by user [W]
+        Real64 RTF = 0.0;                      // Heater runtime fraction, including PLF curve impacts
+        int RTFErrorIndex = 0;                 // used in recurring error warnings
+        int RTFErrorCount = 0;                 // used in recurring error warnings
+        int PLFErrorIndex = 0;                 // used in recurring error warnings
+        int PLFErrorCount = 0;                 // used in recurring error warnings
+        std::string ReclaimHeatingCoilName;    // Name of reclaim heating coil
+        int ReclaimHeatingSourceIndexNum = 0;  // Index to reclaim heating source (condenser) of a specific type
         HeatObjTypes ReclaimHeatingSource = HeatObjTypes::Invalid; // The source for the Reclaim Heating Coil
         int NumOfStages = 0;                                       // Number of speeds
         Array1D<Real64> MSNominalCapacity;                         // Nominal Capacity MS AC Furnace [W]

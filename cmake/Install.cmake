@@ -9,7 +9,7 @@
 #elseif(APPLE)
 #set(CPACK_GENERATOR "IFW;TGZ")
 #elseif(UNIX)
-#set(CPACK_GENERATOR "STGZ;TGZ")
+#set(CPACK_GENERATOR "IFW;STGZ;TGZ")
 #endif()
 
 # So instead, let's cache the default value we want for the individual options for CPACK_BINARY_<GenName>
@@ -34,24 +34,12 @@ if(UNIX)
     set(CPACK_BINARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
 
   else()
-    # TODO: Make IFW recommended? Deprecate STGZ?
     set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommended method")
     set(CPACK_BINARY_STGZ ON CACHE BOOL "Enable to build a Linux sh installer script, which is the legacy method")
 
     # Unix (non Apple CACHE BOOL) specific option to turn off
     set(CPACK_BINARY_TZ OFF CACHE BOOL "Recommended OFF")
   endif()
-
-  # TODO: the "FORCE" is temporary to avoid people having an existing build directory miss the fact that the recommended method changed
-  # TODO: remove after next release
-  if(UNIX AND NOT APPLE)
-    if(NOT CPACK_BINARY_IFW)
-      set(CPACK_BINARY_STGZ OFF CACHE BOOL "This was the legacy method on Linux, superseded by IFW" FORCE)
-      set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
-      message("Switching from STGZ to IFW as the supported generator has changed on Linux")
-    endif()
-  endif()
-  # END TODO
 
   # Tar.gz for inclusion in other programs for eg
   set(CPACK_BINARY_TGZ ON CACHE BOOL "Enable to build a tar.gz package, recommended for an official release")
@@ -374,8 +362,7 @@ set(CPACK_RESOURCE_FILE_README "${PROJECT_BINARY_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/CurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${PROJECT_SOURCE_DIR}/idd/V22-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V23-1-0-Energy+.idd")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd")
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
@@ -670,7 +657,6 @@ if(BUILD_DOCS)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/ModuleDeveloper.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/OutputDetailsAndExamples.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
-  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/index.html" DESTINATION "./Documentation" COMPONENT Documentation)
 else()

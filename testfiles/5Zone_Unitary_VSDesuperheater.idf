@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Building,                !- Name
@@ -2699,7 +2699,7 @@
     Coil:Cooling:DX,  !- Heating Source Object Type
     Main Cooling Coil 1,     !- Heating Source Name
     ,                        !- Temperature Setpoint Node Name
-    5.0;                     !- Parasitic Electric Load {W}
+    5.0;                     !- On Cycle Parasitic Electric Load {W}
 
   SetpointManager:Scheduled,
     Supply Air HumRat Manager 1,  !- Name
@@ -2754,6 +2754,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Main Cooling Coil 1 Performance,  !- Name
     0.0,                     !- Crankcase Heater Capacity
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation
     ,                        !- Unit Internal Static Air Pressure

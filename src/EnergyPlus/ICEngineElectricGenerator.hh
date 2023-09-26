@@ -53,10 +53,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -75,7 +77,7 @@ namespace ICEngineElectricGenerator {
         std::string Name;   // user identifier
         std::string TypeOf; // Type of Generator
         GeneratorType CompType_Num;
-        std::string FuelType;       // Type of Fuel - DIESEL, GASOLINE, GAS
+        Constant::eFuel FuelType;   // Type of Fuel - DIESEL, GASOLINE, GAS
         Real64 RatedPowerOutput;    // W - design nominal capacity of Generator
         int ElectricCircuitNode;    // Electric Circuit Node
         Real64 MinPartLoadRat;      // (IC ENGINE MIN) min allowed operating frac full load

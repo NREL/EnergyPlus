@@ -68,6 +68,29 @@ extern "C" {
 
 // ----- GENERIC QUERY FUNCTIONS
 
+/// \brief A structure representing a data exchange entry for API calls
+/// \details Can represent an output variable (sensor), and actuator, or several other things.
+///          The type of thing should be identified by the "what" member, which can be used as a filter for a specific type.
+struct APIDataEntry
+{
+    ///  \brief This variable will hold the basic type of API data point, in string form.
+    ///  \details This can be one of the following:
+    ///           "Actuator", "InternalVariable", "PluginGlobalVariable", "PluginTrendVariable", "OutputMeter", or "OutputVariable"
+    ///           Once the full list of data exchange points are returned from a call to getAPIData, this parameter can be
+    ///           used to quickly filter down to a specific type.
+    char *what;
+    /// \brief This represents the name of the entry point, not the name of the specific instance of the entry point.
+    /// \details Some examples of this name could be "Chiller Heat Transfer Rate" -- which could be available for multiple chillers.
+    char *name;
+    /// \brief This represents the unique ID for this exchange point.
+    /// \details In the example of the chiller output variable, this could be "Chiller 1". This is not used for meters
+    char *key; // not used for meters
+    /// \brief This represents the "type" of exchange for this exchange point.
+    /// \details This is only used for actuators, and represents the control actuation.
+    ///          For a node setpoint actuation, this could be either temperature or humidity, for example.
+    char *type; // only used for actuators
+};
+
 /// \brief Gets available API data for the current simulation
 /// \details This function returns a char * which points to API data in CSV form for the current simulation
 ///          The data can be easily parsed and then used in subsequent API code.
@@ -82,7 +105,7 @@ ENERGYPLUSLIB_API char *listAllAPIDataCSV(EnergyPlusState state);
 ///          This function allows a user to call the simulation to check whether data is ready for access.
 ///          Do not call for variable, meter, actuator, or any other internal exchange data prior to this returning true.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-/// \return Returns 0 (success) once the data is ready, otherwise returns 1.
+/// \return Returns 1 (true) once the data is ready, otherwise returns 0 (false).
 ENERGYPLUSLIB_API int apiDataFullyReady(EnergyPlusState state);
 /// \brief Provides a user-facing check on the API error flag
 /// \details Some API functions return a value of 0, which could potentially indicate an error, or an actual 0 value.
@@ -95,6 +118,38 @@ ENERGYPLUSLIB_API int apiErrorFlag(EnergyPlusState state);
 ///          a calculation to continue, this function can reset the flag.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API void resetErrorFlag(EnergyPlusState state);
+
+// ----- DATA TRANSFER HELPER FUNCTIONS
+
+/// \brief Gets available API data for the current simulation
+/// \details This function returns a APIDataEntry * (array) which points to an API data array.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[out] resultingSize An integer which will be set to the size of the array upon return
+/// \return An APIDataEntry * pointing to an array with the size passed in the by-ref argument.  When done, pass to freeAPIData to clear the memory.
+ENERGYPLUSLIB_API struct APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize);
+/// \brief Clears an APIData memory allocation
+/// \details This function frees an instance of the API data
+/// \param[in] data An array (pointer) of API data exchange that points as returned from the getAPIData function
+/// \param[in] arraySize The size of the API data exchange array, which is known after the call to getAPIData.
+/// \return Nothing, this simply frees the memory
+ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry *data, unsigned int arraySize);
+/// \brief Gets the names of the object instances in the current input file
+/// \details Although many workflows should be aware of the input file already, there are certain cases where asking EnergyPlus
+///          to report back the current input file objects has value.  The primary application is when a user is still utilizing an IDF based
+///          workflow, and wants to be able to write general purpose API callbacks or Python Plugins.  In this case, they may want to loop over all
+///          zones or chillers, and get handles to actuators or sensors accordingly.  Normally, the user would have to hardcode the object names, but
+///          with this API function, they can simply loop over all the objects of that type.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] objectType The object type from the input schema, such as "Chiller:Electric", or "Zone" -- casing should match input schema!
+/// \param[out] resultingSize An integer which will be set to the size of the array upon return
+/// \return Const char * pointing to an array of const char * with the size set in the by-ref argument.  When done, pass to freeObjectNames to clear.
+ENERGYPLUSLIB_API const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize);
+/// \brief Clears an object names array allocation
+/// \details This function frees an instance of the object names array, which is returned from getObjectNames
+/// \param[in] data An array (pointer) of const char * as returned from the getObjectNames function
+/// \param[in] arraySize The size of the object name array, which is known after the call to getObjectNames.
+/// \return Nothing, this simply frees the memory
+ENERGYPLUSLIB_API void freeObjectNames(const char **objectNames, unsigned int arraySize);
 
 // ----- FUNCTIONS RELATED TO VARIABLES
 
@@ -368,13 +423,21 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableDirection(EnergyPlusState state, 
 
 // ----- FUNCTIONS RELATED TO MISC CURRENT SIMULATION STATE
 
-/// \brief Returns the current year of the simulation.
+/// \brief Returns the current year of the simulation, taken from the EPW.
+/// \details This is directly read from the EPW, and as such, if the EPW is for example a TMY3 file
+///          the year could be set to an abritrary number and change from one timestep to the next. See calendarYear for an alternative
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int year(EnergyPlusState state);
+
+/// \brief Returns the Calendar Year of the simulation (based on the RunPeriod object). Only valid for weather file run periods.
 /// \details A simulation can span multiple years and will always have a "meaningful" year that is either user-defined explicitly,
 ///          determined based on other inputs in the input file, or chosen as the current year.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int year(EnergyPlusState state);
+ENERGYPLUSLIB_API int calendarYear(EnergyPlusState state);
 
 /// \brief Returns the current month of the simulation, from 1 for January to 12 for December.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.

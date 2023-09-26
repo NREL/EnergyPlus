@@ -134,7 +134,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -3774,6 +3774,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5,                       !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     0,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ReverseCycle,            !- Defrost Strategy
     Timed,                   !- Defrost Control
@@ -3872,6 +3873,7 @@
     ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
     0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
     0,                       !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
 ! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps

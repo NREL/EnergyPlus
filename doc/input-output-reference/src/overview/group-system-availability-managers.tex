@@ -24,7 +24,7 @@ The unique, user-assigned name of an instance of a scheduled availability manage
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-006}
 
-The name of a schedule defined elsewhere in the input. Schedule values greater than zero (usually 1 is used) indicate that the system is on. Schedule values less than or equal to zero (usually 0 is used) denote that the system is off. This schedule overides the central fan schedule for determining whether the fan is on.
+The name of a schedule defined elsewhere in the input. Schedule values greater than zero (usually 1 is used) indicate that the system is on. Schedule values less than or equal to zero (usually 0 is used) denote that the system is off. This schedule overrides the central fan schedule for determining whether the fan is on.
 
 An example of this statement in an IDF is:
 
@@ -61,7 +61,7 @@ The unique, user-assigned name of an instance of a scheduled on availability man
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-1-003}
 
-The name of a schedule defined elsewhere in the input. Schedule values greater than zero (usually 1 is used) indicate that the system is on. Schedule values less than or equal to zero (usually 0 is used) denote that \emph{NoAction} is desired. This schedule overides the central fan schedule for determining whether the fan is on.
+The name of a schedule defined elsewhere in the input. Schedule values greater than zero (usually 1 is used) indicate that the system is on. Schedule values less than or equal to zero (usually 0 is used) denote that \emph{NoAction} is desired. This schedule overrides the central fan schedule for determining whether the fan is on.
 
 An example of this statement in an IDF is:
 
@@ -88,7 +88,7 @@ A value of 0 indicates the manager is signaling \emph{NoAction}. A value of 2 me
 
 \subsection{AvailabilityManager:ScheduledOff}\label{availabilitymanagerscheduledoff}
 
-The Schedule Off Availability Manager is used when equipment must be turned off during a given time period. This availability manager will not turn the equipment on, a separate availability manager must be used to enable the equipment as necessary. The scheduled off availability is determined by an off schedule. Schedule values equal to 0 set a \emph{ForceOff} availability status. Schedule values other than 0 (usually a 1 is used) set a \emph{NoAction} availability status. The syntax for mplementing such an availability manager is shown below. The identifying name refers back to the name recorded in the \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} statement described in the \textbf{Group Air Distribution} section. The schedule must be the name of a schedule defined elsewhere in the input.
+The Schedule Off Availability Manager is used when equipment must be turned off during a given time period. This availability manager will not turn the equipment on, a separate availability manager must be used to enable the equipment as necessary. The scheduled off availability is determined by an off schedule. Schedule values equal to 0 set a \emph{ForceOff} availability status. Schedule values other than 0 (usually a 1 is used) set a \emph{NoAction} availability status. The syntax for implementing such an availability manager is shown below. The identifying name refers back to the name recorded in the \hyperref[availabilitymanagerassignmentlist]{AvailabilityManagerAssignmentList} statement described in the \textbf{Group Air Distribution} section. The schedule must be the name of a schedule defined elsewhere in the input.
 
 \subsubsection{Inputs}\label{inputs-2-041}
 

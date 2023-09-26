@@ -122,7 +122,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.1;
+  Version,23.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:PACKAGEDTERMINALHEATPUMP ===========
 
@@ -226,6 +226,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
@@ -234,6 +235,8 @@
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -241,6 +244,8 @@
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -248,6 +253,8 @@
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -255,6 +262,8 @@
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -262,6 +271,8 @@
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -269,6 +280,8 @@
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -276,6 +289,8 @@
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 7 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -283,6 +298,8 @@
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 8 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -290,6 +307,8 @@
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 9 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -297,6 +316,8 @@
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 10 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
@@ -316,6 +337,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
@@ -324,6 +346,8 @@
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -331,6 +355,8 @@
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -338,6 +364,8 @@
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -345,6 +373,8 @@
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -352,6 +382,8 @@
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -359,6 +391,8 @@
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -366,6 +400,8 @@
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 7 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -373,6 +409,8 @@
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 8 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -380,6 +418,8 @@
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 9 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -387,6 +427,8 @@
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 10 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
@@ -406,6 +448,7 @@
     ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
     5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
@@ -414,6 +457,8 @@
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {W/W}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 1 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 1 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
@@ -421,6 +466,8 @@
     2295.5,                  !- Speed 2 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 2 Reference Unit Gross Rated Heating COP {W/W}
     0.179322,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 2 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 2 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
@@ -428,6 +475,8 @@
     2751.3,                  !- Speed 3 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 3 Reference Unit Gross Rated Heating COP {W/W}
     0.1925352,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 3 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 3 Total  Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
@@ -435,6 +484,8 @@
     3659.6,                  !- Speed 4 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 4 Reference Unit Gross Rated Heating COP {W/W}
     0.2189616,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 4 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 4 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
@@ -442,6 +493,8 @@
     4563.7,                  !- Speed 5 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 5 Reference Unit Gross Rated Heating COP {W/W}
     0.245388,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 5 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 5 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
@@ -449,6 +502,8 @@
     5463.3,                  !- Speed 6 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 6 Reference Unit Gross Rated Heating COP {W/W}
     0.2718144,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 6 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 6 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
@@ -456,6 +511,8 @@
     6358.4,                  !- Speed 7 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 7 Reference Unit Gross Rated Heating COP {W/W}
     0.2982408,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 7 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 7 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
@@ -463,6 +520,8 @@
     7248.5,                  !- Speed 8 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 8 Reference Unit Gross Rated Heating COP {W/W}
     0.3246672,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 8 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 8 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
@@ -470,6 +529,8 @@
     8133.6,                  !- Speed 9 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 9 Reference Unit Gross Rated Heating COP {W/W}
     0.3510936,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 9 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 9 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
@@ -477,6 +538,8 @@
     9013.2,                  !- Speed 10 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 10 Reference Unit Gross Rated Heating COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 10r 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     HPACHeatCapFT,           !- Speed 10 Heating Capacity Function of Temperature Curve Name
     HPACHeatCapFFF,          !- Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
     HPACHeatEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
@@ -494,11 +557,15 @@
     0.4,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate
+    ,                        !- Latent Capacity Time Constant
+    ,                        !- Fan Delay Time
     HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
@@ -510,6 +577,8 @@
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -520,6 +589,8 @@
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -530,6 +601,8 @@
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -540,6 +613,8 @@
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -550,6 +625,8 @@
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -560,6 +637,8 @@
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -570,6 +649,8 @@
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
     ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -580,6 +661,8 @@
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -590,6 +673,8 @@
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -600,6 +685,8 @@
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -617,11 +704,15 @@
     autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate
+    ,                        !- Latent Capacity Time Constant
+    ,                        !- Fan Delay Time
     HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
@@ -633,6 +724,8 @@
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -643,6 +736,8 @@
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -653,6 +748,8 @@
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -663,6 +760,8 @@
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -673,6 +772,8 @@
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -683,6 +784,8 @@
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -693,6 +796,8 @@
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
     ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -703,6 +808,8 @@
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -713,6 +820,8 @@
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -723,6 +832,8 @@
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
@@ -740,11 +851,15 @@
     autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate
+    ,                        !- Latent Capacity Time Constant
+    ,                        !- Fan Delay Time
     HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name
     ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
     ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
     200.0,                   !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Supply Water Storage Tank Name
@@ -756,6 +871,8 @@
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {W/W}
     0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
@@ -766,6 +883,8 @@
     0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {W/W}
     0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
@@ -776,6 +895,8 @@
     0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {W/W}
     0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
@@ -786,6 +907,8 @@
     0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {W/W}
     0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
@@ -796,6 +919,8 @@
     0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {W/W}
     0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
@@ -806,6 +931,8 @@
     0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {W/W}
     0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 6 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 6 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
@@ -816,6 +943,8 @@
     0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {W/W}
     0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 7 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 7 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
     ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
@@ -826,6 +955,8 @@
     0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {W/W}
     0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 8 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 8 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
@@ -836,6 +967,8 @@
     0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {W/W}
     0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 9 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 9 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
@@ -846,6 +979,8 @@
     0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {W/W}
     0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 10 2017 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    ,                        !- Speed 10 2023 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
     ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
     HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name

@@ -488,7 +488,7 @@ void SimOAComponent(EnergyPlusData &state,
             CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
         }
         if (Sim) {
-            state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+            state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _); // vector is 0 based, but CompIndex is 1 based so shift
         }
         break;
     }
@@ -794,6 +794,48 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
         state.dataMixedAir->GetOAControllerInputFlag = false;
     }
 
+    // check that the economizer staging operation EconomizerFirst is only used with an sensible load-based controlled AirLoopHVAC:UnitarySystem
+    if (AirLoopNum > 0) {
+        auto &primaryAirSystems = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
+        bool sensLoadCtrlUnitarySystemFound = false;
+        if (primaryAirSystems.EconomizerStagingCheckFlag == false) {
+            OAControllerNum = UtilityRoutines::FindItemInList(CtrlName, state.dataMixedAir->OAController);
+            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingType == DataHVACGlobals::EconomizerStagingType::EconomizerFirst) {
+                for (int BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
+                    for (int CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
+                        if (primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::CompType::UnitarySystemModel) {
+                            std::string_view unitarySystemName = primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name;
+                            int unitarySystemNum = UtilityRoutines::FindItemInList(
+                                unitarySystemName, state.dataUnitarySystems->unitarySys, state.dataUnitarySystems->numUnitarySystems);
+                            if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_ControlType ==
+                                UnitarySystems::UnitarySys::UnitarySysCtrlType::Load) {
+                                if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
+                                        DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                                    state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
+                                        Coil_CoolingAirToAirVariableSpeed ||
+                                    state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num == CoilDX_Cooling) {
+                                    sensLoadCtrlUnitarySystemFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!sensLoadCtrlUnitarySystemFound) {
+                    ShowWarningError(
+                        state,
+                        format(
+                            "SimOAController: EconomizerFirst was selected in the \"{}\" Controller:OutdoorAir object but the air loop it belongs to "
+                            "does not include an AirLoopHVAC:UnitarySystem with a \"Load\" Control Type input and cooling coil of one of the "
+                            "following types: Coil:Cooling:DX:MultiSpeed,"
+                            " Coil:Cooling:DX:VariableSpeed, or Coil:Cooling:DX. EconomizerFirst will not be enforced.",
+                            state.dataMixedAir->OAController(OAControllerNum).Name));
+                }
+            }
+            primaryAirSystems.EconomizerStagingCheckFlag = true;
+        }
+    }
+
     if (CtrlIndex == 0) {
         if (state.dataMixedAir->NumOAControllers > 0) {
             OAControllerNum = UtilityRoutines::FindItemInList(CtrlName, state.dataMixedAir->OAController);
@@ -898,7 +940,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
         for (int CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum) {
             // Json will catch any object types that are not the correct key choice of Controller:OutdoorAir or Controller:WaterCoil
             thisControllerList.ControllerType(CompNum) =
-                static_cast<ControllerKind>(getEnumerationValue(ControllerKindNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(AlphaNum))));
+                static_cast<ControllerKind>(getEnumValue(ControllerKindNamesUC, UtilityRoutines::makeUPPER(AlphArray(AlphaNum))));
             thisControllerList.ControllerName(CompNum) = AlphArray(AlphaNum + 1);
             // loop over all previous controller lists to check if this controllers is also present on previous controllers
             for (int previousListNum = 1; previousListNum < Item; ++previousListNum) {
@@ -1010,7 +1052,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                     OASys.ControllerName(InListNum) = AlphArray(InListNum * 2 + 1);
                     OASys.ControllerType(InListNum) = AlphArray(InListNum * 2);
                     OASys.controllerTypeEnum(InListNum) =
-                        static_cast<DataAirLoop::ControllerKind>(getEnumerationValue(ControllerKindNamesUC, OASys.ControllerType(InListNum)));
+                        static_cast<DataAirLoop::ControllerKind>(getEnumValue(ControllerKindNamesUC, OASys.ControllerType(InListNum)));
                     // only count Controller:OutdoorAir types as valid simple controllers
                     if (OASys.controllerTypeEnum(InListNum) != DataAirLoop::ControllerKind::OutdoorAir) {
                         ++NumSimpControllers;
@@ -1041,8 +1083,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
         auto &OASys = state.dataAirLoop->OutsideAirSys(OASysNum);
         for (int CompNum = 1; CompNum <= OASys.NumComponents; ++CompNum) {
-            OASys.ComponentTypeEnum(CompNum) =
-                static_cast<SimAirServingZones::CompType>(getEnumerationValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
+            OASys.ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(getEnumValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
             if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, OASys.ComponentName(CompNum)));
@@ -1051,8 +1092,6 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
                 OASys.ComponentIndex(CompNum) = CompNum;
-                OASys.compPointer[CompNum] =
-                    UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OASys.ComponentName(CompNum), false, 0);
             } else if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Invalid) {
                 std::string const thisComp = OASys.ComponentType(CompNum);
                 if (thisComp == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" || thisComp == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW") {
@@ -1095,6 +1134,19 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
     lNumericBlanks.deallocate();
 
     state.dataMixedAir->GetOASysInputFlag = false;
+
+    // once GetOASysInputFlag is set to false other calls to objects can occur without worry that GetOutsideAirSysInputs will be called again
+    // now get the pointer for UnitarySystem - doing this earlier can cause recursion which trips IntraObjUniquenessCheck warnings
+    for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
+        for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
+            if (state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::CoilSystemWater ||
+                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
+                state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
+                state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = UnitarySystems::UnitarySys::factory(
+                    state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+            }
+        }
+    }
 }
 
 void GetOAControllerInputs(EnergyPlusData &state)
@@ -1289,7 +1341,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
 
             // System outdoor air method
             thisVentilationMechanical.SystemOAMethod =
-                static_cast<DataSizing::SysOAMethod>(getEnumerationValue(SOAMNamesUC, UtilityRoutines::MakeUPPERCase(AlphArray(4))));
+                static_cast<DataSizing::SysOAMethod>(getEnumValue(SOAMNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
 
             if (thisVentilationMechanical.SystemOAMethod == DataSizing::SysOAMethod::IAQP ||
                 thisVentilationMechanical.SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlSchOcc ||
@@ -1633,7 +1685,7 @@ void GetOAControllerInputs(EnergyPlusData &state)
                             for (int EquipListNum = 1; EquipListNum <= state.dataZoneEquip->NumOfZoneEquipLists; ++EquipListNum) {
                                 if (EquipListNum == EquipListIndex) {
                                     for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(EquipListNum).NumOfEquipTypes; ++EquipNum) {
-                                        if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipType(EquipNum),
+                                        if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipTypeName(EquipNum),
                                                                         "ZONEHVAC:AIRDISTRIBUTIONUNIT")) {
                                             for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
                                                 if (UtilityRoutines::SameString(state.dataZoneEquip->ZoneEquipList(EquipListNum).EquipName(EquipNum),
@@ -2361,6 +2413,17 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
                 ShowWarningError(state, format("{}=\"{}\" invalid {}=\"{}\".", CurrentModuleObject, AlphArray(1), cAlphaFields(19), AlphArray(19)));
                 ShowContinueError(state, "...assuming \"BypassWhenWithinEconomizerLimits\" and the simulation continues.");
                 state.dataMixedAir->OAController(OutAirNum).HeatRecoveryBypassControlType = BypassWhenWithinEconomizerLimits;
+            }
+        }
+    }
+
+    if (NumAlphas > 19) {
+        if (!lAlphaBlanks(20)) {
+            if (UtilityRoutines::SameString(AlphArray(20), "EconomizerFirst")) {
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType = DataHVACGlobals::EconomizerStagingType::EconomizerFirst;
+            } else {
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType =
+                    DataHVACGlobals::EconomizerStagingType::InterlockedWithMechanicalCooling;
             }
         }
     }
@@ -3109,6 +3172,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 // if flow rate has been specified by a manager, set it to the specified value
                 thisOAController.MixMassFlow =
                     state.dataAirLoop->AirLoopFlow(AirLoopNum).ReqSupplyFrac * state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
+                // state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate = thisOAController.MixMassFlow - thisOAController.ExhMassFlow;
             } else {
                 thisOAController.MixMassFlow = state.dataLoopNodes->Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
 

@@ -469,7 +469,7 @@ namespace UnitHeater {
             // Heating coil information:
             {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type =
-                    static_cast<HCoilType>(getEnumerationValue(HCoilTypeNamesUC, UtilityRoutines::MakeUPPERCase(Alphas(7))));
+                    static_cast<HCoilType>(getEnumValue(HCoilTypeNamesUC, UtilityRoutines::makeUPPER(Alphas(7))));
                 switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
                 case HCoilType::WaterHeatingCoil:
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatingCoilType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
@@ -762,8 +762,6 @@ namespace UnitHeater {
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleOnOff;
         auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
 
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
@@ -802,14 +800,13 @@ namespace UnitHeater {
         }
 
         if (allocated(ZoneComp)) {
+            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum);
             if (state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum)) { // initialize the name of each availability manager list and zone number
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailManagerListName =
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).ZoneNum = ZoneNum;
+                availMgr.AvailManagerListName = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
+                availMgr.ZoneNum = ZoneNum;
                 state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum) = false;
             }
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus =
-                ZoneComp(DataZoneEquipment::ZoneEquip::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum).AvailStatus;
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus = availMgr.AvailStatus;
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -934,8 +931,9 @@ namespace UnitHeater {
 
         state.dataUnitHeaters->SetMassFlowRateToZero = false;
         if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) > 0) {
-            if ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) > 0 || ZoneCompTurnFansOn) &&
-                !ZoneCompTurnFansOff) {
+            if ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) > 0 ||
+                 state.dataHVACGlobal->TurnFansOn) &&
+                !state.dataHVACGlobal->TurnFansOff) {
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOffNoHeating &&
                     ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP < SmallLoad) ||
                      (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)))) {
@@ -1498,8 +1496,6 @@ namespace UnitHeater {
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::FanType_SimpleOnOff;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using General::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -1544,8 +1540,9 @@ namespace UnitHeater {
         if (OpMode != CycFanCycCoil) {
 
             if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) <= 0 ||
-                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) ||
-                 ZoneCompTurnFansOff)) {
+                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 &&
+                  !state.dataHVACGlobal->TurnFansOn) ||
+                 state.dataHVACGlobal->TurnFansOff)) {
                 // Case 1: OFF-->unit schedule says that it it not available
                 //         OR child fan in not available OR child fan not being cycled ON by sys avail manager
                 //         OR child fan being forced OFF by sys avail manager
@@ -1686,8 +1683,9 @@ namespace UnitHeater {
         } else { // OnOff fan and cycling
             if ((state.dataUnitHeaters->QZnReq < SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
                 GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).SchedPtr) <= 0 ||
-                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 && !ZoneCompTurnFansOn) ||
-                 ZoneCompTurnFansOff)) {
+                ((GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr) <= 0 &&
+                  !state.dataHVACGlobal->TurnFansOn) ||
+                 state.dataHVACGlobal->TurnFansOff)) {
                 // Case 1: OFF-->unit schedule says that it it not available
                 //         OR child fan in not available OR child fan not being cycled ON by sys avail manager
                 //         OR child fan being forced OFF by sys avail manager
@@ -1790,8 +1788,6 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using DataHVACGlobals::FanType_SimpleOnOff;
-        auto &ZoneCompTurnFansOff = state.dataHVACGlobal->ZoneCompTurnFansOff;
-        auto &ZoneCompTurnFansOn = state.dataHVACGlobal->ZoneCompTurnFansOn;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -1816,12 +1812,9 @@ namespace UnitHeater {
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index,
-                                            _,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, _);
             }
 
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
@@ -1897,12 +1890,9 @@ namespace UnitHeater {
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index,
-                                            _,
-                                            ZoneCompTurnFansOn,
-                                            ZoneCompTurnFansOff);
+                                            _);
             } else {
-                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(
-                    state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                state.dataHVACFan->fanObjs[state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index]->simulate(state, _, _);
             }
             switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Type) {
 

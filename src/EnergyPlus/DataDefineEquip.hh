@@ -129,6 +129,7 @@ namespace DataDefineEquip {
         Real64 HeatGain = 0.0;              // [J]
         Real64 CoolGain = 0.0;              // [J]
         bool EachOnceFlag = true;
+        bool IsConstLeakageRate = false; // if true, constant leakage rate, if false proportional leakage rate will be calculated
 
         // Default Constructor
         ZoneAirEquip()

@@ -127,7 +127,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,23.1;
+  Version,23.2;
 
   Building,
     NONE,                    !- Name
@@ -1473,6 +1473,7 @@
   Coil:Cooling:DX:CurveFit:Performance,
     Furnace ACDXCoil 1 Performance,  !- Name
     ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name
     ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
     ,                        !- Unit Internal Static Air Pressure {Pa}
