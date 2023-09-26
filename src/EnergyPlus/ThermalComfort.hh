@@ -298,7 +298,6 @@ struct ThermalComfortsData : BaseGlobalStruct
     int IterNum = 0;                        // Number of iteration
     Real64 LatRespHeatLoss = 0.0;           // Latent respiration heat loss
     int MaxZoneNum = 0;                     // Number of zones
-    int MRTCalcType = 0;                    // The type of MRT calculation (ZoneAveraged or SurfaceWeighted)
     Real64 OpTemp = 0.0;                    // Operative temperature
     Real64 EffTemp = 0.0;                   // Effective temperature
     int PeopleNum = 0;                      // People number

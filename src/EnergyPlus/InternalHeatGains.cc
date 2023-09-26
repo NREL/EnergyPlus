@@ -733,8 +733,8 @@ namespace InternalHeatGains {
 
                         if (state.dataInternalHeatGains->UsingThermalComfort) {
 
-                            // Set the default value of MRTCalcType as 'ZoneAveraged'
-                            thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
+                            // Set the default value of MRTCalcType as 'EnclosureAveraged'
+                            thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::EnclosureAveraged;
 
                             bool ModelWithAdditionalInputs = thisPeople.Fanger || thisPeople.Pierce || thisPeople.KSU ||
                                                              thisPeople.CoolingEffectASH55 || thisPeople.AnkleDraftASH55;
@@ -743,8 +743,8 @@ namespace InternalHeatGains {
                             {
                                 std::string const &mrtType = IHGAlphas(7);
 
-                                if (mrtType == "ZONEAVERAGED") {
-                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
+                                if (mrtType == "ENCLOSUREAVERAGED") {
+                                    thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::EnclosureAveraged;
 
                                 } else if (mrtType == "SURFACEWEIGHTED") {
                                     thisPeople.MRTCalcType = DataHeatBalance::CalcMRT::SurfaceWeighted;
@@ -797,7 +797,7 @@ namespace InternalHeatGains {
                                                                 IHGAlphas(1),
                                                                 IHGAlphaFieldNames(7),
                                                                 IHGAlphas(7)));
-                                        ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
+                                        ShowContinueError(state, "...Valid values are \"EnclosureAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
                                     }
                                 }
                             }
@@ -3787,7 +3787,7 @@ namespace InternalHeatGains {
                 state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
 
-                if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::ZoneAveraged) {
+                if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::EnclosureAveraged) {
                     print(state.files.eio, "Zone Averaged,");
                 } else if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::SurfaceWeighted) {
                     print(state.files.eio, "Surface Weighted,");

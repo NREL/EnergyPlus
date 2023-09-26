@@ -1944,7 +1944,6 @@ namespace ThermalComfort {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             thisAngFacList.Name = state.dataIPShortCut->cAlphaArgs(1); // no need for verification/uniqueness.
-            // Ignore ZoneName cAlphaArgs(2)
 
             thisAngFacList.TotAngleFacSurfaces = NumNumbers;
             thisAngFacList.SurfaceName.allocate(thisAngFacList.TotAngleFacSurfaces);
@@ -1952,17 +1951,17 @@ namespace ThermalComfort {
             thisAngFacList.AngleFactor.allocate(thisAngFacList.TotAngleFacSurfaces);
 
             for (int SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
-                thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 2);
+                thisAngFacList.SurfaceName(SurfNum) = state.dataIPShortCut->cAlphaArgs(SurfNum + 1);
                 thisAngFacList.SurfacePtr(SurfNum) =
-                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
+                    UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(SurfNum + 1), state.dataSurface->Surface);
                 thisAngFacList.AngleFactor(SurfNum) = state.dataIPShortCut->rNumericArgs(SurfNum);
                 // Error trap for surfaces that do not exist or surfaces not in the zone
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
                     ShowSevereError(state,
                                     format("{}: invalid {}, entered value={}",
                                            cCurrentModuleObject,
-                                           state.dataIPShortCut->cAlphaFieldNames(SurfNum + 2),
-                                           state.dataIPShortCut->cAlphaArgs(SurfNum + 2)));
+                                           state.dataIPShortCut->cAlphaFieldNames(SurfNum + 1),
+                                           state.dataIPShortCut->cAlphaArgs(SurfNum + 1)));
                     ShowContinueError(state,
                                       format("ref {}={} not found in {}={}",
                                              state.dataIPShortCut->cAlphaFieldNames(1),
@@ -2228,7 +2227,7 @@ namespace ThermalComfort {
         Real64 constexpr StefanBoltzmannConst = 5.6697e-8; // Stefan-Boltzmann constant in W/(m2*K4)
 
         switch (state.dataHeatBal->People(PeopleListNum).MRTCalcType) {
-        case DataHeatBalance::CalcMRT::ZoneAveraged: {
+        case DataHeatBalance::CalcMRT::EnclosureAveraged: {
             state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
         } break;
         case DataHeatBalance::CalcMRT::SurfaceWeighted: {

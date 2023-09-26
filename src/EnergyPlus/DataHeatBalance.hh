@@ -115,7 +115,7 @@ namespace DataHeatBalance {
     enum class CalcMRT
     {
         Invalid = -1,
-        ZoneAveraged,
+        EnclosureAveraged,
         SurfaceWeighted,
         AngleFactor,
         Num

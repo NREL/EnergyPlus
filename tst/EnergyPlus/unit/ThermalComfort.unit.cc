@@ -214,7 +214,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
         "    Activity Schedule,       !- Activity Level Schedule Name              ",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}   ",
         "    Yes,                     !- Enable ASHRAE 55 Comfort Warnings         ",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type ",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type ",
         "    ,                        !- Surface Name/Angle Factor List Name       ",
         "    Work efficiency,         !- Work Efficiency Schedule Name             ",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1007,7 +1007,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).CO2RateFactor = 3.82e-8;
     state->dataHeatBal->People(1).Show55Warning = true;
     state->dataHeatBal->People(1).Pierce = true;
-    state->dataHeatBal->People(1).MRTCalcType = DataHeatBalance::CalcMRT::ZoneAveraged;
+    state->dataHeatBal->People(1).MRTCalcType = DataHeatBalance::CalcMRT::EnclosureAveraged;
     state->dataHeatBal->People(1).WorkEffPtr = 0;
     state->dataHeatBal->People(1).clothingType = ClothingType::InsulationSchedule;
 
@@ -1108,7 +1108,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
         "    Activity Schedule,       !- Activity Level Schedule Name              ",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}   ",
         "    Yes,                     !- Enable ASHRAE 55 Comfort Warnings         ",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type ",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type ",
         "    ,                        !- Surface Name/Angle Factor List Name       ",
         "    Work efficiency,         !- Work Efficiency Schedule Name             ",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1662,7 +1662,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_GetAngleFactorListTest)
     std::string const idf_objects = delimited_string({
         "ComfortViewFactorAngles, ",
         "  Angle Factor Lost,  !- Name ",
-        "  InTheZone,          !- Zone Name ",
         "  InTheZone:Wall1,    !- Surface 1 Name ",
         "  0.01,               !- Angle Factor 1 ",
         "  InTheZone:Wall2,    !- Surface 2 Name ",
@@ -1892,11 +1891,14 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT_Enclosure_Based)
     state->dataThermalComforts->AngleFactorList.allocate(1);
     state->dataSurface->TotSurfaces = 12;
     state->dataGlobal->NumOfZones = 2;
+    state->dataGlobal->numSpaces = 2;
+
     state->dataHeatBalSurf->SurfInsideTempHist.allocate(1);
     state->dataHeatBalSurf->SurfInsideTempHist(1).allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->space.allocate(state->dataGlobal->numSpaces);
 
     state->dataSurface->Surface(1).Area = 10.0;
     state->dataSurface->Surface(2).Area = 10.0;
@@ -1951,6 +1953,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT_Enclosure_Based)
     state->dataSurface->Surface(4).Zone = 1;
     state->dataSurface->Surface(5).Zone = 1;
     state->dataSurface->Surface(6).Zone = 1;
+    state->dataSurface->Surface(1).spaceNum = 1;
+    state->dataSurface->Surface(2).spaceNum = 1;
+    state->dataSurface->Surface(3).spaceNum = 1;
+    state->dataSurface->Surface(4).spaceNum = 1;
+    state->dataSurface->Surface(5).spaceNum = 1;
+    state->dataSurface->Surface(6).spaceNum = 1;
 
     state->dataSurface->Surface(7).Zone = 2;
     state->dataSurface->Surface(8).Zone = 2;
@@ -1958,6 +1966,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT_Enclosure_Based)
     state->dataSurface->Surface(10).Zone = 2;
     state->dataSurface->Surface(11).Zone = 2;
     state->dataSurface->Surface(12).Zone = 2;
+    state->dataSurface->Surface(7).spaceNum = 2;
+    state->dataSurface->Surface(8).spaceNum = 2;
+    state->dataSurface->Surface(9).spaceNum = 2;
+    state->dataSurface->Surface(10).spaceNum = 2;
+    state->dataSurface->Surface(11).spaceNum = 2;
+    state->dataSurface->Surface(12).spaceNum = 2;
 
     state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
     state->dataHeatBal->Zone(1).spaceIndexes[0] = 1;
