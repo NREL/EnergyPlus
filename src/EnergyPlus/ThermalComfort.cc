@@ -2129,24 +2129,28 @@ namespace ThermalComfort {
         }
 
         // Now weight the MRT
+        auto &thisSurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
         if (thisSurface.enclAESum > 0.01) {
             CalcSurfaceWeightedMRT = sumAET / thisSurface.enclAESum;
             // if averaged with surface--half comes from the surface used for weighting (SurfNum) and the rest from the calculated MRT that excludes
             // this surface
             if (AverageWithSurface) {
-                CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + CalcSurfaceWeightedMRT);
+                CalcSurfaceWeightedMRT = 0.5 * (thisSurfaceTemp + CalcSurfaceWeightedMRT);
             }
         } else {
             if (state.dataThermalComforts->FirstTimeError) {
-                int ZoneNum = thisSurface.Zone;
-                ShowWarningError(
-                    state,
-                    format("Zone areas*inside surface emissivities are summing to zero, for Zone=\"{}\"", state.dataHeatBal->Zone(ZoneNum).Name));
-                ShowContinueError(state, "As a result, MAT will be used for MRT when calculating a surface weighted MRT for this zone.");
+                int spaceNum = thisSurface.spaceNum;
+                ShowWarningError(state,
+                                 format("CalcSurfaceWeightedMRT: Areas*Inside surface emissivities are summing to zero for Enclosure=\"{}\"",
+                                        thisRadEnclosure.Name));
+                ShowContinueError(state,
+                                  format("As a result, the MAT for Space={} will be used for MRT when calculating the surface weighted MRT.",
+                                         state.dataHeatBal->space(spaceNum).Name));
+                ShowContinueError(state, format("for Surface={}", thisSurface.Name));
                 state.dataThermalComforts->FirstTimeError = false;
-                CalcSurfaceWeightedMRT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                CalcSurfaceWeightedMRT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
                 if (AverageWithSurface) {
-                    CalcSurfaceWeightedMRT = 0.5 * (state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) + CalcSurfaceWeightedMRT);
+                    CalcSurfaceWeightedMRT = 0.5 * (thisSurfaceTemp + CalcSurfaceWeightedMRT);
                 }
             }
         }
@@ -2219,26 +2223,15 @@ namespace ThermalComfort {
         // within a space.  Future additions might include the effect of direct
         // solar energy on occupants.
 
-        // Return value
-        Real64 CalcRadTemp;
-
-        // Locals
-        Real64 SurfaceTemp;
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        Real64 constexpr AreaEff(1.8);                    // Effective area of a "standard" person in meters squared
-        Real64 constexpr StefanBoltzmannConst(5.6697e-8); // Stefan-Boltzmann constant in W/(m2*K4)
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 ZoneRadTemp;
+        Real64 CalcRadTemp = 0.0;
+        Real64 constexpr AreaEff = 1.8;                    // Effective area of a "standard" person in meters squared
+        Real64 constexpr StefanBoltzmannConst = 5.6697e-8; // Stefan-Boltzmann constant in W/(m2*K4)
 
         switch (state.dataHeatBal->People(PeopleListNum).MRTCalcType) {
         case DataHeatBalance::CalcMRT::ZoneAveraged: {
             state.dataThermalComforts->RadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
         } break;
         case DataHeatBalance::CalcMRT::SurfaceWeighted: {
-            ZoneRadTemp = state.dataHeatBal->ZoneMRT(state.dataThermalComforts->ZoneNum);
-            SurfaceTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(state.dataHeatBal->People(PeopleListNum).SurfacePtr);
             state.dataThermalComforts->RadTemp = CalcSurfaceWeightedMRT(state, state.dataHeatBal->People(PeopleListNum).SurfacePtr);
         } break;
         case DataHeatBalance::CalcMRT::AngleFactor: {
