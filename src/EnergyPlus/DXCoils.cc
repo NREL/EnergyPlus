@@ -5999,7 +5999,7 @@ void GetDXCoils(EnergyPlusData &state)
                                     thisDXCoil.Name,
                                     {},
                                     "Electricity",
-                                    "DHW",
+                                    "WaterSystems", //"DHW",
                                     {},
                                     "Plant");
             }
@@ -6036,7 +6036,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 thisDXCoil.Name,
                                 {},
                                 "Electricity",
-                                "DHW",
+                                "WaterSystems", // "DHW",
                                 {},
                                 "Plant");
         }
