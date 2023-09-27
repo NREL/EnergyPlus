@@ -431,6 +431,7 @@ struct SolarShadingData : BaseGlobalStruct
     bool penumbra = false;
 #else
     std::unique_ptr<Penumbra::Penumbra> penumbra = nullptr;
+    std::pair<EnergyPlusData *, std::string> LoggerContext;
 #endif
 
     bool GetInputFlag = true;
