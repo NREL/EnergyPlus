@@ -5817,7 +5817,8 @@ namespace CondenserLoopTowers {
         Real64 constexpr Acc(0.0001); // Accuracy of result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 constexpr VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
+        Real64 lowerTr = 0.001;
+        Real64 upperTr = 22.2222;
 
         //   determine tower outlet water temperature
         Real64 Tr; // range temperature which results in an energy balance
@@ -5827,8 +5828,16 @@ namespace CondenserLoopTowers {
             // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
             return (Twb + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
         };
+
+        // select bounds so range calculation through regula falsi can be determined
+        for (int upperTrIncr = 0; upperTrIncr <= 100; ++upperTrIncr) {
+            if (f(lowerTr) * f(upperTr + upperTrIncr) < 0) {
+                upperTr += upperTrIncr;
+                break;
+            }
+        }
         int SolFla = 0;
-        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp);
+        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, lowerTr, upperTr);
 
         Real64 OutletWaterTempLocal = this->WaterTemp - Tr;
 
@@ -5854,6 +5863,27 @@ namespace CondenserLoopTowers {
             }
             if (this->WaterTemp > (TempSetPoint + state.dataCondenserLoopTowers->towers(this->VSTower).MaxRangeTemp)) { // run flat out
                 OutletWaterTempLocal = this->WaterTemp - state.dataCondenserLoopTowers->towers(this->VSTower).MaxRangeTemp;
+            } else {
+                if (this->WaterTemp > TempSetPoint) {
+                    ++this->VSErrorCountTRCalc;
+                    if (this->VSErrorCountTRCalc < 2) {
+                        ShowWarningError(
+                            state,
+                            format("The outlet water temperature for cooling tower {} could not be correctly calculated. The outlet water "
+                                   "temperature was set to the inlet water temperature minus 0.001 deg. C.",
+                                   this->Name));
+                        ShowContinueError(state,
+                                          format(" ... Occurrence info = {}, {} {}",
+                                                 state.dataEnvrn->EnvironmentName,
+                                                 state.dataEnvrn->CurMnDy,
+                                                 General::CreateSysTimeIntervalString(state)));
+                    } else {
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            format("The outlet water temperature for cooling tower {} could not be calculated.", this->Name),
+                            this->ErrIndexTRCalc);
+                    }
+                }
             }
         }
         return OutletWaterTempLocal;

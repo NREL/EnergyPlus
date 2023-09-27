@@ -318,11 +318,13 @@ namespace CondenserLoopTowers {
         int VSErrorCountWFRR = 0;             // - counter if water flow rate ratio limits are exceeded
         int VSErrorCountIAWB = 0;             // - counter if inlet air wet-bulb temperature limits are exceeded
         int VSErrorCountTR = 0;               // - counter if tower range temperature limits are exceeded
+        int VSErrorCountTRCalc = 0;           // - counter if tower range temperature could not be calculated
         int VSErrorCountTA = 0;               // - counter if tower approach temperature limits are exceeded
         int ErrIndexFlowFrac = 0;             // - index to recurring error structure for liquid to gas ratio
         int ErrIndexWFRR = 0;                 // - index to recurring error structure for water flow rate ratio
         int ErrIndexIAWB = 0;                 // - index to recurring error structure for inlet air WB
         int ErrIndexTR = 0;                   // - index to recurring error structure for tower range
+        int ErrIndexTRCalc = 0;               // - index to recurring error structure for tower range
         int ErrIndexTA = 0;                   // - index to recurring error structure for tower approach
         int ErrIndexLG = 0;                   // - index to recurring error structure for tower liquid/gas ratio
         //- Tr = Range temperature
