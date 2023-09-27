@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - '*'
-    branches: [ ci_fix ]
 
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
@@ -48,8 +47,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      with:
-        ref: v23.2.0-RC1   # TODO: Temporary
 
     - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
       uses: actions/setup-python@v4
@@ -141,7 +138,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.zip
-        tag: v23.2.0-RC1
+        tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
 
@@ -150,6 +147,6 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: build/EnergyPlus-*-Windows-${{ matrix.package-arch }}.exe
-        tag: v23.2.0-RC1
+        tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
