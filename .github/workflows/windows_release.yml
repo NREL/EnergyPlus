@@ -20,7 +20,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        name: [x64, x86, x64_hardened]
+        name: [x64, x64_hardened]  # removed x86 because it won't build packages now
         include:
         - name: x64
           arch: x64
@@ -28,12 +28,12 @@ jobs:
           vs-generator: x64
           package-arch: x86_64
           enable_hardened_runtime: OFF
-        - name: x86
-          arch: x86
-          allow_failure: false
-          vs-generator: Win32
-          package-arch: i386
-          enable_hardened_runtime: OFF
+        # - name: x86
+        #   arch: x86
+        #   allow_failure: false
+        #   vs-generator: Win32
+        #   package-arch: i386
+        #   enable_hardened_runtime: OFF
         - name: x64_hardened
           arch: x64
           allow_failure: false

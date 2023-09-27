@@ -308,6 +308,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           NumUnitarySystem = GetNumObjectsFound('AIRLOOPHVAC:UNITARYSYSTEM')
           NumUnitaryWAHP = GetNumObjectsFound('AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR')
           NumZoneWAHP = GetNumObjectsFound('ZONEHVAC:WATERTOAIRHEATPUMP')
+          IF (ALLOCATED(CoilLatentStuff)) DEALLOCATE(CoilLatentStuff)
           ALLOCATE(CoilLatentStuff(NumUnitarySystem + NumUnitaryWAHP + NumZoneWAHP))
           NumCoilLatentStuff = 0
           DO Num=1,NumIDFRecords
