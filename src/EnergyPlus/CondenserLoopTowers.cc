@@ -5817,7 +5817,7 @@ namespace CondenserLoopTowers {
         Real64 constexpr Acc(0.0001); // Accuracy of result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 lowerTr = 0.001;
+        Real64 constexpr lowerTr = 0.001;
         Real64 upperTr = 22.2222;
 
         //   determine tower outlet water temperature
@@ -5830,8 +5830,9 @@ namespace CondenserLoopTowers {
         };
 
         // select bounds so range calculation through regula falsi can be determined
+        Real64 fLowerTr = f(lowerTr);
         for (int upperTrIncr = 0; upperTrIncr <= 100; ++upperTrIncr) {
-            if (f(lowerTr) * f(upperTr + upperTrIncr) < 0) {
+            if (fLowerTr * f(upperTr + upperTrIncr) < 0) {
                 upperTr += upperTrIncr;
                 break;
             }
