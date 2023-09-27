@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -141,14 +142,16 @@ void getChillerASHRAE205Input(EnergyPlusData &state)
             // be set The CheckForActualFilePath function emits some nice information to the ERR file, so we just need a simple fatal here
             ShowFatalError(state, "Program terminates due to the missing ASHRAE 205 RS0001 representation file.");
         }
-        std::pair<EnergyPlusData *, std::string> callbackPair{&state,
-                                                              format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
+        // Since logger context must persist across all calls to libtk205/btwxt, it must be a member
+        thisChiller.LoggerContext = {&state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, thisObjectName)};
         thisChiller.Representation = std::dynamic_pointer_cast<tk205::rs0001_ns::RS0001>(
-            RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlus::Curve::EPlusLogging>()));
+            RSInstanceFactory::create("RS0001", rep_file_path.string().c_str(), std::make_shared<EnergyPlusLogger>()));
         if (nullptr == thisChiller.Representation) {
             ShowSevereError(state, format("{} is not an instance of an ASHRAE205 Chiller.", rep_file_path.string()));
             ErrorsFound = true;
         }
+        thisChiller.Representation->performance.performance_map_cooling.get_logger()->set_message_context(&thisChiller.LoggerContext);
+        thisChiller.Representation->performance.performance_map_standby.get_logger()->set_message_context(&thisChiller.LoggerContext);
         thisChiller.InterpolationType =
             InterpMethods[UtilityRoutines::makeUPPER(ip->getAlphaFieldValue(fields, objectSchemaProps, "performance_interpolation_method"))];
 

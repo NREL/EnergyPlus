@@ -78,6 +78,8 @@ namespace ChillerElectricASHRAE205 {
     {
         static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
         std::shared_ptr<tk205::rs0001_ns::RS0001> Representation; // ASHRAE205 representation instance
+        std::pair<EnergyPlusData *, std::string> LoggerContext;
+
         Btwxt::InterpolationMethod InterpolationType{Btwxt::InterpolationMethod::linear};
         int MinSequenceNumber{1};
         int MaxSequenceNumber{1};

@@ -254,6 +254,8 @@ set(SRC
     ElectricPowerServiceManager.cc
     ElectricPowerServiceManager.hh
     EnergyPlus.hh
+    EnergyPlusLogger.cc 
+    EnergyPlusLogger.hh
     EvaporativeCoolers.cc
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc

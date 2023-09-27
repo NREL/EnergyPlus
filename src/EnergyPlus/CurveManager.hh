@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlusLogger.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -223,19 +224,6 @@ namespace Curve {
         std::size_t numColumns = 0u;
     };
 
-    class EPlusLogging : public Courierr::Courierr
-    {
-    public:
-        void error(const std::string_view message) override;
-        void warning(const std::string_view message) override;
-        void info(const std::string_view) override
-        {
-        }
-        void debug(const std::string_view) override
-        {
-        }
-    };
-
     // Container for Btwxt N-d Objects
     class BtwxtManager
     {
@@ -260,7 +248,7 @@ namespace Curve {
         double getGridValue(int gridIndex, int outputIndex, const std::vector<double> &target);
         std::map<std::string, const nlohmann::json &> independentVarRefs;
         std::map<fs::path, TableFile> tableFiles;
-        static std::shared_ptr<EPlusLogging> btwxt_logger;
+        static std::shared_ptr<EnergyPlusLogger> btwxt_logger;
         void clear();
 
     private:

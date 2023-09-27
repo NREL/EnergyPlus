@@ -57,7 +57,6 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // Third-party Headers
-#include <courierr/courierr.h>
 #include <fast_float/fast_float.h>
 
 // EnergyPlus Headers
@@ -110,22 +109,7 @@ namespace Curve {
     // validating it, and storing it in such a manner that the curve manager
     // can provide the simulation with performance curve output.
 
-    std::shared_ptr<EPlusLogging> BtwxtManager::btwxt_logger{{std::make_shared<EPlusLogging>()}};
-
-    void EPlusLogging::error(const std::string_view message)
-    {
-        const std::pair<EnergyPlusData *, std::string> &contextPair =
-            *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
-        std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
-        ShowSevereError(*contextPair.first, fullMessage);
-    }
-    void EPlusLogging::warning(const std::string_view message)
-    {
-        const std::pair<EnergyPlusData *, std::string> &contextPair =
-            *(reinterpret_cast<std::pair<EnergyPlusData *, std::string> *>(message_context));
-        std::string fullMessage = fmt::format("{}: {}", contextPair.second, message);
-        ShowWarningError(*contextPair.first, fullMessage);
-    }
+    std::shared_ptr<EnergyPlusLogger> BtwxtManager::btwxt_logger{{std::make_shared<EnergyPlusLogger>()}};
 
     // Functions
     void commonEnvironInit(EnergyPlusData &state)
