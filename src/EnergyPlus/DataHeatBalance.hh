@@ -281,6 +281,9 @@ namespace DataHeatBalance {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::CalcMRT::Num)> CalcMRTTypeNamesUC = {
+        "ENCLOSUREAVERAGED", "SURFACEWEIGHTED", "ANGLEFACTOR"};
+
     static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::AirBalance::Num)> AirBalanceTypeNamesUC = {"NONE", "QUADRATURE"};
 
     static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::InfiltrationFlow::Num)> InfiltrationFlowTypeNamesUC = {
