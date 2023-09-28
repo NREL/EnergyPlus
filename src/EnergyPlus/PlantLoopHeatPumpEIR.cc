@@ -66,6 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -94,13 +95,13 @@ void EIRPlantLoopHeatPump::simulate(
 
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state, FirstHVACIteration);
-        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) {                           // condenser side
-            Real64 sourceQdotArg = 0.0;                                                                 // TRANE, pass negative if heat pump heating
-            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {                 // TRANE
-                sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone; // TRANE
-            } else {                                                                                    // TRANE
-                sourceQdotArg = this->sourceSideHeatTransfer;                                           // TRANE
-            }                                                                                           // TRANE
+        if (calledFromLocation.loopNum == this->sourceSidePlantLoc.loopNum) { // condenser side
+            Real64 sourceQdotArg = 0.0;                                       // pass negative if heat pump heating
+            if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+                sourceQdotArg = this->sourceSideHeatTransfer * DataPrecisionGlobals::constant_minusone;
+            } else {
+                sourceQdotArg = this->sourceSideHeatTransfer;
+            }
             PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                 this->sourceSidePlantLoc.loopNum,
                                                                 this->sourceSidePlantLoc.loopSideNum,
@@ -583,6 +584,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     } else {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    // this->sourceSideCp = CpSrc; // debuging variable
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 
@@ -1272,7 +1274,6 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 std::string condenserType = UtilityRoutines::makeUPPER(fields.at("condenser_type").get<std::string>());
                 std::string sourceSideInletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_inlet_node_name").get<std::string>());
                 std::string sourceSideOutletNodeName = UtilityRoutines::makeUPPER(fields.at("source_side_outlet_node_name").get<std::string>());
-
                 thisPLHP.companionCoilName = UtilityRoutines::makeUPPER(
                     state.dataInputProcessing->inputProcessor->getAlphaFieldValue(fields, schemaProps, "companion_heat_pump_name"));
 
@@ -1469,8 +1470,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 } else if (condenserType == "AIRSOURCE") {
                     thisPLHP.airSource = true;
                     condenserNodeType = DataLoopNode::NodeFluidType::Air;
-                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::OutsideAir;
-                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::OutsideAir;
+                    condenserNodeConnectionType_Inlet = DataLoopNode::ConnectionType::Inlet;
+                    condenserNodeConnectionType_Outlet = DataLoopNode::ConnectionType::Outlet;
+                    if (sourceSideInletNodeName == sourceSideOutletNodeName) {
+                        ShowSevereError(state, format("PlantLoopHeatPump {} has the same inlet and outlet node.", thisObjectName));
+                        ShowContinueError(state, format("Node Name: {}", sourceSideInletNodeName));
+                        errorsFound = true;
+                    }
                 } else {
                     // Again, this should be protected by the input processor
                     ShowErrorMessage(
@@ -1742,6 +1748,15 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->name);
+        // report variable used for debugging, System Node Specific Heat can also report the node Cp
+        // added spaces to SetupOutputVariable to avoid issue with variable parsing script
+        // Setup Output Variable(state,
+        //                   "Heat Pump Source Side Specific Heat",
+        //                   OutputProcessor::Unit::J_kgK,
+        //                   this->sourceSideCp,
+        //                   OutputProcessor::SOVTimeStepType::System,
+        //                   OutputProcessor::SOVStoreType::Average,
+        //                   this->name);
 
         // find this component on the plant
         bool thisErrFlag = false;
@@ -2241,11 +2256,13 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     // calculate source side outlet conditions
     Real64 CpSrc = 0.0;
     if (this->waterSource) {
+        auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
         CpSrc = FluidProperties::GetSpecificHeatGlycol(
-            state, thisLoadPlantLoop.FluidName, thisInletNode.Temp, thisLoadPlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
+            state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "PLFFHPEIR::simulate()");
     } else if (this->airSource) {
         CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     }
+    // this->sourceSideCp = CpSrc; // debuging variable
     // Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     Real64 const sourceMCp = (this->sourceSideMassFlowRate < 1e-6 ? 1.0 : this->sourceSideMassFlowRate) * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
