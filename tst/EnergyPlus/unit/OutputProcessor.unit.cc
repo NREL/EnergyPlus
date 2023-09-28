@@ -6111,6 +6111,11 @@ namespace OutputProcessor {
         EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
+        // There is a whole table to valid but non-standard "endUse" alias strings that could be used.
+        // The unit test demonstrates a few representative ones that could potentially go wrong;
+        // The unit tests should fail for any of these non-standard alias names,
+        // not only limited to the few ones tested in the current unit test.
+
         // Cooling Electricity
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
         EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
