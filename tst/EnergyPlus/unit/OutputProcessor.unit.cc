@@ -6014,10 +6014,13 @@ namespace OutputProcessor {
 
     TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseAlias)
     {
+        // Test PR 10228 that fixes Issue 10224 about refactoring
+        // the procedures that SetupOutputVariable() deals with valid endUse alias names
         std::string const idf_objects = delimited_string({
             "Output:Variable,*,Cooling Coil Crankcase Heater Electricity Energy,runperiod;",
             "Output:Variable,*,Cooling Coil Water Heating Electricity Energy,runperiod;",
             "Output:Variable,*,Water System Storage Tank Mains Water Volume,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,runperiod;",
             "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
         });
 
@@ -6025,8 +6028,23 @@ namespace OutputProcessor {
 
         GetReportVariableInput(*state);
 
-        Real64 crankcaseHeater_consumption = 0.;
+        Real64 cooling_consumption = 0.;
+        // Test out a valid Alias named "CLG" for "Cooling" (Electricity):
+        SetupOutputVariable(*state,
+                            "Chiller Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            cooling_consumption,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "ChillerName_1",
+                            {},
+                            "ELECTRICITY",
+                            "CLG",
+                            {},
+                            "Plant");
 
+        Real64 crankcaseHeater_consumption = 0.;
+        // Test out a valid Alias named "DHW" for "WaterSystems" (Electricity):
         SetupOutputVariable(*state,
                             "Cooling Coil Crankcase Heater Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -6041,6 +6059,7 @@ namespace OutputProcessor {
                             "Plant");
 
         Real64 electricWaterHeating_consumption = 0.0;
+        // Another alias "DHW" for "WaterSystems" (Electricity):
         SetupOutputVariable(*state,
                             "Cooling Coil Water Heating Electricity Energy",
                             OutputProcessor::Unit::J,
@@ -6055,6 +6074,7 @@ namespace OutputProcessor {
                             "Plant");
 
         Real64 MainsWater_DrawVolume = 0.0;
+        // Test out a valid alias named "WaterSystem" for "WaterSystems" (MainsWater):
         SetupOutputVariable(*state,
                             "Water System Storage Tank Mains Water Volume",
                             OutputProcessor::Unit::m3,
@@ -6090,6 +6110,22 @@ namespace OutputProcessor {
         EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
         EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
         EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        // Cooling Electricity
+        EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(2).NumSubcategories);
+        EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(2).SubcategoryName(1));
+
+        found = UtilityRoutines::FindItem("Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        found = UtilityRoutines::FindItem("General:Cooling:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("General", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
 
         // WaterSystems Electricity
         EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(12).NumSubcategories);
