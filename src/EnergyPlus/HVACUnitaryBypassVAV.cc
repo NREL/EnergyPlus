@@ -616,8 +616,8 @@ namespace HVACUnitaryBypassVAV {
                 thisCBVAV.FanVolFlow = 9999.0;
             } else {
                 if (thisCBVAV.FanType == DataHVACGlobals::FanType::System) {
-                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisCBVAV.FanName)); // call constructor
+                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     thisCBVAV.FanInletNodeNum = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->inletNodeNum;
                     fanOutletNode = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
                     thisCBVAV.FanVolFlow = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
@@ -739,8 +739,12 @@ namespace HVACUnitaryBypassVAV {
                             ShowContinueError(state, format("...occurs in {} \"{}\"", thisCBVAV.UnitType, thisCBVAV.Name));
                             ErrorsFound = true;
                         } else {
-                            thisCBVAV.DXCoilInletNode = state.dataDXCoils->DXCoil(thisCBVAV.DXCoolCoilIndexNum).AirInNode;
-                            thisCBVAV.DXCoilOutletNode = state.dataDXCoils->DXCoil(thisCBVAV.DXCoolCoilIndexNum).AirOutNode;
+                            // the "coil" nodes are actually the parent nodes of the wrapped HX
+                            thisCBVAV.DXCoilInletNode =
+                                HVACHXAssistedCoolingCoil::GetCoilInletNode(state, thisCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                            thisCBVAV.DXCoilOutletNode =
+                                HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, thisCoolCoilType, thisCBVAV.DXCoolCoilName, DXErrorsFound);
+                            // the DX coil holds the condenser inlet node number
                             thisCBVAV.CondenserNodeNum = state.dataDXCoils->DXCoil(thisCBVAV.DXCoolCoilIndexNum).CondenserInletNodeNum(1);
                         }
                     } else if (ActualCoolCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
