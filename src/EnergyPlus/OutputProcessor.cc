@@ -4301,31 +4301,49 @@ void SetupOutputVariable(EnergyPlusData &state,
     if (EndUseKey == Constant::EndUse::Invalid) {
         // Severe warning message
         ShowSevereError(state, "Invalid End Use Category Type.");
-    } else if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // maybe EachCall is valid
-    {
-        // Need to further consider if "EachCall" option is valid
-        ShowSevereError(state, "Invalid Reporting Frequency Type.");
     } else if (ResourceTypeKey == Constant::eResource::Invalid) {
         ShowSevereError(state, "Invalid Resource Type.");
     } else {
-        SetupOutputVariable(state,
-                            VariableName,
-                            VariableUnit,
-                            ActualVariable,
-                            TimeStepTypeKey,
-                            VariableTypeKey,
-                            KeyedValue,
-                            OutputProcessor::ReportingFrequencyNames[static_cast<int>(ReportFreq)],
-                            Constant::eResourceNames[static_cast<int>(ResourceTypeKey)], // or eResourceNamesUC
-                            OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)],
-                            EndUseSubKey,
-                            GroupKey,
-                            ZoneKey,
-                            ZoneMult,
-                            ZoneListMult,
-                            indexGroupKey,
-                            customUnitName,
-                            SpaceType);
+        if (ReportFreq == OutputProcessor::ReportingFrequency::EachCall) // This is valid
+        {
+            SetupOutputVariable(state,
+                                VariableName,
+                                VariableUnit,
+                                ActualVariable,
+                                TimeStepTypeKey,
+                                VariableTypeKey,
+                                KeyedValue,
+                                "DETAILED",
+                                Constant::eResourceNames[static_cast<int>(ResourceTypeKey)], // or eResourceNamesUC
+                                OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)],
+                                EndUseSubKey,
+                                GroupKey,
+                                ZoneKey,
+                                ZoneMult,
+                                ZoneListMult,
+                                indexGroupKey,
+                                customUnitName,
+                                SpaceType);
+        } else {
+            SetupOutputVariable(state,
+                                VariableName,
+                                VariableUnit,
+                                ActualVariable,
+                                TimeStepTypeKey,
+                                VariableTypeKey,
+                                KeyedValue,
+                                OutputProcessor::ReportingFrequencyNames[static_cast<int>(ReportFreq)],
+                                Constant::eResourceNames[static_cast<int>(ResourceTypeKey)], // or eResourceNamesUC
+                                OutputProcessor::endUseCategoryNames[static_cast<int>(EndUseKey)],
+                                EndUseSubKey,
+                                GroupKey,
+                                ZoneKey,
+                                ZoneMult,
+                                ZoneListMult,
+                                indexGroupKey,
+                                customUnitName,
+                                SpaceType);
+        }
     }
 }
 
