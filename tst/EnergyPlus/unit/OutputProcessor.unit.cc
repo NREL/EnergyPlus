@@ -6074,6 +6074,115 @@ namespace OutputProcessor {
         }
     }
 
+    TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseAlias)
+    {
+        std::string const idf_objects = delimited_string({
+            "Output:Variable,*,Cooling Coil Crankcase Heater Electricity Energy,runperiod;",
+            "Output:Variable,*,Cooling Coil Water Heating Electricity Energy,runperiod;",
+            "Output:Variable,*,Water System Storage Tank Mains Water Volume,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        GetReportVariableInput(*state);
+
+        Real64 crankcaseHeater_consumption = 0.;
+
+        SetupOutputVariable(*state,
+                            "Cooling Coil Crankcase Heater Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            crankcaseHeater_consumption,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "CoilName_1",
+                            {},
+                            "Electricity",
+                            "DHW",
+                            {},
+                            "Plant");
+
+        Real64 electricWaterHeating_consumption = 0.0;
+        SetupOutputVariable(*state,
+                            "Cooling Coil Water Heating Electricity Energy",
+                            OutputProcessor::Unit::J,
+                            electricWaterHeating_consumption,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "CoilName_1",
+                            {},
+                            "Electricity",
+                            "DHW",
+                            {},
+                            "Plant");
+
+        Real64 MainsWater_DrawVolume = 0.0;
+        SetupOutputVariable(*state,
+                            "Water System Storage Tank Mains Water Volume",
+                            OutputProcessor::Unit::m3,
+                            MainsWater_DrawVolume,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "WaterTankName_1",
+                            {},
+                            "MainsWater",
+                            "WaterSystem",
+                            {},
+                            "System");
+
+        Real64 fuel_oil_co2 = 0.;
+        SetupOutputVariable(*state,
+                            "Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
+                            OutputProcessor::Unit::kg,
+                            fuel_oil_co2,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Summed,
+                            "Site",
+                            {},
+                            "CO2",
+                            "FuelOilNo2Emissions",
+                            {},
+                            "");
+
+        int found;
+
+        // fuel oil CO2 emissions
+        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("CO2", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("FuelOilNo2Emissions", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        // WaterSystems Electricity
+        EXPECT_EQ(1, state->dataOutputProcessor->EndUseCategory(12).NumSubcategories);
+        EXPECT_EQ("General", state->dataOutputProcessor->EndUseCategory(12).SubcategoryName(1));
+
+        found = UtilityRoutines::FindItem("WaterSystems:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        found = UtilityRoutines::FindItem("General:WaterSystems:Electricity", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("General", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        // WaterSystems MainsWater
+        found = UtilityRoutines::FindItem("WaterSystems:MainsWater", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("MainsWater", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+
+        found = UtilityRoutines::FindItem("General:WaterSystems:MainsWater", state->dataOutputProcessor->EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("MainsWater", state->dataOutputProcessor->EnergyMeters(found).ResourceType);
+        EXPECT_EQ("WaterSystems", state->dataOutputProcessor->EnergyMeters(found).EndUse);
+        EXPECT_EQ("General", state->dataOutputProcessor->EnergyMeters(found).EndUseSub);
+    }
+
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus
