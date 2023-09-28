@@ -6846,9 +6846,9 @@ namespace UnitarySystems {
                         if (((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple ||
                               this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
                              this->m_sysType == SysType::PackagedWSHP) ||
-                            (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
-                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
-                                this->m_sysType == SysType::PackagedWSHP) {
+                            ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                              this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
+                             this->m_sysType == SysType::PackagedWSHP)) {
                             ShowWarningError(state,
                                              format("{} = {} with Fan:SystemModel is used in \"{}\"",
                                                     cCurrentModuleObject,
