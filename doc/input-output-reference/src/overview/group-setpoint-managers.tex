@@ -107,7 +107,7 @@ The type of variable that will be controlled. There are several choices for this
 
 \begin{itemize}
 \item
-  Temperature Temperture of fluid at node ( °C)
+  Temperature Temperature of fluid at node ( °C)
 \item
   MaximumTemperature Maximum temperature of fluid at node ( °C)
 \item
@@ -329,7 +329,7 @@ SetpointManager:SingleZone:Reheat,
 
 \subsection{SetpointManager:SingleZone:Heating}\label{setpointmanagersinglezoneheating}
 
-The Single Zone Heating Setpoint Manager allows a component to be controlled based on the load required to meet the zone heating setpoint. Ths setpoint manager detects the control zone load to meet the current heating setpoint, zone inlet node flow rate, and zone node temperature, and calculates a setpoint temperature for the supply air that will satisfy the zone heating load for the control zone. This setpoint manager creates a variable temperature system. The input consists of the setpoint manager name, the controlled variable type, the minimum and maximum supply air temperatures, the name of the control zone, the name of the control zone node, the name of the control zone inlet node, and the name of a node or node list containing the nodes whose setpoint temperatures are to be set by this manager.
+The Single Zone Heating Setpoint Manager allows a component to be controlled based on the load required to meet the zone heating setpoint. The setpoint manager detects the control zone load to meet the current heating setpoint, zone inlet node flow rate, and zone node temperature, and calculates a setpoint temperature for the supply air that will satisfy the zone heating load for the control zone. This setpoint manager creates a variable temperature system. The input consists of the setpoint manager name, the controlled variable type, the minimum and maximum supply air temperatures, the name of the control zone, the name of the control zone node, the name of the control zone inlet node, and the name of a node or node list containing the nodes whose setpoint temperatures are to be set by this manager.
 
 \subsubsection{Inputs}\label{inputs-4-030}
 
@@ -515,7 +515,7 @@ SetpointManager:SingleZone:Humidity:Maximum,
 
 
   Controller:WaterCoil,
-  Central Cooling Coil Contoller 1,     !- Name
+  Central Cooling Coil Controller 1,    !- Name
   TEMPandHUMRAT,                        !- Control Variable
   Reverse,                              !- Action
   FLOW,                                 !- Actuator Variable
@@ -1535,7 +1535,7 @@ This alpha field is the name of the control zone for this setpoint manager. This
 
 \paragraph{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-20}
 
-This alpha field is the name of a \hyperref[nodelist]{NodeList} objet containing the names of the HVAC system nodes, or the name of a system node, for which temperature setpoints will be established by this setpoint manager.
+This alpha field is the name of a \hyperref[nodelist]{NodeList} object containing the names of the HVAC system nodes, or the name of a system node, for which temperature setpoints will be established by this setpoint manager.
 
 An example input follows.
 
@@ -1573,7 +1573,7 @@ This alpha field is the name of the control zone for this setpoint manager. This
 
 \subsubsection{Field: Setpoint Node or NodeList Name}\label{field-setpoint-node-or-nodelist-name-21}
 
-This alpha field is the name of a \hyperref[nodelist]{NodeList} objet containing the names of the HVAC system nodes, or the name of a system node, for which temperature setpoints will be established by this setpoint manager.
+This alpha field is the name of a \hyperref[nodelist]{NodeList} object containing the names of the HVAC system nodes, or the name of a system node, for which temperature setpoints will be established by this setpoint manager.
 
 An example input follows.
 
@@ -1849,7 +1849,7 @@ SetpointManager:SystemNodeReset:Humidity,
   MaximumHumidityRatio,                   !- Control Variable
   0.00924,                                !- Setpoint at Low Reference Humidity Ratio (kgWater/kgDryAir)
   0.00600,                                !- Setpoint at High Reference Humidity Ratio (kgWater/kgDryAir)
-  0.00850,                                !- Low Reference Humdity Ratio (kgWater/kgDryAir)
+  0.00850,                                !- Low Reference Humidity Ratio (kgWater/kgDryAir)
   0.01000,                                !- High Reference Humidity Ratio (kgWater/kgDryAir)
   Plenum-1 Out Node,                      !- Reference Node Name
   DOAS Cooling Coil Outlet;               !- Setpoint Node or NodeList Name

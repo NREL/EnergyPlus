@@ -332,17 +332,13 @@ namespace OutputReportTabular {
     struct MonthlyInputType
     {
         // Members
-        std::string name;  // identifier
-        int numFieldSet;   // number of monthly field sets
-        int firstFieldSet; // pointer to the first field set
-        int numTables;     // number of tables
-        int firstTable;    // pointer to the first table
-        int showDigits;    // the number of digits to be shown
-
-        // Default Constructor
-        MonthlyInputType() : numFieldSet(0), firstFieldSet(0), numTables(0), firstTable(0), showDigits(0)
-        {
-        }
+        std::string name;      // identifier
+        int numFieldSet = 0;   // number of monthly field sets
+        int firstFieldSet = 0; // pointer to the first field set
+        int numTables = 0;     // number of tables
+        int firstTable = 0;    // pointer to the first table
+        int showDigits = 0;    // the number of digits to be shown
+        bool isNamedMonthly = false;
     };
 
     struct MonthlyFieldSetInputType
@@ -524,7 +520,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularMonthly(EnergyPlusData &state);
 
-    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
+    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown, bool isNamedMonthly = false);
 
     void AddMonthlyFieldSetInput(
         EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, AggType const inAggregate);
@@ -1140,8 +1136,8 @@ struct OutputReportTabularData : BaseGlobalStruct
     Real64 sourceFactorElectric = 0.0;
     Real64 sourceFactorNaturalGas = 0.0;
     Real64 efficiencyDistrictCooling = 0.0;
-    Real64 efficiencyDistrictHeating = 0.0;
-    Real64 sourceFactorSteam = 0.0;
+    Real64 efficiencyDistrictHeatingWater = 0.0;
+    Real64 sourceFactorDistrictHeatingSteam = 0.0;
     Real64 sourceFactorGasoline = 0.0;
     Real64 sourceFactorDiesel = 0.0;
     Real64 sourceFactorCoal = 0.0;
@@ -1245,7 +1241,6 @@ struct OutputReportTabularData : BaseGlobalStruct
     int numPeopleAdaptive = 0;
 
     Real64 BigNum = 0.0;
-    bool VarWarning = true;
     int ErrCount1 = 0;
     Array1D<OutputProcessor::VariableType> MonthlyColumnsTypeOfVar;
     Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
@@ -1470,8 +1465,8 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->sourceFactorElectric = 0.0;
         this->sourceFactorNaturalGas = 0.0;
         this->efficiencyDistrictCooling = 0.0;
-        this->efficiencyDistrictHeating = 0.0;
-        this->sourceFactorSteam = 0.0;
+        this->efficiencyDistrictHeatingWater = 0.0;
+        this->sourceFactorDistrictHeatingSteam = 0.0;
         this->sourceFactorGasoline = 0.0;
         this->sourceFactorDiesel = 0.0;
         this->sourceFactorCoal = 0.0;
@@ -1546,7 +1541,6 @@ struct OutputReportTabularData : BaseGlobalStruct
         this->numPeopleAdaptive = 0;
 
         this->BigNum = 0.0;
-        this->VarWarning = true;
         this->ErrCount1 = 0;
         this->MonthlyColumnsTypeOfVar.clear();
         this->MonthlyColumnsStepType.clear();

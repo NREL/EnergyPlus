@@ -102,7 +102,7 @@ EnergyPlus includes three models for converting Direct Current (DC) electrical p
 {P_{AC - out}} = {P_{DC - in}} \cdot {\varepsilon_{inverter}}
 \end{equation}
 
-The inverter efficiency is determined using one of the three models. For the ``Simple'' inveter model, efficiency is constant and input by the user. For the ``Look Up Table'' model, the efficiency is calculated using linear interpolation. For the ``Function of Power'' model, the efficiency is calculating using a single-variable curve object. For both the Look Up Table and Function of Power models, the power production is normalized by \({P_{DC - in}}\).
+The inverter efficiency is determined using one of the three models. For the ``Simple'' inverter model, efficiency is constant and input by the user. For the ``Look Up Table'' model, the efficiency is calculated using linear interpolation. For the ``Function of Power'' model, the efficiency is calculating using a single-variable curve object. For both the Look Up Table and Function of Power models, the power production is normalized by \({P_{DC - in}}\).
 
 The conversion power losses are calculated from the difference between ${P_{DC,in}}$ and ${P_{AC,out}}$ and are metered as negative values on PowerConversion:ElectricityProduced.  The thermal losses include the conversion power losses plus any ancillary power consumed during standby.  The ancillary electric power consumption occurs when the inverter is scheduled to be available but it is not conditioning any power flows at the time. 
 
@@ -527,13 +527,13 @@ The description of the model parameters, and constants can be found in (Smith, 2
 N. DiOrio et al. Technoeconomic modeling of battery energy storage in SAM. Tech. rep. National Renewable Energy Lab. (NREL), Golden, CO (United States), 2015.
 
 \noindent
-K.  Smith  et  al.  “Life  prediction  model  for  grid-connected  Li-ion  batteryenergy  storage  system”.  In: 2017 American Control Conference (ACC). IEEE. 2017, pp. 4062–4068.
+K.  Smith  et  al.  “Life  prediction  model  for  grid-connected  Li-ion  battery energy  storage  system”.  In: 2017 American Control Conference (ACC). IEEE. 2017, pp. 4062–4068.
 
 \noindent
-O. Tremblay, L.-A. Dessaint, and A.-I. Dekkiche. “A generic battery modelfor the dynamic simulation of hybrid electric vehicles”. In: 2007 IEEE Vehicle Power and Propulsion Conference. Ieee. 2007, pp. 284–289.
+O. Tremblay, L.-A. Dessaint, and A.-I. Dekkiche. “A generic battery model for the dynamic simulation of hybrid electric vehicles”. In: 2007 IEEE Vehicle Power and Propulsion Conference. Ieee. 2007, pp. 284–289.
 
 \noindent
-P. P. Mishra et al. “Analysis of degradation in residential battery energystorage systems for rate-based use-cases”. In: Applied Energy 264 (2020), p. 114632.
+P. P. Mishra et al. “Analysis of degradation in residential battery energy storage systems for rate-based use-cases”. In: Applied Energy 264 (2020), p. 114632.
 
 \subsection{Electric Load Center Transformers}\label{electric-load-center-transformers}
 

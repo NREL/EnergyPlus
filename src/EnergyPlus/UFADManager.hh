@@ -88,6 +88,8 @@ namespace RoomAir {
                   RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
+    Real64 sumUFADConvGainPerPlume(EnergyPlusData &state, int const zoneNum, Real64 const numOccupants);
+
     void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight, UFADConvCoef &ufadCC);
 
     void CalcUFADInt(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone

@@ -2117,6 +2117,11 @@ namespace OutputProcessor {
         // from calling program.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+        if (state.dataGlobal->WarmupFlag) {
+            return;
+        }
+
         auto &op = state.dataOutputProcessor;
 
         if (!op->MeterValue.allocated()) {
@@ -2134,7 +2139,8 @@ namespace OutputProcessor {
             op->EnergyMeters(Meter).MNValue += op->EnergyMeters(Meter).TSValue;
             op->EnergyMeters(Meter).YRValue += op->EnergyMeters(Meter).TSValue;
             op->EnergyMeters(Meter).SMValue += op->EnergyMeters(Meter).TSValue;
-            if (op->isFinalYear) op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
+            // if (op->isFinalYear) op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
+            op->EnergyMeters(Meter).FinYrSMValue += op->EnergyMeters(Meter).TSValue;
         }
         // Set Max
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
@@ -2159,12 +2165,12 @@ namespace OutputProcessor {
                 op->EnergyMeters(Meter).SMMaxVal = op->EnergyMeters(Meter).TSValue;
                 op->EnergyMeters(Meter).SMMaxValDate = TimeStamp;
             }
-            if (op->isFinalYear) {
-                if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).FinYrSMMaxVal) {
-                    op->EnergyMeters(Meter).FinYrSMMaxVal = op->EnergyMeters(Meter).TSValue;
-                    op->EnergyMeters(Meter).FinYrSMMaxValDate = TimeStamp;
-                }
+            // if (op->isFinalYear) {
+            if (op->EnergyMeters(Meter).TSValue > op->EnergyMeters(Meter).FinYrSMMaxVal) {
+                op->EnergyMeters(Meter).FinYrSMMaxVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).FinYrSMMaxValDate = TimeStamp;
             }
+            //}
         }
         // Set Min
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
@@ -2188,86 +2194,15 @@ namespace OutputProcessor {
                 op->EnergyMeters(Meter).SMMinVal = op->EnergyMeters(Meter).TSValue;
                 op->EnergyMeters(Meter).SMMinValDate = TimeStamp;
             }
-            if (op->isFinalYear) {
-                if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).FinYrSMMinVal) {
-                    op->EnergyMeters(Meter).FinYrSMMinVal = op->EnergyMeters(Meter).TSValue;
-                    op->EnergyMeters(Meter).FinYrSMMinValDate = TimeStamp;
-                }
+            // if (op->isFinalYear) {
+            if (op->EnergyMeters(Meter).TSValue < op->EnergyMeters(Meter).FinYrSMMinVal) {
+                op->EnergyMeters(Meter).FinYrSMMinVal = op->EnergyMeters(Meter).TSValue;
+                op->EnergyMeters(Meter).FinYrSMMinValDate = TimeStamp;
             }
+            //}
         }
         for (int Meter = 1; Meter <= op->NumEnergyMeters; ++Meter) {
             op->MeterValue(Meter) = 0.0; // Ready for next update
-        }
-    }
-
-    void ResetAccumulationWhenWarmupComplete(EnergyPlusData &state)
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Jason Glazer
-        //       DATE WRITTEN   June 2015
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Resets the accumulating meter values. Needed after warmup period is over to
-        // reset the totals on meters so that they are not accumulated over the warmup period
-
-        // METHODOLOGY EMPLOYED:
-        // Cycle through the meters and reset all accumulating values
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        auto &op = state.dataOutputProcessor;
-
-        for (auto &m : op->EnergyMeters) {
-            m.HRValue = 0.0;
-
-            m.DYValue = 0.0;
-            m.DYMaxVal = MaxSetValue;
-            m.DYMaxValDate = 0;
-            m.DYMinVal = MinSetValue;
-            m.DYMinValDate = 0;
-
-            m.MNValue = 0.0;
-            m.MNMaxVal = MaxSetValue;
-            m.MNMaxValDate = 0;
-            m.MNMinVal = MinSetValue;
-            m.MNMinValDate = 0;
-
-            m.YRValue = 0.0;
-            m.YRMaxVal = MaxSetValue;
-            m.YRMaxValDate = 0;
-            m.YRMinVal = MinSetValue;
-            m.YRMinValDate = 0;
-
-            m.SMValue = 0.0;
-            m.SMMaxVal = MaxSetValue;
-            m.SMMaxValDate = 0;
-            m.SMMinVal = MinSetValue;
-            m.SMMinValDate = 0;
-
-            m.FinYrSMValue = 0.0;
-            m.FinYrSMMaxVal = MaxSetValue;
-            m.FinYrSMMaxValDate = 0;
-            m.FinYrSMMinVal = MinSetValue;
-            m.FinYrSMMinValDate = 0;
-        }
-
-        for (int Loop = 1; Loop <= op->NumOfRVariable; ++Loop) {
-            auto &rVar = op->RVariableTypes(Loop).VarPtr;
-            if (rVar.frequency == ReportingFrequency::Monthly || rVar.frequency == ReportingFrequency::Yearly ||
-                rVar.frequency == ReportingFrequency::Simulation) {
-                rVar.StoreValue = 0.0;
-                rVar.NumStored = 0;
-            }
-        }
-
-        for (int Loop = 1; Loop <= op->NumOfIVariable; ++Loop) {
-            auto &iVar = op->IVariableTypes(Loop).VarPtr;
-            if (iVar.frequency == ReportingFrequency::Monthly || iVar.frequency == ReportingFrequency::Yearly ||
-                iVar.frequency == ReportingFrequency::Simulation) {
-                iVar.StoreValue = 0;
-                iVar.NumStored = 0;
-            }
         }
     }
 
@@ -3219,6 +3154,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 Hour,
@@ -3247,6 +3183,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 Hour,
@@ -3272,6 +3209,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month,
                                                                                 DayOfMonth,
                                                                                 _,
@@ -3290,6 +3228,7 @@ namespace OutputProcessor {
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
                                                                                 state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear,
                                                                                 Month);
             }
             break;
@@ -3300,7 +3239,8 @@ namespace OutputProcessor {
                                                                                 reportID,
                                                                                 state.dataGlobal->DayOfSim,
                                                                                 state.dataEnvrn->CurEnvirNum,
-                                                                                state.dataGlobal->CalendarYear);
+                                                                                state.dataGlobal->CalendarYear,
+                                                                                state.dataEnvrn->CurrentYearIsLeapYear);
             }
             break;
         default:
@@ -3997,7 +3937,7 @@ namespace OutputProcessor {
             state.dataOutputProcessor->indexGroupKey = 100;
         } else if (has(meterName, "NaturalGas:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 101;
-        } else if (has(meterName, "DistricHeating:Facility")) {
+        } else if (has(meterName, "DistricHeatingWater:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 102;
         } else if (has(meterName, "DistricCooling:Facility")) {
             state.dataOutputProcessor->indexGroupKey = 103;
@@ -7296,7 +7236,8 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
                                                 {"Electricity:Facility",
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
-                                                 "DistrictHeating:Facility",
+                                                 "DistrictHeatingWater:Facility",
+                                                 "DistrictHeatingSteam:Facility",
                                                  "NaturalGas:Facility",
                                                  "GASOLINE:Facility",
                                                  "COAL:Facility",
@@ -7304,7 +7245,6 @@ void InitPollutionMeterReporting(EnergyPlusData &state, std::string const &Repor
                                                  "FuelOilNo2:Facility",
                                                  "Propane:Facility",
                                                  "ElectricityProduced:Facility",
-                                                 "Steam:Facility",
                                                  "CO2:Facility",
                                                  "CO:Facility",
                                                  "CH4:Facility",

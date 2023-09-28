@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
     state->dataLoopNodes->Node.allocate(2);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 10.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.003;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlow = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).CompressorPartLoadRatio = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
     state->dataLoopNodes->Node.allocate(2);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 10.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZoneAirHumRat = 0.003;
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRat = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(1) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(2) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFT(1) = 0;

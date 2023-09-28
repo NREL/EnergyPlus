@@ -255,9 +255,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmResourceWarning)
     EXPECT_EQ(
         "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Cooling [kBtu]",
         ResourceWarningMessage("District Cooling [kBtu]"));
-    EXPECT_EQ(
-        "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Heating [kBtu]",
-        ResourceWarningMessage("District Heating [kBtu]"));
+    EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: District Heating "
+              "Water [kBtu]",
+              ResourceWarningMessage("District Heating Water [kBtu]"));
     EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Water [GJ]",
               ResourceWarningMessage("Water [GJ]"));
     EXPECT_EQ("In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: Electricity [GJ]",
@@ -2261,6 +2261,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "   ,                      !- Evaporative Condenser Air Flow Rate",
         "   autosize,              !- Evaporative Condenser Pump Rated Power Consumption",
         "   0.0,                   !- Crankcase Heater Capacity",
+        "   ,                      !- Crankcase Heater Capacity Function of Temperature Curve Name",
         "   10.0;                  !- Maximum Outdoor DryBulb Temperature for Crankcase Heater Operation",
 
         "Coil:Heating:Fuel,",
@@ -6599,8 +6600,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
-
     state->dataSize->CalcFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
     state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
@@ -7113,7 +7112,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     auto &finalZoneSizing = state->dataSize->CalcFinalZoneSizing(1);
     finalZoneSizing.CoolDDNum = coolDDNum;
     finalZoneSizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
     finalZoneSizing.CoolOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.CoolOutTempSeq(coolTimeOfMax) = 38.;
@@ -7132,7 +7130,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int heatTimeOfMax = 4;
     finalZoneSizing.HeatDDNum = heatDDNum;
     finalZoneSizing.TimeStepNumAtHeatMax = heatTimeOfMax;
-    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
     finalZoneSizing.HeatOutTempSeq.allocate(numTimeStepInDay);
     finalZoneSizing.HeatOutTempSeq(heatTimeOfMax) = -17.4;
@@ -8214,7 +8211,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
@@ -8268,7 +8265,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     {
@@ -8278,7 +8275,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 }
 
@@ -8495,7 +8492,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
     bool fFScheduleUsed;
     int ffScheduleIndex;
 
-    PollutionModule::GetFuelFactorInfo(*state, "Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+    PollutionModule::GetFuelFactorInfo(
+        *state, Constant::eFuel::DistrictHeatingSteam, fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
 
     EXPECT_EQ(curSourceFactor, 1.2);
 }
@@ -8607,6 +8605,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = false;
 
     InitializeOutput(*state);
 
@@ -8628,12 +8627,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_8317_ValidateOutputTableMon
     OutputReportTabular::GetInputTabularMonthly(*state);
     OutputReportTabular::InitializeTabularMonthly(*state);
 
-    std::string expected_error = delimited_string({
-        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'HEATING:GAS'",
-        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'EXTERIOR LIGHTS ELECTRIC POWER'",
-        "   ** Warning ** In Output:Table:Monthly 'MY REPORT' invalid Variable or Meter Name 'ALWAYSON'",
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.",
     });
-
     compare_err_stream(expected_error);
 }
 
@@ -9749,7 +9746,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     // Specifically get the each fuel (Coal, Gasoline, and Propane) usage for End Use = Heating,
@@ -9807,7 +9804,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 
     {
@@ -9817,7 +9814,7 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
                           "  AND RowName = 'Heating'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(14u, result.size()) << "Failed for query: " << query;
     }
 }
 
@@ -10781,8 +10778,8 @@ TEST_F(SQLiteFixture, WriteVeriSumSpaceTables_Test)
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
 
-    state->dataHeatBal->space(1).floorArea = 100.0;
-    state->dataHeatBal->space(2).floorArea = 100.0;
+    state->dataHeatBal->space(1).FloorArea = 100.0;
+    state->dataHeatBal->space(2).FloorArea = 100.0;
 
     OutputReportTabular::writeVeriSumSpaceTables(*state, produceTabular, produceSQLite);
 
@@ -11640,7 +11637,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                             "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_total = execAndReturnFirstDouble(query_total);
-    EXPECT_EQ(return_val_total, 515.19);
+    EXPECT_EQ(return_val_total, 598.2);
 
     // get the sensible instant 'DOAS Direct to Zone' cooling peak load component
     std::string query_sensible_instant("SELECT Value From TabularDataWithStrings"
@@ -11650,7 +11647,7 @@ TEST_F(SQLiteFixture, DOASDirectToZone_ZoneMultiplierRemoved)
                                        "  AND RowName = 'DOAS Direct to Zone'");
     // check the value from result records
     Real64 return_val_sensible_instant = execAndReturnFirstDouble(query_sensible_instant);
-    EXPECT_EQ(return_val_sensible_instant, 517.05);
+    EXPECT_EQ(return_val_sensible_instant, 600.28);
 }
 
 TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
@@ -12587,4 +12584,462 @@ TEST_F(SQLiteFixture, UpdateSizing_EndSysSizingCalc)
     // check the value from result records
     Real64 return_val = execAndReturnFirstDouble(query);
     EXPECT_EQ(return_val, 5080.22);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
+        "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 2 Name",
+        "  Maximum; !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = false;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthly_AlwaysIfWeatherRunRequested)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    // If I request a Weater File run Period I expect a warning
+    // Regardless of the fact that the sizing run happens first
+    std::string const idf_objects = delimited_string({
+        "SimulationControl,",
+        "  No,                                 !- Do Zone Sizing Calculation",
+        "  No,                                 !- Do System Sizing Calculation",
+        "  No,                                 !- Do Plant Sizing Calculation",
+        "  Yes,                                !- Run Simulation for Sizing Periods",
+        "  Yes;                                !- Run Simulation for Weather File Run Periods",
+
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report,          !- Name",
+        "  2,                                  !-  Digits After Decimal",
+        "  Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
+        "  SumOrAverage,                       !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE,              !- Variable or Meter 2 Name",
+        "  Maximum;                            !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;               !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+    EXPECT_TRUE(state->dataGlobal->DoDesDaySim);
+    EXPECT_TRUE(state->dataGlobal->DoWeathSim);
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    // In a regular simulation with the above SimulationControl, when InitializeTabularMonthly is called it's DesignDay
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::DesignDay;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = false;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual variables.",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_WarnMonthlyDisplayExtraWarnings)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 1 Name",
+        "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE BIS, !- Variable or Meter 2 Name",
+        "  Maximum; !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly + 1);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Processing Monthly Tabular Reports: Variable names not valid for this simulation",
+        "   **   ~~~   ** ..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of the Table Report.",
+        "   ** Warning ** In Output:Table:Monthly 'SPACE GAINS ANNUAL REPORT' invalid Variable or Meter Name 'NON EXISTANT VARIABLE'",
+        "   ** Warning ** In Output:Table:Monthly 'SPACE GAINS ANNUAL REPORT' invalid Variable or Meter Name 'NON EXISTANT VARIABLE BIS'",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_NoWarnMonthlIfNoWeatherFileRun)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:Monthly,",
+        "  Space Gains Annual Report, !- Name",
+        "  2, !-  Digits After Decimal",
+        "  NON EXISTANT VARIABLE, !- Variable or Meter 1 Name",
+        "  SumOrAverage, !- Aggregation Type for Variable or Meter 1",
+        "  NON EXISTANT VARIABLE BIS, !- Variable or Meter 2 Name",
+        "  Maximum; !- Aggregation Type for Variable or Meter 2",
+
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite2",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = false; // <- here
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::DesignDay;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 1);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly);
+
+    InitializeTabularMonthly(*state);
+
+    std::string const expected_error = delimited_string({
+        "   ** Warning ** Output:Table:Monthly requested with SimulationControl Run Simulation for Weather File Run Periods set to No so "
+        "Output:Table:Monthly will not be generated",
+    });
+    compare_err_stream(expected_error);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_DontWarnMonthlyIfOnlyNamedReports)
+{
+    // #9621 - Only warn if a bad variable is defined in a Monthly table user requested, not on the AllSummaryAndMonthly ones
+    std::string const idf_objects = delimited_string({
+        "Output:Table:SummaryReports,",
+        "  AllSummaryAndMonthly;              !- Report 1 Name",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Real64 extLitUse;
+
+    SetupOutputVariable(*state,
+                        "Exterior Lights Electricity Energy",
+                        OutputProcessor::Unit::J,
+                        extLitUse,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "Lite1",
+                        {},
+                        "Electricity",
+                        "Exterior Lights",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->KindOfSim = Constant::KindOfSim::RunPeriodWeather; // Trigger the extra warning
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 60.0;
+    state->dataGlobal->DisplayExtraWarnings = true;
+
+    GetInputTabularMonthly(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, 0);
+    GetInputOutputTableSummaryReports(*state);
+    EXPECT_EQ(state->dataOutRptTab->MonthlyInputCount, numNamedMonthly);
+
+    InitializeTabularMonthly(*state);
+
+    compare_err_stream("");
+}
+
+TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
+{
+    // Test for #10190 - District Heating Steam is empty
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displayTabularBEPS = true;
+    state->dataOutRptTab->displayDemandEndUse = true;
+    state->dataOutRptTab->displayLEEDSummary = true;
+
+    state->dataOutRptTab->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::JtoKWH;
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoKWH;
+
+    // Needed to avoid crash (from ElectricPowerServiceManager.hh)
+    createFacilityElectricPowerServiceObject(*state);
+
+    SetPredefinedTables(*state);
+
+    Real64 DistrictHeatingWater = 4e8;
+    SetupOutputVariable(*state,
+                        "Exterior Equipment DistrictHeatingWater Energy",
+                        OutputProcessor::Unit::J,
+                        DistrictHeatingWater,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "DHWaterExtEq",
+                        {},
+                        "DistrictHeatingWater",
+                        "ExteriorEquipment",
+                        "General");
+
+    Real64 DistrictHeatingSteam = 5e8;
+    SetupOutputVariable(*state,
+                        "Exterior Equipment DistrictHeatingSteam Energy",
+                        OutputProcessor::Unit::J,
+                        DistrictHeatingSteam,
+                        OutputProcessor::SOVTimeStepType::Zone,
+                        OutputProcessor::SOVStoreType::Summed,
+                        "DHSteamExtEq",
+                        {},
+                        "DistrictHeatingSteam",
+                        "ExteriorEquipment",
+                        "General");
+
+    state->dataGlobal->DoWeathSim = true;
+    state->dataGlobal->TimeStepZone = 1.0;
+    state->dataGlobal->MinutesPerTimeStep = state->dataGlobal->TimeStepZone * 60;
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * 3600.0;
+    state->dataOutRptTab->displayTabularBEPS = true;
+    // OutputProcessor::TimeValue.allocate(2);
+
+    auto timeStep = 1.0;
+
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::Zone).TimeStep = 60;
+    *state->dataOutputProcessor->TimeValue.at(OutputProcessor::TimeStepType::System).TimeStep = 60;
+
+    GetInputOutputTableSummaryReports(*state);
+
+    state->dataEnvrn->Month = 12;
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+
+    auto &ort = state->dataOutRptTab;
+    constexpr int dhWaterIndex = 4;
+    constexpr int dhSteamIndex = 5;
+    EXPECT_EQ("DistrictHeatingWater", ort->resourceTypeNames(dhWaterIndex));
+    EXPECT_EQ("DistrictHeatingSteam", ort->resourceTypeNames(dhSteamIndex));
+
+    EXPECT_NEAR(DistrictHeatingWater, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
+    EXPECT_NEAR(
+        DistrictHeatingWater, state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1), 1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingWater,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
+                1.);
+
+    EXPECT_NEAR(DistrictHeatingSteam, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
+    EXPECT_NEAR(
+        DistrictHeatingSteam, state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1), 1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingSteam,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
+                1.);
+
+    UpdateMeterReporting(*state);
+    UpdateDataandReport(*state, OutputProcessor::TimeStepType::Zone);
+    GatherBEPSResultsForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    GatherPeakDemandForTimestep(*state, OutputProcessor::TimeStepType::Zone);
+    EXPECT_NEAR(DistrictHeatingWater * 2, state->dataOutRptTab->gatherTotalsBEPS(dhWaterIndex), 1.);
+    EXPECT_NEAR(DistrictHeatingWater * 2,
+                state->dataOutRptTab->gatherEndUseBEPS(dhWaterIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
+                1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingWater * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhWaterIndex),
+                1.);
+
+    EXPECT_NEAR(DistrictHeatingSteam * 2, state->dataOutRptTab->gatherTotalsBEPS(dhSteamIndex), 1.);
+    EXPECT_NEAR(DistrictHeatingSteam * 2,
+                state->dataOutRptTab->gatherEndUseBEPS(dhSteamIndex, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1),
+                1.);
+    // General
+    EXPECT_NEAR(DistrictHeatingSteam * 2,
+                state->dataOutRptTab->gatherEndUseSubBEPS(1, static_cast<int>(Constant::EndUse::ExteriorEquipment) + 1, dhSteamIndex),
+                1.);
+
+    OutputReportTabular::WriteBEPSTable(*state);
+    OutputReportTabular::WriteDemandEndUseSummary(*state);
+
+    // We test for Heating and Total, since they should be the same
+    std::vector<std::string> testReportNames = {"AnnualBuildingUtilityPerformanceSummary", "DemandEndUseComponentsSummary"};
+    std::vector<std::string> endUseSubCategoryNames = {"General"};
+
+    // Query End Use
+    {
+        std::string query(R"sql(
+        SELECT Value From TabularDataWithStrings
+           WHERE TableName = 'End Uses'
+             AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'
+             AND ColumnName = 'District Heating Water'
+             AND RowName = 'Exterior Equipment')sql");
+        auto const result = queryResult(query, "TabularDataWithStrings");
+        Real64 const return_val1 = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val1, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'District Heating Steam'"
+                          "  AND RowName = 'Exterior Equipment'");
+        auto const result = queryResult(query, "TabularDataWithStrings");
+        Real64 const return_val = execAndReturnFirstDouble(query);
+
+        ASSERT_EQ(1u, result.size()) << "Failed for query: " << query;
+        EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+
+    // Query End Use with Subcategory
+    {
+        std::string const query("SELECT Value From TabularDataWithStrings"
+                                "  WHERE TableName = 'End Uses By Subcategory'"
+                                "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                                "  AND ColumnName = 'District Heating Water'"
+                                "  AND RowName = 'Exterior Equipment:General'");
+        Real64 const return_val = execAndReturnFirstDouble(query);
+        EXPECT_NEAR(DistrictHeatingWater * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+
+    {
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE TableName = 'End Uses By Subcategory'"
+                          "  AND ReportName = 'AnnualBuildingUtilityPerformanceSummary'"
+                          "  AND ColumnName = 'District Heating Steam'"
+                          "  AND RowName = 'Exterior Equipment:General'");
+        Real64 return_val = execAndReturnFirstDouble(query);
+        EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
 }

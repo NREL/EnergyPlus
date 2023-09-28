@@ -386,6 +386,10 @@ namespace OutputReportPredefined {
         s->pdchDXHeatCoilLowCap = newPreDefColumn(state, s->pdstDXHeatCoil, "Low Temperature Heating (net) Rating Capacity [W]");
         s->pdchDXHeatCoilHSPFIP = newPreDefColumn(state, s->pdstDXHeatCoil, "HSPF [Btu/W-h]");
         s->pdchDXHeatCoilRegionNum = newPreDefColumn(state, s->pdstDXHeatCoil, "Region Number");
+        // Std 229 Predef outputs for DX Heating Coils
+        s->pdchDXHeatCoilMinOADBTforCompOp =
+            newPreDefColumn(state, s->pdstDXHeatCoil, "Minimum Outdoor Dry-Bulb Temperature for Compressor Operation");
+        s->pdchDXHeatCoilAirloopName = newPreDefColumn(state, s->pdstDXHeatCoil, "Airloop Name");
 
         // for DX Heating Coil AHRI Standard 2023 Ratings | HSPF2
         s->pdstDXHeatCoil_2023 = newPreDefSubTable(state, s->pdrEquip, "DX Heating Coils [ HSPF2 ]");
@@ -401,6 +405,10 @@ namespace OutputReportPredefined {
         s->pdchHeatCoilDesCap = newPreDefColumn(state, s->pdstHeatCoil, "Design Coil Load [W]");
         s->pdchHeatCoilNomCap = newPreDefColumn(state, s->pdstHeatCoil, "Nominal Total Capacity [W]");
         s->pdchHeatCoilNomEff = newPreDefColumn(state, s->pdstHeatCoil, "Nominal Efficiency [W/W]");
+        // Std 229 Predef outputs for Heating Coils
+        s->pdchHeatCoilUsedAsSupHeat = newPreDefColumn(state, s->pdstHeatCoil, "Used as Supplementary Heat");
+        s->pdchHeatCoilAirloopName = newPreDefColumn(state, s->pdstHeatCoil, "Airloop Name");
+        s->pdchHeatCoilPlantloopName = newPreDefColumn(state, s->pdstHeatCoil, "Plantloop Name");
 
         s->pdstFan = newPreDefSubTable(state, s->pdrEquip, "Fans");
 
@@ -415,6 +423,12 @@ namespace OutputReportPredefined {
         s->pdchFanEndUse = newPreDefColumn(state, s->pdstFan, "End Use Subcategory");
         s->pdchFanDesDay = newPreDefColumn(state, s->pdstFan, "Design Day Name for Fan Sizing Peak");
         s->pdchFanPkTime = newPreDefColumn(state, s->pdstFan, "Date/Time for Fan Sizing Peak");
+        // Std 229 Predef outputs for Fans
+        s->pdchFanPurpose = newPreDefColumn(state, s->pdstFan, "Purpose");
+        s->pdchFanAutosized = newPreDefColumn(state, s->pdstFan, "Is Autosized");
+        s->pdchFanMotorEff = newPreDefColumn(state, s->pdstFan, "Motor Efficiency");
+        s->pdchFanMotorHeatToZoneFrac = newPreDefColumn(state, s->pdstFan, "Motor Heat to Zone Fraction");
+        s->pdchFanAirLoopName = newPreDefColumn(state, s->pdstFan, "Airloop Name");
 
         s->pdstPump = newPreDefSubTable(state, s->pdrEquip, "Pumps");
         s->pdchPumpType = newPreDefColumn(state, s->pdstPump, "Type");
@@ -425,6 +439,10 @@ namespace OutputReportPredefined {
         s->pdchPumpPwrPerFlow = newPreDefColumn(state, s->pdstPump, "Power Per Water Flow Rate [W-s/m3]");
         s->pdchMotEff = newPreDefColumn(state, s->pdstPump, "Motor Efficiency [W/W]");
         s->pdchPumpEndUse = newPreDefColumn(state, s->pdstPump, "End Use Subcategory");
+        // Std 229 Predef outputs for Pumps
+        s->pdchPumpAutosized = newPreDefColumn(state, s->pdstPump, "Is Autosized");
+        s->pdchPumpPlantloopName = newPreDefColumn(state, s->pdstPump, "Plantloop Name");
+        s->pdchPumpPlantloopBranchName = newPreDefColumn(state, s->pdstPump, "Plantloop Branch Name");
 
         s->pdstSWH = newPreDefSubTable(state, s->pdrEquip, "Service Water Heating");
         s->pdchSWHType = newPreDefColumn(state, s->pdstSWH, "Type");
@@ -434,9 +452,116 @@ namespace OutputReportPredefined {
         s->pdchSWHRecEff = newPreDefColumn(state, s->pdstSWH, "Recovery Efficiency [W/W]");
         s->pdchSWHEnFac = newPreDefColumn(state, s->pdstSWH, "Energy Factor");
 
+        // Std 229 Chillers in Equipment Summary
+        s->pdstChiller = newPreDefSubTable(state, s->pdrEquip, "Chillers");
+
+        s->pdchChillerType = newPreDefColumn(state, s->pdstChiller, "Type");
+        s->pdchChillerRefCap = newPreDefColumn(state, s->pdstChiller, "Reference Capacity[W]");
+        s->pdchChillerRefEff = newPreDefColumn(state, s->pdstChiller, "TypeReference Efficiency [W/W]");
+        s->pdchChillerRatedCap = newPreDefColumn(state, s->pdstChiller, "Rated Capacity [W]");
+        s->pdchChillerRatedEff = newPreDefColumn(state, s->pdstChiller, "Rated Efficiency [W/W]");
+        s->pdchChillerIPLVinSI = newPreDefColumn(state, s->pdstChiller, "IPLV in SI Units [W/W]");
+        s->pdchChillerIPLVinIP = newPreDefColumn(state, s->pdstChiller, "IPLV in IP Units [Btu/W-h]");
+        s->pdchChillerMinPLR = newPreDefColumn(state, s->pdstChiller, "Minimum Part Load Ratio");
+        s->pdchChillerFuelType = newPreDefColumn(state, s->pdstChiller, "Fuel Type");
+        s->pdchChillerRatedEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Rated Entering Condenser Temperature [C]");
+        s->pdchChillerRatedLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Rated Leaving Evaporator Temperature [C]");
+        s->pdchChillerRefEntCondTemp = newPreDefColumn(state, s->pdstChiller, "Reference Entering Condenser Temperature [C]");
+        s->pdchChillerRefLevEvapTemp = newPreDefColumn(state, s->pdstChiller, "Reference Leaving Evaporator Temperature [C]");
+        s->pdchChillerDesSizeRefCHWFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Chilled Water Flow Rate [kg/s]");
+        s->pdchChillerDesSizeRefCondFluidFlowRate = newPreDefColumn(state, s->pdstChiller, "Design Size Reference Condenser Fluid Flow Rate [kg/s]");
+        s->pdchChillerPlantloopName = newPreDefColumn(state, s->pdstChiller, "Plantloop Name");
+        s->pdchChillerPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Plantloop Branch Name");
+        s->pdchChillerCondLoopName = newPreDefColumn(state, s->pdstChiller, "Condenser Loop Name");
+        s->pdchChillerCondLoopBranchName = newPreDefColumn(state, s->pdstChiller, "Condenser Loop Branch Name");
+        s->pdchChillerHeatRecPlantloopName = newPreDefColumn(state, s->pdstChiller, "Heat Recovery Plantloop Name");
+        s->pdchChillerHeatRecPlantloopBranchName = newPreDefColumn(state, s->pdstChiller, "Heat Recovery Plantloop Branch Name");
+        s->pdchChillerRecRelCapFrac = newPreDefColumn(state, s->pdstChiller, "Recovery Relative Capacity Fraction");
+
+        // Std 229 Boiler Table in Equipment Summary
+        s->pdstBoiler = newPreDefSubTable(state, s->pdrEquip, "Boilers");
+
+        s->pdchBoilerType = newPreDefColumn(state, s->pdstBoiler, "Type");
+        s->pdchBoilerRefCap = newPreDefColumn(state, s->pdstBoiler, "Reference Capacity [W]");
+        s->pdchBoilerRefEff = newPreDefColumn(state, s->pdstBoiler, "Reference Efficiency[W/W]");
+        s->pdchBoilerRatedCap = newPreDefColumn(state, s->pdstBoiler, "Rated Capacity [W]");
+        s->pdchBoilerRatedEff = newPreDefColumn(state, s->pdstBoiler, "Rated Efficiency [W/W]");
+        s->pdchBoilerMinPLR = newPreDefColumn(state, s->pdstBoiler, "Minimum Part Load Ratio");
+        s->pdchBoilerFuelType = newPreDefColumn(state, s->pdstBoiler, "Fuel Type");
+        s->pdchBoilerParaElecLoad = newPreDefColumn(state, s->pdstBoiler, "Parasitic Electric Load [W]");
+        s->pdchBoilerPlantloopName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Name");
+        s->pdchBoilerPlantloopBranchName = newPreDefColumn(state, s->pdstBoiler, "Plantloop Branch Name");
+
+        // Std 229 cooling towers and fluid coolers Table in Equipment Summary
+        s->pdstCTFC = newPreDefSubTable(state, s->pdrEquip, "Cooling Towers and Fluid Coolers");
+
+        s->pdchCTFCType = newPreDefColumn(state, s->pdstCTFC, "Type");
+        s->pdchCTFCFluidType = newPreDefColumn(state, s->pdstCTFC, "Fluid Type");
+        s->pdchCTFCRange = newPreDefColumn(state, s->pdstCTFC, "Range [C]");
+        s->pdchCTFCApproach = newPreDefColumn(state, s->pdstCTFC, "Approach [C]");
+        s->pdchCTFCDesFanPwr = newPreDefColumn(state, s->pdstCTFC, "Design Fan Power [W]");
+        s->pdchCTFCDesInletAirWBT = newPreDefColumn(state, s->pdstCTFC, "Design Inlet Air Wet-Bulb Temperature [C]");
+        s->pdchCTFCDesWaterFlowRate = newPreDefColumn(state, s->pdstCTFC, "Design Water Flow Rate [m3/s]");
+        s->pdchCTFCLevWaterSPTemp = newPreDefColumn(state, s->pdstCTFC, "Leaving Water Setpoint Temperature [C]");
+        s->pdchCTFCCondLoopName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Name");
+        s->pdchCTFCCondLoopBranchName = newPreDefColumn(state, s->pdstCTFC, "Condenser Loop Branch Name");
+
+        // Std 229 Plantloop and CondenserLoop Table in Equipment Summary
+        s->pdstPLCL = newPreDefSubTable(state, s->pdrEquip, "PlantLoop or CondenserLoop");
+
+        s->pdchPLCLType = newPreDefColumn(state, s->pdstPLCL, "Type");
+        s->pdchPLCLProvHeat = newPreDefColumn(state, s->pdstPLCL, "Provides Heating");
+        s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "Provides Cooling");
+        s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate [m3/s]");
+        s->pdchPLCLMinLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Minimum Loop Flow Rate [m3/s]");
+
+        // Std 229 Air Terminal Table in Equipment Summary
+        s->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");
+
+        s->pdchAirTermZoneName = newPreDefColumn(state, s->pdstAirTerm, "Zone Name");
+        s->pdchAirTermMinFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow [m3/s]");
+        s->pdchAirTermMinOutdoorFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow [m3/s]");
+        s->pdchAirTermSupCoolingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Cooling Setpoint [C]");
+        s->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Heating Setpoint [C]");
+        s->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating Capacity [W]");
+        s->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling Capacity [W]");
+
+        // Std 229 Air Heat Recovery
+        s->pdstAirHR = newPreDefSubTable(state, s->pdrEquip, "Air Heat Recovery");
+
+        s->pdchAirHRInputObjName = newPreDefColumn(state, s->pdstAirHR, "Name");
+        s->pdchAirHRInputObjType = newPreDefColumn(state, s->pdstAirHR, "Input object type");
+        s->pdchAirHRPlateOrRotary = newPreDefColumn(state, s->pdstAirHR, "Plate/Rotary");
+        s->pdchAirHRSenEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Heating Air Flow");
+        s->pdchAirHRSenEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Sensible Effectiveness at 100% Cooling Air Flow");
+        s->pdchAirHRLatEffAt100PerHeatAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Heating Air Flow");
+        s->pdchAirHRLatEffAt100PerCoolAirFlow = newPreDefColumn(state, s->pdstAirHR, "Latent Effectiveness at 100% Cooling Air Flow");
+        s->pdchAirHRExhaustAirflow = newPreDefColumn(state, s->pdstAirHR, "Exhaust Airflow [kg/s]");
+        s->pdchAirHROutdoorAirflow = newPreDefColumn(state, s->pdstAirHR, "Outdoor Airflow [kg/s]");
+
         // Sizing Report
 
         s->pdrSizing = newPreDefReport(state, "HVACSizingSummary", "Size", "HVAC Sizing Summary");
+
+        s->pdstSpaceClSize = newPreDefSubTable(state, s->pdrSizing, "Space Sensible Cooling");
+
+        s->pdchSpClCalcDesLd = newPreDefColumn(state, s->pdstSpaceClSize, "Calculated Design Load [W]");
+        s->pdchSpClUserDesLd = newPreDefColumn(state, s->pdstSpaceClSize, "User Design Load [W]");
+        s->pdchSpClUserDesLdPerArea = newPreDefColumn(state, s->pdstSpaceClSize, "User Design Load per Area [W/m2]");
+        s->pdchSpClCalcDesAirFlow = newPreDefColumn(state, s->pdstSpaceClSize, "Calculated Design Air Flow [m3/s]");
+        s->pdchSpClUserDesAirFlow = newPreDefColumn(state, s->pdstSpaceClSize, "User Design Air Flow [m3/s]");
+        s->pdchSpClDesDay = newPreDefColumn(state, s->pdstSpaceClSize, "Design Day Name");
+        s->pdchSpClPkTime = newPreDefColumn(state, s->pdstSpaceClSize, "Date/Time Of Peak {TIMESTAMP}");
+        s->pdchSpClPkTstatTemp = newPreDefColumn(state, s->pdstSpaceClSize, "Thermostat Setpoint Temperature at Peak Load [C]");
+        s->pdchSpClPkIndTemp = newPreDefColumn(state, s->pdstSpaceClSize, "Indoor Temperature at Peak Load [C]");
+        s->pdchSpClPkIndHum = newPreDefColumn(state, s->pdstSpaceClSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpClPkOATemp = newPreDefColumn(state, s->pdstSpaceClSize, "Outdoor Temperature at Peak Load [C]");
+        s->pdchSpClPkOAHum = newPreDefColumn(state, s->pdstSpaceClSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpClPkOAMinFlow = newPreDefColumn(state, s->pdstSpaceClSize, "Minimum Outdoor Air Flow Rate [m3/s]");
+        s->pdchSpClPkDOASHeatGain = newPreDefColumn(state, s->pdstSpaceClSize, "Heat Gain Rate from DOAS [W]");
+        addFootNoteSubTable(state,
+                            s->pdstSpaceClSize,
+                            "The Design Load is the space sensible load only. It does not include any system effects or ventilation loads.");
 
         s->pdstZoneClSize = newPreDefSubTable(state, s->pdrSizing, "Zone Sensible Cooling");
 
@@ -456,6 +581,27 @@ namespace OutputReportPredefined {
         s->pdchZnClPkDOASHeatGain = newPreDefColumn(state, s->pdstZoneClSize, "Heat Gain Rate from DOAS [W]");
         addFootNoteSubTable(
             state, s->pdstZoneClSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
+
+        s->pdstSpaceHtSize = newPreDefSubTable(state, s->pdrSizing, "Space Sensible Heating");
+
+        s->pdchSpHtCalcDesLd = newPreDefColumn(state, s->pdstSpaceHtSize, "Calculated Design Load [W]");
+        s->pdchSpHtUserDesLd = newPreDefColumn(state, s->pdstSpaceHtSize, "User Design Load [W]");
+        s->pdchSpHtUserDesLdPerArea = newPreDefColumn(state, s->pdstSpaceHtSize, "User Design Load per Area [W/m2]");
+        s->pdchSpHtCalcDesAirFlow = newPreDefColumn(state, s->pdstSpaceHtSize, "Calculated Design Air Flow [m3/s]");
+        s->pdchSpHtUserDesAirFlow = newPreDefColumn(state, s->pdstSpaceHtSize, "User Design Air Flow [m3/s]");
+        s->pdchSpHtDesDay = newPreDefColumn(state, s->pdstSpaceHtSize, "Design Day Name");
+        s->pdchSpHtPkTime = newPreDefColumn(state, s->pdstSpaceHtSize, "Date/Time Of Peak {TIMESTAMP}");
+        s->pdchSpHtPkTstatTemp = newPreDefColumn(state, s->pdstSpaceHtSize, "Thermostat Setpoint Temperature at Peak Load [C]");
+        s->pdchSpHtPkIndTemp = newPreDefColumn(state, s->pdstSpaceHtSize, "Indoor Temperature at Peak Load [C]");
+        s->pdchSpHtPkIndHum = newPreDefColumn(state, s->pdstSpaceHtSize, "Indoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpHtPkOATemp = newPreDefColumn(state, s->pdstSpaceHtSize, "Outdoor Temperature at Peak Load [C]");
+        s->pdchSpHtPkOAHum = newPreDefColumn(state, s->pdstSpaceHtSize, "Outdoor Humidity Ratio at Peak Load [kgWater/kgDryAir]");
+        s->pdchSpHtPkOAMinFlow = newPreDefColumn(state, s->pdstSpaceHtSize, "Minimum Outdoor Air Flow Rate [m3/s]");
+        s->pdchSpHtPkDOASHeatGain = newPreDefColumn(state, s->pdstSpaceHtSize, "Heat Gain Rate from DOAS [W]");
+        addFootNoteSubTable(state,
+                            s->pdstSpaceHtSize,
+                            "The Design Load is the space sensible load only. It does not include any system effects or ventilation loads.");
+
         s->pdstZoneHtSize = newPreDefSubTable(state, s->pdrSizing, "Zone Sensible Heating");
 
         s->pdchZnHtCalcDesLd = newPreDefColumn(state, s->pdstZoneHtSize, "Calculated Design Load [W]");
@@ -474,6 +620,7 @@ namespace OutputReportPredefined {
         s->pdchZnHtPkDOASHeatGain = newPreDefColumn(state, s->pdstZoneHtSize, "Heat Gain Rate from DOAS [W]");
         addFootNoteSubTable(
             state, s->pdstZoneHtSize, "The Design Load is the zone sensible load only. It does not include any system effects or ventilation loads.");
+
         s->pdstSystemSize = newPreDefSubTable(state, s->pdrSizing, "System Design Air Flow Rates");
 
         s->pdchSysSizCalcClAir = newPreDefColumn(state, s->pdstSystemSize, "Calculated cooling [m3/s]");
@@ -691,6 +838,21 @@ namespace OutputReportPredefined {
         s->pdchCoilRatedLvgEnthalpy =
             newPreDefColumn(state, s->pdstCoilSummaryCoilSelection, "Coil Leaving Air Enthalpy at Rating Conditions [J/KG-K]");
 
+        // Std 229 New Table "Coil Connections"
+        s->pdstCoilConnections = newPreDefSubTable(state, s->pdrCoilSizingDetailsTable, "Coil Connections");
+        // coil connections information
+        s->pdchCoilName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Coil Name");
+        s->pdchCoilType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Coil Type");
+        s->pdchCoilLoc_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Coil Location");
+        s->pdchCoilHVACType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "HVAC Type");
+        s->pdchCoilHVACName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "HVAC Name");
+        s->pdchCoilZoneNames_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Zone Name(s)");
+        s->pdchCoilSupFanName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Name for HVAC");
+        s->pdchCoilSupFanType_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Supply Fan Type for HVAC");
+        s->pdchCoilAirloopName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Airloop Name");
+        s->pdchCoilPlantName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Name for Coil");
+        s->pdchCoilPlantloopName_CCs = newPreDefColumn(state, s->pdstCoilConnections, "Plant Loop Name");
+
         // System Summary Report
 
         s->pdrSystem = newPreDefReport(state, "SystemSummary", "Sys", "System Summary");
@@ -713,7 +875,6 @@ namespace OutputReportPredefined {
         s->pdchDCVperACH = newPreDefColumn(state, s->pdstDemCntlVent, "Outdoor Air ACH [ach]");
         s->pdchDCVMethod = newPreDefColumn(state, s->pdstDemCntlVent, "Outdoor Air Method");
         s->pdchDCVOASchName = newPreDefColumn(state, s->pdstDemCntlVent, "Outdoor Air Schedule Name");
-
         // added for new DCV
         s->pdchDCVZoneADEffCooling = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness in Cooling Mode");
         s->pdchDCVZoneADEffHeating = newPreDefColumn(state, s->pdstDemCntlVent, "Air Distribution Effectiveness in Heating Mode");
@@ -860,6 +1021,8 @@ namespace OutputReportPredefined {
         // s->pdchEMmaxvaluetime = newPreDefColumn(state, s->pdstEMvalues,'Timestamp of Maximum')
         // Electricity Sub Table
         s->pdstEMelecvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Electricity");
+        addFootNoteSubTable(
+            state, s->pdstEMelecvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMelecannual = newPreDefColumn(state, s->pdstEMelecvalues, "Electricity Annual Value [GJ]");
         s->pdchEMelecminvalue = newPreDefColumn(state, s->pdstEMelecvalues, "Electricity Minimum Value [W]");
         s->pdchEMelecminvaluetime = newPreDefColumn(state, s->pdstEMelecvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -868,6 +1031,8 @@ namespace OutputReportPredefined {
 
         // Gas Sub Table
         s->pdstEMgasvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Natural Gas");
+        addFootNoteSubTable(
+            state, s->pdstEMgasvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMgasannual = newPreDefColumn(state, s->pdstEMgasvalues, "Natural Gas Annual Value [GJ]");
         s->pdchEMgasminvalue = newPreDefColumn(state, s->pdstEMgasvalues, "Natural Gas Minimum Value [W]");
         s->pdchEMgasminvaluetime = newPreDefColumn(state, s->pdstEMgasvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -876,6 +1041,8 @@ namespace OutputReportPredefined {
 
         // Cool SubTable
         s->pdstEMcoolvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Cooling");
+        addFootNoteSubTable(
+            state, s->pdstEMcoolvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMcoolannual = newPreDefColumn(state, s->pdstEMcoolvalues, "Cooling Annual Value [GJ]");
         s->pdchEMcoolminvalue = newPreDefColumn(state, s->pdstEMcoolvalues, "Cooling Minimum Value [W]");
         s->pdchEMcoolminvaluetime = newPreDefColumn(state, s->pdstEMcoolvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -884,6 +1051,8 @@ namespace OutputReportPredefined {
 
         // Water SubTable
         s->pdstEMwatervalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Water");
+        addFootNoteSubTable(
+            state, s->pdstEMwatervalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMwaterannual = newPreDefColumn(state, s->pdstEMwatervalues, "Annual Value [m3]");
         s->pdchEMwaterminvalue = newPreDefColumn(state, s->pdstEMwatervalues, "Minimum Value [m3/s]");
         s->pdchEMwaterminvaluetime = newPreDefColumn(state, s->pdstEMwatervalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -892,6 +1061,8 @@ namespace OutputReportPredefined {
 
         // Other KG SubTable
         s->pdstEMotherKGvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other by Weight/Mass");
+        addFootNoteSubTable(
+            state, s->pdstEMotherKGvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherKGannual = newPreDefColumn(state, s->pdstEMotherKGvalues, "Annual Value [kg]");
         s->pdchEMotherKGminvalue = newPreDefColumn(state, s->pdstEMotherKGvalues, "Minimum Value [kg/s]");
         s->pdchEMotherKGminvaluetime = newPreDefColumn(state, s->pdstEMotherKGvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -900,6 +1071,8 @@ namespace OutputReportPredefined {
 
         // Other M3 SubTable
         s->pdstEMotherM3values = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other Volumetric");
+        addFootNoteSubTable(
+            state, s->pdstEMotherM3values, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherM3annual = newPreDefColumn(state, s->pdstEMotherM3values, "Annual Value [m3]");
         s->pdchEMotherM3minvalue = newPreDefColumn(state, s->pdstEMotherM3values, "Minimum Value [m3/s]");
         s->pdchEMotherM3minvaluetime = newPreDefColumn(state, s->pdstEMotherM3values, "Timestamp of Minimum {TIMESTAMP}");
@@ -908,6 +1081,8 @@ namespace OutputReportPredefined {
 
         // Other M3 SubTable
         s->pdstEMotherLvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other Liquid/Gas");
+        addFootNoteSubTable(
+            state, s->pdstEMotherLvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherLannual = newPreDefColumn(state, s->pdstEMotherLvalues, "Annual Value [L]");
         s->pdchEMotherLminvalue = newPreDefColumn(state, s->pdstEMotherLvalues, "Minimum Value [L]");
         s->pdchEMotherLminvaluetime = newPreDefColumn(state, s->pdstEMotherLvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -916,6 +1091,8 @@ namespace OutputReportPredefined {
 
         // Other J SubTable
         s->pdstEMotherJvalues = newPreDefSubTable(state, s->pdrEnergyMeters, "Annual and Peak Values - Other");
+        addFootNoteSubTable(
+            state, s->pdstEMotherJvalues, "Values shown are for all completed run periods - including any simulations run during sizing periods");
         s->pdchEMotherJannual = newPreDefColumn(state, s->pdstEMotherJvalues, "Annual Value [GJ]");
         s->pdchEMotherJminvalue = newPreDefColumn(state, s->pdstEMotherJvalues, "Minimum Value [W]");
         s->pdchEMotherJminvaluetime = newPreDefColumn(state, s->pdstEMotherJvalues, "Timestamp of Minimum {TIMESTAMP}");
@@ -1192,8 +1369,10 @@ namespace OutputReportPredefined {
         s->pdchLeedPerfOtherFuel2Dem = newPreDefColumn(state, s->pdstLeedPerf, "Other Fuel 2 Demand [W]");
         s->pdchLeedPerfDisClEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Cooling Use [GJ]");
         s->pdchLeedPerfDisClDem = newPreDefColumn(state, s->pdstLeedPerf, "District Cooling Demand [W]");
-        s->pdchLeedPerfDisHtEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Use [GJ]");
-        s->pdchLeedPerfDisHtDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Demand [W]");
+        s->pdchLeedPerfDisHtWtrEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Water Use [GJ]");
+        s->pdchLeedPerfDisHtWtrDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Water Demand [W]");
+        s->pdchLeedPerfDisHtStEneUse = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Steam Use [GJ]");
+        s->pdchLeedPerfDisHtStDem = newPreDefColumn(state, s->pdstLeedPerf, "District Heating Steam Demand [W]");
 
         s->pdstLeedEneUseSum = newPreDefSubTable(state, s->pdrLeed, "EAp2-6. Energy Use Summary");
         // Multiple columns with rows of:
@@ -1341,22 +1520,16 @@ namespace OutputReportPredefined {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int sigDigitCount;
-        std::string stringEntry;
-
         incrementTableEntry(state);
+        int sigDigitCount = 2;
         // check for number of significant digits
         if (present(numSigDigits)) {
             if ((numSigDigits <= 9) && (numSigDigits >= 0)) {
                 sigDigitCount = numSigDigits;
-            } else {
-                sigDigitCount = 2;
             }
-        } else {
-            sigDigitCount = 2;
         }
 
-        if (tableEntryReal < 1e8) { // change from 1e10 for more robust entry writing
+        if (std::abs(tableEntryReal) < 1e8) { // change from 1e10 for more robust entry writing
             // something changed in FMT 7.x and "{:#12.{}F}" now outputs 13. So changing it to 11.{}F to maintain existing functionality. Likely
             // related to https://github.com/fmtlib/fmt/issues/1893
             state.dataOutRptPredefined->tableEntry(state.dataOutRptPredefined->numTableEntry).charEntry =
