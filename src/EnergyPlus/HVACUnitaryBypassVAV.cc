@@ -616,8 +616,8 @@ namespace HVACUnitaryBypassVAV {
                 thisCBVAV.FanVolFlow = 9999.0;
             } else {
                 if (thisCBVAV.FanType == DataHVACGlobals::FanType::System) {
-                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisCBVAV.FanName)); // call constructor
+                    thisCBVAV.FanIndex = HVACFan::getFanObjectVectorIndex(state, thisCBVAV.FanName);
                     thisCBVAV.FanInletNodeNum = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->inletNodeNum;
                     fanOutletNode = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
                     thisCBVAV.FanVolFlow = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
