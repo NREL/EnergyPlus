@@ -8622,8 +8622,9 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnHead(9) = "Other Fuel 1 [kBtu]";
             columnHead(10) = "Other Fuel 2 [kBtu]";
             columnHead(11) = "District Cooling [kBtu]";
-            columnHead(12) = "District Heating [kBtu]";
-            columnHead(13) = "Water [gal]";
+            columnHead(12) = "District Heating Water [kBtu]";
+            columnHead(13) = "District Heating Steam [kBtu]";
+            columnHead(14) = "Water [gal]";
         } break;
         default: {
             columnHead(1) = "Electricity [GJ]";
@@ -9118,8 +9119,9 @@ void WriteBEPSTable(EnergyPlusData &state)
             columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
             columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
             columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
-            columnHead(12) = "District Heating Intensity [kBtu/ft2]";
-            columnHead(13) = "Water Intensity [gal/ft2]";
+            columnHead(12) = "District Heating Water Intensity [kBtu/ft2]";
+            columnHead(13) = "District Heating Steam Intensity [kBtu/ft2]";
+            columnHead(14) = "Water Intensity [gal/ft2]";
         } break;
         default: {
             columnHead(1) = "Electricity Intensity [MJ/m2]";
@@ -9722,8 +9724,9 @@ void writeBEPSEndUseBySubCatOrSpaceType(EnergyPlusData &state,
         columnHead(10) = "Other Fuel 1 [kBtu]";
         columnHead(11) = "Other Fuel 2 [kBtu]";
         columnHead(12) = "District Cooling [kBtu]";
-        columnHead(13) = "District Heating [kBtu]";
-        columnHead(14) = "Water [gal]";
+        columnHead(13) = "District Heating Water [kBtu]";
+        columnHead(14) = "District Heating Steam [kBtu]";
+        columnHead(15) = "Water [gal]";
     } break;
     default: {
         columnHead(2) = "Electricity [GJ]";
@@ -10100,7 +10103,8 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             columnHead(9) = "Source Other Fuel 1 [kBtu]";
             columnHead(10) = "Source Other Fuel 2 [kBtu]";
             columnHead(11) = "Source District Cooling [kBtu]";
-            columnHead(12) = "Source District Heating [kBtu]";
+            columnHead(12) = "Source District Heating Water [kBtu]";
+            columnHead(13) = "Source District Heating Steam [kBtu]";
         } break;
         default: {
             columnHead(1) = "Source Electricity [GJ]";
@@ -10201,7 +10205,8 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
             columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
             columnHead(11) = "Source District Cooling [kBtu/ft2]";
-            columnHead(12) = "Source District Heating [kBtu/ft2]";
+            columnHead(12) = "Source District Heating Water [kBtu/ft2]";
+            columnHead(13) = "Source District Heating Water [kBtu/ft2]";
         } break;
         default: {
             columnHead(1) = "Source Electricity [MJ/m2]";
