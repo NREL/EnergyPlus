@@ -143,6 +143,7 @@ def generate_mock_api(bare_mock_api_instance: Mock) -> Mock:
     bare_mock_api_instance.exchange.get_global_value.return_value = 3.14
     bare_mock_api_instance.exchange.set_global_value.return_value = None
     bare_mock_api_instance.exchange.year.return_value = 1
+    bare_mock_api_instance.exchange.calendarYear.return_value = 1
     bare_mock_api_instance.exchange.month.return_value = 1
     bare_mock_api_instance.exchange.day_of_month.return_value = 1
     bare_mock_api_instance.exchange.hour.return_value = 1

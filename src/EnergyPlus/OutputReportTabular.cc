@@ -3124,7 +3124,8 @@ void OpenOutputTabularFile(EnergyPlusData &state)
                     open_tbl_stream(state, iStyle, state.dataStrGlobals->outputTblXmlFilePath, state.files.outputControl.tabular);
                 tbl_stream << "<?xml version=\"1.0\"?>\n";
                 tbl_stream << "<EnergyPlusTabularReports>\n";
-                tbl_stream << "  <state.dataHeatBal->BuildingName>" << state.dataHeatBal->BuildingName << "</state.dataHeatBal->BuildingName>\n";
+                tbl_stream << "  <state.dataHeatBal->BuildingName>" << ConvertToEscaped(state.dataHeatBal->BuildingName)
+                           << "</state.dataHeatBal->BuildingName>\n";
                 tbl_stream << "  <EnvironmentName>" << state.dataEnvrn->EnvironmentName << "</EnvironmentName>\n";
                 tbl_stream << "  <WeatherFileLocationTitle>" << state.dataEnvrn->WeatherFileLocationTitle << "</WeatherFileLocationTitle>\n";
                 tbl_stream << "  <ProgramVersion>" << state.dataStrGlobals->VerStringVar << "</ProgramVersion>\n";
@@ -3862,9 +3863,9 @@ void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeSt
     //          HeatRejection
     //          Humidifier
     //          HeatRecovery
-    //          DHW
     //          Refrigeration
     //          Cogeneration
+    //          WaterSystems
     //   The <ResourceType> are:
     //          Electricity
     //          Gas
@@ -3996,9 +3997,9 @@ void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state,
     //          HeatRejection
     //          Humidifier
     //          HeatRecovery
-    //          DHW
     //          Refrigeration
     //          Cogeneration
+    //          WaterSystems
     //   The <ResourceType> are:
     //          Electricity 1
     //          Gas 2
@@ -4125,9 +4126,9 @@ void GatherPeakDemandForTimestep(EnergyPlusData &state, OutputProcessor::TimeSte
     //          HeatRejection
     //          Humidifier
     //          HeatRecovery
-    //          DHW
     //          Refrigeration
     //          Cogeneration
+    //          WaterSystems
     //   The <ResourceType> are:
     //          Electricity
     //          Gas
@@ -16462,8 +16463,8 @@ void OutputCompLoadSummary(EnergyPlusData &state,
         if (kind == OutputType::AirLoop) {
             tableBody(1, 9) = RealToStr(curCompLoad.mixAirTemp, 2); // mixed air temperature - not for zone or facility
         }
-        tableBody(1, 10) = RealToStr(curCompLoad.mainFanAirFlow, 2);     // main fan air flow
-        tableBody(1, 11) = RealToStr(curCompLoad.outsideAirFlow, 2);     // outside air flow
+        tableBody(1, 10) = RealToStr(curCompLoad.mainFanAirFlow, 4);     // main fan air flow
+        tableBody(1, 11) = RealToStr(curCompLoad.outsideAirFlow, 4);     // outside air flow
         tableBody(1, 12) = RealToStr(curCompLoad.designPeakLoad, 2);     // design peak load
         tableBody(1, 13) = RealToStr(curCompLoad.diffDesignPeak, 2);     // difference between Design and Peak Load
         tableBody(1, 14) = RealToStr(curCompLoad.peakDesSensLoad, 2);    // Peak Design Sensible Load
@@ -16631,7 +16632,7 @@ void WriteReportHeaders(EnergyPlusData &state,
                 tbl_stream << "</" << ort->prevReportName << ">\n"; // close the last element if it was used.
             }
             tbl_stream << "<" << ConvertToElementTag(modifiedReportName) << ">\n";
-            tbl_stream << "  <for>" << objectName << "</for>\n";
+            tbl_stream << "  <for>" << ConvertToEscaped(objectName) << "</for>\n";
             ort->prevReportName = ConvertToElementTag(modifiedReportName); // save the name for next time
         }
     }

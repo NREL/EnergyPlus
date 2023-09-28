@@ -1706,7 +1706,7 @@ The name of the OtherEquipment object.
 
 \paragraph{Field: Fuel Type}\label{field-fuel-use-type}
 
-This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
+This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, DistrictHeatingSteam, \hyperref[districtheating]{DistrictHeatingWater}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
 
 \paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{othereq-field-zone-or-zonelist-name-000}
 
@@ -2243,16 +2243,16 @@ InteriorEquipment:NaturalGas:SpaceType:<Space Type Name>
 The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Hot Water Equipment District Heating Energy is added to the following district heating meters:
 
 \begin{lstlisting}
-DistrictHeating:Facility
-DistrictHeating:Building
-DistrictHeating:Zone:<Zone Name>
-DistrictHeating:SpaceType:<Space Type Name>
-InteriorEquipment:DistrictHeating
-InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+DistrictHeatingWater:Facility
+DistrictHeatingWater:Building
+DistrictHeatingWater:Zone:<Zone Name>
+DistrictHeatingWater:SpaceType:<Space Type Name>
+InteriorEquipment:DistrictHeatingWater
+InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
 \end{lstlisting}
 
 \paragraph{Steam Equipment District Heating Rate {[}W{]}}\label{steam-equipment-district-heating-rate-w}
@@ -2266,16 +2266,16 @@ InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
 The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Steam Equipment District Heating Energy is added to the following:
 
 \begin{lstlisting}
-DistrictHeating:Facility
-DistrictHeating:Building
-DistrictHeating:Zone:<Zone Name>
-DistrictHeating:SpaceType:<Space Type Name>
-InteriorEquipment:DistrictHeating
-InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+DistrictHeatingWater:Facility
+DistrictHeatingWater:Building
+DistrictHeatingWater:Zone:<Zone Name>
+DistrictHeatingWater:SpaceType:<Space Type Name>
+InteriorEquipment:DistrictHeatingWater
+InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
 \end{lstlisting}
 
 \paragraph{Other Equipment Fuel Rate {[}W{]}}\label{otherequip-fuel-rate}
