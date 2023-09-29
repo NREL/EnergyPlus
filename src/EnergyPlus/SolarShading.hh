@@ -430,7 +430,7 @@ struct SolarShadingData : BaseGlobalStruct
 #ifdef EP_NO_OPENGL
     bool penumbra = false;
 #else
-    std::unique_ptr<Pumbra::Penumbra> penumbra = nullptr;
+    std::unique_ptr<Penumbra::Penumbra> penumbra = nullptr;
 #endif
 
     bool GetInputFlag = true;
@@ -642,6 +642,18 @@ struct SolarShadingData : BaseGlobalStruct
     {
     }
 };
+
+#ifndef EP_NO_OPENGL
+class EnergyPlusLogger : public Courierr::Courierr
+{
+public:
+    void error(const std::string_view message) override;
+    void warning(const std::string_view message) override;
+    void info(const std::string_view message) override;
+    void debug(const std::string_view message) override;
+};
+#endif
+
 } // namespace EnergyPlus
 
 #endif

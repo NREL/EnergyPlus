@@ -5999,7 +5999,7 @@ void GetDXCoils(EnergyPlusData &state)
                                     thisDXCoil.Name,
                                     {},
                                     "Electricity",
-                                    "DHW",
+                                    "WaterSystems", //"DHW",
                                     {},
                                     "Plant");
             }
@@ -6036,7 +6036,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 thisDXCoil.Name,
                                 {},
                                 "Electricity",
-                                "DHW",
+                                "WaterSystems", // "DHW",
                                 {},
                                 "Plant");
         }
@@ -13811,8 +13811,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
 
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
-                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-                        thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
+                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                         DefrostEIRTempModFac = CurveValue(state, thisDXCoil.DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         LoadDueToDefrostLS =
                             (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (thisDXCoil.MSRatedTotCap(SpeedNumLS) / 1.01667);
@@ -14026,8 +14025,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
 
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
-                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-                        thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
+                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                         LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (thisDXCoil.MSRatedTotCap(1) / 1.01667);
                         DefrostEIRTempModFac = CurveValue(state, thisDXCoil.DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         thisDXCoil.DefrostPower = DefrostEIRTempModFac * (thisDXCoil.MSRatedTotCap(1) / 1.01667) * FractionalDefrostTime;
@@ -17180,6 +17178,16 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
         (PartLoadRatio > 0.0) && (OutdoorDryBulb > thisDXCoil.MinOATCompressor)) {
 
         TotCap = thisDXCoil.RatedTotCap(Mode);
+        HeatingCapacityMultiplier = 1.0;
+        // Modify total heating capacity based on defrost heating capacity multiplier
+        // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
+        if (present(MaxHeatCap)) {
+            TotCapAdj = min(MaxHeatCap, TotCap * HeatingCapacityMultiplier);
+            TotCap = min(MaxHeatCap, TotCap);
+        } else {
+            TotCapAdj = TotCap * HeatingCapacityMultiplier;
+        }
+
         QCoilReq = PartLoadRatio * TotCap;
         if (PartLoadRatio == 0.0) {
             AirMassFlowMin = state.dataHVACVarRefFlow->OACompOffMassFlow;
@@ -17219,18 +17227,8 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
 
         // Initializing defrost adjustment factors
         LoadDueToDefrost = 0.0;
-        HeatingCapacityMultiplier = 1.0;
         FractionalDefrostTime = 0.0;
         InputPowerMultiplier = 1.0;
-
-        // Modify total heating capacity based on defrost heating capacity multiplier
-        // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
-        if (present(MaxHeatCap)) {
-            TotCapAdj = min(MaxHeatCap, TotCap * HeatingCapacityMultiplier);
-            TotCap = min(MaxHeatCap, TotCap);
-        } else {
-            TotCapAdj = TotCap * HeatingCapacityMultiplier;
-        }
 
         // Calculate full load outlet conditions
         FullLoadOutAirEnth = InletAirEnthalpy + TotCapAdj / AirMassFlow;

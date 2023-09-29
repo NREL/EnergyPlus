@@ -4183,7 +4183,7 @@ bool GetWaterThermalTankInput(EnergyPlusData &state)
                 "Standard Rated Energy Factor\n");
             static constexpr std::string_view Format_721(
                 "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
-                "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {{W, HPWH Only}}\"\n");
+                "Efficiency,Standard Rated Energy Factor,DX Coil Total Cooling Rate {{W}}\n");
             static constexpr std::string_view Format_722(
                 "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
                 "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
@@ -5298,7 +5298,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         "PLANTLOOPHEATINGDEMAND",
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5445,7 +5445,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eFuelNames[static_cast<int>(this->FuelType)],
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5465,7 +5465,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eFuelNames[static_cast<int>(this->OffCycParaFuelType)],
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5485,7 +5485,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         Constant::eFuelNames[static_cast<int>(this->OnCycParaFuelType)],
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5505,7 +5505,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         "Water",
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
     SetupOutputVariable(state,
@@ -5517,7 +5517,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         this->Name,
                         {},
                         "MainsWater",
-                        "DHW",
+                        "WaterSystems", // "DHW",
                         this->EndUseSubcategoryName,
                         "Plant");
 
@@ -5547,7 +5547,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             HPWH.Name,
                             {},
                             "Electricity",
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5566,7 +5566,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             HPWH.Name,
                             {},
                             "Electricity",
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5610,7 +5610,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             "Electricity",
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5629,7 +5629,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             "Electricity",
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater Parasitic",
                             "Plant");
         SetupOutputVariable(state,
@@ -5655,7 +5655,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             "Electricity",
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Desuperheater Pump",
                             "Plant");
         SetupOutputVariable(state,
@@ -5674,7 +5674,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                             state.dataWaterThermalTanks->WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                             {},
                             "EnergyTransfer",
-                            "DHW",
+                            "WaterSystems", // "DHW",
                             "Water Heater",
                             "Plant");
     }

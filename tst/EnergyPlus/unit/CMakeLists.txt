@@ -172,6 +172,7 @@ set(test_src
     OutputReportTabular.unit.cc
     OutputReportTabularAnnual.unit.cc
     OutputReports.unit.cc
+    OutsideEnergySources.unit.cc
     PVWatts.unit.cc
     PackagedTerminalHeatPump.unit.cc
     Photovoltaics.unit.cc
@@ -185,6 +186,7 @@ set(test_src
     PlantComponentTemperatureSources.unit.cc
     PlantCondLoopOperation.unit.cc
     PlantHeatExchangerFluidToFluid.unit.cc
+    PlantLoadProfile.unit.cc
     PlantLoopHeatPumpEIR.unit.cc
     PlantManager.unit.cc
     PlantPipingSystemsManager.unit.cc
@@ -233,6 +235,7 @@ set(test_src
     TranspiredCollector.unit.cc
     UnitHeater.unit.cc
     UnitVentilator.unit.cc
+    UFADManager.unit.cc
     UnitaryHybridAirConditioner.unit.cc
     UnitarySystem.unit.cc
     UtilityRoutines.unit.cc
