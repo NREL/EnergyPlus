@@ -8368,12 +8368,7 @@ void WriteBEPSTable(EnergyPlusData &state)
         tableBody = "";
         tableBody(1, 1) = RealToStr(convBldgGrossFloorArea, 2);
 
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            if (produceTabular) {
-                PreDefTableEntry(
-                    state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
-            }
-        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
             if (produceTabular) {
                 PreDefTableEntry(
                     state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
@@ -9410,10 +9405,8 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
             rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
-            if (unitsStyle_cur != UnitsStyle::InchPound) {
-                tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
-                tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
-            } else if (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity) {
+            if ((unitsStyle_cur != UnitsStyle::InchPound) || (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity))
+                {
                 tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
                 tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
             } else {
