@@ -6791,55 +6791,72 @@ namespace UnitarySystems {
                 if (state.dataHVACFan->fanObjs[FanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Discrete) {
                     int NumSpeeds = state.dataHVACFan->fanObjs[FanIndex]->m_numSpeeds;
                     if (NumSpeeds > 1) {
-                        if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple ||
-                            this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                        if ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple ||
+                             this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                            this->m_sysType == SysType::PackagedWSHP) {
                             this->m_NumOfSpeedCooling = NumSpeeds;
                             this->m_CoolVolumeFlowRate.resize(NumSpeeds + 1);
                             this->m_CoolMassFlowRate.resize(NumSpeeds + 1);
                             this->m_MSCoolingSpeedRatio.resize(NumSpeeds + 1);
                             this->m_MultiOrVarSpeedCoolCoil = true;
                             this->m_DiscreteSpeedCoolingCoil = true;
-                            if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
-                                for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
-                                    this->m_CoolMassFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
-                                    this->m_CoolVolumeFlowRate[i] = this->m_CoolMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
-                                    this->m_MSCoolingSpeedRatio[i] = 1.0;
-                                }
-                            } else {
-                                for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
-                                    this->m_CoolMassFlowRate[i] = 0.0;
-                                    this->m_CoolVolumeFlowRate[i] = 0.0;
-                                    this->m_MSCoolingSpeedRatio[i] = 1.0;
+                            if (state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate > 0.0) {
+                                if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
+                                    for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
+                                        this->m_CoolVolumeFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate *
+                                                                        state.dataHVACFan->fanObjs[FanIndex]->m_flowFractionAtSpeed[i - 1];
+                                        this->m_CoolMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
+                                        this->m_MSCoolingSpeedRatio[i] = 1.0;
+                                    }
+                                } else {
+                                    for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
+                                        this->m_CoolMassFlowRate[i] = 0.0;
+                                        this->m_CoolVolumeFlowRate[i] = 0.0;
+                                        this->m_MSCoolingSpeedRatio[i] = 1.0;
+                                    }
                                 }
                             }
                         }
-                        if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
-                            this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) {
+                        if ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                             this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
+                            this->m_sysType == SysType::PackagedWSHP) {
                             this->m_NumOfSpeedHeating = NumSpeeds;
                             this->m_HeatVolumeFlowRate.resize(NumSpeeds + 1);
                             this->m_HeatMassFlowRate.resize(NumSpeeds + 1);
                             this->m_MSHeatingSpeedRatio.resize(NumSpeeds + 1);
                             this->m_MultiSpeedHeatingCoil = true;
                             this->m_MultiOrVarSpeedHeatCoil = true;
-                            if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
-                                for (int i = 1; i <= this->m_NumOfSpeedHeating; ++i) {
-                                    this->m_HeatMassFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
-                                    this->m_HeatVolumeFlowRate[i] = this->m_HeatMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
-                                    this->m_MSHeatingSpeedRatio[i] = 1.0;
-                                }
-                            } else {
-                                for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
-                                    this->m_HeatMassFlowRate[i] = 0.0;
-                                    this->m_HeatVolumeFlowRate[i] = 0.0;
-                                    this->m_MSHeatingSpeedRatio[i] = 1.0;
+                            if (state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate > 0.0) {
+                                if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
+                                    for (int i = 1; i <= this->m_NumOfSpeedHeating; ++i) {
+                                        this->m_HeatVolumeFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate *
+                                                                        state.dataHVACFan->fanObjs[FanIndex]->m_flowFractionAtSpeed[i - 1];
+                                        this->m_HeatMassFlowRate[i] = this->m_HeatVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
+                                        this->m_MSHeatingSpeedRatio[i] = 1.0;
+                                    }
+                                } else {
+                                    for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
+                                        this->m_HeatMassFlowRate[i] = 0.0;
+                                        this->m_HeatVolumeFlowRate[i] = 0.0;
+                                        this->m_MSHeatingSpeedRatio[i] = 1.0;
+                                    }
                                 }
                             }
                         }
-                        ShowWarningError(state,
-                                         cCurrentModuleObject + " = " + this->Name + " with Fan:SystemModel is used in  " +
-                                             this->input_specs.supply_fan_name + "\"");
-                        ShowContinueError(state, format("...The number of speed = {:.0R}.", double(NumSpeeds)));
-                        ShowContinueError(state, "...Multiple speed fan will be applied to this unit. The speed number is determined by load.");
+                        if (((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple ||
+                              this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                             this->m_sysType == SysType::PackagedWSHP) ||
+                            ((this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
+                              this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) &&
+                             this->m_sysType == SysType::PackagedWSHP)) {
+                            ShowWarningError(state,
+                                             format("{} = {} with Fan:SystemModel is used in \"{}\"",
+                                                    cCurrentModuleObject,
+                                                    this->Name,
+                                                    this->input_specs.supply_fan_name));
+                            ShowContinueError(state, format("...The number of speed = {:.0R}.", double(NumSpeeds)));
+                            ShowContinueError(state, "...Multiple speed fan will be applied to this unit. The speed number is determined by load.");
+                        }
                     }
                 }
             }
