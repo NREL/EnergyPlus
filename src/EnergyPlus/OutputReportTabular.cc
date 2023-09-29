@@ -7819,6 +7819,7 @@ void WriteBEPSTable(EnergyPlusData &state)
         Real64 kConversionFactor;
         Real64 waterConversionFactor;
         Real64 areaConversionFactor;
+        Real64 ipElectricityConversionFactor = 1.0;
         switch (unitsStyle_cur) {
         case UnitsStyle::JtoKWH: {
             largeConversionFactor = 3600000.0;
@@ -7837,6 +7838,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             kConversionFactor = 1.0;
             waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
             areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+            ipElectricityConversionFactor = largeConversionFactor;
         } break;
         default: {
             largeConversionFactor = 1000000000.0;
@@ -7848,16 +7850,21 @@ void WriteBEPSTable(EnergyPlusData &state)
 
         // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
         for (int iResource = 1; iResource <= 13; ++iResource) { // don't do water
+            int ipElectricityAdjust = (iResource == 1) ? ipElectricityConversionFactor : 1.0;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
                 collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                collapsedEndUse(iResource, jEndUse) *= ipElectricityAdjust;
                 for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
+                    collapsedEndUseSub(kEndUseSub, jEndUse, iResource) *= ipElectricityAdjust;
                 }
                 for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
                     collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) /= largeConversionFactor;
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) *= ipElectricityAdjust;
                 }
             }
             collapsedTotal(iResource) /= largeConversionFactor;
+            collapsedTotal(iResource) *= ipElectricityAdjust;
         }
         // do water
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
