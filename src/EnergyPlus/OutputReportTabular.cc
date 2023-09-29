@@ -7850,21 +7850,17 @@ void WriteBEPSTable(EnergyPlusData &state)
 
         // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
         for (int iResource = 1; iResource <= 13; ++iResource) { // don't do water
-            int ipElectricityAdjust = (iResource == 1) ? ipElectricityConversionFactor : 1.0;
+            Real64 ipElectricityAdjust = (iResource == 1) ? ipElectricityConversionFactor : 1.0;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
-                collapsedEndUse(iResource, jEndUse) *= ipElectricityAdjust;
+                collapsedEndUse(iResource, jEndUse) /= (largeConversionFactor / ipElectricityAdjust);
                 for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
-                    collapsedEndUseSub(kEndUseSub, jEndUse, iResource) *= ipElectricityAdjust;
+                    collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= (largeConversionFactor / ipElectricityAdjust);
                 }
                 for (int kEndUseSpType = 1; kEndUseSpType <= state.dataOutputProcessor->EndUseCategory(jEndUse).numSpaceTypes; ++kEndUseSpType) {
-                    collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) /= largeConversionFactor;
-                    collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) *= ipElectricityAdjust;
+                    collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) /= (largeConversionFactor / ipElectricityAdjust);
                 }
             }
-            collapsedTotal(iResource) /= largeConversionFactor;
-            collapsedTotal(iResource) *= ipElectricityAdjust;
+            collapsedTotal(iResource) /= (largeConversionFactor/ipElectricityAdjust);
         }
         // do water
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
@@ -9405,8 +9401,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
             rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
 
-            if ((unitsStyle_cur != UnitsStyle::InchPound) || (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity))
-                {
+            if ((unitsStyle_cur != UnitsStyle::InchPound) || (unitsStyle_cur != UnitsStyle::InchPoundExceptElectricity)) {
                 tableBody(1, 1) = RealToStr(std::abs(state.dataHVACGlobal->deviationFromSetPtThresholdHtg), 2);
                 tableBody(1, 2) = RealToStr(state.dataHVACGlobal->deviationFromSetPtThresholdClg, 2);
             } else {
@@ -9856,6 +9851,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
         // unit conversion - all values are used as divisors
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
+        Real64 ipElectricityConversionFactor = 1.0;
         switch (unitsStyle_cur) {
         case UnitsStyle::JtoKWH: {
             largeConversionFactor = 3600000.0;
@@ -9866,8 +9862,9 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
         } break;
         case UnitsStyle::InchPoundExceptElectricity: {
-            largeConversionFactor = 3600000.0;                                 // getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-            areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2"); // 0.092893973 m2 to ft2
+            largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+            areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+            ipElectricityConversionFactor = largeConversionFactor;
         } break;
         default: {
             largeConversionFactor = 1000000.0; // to MJ
@@ -9877,10 +9874,11 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
 
         // convert units into MJ (divide by 1,000,000) if J otherwise kWh
         for (int iResource = 1; iResource <= 13; ++iResource) { // don't do water
+            Real64 ipElectricityAdjust = (iResource == 1) ? ipElectricityConversionFactor : 1.0;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                collapsedEndUse(iResource, jEndUse) /= (largeConversionFactor/ipElectricityAdjust);
             }
-            collapsedTotal(iResource) /= largeConversionFactor;
+            collapsedTotal(iResource) /= (largeConversionFactor/ipElectricityAdjust);
         }
 
         rowHead.allocate(16);
