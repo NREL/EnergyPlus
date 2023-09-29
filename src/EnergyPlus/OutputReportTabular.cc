@@ -10058,7 +10058,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
             columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
             columnHead(11) = "Source District Cooling [kBtu/ft2]";
             columnHead(12) = "Source District Heating Water [kBtu/ft2]";
-            columnHead(13) = "Source District Heating Water [kBtu/ft2]";
+            columnHead(13) = "Source District Heating Steam [kBtu/ft2]";
         } break;
         default: {
             columnHead(1) = "Source Electricity [MJ/m2]";
