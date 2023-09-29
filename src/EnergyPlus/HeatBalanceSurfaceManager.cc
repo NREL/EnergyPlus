@@ -5448,7 +5448,7 @@ void CalculateZoneMRT(EnergyPlusData &state,
     //       DATE WRITTEN   November 2000
 
     // PURPOSE OF THIS SUBROUTINE:
-    // Calculates the current zone MRT for thermal comfort and radiation
+    // Calculates the current zone and enclosure MRT for thermal comfort and radiation
     // calculation purposes.
 
     if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
@@ -5463,28 +5463,72 @@ void CalculateZoneMRT(EnergyPlusData &state,
                     surface.Area * state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal;
                 int ZoneNum = surface.Zone;
                 if (ZoneNum > 0) state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
+                if (surface.RadEnclIndex > 0)
+                    state.dataViewFactor->EnclRadInfo(surface.RadEnclIndex).sumAE += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
             }
         }
     }
 
+    // Zero sumAET for applicable enclosures
+    if (present(ZoneToResimulate)) {
+        for (int spaceNum : state.dataHeatBal->Zone(ZoneToResimulate).spaceIndexes) {
+            int enclNum = state.dataHeatBal->space(spaceNum).radiantEnclosureNum;
+            state.dataViewFactor->EnclRadInfo(enclNum).sumAET = 0.0;
+            state.dataViewFactor->EnclRadInfo(enclNum).reCalcMRT = true;
+        }
+    } else {
+        for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+            thisEnclosure.sumAET = 0.0;
+            thisEnclosure.reCalcMRT = true;
+        }
+    }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
-        Real64 SumAET = 0.0;
+        Real64 zoneSumAET = 0.0;
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
             for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                SumAET += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                Real64 surfAET = state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                zoneSumAET += surfAET;
+                state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex).sumAET += surfAET;
             }
-            if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) > 0.01) {
-                state.dataHeatBal->ZoneMRT(ZoneNum) = SumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
+        }
+        if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) > 0.01) {
+            state.dataHeatBal->ZoneMRT(ZoneNum) = zoneSumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
+        } else {
+            if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
+                ShowWarningError(
+                    state,
+                    format("Zone areas*inside surface emissivities are summing to zero, for Zone=\"{}\"", state.dataHeatBal->Zone(ZoneNum).Name));
+                ShowContinueError(state, "As a result, MRT will be set to MAT for that zone");
+            }
+            state.dataHeatBal->ZoneMRT(ZoneNum) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+        }
+    }
+    // Calculate MRT for applicable enclosures
+    for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+        if (!thisEnclosure.reCalcMRT) continue;
+        if (thisEnclosure.sumAE > 0.01) {
+            thisEnclosure.MRT = thisEnclosure.sumAET / thisEnclosure.sumAE;
+        } else {
+            if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
+                ShowWarningError(state,
+                                 format("Enclosure areas*inside surface emissivities are summing to zero, for Enclosure=\"{}\"", thisEnclosure.Name));
+                ShowContinueError(state, "As a result, MRT will be set to the volume weighted average MAT for that enclosure");
+            }
+            Real64 sumMATVol = 0.0;
+            Real64 sumVol = 0.0;
+            Real64 sumMAT = 0.0;
+            for (auto &spaceNum : thisEnclosure.spaceNums) {
+                Real64 spaceVolume = state.dataHeatBal->space(spaceNum).Volume;
+                sumVol += spaceVolume;
+                sumMATVol += state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT * spaceVolume;
+                sumMAT += state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
+            }
+            if (sumVol > 0.01) {
+                thisEnclosure.MRT = sumMATVol / sumVol;
             } else {
-                if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
-                    ShowWarningError(
-                        state,
-                        format("Zone areas*inside surface emissivities are summing to zero, for Zone=\"{}\"", state.dataHeatBal->Zone(ZoneNum).Name));
-                    ShowContinueError(state, "As a result, MRT will be set to MAT for that zone");
-                }
-                state.dataHeatBal->ZoneMRT(ZoneNum) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+                thisEnclosure.MRT = sumMAT / (int)thisEnclosure.spaceNums.size();
             }
         }
     }
