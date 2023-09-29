@@ -724,6 +724,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 25.0;
     state->dataHeatBal->ZoneMRT(1) = 26.0;
+    state->dataViewFactor->EnclRadInfo(1).MRT = 26.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -733,6 +734,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 26.0;
     state->dataHeatBal->ZoneMRT(1) = 27.0;
+    state->dataViewFactor->EnclRadInfo(1).MRT = 27.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -742,6 +744,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 27.0;
     state->dataHeatBal->ZoneMRT(1) = 28.0;
+    state->dataViewFactor->EnclRadInfo(1).MRT = 28.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -751,6 +754,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 25.0;
     state->dataHeatBal->ZoneMRT(1) = 26.0;
+    state->dataViewFactor->EnclRadInfo(1).MRT = 26.0;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00629; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -1008,6 +1012,10 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).Show55Warning = true;
     state->dataHeatBal->People(1).Pierce = true;
     state->dataHeatBal->People(1).MRTCalcType = DataHeatBalance::CalcMRT::EnclosureAveraged;
+    state->dataHeatBal->People(1).spaceIndex = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).radiantEnclosureNum = 1;
+    state->dataViewFactor->EnclRadInfo.allocate(1);
     state->dataHeatBal->People(1).WorkEffPtr = 0;
     state->dataHeatBal->People(1).clothingType = ClothingType::InsulationSchedule;
 
@@ -1052,6 +1060,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = AirTemp;
     state->dataHeatBal->ZoneMRT(1) = RadTemp;
+    state->dataViewFactor->EnclRadInfo(1).MRT = RadTemp;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = Psychrometrics::PsyWFnTdbRhPb(
         *state, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf, RelHum, state->dataEnvrn->OutBaroPress);
     state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * ThermalComfort::ActLevelConv;
