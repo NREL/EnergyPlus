@@ -7076,7 +7076,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
-                    } else if(unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
                         varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
@@ -7860,7 +7860,7 @@ void WriteBEPSTable(EnergyPlusData &state)
                     collapsedEndUseSpType(kEndUseSpType, jEndUse, iResource) /= (largeConversionFactor / ipElectricityAdjust);
                 }
             }
-            collapsedTotal(iResource) /= (largeConversionFactor/ipElectricityAdjust);
+            collapsedTotal(iResource) /= (largeConversionFactor / ipElectricityAdjust);
         }
         // do water
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
@@ -9876,9 +9876,9 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
         for (int iResource = 1; iResource <= 13; ++iResource) { // don't do water
             Real64 ipElectricityAdjust = (iResource == 1) ? ipElectricityConversionFactor : 1.0;
             for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-                collapsedEndUse(iResource, jEndUse) /= (largeConversionFactor/ipElectricityAdjust);
+                collapsedEndUse(iResource, jEndUse) /= (largeConversionFactor / ipElectricityAdjust);
             }
-            collapsedTotal(iResource) /= (largeConversionFactor/ipElectricityAdjust);
+            collapsedTotal(iResource) /= (largeConversionFactor / ipElectricityAdjust);
         }
 
         rowHead.allocate(16);
@@ -10247,37 +10247,40 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
 
         Real64 powerConversion = 1.0;
         Real64 flowConversion = 1.0;
+        Real64 ipElectricityConversion = 1.0;
 
         // establish unit conversion factors
         if (unitsStyle_cur == UnitsStyle::InchPound) {
             powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
             flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
         } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
-            powerConversion = 1.0; // getSpecificUnitMultiplier(state, "W", "kBtuh");
+            powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
             flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
+            ipElectricityConversion = powerConversion;
         }
 
         // collapse the gatherEndUseBEPS array to the resource groups displayed
         collapsedEndUse = 0.0;
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
-            collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;   // electricity
-            collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;   // natural gas
-            collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;   // gasoline
-            collapsedEndUse(4, jEndUse) = ort->gatherDemandEndUse(8, jEndUse) * powerConversion;   // diesel
-            collapsedEndUse(5, jEndUse) = ort->gatherDemandEndUse(9, jEndUse) * powerConversion;   // coal
-            collapsedEndUse(6, jEndUse) = ort->gatherDemandEndUse(10, jEndUse) * powerConversion;  // fuel oil no 1
-            collapsedEndUse(7, jEndUse) = ort->gatherDemandEndUse(11, jEndUse) * powerConversion;  // fuel oil no 2
-            collapsedEndUse(8, jEndUse) = ort->gatherDemandEndUse(12, jEndUse) * powerConversion;  // propane
-            collapsedEndUse(9, jEndUse) = ort->gatherDemandEndUse(13, jEndUse) * powerConversion;  // otherfuel1
-            collapsedEndUse(10, jEndUse) = ort->gatherDemandEndUse(14, jEndUse) * powerConversion; // otherfuel2
-            collapsedEndUse(11, jEndUse) = ort->gatherDemandEndUse(3, jEndUse) * powerConversion;  // purchased cooling
-            collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(4, jEndUse) * powerConversion;  // district heating water
-            collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(5, jEndUse) * powerConversion;  // district heating steam
-            collapsedEndUse(14, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;   // water
+            collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * (powerConversion / ipElectricityConversion); // electricity
+            collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                             // natural gas
+            collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                             // gasoline
+            collapsedEndUse(4, jEndUse) = ort->gatherDemandEndUse(8, jEndUse) * powerConversion;                             // diesel
+            collapsedEndUse(5, jEndUse) = ort->gatherDemandEndUse(9, jEndUse) * powerConversion;                             // coal
+            collapsedEndUse(6, jEndUse) = ort->gatherDemandEndUse(10, jEndUse) * powerConversion;                            // fuel oil no 1
+            collapsedEndUse(7, jEndUse) = ort->gatherDemandEndUse(11, jEndUse) * powerConversion;                            // fuel oil no 2
+            collapsedEndUse(8, jEndUse) = ort->gatherDemandEndUse(12, jEndUse) * powerConversion;                            // propane
+            collapsedEndUse(9, jEndUse) = ort->gatherDemandEndUse(13, jEndUse) * powerConversion;                            // otherfuel1
+            collapsedEndUse(10, jEndUse) = ort->gatherDemandEndUse(14, jEndUse) * powerConversion;                           // otherfuel2
+            collapsedEndUse(11, jEndUse) = ort->gatherDemandEndUse(3, jEndUse) * powerConversion;                            // purchased cooling
+            collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(4, jEndUse) * powerConversion;                            // district heating water
+            collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(5, jEndUse) * powerConversion;                            // district heating steam
+            collapsedEndUse(14, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                             // water
         }
         for (int jEndUse = 1; jEndUse <= static_cast<int>(Constant::EndUse::Num); ++jEndUse) {
             for (int kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
+                collapsedEndUseSub(kEndUseSub, jEndUse, 1) =
+                    ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * (powerConversion / ipElectricityConversion);                // electricity
                 collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
                 collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
                 collapsedEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion;   // diesel
@@ -10335,20 +10338,20 @@ void WriteDemandEndUseSummary(EnergyPlusData &state)
         }
 
         // convert totals
-        collapsedTotal(1) *= powerConversion;  // electricity
-        collapsedTotal(2) *= powerConversion;  // natural gas
-        collapsedTotal(3) *= powerConversion;  // gasoline
-        collapsedTotal(4) *= powerConversion;  // diesel
-        collapsedTotal(5) *= powerConversion;  // coal
-        collapsedTotal(6) *= powerConversion;  // fuel oil no 1
-        collapsedTotal(7) *= powerConversion;  // fuel oil no 2
-        collapsedTotal(8) *= powerConversion;  // propane
-        collapsedTotal(9) *= powerConversion;  // otherfuel1
-        collapsedTotal(10) *= powerConversion; // otherfuel2
-        collapsedTotal(11) *= powerConversion; // purchased cooling
-        collapsedTotal(12) *= powerConversion; // district heating water
-        collapsedTotal(13) *= powerConversion; // district heating steam
-        collapsedTotal(14) *= flowConversion;  // water
+        collapsedTotal(1) *= (powerConversion / ipElectricityConversion); // electricity
+        collapsedTotal(2) *= powerConversion;                             // natural gas
+        collapsedTotal(3) *= powerConversion;                             // gasoline
+        collapsedTotal(4) *= powerConversion;                             // diesel
+        collapsedTotal(5) *= powerConversion;                             // coal
+        collapsedTotal(6) *= powerConversion;                             // fuel oil no 1
+        collapsedTotal(7) *= powerConversion;                             // fuel oil no 2
+        collapsedTotal(8) *= powerConversion;                             // propane
+        collapsedTotal(9) *= powerConversion;                             // otherfuel1
+        collapsedTotal(10) *= powerConversion;                            // otherfuel2
+        collapsedTotal(11) *= powerConversion;                            // purchased cooling
+        collapsedTotal(12) *= powerConversion;                            // district heating water
+        collapsedTotal(13) *= powerConversion;                            // district heating steam
+        collapsedTotal(14) *= flowConversion;                             // water
         //---- End Use Sub-Table
         rowHead.allocate(17);
         columnHead.allocate(14);
