@@ -12381,13 +12381,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     columnWidth.allocate(columnNum);
     columnWidth = 10;
     Array1D_string columnHead(5);
-    if (unitsStyle_cur == UnitsStyle::InchPound) {
-        columnHead(1) = "Safe (≤ 80.1°F) [hr]";
-        columnHead(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
-        columnHead(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
-        columnHead(4) = "Danger (> 102.9, ≤ 125.1°F) [hr]";
-        columnHead(5) = "Extreme Danger (> 125.1°F) [hr]";
-    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+    if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
         columnHead(1) = "Safe (≤ 80.1°F) [hr]";
         columnHead(2) = "Caution (> 80.1°F, ≤ 90.0°F) [hr]";
         columnHead(3) = "Extreme Caution (> 90.0°F, ≤ 102.9°F) [hr]";
@@ -12518,13 +12512,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
         columnHead(4) = "Longest SET ≤ 12.2°C Duration for Occupied Period [hr]";
         columnHead(5) = "Start Time of the Longest SET ≤ 12.2°C Duration for Occupied Period ";
 
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            columnHead(1) = "SET ≤ 54.0°F Degree-Hours [°F·hr]";
-            columnHead(2) = "SET ≤ 54.0°F Occupant-Weighted Degree-Hours [°F·hr]";
-            columnHead(3) = "SET ≤ 54.0°F Occupied Degree-Hours [°F·hr]";
-            columnHead(4) = "Longest SET ≤ 54.0°F Duration for Occupied Period [hr]";
-            columnHead(5) = "Start Time of the Longest SET ≤ 54.0°F Duration for Occupied Period ";
-        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
             columnHead(1) = "SET ≤ 54.0°F Degree-Hours [°F·hr]";
             columnHead(2) = "SET ≤ 54.0°F Occupant-Weighted Degree-Hours [°F·hr]";
             columnHead(3) = "SET ≤ 54.0°F Occupied Degree-Hours [°F·hr]";
@@ -12555,13 +12543,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
                                           tableBodySET,
                                           degreeHourConversion);
 
-        if (unitsStyle_cur == UnitsStyle::InchPound) {
-            columnHead(1) = "SET > 86°F Degree-Hours [°F·hr]";
-            columnHead(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
-            columnHead(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
-            columnHead(4) = "Longest SET > 86°F Duration for Occupied Period [hr]";
-            columnHead(5) = "Start Time of the Longest SET > 86°F Duration for Occupied Period";
-        } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+        if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
             columnHead(1) = "SET > 86°F Degree-Hours [°F·hr]";
             columnHead(2) = "SET > 86°F Occupant-Weighted Degree-Hours [°F·hr]";
             columnHead(3) = "SET > 86°F Occupied Degree-Hours [°F·hr]";
@@ -12634,14 +12616,7 @@ void WriteThermalResilienceTablesRepPeriod(EnergyPlusData &state, int const peri
     columnHeadUnmetDegHr(6) = "Heating Setpoint Unmet Occupied Degree-Hours [°C·hr]";
     tableName = "Unmet Degree-Hours";
 
-    if (unitsStyle_cur == UnitsStyle::InchPound) {
-        int indexUnitConv;
-        std::string curUnits;
-        for (int i = 1; i < columnNumUnmetDegHr; i++) {
-            LookupSItoIP(state, columnHeadUnmetDegHr(i), indexUnitConv, curUnits);
-            columnHeadUnmetDegHr(i) = curUnits;
-        }
-    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+    if ((unitsStyle_cur == UnitsStyle::InchPound) || (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity)) {
         int indexUnitConv;
         std::string curUnits;
         for (int i = 1; i < columnNumUnmetDegHr; i++) {
@@ -16533,6 +16508,8 @@ void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLo
         compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
         compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion;
     } else if (unitsStyle_para == UnitsStyle::InchPoundExceptElectricity) {
+        // These variables are not strictly need to be different from InchPounds
+        // So leave these here (as a duplication for now)
         Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
         Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
         Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
