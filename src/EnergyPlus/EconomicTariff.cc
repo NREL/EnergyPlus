@@ -4116,12 +4116,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
 
                 // do unit conversions if necessary
                 std::string perAreaUnitName;
-                if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound) {
-                    int unitConvIndex = 0;
-                    std::string SIunit = "[~~$~~/m2]";
-                    OutputReportTabular::LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
-                    perAreaUnitConv = OutputReportTabular::ConvertIP(state, unitConvIndex, 1.0);
-                } else if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity) {
+                if ((unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound) ||
+                    (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
                     int unitConvIndex = 0;
                     std::string SIunit = "[~~$~~/m2]";
                     OutputReportTabular::LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);

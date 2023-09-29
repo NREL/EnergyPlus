@@ -5529,13 +5529,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             lnPtr = index(lineIn.substr(12), 'm');
             if (lnPtr != std::string::npos) {
                 curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchWthrVal,
-                                     curNameAndUnits,
-                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(12, lnPtr))), 1));
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
                                      state.dataOutRptPredefined->pdchWthrVal,
@@ -5586,18 +5580,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             if (iscalc) {
                 if (isASHRAE) {
                     if (ashDesYear == "2001") {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Heating Design Temperature 99% (F)",
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 3))), 1) + degChar);
-                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                        if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                             curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5619,18 +5602,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                              GetColumnUsingTabs(lineIn, 3) + degChar);
                         }
                     } else { // 2005 and 2009 are the same
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Heating Design Temperature 99% (F)",
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
-                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                        if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                             curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5660,18 +5632,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         col1 = 4;
                         col2 = 5;
                     }
-                    if (ort->unitsStyle == UnitsStyle::InchPound) {
-                        curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
-                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         curNameAndUnits,
-                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         "Heating Design Temperature 99% (F)",
-                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
-                    } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                         curNameWithSIUnits = "Heating Design Temperature 99.6% (C)";
                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                         PreDefTableEntry(state,
@@ -5699,22 +5660,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
             if (iscalc) {
                 if (isASHRAE) {
                     if (ashDesYear == "2001") {
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 2))), 1) + degChar);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Cooling Design Temperature 1% (F)",
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 4))), 1) + degChar);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Cooling Design Temperature 2% (F)",
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 6))), 1) + degChar);
-                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                        if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                             curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5744,22 +5690,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                                              GetColumnUsingTabs(lineIn, 6) + degChar);
                         }
                     } else { // 2005 and 2009 are the same
-                        if (ort->unitsStyle == UnitsStyle::InchPound) {
-                            curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             curNameAndUnits,
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 5))), 1) + degChar);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Cooling Design Temperature 1% (F)",
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 7))), 1) + degChar);
-                            PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchWthrVal,
-                                             "Cooling Design Temperature 2% (F)",
-                                             RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, 9))), 1) + degChar);
-                        } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                        if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                             curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                             LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                             PreDefTableEntry(state,
@@ -5799,22 +5730,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         col2 = 5;
                         col3 = 6;
                     }
-                    if (ort->unitsStyle == UnitsStyle::InchPound) {
-                        curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
-                        LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         curNameAndUnits,
-                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col1))), 1) + degChar);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         "Cooling Design Temperature 1% (F)",
-                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col2))), 1) + degChar);
-                        PreDefTableEntry(state,
-                                         state.dataOutRptPredefined->pdchWthrVal,
-                                         "Cooling Design Temperature 2% (F)",
-                                         RealToStr(ConvertIP(state, indexUnitConv, StrToReal(GetColumnUsingTabs(lineIn, col3))), 1) + degChar);
-                    } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                    if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                         curNameWithSIUnits = "Cooling Design Temperature 0.4% (C)";
                         LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                         PreDefTableEntry(state,
@@ -5863,14 +5779,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchWthrVal,
-                                     curNameAndUnits,
-                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     curNameWithSIUnits = "Maximum Dry Bulb Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5905,14 +5814,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchWthrVal,
-                                     curNameAndUnits,
-                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     curNameWithSIUnits = "Minimum Dry Bulb Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5947,14 +5849,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchWthrVal,
-                                     curNameAndUnits,
-                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     curNameWithSIUnits = "Maximum Dew Point Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -5989,14 +5884,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                 eposlt -= 2;
             }
             if (sposlt != std::string::npos && eposlt != std::string::npos) {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchWthrVal,
-                                     curNameAndUnits,
-                                     RealToStr(ConvertIP(state, indexUnitConv, StrToReal(lineIn.substr(sposlt, eposlt - sposlt + 1))), 1) + degChar);
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     curNameWithSIUnits = "Minimum Dew Point Temperature (C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -6065,14 +5953,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
         } break;
         case StatLineType::WithHDDLine: { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
             if (storeASHRAEHDD != "") {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                    PreDefTableEntry(state,
-                                     state.dataOutRptPredefined->pdchWthrVal,
-                                     curNameAndUnits,
-                                     RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(storeASHRAEHDD)), 1));
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
                     LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                     PreDefTableEntry(state,
@@ -6084,10 +5965,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", storeASHRAEHDD);
                 }
             } else {
-                if (ort->unitsStyle == UnitsStyle::InchPound) {
-                    PreDefTableEntry(
-                        state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
-                } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+                if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                     PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 65°F)", "not found");
                 } else {
@@ -6095,18 +5973,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009 Heating Degree-Days (base 18.3°C)", "not found");
                 }
             }
-            if (ort->unitsStyle == UnitsStyle::InchPound) {
-                curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
-                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchWthrVal,
-                                 curNameAndUnits,
-                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchLeedGenData,
-                                 "Heating Degree Days",
-                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-            } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+            if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                 curNameWithSIUnits = "Weather File Heating Degree-Days - base 65°(C)";
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 PreDefTableEntry(state,
@@ -6155,18 +6022,7 @@ void FillWeatherPredefinedEntries(EnergyPlusData &state)
                         state, state.dataOutRptPredefined->pdchWthrVal, "ASHRAE Handbook 2009  Cooling Degree-Days (base 10°C)", "not found");
                 }
             }
-            if (ort->unitsStyle == UnitsStyle::InchPound) {
-                curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
-                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchWthrVal,
-                                 curNameAndUnits,
-                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-                PreDefTableEntry(state,
-                                 state.dataOutRptPredefined->pdchLeedGenData,
-                                 "Cooling Degree Days",
-                                 RealToStr(ConvertIPdelta(state, indexUnitConv, StrToReal(lineIn.substr(2, 4))), 1));
-            } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+            if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
                 curNameWithSIUnits = "Weather File Cooling Degree-Days - base 50°(C)";
                 LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
                 PreDefTableEntry(state,
@@ -7031,9 +6887,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
                          state.dataEnvrn->EnvironmentName + " ** " + state.dataEnvrn->WeatherFileLocationTitle);
     }
 
-    if (ort->unitsStyle == UnitsStyle::InchPound) {
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
-    } else if (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity) {
+    if ((ort->unitsStyle == UnitsStyle::InchPound) || (ort->unitsStyle == UnitsStyle::InchPoundExceptElectricity)) {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", "-");
     } else {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", "-");
@@ -7222,7 +7076,7 @@ void WriteMonthlyTables(EnergyPlusData &state)
                         varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
-                    } else if (unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
+                    } else if(unitsStyle_cur == UnitsStyle::InchPoundExceptElectricity) {
                         varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
                         LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
                         GetUnitConversion(state, indexUnitConv, curConversionFactor, state.dataOutRptTab->curConversionOffset, curUnits);
