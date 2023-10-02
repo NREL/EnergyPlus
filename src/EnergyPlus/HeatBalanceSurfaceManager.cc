@@ -5478,22 +5478,21 @@ void CalculateZoneMRT(EnergyPlusData &state,
         }
     } else {
         for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
-            thisEnclosure.sumAET = 0.0;
             thisEnclosure.reCalcMRT = true;
         }
     }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
-        Real64 zoneSumAET = 0.0;
-        for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
-            auto const &thisSpace = state.dataHeatBal->space(spaceNum);
-            for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
-                Real64 surfAET = state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
-                zoneSumAET += surfAET;
-                state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex).sumAET += surfAET;
-            }
-        }
         if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) > 0.01) {
+            Real64 zoneSumAET = 0.0;
+            for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
+                auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+                for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
+                    Real64 surfAET = state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * state.dataHeatBalSurf->SurfTempIn(SurfNum);
+                    zoneSumAET += surfAET;
+                    state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex).sumAET += surfAET;
+                }
+            }
             state.dataHeatBal->ZoneMRT(ZoneNum) = zoneSumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
         } else {
             if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
@@ -5509,6 +5508,11 @@ void CalculateZoneMRT(EnergyPlusData &state,
     for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
         if (!thisEnclosure.reCalcMRT) continue;
         if (thisEnclosure.sumAE > 0.01) {
+            thisEnclosure.sumAET = 0.0;
+            for (int surfNum : thisEnclosure.SurfacePtr) {
+                Real64 surfAET = state.dataHeatBalSurfMgr->SurfaceAE(surfNum) * state.dataHeatBalSurf->SurfTempIn(surfNum);
+                thisEnclosure.sumAET += surfAET;
+            }
             thisEnclosure.MRT = thisEnclosure.sumAET / thisEnclosure.sumAE;
         } else {
             if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
