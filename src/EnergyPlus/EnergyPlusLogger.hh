@@ -59,4 +59,4 @@ public:
     void debug(const std::string_view message) override;
 };
 
-#endif ENERGYPLUSLOGGER_HH_INCLUDED
+#endif // ENERGYPLUSLOGGER_HH_INCLUDED
