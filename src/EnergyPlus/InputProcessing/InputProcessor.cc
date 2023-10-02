@@ -2222,7 +2222,7 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT LOSS ENERGY");
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER TANK TEMPERATURE");
         addRecordToOutputVariableStructure(state, "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "WATER HEATER SOURCE ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "WATER HEATER SOURCE SIDE HEAT TRANSFER ENERGY");
 
     } else if (reportName == "GENERATORREPORTMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");

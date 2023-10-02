@@ -280,6 +280,7 @@ void InitIntConvCoeff(EnergyPlusData &state,
         auto const &zone = state.dataHeatBal->Zone(ZoneNum);
         for (int spaceNum : zone.spaceIndexes) {
             auto const &thisSpace = state.dataHeatBal->space(spaceNum);
+            Real64 spaceMAT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
             for (int SurfNum = thisSpace.HTSurfaceFirst; SurfNum <= thisSpace.HTSurfaceLast; ++SurfNum) {
 
                 if (present(ZoneToResimulate)) {
@@ -309,8 +310,7 @@ void InitIntConvCoeff(EnergyPlusData &state,
                 } break;
 
                 case HcInt::ASHRAESimple: {
-                    CalcASHRAESimpleIntConvCoeff(
-                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                    CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                     if (state.dataHeatBalSurf->SurfHConvInt(SurfNum) < state.dataHeatBal->LowHConvLimit)
                         state.dataHeatBalSurf->SurfHConvInt(SurfNum) = state.dataHeatBal->LowHConvLimit;
@@ -318,11 +318,9 @@ void InitIntConvCoeff(EnergyPlusData &state,
 
                 case HcInt::ASHRAETARP: {
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                        CalcASHRAEDetailedIntConvCoeff(
-                            state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
                     } else {
-                        CalcISO15099WindowIntConvCoeff(
-                            state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        CalcISO15099WindowIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
                     }
 
                     // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -340,8 +338,7 @@ void InitIntConvCoeff(EnergyPlusData &state,
                 } break;
 
                 case HcInt::ASTMC1340: {
-                    CalcASTMC1340ConvCoeff(
-                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                    CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), spaceMAT);
                 } break;
 
                 default: {
@@ -2167,7 +2164,7 @@ void CalcCeilingDiffuserIntConvCoeff(EnergyPlusData &state,
 
     Real64 ACH = CalcCeilingDiffuserACH(state, ZoneNum);
 
-    Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
+    Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
 
     for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
         auto const &thisSpace = state.dataHeatBal->space(spaceNum);
@@ -2257,10 +2254,10 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
             if (ACH <= 3.0) { // Use the other convection algorithm
                 if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) {
                     CalcASHRAEDetailedIntConvCoeff(
-                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT);
                 } else {
                     CalcISO15099WindowIntConvCoeff(
-                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                        state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT);
                 }
             } else { // Use forced convection correlations
                 Real64 Tilt = state.dataSurface->Surface(SurfNum).Tilt;
@@ -2392,7 +2389,7 @@ void CalcTrombeWallIntConvCoeff(EnergyPlusData &state,
             auto const &surface = state.dataSurface->Surface(SurfNum);
             // Use ASHRAESimple correlation to give values for all the minor surfaces
             CalcASHRAESimpleIntConvCoeff(
-                state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT);
+                state, SurfNum, SurfaceTemperatures(SurfNum), state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT);
 
             // assign the convection coefficent to the major surfaces and any subsurfaces on them
             if ((surface.BaseSurf == Surf1) || (surface.BaseSurf == Surf2)) {
@@ -2727,7 +2724,7 @@ void CalcISO15099WindowIntConvCoeff(EnergyPlusData &state,
 
     // Get humidity ratio
     Real64 AirHumRat =
-        (surface.Zone > 0) ? state.dataZoneTempPredictorCorrector->zoneHeatBalance(surface.Zone).ZoneAirHumRatAvg : state.dataEnvrn->OutHumRat;
+        (surface.spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(surface.spaceNum).airHumRatAvg : state.dataEnvrn->OutHumRat;
 
     Real64 Height = surface.Height;
     Real64 TiltDeg = surface.Tilt;
@@ -3153,8 +3150,9 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
     auto const &surfIntConv = state.dataSurface->surfIntConv(SurfNum);
 
     int const ZoneNum = thisSurface.Zone;
+    int const spaceNum = thisSurface.spaceNum;
     Real64 const Tsurface = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
-    Real64 const Tzone = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+    Real64 const Tzone = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
 
     auto &HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in;
     // now call appropriate function to calculate Hc
@@ -3198,7 +3196,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
 
     case HcInt::FisherPedersenCeilDiffuserFloor: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
+        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
 
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -3219,7 +3217,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
 
     case HcInt::FisherPedersenCeilDiffuserCeiling: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
+        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
 
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -3240,7 +3238,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
 
     case HcInt::FisherPedersenCeilDiffuserWalls: {
         Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).ZoneAirHumRatAvg;
+        Real64 AirHumRat = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).airHumRatAvg;
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
 
             HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -3978,6 +3976,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     auto &surface = state.dataSurface->Surface(SurfNum);
     int zoneNum = surface.Zone;
+    int spaceNum = surface.spaceNum;
     auto &zone = state.dataHeatBal->Zone(zoneNum);
 
     EquipOnCount = 0;
@@ -4069,7 +4068,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 if (surface.Class != SurfaceClass::Floor) continue;
 
                                 Real64 DeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
-                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT;
+                                                   state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
                                 if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with floor
                                     // system ON is not enough because floor surfaces can continue to heat because of thermal capacity
                                     EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
@@ -4092,7 +4091,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 if (surface.Class != SurfaceClass::Roof) continue;
 
                                 Real64 DeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
-                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT;
+                                                   state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
                                 if (DeltaTemp < ActiveDelTempThreshold) { // assume cooling with ceiling
                                     // system ON is not enough because  surfaces can continue to cool because of thermal capacity
                                     EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
@@ -4115,7 +4114,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                                 if (surface.Class != SurfaceClass::Wall && surface.Class != SurfaceClass::Door) continue;
 
                                 DeltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfLoop) -
-                                            state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT;
+                                            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
                                 if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with wall panel
                                     // system ON is not enough because  surfaces can continue to heat because of thermal capacity
                                     EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
@@ -4141,7 +4140,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
 
     // now select which equipment type is dominant compared to all those that are ON
     if (EquipOnCount > 0) {
-        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadPredictedRate >= 0.0) { // heating load
+        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).predictedRate >= 0.0) { // heating load
             PriorityEquipOn = 1;
             for (int EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime
@@ -4149,7 +4148,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                     PriorityEquipOn = EquipOnLoop;
                 }
             }
-        } else if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).ZoneSNLoadPredictedRate < 0.0) { // cooling load
+        } else if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum).predictedRate < 0.0) { // cooling load
             PriorityEquipOn = 1;
             for (int EquipOnLoop = 1; EquipOnLoop <= EquipOnCount; ++EquipOnLoop) {
                 // assume highest priority/first sim order is dominant for flow regime
@@ -4322,7 +4321,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     // now finish out specific model eq for this surface
 
     int iDeltaTemp =
-        DeltaTempLambda(state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum), state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT);
+        DeltaTempLambda(state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum), state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT);
     int iConvOrient = int(surface.convOrientation);
 
     auto &surfIntConv = state.dataSurface->surfIntConv(SurfNum);
@@ -4500,7 +4499,8 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     } break; // D
 
     case InConvFlowRegime::E: {
-        Real64 deltaTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) - state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT;
+        Real64 deltaTemp =
+            state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum) - state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
 
         switch (surface.Class) {
         case SurfaceClass::Wall:
@@ -4658,6 +4658,7 @@ Real64 CalcUserDefinedIntHcModel(EnergyPlusData &state, int const SurfNum, int c
 
     auto const &surface = state.dataSurface->Surface(SurfNum);
     int zoneNum = state.dataSurface->Surface(SurfNum).Zone;
+    int spaceNum = state.dataSurface->Surface(SurfNum).spaceNum;
     auto const &zone = state.dataHeatBal->Zone(zoneNum);
 
     Real64 SumMdotTemp = 0.0;
@@ -4693,7 +4694,7 @@ Real64 CalcUserDefinedIntHcModel(EnergyPlusData &state, int const SurfNum, int c
 
     switch (userCurve.refTempType) {
     case RefTemp::MeanAirTemp:
-        tmpAirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT;
+        tmpAirTemp = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
         state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
         break;
     case RefTemp::AdjacentAirTemp:

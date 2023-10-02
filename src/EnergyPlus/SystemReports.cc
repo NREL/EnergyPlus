@@ -4458,7 +4458,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
             Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                               state.dataEnvrn->OutBaroPress,
                                               state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).MAT,
-                                              state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).ZoneAirHumRatAvg);
+                                              state.dataZoneTempPredictorCorrector->zoneHeatBalance(CtrlZoneNum).airHumRatAvg);
         if (currentZoneAirDensity > 0.0) thisZoneVentRepVars.OAVolFlowCrntRho = thisZoneVentRepVars.OAMassFlow / currentZoneAirDensity;
         thisZoneVentRepVars.OAVolCrntRho = thisZoneVentRepVars.OAVolFlowCrntRho * TimeStepSysSec;
         if (ZoneVolume > 0.0) thisZoneVentRepVars.MechACH = (thisZoneVentRepVars.OAVolCrntRho / TimeStepSys) / ZoneVolume;

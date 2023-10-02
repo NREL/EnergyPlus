@@ -611,12 +611,14 @@ namespace HVACHXAssistedCoolingCoil {
         // Get the data for the Coil:Water:CoolingHeatExchangerAssisted objects
         CurrentModuleObject = "CoilSystem:Cooling:Water:HeatExchangerAssisted";
 
-        for (HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= NumHXAssistedWaterCoils; ++HXAssistedCoilNum) {
+        for (HXAssistedCoilNum = NumHXAssistedDXCoils + 1; HXAssistedCoilNum <= state.dataHVACAssistedCC->TotalNumHXAssistedCoils;
+             ++HXAssistedCoilNum) {
+            int thisWaterHXNum = HXAssistedCoilNum - NumHXAssistedDXCoils;
             auto &thisHXCoil = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum);
 
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      CurrentModuleObject,
-                                                                     HXAssistedCoilNum,
+                                                                     thisWaterHXNum,
                                                                      AlphArray,
                                                                      NumAlphas,
                                                                      NumArray,

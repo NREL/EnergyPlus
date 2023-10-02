@@ -264,74 +264,14 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
                 }
             }
         }
-        for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-            if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-
-            auto &zoneNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode);
-            zoneNode.Temp = 20.0;
-            zoneNode.MassFlowRate = 0.0;
-            zoneNode.Quality = 1.0;
-            zoneNode.Press = state.dataEnvrn->OutBaroPress;
-            zoneNode.HumRat = state.dataEnvrn->OutHumRat;
-            zoneNode.Enthalpy = PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
-            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                zoneNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-            }
-            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                zoneNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-            }
-
-            for (int ZoneInNode = 1; ZoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++ZoneInNode) {
-                auto &inNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(ZoneInNode));
-                inNode.Temp = 20.0;
-                inNode.MassFlowRate = 0.0;
-                inNode.Quality = 1.0;
-                inNode.Press = state.dataEnvrn->OutBaroPress;
-                inNode.HumRat = state.dataEnvrn->OutHumRat;
-                inNode.Enthalpy = PsyHFnTdbW(inNode.Temp, inNode.HumRat);
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    inNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    inNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                }
-            }
-
-            for (int ZoneExhNode = 1; ZoneExhNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNode) {
-
-                auto &exhNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNode));
-                exhNode.Temp = 20.0;
-                exhNode.MassFlowRate = 0.0;
-                exhNode.Quality = 1.0;
-                exhNode.Press = state.dataEnvrn->OutBaroPress;
-                exhNode.HumRat = state.dataEnvrn->OutHumRat;
-                exhNode.Enthalpy = PsyHFnTdbW(exhNode.Temp, exhNode.HumRat);
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    exhNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    exhNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                }
-            }
-
-            // BG CR 7122 following resets return air node.
-            int NumRetNodes = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumReturnNodes;
-            if (NumRetNodes > 0) {
-                for (int nodeCount = 1; nodeCount <= NumRetNodes; ++nodeCount) {
-                    auto &returnNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ReturnNode(nodeCount));
-                    returnNode.Temp = 20.0;
-                    returnNode.MassFlowRate = 0.0;
-                    returnNode.Quality = 1.0;
-                    returnNode.Press = state.dataEnvrn->OutBaroPress;
-                    returnNode.HumRat = state.dataEnvrn->OutHumRat;
-                    returnNode.Enthalpy = PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);
-                    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                        returnNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
-                    }
-                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                        returnNode.GenContam = state.dataContaminantBalance->OutdoorGC;
-                    }
-                }
+        for (auto &thisZoneEquipConfig : state.dataZoneEquip->ZoneEquipConfig) {
+            if (!thisZoneEquipConfig.IsControlled) continue;
+            thisZoneEquipConfig.beginEnvirnInit(state);
+        }
+        if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+            for (auto &thisSpaceEquipConfig : state.dataZoneEquip->spaceEquipConfig) {
+                if (!thisSpaceEquipConfig.IsControlled) continue;
+                thisSpaceEquipConfig.beginEnvirnInit(state);
             }
         }
 
@@ -344,29 +284,14 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
 
     // do the  HVAC time step initializations
 
-    for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-        if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
-        auto &zoneNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode);
-        state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExcessZoneExh = 0.0;
-
-        if (FirstHVACIteration) {
-            for (int ZoneExhNode = 1; ZoneExhNode <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).NumExhaustNodes; ++ZoneExhNode) {
-                auto &exhNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNode));
-                exhNode.Temp = zoneNode.Temp;
-                exhNode.HumRat = zoneNode.HumRat;
-                exhNode.Enthalpy = zoneNode.Enthalpy;
-                exhNode.Press = zoneNode.Press;
-                exhNode.Quality = zoneNode.Quality;
-                exhNode.MassFlowRate = 0.0;
-                exhNode.MassFlowRateMaxAvail = 0.0;
-                exhNode.MassFlowRateMinAvail = 0.0;
-                if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                    exhNode.CO2 = zoneNode.CO2;
-                }
-                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-                    exhNode.GenContam = zoneNode.GenContam;
-                }
-            }
+    for (auto &thisZoneEquipConfig : state.dataZoneEquip->ZoneEquipConfig) {
+        if (!thisZoneEquipConfig.IsControlled) continue;
+        thisZoneEquipConfig.hvacTimeStepInit(state, FirstHVACIteration);
+    }
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+        for (auto &thisSpaceEquipConfig : state.dataZoneEquip->spaceEquipConfig) {
+            if (!thisSpaceEquipConfig.IsControlled) continue;
+            thisSpaceEquipConfig.hvacTimeStepInit(state, FirstHVACIteration);
         }
     }
 
@@ -395,8 +320,8 @@ void sizeZoneSpaceEquipmentPart1(EnergyPlusData &state,
                                                 : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).NonAirSystemResponse;
     auto &sysDepZoneLoads = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).SysDepZoneLoads
                                            : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).SysDepZoneLoads;
-    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).ZoneLatentGain
-                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).ZoneLatentGain;
+    auto &zoneLatentGain = (spaceNum > 0) ? state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).latentGain
+                                          : state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).latentGain;
     auto &zoneNodeNum =
         (spaceNum > 0) ? state.dataHeatBal->space(spaceNum).SystemZoneNodeNumber : state.dataHeatBal->Zone(zoneNum).SystemZoneNodeNumber;
     nonAirSystemResponse = 0.0;
@@ -715,7 +640,7 @@ void SizeZoneEquipment(EnergyPlusData &state)
         if (state.dataHeatBal->doSpaceHeatBalance) {
             for (int spaceNum : state.dataHeatBal->Zone(ControlledZoneNum).spaceIndexes) {
                 sizeZoneSpaceEquipmentPart1(state,
-                                            zoneEquipConfig,
+                                            state.dataZoneEquip->spaceEquipConfig(spaceNum),
                                             state.dataSize->CalcSpaceSizing(state.dataSize->CurOverallSimDay, spaceNum),
                                             state.dataZoneEnergyDemand->spaceSysEnergyDemand(spaceNum),
                                             state.dataZoneEnergyDemand->spaceSysMoistureDemand(spaceNum),
@@ -2301,8 +2226,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zsFinalSizing.DesCoolVolFlow = zsCalcFinalSizing.DesCoolVolFlow * TotCoolSizMult;
             zsFinalSizing.DesCoolMassFlow = zsCalcFinalSizing.DesCoolMassFlow * TotCoolSizMult;
             zsFinalSizing.DesCoolLoad = zsCalcFinalSizing.DesCoolLoad * TotCoolSizMult;
-            zsFinalSizing.CoolFlowSeq = zsCalcFinalSizing.CoolFlowSeq * TotCoolSizMult;
-            zsFinalSizing.CoolLoadSeq = zsCalcFinalSizing.CoolLoadSeq * TotCoolSizMult;
+            for (int i = 0; i < (int)zsFinalSizing.CoolFlowSeq.size(); ++i) {
+                zsFinalSizing.CoolFlowSeq[i] = zsCalcFinalSizing.CoolFlowSeq[i] * TotCoolSizMult;
+                zsFinalSizing.CoolLoadSeq[i] = zsCalcFinalSizing.CoolLoadSeq[i] * TotCoolSizMult;
+            }
             Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesCoolVolFlow;
             OAFrac = min(1.0, max(0.0, OAFrac));
             zsFinalSizing.DesCoolCoilInTemp =
@@ -2322,8 +2249,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizing.DesCoolVolFlow = calcZoneSizing.DesCoolVolFlow * TotCoolSizMult;
                 zoneSizing.DesCoolMassFlow = calcZoneSizing.DesCoolMassFlow * TotCoolSizMult;
                 zoneSizing.DesCoolLoad = calcZoneSizing.DesCoolLoad * TotCoolSizMult;
-                zoneSizing.CoolFlowSeq = calcZoneSizing.CoolFlowSeq * TotCoolSizMult;
-                zoneSizing.CoolLoadSeq = calcZoneSizing.CoolLoadSeq * TotCoolSizMult;
+                for (int i = 0; i < (int)zoneSizing.CoolFlowSeq.size(); ++i) {
+                    zoneSizing.CoolFlowSeq[i] = calcZoneSizing.CoolFlowSeq[i] * TotCoolSizMult;
+                    zoneSizing.CoolLoadSeq[i] = calcZoneSizing.CoolLoadSeq[i] * TotCoolSizMult;
+                }
                 Real64 OAFrac = zoneSizing.MinOA / zoneSizing.DesCoolVolFlow;
                 OAFrac = min(1.0, max(0.0, OAFrac));
                 zoneSizing.DesCoolCoilInTemp = OAFrac * desDayWeath.Temp(TimeStepAtPeak) + (1.0 - OAFrac) * zoneSizing.ZoneTempAtCoolPeak;
@@ -2477,8 +2406,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zsFinalSizing.DesHeatVolFlow = zsCalcFinalSizing.DesHeatVolFlow * TotHeatSizMult;
             zsFinalSizing.DesHeatMassFlow = zsCalcFinalSizing.DesHeatMassFlow * TotHeatSizMult;
             zsFinalSizing.DesHeatLoad = zsCalcFinalSizing.DesHeatLoad * TotHeatSizMult;
-            zsFinalSizing.HeatFlowSeq = zsCalcFinalSizing.HeatFlowSeq * TotHeatSizMult;
-            zsFinalSizing.HeatLoadSeq = zsCalcFinalSizing.HeatLoadSeq * TotHeatSizMult;
+            for (int i = 0; i < (int)zsFinalSizing.HeatFlowSeq.size(); ++i) {
+                zsFinalSizing.HeatFlowSeq[i] = zsCalcFinalSizing.HeatFlowSeq[i] * TotHeatSizMult;
+                zsFinalSizing.HeatLoadSeq[i] = zsCalcFinalSizing.HeatLoadSeq[i] * TotHeatSizMult;
+            }
             Real64 OAFrac = zsFinalSizing.MinOA / zsFinalSizing.DesHeatVolFlow;
             OAFrac = min(1.0, max(0.0, OAFrac));
             zsFinalSizing.DesHeatCoilInTemp =
@@ -2497,8 +2428,10 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizingDD.DesHeatVolFlow = calcZoneSizing.DesHeatVolFlow * TotHeatSizMult;
                 zoneSizingDD.DesHeatMassFlow = calcZoneSizing.DesHeatMassFlow * TotHeatSizMult;
                 zoneSizingDD.DesHeatLoad = calcZoneSizing.DesHeatLoad * TotHeatSizMult;
-                zoneSizingDD.HeatFlowSeq = calcZoneSizing.HeatFlowSeq * TotHeatSizMult;
-                zoneSizingDD.HeatLoadSeq = calcZoneSizing.HeatLoadSeq * TotHeatSizMult;
+                for (int i = 0; i < (int)zoneSizingDD.HeatFlowSeq.size(); ++i) {
+                    zoneSizingDD.HeatFlowSeq[i] = calcZoneSizing.HeatFlowSeq[i] * TotHeatSizMult;
+                    zoneSizingDD.HeatLoadSeq[i] = calcZoneSizing.HeatLoadSeq[i] * TotHeatSizMult;
+                }
                 Real64 OAFrac = zoneSizingDD.MinOA / zoneSizingDD.DesHeatVolFlow;
                 OAFrac = min(1.0, max(0.0, OAFrac));
                 zoneSizingDD.DesHeatCoilInTemp =
@@ -3181,6 +3114,13 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
         }
     }
 
+    // If SpaceHVAC is active calculate SpaceHVAC:EquipmentMixer outlet conditions before simulating zone equipment
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing) {
+        for (auto &thisSpaceHVACMixer : state.dataZoneEquip->zoneEquipMixer) {
+            thisSpaceHVACMixer.setOutletConditions(state);
+        }
+    }
+
     for (int ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
 
         if (!state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled) continue;
@@ -3271,6 +3211,13 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                     state.dataHVACGlobal->TurnFansOn = false;
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
+            }
+
+            // If SpaceHVAC is active and this equipment has a space splitter, scale the zone load if needed
+            if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
+                zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
+                state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)].adjustLoads(
+                    state, ControlledZoneNum, EquipTypeNum);
             }
 
             switch (zoneEquipType) {
@@ -3627,33 +3574,12 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             // If SpaceHVAC is active and this equipment has a space splitter, distribute the equipment output and update the spaces
             if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing &&
                 zoneEquipList.zoneEquipSplitterIndex(EquipPtr) > -1) {
-                auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)];
-                for (auto &space : thisZeqSplitter.spaces) {
-                    Real64 spaceSysOutputProvided = SysOutputProvided * space.outputFraction;
-                    Real64 spaceLatOutputProvided = LatOutputProvided * space.outputFraction;
-                    state.dataZoneTempPredictorCorrector->spaceHeatBalance(space.spaceIndex).NonAirSystemResponse += NonAirSysOutput;
-                    if (thisZeqSplitter.zoneEquipOutletNodeNum > 0 && space.spaceNodeNum > 0) {
-                        auto &equipOutletNode = state.dataLoopNodes->Node(thisZeqSplitter.zoneEquipOutletNodeNum);
-                        auto &spaceInletNode = state.dataLoopNodes->Node(space.spaceNodeNum);
-                        spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * space.outputFraction;
-                        spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail;
-                        spaceInletNode.MassFlowRateMinAvail = equipOutletNode.MassFlowRateMinAvail;
-                        spaceInletNode.Temp = equipOutletNode.Temp;
-                        spaceInletNode.HumRat = equipOutletNode.HumRat;
-                        spaceInletNode.CO2 = equipOutletNode.CO2;
-                    }
-                    updateSystemOutputRequired(state,
-                                               ControlledZoneNum,
-                                               spaceSysOutputProvided,
-                                               spaceLatOutputProvided,
-                                               state.dataZoneEnergyDemand->spaceSysEnergyDemand(space.spaceIndex),
-                                               state.dataZoneEnergyDemand->spaceSysMoistureDemand(space.spaceIndex),
-                                               EquipTypeNum);
-                }
+                state.dataZoneEquip->zoneEquipSplitter[zoneEquipList.zoneEquipSplitterIndex(EquipPtr)].distributeOutput(
+                    state, ControlledZoneNum, SysOutputProvided, LatOutputProvided, NonAirSysOutput, EquipTypeNum);
             } else {
                 thisZoneHB.NonAirSystemResponse += NonAirSysOutput;
             }
-            // Space HVAC TODO: For now, update both spaces and zone, but ultimately update one or the other
+            // Space HVAC TODO: For now, update both spaces and zone, but maybe ultimately update one or the other
             updateSystemOutputRequired(state,
                                        ControlledZoneNum,
                                        SysOutputProvided,
@@ -3665,6 +3591,14 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
             state.dataSize->CurTermUnitSizingNum = 0;
         } // zone equipment loop
     }     // End of controlled zone loop
+
+    // If SpaceHVAC is active calculate SpaceHVAC:EquipmentMixer inlet flow rates after simulating zone equipment
+    if (state.dataHeatBal->doSpaceHeatBalanceSimulation && !state.dataGlobal->DoingSizing) {
+        for (auto &thisSpaceHVACMixer : state.dataZoneEquip->zoneEquipMixer) {
+            thisSpaceHVACMixer.setInletFlows(state);
+        }
+    }
+
     state.dataSize->CurZoneEqNum = 0;
     state.dataZoneEquipmentManager->FirstPassZoneEquipFlag = false;
 
@@ -4425,6 +4359,29 @@ void updateSystemOutputRequired(EnergyPlusData &state,
     }
 }
 
+void adjustSystemOutputRequired(Real64 const sensibleRatio, // sensible load adjustment
+                                Real64 const latentRatio,   // latent load adjustment
+                                DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                                int const equipPriorityNum // index in PrioritySimOrder
+)
+{
+    // Adjust the zone energy demands for space thermostat control
+    energy.RemainingOutputRequired *= sensibleRatio;
+    energy.RemainingOutputReqToHeatSP *= sensibleRatio;
+    energy.RemainingOutputReqToCoolSP *= sensibleRatio;
+    moisture.RemainingOutputRequired *= latentRatio;
+    moisture.RemainingOutputReqToHumidSP *= latentRatio;
+    moisture.RemainingOutputReqToDehumidSP *= latentRatio;
+
+    energy.SequencedOutputRequired(equipPriorityNum) *= sensibleRatio;
+    energy.SequencedOutputRequiredToHeatingSP(equipPriorityNum) *= sensibleRatio;
+    energy.SequencedOutputRequiredToCoolingSP(equipPriorityNum) *= sensibleRatio;
+    moisture.SequencedOutputRequired(equipPriorityNum) *= latentRatio;
+    moisture.SequencedOutputRequiredToHumidSP(equipPriorityNum) *= latentRatio;
+    moisture.SequencedOutputRequiredToDehumidSP(equipPriorityNum) *= latentRatio;
+}
+
 void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
 {
 
@@ -4501,9 +4458,9 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
         BuildingZoneReturnFlow = 0.0;
 
         for (int ZoneNum1 = 1; ZoneNum1 <= state.dataGlobal->NumOfZones; ++ZoneNum1) {
-            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum1).IsControlled) continue;
             int ZoneNum = ZoneNum1;
             if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) ZoneNum = state.dataHeatBalFanSys->ZoneReOrder(ZoneNum1);
+            if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
             auto &massConservation = state.dataHeatBal->MassConservation(ZoneNum);
             auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
             Real64 TotExhaustAirMassFlowRate = 0.0;
@@ -5143,14 +5100,14 @@ void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIterat
                         state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
                     SumRetAirLatentGainRate = InternalHeatGains::SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
-                    thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
+                    thisZoneHB.latentGain += SumRetAirLatentGainRate;
                 }
             } else {
                 state.dataLoopNodes->Node(ReturnNode).HumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 SumRetAirLatentGainRate = InternalHeatGains::SumAllReturnAirLatentGains(state, ZoneNum, ReturnNode);
-                thisZoneHB.ZoneLatentGain += SumRetAirLatentGainRate;
+                thisZoneHB.latentGain += SumRetAirLatentGainRate;
             }
 
             state.dataLoopNodes->Node(ReturnNode).Enthalpy =
@@ -5281,21 +5238,21 @@ void CalcAirFlowSimple(EnergyPlusData &state,
     // Assign zone air temperature
     for (auto &thisZoneHB : state.dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MixingMAT = thisZoneHB.MAT;
-        thisZoneHB.MixingHumRat = thisZoneHB.ZoneAirHumRat;
+        thisZoneHB.MixingHumRat = thisZoneHB.airHumRat;
         // This is only temporary fix for CR8867.  (L. Gu 8/12)
         if (SysTimestepLoop == 1) {
             thisZoneHB.MixingMAT = thisZoneHB.XMPT;
-            thisZoneHB.MixingHumRat = thisZoneHB.WZoneTimeMinusP;
+            thisZoneHB.MixingHumRat = thisZoneHB.WTimeMinusP;
         }
     }
     if (state.dataHeatBal->doSpaceHeatBalance) {
         for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
             thisSpaceHB.MixingMAT = thisSpaceHB.MAT;
-            thisSpaceHB.MixingHumRat = thisSpaceHB.ZoneAirHumRat;
+            thisSpaceHB.MixingHumRat = thisSpaceHB.airHumRat;
             // This is only temporary fix for CR8867.  (L. Gu 8/12)
             if (SysTimestepLoop == 1) {
                 thisSpaceHB.MixingMAT = thisSpaceHB.XMPT;
-                thisSpaceHB.MixingHumRat = thisSpaceHB.WZoneTimeMinusP;
+                thisSpaceHB.MixingHumRat = thisSpaceHB.WTimeMinusP;
             }
         }
     }

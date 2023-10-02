@@ -1114,12 +1114,11 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
                           ObjexxFCL::Optional_int_const()); // process trend functions again using above data
     EXPECT_TRUE(anyRan);
 
-    int index(0);
-    int offset(27); // first 26 values in ErlExpression() are key words + 1 EMS global variable
+    int offset = 28; // first 27 values in ErlExpression() are constant and built-in variables
     EXPECT_TRUE(compare_enums(state->dataRuntimeLang->ErlExpression(1).Operator, ErlFunc::Round));
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(1).NumOperands, 1);
     EXPECT_EQ(state->dataRuntimeLang->ErlExpression(1).Operand.size(), 1u);
-    index = 1 + offset;
+    int index = 1 + offset;
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Name, "VAR1");
     EXPECT_EQ(state->dataRuntimeLang->ErlVariable(index).Value.Number, 2.0); // round(2.1)
 

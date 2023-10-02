@@ -675,13 +675,13 @@ namespace ExhaustAirSystemManager {
         }
 
         for (int ExhaustControlNum = 1; ExhaustControlNum <= state.dataZoneEquip->NumZoneExhaustControls; ++ExhaustControlNum) {
-            CalcZoneHVACExhaustControl(state, ExhaustControlNum, _);
+            CalcZoneHVACExhaustControl(state, ExhaustControlNum);
         }
 
         // report results if needed
     }
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, ObjexxFCL::Optional<bool const> FlowRatio)
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Real64 const FlowRatio)
     {
         // Calculate a zonehvac exhaust control system
 
@@ -695,7 +695,7 @@ namespace ExhaustAirSystemManager {
         Real64 Tin = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisExhCtrl.ZoneNum).ZT;
         Real64 thisExhCtrlAvailScheVal = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.AvailScheduleNum);
 
-        if (present(FlowRatio)) {
+        if (FlowRatio >= 0.0) {
             thisExhCtrl.BalancedFlow *= FlowRatio;
             thisExhCtrl.UnbalancedFlow *= FlowRatio;
 
@@ -713,11 +713,24 @@ namespace ExhaustAirSystemManager {
             Real64 FlowFrac = 0.0;
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 FlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.ExhaustFlowFractionScheduleNum);
+                if (FlowFrac < 0.0) {
+                    ShowWarningError(
+                        state, format("Exhaust Flow Fraction Schedule value is negative for Zone Exhaust Control Named: {};", thisExhCtrl.Name));
+                    ShowContinueError(state, "Reset value to zero and continue the simulation.");
+                    FlowFrac = 0.0;
+                }
             }
 
             Real64 MinFlowFrac = 0.0;
             if (thisExhCtrl.MinExhFlowFracScheduleNum > 0) {
                 MinFlowFrac = ScheduleManager::GetCurrentScheduleValue(state, thisExhCtrl.MinExhFlowFracScheduleNum);
+                if (MinFlowFrac < 0.0) {
+                    ShowWarningError(
+                        state,
+                        format("Minimum Exhaust Flow Fraction Schedule value is negative for Zone Exhaust Control Named: {};", thisExhCtrl.Name));
+                    ShowContinueError(state, "Reset value to zero and continue the simulation.");
+                    MinFlowFrac = 0.0;
+                }
             }
 
             if (FlowFrac < MinFlowFrac) {

@@ -4080,7 +4080,6 @@ void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const 
                                          "Central Heating Maximum System Air Flow Ratio",
                                          FinalSysSizing(AirLoopNum).SysAirMinFlowRat);
         }
-
         if (PrimaryAirSystems(AirLoopNum).DesignVolFlowRate < SmallAirVolFlow) {
             ShowSevereError(state,
                             format("SizeAirLoopBranches: AirLoopHVAC {} has air flow less than {:.4R} m3/s.",
@@ -4090,7 +4089,6 @@ void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const 
                               format("Primary air system volumetric flow rate = {:.4R} m3/s.", PrimaryAirSystems(AirLoopNum).DesignVolFlowRate));
             ShowContinueError(state, "Check flow rate inputs for components in this air loop and,");
             ShowContinueError(state, "if autosized, check Sizing:Zone and Sizing:System objects and related inputs.");
-            ShowFatalError(state, "Previous condition causes termination.");
         }
     }
 

@@ -6001,7 +6001,7 @@ void GetDXCoils(EnergyPlusData &state)
                                     thisDXCoil.Name,
                                     {},
                                     "Electricity",
-                                    "DHW",
+                                    "WaterSystems", //"DHW",
                                     {},
                                     "Plant");
             }
@@ -6038,7 +6038,7 @@ void GetDXCoils(EnergyPlusData &state)
                                 thisDXCoil.Name,
                                 {},
                                 "Electricity",
-                                "DHW",
+                                "WaterSystems", // "DHW",
                                 {},
                                 "Plant");
         }
@@ -7309,7 +7309,7 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
             thisDXCoil.EvapInletWetBulb = PsyTwbFnTdbWPb(state,
                                                          state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr).ZT,
-                                                         state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr).ZoneAirHumRat,
+                                                         state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr).airHumRat,
                                                          state.dataEnvrn->OutBaroPress,
                                                          RoutineName);
         }
@@ -9369,7 +9369,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
             auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
-            OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+            OutdoorHumRat = secZoneHB.airHumRat;
             OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         }
@@ -9392,7 +9392,7 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
             CondInletTemp = secZoneHB.ZT;
             CompAmbTemp = CondInletTemp; // assumes compressor is in same location as secondary coil
             OutdoorDryBulb = CondInletTemp;
-            OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+            OutdoorHumRat = secZoneHB.airHumRat;
             OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         }
@@ -11017,7 +11017,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
             if (thisDXCoil.IsSecondaryDXCoilInZone) {
                 auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
                 OutdoorDryBulb = secZoneHB.ZT;
-                OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+                OutdoorHumRat = secZoneHB.airHumRat;
                 OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 CompAmbTemp = OutdoorDryBulb;
@@ -11026,7 +11026,7 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     } else if (thisDXCoil.IsSecondaryDXCoilInZone) {
         auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
-        OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+        OutdoorHumRat = secZoneHB.airHumRat;
         OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
         CompAmbTemp = OutdoorDryBulb;
@@ -11499,7 +11499,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
             auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
-            OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+            OutdoorHumRat = secZoneHB.airHumRat;
             OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             CompAmbTemp = OutdoorDryBulb;
@@ -11507,7 +11507,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
     } else if (thisDXCoil.IsSecondaryDXCoilInZone) {
         auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
-        OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+        OutdoorHumRat = secZoneHB.airHumRat;
         OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
         CompAmbTemp = OutdoorDryBulb;
@@ -12731,14 +12731,14 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
             auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
-            OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+            OutdoorHumRat = secZoneHB.airHumRat;
             OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         }
     } else if (thisDXCoil.IsSecondaryDXCoilInZone) {
         auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
-        OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+        OutdoorHumRat = secZoneHB.airHumRat;
         OutdoorWetBulb = thisDXCoil.EvapInletWetBulb;
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
     } else {
@@ -13627,14 +13627,14 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
             auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
             OutdoorDryBulb = secZoneHB.ZT;
-            OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+            OutdoorHumRat = secZoneHB.airHumRat;
             // OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         }
     } else if (thisDXCoil.IsSecondaryDXCoilInZone) {
         auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
         OutdoorDryBulb = secZoneHB.ZT;
-        OutdoorHumRat = secZoneHB.ZoneAirHumRat;
+        OutdoorHumRat = secZoneHB.airHumRat;
         // OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
         OutdoorPressure = state.dataEnvrn->OutBaroPress;
     } else {
@@ -13813,8 +13813,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
 
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
-                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-                        thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
+                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                         DefrostEIRTempModFac = CurveValue(state, thisDXCoil.DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         LoadDueToDefrostLS =
                             (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (thisDXCoil.MSRatedTotCap(SpeedNumLS) / 1.01667);
@@ -14028,8 +14027,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
 
                 if (FractionalDefrostTime > 0.0) {
                     // Calculate defrost adjustment factors depending on defrost control strategy
-                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle &&
-                        thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::OnDemand) {
+                    if (thisDXCoil.DefrostStrategy == StandardRatings::DefrostStrat::ReverseCycle) {
                         LoadDueToDefrost = (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (thisDXCoil.MSRatedTotCap(1) / 1.01667);
                         DefrostEIRTempModFac = CurveValue(state, thisDXCoil.DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         thisDXCoil.DefrostPower = DefrostEIRTempModFac * (thisDXCoil.MSRatedTotCap(1) / 1.01667) * FractionalDefrostTime;
@@ -16316,7 +16314,7 @@ void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum)
             }
             thisDXCoil.SecCoilTotalHeatRemovalRate = -TotalHeatRemovalRate; // +DXCoil( DXCoilNum ).DefrostPower;
             EvapInletDryBulb = secZoneHB.ZT;
-            EvapInletHumRat = secZoneHB.ZoneAirHumRat;
+            EvapInletHumRat = secZoneHB.airHumRat;
             RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapInletDryBulb, EvapInletHumRat);
             EvapAirMassFlow = RhoAir * thisDXCoil.SecCoilAirFlow;
             ;
@@ -16372,7 +16370,7 @@ void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum)
         } break;
         case CoilDX_MultiSpeedHeating: {
             EvapInletDryBulb = secZoneHB.ZT;
-            EvapInletHumRat = secZoneHB.ZoneAirHumRat;
+            EvapInletHumRat = secZoneHB.airHumRat;
             RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapInletDryBulb, EvapInletHumRat);
             MSSpeedRatio = thisDXCoil.MSSpeedRatio;
             MSCycRatio = thisDXCoil.MSCycRatio;
@@ -17182,6 +17180,16 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
         (PartLoadRatio > 0.0) && (OutdoorDryBulb > thisDXCoil.MinOATCompressor)) {
 
         TotCap = thisDXCoil.RatedTotCap(Mode);
+        HeatingCapacityMultiplier = 1.0;
+        // Modify total heating capacity based on defrost heating capacity multiplier
+        // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
+        if (present(MaxHeatCap)) {
+            TotCapAdj = min(MaxHeatCap, TotCap * HeatingCapacityMultiplier);
+            TotCap = min(MaxHeatCap, TotCap);
+        } else {
+            TotCapAdj = TotCap * HeatingCapacityMultiplier;
+        }
+
         QCoilReq = PartLoadRatio * TotCap;
         if (PartLoadRatio == 0.0) {
             AirMassFlowMin = state.dataHVACVarRefFlow->OACompOffMassFlow;
@@ -17221,18 +17229,8 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
 
         // Initializing defrost adjustment factors
         LoadDueToDefrost = 0.0;
-        HeatingCapacityMultiplier = 1.0;
         FractionalDefrostTime = 0.0;
         InputPowerMultiplier = 1.0;
-
-        // Modify total heating capacity based on defrost heating capacity multiplier
-        // MaxHeatCap passed from parent object VRF Condenser and is used to limit capacity of TU's to that available from condenser
-        if (present(MaxHeatCap)) {
-            TotCapAdj = min(MaxHeatCap, TotCap * HeatingCapacityMultiplier);
-            TotCap = min(MaxHeatCap, TotCap);
-        } else {
-            TotCapAdj = TotCap * HeatingCapacityMultiplier;
-        }
 
         // Calculate full load outlet conditions
         FullLoadOutAirEnth = InletAirEnthalpy + TotCapAdj / AirMassFlow;

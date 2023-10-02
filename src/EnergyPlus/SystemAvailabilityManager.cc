@@ -4701,7 +4701,7 @@ namespace SystemAvailabilityManager {
                 // Enthalpy control
             } break;
             case HybridVentMode_Enth: {
-                ZoneAirEnthalpy = PsyHFnTdbW(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
+                ZoneAirEnthalpy = PsyHFnTdbW(thisZoneHB.MAT, thisZoneHB.airHumRat);
                 if (state.dataEnvrn->OutEnthalpy >= hybridVentMgr.MinOutdoorEnth && state.dataEnvrn->OutEnthalpy <= hybridVentMgr.MaxOutdoorEnth) {
                     hybridVentMgr.VentilationCtrl = HybridVentCtrl_Open;
                 } else {
@@ -4872,8 +4872,8 @@ namespace SystemAvailabilityManager {
 
                 // Dew point control mode
                 if (hybridVentMgr.ControlMode == HybridVentMode_DewPoint) {
-                    ZoneAirRH = PsyRhFnTdbWPb(state, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
-                    ZoneAirDewPoint = PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+                    ZoneAirRH = PsyRhFnTdbWPb(state, thisZoneHB.MAT, thisZoneHB.airHumRat, state.dataEnvrn->OutBaroPress) * 100.0;
+                    ZoneAirDewPoint = PsyTdpFnWPb(state, thisZoneHB.airHumRat, state.dataEnvrn->OutBaroPress);
                     if (state.dataZoneCtrls->NumHumidityControlZones == 0) {
                         ++hybridVentMgr.DewPointNoRHErrCount;
                         if (hybridVentMgr.DewPointNoRHErrCount < 2) {

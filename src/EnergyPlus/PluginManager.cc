@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -223,27 +224,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 }
                 std::string const resourceType = EnergyPlus::Util::makeUPPER(fields.at("resource_type").get<std::string>());
                 std::string sResourceType;
-                if (resourceType == "ELECTRICITY") {
-                    sResourceType = "Electricity";
-                } else if (resourceType == "NATURALGAS") {
-                    sResourceType = "NaturalGas";
-                } else if (resourceType == "GASOLINE") {
-                    sResourceType = "Gasoline";
-                } else if (resourceType == "DIESEL") {
-                    sResourceType = "Diesel";
-                } else if (resourceType == "COAL") {
-                    sResourceType = "Coal";
-                } else if (resourceType == "FUELOILNO1") {
-                    sResourceType = "FuelOilNo1";
-                } else if (resourceType == "FUELOILNO2") {
-                    sResourceType = "FuelOilNo2";
-                } else if (resourceType == "OTHERFUEL1") {
-                    sResourceType = "OtherFuel1";
-                } else if (resourceType == "OTHERFUEL2") {
-                    sResourceType = "OtherFuel2";
-                } else if (resourceType == "PROPANE") {
-                    sResourceType = "Propane";
-                } else if (resourceType == "WATERUSE") {
+                if (resourceType == "WATERUSE") {
                     sResourceType = "Water";
                 } else if (resourceType == "ONSITEWATERPRODUCED") {
                     sResourceType = "OnSiteWater";
@@ -255,16 +236,6 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     sResourceType = "WellWater";
                 } else if (resourceType == "CONDENSATEWATERCOLLECTED") {
                     sResourceType = "Condensate";
-                } else if (resourceType == "ENERGYTRANSFER") {
-                    sResourceType = "EnergyTransfer";
-                } else if (resourceType == "STEAM") {
-                    sResourceType = "Steam";
-                } else if (resourceType == "DISTRICTCOOLING") {
-                    sResourceType = "DistrictCooling";
-                } else if (resourceType == "DISTRICTHEATINGWATER") {
-                    sResourceType = "DistrictHeatingWater";
-                } else if (resourceType == "DISTRICTHEATINGSTEAM") {
-                    sResourceType = "DistrictHeatingSteam";
                 } else if (resourceType == "ELECTRICITYPRODUCEDONSITE") {
                     sResourceType = "ElectricityProduced";
                 } else if (resourceType == "SOLARWATERHEATING") {
@@ -272,8 +243,12 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 } else if (resourceType == "SOLARAIRHEATING") {
                     sResourceType = "SolarAir";
                 } else {
-                    ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Resource Type = {}", resourceType));
-                    ShowFatalError(state, "Python plugin output variable input problem causes program termination");
+                    if (static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, resourceType)) != Constant::eResource::Invalid) {
+                        sResourceType = Constant::eResourceNames[getEnumValue(Constant::eResourceNamesUC, resourceType)];
+                    } else {
+                        ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Resource Type = {}", resourceType));
+                        ShowFatalError(state, "Python plugin output variable input problem causes program termination");
+                    }
                 }
 
                 // Group Type

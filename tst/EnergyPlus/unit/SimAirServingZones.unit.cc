@@ -1033,6 +1033,142 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
 }
 
+// this test checks whether an AirLoop with 0 airflow will raise the correct severe error
+TEST_F(EnergyPlusFixture, SizeAirLoopBranches_0Airflow)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Space1;                  !- Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space1,                   !- Zone Name",
+        "    Space1 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space1-1 In Node,         !- Zone Air Inlet Node or NodeList Name",
+        "    Space1 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space1 Node,              !- Zone Air Node Name",
+        "    Space1 Ret Node;          !- Zone Return Air Node Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space1 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE1-1 ATU,            !- Name",
+        "    Space1-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE1-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE1-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space1-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE1-1 ATU In Node,    !- Air Inlet Node Name",
+        "    0,                       !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  BranchList,",
+        "    VAV Sys 1 Branches,      !- Name",
+        "    VAV Sys 1 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 1 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 1,            !- Component 4 Name",
+        "    VAV Sys 1 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 1,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 1 Avail List,    !- Availability Manager List Name",
+        "    0.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 1 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 1,  !- Name",
+        "    Zone Eq In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter,  !- Name",
+        "    Zone Eq In Node,         !- Inlet Node Name",
+        "    SPACE1-1 ATU In Node;    !- Outlet 1 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath1,          !- Name",
+        "    Demand Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer,   !- Name",
+        "    Demand Out Node,         !- Outlet Node Name",
+        "    Space1 Ret Node;         !- Inlet 1 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 1,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    autosize,                !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.0,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 1 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(*state, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream(""));
+    DataZoneEquipment::GetZoneEquipmentData(*state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SingleDuct::GetSysInput(*state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SplitterComponent::GetSplitterInput(*state);
+    EXPECT_TRUE(compare_err_stream(""));
+    SimAirServingZones::GetAirPathData(*state);
+    // Expect warnings about no controllers, clear err_stream
+    EXPECT_TRUE(has_err_output(true));
+    SimAirServingZones::InitAirLoops(*state, true);
+    // Expect warnings about 0 airflow
+    std::string error_msg = delimited_string({
+        "   ** Severe  ** SizeAirLoopBranches: AirLoopHVAC VAV SYS 1 has air flow less than 1.0000E-003 m3/s.",
+        "   **   ~~~   ** Primary air system volumetric flow rate = 0.0000 m3/s.",
+        "   **   ~~~   ** Check flow rate inputs for components in this air loop and,",
+        "   **   ~~~   ** if autosized, check Sizing:Zone and Sizing:System objects and related inputs.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_msg));
+}
+
 TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
 {
 

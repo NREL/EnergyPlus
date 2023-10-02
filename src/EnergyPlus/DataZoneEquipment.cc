@@ -50,6 +50,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -65,9 +66,12 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus::DataZoneEquipment {
 
@@ -155,7 +159,7 @@ static constexpr std::array<std::string_view, static_cast<int>(ZoneEquipTstatCon
     "SINGLESPACE", "MAXIMUM", "IDEAL"};
 
 static constexpr std::array<std::string_view, static_cast<int>(SpaceEquipSizingBasis::Num)> spaceEquipSizingBasisNamesUC = {
-    "DESIGNLOAD", "FLOORAREA", "VOLUME", "PERIMETERLENGTH"};
+    "DESIGNCOOLINGLOAD", "DESIGNHEATINGLOAD", "FLOORAREA", "VOLUME", "PERIMETERLENGTH"};
 
 void GetZoneEquipmentData(EnergyPlusData &state)
 {
@@ -492,6 +496,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             auto const &objectFields = instance.value();
             auto &thisZeqSplitter = state.dataZoneEquip->zoneEquipSplitter[zeqSplitterNum];
             thisZeqSplitter.Name = Util::makeUPPER(instance.key());
+            thisZeqSplitter.spaceEquipType = DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter;
             ip->markObjectAsUsed(CurrentModuleObject, instance.key());
 
             std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
@@ -528,6 +533,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
             auto const &objectFields = instance.value();
             auto &thisZeqMixer = state.dataZoneEquip->zoneEquipMixer[zeqMixerNum];
             thisZeqMixer.Name = Util::makeUPPER(instance.key());
+            thisZeqMixer.spaceEquipType = DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer;
             ip->markObjectAsUsed(CurrentModuleObject, instance.key());
 
             std::string zoneName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_name");
@@ -1169,13 +1175,13 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("processZoneEquipSplitterInput: "); // include trailing blank space
     auto &ip = state.dataInputProcessing->inputProcessor;
     std::string const zeqTypeName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_object_type");
-    thisZeqSplitter.equipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
+    thisZeqSplitter.zoneEquipType = DataZoneEquipment::ZoneEquipType(getEnumValue(zoneEquipTypeNamesUC, zeqTypeName));
     // SpaceHVAC TODO: Copied this block from processZoneEquipmentInput section for ZoneHVAC:EquipmentList - seems this could be simplified
-    if (thisZeqSplitter.equipType == ZoneEquipType::Invalid) {
+    if (thisZeqSplitter.zoneEquipType == ZoneEquipType::Invalid) {
         if (zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW" || zeqTypeName == "ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC") {
-            thisZeqSplitter.equipType = ZoneEquipType::LowTemperatureRadiant;
+            thisZeqSplitter.zoneEquipType = ZoneEquipType::LowTemperatureRadiant;
         } else if (zeqTypeName == "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER") {
-            thisZeqSplitter.equipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
+            thisZeqSplitter.zoneEquipType = DataZoneEquipment::ZoneEquipType::HeatPumpWaterHeater;
         } else {
             ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
             ShowContinueError(state, format("..Invalid Equipment Type = {}", zeqTypeName));
@@ -1183,14 +1189,14 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         }
     }
 
-    thisZeqSplitter.equipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
+    thisZeqSplitter.zoneEquipName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_name");
 
     // Search zone equipment list for matching equip type and name
     bool found = false;
     auto &thisZoneEqList = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(zoneNum).EquipListIndex);
     for (int eqCount = 1; eqCount <= thisZoneEqList.NumOfEquipTypes; ++eqCount) {
-        if (thisZeqSplitter.equipType == thisZoneEqList.EquipType(eqCount)) {
-            if (thisZeqSplitter.equipName == thisZoneEqList.EquipName(eqCount)) {
+        if (thisZeqSplitter.zoneEquipType == thisZoneEqList.EquipType(eqCount)) {
+            if (thisZeqSplitter.zoneEquipName == thisZoneEqList.EquipName(eqCount)) {
                 found = true;
                 // Set index in zone equipment list pointing to this SpaceHVAC:ZoneEquipmentSplitter
                 thisZoneEqList.zoneEquipSplitterIndex = zeqSplitterNum;
@@ -1202,8 +1208,8 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
     }
     if (!found) {
         ShowSevereError(state, format("{}{} = {}", RoutineName, zeqSplitterModuleObject, thisZeqSplitter.Name));
-        ShowContinueError(state,
-                          format(".. Zone Equipment Object Type={} and Zone Equipment Name={} not found", zeqTypeName, thisZeqSplitter.equipName));
+        ShowContinueError(
+            state, format(".. Zone Equipment Object Type={} and Zone Equipment Name={} not found", zeqTypeName, thisZeqSplitter.zoneEquipName));
         ShowContinueError(state, format(".. in ZoneHVAC:EquipmentList={}", thisZoneEqList.Name));
         state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
         return;
@@ -1214,7 +1220,7 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
         GetOnlySingleNode(state,
                           ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_outlet_node_name"),
                           state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                          DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter,
+                          thisZeqSplitter.spaceEquipType,
                           thisZeqSplitter.Name,
                           DataLoopNode::NodeFluidType::Air,
                           DataLoopNode::ConnectionType::Inlet,
@@ -1252,17 +1258,20 @@ void processZoneEquipSplitterInput(EnergyPlusData &state,
                 ShowContinueError(state, format("Space Name={} not found.", spaceName));
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             } else {
-                thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_fraction");
+                thisZeqSpace.fraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_fraction");
                 thisZeqSpace.spaceNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_supply_node_name"),
                                       state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentSplitter,
+                                      thisZeqSplitter.spaceEquipType,
                                       thisZeqSplitter.Name,
                                       DataLoopNode::NodeFluidType::Air,
                                       DataLoopNode::ConnectionType::Outlet,
                                       NodeInputManager::CompFluidStream::Primary,
                                       objectIsParent);
+                if (thisZeqSplitter.controlSpaceIndex == thisZeqSpace.spaceIndex) {
+                    thisZeqSplitter.controlSpaceNumber = spaceCount;
+                }
             }
         }
     }
@@ -1282,7 +1291,7 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
     thisZeqMixer.zoneEquipInletNodeNum = GetOnlySingleNode(state,
                                                            ip->getAlphaFieldValue(objectFields, objectSchemaProps, "zone_equipment_inlet_node_name"),
                                                            state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer,
+                                                           thisZeqMixer.spaceEquipType,
                                                            thisZeqMixer.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Outlet,
@@ -1326,11 +1335,11 @@ void processZoneEquipMixerInput(EnergyPlusData &state,
                 ShowContinueError(state, format("Space Name={} not found.", spaceName));
                 state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
             } else {
-                thisZeqSpace.outputFraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_fraction");
+                thisZeqSpace.fraction = ip->getRealFieldValue(extensibleInstance, extensionSchemaProps, "space_fraction");
                 thisZeqSpace.spaceNodeNum = GetOnlySingleNode(state,
                                                               ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "space_node_name"),
                                                               state.dataZoneEquip->GetZoneEquipmentDataErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::SpaceHVACZoneEquipmentMixer,
+                                                              thisZeqMixer.spaceEquipType,
                                                               thisZeqMixer.Name,
                                                               DataLoopNode::NodeFluidType::Air,
                                                               DataLoopNode::ConnectionType::Inlet,
@@ -1725,4 +1734,345 @@ void scaleInletFlows(EnergyPlusData &state, int const zoneNodeNum, int const spa
     spaceNode.MassFlowRateMin = zoneNode.MassFlowRateMin * frac;
     spaceNode.MassFlowRateMinAvail = zoneNode.MassFlowRateMinAvail * frac;
 }
+
+void ZoneEquipmentSplitterMixer::size(EnergyPlusData &state)
+{
+    bool anyAutoSize = std::any_of(spaces.begin(), spaces.end(), [](ZoneEquipSplitterMixerSpace &s) { return s.fraction == DataSizing::AutoSize; });
+    if (!anyAutoSize) return;
+
+    // Calculate total of space fraction basis value across all spaces for this splitter or mixer
+    // including spaces which are not autosized here.
+    Real64 spacesTotal = 0.0;
+    switch (this->spaceSizingBasis) {
+    case DataZoneEquipment::SpaceEquipSizingBasis::DesignCoolingLoad:
+        for (auto &thisSpace : this->spaces) {
+            spacesTotal += state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesCoolLoad;
+        }
+        break;
+    case DataZoneEquipment::SpaceEquipSizingBasis::DesignHeatingLoad:
+        for (auto &thisSpace : this->spaces) {
+            spacesTotal += state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesHeatLoad;
+        }
+        break;
+    case DataZoneEquipment::SpaceEquipSizingBasis::FloorArea:
+        for (auto &thisSpace : this->spaces) {
+            spacesTotal += state.dataHeatBal->space(thisSpace.spaceIndex).FloorArea;
+        }
+        break;
+    case DataZoneEquipment::SpaceEquipSizingBasis::Volume:
+        for (auto &thisSpace : this->spaces) {
+            spacesTotal += state.dataHeatBal->space(thisSpace.spaceIndex).Volume;
+        }
+        break;
+    case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
+        ShowFatalError(state,
+                       format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}={}",
+                              DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
+                              BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                              this->Name));
+        break;
+    default:
+        break;
+    }
+
+    if (spacesTotal < 0.00001) {
+        ShowSevereError(state,
+                        format("ZoneEquipmentSplitterMixer::size: Total {} is zero for {}={}. Unable to autosize Space Fractions.",
+                               DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
+                               BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                               this->Name));
+        Real64 spaceFrac = 1.0 / (int)this->spaces.size();
+        ShowContinueError(state, format("Setting space fractions to 1/number of spaces = {}.", spaceFrac));
+        for (auto &thisSpace : this->spaces) {
+            thisSpace.fraction = spaceFrac;
+        }
+        return;
+    }
+
+    // Calculate space fractions
+    int spaceCounter = 0;
+    for (auto &thisSpace : this->spaces) {
+        ++spaceCounter;
+        if (thisSpace.fraction == DataSizing::AutoSize) {
+            switch (this->spaceSizingBasis) {
+            case DataZoneEquipment::SpaceEquipSizingBasis::DesignCoolingLoad:
+                thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesCoolLoad / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::DesignHeatingLoad:
+                thisSpace.fraction = state.dataSize->FinalSpaceSizing(thisSpace.spaceIndex).DesHeatLoad / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::FloorArea:
+                thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).FloorArea / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::Volume:
+                thisSpace.fraction = state.dataHeatBal->space(thisSpace.spaceIndex).Volume / spacesTotal;
+                break;
+            case DataZoneEquipment::SpaceEquipSizingBasis::PerimeterLength:
+                ShowFatalError(state,
+                               format("ZoneEquipmentSplitterMixer::size: Space Fraction Method={} not supported for {}={}",
+                                      DataZoneEquipment::spaceEquipSizingBasisNamesUC[(int)this->spaceSizingBasis],
+                                      BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                                      this->Name));
+                break;
+            default:
+                break;
+            }
+            BaseSizer::reportSizerOutput(state,
+                                         BranchNodeConnections::ConnectionObjectTypeNames[(int)this->spaceEquipType],
+                                         this->Name,
+                                         format("Space {} Fraction", spaceCounter),
+                                         thisSpace.fraction);
+        }
+    }
+}
+
+void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
+{
+    if (this->zoneEquipInletNodeNum == 0) return;
+
+    Real64 sumEnthalpy = 0.0;
+    Real64 sumHumRat = 0.0;
+    Real64 sumCO2 = 0.0;
+    Real64 sumPressure = 0.0;
+    Real64 sumFractions = 0.0;
+    auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
+    for (auto &mixerSpace : this->spaces) {
+        auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
+        sumEnthalpy += spaceOutletNode.Enthalpy * mixerSpace.fraction;
+        sumHumRat += spaceOutletNode.HumRat * mixerSpace.fraction;
+        sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
+        sumPressure += spaceOutletNode.Press * mixerSpace.fraction;
+        sumFractions += mixerSpace.fraction;
+    }
+    equipInletNode.Enthalpy = sumEnthalpy / sumFractions;
+    equipInletNode.HumRat = sumHumRat / sumFractions;
+    equipInletNode.CO2 = sumCO2 / sumFractions;
+    equipInletNode.Press = sumPressure / sumFractions;
+
+    // Use Enthalpy and humidity ratio to get outlet temperature from psych chart
+    equipInletNode.Temp = Psychrometrics::PsyTdbFnHW(equipInletNode.Enthalpy, equipInletNode.HumRat);
+}
+
+void ZoneEquipmentMixer::setInletFlows(EnergyPlusData &state)
+{
+    if (this->zoneEquipInletNodeNum == 0) return;
+
+    auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
+    for (auto &mixerSpace : this->spaces) {
+        auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
+        spaceOutletNode.MassFlowRate = equipInletNode.MassFlowRate * mixerSpace.fraction;
+        spaceOutletNode.MassFlowRateMaxAvail = equipInletNode.MassFlowRateMaxAvail * mixerSpace.fraction;
+        spaceOutletNode.MassFlowRateMinAvail = equipInletNode.MassFlowRateMinAvail * mixerSpace.fraction;
+    }
+}
+
+void ZoneEquipmentSplitter::adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum)
+{
+    auto &thisZoneEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
+    auto &thisZoneMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum);
+    Real64 sensibleRatio = 1.0;
+    Real64 latentRatio = 1.0;
+    switch (this->tstatControl) {
+    case DataZoneEquipment::ZoneEquipTstatControl::Ideal:
+        return;
+        break; // Do nothing
+    case DataZoneEquipment::ZoneEquipTstatControl::SingleSpace: {
+        Real64 controlSpaceFrac = this->spaces[this->controlSpaceNumber].fraction;
+        if (controlSpaceFrac > 0.0) {
+            if (thisZoneEnergyDemand.RemainingOutputRequired != 0.0) {
+                sensibleRatio = (state.dataZoneEnergyDemand->spaceSysEnergyDemand(this->controlSpaceIndex).RemainingOutputRequired /
+                                 thisZoneEnergyDemand.RemainingOutputRequired) /
+                                controlSpaceFrac;
+            }
+            if (thisZoneMoistureDemand.RemainingOutputRequired != 0.0) {
+                latentRatio = (state.dataZoneEnergyDemand->spaceSysMoistureDemand(this->controlSpaceIndex).RemainingOutputRequired /
+                               thisZoneMoistureDemand.RemainingOutputRequired) /
+                              controlSpaceFrac;
+            }
+        }
+    } break;
+    case DataZoneEquipment::ZoneEquipTstatControl::Maximum: {
+        int maxSpaceIndex = 0;
+        Real64 maxDeltaTemp = 0.0; // Only positive deltaTemps are relevant
+        Real64 maxSpaceFrac = 1.0;
+        for (auto &splitterSpace : this->spaces) {
+            Real64 spaceTemp =
+                state.dataZoneTempPredictorCorrector->spaceHeatBalance(splitterSpace.spaceIndex).T1; // Based on calcPredictedSystemLoad usage
+            Real64 spaceDeltaTemp = max((state.dataHeatBalFanSys->ZoneThermostatSetPointLo(zoneNum) - spaceTemp),
+                                        (spaceTemp - state.dataHeatBalFanSys->ZoneThermostatSetPointHi(zoneNum)));
+            if (spaceDeltaTemp > maxDeltaTemp) {
+                maxSpaceIndex = splitterSpace.spaceIndex;
+                maxSpaceFrac = splitterSpace.fraction;
+                maxDeltaTemp = spaceDeltaTemp;
+            }
+        }
+        if ((maxSpaceIndex > 0) && (maxSpaceFrac > 0.0)) {
+            if (thisZoneEnergyDemand.RemainingOutputRequired != 0.0) {
+                sensibleRatio = (state.dataZoneEnergyDemand->spaceSysEnergyDemand(maxSpaceIndex).RemainingOutputRequired /
+                                 thisZoneEnergyDemand.RemainingOutputRequired) /
+                                maxSpaceFrac;
+            }
+            if (thisZoneMoistureDemand.RemainingOutputRequired != 0.0) {
+                latentRatio = (state.dataZoneEnergyDemand->spaceSysMoistureDemand(maxSpaceIndex).RemainingOutputRequired /
+                               thisZoneMoistureDemand.RemainingOutputRequired) /
+                              maxSpaceFrac;
+            }
+        }
+    } break;
+    default:
+        break;
+    }
+    // Save unadjusted zone loads to restore later
+    this->saveZoneSysSensibleDemand = thisZoneEnergyDemand;
+    this->saveZoneSysMoistureDemand = thisZoneMoistureDemand;
+    // Apply zone load adjustment
+    ZoneEquipmentManager::adjustSystemOutputRequired(sensibleRatio,
+                                                     latentRatio,
+                                                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum),
+                                                     state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum),
+                                                     equipTypeNum);
+}
+
+void ZoneEquipmentSplitter::distributeOutput(EnergyPlusData &state,
+                                             int const zoneNum,
+                                             Real64 const sysOutputProvided,
+                                             Real64 const latOutputProvided,
+                                             Real64 const nonAirSysOutput,
+                                             int const equipTypeNum)
+{
+    for (auto &splitterSpace : this->spaces) {
+        if (this->tstatControl != DataZoneEquipment::ZoneEquipTstatControl::Ideal) {
+            // Restore zone loads to unadjusted values (for all ZoneEquipTstatControl types except Ideal)
+            state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum) = this->saveZoneSysSensibleDemand;
+            state.dataZoneEnergyDemand->ZoneSysMoistureDemand(zoneNum) = this->saveZoneSysMoistureDemand;
+        }
+
+        Real64 spaceFraction = splitterSpace.fraction;
+        if (this->tstatControl == DataZoneEquipment::ZoneEquipTstatControl::Ideal) {
+            // Proportion output by sensible space load / zone load (varies every timestep, overrides outputFraction)
+            auto &thisZoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(zoneNum);
+            if (thisZoneSysEnergyDemand.RemainingOutputRequired != 0.0) {
+                spaceFraction = state.dataZoneEnergyDemand->spaceSysEnergyDemand(splitterSpace.spaceIndex).RemainingOutputRequired /
+                                thisZoneSysEnergyDemand.RemainingOutputRequired;
+            }
+        }
+
+        Real64 spaceSysOutputProvided = sysOutputProvided * spaceFraction;
+        Real64 spaceLatOutputProvided = latOutputProvided * spaceFraction;
+        state.dataZoneTempPredictorCorrector->spaceHeatBalance(splitterSpace.spaceIndex).NonAirSystemResponse += nonAirSysOutput * spaceFraction;
+        if (this->zoneEquipOutletNodeNum > 0 && splitterSpace.spaceNodeNum > 0) {
+            auto &equipOutletNode = state.dataLoopNodes->Node(this->zoneEquipOutletNodeNum);
+            auto &spaceInletNode = state.dataLoopNodes->Node(splitterSpace.spaceNodeNum);
+            spaceInletNode.MassFlowRate = equipOutletNode.MassFlowRate * spaceFraction;
+            spaceInletNode.MassFlowRateMaxAvail = equipOutletNode.MassFlowRateMaxAvail * spaceFraction;
+            spaceInletNode.MassFlowRateMinAvail = equipOutletNode.MassFlowRateMinAvail * spaceFraction;
+            spaceInletNode.Temp = equipOutletNode.Temp;
+            spaceInletNode.HumRat = equipOutletNode.HumRat;
+            spaceInletNode.CO2 = equipOutletNode.CO2;
+        }
+        ZoneEquipmentManager::updateSystemOutputRequired(state,
+                                                         zoneNum,
+                                                         spaceSysOutputProvided,
+                                                         spaceLatOutputProvided,
+                                                         state.dataZoneEnergyDemand->spaceSysEnergyDemand(splitterSpace.spaceIndex),
+                                                         state.dataZoneEnergyDemand->spaceSysMoistureDemand(splitterSpace.spaceIndex),
+                                                         equipTypeNum);
+    }
+}
+
+void EquipConfiguration::beginEnvirnInit(EnergyPlusData &state)
+{
+    auto &zoneNode = state.dataLoopNodes->Node(this->ZoneNode);
+    zoneNode.Temp = 20.0;
+    zoneNode.MassFlowRate = 0.0;
+    zoneNode.Quality = 1.0;
+    zoneNode.Press = state.dataEnvrn->OutBaroPress;
+    zoneNode.HumRat = state.dataEnvrn->OutHumRat;
+    zoneNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneNode.Temp, zoneNode.HumRat);
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        zoneNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+    }
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        zoneNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+    }
+
+    for (int const nodeNum : this->InletNode) {
+        auto &inNode = state.dataLoopNodes->Node(nodeNum);
+        inNode.Temp = 20.0;
+        inNode.MassFlowRate = 0.0;
+        inNode.Quality = 1.0;
+        inNode.Press = state.dataEnvrn->OutBaroPress;
+        inNode.HumRat = state.dataEnvrn->OutHumRat;
+        inNode.Enthalpy = Psychrometrics::PsyHFnTdbW(inNode.Temp, inNode.HumRat);
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            inNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            inNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+        }
+    }
+
+    for (int const nodeNum : this->ExhaustNode) {
+        auto &exhNode = state.dataLoopNodes->Node(nodeNum);
+        exhNode.Temp = 20.0;
+        exhNode.MassFlowRate = 0.0;
+        exhNode.Quality = 1.0;
+        exhNode.Press = state.dataEnvrn->OutBaroPress;
+        exhNode.HumRat = state.dataEnvrn->OutHumRat;
+        exhNode.Enthalpy = Psychrometrics::PsyHFnTdbW(exhNode.Temp, exhNode.HumRat);
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            exhNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            exhNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+        }
+    }
+
+    // BG CR 7122 following resets return air node.
+    int NumRetNodes = this->NumReturnNodes;
+    if (NumRetNodes > 0) {
+        for (int const nodeNum : this->ReturnNode) {
+            auto &returnNode = state.dataLoopNodes->Node(nodeNum);
+            returnNode.Temp = 20.0;
+            returnNode.MassFlowRate = 0.0;
+            returnNode.Quality = 1.0;
+            returnNode.Press = state.dataEnvrn->OutBaroPress;
+            returnNode.HumRat = state.dataEnvrn->OutHumRat;
+            returnNode.Enthalpy = Psychrometrics::PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);
+            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                returnNode.CO2 = state.dataContaminantBalance->OutdoorCO2;
+            }
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                returnNode.GenContam = state.dataContaminantBalance->OutdoorGC;
+            }
+        }
+    }
+}
+
+void EquipConfiguration::hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACIteration)
+{
+    auto &zoneNode = state.dataLoopNodes->Node(this->ZoneNode);
+    this->ExcessZoneExh = 0.0;
+
+    if (FirstHVACIteration) {
+        for (int const nodeNum : this->ExhaustNode) {
+            auto &exhNode = state.dataLoopNodes->Node(nodeNum);
+            exhNode.Temp = zoneNode.Temp;
+            exhNode.HumRat = zoneNode.HumRat;
+            exhNode.Enthalpy = zoneNode.Enthalpy;
+            exhNode.Press = zoneNode.Press;
+            exhNode.Quality = zoneNode.Quality;
+            exhNode.MassFlowRate = 0.0;
+            exhNode.MassFlowRateMaxAvail = 0.0;
+            exhNode.MassFlowRateMinAvail = 0.0;
+            if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+                exhNode.CO2 = zoneNode.CO2;
+            }
+            if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+                exhNode.GenContam = zoneNode.GenContam;
+            }
+        }
+    }
+}
+
 } // namespace EnergyPlus::DataZoneEquipment

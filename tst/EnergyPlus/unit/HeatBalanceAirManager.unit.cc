@@ -860,4 +860,62 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_GetMixingAndCrossMixing)
     }
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceAirManager_InitSimpleMixingConvectiveHeatGains_Test)
+{
+    Real64 expectedResult1;
+    Real64 expectedResult2;
+    Real64 constexpr allowedTolerance = 0.00001;
+
+    // Base line data that do not change between tests
+    state->dataHeatBal->TotRefDoorMixing = 0;
+    state->dataHeatBal->TotCrossMixing = 0;
+    state->dataHeatBal->TotMixing = 3;
+    state->dataHeatBal->Mixing.allocate(state->dataHeatBal->TotMixing);
+    state->dataHeatBal->Mixing(1).SchedPtr = -1; // this returns a value of one
+    state->dataHeatBal->Mixing(2).SchedPtr = -1; // this returns a value of one
+    state->dataHeatBal->Mixing(3).SchedPtr = -1; // this returns a value of one
+    state->dataHeatBal->Mixing(1).EMSSimpleMixingOn = false;
+    state->dataHeatBal->Mixing(2).EMSSimpleMixingOn = false;
+    state->dataHeatBal->Mixing(3).EMSSimpleMixingOn = false;
+    state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
+    state->dataHeatBal->MassConservation.allocate(2);
+    state->dataHeatBal->MassConservation(1).NumReceivingZonesMixingObject = 2;
+    state->dataHeatBal->MassConservation(2).NumReceivingZonesMixingObject = 0;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr.allocate(2);
+
+    // Test 1: not air flow flag--don't do anything
+    state->dataHeatBal->AirFlowFlag = false;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1) = -9999.9;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2) = -9999.9;
+    expectedResult1 = -9999.9;
+    expectedResult2 = -9999.9;
+    HeatBalanceAirManager::InitSimpleMixingConvectiveHeatGains(*state);
+    EXPECT_NEAR(expectedResult1, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1), allowedTolerance);
+    EXPECT_NEAR(expectedResult2, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2), allowedTolerance);
+
+    // Test 2: yes to air flow flag, but no mixing flow sum, set ZoneMixingReceivingFr to zero
+    state->dataHeatBal->AirFlowFlag = true;
+    state->dataHeatBal->Mixing(1).DesignLevel = 0.0;
+    state->dataHeatBal->Mixing(2).DesignLevel = 0.0;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1) = -9999.9;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2) = -9999.9;
+    expectedResult1 = 0.0;
+    expectedResult2 = 0.0;
+    HeatBalanceAirManager::InitSimpleMixingConvectiveHeatGains(*state);
+    EXPECT_NEAR(expectedResult1, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1), allowedTolerance);
+    EXPECT_NEAR(expectedResult2, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2), allowedTolerance);
+
+    // Test 3: yes to air flow flag, with mixing, ZoneMixingReceivingFr set to appropriate value
+    state->dataHeatBal->AirFlowFlag = true;
+    state->dataHeatBal->Mixing(1).DesignLevel = 100.0;
+    state->dataHeatBal->Mixing(2).DesignLevel = 300.0;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1) = -9999.9;
+    state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2) = -9999.9;
+    expectedResult1 = 0.25;
+    expectedResult2 = 0.75;
+    HeatBalanceAirManager::InitSimpleMixingConvectiveHeatGains(*state);
+    EXPECT_NEAR(expectedResult1, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(1), allowedTolerance);
+    EXPECT_NEAR(expectedResult2, state->dataHeatBal->MassConservation(1).ZoneMixingReceivingFr(2), allowedTolerance);
+}
+
 } // namespace EnergyPlus

@@ -169,15 +169,40 @@
                     on exact object changes that you can do by hand. The updater program is described more fully in the
                     Auxiliary Programs document.
                     <ul class="list-group">
-                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:CurveFit:Speed</li>
+                        <li class="list-group-item transition-object-name">Branch</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:TwoSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:CurveFit:Performance</li>
                         <li class="list-group-item transition-object-name">Coil:Cooling:DX:SingleSpeed</li>
                         <li class="list-group-item transition-object-name">Coil:Cooling:DX:MultiSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:VariableSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:TwoStageWithHumidityControlMode</li>
                         <li class="list-group-item transition-object-name">Coil:Heating:DX:SingleSpeed</li>
                         <li class="list-group-item transition-object-name">Coil:Heating:DX:MultiSpeed</li>
-                        <li class="list-group-item transition-object-name">FuelFactors</li>
-                        <li class="list-group-item transition-object-name">Space</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:DX:VariableSpeed</li>
+                        <li class="list-group-item transition-object-name">Coil:WaterHeating:AirToWaterHeatPump:Pumped</li>
+                        <li class="list-group-item transition-object-name">Coil:WaterHeating:AirToWaterHeatPump:Wrapped</li>
+                        <li class="list-group-item transition-object-name">Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed</li>
+                        <li class="list-group-item transition-object-name">DistrictHeating</li>
+                        <li class="list-group-item transition-object-name">EnergyManagementSystem:MeteredOutputVariable</li>
+                        <li class="list-group-item transition-object-name">Exterior:FuelEquipment</li>
+                        <li class="list-group-item transition-object-name">HVACTemplate:Zone:WaterToAirHeatPump</li>
+                        <li class="list-group-item transition-object-name">AirLoopHVAC:UnitarySystem</li>
+                        <li class="list-group-item transition-object-name">AirLoopHVAC:UnitarySystem:WaterToAir</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:WaterToAirHeatPump</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:ParameterEstimation</li>
+                        <li class="list-group-item transition-object-name">Coil:Heating:WaterToAirHeatPump:ParameterEstimation</li>
                         <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:EquationFit</li>
                         <li class="list-group-item transition-object-name">Coil:Heating:WaterToAirHeatPump:EquationFit</li>
+                        <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit</li>
+                        <li class="list-group-item transition-object-name">LifeCycleCost:UsePriceEscalation</li>
+                        <li class="list-group-item transition-object-name">LifeCycleCost:UseAdjustment</li>
+                        <li class="list-group-item transition-object-name">OtherEquipment</li>
+                        <li class="list-group-item transition-object-name">PythonPlugin:OutputVariable</li>
+                        <li class="list-group-item transition-object-name">PlantEquipmentList</li>
+                        <li class="list-group-item transition-object-name">PlantEquipmentOperation:ComponentSetpoint</li>
+                        <li class="list-group-item transition-object-name">WaterHeat:Mixed</li>
+                        <li class="list-group-item transition-object-name">WaterHeater:Stratified</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:HybridUnitaryHVAC</li>
                     </ul>
                 </div>
             </div>
@@ -249,24 +274,40 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9394">9394</a></td>
-            <td>Subdivide Heat Balance by Space</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10138">10138</a></td>
+            <td>Add Vertical (1-D) Solution to Earth Tube Object</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9405">9405</a></td>
-            <td>Gas-Fired Absorption Heat Pump (GAHP) model</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10143">10143</a></td>
+            <td>Ruleset Model Description Phase 2</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9594">9594</a></td>
-            <td>NewFeature: Implement Model for Building-Integrated Photovoltaic Thermal (BIPVT)</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9746">9746</a></td>
+            <td>Improved Support for Multi-speed Fans</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9755">9755</a></td>
-            <td>Modeling Dynamic Coating for Opaque Surfaces</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9756">9756</a></td>
+            <td>90.1 metrics - EER/IEER</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9848">9848</a></td>
-            <td>Add ISO 8601 format support to native CSV and JSON output</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9949">9949</a></td>
+            <td>Enhancement to crankcase heater</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9950">9950</a></td>
+            <td>Evaporative cooler RH control</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9979">9979</a></td>
+            <td>New plant heat pump features and supervisory controller</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9982">9982</a></td>
+            <td>Extend Spaces to Sizing and HVAC</td>
+        </tr>
+        <tr>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9987">9987</a></td>
+            <td>Multistage economizer control</td>
         </tr>
     </table>
     <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
@@ -291,68 +332,28 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9670">9670</a></td>
-            <td>Quick SolveRoot cleanup</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10015">10015</a></td>
+            <td>Refactor logic in VRF control function to simplify code readability</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9693">9693</a></td>
-            <td>Clean up Par arrays in SolveRoot calls</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10050">10050</a></td>
+            <td>ConvectionCoefficients Enumeration-based Cleanup</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9765">9765</a></td>
-            <td>Refactor int to enum as a follow up to previous code changes</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10202">10202</a></td>
+            <td>Update penumbra</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9766">9766</a></td>
-            <td>Solve root cleanups continued</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9902">9902</a></td>
+            <td>End Use Cleanup</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9770">9770</a></td>
-            <td>Quick curve manager cleanup</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9924">9924</a></td>
+            <td>Remove Optional Arguments, Part 1</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9779">9779</a></td>
-            <td>Curve Manager Round 2</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9782">9782</a></td>
-            <td>Refactor loops for zone sizing array initialization</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9812">9812</a></td>
-            <td>MaterialProperties Refactoring step 2</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9823">9823</a></td>
-            <td>Quick cleaning in General.cc</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9854">9854</a></td>
-            <td>Refactor in RefrigeratedCase and new unit test process_idf for string_view</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9868">9868</a></td>
-            <td>Remove Scalar Auto Refs -- Pass1</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9872">9872</a></td>
-            <td>Remove Scalar Auto Refs -- pass 2</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9886">9886</a></td>
-            <td>Fix Bad Auto: Part 3</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9892">9892</a></td>
-            <td>Fix Bad Auto 4 (with a bonus)</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9896">9896</a></td>
-            <td>Fix Bad Auto: Part 2 (Take 2)</td>
-        </tr>
-        <tr>
-            <td>(many!)</td>
-            <td>Cleaning up CppCheck-identified issues in many files!</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/9981">9981</a></td>
+            <td>Improved ReadTheDocs Documentation</td>
         </tr>
     </table>
 

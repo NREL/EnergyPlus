@@ -3921,7 +3921,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             // If defrost is disabled in the VRF condenser, it must be disabled in the DX coil
                             // Defrost primarily handled in parent object, set defrost capacity to 1 to avoid autosizing.
                             // Defrost capacity is used for nothing more than setting defrost power/consumption report
-                            // variables which are not reported. The coil's defrost algorythm IS used to derate the coil
+                            // variables which are not reported. The coil's defrost algorithm IS used to derate the coil
                             SetDXCoolingCoilData(state,
                                                  thisVrfTU.HeatCoilIndex,
                                                  ErrorsFound,
@@ -4156,7 +4156,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         // If defrost is disabled in the VRF condenser, it must be disabled in the DX coil
                         // Defrost primarily handled in parent object, set defrost capacity to 1 to avoid autosizing.
                         // Defrost capacity is used for nothing more than setting defrost power/consumption report
-                        // variables which are not reported. The coil's defrost algorythm IS used to derate the coil
+                        // variables which are not reported. The coil's defrost algorithm IS used to derate the coil
                         SetDXCoolingCoilData(state,
                                              thisVrfTU.HeatCoilIndex,
                                              ErrorsFound,
@@ -4220,7 +4220,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                  _,
                                                  state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).HeatingCapacitySizeRatio);
                         }
-                        // Check VRF DX heating coil heating capacity as a fuction of temperature performance curve. Only report here for
+                        // Check VRF DX heating coil heating capacity as a function of temperature performance curve. Only report here for
                         // biquadratic curve type.
                         if (thisVrfTU.VRFSysNum > 0 && thisVrfTU.HeatCoilIndex > 0 &&
                             state.dataCurveManager->PerfCurve(GetDXCoilCapFTCurveIndex(state, thisVrfTU.HeatCoilIndex, ErrorsFound))->numDims == 2) {
@@ -4543,7 +4543,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         ShowWarningError(state,
                                          cCurrentModuleObject + " = " + thisVrfTU.Name + " with Fan:SystemModel is used in  " + cAlphaArgs(8) + "\"");
                         ShowContinueError(state, format("...The number of speed = {:.0R}.", double(NumSpeeds)));
-                        ShowContinueError(state, "...Multiple speed fan will be appiled to this unit. The speed number is determined by load.");
+                        ShowContinueError(state, "...Multiple speed fan will be applied to this unit. The speed number is determined by load.");
                     }
                 }
             }
@@ -9790,7 +9790,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
         }
     }
 
-    Real64 LatentLoadMet = 0.0; // latent load deleivered [kgWater/s]
+    Real64 LatentLoadMet = 0.0; // latent load delivered [kgWater/s]
     Real64 TempOut = 0.0;
     Real64 TempIn = 0.0;
     if (this->ATMixerExists) {
@@ -9970,7 +9970,7 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
         TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).Temp;
         TempIn = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
     }
-    // latent heat vaporization/condensation used in moist air psychometrics
+    // latent heat vaporization/condensation used in moist air psychrometrics
     Real64 const H2OHtOfVap = PsyHgAirFnWTdb(0.0, TempOut);
     // convert latent in kg/s to watts
     TotalConditioning = SensibleConditioning + (LatentConditioning * H2OHtOfVap);
@@ -10994,7 +10994,7 @@ void getVRFTUZoneLoad(
         if (InitFlag) {
             // this will need more investigation. Using Remaining* variable during the initial load calculation seems wrong.
             // This may also have implications when VRF TUs are in the air loop or if SP control is used
-            // another question is whether initialization of the opeating mode should look at TotalOutputRequired or RemainingOutputRequired
+            // another question is whether initialization of the operating mode should look at TotalOutputRequired or RemainingOutputRequired
             zoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired /
                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             LoadToCoolingSP =
@@ -11368,6 +11368,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     Real64 SH_Comp;                  // Temperature difference between compressor inlet node and Tsuction [C]
     Real64 T_comp_in;                // temperature of refrigerant at compressor inlet, after piping loss (c) [C]
     Real64 TU_HeatingLoad;           // Heating load from terminal units, excluding heating loss [W]
+    Real64 TU_HeatingLoad_actual;    // TU_HeatingLoad trimed to maximum system capacity[W]
     Real64 TU_CoolingLoad;           // Cooling load from terminal units, excluding heating loss [W]
     Real64 Tdischarge;               // VRF Compressor discharge refrigerant temperature [C]
     Real64 Tsuction;                 // VRF compressor suction refrigerant temperature [C]
@@ -11436,6 +11437,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     }
     this->TUCoolingLoad = TU_CoolingLoad; // this is cooling coil load, not terminal unit load
     this->TUHeatingLoad = TU_HeatingLoad; // this is heating coil load, not terminal unit load
+    TU_HeatingLoad_actual = TU_HeatingLoad;
 
     // loop through TU's and calculate average inlet conditions for active coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
@@ -11783,9 +11785,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         if (Q_h_TU_PL > CompEvaporatingCAPSpdMax + CompEvaporatingPWRSpdMax) {
             // Required load is beyond the max system capacity
 
-            Q_h_TU_PL = CompEvaporatingCAPSpdMax;
-            TU_HeatingLoad = CompEvaporatingCAPSpdMax;
-            this->TUHeatingLoad = TU_HeatingLoad;
             h_IU_cond_out = GetSatEnthalpyRefrig(
                 state,
                 this->RefrigerantName,
@@ -11795,7 +11794,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                 RoutineName); // Quality=0
             h_IU_cond_out_ave = h_IU_cond_out;
             SC_IU_merged = 5;
-            m_ref_IU_cond = TU_HeatingLoad / (h_IU_cond_in - h_IU_cond_out);
+            TU_HeatingLoad_actual = min(TU_HeatingLoad, CompEvaporatingCAPSpdMax + CompEvaporatingPWRSpdMax);
+            m_ref_IU_cond = TU_HeatingLoad_actual / (h_IU_cond_in - h_IU_cond_out);
 
         } else {
             for (NumTU = 1; NumTU <= NumTUInList; NumTU++) {
@@ -11951,7 +11951,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                               this->OUCoolingPWRFT(NumOfCompSpdInput),
                                               Tdischarge,
                                               Tsuction); // Include the piping loss, at the highest compressor speed
-        this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
+        this->PipingCorrectionHeating = TU_HeatingLoad_actual / (TU_HeatingLoad_actual + Pipe_Q_h);
         state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) =
             this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
 
@@ -12204,13 +12204,13 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         this->OUFanPower = 0.0;
         this->VRFCondCyclingRatio = 0.0;
 
-        this->HeatingCapacity = 0.0;         // Include the piping loss
-        this->PipingCorrectionHeating = 1.0; // 1 means no piping loss
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = 0.0;
+        this->HeatingCapacity = 0.0;                                    // Include the piping loss
+        this->PipingCorrectionHeating = 1.0;                            // 1 means no piping loss
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap; // yujie: default value is MaxCap = 1e+20, not 0
 
         this->CoolingCapacity = 0.0; // Include the piping loss
-        this->PipingCorrectionCooling = 0.0;
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = 0.0; // for report
+        this->PipingCorrectionCooling = 1.0;
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = MaxCap; // for report
 
         this->CondensingTemp = state.dataEnvrn->OutDryBulbTemp;
         this->EvaporatingTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -12804,7 +12804,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
         auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
             Real64 QZnReqTemp = QZnReq;    // denominator representing zone load (W)
             Real64 ActualOutput;           // delivered capacity of VRF terminal unit
-            Real64 SuppHeatCoilLoad = 0.0; // supplemetal heating coil load (W)
+            Real64 SuppHeatCoilLoad = 0.0; // supplemental heating coil load (W)
             bool setPointControlled = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled;
             Real64 nonConstOnOffAirFlowRatio = OnOffAirFlowRatio;
 
@@ -13718,7 +13718,7 @@ void VRFCondenserEquipment::VRFOU_TeModification(
 
     // PURPOSE OF THIS SUBROUTINE:
     // This is part of the low load modification algorithm for the VRF-FluidTCtrl model. It aims
-    // to find a new Te (Te_update) that can generate a new compressor suction temperature (Tsuction) equalling
+    // to find a new Te (Te_update) that can generate a new compressor suction temperature (Tsuction) equaling
     // to the given compressor suction temperature (Te_low). This requires the re-calculate of piping loss.
 
     // METHODOLOGY EMPLOYED:
@@ -14134,7 +14134,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine simulates the compressor performance at given oprtaional conditions (cooling mode). More specifically, it sepcifies
+    // This subroutine simulates the compressor performance at given operational conditions (cooling mode). More specifically, it specifies
     // the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the specified
     // speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load conditions.
     // The low load modification logics are different for cooling mode and heating mode.
@@ -14288,7 +14288,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 // Pipe_Pe_assumed, Pipe_m_ref, Pipe_SH_merged );
                 {
                     // Initialization of Iteration_Te (Label11)
-                    // i.e., find a new Te (Pipe_Te_assumed) that can generate a new T_suction equalling to SmallLoadTe.
+                    // i.e., find a new Te (Pipe_Te_assumed) that can generate a new T_suction equaling to SmallLoadTe.
                     // This requires the re-calculate of piping loss.
                     NumIteTe = 1;
                     MaxNumIteTe = (this->EvaporatingTemp - SmallLoadTe) / 0.1 + 1; // upper bound and lower bound of Te iterations
@@ -14689,7 +14689,7 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
     //
     // PURPOSE OF THIS SUBROUTINE:
     //        Determine the operational mode of the VRF-HR system, given the terminal unit side load conditions.
-    //        Compressor and OU hex performance are analysed for each mode.
+    //        Compressor and OU hex performance are analyzed for each mode.
     //        A number of OU side operational parameters are also calculated here, including:
     //        (1) OU evaporator load Q_c_OU (2) OU condenser load Q_h_OU (3) OU fan energy consumption
     //        (4) OU compressor speed and energy consumption
@@ -15462,7 +15462,7 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                 state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
             if (QActual > SuppHeatCoilLoad) {
                 auto f = [&state, VRFTUNum, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
-                    Real64 QActual = 0.0; // actual heating load deleivered [W]
+                    Real64 QActual = 0.0; // actual heating load delivered [W]
                     Real64 mdot = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
                     state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
                     WaterCoils::SimulateWaterCoilComponents(state,
@@ -15522,7 +15522,7 @@ Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(EnergyPlusData &sta
     // fraction residual to zero.
 
     // METHODOLOGY EMPLOYED:
-    // runs Coil:Heating:Water component object to get the actual heating load deleivered [W] at a
+    // runs Coil:Heating:Water component object to get the actual heating load delivered [W] at a
     // given part load ratio and calculates the residual as defined above
 
     // Return value
@@ -15532,7 +15532,7 @@ Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(EnergyPlusData &sta
     int VRFTUNum = int(Par[1]);       // index to current terminal unit simulated
     bool FirstHVACIteration = Par[2]; // 0 flag if it first HVAC iteration, or else 1
     Real64 SuppHeatCoilLoad = Par[3]; // supplemental heating coil load to be met [W]
-    Real64 QActual = 0.0;             // actual heating load deleivered [W]
+    Real64 QActual = 0.0;             // actual heating load delivered [W]
 
     // Real64 mdot = min(state.dataLoopNodes->Node(VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode).MassFlowRateMaxAvail,
     //                  VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac);
@@ -15570,7 +15570,7 @@ Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(
     // ( m_dot_air * Cp_air_avg * DeltaT_air_across_heating_coil) [W]
 
     // Return value
-    Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be deleivered at current time [W]
+    Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be delivered at current time [W]
 
     Real64 MDotAir = state.dataLoopNodes->Node(HeatCoilAirInletNode).MassFlowRate;
     Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(HeatCoilAirInletNode).HumRat);

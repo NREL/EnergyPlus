@@ -765,8 +765,8 @@ namespace ThermalChimney {
                 AbsorberWallWidthTC = state.dataThermalChimneys->ThermalChimneySys(Loop).AbsorberWallWidth;
             }
 
-            AirDensityThermalChim = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat);
-            AirSpecHeatThermalChim = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+            AirDensityThermalChim = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRat);
+            AirSpecHeatThermalChim = PsyCpAirFnW(thisZoneHB.airHumRat);
             AirOutletCrossAreaTC = state.dataThermalChimneys->ThermalChimneySys(Loop).AirOutletCrossArea;
             DischargeCoeffTC = state.dataThermalChimneys->ThermalChimneySys(Loop).DischargeCoeff;
 
@@ -788,11 +788,11 @@ namespace ThermalChimney {
             for (TCZoneNum = 1; TCZoneNum <= state.dataThermalChimneys->ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                 TCZoneNumCounter = state.dataThermalChimneys->ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                 auto &thisTCZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter);
-                Process1 += PsyHFnTdbW(thisTCZoneHB.MAT, thisTCZoneHB.ZoneAirHumRat) *
+                Process1 += PsyHFnTdbW(thisTCZoneHB.MAT, thisTCZoneHB.airHumRat) *
                             state.dataThermalChimneys->ThermalChimneySys(Loop).DistanceThermChimInlet(TCZoneNum) *
                             state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum);
                 Process2 += state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum) *
-                            PsyHFnTdbW(state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT, thisTCZoneHB.ZoneAirHumRat);
+                            PsyHFnTdbW(state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT, thisTCZoneHB.airHumRat);
             }
             OverallThermalChimLength = Process1 / Process2;
 
@@ -894,8 +894,8 @@ namespace ThermalChimney {
                 AirDensity = PsyRhoAirFnPbTdbW(state,
                                                state.dataEnvrn->OutBaroPress,
                                                state.dataZoneTempPredictorCorrector->zoneHeatBalance(TCZoneNumCounter).MAT,
-                                               thisTCZoneHB.ZoneAirHumRat);
-                CpAir = PsyCpAirFnW(thisTCZoneHB.ZoneAirHumRat);
+                                               thisTCZoneHB.airHumRat);
+                CpAir = PsyCpAirFnW(thisTCZoneHB.airHumRat);
                 thisTCZoneHB.MCPThermChim =
                     TCVolumeAirFlowRate * AirDensity * CpAir * state.dataThermalChimneys->ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum);
                 if (thisTCZoneHB.MCPThermChim <= 0.0) {
@@ -965,8 +965,8 @@ namespace ThermalChimney {
 
             // Break the infiltration load into heat gain and loss components.
             AirDensity = PsyRhoAirFnPbTdbW(
-                state, state.dataEnvrn->OutBaroPress, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).MAT, thisZoneHB.ZoneAirHumRat);
-            CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                state, state.dataEnvrn->OutBaroPress, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop).MAT, thisZoneHB.airHumRat);
+            CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyVolume =
                 (thisZoneHB.MCPThermChim / CpAir / AirDensity) * TimeStepSysSec;
             state.dataThermalChimneys->ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (thisZoneHB.MCPThermChim / CpAir) * TimeStepSysSec;

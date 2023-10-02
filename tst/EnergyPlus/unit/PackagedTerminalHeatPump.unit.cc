@@ -3866,7 +3866,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(6);
     for (auto &thisZoneHB : state->dataZoneTempPredictorCorrector->zoneHeatBalance) {
         thisZoneHB.MAT = 23.0;
-        thisZoneHB.ZoneAirHumRat = 0.001;
+        thisZoneHB.airHumRat = 0.001;
     }
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
@@ -3885,7 +3885,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
             state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);
@@ -3953,7 +3953,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp =
             state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).MAT;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat =
-            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).ZoneAirHumRat;
+            state->dataZoneTempPredictorCorrector->zoneHeatBalance(i).airHumRat;
         state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Enthalpy =
             Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).Temp,
                                        state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(i).ZoneNode).HumRat);

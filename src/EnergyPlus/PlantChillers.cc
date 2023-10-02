@@ -6539,6 +6539,19 @@ namespace PlantChillers {
                                             state.dataIPShortCut->cAlphaArgs(8)));
                 }
             }
+
+            // set default design condenser in and evaporator out temperatures
+            // Values from AHRI Standard 550/590 (2023, IP Version)
+            thisChiller.TempDesEvapOut = 6.67; // Degree Celsius, or 44 Degree Fahrenheit
+            if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
+                thisChiller.TempDesCondIn = 29.44; // Degree Celsius, or 85 Degree Fahrenheit
+            } else if (thisChiller.CondenserType == DataPlant::CondenserType::AirCooled) {
+                thisChiller.TempDesCondIn = 35.0; // Degree Celsius, or 95 Degree Fahrenheit
+            } else if (thisChiller.CondenserType == DataPlant::CondenserType::EvapCooled) {
+                thisChiller.TempDesCondIn = 35.0; // Degree Celsius, or 95 Degree Fahrenheit
+            } else {
+                thisChiller.TempDesCondIn = 35.0; // Degree Celsius, or 95 Degree Fahrenheit
+            }
         }
 
         if (ErrorsFound) {

@@ -837,13 +837,15 @@ namespace Weather {
                         (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodDesign)) {
                         std::string kindOfRunPeriod = envCurr.cKindOfEnvrn;
                         state.dataEnvrn->RunPeriodEnvironment = state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather;
-                        Array1D_int ActEndDayOfMonth(12);
-                        ActEndDayOfMonth = state.dataWeather->EndDayOfMonth;
-                        state.dataEnvrn->CurrentYearIsLeapYear = envCurr.IsLeapYear;
-
-                        state.dataWeather->LeapYearAdd = (int)(state.dataEnvrn->CurrentYearIsLeapYear && state.dataWeather->WFAllowsLeapYears);
+                        state.dataEnvrn->CurrentYearIsLeapYear = state.dataWeather->Environment(state.dataWeather->Envrn).IsLeapYear;
+                        if (state.dataEnvrn->CurrentYearIsLeapYear && state.dataWeather->WFAllowsLeapYears) {
+                            state.dataWeather->LeapYearAdd = 1;
+                        } else {
+                            state.dataWeather->LeapYearAdd = 0;
+                        }
                         if (state.dataEnvrn->CurrentYearIsLeapYear) {
-                            ActEndDayOfMonth(2) = state.dataWeather->EndDayOfMonth(2) + state.dataWeather->LeapYearAdd;
+                            state.dataWeather->EndDayOfMonthWithLeapDay(2) =
+                                state.dataWeather->EndDayOfMonth(2) + state.dataWeather->LeapYearAdd;
                         }
                         state.dataWeather->UseDaylightSaving = envCurr.UseDST;
                         state.dataWeather->UseSpecialDays = envCurr.UseHolidays;
@@ -1486,11 +1488,8 @@ namespace Weather {
         int ActStartDay;   // Actual Start Day of Month
         int ActEndMonth;   // Actual End Month
         int ActEndDay;     // Actual End Day of Month
-        Array1D_int ActEndDayOfMonth(12);
 
         bool ErrorsFound = false;
-        ActEndDayOfMonth = state.dataWeather->EndDayOfMonth;
-        ActEndDayOfMonth(2) = state.dataWeather->EndDayOfMonth(2) + state.dataWeather->LeapYearAdd;
         if (state.dataWeather->DST.StDateType == DateType::MonthDay) {
             ActStartMonth = state.dataWeather->DST.StMon;
             ActStartDay = state.dataWeather->DST.StDay;
@@ -1500,7 +1499,7 @@ namespace Weather {
                 ThisDay += 7;
             }
             ThisDay += 7 * (state.dataWeather->DST.StDay - 1);
-            if (ThisDay > ActEndDayOfMonth(state.dataWeather->DST.StMon)) {
+            if (ThisDay > state.dataWeather->EndDayOfMonthWithLeapDay(state.dataWeather->DST.StMon)) {
                 ShowSevereError(state, format("{}Determining DST: DST Start Date, Nth Day of Month, not enough Nths", RoutineName));
                 ErrorsFound = true;
             } else {
@@ -1509,7 +1508,7 @@ namespace Weather {
             }
         } else { // LastWeekDayInMonth
             int ThisDay = state.dataWeather->DST.StWeekDay - MonWeekDay(state.dataWeather->DST.StMon) + 1;
-            while (ThisDay + 7 <= ActEndDayOfMonth(state.dataWeather->DST.StMon)) {
+            while (ThisDay + 7 <= state.dataWeather->EndDayOfMonthWithLeapDay(state.dataWeather->DST.StMon)) {
                 ThisDay += 7;
             }
             ActStartMonth = state.dataWeather->DST.StMon;
@@ -1525,7 +1524,7 @@ namespace Weather {
                 ThisDay += 7;
             }
             ThisDay += 7 * (state.dataWeather->DST.EnDay - 1);
-            if (ThisDay > ActEndDayOfMonth(state.dataWeather->DST.EnMon)) {
+            if (ThisDay >> state.dataWeather->EndDayOfMonthWithLeapDay(state.dataWeather->DST.EnMon)) {
                 ActEndMonth = 0; // Suppress uninitialized warning
                 ActEndDay = 0;   // Suppress uninitialized warning
                 ShowSevereError(state, format("{}Determining DST: DST End Date, Nth Day of Month, not enough Nths", RoutineName));
@@ -1536,7 +1535,7 @@ namespace Weather {
             }
         } else { // LastWeekDayInMonth
             int ThisDay = state.dataWeather->DST.EnWeekDay - MonWeekDay(state.dataWeather->DST.EnMon) + 1;
-            while (ThisDay + 7 <= ActEndDayOfMonth(state.dataWeather->DST.EnMon)) {
+            while (ThisDay + 7 <= state.dataWeather->EndDayOfMonthWithLeapDay(state.dataWeather->DST.EnMon)) {
                 ThisDay += 7;
             }
             ActEndMonth = state.dataWeather->DST.EnMon;
@@ -1580,22 +1579,17 @@ namespace Weather {
         static constexpr std::string_view RoutineName("SetSpecialDayDates: ");
 
         int JDay;
-        Array1D_int ActEndDayOfMonth(12);
 
         bool ErrorsFound = false;
-        ActEndDayOfMonth = state.dataWeather->EndDayOfMonth;
-        ActEndDayOfMonth(2) = state.dataWeather->EndDayOfMonth(2) + state.dataWeather->LeapYearAdd;
         state.dataWeather->SpecialDayTypes = 0;
-
-
-        auto &envCurr = state.dataWeather->Environment(state.dataWeather->Envrn);
         for (int i = 1; i <= state.dataWeather->NumSpecialDays; ++i) {
             auto &specialDay = state.dataWeather->SpecialDays(i);
             if (specialDay.WthrFile && !state.dataWeather->UseSpecialDays) continue;
             if (specialDay.dateType <= DateType::MonthDay) {
                 JDay = General::OrdinalDay(specialDay.Month, specialDay.Day, state.dataWeather->LeapYearAdd);
-                if (specialDay.Duration == 1 && envCurr.ApplyWeekendRule) {
-                    if (state.dataWeather->WeekDayTypes(JDay) == (int)ScheduleManager::DayType::Sunday) {
+                if (specialDay.Duration == 1 &&
+                    state.dataWeather->Environment(state.dataWeather->Envrn).ApplyWeekendRule) {
+                    if (state.dataWeather->WeekDayTypes(JDay) == static_cast<int>(ScheduleManager::DayType::Sunday)) {
                         // Sunday, must go to Monday
                         ++JDay;
                         if (JDay == 366 && state.dataWeather->LeapYearAdd == 0) JDay = 1;
@@ -1613,8 +1607,11 @@ namespace Weather {
                     ThisDay += 7;
                 }
                 ThisDay += 7 * (specialDay.Day - 1);
-                if (ThisDay > ActEndDayOfMonth(specialDay.Month)) {
-                    ShowSevereError(state, format("{}Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay={}", RoutineName, specialDay.Name));
+                if (ThisDay > state.dataWeather->EndDayOfMonthWithLeapDay(specialDay.Month)) {
+                    ShowSevereError(state,
+                                    format("{}Special Day Date, Nth Day of Month, not enough Nths, for SpecialDay={}",
+                                           RoutineName,
+                                           specialDay.Name));
                     ErrorsFound = true;
                     continue;
                 }
@@ -1623,7 +1620,7 @@ namespace Weather {
                 JDay = General::OrdinalDay(specialDay.Month, ThisDay, state.dataWeather->LeapYearAdd);
             } else { // LastWeekDayInMonth
                 int ThisDay = specialDay.WeekDay - MonWeekDay(specialDay.Month) + 1;
-                while (ThisDay + 7 <= ActEndDayOfMonth(specialDay.Month)) {
+                while (ThisDay + 7 <= state.dataWeather->EndDayOfMonthWithLeapDay(specialDay.Month)) {
                     ThisDay += 7;
                 }
                 specialDay.ActStMon = specialDay.Month;
@@ -1766,7 +1763,7 @@ namespace Weather {
             }
 
             state.dataEnvrn->EndYearFlag = false;
-            if (state.dataEnvrn->DayOfMonth == state.dataWeather->EndDayOfMonth(state.dataEnvrn->Month)) {
+            if (state.dataEnvrn->DayOfMonth == state.dataWeather->EndDayOfMonthWithLeapDay(state.dataEnvrn->Month)) {
                 state.dataEnvrn->EndMonthFlag = true;
                 state.dataEnvrn->EndYearFlag = (state.dataEnvrn->Month == 12);
             }
@@ -2681,6 +2678,7 @@ namespace Weather {
                     if (hour == 1 && CurTimeStep == 1) {
                         if (WMonth == 2 && WDay == 29 && (!state.dataEnvrn->CurrentYearIsLeapYear || !state.dataWeather->WFAllowsLeapYears)) {
                             state.dataWeather->EndDayOfMonth(2) = 28;
+                            state.dataWeather->EndDayOfMonthWithLeapDay(2) = 28;
                             SkipThisDay = true;
                             TryAgain = true;
                             ShowWarningError(state, "ReadEPlusWeatherForDay: Feb29 data encountered but will not be processed.");
