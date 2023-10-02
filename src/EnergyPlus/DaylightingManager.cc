@@ -5964,7 +5964,7 @@ void manageDaylighting(EnergyPlusData &state)
                     DayltgInterReflIllFrIntWins(state, enclNum);
                     for (int daylightCtrlNum : state.dataDaylightingData->enclDaylight(enclNum).daylightControlIndexes) {
                         auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
-                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, enclNum);
+                        DayltgGlareWithIntWins(state, thisDaylightControl.GlareIndexAtRefPt, daylightCtrlNum);
                     }
                 }
             }
