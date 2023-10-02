@@ -310,6 +310,9 @@ namespace HeatBalanceManager {
             ShowFatalError(state, "Errors found in Building Input, Program Stopped");
         }
 
+        // Set up enclosures before processing internal gains input
+        HeatBalanceIntRadExchange::InitSolarViewFactors(state);
+
         // following is done to "get internal heat gains" input so that lights are gotten before
         // daylighting input
         ManageInternalHeatGains(state, true);
