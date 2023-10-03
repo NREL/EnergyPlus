@@ -1398,7 +1398,7 @@ namespace DataHeatBalance {
         Real64 OperativeTemp = 0.0;          // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
         Real64 MeanAirHumRat = 0.0;          // Mean Air Humidity Ratio {kg/kg} (averaged over zone time step)
         Real64 MeanAirDewPointTemp = 0.0;    // Mean Air Dewpoint Temperature {C}
-        Real64 ThermOperativeTemp = 0.0;     // Mix or MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
+        Real64 ThermOperativeTemp = 0.0;     // Mix of MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}
         Real64 InfilHeatGain = 0.0;          // Heat Gain {J} due to infiltration
         Real64 InfilHeatLoss = 0.0;          // Heat Loss {J} due to infiltration
         Real64 InfilLatentGain = 0.0;        // Latent Gain {J} due to infiltration
