@@ -2123,6 +2123,9 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
         thisZoneHB.airHumRat = state.dataEnvrn->OutHumRat;
         state.dataHeatBalFanSys->TempTstatAir(zoneNum) = DataHeatBalance::ZoneInitialTemp;
     }
+    for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+        thisEnclosure.MRT = DataHeatBalance::ZoneInitialTemp;
+    }
     // Reset spaceHeatBalance even if doSpaceHeatBalance is false, beause spaceHB is used to gether zoneHB in some cases
     for (auto &thisSpaceHB : state.dataZoneTempPredictorCorrector->spaceHeatBalance) {
         new (&thisSpaceHB) ZoneTempPredictorCorrector::SpaceHeatBalanceData();
