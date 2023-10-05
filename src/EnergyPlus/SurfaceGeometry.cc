@@ -15661,6 +15661,16 @@ namespace SurfaceGeometry {
             Enclosures.resize(state.dataViewFactor->NumOfSolarEnclosures);
         }
 
+        for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
+            SetupOutputVariable(state,
+                                "Enclosure Mean Radiant Temperature",
+                                OutputProcessor::Unit::C,
+                                thisEnclosure.MRT,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::State,
+                                thisEnclosure.Name);
+        }
+
         // TODO MJW: For now, set the max and min enclosure numbers for each zone to be used in CalcInteriorRadExchange with ZoneToResimulate
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             for (int spaceNum : state.dataHeatBal->Zone(zoneNum).spaceIndexes) {

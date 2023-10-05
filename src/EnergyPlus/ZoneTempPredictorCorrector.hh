@@ -120,6 +120,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Zone or space air drybulb temperature conditions
         Real64 MAT = DataHeatBalance::ZoneInitialTemp;      // Mean Air Temperature at end of zone time step [C]
+        Real64 MRT = DataHeatBalance::ZoneInitialTemp;      // Mean Radiant Temperature [C]
         Real64 ZTAV = DataHeatBalance::ZoneInitialTemp;     // Air Temperature Averaged over the zone time step (during HVAC Time Steps)
         Real64 ZT = DataHeatBalance::ZoneInitialTemp;       // Air Temperature Averaged over the system time step
         Real64 ZTAVComf = DataHeatBalance::ZoneInitialTemp; // Air Temperature Averaged used in thermal comfort models (currently Fanger model only) -

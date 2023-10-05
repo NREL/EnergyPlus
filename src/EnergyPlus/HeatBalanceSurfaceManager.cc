@@ -2114,7 +2114,6 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
 
     // First do the "bulk" initializations of arrays sized to NumOfZones
     for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-        state.dataHeatBal->ZoneMRT(zoneNum) = DataHeatBalance::ZoneInitialTemp; // module level array
         // TODO: Reinitializing this entire struct may cause diffs
         new (&state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum)) ZoneTempPredictorCorrector::ZoneHeatBalanceData();
         // Initialize the Zone Humidity Ratio here so that it is available for EMPD implementations
@@ -5486,6 +5485,7 @@ void CalculateZoneMRT(EnergyPlusData &state,
     }
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
+        auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
         if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) > 0.01) {
             Real64 zoneSumAET = 0.0;
             for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
@@ -5496,7 +5496,7 @@ void CalculateZoneMRT(EnergyPlusData &state,
                     state.dataViewFactor->EnclRadInfo(state.dataSurface->Surface(SurfNum).RadEnclIndex).sumAET += surfAET;
                 }
             }
-            state.dataHeatBal->ZoneMRT(ZoneNum) = zoneSumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
+            thisZoneHB.MRT = zoneSumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
         } else {
             if (state.dataHeatBalSurfMgr->CalculateZoneMRTfirstTime) {
                 ShowWarningError(
@@ -5504,7 +5504,7 @@ void CalculateZoneMRT(EnergyPlusData &state,
                     format("Zone areas*inside surface emissivities are summing to zero, for Zone=\"{}\"", state.dataHeatBal->Zone(ZoneNum).Name));
                 ShowContinueError(state, "As a result, MRT will be set to MAT for that zone");
             }
-            state.dataHeatBal->ZoneMRT(ZoneNum) = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
+            thisZoneHB.MRT = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum).MAT;
         }
     }
     // Calculate MRT for applicable enclosures
@@ -5537,6 +5537,10 @@ void CalculateZoneMRT(EnergyPlusData &state,
             } else {
                 thisEnclosure.MRT = sumMAT / (int)thisEnclosure.spaceNums.size();
             }
+        }
+        // Set space MRTs
+        for (int spaceNum : thisEnclosure.spaceNums) {
+            state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MRT = thisEnclosure.MRT;
         }
     }
 

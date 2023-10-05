@@ -1916,7 +1916,6 @@ struct HeatBalanceData : BaseGlobalStruct
     Array1D<Real64> ZoneGroupSNLoadHeatRate;
     Array1D<Real64> ZoneGroupSNLoadCoolRate;
 
-    Array1D<Real64> ZoneMRT;        // MEAN RADIANT TEMPERATURE (C)
     Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone sum of WinTransSolar for exterior windows in zone (W)
     Array1D<Real64>
         ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes oneTransSolar); sum of WinHeatGain for exterior windows in zone (W)

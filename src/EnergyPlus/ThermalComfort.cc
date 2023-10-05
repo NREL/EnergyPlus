@@ -2279,8 +2279,6 @@ namespace ThermalComfort {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 OperTemp;
-        Real64 CurAirTemp;
-        Real64 CurMeanRadiantTemp;
         Real64 NumberOccupants;
         bool isComfortableWithSummerClothes;
         bool isComfortableWithWinterClothes;
@@ -2312,13 +2310,13 @@ namespace ThermalComfort {
                 auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(iZone);
                 // keep track of occupied hours
                 state.dataThermalComforts->ZoneOccHrs(iZone) += state.dataGlobal->TimeStepZone;
-                CurAirTemp = thisZoneHB.ZTAVComf;
+                Real64 CurAirTemp = thisZoneHB.ZTAVComf;
                 if (state.dataRoomAir->anyNonMixingRoomAirModel) {
                     if (state.dataRoomAir->IsZoneDispVent3Node(iZone) || state.dataRoomAir->IsZoneUFAD(iZone)) {
                         CurAirTemp = state.dataRoomAir->TCMF(iZone);
                     }
                 }
-                CurMeanRadiantTemp = state.dataHeatBal->ZoneMRT(iZone);
+                Real64 CurMeanRadiantTemp = thisZoneHB.MRT;
                 OperTemp = CurAirTemp * 0.5 + CurMeanRadiantTemp * 0.5;
                 // for debugging
                 // ThermalComfortInASH55(iZone)%dCurAirTemp = CurAirTemp

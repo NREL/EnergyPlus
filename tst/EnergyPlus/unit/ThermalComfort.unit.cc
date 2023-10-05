@@ -722,40 +722,41 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
 
     //	compare_err_stream( "" );
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 25.0;
-    state->dataHeatBal->ZoneMRT(1) = 26.0;
+    auto &zoneHB1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    zoneHB1.ZTAVComf = 25.0;
+    zoneHB1.MRT = 26.0;
     state->dataViewFactor->EnclRadInfo(1).MRT = 26.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00529; // 0.002 to 0.006
+    zoneHB1.airHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -1.262, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 38.3, 0.1);
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 26.0;
-    state->dataHeatBal->ZoneMRT(1) = 27.0;
+    zoneHB1.ZTAVComf = 26.0;
+    zoneHB1.MRT = 27.0;
     state->dataViewFactor->EnclRadInfo(1).MRT = 27.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00529; // 0.002 to 0.006
+    zoneHB1.airHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.860, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 20.6, 0.1);
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 27.0;
-    state->dataHeatBal->ZoneMRT(1) = 28.0;
+    zoneHB1.ZTAVComf = 27.0;
+    zoneHB1.MRT = 28.0;
     state->dataViewFactor->EnclRadInfo(1).MRT = 28.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00529; // 0.002 to 0.006
+    zoneHB1.airHumRatAvgComf = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.460, 0.005);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 9.4, 0.1);
 
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = 25.0;
-    state->dataHeatBal->ZoneMRT(1) = 26.0;
+    zoneHB1.ZTAVComf = 25.0;
+    zoneHB1.MRT = 26.0;
     state->dataViewFactor->EnclRadInfo(1).MRT = 26.0;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = 0.00629; // 0.002 to 0.006
+    zoneHB1.airHumRatAvgComf = 0.00629; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
 
@@ -989,7 +990,6 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->ZoneMRT.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAir->IsZoneDispVent3Node.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAir->IsZoneUFAD.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBalFanSys->ZoneQdotRadHVACToPerson.allocate(state->dataGlobal->NumOfZones);
@@ -1058,11 +1058,11 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     Real64 CloUnit = 0.5;
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state->dataGlobal->NumOfZones);
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf = AirTemp;
-    state->dataHeatBal->ZoneMRT(1) = RadTemp;
+    auto &zoneHB1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    zoneHB1.ZTAVComf = AirTemp;
+    zoneHB1.MRT = RadTemp;
     state->dataViewFactor->EnclRadInfo(1).MRT = RadTemp;
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).airHumRatAvgComf = Psychrometrics::PsyWFnTdbRhPb(
-        *state, state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZTAVComf, RelHum, state->dataEnvrn->OutBaroPress);
+    zoneHB1.airHumRatAvgComf = Psychrometrics::PsyWFnTdbRhPb(*state, zoneHB1.ZTAVComf, RelHum, state->dataEnvrn->OutBaroPress);
     state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * ThermalComfort::ActLevelConv;
     state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 

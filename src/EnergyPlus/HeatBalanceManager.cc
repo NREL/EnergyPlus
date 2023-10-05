@@ -2959,10 +2959,6 @@ namespace HeatBalanceManager {
         if (!state.dataHeatBal->ZoneIntGain.allocated()) {
             DataHeatBalance::AllocateIntGains(state);
         }
-        state.dataHeatBal->ZoneMRT.allocate(state.dataGlobal->NumOfZones);
-        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            state.dataHeatBal->ZoneMRT(zoneNum) = 0.0;
-        }
         state.dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(state.dataGlobal->NumOfZones);
         // Always allocate spaceHeatBalance, even if doSpaceHeatBalance is false, because it's used to gather some of the zone totals
         state.dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(state.dataGlobal->numSpaces);
@@ -3101,26 +3097,6 @@ namespace HeatBalanceManager {
         state.dataHeatBalFanSys->highSETLongestStartRepPeriod.allocate(state.dataGlobal->NumOfZones, state.dataWeatherManager->TotThermalReportPers);
 
         state.dataHeatBalMgr->CountWarmupDayPoints = 0;
-
-        for (int loop = 1; loop <= state.dataGlobal->NumOfZones; ++loop) {
-            // CurrentModuleObject='Zone'
-            SetupOutputVariable(state,
-                                "Zone Mean Radiant Temperature",
-                                OutputProcessor::Unit::C,
-                                state.dataHeatBal->ZoneMRT(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
-                                state.dataHeatBal->Zone(loop).Name);
-        }
-        for (auto &thisEnclosure : state.dataViewFactor->EnclRadInfo) {
-            SetupOutputVariable(state,
-                                "Enclosure Mean Radiant Temperature",
-                                OutputProcessor::Unit::C,
-                                thisEnclosure.MRT,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
-                                thisEnclosure.Name);
-        }
     }
 
     // End Initialization Section of the Module
