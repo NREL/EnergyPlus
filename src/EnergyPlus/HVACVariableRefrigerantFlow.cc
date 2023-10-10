@@ -9245,6 +9245,7 @@ void VRFTerminalUnitEquipment::ControlVRF(EnergyPlusData &state,
     PartLoadRatio = 0.0;
     state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = 0.0;
     state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = 0.0;
+    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
 
     // The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
@@ -9451,7 +9452,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 
     // The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
 
-    if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
+    if ((VRFHeatingMode || HRHeatingMode) || ((VRFCoolingMode && DXCoolingCoilOprCtrl) || HRCoolingMode)) {
 
         int NumOfSpeed = 1;
         if (this->NumOfSpeedHeating > 1 && ((VRFHeatingMode || HRHeatingMode))) {
@@ -10124,10 +10125,14 @@ void SetAverageAirFlow(EnergyPlusData &state,
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == DataHVACGlobals::CycFanCycCoil &&
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SpeedNum == 0) {
+        Real64 partLoadRat = PartLoadRatio;
+        if (partLoadRat == 0.0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio > 0.0) {
+            partLoadRat = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio;
+        }
         AverageUnitMassFlow =
-            (PartLoadRatio * state.dataHVACVarRefFlow->CompOnMassFlow) + ((1 - PartLoadRatio) * state.dataHVACVarRefFlow->CompOffMassFlow);
+            (partLoadRat * state.dataHVACVarRefFlow->CompOnMassFlow) + ((1 - partLoadRat) * state.dataHVACVarRefFlow->CompOffMassFlow);
         AverageOAMassFlow =
-            (PartLoadRatio * state.dataHVACVarRefFlow->OACompOnMassFlow) + ((1 - PartLoadRatio) * state.dataHVACVarRefFlow->OACompOffMassFlow);
+            (partLoadRat * state.dataHVACVarRefFlow->OACompOnMassFlow) + ((1 - partLoadRat) * state.dataHVACVarRefFlow->OACompOffMassFlow);
     } else {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SpeedNum == 0) {
             if (PartLoadRatio == 0.0) {
@@ -12629,6 +12634,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
     PartLoadRatio = 0.0;
     state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = 0.0;
     state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = 0.0;
+    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio = 0.0;
     VRFCond = this->VRFSysNum;
     IndexToTUInTUList = this->IndexToTUInTUList;
     auto &thisVRFCond = state.dataHVACVarRefFlow->VRF(VRFCond);
@@ -12800,7 +12806,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 
     // The coil will not operate at PLR=0 or PLR=1, calculate the operating part-load ratio
 
-    if ((VRFHeatingMode || HRHeatingMode) || (VRFCoolingMode || HRCoolingMode)) {
+    if ((VRFHeatingMode || HRHeatingMode) || ((VRFCoolingMode && DXCoolingCoilOprCtrl) || HRCoolingMode)) {
         auto f = [&state, VRFTUNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio](Real64 const PartLoadRatio) {
             Real64 QZnReqTemp = QZnReq;    // denominator representing zone load (W)
             Real64 ActualOutput;           // delivered capacity of VRF terminal unit
