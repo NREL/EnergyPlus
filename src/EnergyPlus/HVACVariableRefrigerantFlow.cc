@@ -4552,9 +4552,17 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         // set supplemental heating coil operation temperature limits
         if (thisVrfTU.SuppHeatingCoilPresent) {
             // Set maximum supply air temperature for supplemental heating coil
-            thisVrfTU.MaxSATFromSuppHeatCoil = rNumericArgs(11);
+            if (NumNums < 11) {
+                thisVrfTU.MaxSATFromSuppHeatCoil = DataSizing::AutoSize;
+            } else {
+                thisVrfTU.MaxSATFromSuppHeatCoil = rNumericArgs(11);
+            }
             // set maximum outdoor dry-bulb temperature for supplemental heating coil operation
-            thisVrfTU.MaxOATSuppHeatingCoil = rNumericArgs(12);
+            if (NumNums < 12) {
+                thisVrfTU.MaxOATSuppHeatingCoil = 21.0;
+            } else {
+                thisVrfTU.MaxOATSuppHeatingCoil = rNumericArgs(12);
+            }
         }
 
         // Add cooling coil to component sets array
