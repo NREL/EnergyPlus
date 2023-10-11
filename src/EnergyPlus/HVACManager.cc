@@ -247,7 +247,8 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
     }
-    
+    //LW to do check and test for the right position 
+    IndoorGreen::SimIndoorGreen(state); 
     InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
     ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
@@ -266,7 +267,6 @@ void ManageHVAC(EnergyPlusData &state)
 
 
     SimHVAC(state);
-    IndoorGreen::SimIndoorGreen(state);
     if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
         state.dataGlobal->RunOptCondEntTemp = true;
         while (state.dataGlobal->RunOptCondEntTemp) {
