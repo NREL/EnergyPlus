@@ -474,7 +474,7 @@ Current resource types are shown in the table below:
 
 % table 38
 \begin{longtable}[c]{@{}l@{}}
-	\caption{Table of Metered Resource Types---Fuels\label{table:table-of-metered-resource-types}} \tabularnewline
+	\caption{Table of Metered Resource Types---Fuels \label{table:table-of-metered-resource-types}} \tabularnewline
 	\toprule
 	Utility/Fuel Resource Types \tabularnewline
 	\midrule
@@ -535,13 +535,13 @@ Current resource types are shown in the table below:
 \end{longtable}
 	
 \begin{longtable}[c]{@{}l@{}}
-	\caption{Table of Metered Resource Types---Pollutants \label{table:table-of-metered-resource-types-pollutants}} \tabularnewline
+	\caption{Table of Metered Resource Types---Others \label{table:table-of-metered-resource-types-others}} \tabularnewline
 	\toprule
 	Pollutant Resource Types \tabularnewline
 	\midrule
 	\endfirsthead
 
-	\caption[]{Table of Metered Resource Types---Others \label{table:table-of-metered-resource-types-others}} \tabularnewline
+	\caption[]{Table of Metered Resource Types---Others} \tabularnewline
 	\toprule
 	Other Resource Types \tabularnewline
 	\midrule
@@ -701,24 +701,28 @@ Users will enter environmental impact factors for each Fuel Type or FuelFactor. 
 The energy is obtained internally from the following facility meters:
 
 \begin{longtable}[c]{@{}ll@{}}
-\toprule
-%Electricity:Facility & Diesel:Facility \tabularnewline
-%\midrule
-%\endfirsthead
-%
-%\toprule
-%Electricity:Facility & Diesel:Facility \tabularnewline
-%\midrule
-%\endhead
-%
-Electricity:Facility & Diesel:Facility \tabularnewline
-DistrictCooling:Facility & DistrictHeatingWater:Facility \tabularnewline
-NaturalGas:Facility & Gasoline:Facility \tabularnewline
-Coal:Facility & FuelOilNo1:Facility \tabularnewline
-FuelOilNo2:Facility & Propane:Facility \tabularnewline
-ElectricityProduced:Facility & DistrictHeatingSteam:Facility \tabularnewline
-OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
-\bottomrule
+	\caption{Facility Meters \label{table:facility-meters}} \tabularnewline
+	\toprule
+	%Electricity:Facility & Diesel:Facility \tabularnewline
+	Facility Meters & \tabularnewline
+	\midrule
+	\endfirsthead
+
+	\caption[]{Facility Meters} \tabularnewline
+	\toprule
+	%Electricity:Facility & Diesel:Facility \tabularnewline
+	Facility Meters & \tabularnewline
+	\midrule
+	\endhead
+
+	Electricity:Facility & Diesel:Facility \tabularnewline
+	DistrictCooling:Facility & DistrictHeatingWater:Facility \tabularnewline
+	NaturalGas:Facility & Gasoline:Facility \tabularnewline
+	Coal:Facility & FuelOilNo1:Facility \tabularnewline
+	FuelOilNo2:Facility & Propane:Facility \tabularnewline
+	ElectricityProduced:Facility & DistrictHeatingSteam:Facility \tabularnewline
+	OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
+	\bottomrule
 \end{longtable}
 
 For the pollutant calculation only the total off-site or purchased electric energy is calculated using Electricity Factors. Off-Site Electricity = Electricity:Facility - ElectricityProduced:Facility, pollutants for the fuel type used by the on-site generator will be calculated, for example Diesel, in these cases.
