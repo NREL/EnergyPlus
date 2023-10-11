@@ -702,7 +702,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             // now search equipment
             auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
             if (zoneEquipList.NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-                c->typeHVACname = zoneEquipList.EquipType(1);
+                c->typeHVACname = zoneEquipList.EquipTypeName(1);
                 c->userNameforHVACsystem = zoneEquipList.EquipName(1);
                 c->coilLocation = "Zone Equipment";
             } else if (zoneEquipList.NumOfEquipTypes > 1) {

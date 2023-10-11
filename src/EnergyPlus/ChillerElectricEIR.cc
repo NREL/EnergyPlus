@@ -1585,7 +1585,17 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
     // now do heat recovery flow rate sizing if active
     if (this->HeatRecActive) {
-        Real64 tempHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        Real64 tempHeatRecVolFlowRate;
+        if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+            tempHeatRecVolFlowRate = tmpCondVolFlowRate * this->HeatRecCapacityFraction;
+        } else {
+            if (this->EvapVolFlowRateWasAutoSized) {
+                tempHeatRecVolFlowRate = tmpEvapVolFlowRate;
+            } else {
+                tempHeatRecVolFlowRate = this->EvapVolFlowRate;
+            }
+            tempHeatRecVolFlowRate *= (1.0 + (1.0 / this->RefCOP)) * this->CompPowerToCondenserFrac * this->HeatRecCapacityFraction;
+        }
         if (this->DesignHeatRecVolFlowRateWasAutoSized) {
 
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
