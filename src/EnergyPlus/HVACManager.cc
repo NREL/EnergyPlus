@@ -103,6 +103,7 @@
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/IndoorGreen.hh>
 
 namespace EnergyPlus::HVACManager {
 
@@ -246,7 +247,7 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
     }
-
+    
     InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
     ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
@@ -263,8 +264,9 @@ void ManageHVAC(EnergyPlusData &state)
                                                                        state.dataHVACGlobal->UseZoneTimeStepHistory,
                                                                        PriorTimeStep);
 
-    SimHVAC(state);
 
+    SimHVAC(state);
+    IndoorGreen::SimIndoorGreen(state);
     if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
         state.dataGlobal->RunOptCondEntTemp = true;
         while (state.dataGlobal->RunOptCondEntTemp) {
