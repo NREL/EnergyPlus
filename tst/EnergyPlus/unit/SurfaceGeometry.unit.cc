@@ -55,10 +55,12 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
@@ -69,6 +71,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <algorithm>
 #include <iterator>
@@ -5788,6 +5791,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
     EXPECT_FALSE(ErrorsFound); // expect no errors
+    HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
+    HeatBalanceIntRadExchange::InitInteriorRadExchange(*state);
 
     ErrorsFound = false;
 
@@ -5841,6 +5846,77 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_EQ(state->dataHeatBal->space(1).HTSurfaceLast, Zone1Floor);
     EXPECT_EQ(state->dataHeatBal->space(2).HTSurfaceLast, Zone2Floor);
     EXPECT_EQ(state->dataHeatBal->space(3).HTSurfaceLast, Zone3Floor);
+
+    // Check MRT calculations
+    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(3);
+    state->dataZoneTempPredictorCorrector->spaceHeatBalance.allocate(3);
+    state->dataHeatBalSurf->SurfTempIn.allocate(7);
+    auto &zoneHB1 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(1);
+    auto &zoneHB2 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(2);
+    auto &zoneHB3 = state->dataZoneTempPredictorCorrector->zoneHeatBalance(3);
+    auto &spaceHB1 = state->dataZoneTempPredictorCorrector->spaceHeatBalance(1);
+    auto &spaceHB2 = state->dataZoneTempPredictorCorrector->spaceHeatBalance(2);
+    auto &spaceHB3 = state->dataZoneTempPredictorCorrector->spaceHeatBalance(3);
+    auto &encl1 = state->dataViewFactor->EnclRadInfo(1);
+    auto &encl2 = state->dataViewFactor->EnclRadInfo(2);
+
+    // Case 1 - all surfaces the same temperature
+    state->dataHeatBalSurf->SurfTempIn(Zone1Surface1) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone2Surface1) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone1Floor) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone2Floor) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone3Floor) = 10.0;
+
+    HeatBalanceSurfaceManager::CalculateZoneMRT(*state);
+    EXPECT_NEAR(zoneHB1.MRT, 10.0, 0.001);
+    EXPECT_NEAR(zoneHB2.MRT, 10.0, 0.001);
+    EXPECT_NEAR(zoneHB3.MRT, 10.0, 0.001);
+    EXPECT_NEAR(encl1.MRT, 10.0, 0.001);
+    EXPECT_NEAR(encl2.MRT, 10.0, 0.001);
+    EXPECT_EQ(spaceHB1.MRT, encl1.MRT);
+    EXPECT_EQ(spaceHB2.MRT, encl2.MRT);
+    EXPECT_EQ(spaceHB3.MRT, encl1.MRT);
+
+    // Case 2 - all surfaces in each zone same temperature
+    state->dataHeatBalSurf->SurfTempIn(Zone1Surface1) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone2Surface1) = 20.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone1Floor) = 10.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone2Floor) = 20.0;
+    state->dataHeatBalSurf->SurfTempIn(Zone3Floor) = 30.0;
+
+    HeatBalanceSurfaceManager::CalculateZoneMRT(*state);
+    EXPECT_NEAR(zoneHB1.MRT, 10.0, 0.001);
+    EXPECT_NEAR(zoneHB2.MRT, 20.0, 0.001);
+    EXPECT_NEAR(zoneHB3.MRT, 30.0, 0.001);
+    EXPECT_NEAR(encl1.MRT, 16.667, 0.001);
+    EXPECT_NEAR(encl2.MRT, 20.0, 0.001);
+    EXPECT_EQ(spaceHB1.MRT, encl1.MRT);
+    EXPECT_EQ(spaceHB2.MRT, encl2.MRT);
+    EXPECT_EQ(spaceHB3.MRT, encl1.MRT);
+
+    // Case 3 - surface AEs sum to zero - so revert to MATs
+    state->dataSurface->Surface(Zone1Surface1).Area = 0.0;
+    state->dataSurface->Surface(Zone2Surface1).Area = 0.0;
+    state->dataSurface->Surface(Zone1Floor).Area = 0.0;
+    state->dataSurface->Surface(Zone2Floor).Area = 0.0;
+    state->dataSurface->Surface(Zone3Floor).Area = 0.0;
+
+    spaceHB1.MAT = 15.0;
+    spaceHB2.MAT = 22.0;
+    spaceHB3.MAT = 28.0;
+    zoneHB1.MAT = 20.0;
+    zoneHB2.MAT = 25.0;
+    zoneHB3.MAT = 28.0;
+    state->dataHeatBalSurfMgr->CalculateZoneMRTfirstTime = true;
+    HeatBalanceSurfaceManager::CalculateZoneMRT(*state);
+    EXPECT_NEAR(zoneHB1.MRT, 20.0, 0.001);
+    EXPECT_NEAR(zoneHB2.MRT, 25.0, 0.001);
+    EXPECT_NEAR(zoneHB3.MRT, 28.0, 0.001);
+    EXPECT_NEAR(encl1.MRT, 21.5, 0.001);
+    EXPECT_NEAR(encl2.MRT, 22.0, 0.001);
+    EXPECT_EQ(spaceHB1.MRT, encl1.MRT);
+    EXPECT_EQ(spaceHB2.MRT, encl2.MRT);
+    EXPECT_EQ(spaceHB3.MRT, encl1.MRT);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries3)
