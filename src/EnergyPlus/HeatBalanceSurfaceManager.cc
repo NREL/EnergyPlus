@@ -5458,15 +5458,17 @@ void CalculateZoneMRT(EnergyPlusData &state,
         state.dataHeatBalSurfMgr->ZoneAESum.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBalSurfMgr->SurfaceAE = 0.0;
         state.dataHeatBalSurfMgr->ZoneAESum = 0.0;
+        for (auto &encl : state.dataViewFactor->EnclRadInfo) {
+            encl.sumAE = 0.0;
+        }
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             auto const &surface = state.dataSurface->Surface(SurfNum);
             if (surface.HeatTransSurf) {
-                state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) =
-                    surface.Area * state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal;
+                auto &thisSurfAE = state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
+                thisSurfAE = surface.Area * state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal;
                 int ZoneNum = surface.Zone;
-                if (ZoneNum > 0) state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
-                if (surface.RadEnclIndex > 0)
-                    state.dataViewFactor->EnclRadInfo(surface.RadEnclIndex).sumAE += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
+                if (ZoneNum > 0) state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) += thisSurfAE;
+                if (surface.RadEnclIndex > 0) state.dataViewFactor->EnclRadInfo(surface.RadEnclIndex).sumAE += thisSurfAE;
             }
         }
     }
@@ -5528,9 +5530,10 @@ void CalculateZoneMRT(EnergyPlusData &state,
             Real64 sumMAT = 0.0;
             for (auto &spaceNum : thisEnclosure.spaceNums) {
                 Real64 spaceVolume = state.dataHeatBal->space(spaceNum).Volume;
+                Real64 spaceMAT = state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
                 sumVol += spaceVolume;
-                sumMATVol += state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT * spaceVolume;
-                sumMAT += state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT;
+                sumMATVol += spaceMAT * spaceVolume;
+                sumMAT += spaceMAT;
             }
             if (sumVol > 0.01) {
                 thisEnclosure.MRT = sumMATVol / sumVol;
