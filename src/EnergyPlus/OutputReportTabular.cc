@@ -7838,7 +7838,7 @@ void WriteBEPSTable(EnergyPlusData &state)
             kConversionFactor = 1.0;
             waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
             areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-            ipElectricityConversionFactor = largeConversionFactor;
+            ipElectricityConversionFactor = largeConversionFactor * (1000 * 3600);
         } break;
         default: {
             largeConversionFactor = 1000000000.0;
@@ -9864,7 +9864,7 @@ void WriteSourceEnergyEndUseSummary(EnergyPlusData &state)
         case UnitsStyle::InchPoundExceptElectricity: {
             largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
             areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-            ipElectricityConversionFactor = largeConversionFactor;
+            ipElectricityConversionFactor = largeConversionFactor * (1000*3600);
         } break;
         default: {
             largeConversionFactor = 1000000.0; // to MJ
