@@ -65,6 +65,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/api/datatransfer.h>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -106,10 +107,12 @@ namespace IndoorGreen {
             }
             state.dataIndoorGreen->getInputFlag = false;
         }
-        InitIndoorGreen(state);
+        if (state.dataIndoorGreen->NumIndoorGreen > 0) {
+            InitIndoorGreen(state);
 
-        // Simulate evapotranspiration from indoor greenery systems
-        ETModel(state);
+            // Simulate evapotranspiration from indoor greenery systems
+            ETModel(state);
+        } 
     }
 
     void GetIndoorGreenInput(EnergyPlusData &state, bool &ErrorsFound)
@@ -134,12 +137,12 @@ namespace IndoorGreen {
         static constexpr std::string_view RoutineName("GetIndoorGreenInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string cAlphaFieldNames;
-        Array1D_string cNumericFieldNames;
-        Array1D_bool lNumericFieldBlanks;
-        Array1D_bool lAlphaFieldBlanks;
-        Array1D_string cAlphaArgs;
-        Array1D<Real64> rNumericArgs;
+        //Array1D_string cAlphaFieldNames;
+        //Array1D_string cNumericFieldNames;
+        //Array1D_bool lNumericFieldBlanks;
+        //Array1D_bool lAlphaFieldBlanks;
+        //Array1D_string cAlphaArgs;
+        //Array1D<Real64> rNumericArgs;
         const std::string cCurrentModuleObject = "IndoorGreen";
        
                 
@@ -157,39 +160,55 @@ namespace IndoorGreen {
             state.dataIndoorGreen->indoorgreens.allocate(
                 state.dataIndoorGreen->NumIndoorGreen); // Allocate the IndoorGreen input data array
 
-        // Input the data for each Setpoint Manager
+        // Input the data for each Indoor Greenery System
         for (IndoorGreenNum = 1; IndoorGreenNum <= state.dataIndoorGreen->NumIndoorGreen; ++IndoorGreenNum) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      cCurrentModuleObject,
                                                                      IndoorGreenNum,
-                                                                     cAlphaArgs,
+                                                                     state.dataIPShortCut->cAlphaArgs,
                                                                      NumAlphas,
-                                                                     rNumericArgs,
+                                                                     state.dataIPShortCut->rNumericArgs,
                                                                      NumNums,
                                                                      IOStat,
-                                                                     lNumericFieldBlanks,
-                                                                     lAlphaFieldBlanks,
-                                                                     cAlphaFieldNames,
-                                                                     cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName = cAlphaArgs(1);
+                                                                     state.dataIPShortCut->lNumericFieldBlanks,
+                                                                     state.dataIPShortCut->lAlphaFieldBlanks,
+                                                                     state.dataIPShortCut->cAlphaFieldNames,
+                                                                     state.dataIPShortCut->cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).IndoorGreenName = state.dataIPShortCut->cAlphaArgs(1);
             // LW to do space, space list
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneName = cAlphaArgs(2);
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneName = state.dataIPShortCut->cAlphaArgs(2);
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr =
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->Zone);
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneListPtr =
-                UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->ZoneList);
-            if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr <= 0 ||
+                UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataHeatBal->ZoneList);
+            if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr <= 0 &&
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZoneListPtr <= 0) {
-                ShowSevereError(state, format("{}=\"{}\", invalid {} entered={}", RoutineName, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2)));
+                ShowSevereError(
+                    state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(2),
+                                       state.dataIPShortCut->cAlphaArgs(2)));
                 ErrorsFound = true;
             }
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedPtr = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3));
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedPtr =
+                ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
             if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedPtr == 0) {
-                if (lAlphaFieldBlanks(3)) {
-                    ShowSevereError(state, format("{} =\"{}\", {} is required.", RoutineName, cAlphaArgs(1), cAlphaFieldNames(3)));
+                if (state.dataIPShortCut->lAlphaFieldBlanks(3)) {
+                    ShowSevereError(state,
+                                    format("{} =\"{}\", {} is required.",
+                                           RoutineName,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(3)));
                 } else {
                     ShowSevereError(state,
-                                    format("{} =\"{}\", invalid {} entered={}", RoutineName, cAlphaArgs(1), cAlphaFieldNames(3), cAlphaArgs(3)));
+                                    format("{} =\"{}\", invalid {} entered={}",
+                                           RoutineName,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(3),
+                                           state.dataIPShortCut->cAlphaArgs(3)));
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
@@ -197,41 +216,63 @@ namespace IndoorGreen {
                 SchMax = ScheduleManager::GetScheduleMaxValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
-                        ShowSevereError(state, format("{}=\"{}\", {}, minimum is < 0.0", RoutineName, cAlphaArgs(1), cAlphaFieldNames(3)));
-                        ShowContinueError(state, format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMin));
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", {}, minimum is < 0.0",
+                                               RoutineName,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(3)));
+                        ShowContinueError(
+                            state,
+                            format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                     if (SchMax < 0.0) {
-                        ShowSevereError(state, format("{}=\"{}\", {}, maximum is < 0.0", RoutineName, cAlphaArgs(1), cAlphaFieldNames(3)));
-                        ShowContinueError(state, format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", cAlphaArgs(3), SchMin));
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", {}, maximum is < 0.0",
+                                               RoutineName,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(3)));
+                        ShowContinueError(
+                            state,
+                            format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
                         ErrorsFound = true;
                     }
                 }
             }
             state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 1; // default
-            if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(cAlphaArgs(4)), "PENMAN-MONTEITH")) {
+            if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "PENMAN-MONTEITH")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 1; // default
-            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(cAlphaArgs(4)), "STANGHELLINI")) {
+            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "STANGHELLINI")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 2;
-            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(cAlphaArgs(4)), "DATAD-RIVEN")) {
+            } else if (UtilityRoutines::SameString(UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "DATAD-RIVEN")) {
                 state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ETCalculationMethod = 3;
             } else {
-                ShowSevereError(state, format("{}=\"{}\", invalid {} entered={}", RoutineName, cAlphaArgs(1), cAlphaFieldNames(4), cAlphaArgs(4)));
+                ShowSevereError(
+                    state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cAlphaFieldNames(4),
+                                       state.dataIPShortCut->cAlphaArgs(4)));
                 ErrorsFound = true;
             }
-            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea = rNumericArgs(1);
+            state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea = state.dataIPShortCut->rNumericArgs(1);
             if (state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea <= 0) {
                 ShowSevereError(state,
-                                format("{}=\"{}\", invalid {} entered={}", RoutineName, cAlphaArgs(1), cNumericFieldNames(1), rNumericArgs(1)));
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1),
+                                       state.dataIPShortCut->rNumericArgs(1)));
                 ErrorsFound = true;
             }
         }
-        cAlphaFieldNames.deallocate();
-        cAlphaArgs.deallocate();
-        lAlphaFieldBlanks.deallocate();
-        cNumericFieldNames.deallocate();
-        rNumericArgs.deallocate();
-        lNumericFieldBlanks.deallocate();
+        state.dataIPShortCut->cAlphaFieldNames.deallocate();
+        state.dataIPShortCut->cAlphaArgs.deallocate();
+        state.dataIPShortCut->lAlphaFieldBlanks.deallocate();
+        state.dataIPShortCut->cNumericFieldNames.deallocate();
+        state.dataIPShortCut->rNumericArgs.deallocate();
+        state.dataIPShortCut->lNumericFieldBlanks.deallocate();
         // Set up output variables
         for (IndoorGreenNum = 1; IndoorGreenNum <= state.dataIndoorGreen->NumIndoorGreen; ++IndoorGreenNum) {
             SetupOutputVariable(state,
@@ -306,8 +347,8 @@ namespace IndoorGreen {
             Real64 ZoneAirVol;     // zone air volume (m3)
             // Method for ET calculation: Penman-Monteith=1, Stanghellini=2, Data-driven=3
             for (IndoorGreenNum = 1; IndoorGreenNum <= state.dataIndoorGreen->NumIndoorGreen; ++IndoorGreenNum) {
-                ZonePreTemp = state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr).ZoneMeasuredTemperature;
-                ZonePreHum = state.dataHeatBal->Zone(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr).ZoneMeasuredHumidityRatio;
+                ZonePreTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr).ZT;
+                ZonePreHum = state.dataZoneTempPredictorCorrector->zoneHeatBalance(state.dataIndoorGreen->indoorgreens(IndoorGreenNum).ZonePtr).airHumRat;
                 // LW to do 
                 ZoneCO2 = 400;  
                 ZonePPFD= 100.0;  
@@ -322,7 +363,7 @@ namespace IndoorGreen {
                 } 
 
                 //adding ET effects 
-                Timestep = state.dataGlobal->TimeStepZone * 3600; // unit s
+                Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
                 ETTotal = ETRate * Timestep * state.dataIndoorGreen->indoorgreens(IndoorGreenNum).LeafArea *
                            ScheduleManager::GetCurrentScheduleValue(state, state.dataIndoorGreen->indoorgreens(IndoorGreenNum).SchedPtr) / 1000 /
                            1000;

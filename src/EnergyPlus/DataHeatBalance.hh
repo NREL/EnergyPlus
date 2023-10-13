@@ -414,7 +414,7 @@ namespace DataHeatBalance {
         "Coil:Heating:DX:MultiSpeed",
         "ElectricLoadCenter:Storage:Converter",
         "Fan:SystemModel",
-        "INDOOR GREEN"};
+        "Indoor Green"};
 
     // Parameters for checking surface heat transfer models
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
