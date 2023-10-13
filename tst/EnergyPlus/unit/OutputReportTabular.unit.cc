@@ -7183,10 +7183,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->SysSizInput(1).AirLoopNum = 1;
     state->dataSize->SysSizInput(1).SizingOption = DataSizing::NonCoincident;
-    auto degC_to_F = [](Real64 celsius) constexpr
-    {
-        return celsius * (9.0 / 5.0) + 32.0;
-    };
+    auto degC_to_F = [](Real64 celsius) constexpr { return celsius * (9.0 / 5.0) + 32.0; };
     constexpr Real64 coolMixTempSys = 26.2;
     constexpr Real64 coolMixTempSysIP = degC_to_F(coolMixTempSys);
     constexpr Real64 heatMixTempSys = -1.7;
@@ -13041,5 +13038,189 @@ TEST_F(SQLiteFixture, OutputReportTabular_DistrictHeating)
                           "  AND RowName = 'Exterior Equipment:General'");
         Real64 return_val = execAndReturnFirstDouble(query);
         EXPECT_NEAR(DistrictHeatingSteam * 2 / 3.6e6, return_val, 0.01) << "Failed for query: " << query;
+    }
+}
+
+TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummaryperArea_IPExceptElec)
+{
+    state->dataSQLiteProcedures->sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    state->dataOutRptTab->displaySourceEnergyEndUseSummary = true;
+
+    // DetermineBuildingFloorArea
+
+    state->dataEnvrn->Latitude = 12.3;
+    state->dataEnvrn->Longitude = 45.6;
+
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+
+    // walls
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
+
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
+
+    // windows
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
+
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
+
+    // Loads
+    state->dataHeatBal->TotLights = 3;
+    state->dataHeatBal->Lights.allocate(state->dataHeatBal->TotLights);
+
+    state->dataHeatBal->TotPeople = 3;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+
+    state->dataHeatBal->TotElecEquip = 3;
+    state->dataHeatBal->ZoneElectric.allocate(state->dataHeatBal->TotElecEquip);
+
+    state->dataHeatBal->Lights(1).ZonePtr = 1;
+    state->dataHeatBal->Lights(1).DesignLevel = 1000.0;
+    state->dataHeatBal->Lights(2).ZonePtr = 2;
+    state->dataHeatBal->Lights(2).DesignLevel = 100.0;
+    state->dataHeatBal->Lights(3).ZonePtr = 3;
+    state->dataHeatBal->Lights(3).DesignLevel = 10.0;
+
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 10.0;
+    state->dataHeatBal->People(2).ZonePtr = 2;
+    state->dataHeatBal->People(2).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(3).ZonePtr = 3;
+    state->dataHeatBal->People(3).NumberOfPeople = 1.0;
+
+    state->dataHeatBal->ZoneElectric(1).ZonePtr = 1;
+    state->dataHeatBal->ZoneElectric(1).DesignLevel = 500.0;
+    state->dataHeatBal->ZoneElectric(2).ZonePtr = 2;
+    state->dataHeatBal->ZoneElectric(2).DesignLevel = 50.0;
+    state->dataHeatBal->ZoneElectric(3).ZonePtr = 3;
+    state->dataHeatBal->ZoneElectric(3).DesignLevel = 5.0;
+
+    // zone
+    state->dataGlobal->NumOfZones = 3;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(1).Multiplier = 1.;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(1).FloorArea = 1000.;
+    state->dataHeatBal->Zone(1).Volume = 2000.;
+    state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
+    state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
+
+    state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
+    state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
+    state->dataHeatBal->Zone(2).isPartOfTotalArea = true;
+    state->dataHeatBal->Zone(2).Multiplier = 1.;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(2).FloorArea = 100.;
+    state->dataHeatBal->Zone(2).Volume = 200.;
+    state->dataHeatBal->Zone(2).ExtGrossWallArea = 80.;
+    state->dataHeatBal->Zone(2).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(2).ExtWindowArea = 0.0;
+
+    state->dataHeatBal->Zone(3).Name = "NOT PartofTot Conditioned Zone";
+    state->dataHeatBal->Zone(3).SystemZoneNodeNumber = 1; // Conditioned
+    state->dataHeatBal->Zone(3).isPartOfTotalArea = false;
+    state->dataHeatBal->Zone(3).Multiplier = 1.;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.;
+    state->dataHeatBal->Zone(3).FloorArea = 10.;
+    state->dataHeatBal->Zone(3).Volume = 20.;
+    state->dataHeatBal->Zone(3).ExtGrossWallArea = 8.;
+    state->dataHeatBal->Zone(3).ExteriorTotalGroundSurfArea = 0;
+    state->dataHeatBal->Zone(3).ExtWindowArea = 0.0;
+
+    // 2023-10-13: Need a set up unit conversion first:
+    OutputReportTabular::SetupUnitConversions(*state);
+
+    // Gross areas
+    Real64 expectedBuildingGrossFloorArea = (state->dataHeatBal->Zone(1).FloorArea + state->dataHeatBal->Zone(2).FloorArea);
+    // Conditioned areas
+    Real64 expectedBuildingConditionedFloorArea = state->dataHeatBal->Zone(1).FloorArea;
+
+    // Assume heating electricity usage with a value of 3.6e6 * 1e4 J =10000 kWh that comes for a single end use
+    // state->dataGlobalConst->iEndUse.at(Constant::EndUse::Heating)=1
+    state->dataOutRptTab->gatherEndUseBySourceBEPS(1, static_cast<int>(Constant::EndUse::Heating) + 1) = 3.6e10; // J
+    state->dataOutRptTab->gatherTotalsBySourceBEPS(1) = 3.6e10;                                                  // J
+    Real64 eleckWh = 1e4;                                                                                        // kWh
+
+    state->dataOutRptTab->unitsStyle = OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
+
+    state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
+
+    // Call Source Energy End Use Summary writing function
+    OutputReportTabular::WriteSourceEnergyEndUseSummary(*state);
+
+    // Check that DetermineBuildingFloorArea is converted correctly (called from WriteSourceEnergyEndUseSummary)
+    EXPECT_EQ(expectedBuildingGrossFloorArea, state->dataOutRptTab->buildingGrossFloorArea);
+    EXPECT_EQ(expectedBuildingConditionedFloorArea, state->dataOutRptTab->buildingConditionedFloorArea);
+
+    // Now test the reporting text:
+    // We consistently test in the same report (three different tables) and at the same column for fuel = Elec
+    const std::string reportName = "SourceEnergyEndUseComponentsSummary";
+    const std::string columnName = "Source Electricity";
+
+    // Test for Heating and Total, and they should be the same for this case
+    std::vector<std::string> testRowNames = {"Heating", "Total Source Energy End Use Components"};
+
+    // TableName, value
+    std::vector<std::tuple<std::string, Real64>> results({
+        {"Source Energy End Use Components Summary", eleckWh},
+        {"Source Energy End Use Components Per Conditioned Floor Area", 10000.0 / (expectedBuildingConditionedFloorArea / (0.3048 * 0.3048))},
+        {"Source Energy End Use Components Per Total Floor Area", 10000.0 / (expectedBuildingGrossFloorArea / (0.3048 * 0.3048))},
+    });
+
+    // Test that the reported values are successfully matching kWh/ft2 values (kWh Electricity with InchPound others)
+    for (auto &v : results) {
+
+        std::string tableName = std::get<0>(v);
+        Real64 expectedValue = std::get<1>(v);
+
+        for (auto &rowName : testRowNames) {
+            std::string query("SELECT Value From TabularDataWithStrings"
+                              "  WHERE ReportName = '" +
+                              reportName +
+                              "'"
+                              "  AND TableName = '" +
+                              tableName +
+                              "'"
+                              "  AND RowName = '" +
+                              rowName + "'" + "  AND ColumnName = '" + columnName + "'");
+
+            Real64 return_val = execAndReturnFirstDouble(query);
+
+            // Add informative message if failed
+            EXPECT_NEAR(expectedValue, return_val, 0.01) << "Failed for TableName=" << tableName << "; RowName=" << rowName;
+        }
     }
 }
